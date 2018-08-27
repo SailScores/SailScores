@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SailScores.Web.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class SailScoresIdentityContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public SailScoresIdentityContext(DbContextOptions<SailScoresIdentityContext> options)
             : base(options)
         {
         }
