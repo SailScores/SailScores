@@ -3,13 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Web", "SailScores.Web\SailScores.Web.csproj", "{CCB61BF0-232B-4201-969E-F9550C942583}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Web", "SailScores.Web\SailScores.Web.csproj", "{CCB61BF0-232B-4201-969E-F9550C942583}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Database", "SailScores.Database\SailScores.Database.csproj", "{77DEFDEA-9D44-4D1F-892C-203308F2FA7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Database", "SailScores.Database\SailScores.Database.csproj", "{77DEFDEA-9D44-4D1F-892C-203308F2FA7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Core", "SailScores.Core\SailScores.Core.csproj", "{6F63462D-8914-48A5-9390-5CEC7DC5146B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Core", "SailScores.Core\SailScores.Core.csproj", "{6F63462D-8914-48A5-9390-5CEC7DC5146B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Identity", "SailScores.Identity\SailScores.Identity.csproj", "{C96267CF-4D91-4B81-AE7A-67A29F7B9563}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Identity", "SailScores.Identity\SailScores.Identity.csproj", "{C96267CF-4D91-4B81-AE7A-67A29F7B9563}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Test.Integration", "SailScores.Test.Integration\SailScores.Test.Integration.csproj", "{8A4BE8F6-DF52-4997-99B9-85E0AE0FF486}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CCB61BF0-232B-4201-969E-F9550C942583} = {CCB61BF0-232B-4201-969E-F9550C942583}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +38,10 @@ Global
 		{C96267CF-4D91-4B81-AE7A-67A29F7B9563}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C96267CF-4D91-4B81-AE7A-67A29F7B9563}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C96267CF-4D91-4B81-AE7A-67A29F7B9563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A4BE8F6-DF52-4997-99B9-85E0AE0FF486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A4BE8F6-DF52-4997-99B9-85E0AE0FF486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A4BE8F6-DF52-4997-99B9-85E0AE0FF486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A4BE8F6-DF52-4997-99B9-85E0AE0FF486}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
