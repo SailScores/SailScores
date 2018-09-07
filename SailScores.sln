@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Web", "SailScores.Web\SailScores.Web.csproj", "{CCB61BF0-232B-4201-969E-F9550C942583}"
+	ProjectSection(ProjectDependencies) = postProject
+		{77DEFDEA-9D44-4D1F-892C-203308F2FA7C} = {77DEFDEA-9D44-4D1F-892C-203308F2FA7C}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Database", "SailScores.Database\SailScores.Database.csproj", "{77DEFDEA-9D44-4D1F-892C-203308F2FA7C}"
 EndProject
@@ -11,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Core", "SailScor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Identity", "SailScores.Identity\SailScores.Identity.csproj", "{C96267CF-4D91-4B81-AE7A-67A29F7B9563}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Test.Integration", "SailScores.Test.Integration\SailScores.Test.Integration.csproj", "{8A4BE8F6-DF52-4997-99B9-85E0AE0FF486}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Test.Integration", "SailScores.Test.Integration\SailScores.Test.Integration.csproj", "{8A4BE8F6-DF52-4997-99B9-85E0AE0FF486}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CCB61BF0-232B-4201-969E-F9550C942583} = {CCB61BF0-232B-4201-969E-F9550C942583}
 	EndProjectSection

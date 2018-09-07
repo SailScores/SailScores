@@ -48,6 +48,10 @@ namespace SailScores.Web
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<SailScoresIdentityContext>();
 
+            services.AddDbContext<SailScores.Database.SailscoresContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

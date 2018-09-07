@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SailScores.Core.Interfaces
+namespace SailScores.Database
 {
     public interface ISailScoresContext {
     }

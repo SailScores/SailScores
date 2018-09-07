@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SailScores.Database\SailScores.Database.csproj" />
     <ProjectReference Include="..\SailScores.Identity\SailScores.Identity.csproj" />
   </ItemGroup>
 
