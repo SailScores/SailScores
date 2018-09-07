@@ -8,7 +8,7 @@ using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
-    [DbContext(typeof(SailscoresContext))]
+    [DbContext(typeof(SailScoresContext))]
     partial class SailscoresContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -13,6 +13,8 @@ using SailScores.Web.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using SailScores.Core.Services;
+using SailScores.Database;
 
 namespace SailScores.Web
 {
@@ -48,11 +50,19 @@ namespace SailScores.Web
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<SailScoresIdentityContext>();
 
-            services.AddDbContext<SailScores.Database.SailscoresContext>(options =>
+            services.AddDbContext<SailScoresContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            RegisterSailScoresServices(services);
+        }
+
+        private void RegisterSailScoresServices(IServiceCollection services)
+        {
+            services.AddScoped<IClubService, ClubService>();
+            services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

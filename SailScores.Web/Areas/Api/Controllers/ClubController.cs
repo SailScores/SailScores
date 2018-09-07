@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Services;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -12,11 +13,18 @@ namespace SailScores.Web.Areas.Api.Controllers
     [ApiController]
     public class ClubController : ControllerBase
     {
+        private readonly IClubService _clubService;
+
+        public ClubController(IClubService clubService)
+        {
+            _clubService = clubService;
+        }
+
         // GET: api/Club
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "Club1", "Club2" };
+            return _clubService.GetClubs();
         }
 
         [Authorize]

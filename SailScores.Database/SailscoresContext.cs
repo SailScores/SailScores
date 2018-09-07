@@ -6,7 +6,7 @@ using SailScores.Database.Entities;
 
 namespace SailScores.Database
 {
-    public class SailscoresContext : DbContext, ISailScoresContext
+    public class SailScoresContext : DbContext, ISailScoresContext
     {
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Fleet> Fleets { get; set; }
@@ -23,8 +23,8 @@ namespace SailScores.Database
         public DbSet<File> Files { get; set; }
 
 
-        public SailscoresContext(
-            DbContextOptions<SailscoresContext> options)
+        public SailScoresContext(
+            DbContextOptions<SailScoresContext> options)
             : base(options)
         {
         }

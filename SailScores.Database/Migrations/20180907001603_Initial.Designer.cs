@@ -9,7 +9,7 @@ using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
-    [DbContext(typeof(SailscoresContext))]
+    [DbContext(typeof(SailScoresContext))]
     [Migration("20180907001603_Initial")]
     partial class Initial
     {
