@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SailScores.Core.Services
 {
     public interface IClubService
     {
-        IEnumerable<string> GetClubs();
+        Task<IList<Model.Club>> GetClubs();
     }
 }

@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using SailScores.Core.Services;
 using SailScores.Database;
+using AutoMapper;
 
 namespace SailScores.Web
 {
@@ -55,6 +56,7 @@ namespace SailScores.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAutoMapper();
 
             RegisterSailScoresServices(services);
         }

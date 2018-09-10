@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Services;
+using Model = SailScores.Core.Model;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -22,15 +23,15 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         // GET: api/Club
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<Model.Club>> Get()
         {
-            return _clubService.GetClubs();
+            return await _clubService.GetClubs();
         }
 
         [Authorize]
         // GET: api/Club/5
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public string Get(string id)
         {
             return "Club" + id;
         }
