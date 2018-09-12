@@ -38,7 +38,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         /// <param name="identifier">Initials or Guid for Club</param>
         /// <returns>Model.Club</returns>
         // GET: api/Club/5
-        [HttpGet("{identifier}", Name = "Get")]
+        [HttpGet("{identifier}")]
         public async Task<Model.Club> Get([FromRoute] string identifier)
         {
             return await _clubService.GetFullClub(identifier);
