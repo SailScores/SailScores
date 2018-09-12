@@ -21,6 +21,10 @@ namespace SailScores.Web.Areas.Api.Controllers
             _clubService = clubService;
         }
 
+        /// <summary>
+        /// Get summary list of clubs: some properties may be empty.
+        /// </summary>
+        /// <returns>Array of Model.Club</returns>
         // GET: api/Club
         [HttpGet]
         public async Task<IEnumerable<Model.Club>> Get()
@@ -28,11 +32,16 @@ namespace SailScores.Web.Areas.Api.Controllers
             return await _clubService.GetClubs(false);
         }
 
+        /// <summary>
+        /// Retrieve details for a single club
+        /// </summary>
+        /// <param name="identifier">Initials or Guid for Club</param>
+        /// <returns>Model.Club</returns>
         // GET: api/Club/5
-        [HttpGet("{id}", Name = "Get")]
-        public async Task<Model.Club> Get(string id)
+        [HttpGet("{identifier}", Name = "Get")]
+        public async Task<Model.Club> Get([FromRoute] string identifier)
         {
-            return await _clubService.GetFullClub(id);
+            return await _clubService.GetFullClub(identifier);
         }
 
         [Authorize]
@@ -42,15 +51,10 @@ namespace SailScores.Web.Areas.Api.Controllers
         {
         }
 
+        [Authorize]
         // PUT: api/Club/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
         {
         }
     }
