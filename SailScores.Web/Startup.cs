@@ -45,11 +45,32 @@ namespace SailScores.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+
             services.AddDbContext<SailScoresIdentityContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<SailScoresIdentityContext>();
+            // Make sure API calls that require auth return 401, not redirect on auth failure.
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = new PathString("/Account/Login");
+                options.LogoutPath = new PathString("/Account/Logout");
+
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api")
+                        && context.Response.StatusCode == StatusCodes.Status200OK)
+                    {
+                        context.Response.Clear();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.RedirectUri);
+                    return Task.CompletedTask;
+                };
+            });
 
             services.AddDbContext<SailScoresContext>(options =>
                 options.UseSqlServer(
@@ -59,6 +80,8 @@ namespace SailScores.Web
             services.AddAutoMapper();
 
             RegisterSailScoresServices(services);
+
+
         }
 
         private void RegisterSailScoresServices(IServiceCollection services)
