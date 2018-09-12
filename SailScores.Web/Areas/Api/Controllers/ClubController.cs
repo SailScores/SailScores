@@ -25,17 +25,17 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<Model.Club>> Get()
         {
-            return await _clubService.GetClubs();
+            return await _clubService.GetClubs(false);
+        }
+
+        // GET: api/Club/5
+        [HttpGet("{id}", Name = "Get")]
+        public async Task<Model.Club> Get(string id)
+        {
+            return await _clubService.GetFullClub(id);
         }
 
         [Authorize]
-        // GET: api/Club/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(string id)
-        {
-            return "Club" + id;
-        }
-
         // POST: api/Club
         [HttpPost]
         public void Post([FromBody] string value)

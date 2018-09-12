@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
+using System.Linq;
+using SailScores.Core.Model;
 
 namespace SailScores.Core.Services
 {
@@ -22,13 +24,38 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IList<Model.Club>> GetClubs()
+        public async Task<IList<Model.Club>> GetClubs(bool includeHidden)
         {
-            var returnList = await _dbContext
+            var dbObjects = await _dbContext
                 .Clubs
-                .ProjectTo<Model.Club>(_mapper.ConfigurationProvider)
+                .Where(c => includeHidden || !c.IsHidden)
                 .ToListAsync();
-            return returnList;
+            return _mapper.Map<List<Model.Club>>(dbObjects);
+            //    .ProjectTo<Model.Club>(_mapper.ConfigurationProvider)
+            //    .ToListAsync();
+            //return returnList;
+        }
+
+        public async Task<Model.Club> GetFullClub(string id)
+        {
+            Guid potentialClubId;
+            Club club;
+            if(Guid.TryParse(id, out potentialClubId)){
+                club = await _dbContext
+                    .Clubs
+                    .Where(c => c.Id == potentialClubId)
+                    .ProjectTo<Model.Club>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync();
+            } else
+            {
+                club = await _dbContext
+                    .Clubs
+                    .Where(c => c.Initials == id)
+                    .ProjectTo<Model.Club>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync();
+            }
+
+            return club;
         }
     }
 }
