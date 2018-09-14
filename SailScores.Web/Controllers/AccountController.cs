@@ -14,6 +14,9 @@ using SailScores.Web.Models.AccountViewModels;
 
 namespace SailScores.Web.Controllers
 {
+    // this keeps the controller out of swagger.
+    //TODO: include specific endpoints for auth.
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Authorize]
     [Route("[controller]/[action]")]
     public class AccountController : Controller
