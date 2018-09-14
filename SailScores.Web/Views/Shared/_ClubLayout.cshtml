@@ -1,0 +1,77 @@
+﻿@using Microsoft.AspNetCore.Routing
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <link rel="apple-touch-icon" sizes="57x57" href="~/images/favicon/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="~/images/favicon/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="~/images/favicon/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="~/images/favicon/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="~/images/favicon/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="~/images/favicon/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="~/images/favicon/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="~/images/favicon/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="~/images/favicon/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="~/images/favicon/favicon-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="~/images/favicon/favicon-160x160.png" sizes="160x160">
+    <link rel="icon" type="image/png" href="~/images/favicon/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="~/images/favicon/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="~/images/favicon/favicon-32x32.png" sizes="32x32">
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="msapplication-TileImage" content="~/images/favicon/mstile-144x144.png">
+    <title>@ViewData["Title"]</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/vendor/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <header class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a asp-area="" asp-controller="Club" asp-action="Index"
+           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]"
+           class="navbar-brand">@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()</a>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a asp-area="" asp-controller="Series" asp-action="Index" asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]" class="nav-link">Series</a></li>
+                <li class="nav-item"><a asp-area="" asp-controller="Race" asp-action="Index" asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]" class="nav-link">Races</a></li>
+            </ul>
+            <ul class="navbar-nav navbar-right">
+                <li class="nav-item"><a href="~/" class="nav-link">Sailscores.com</a></li>
+            </ul>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+    </header>
+    <div class="container-fluid body-content">
+        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <environment include="Development">
+        <script src="~/vendor/jquery/jquery.js"></script>
+        <script src="~/vendor/popper.js/umd/popper.js"></script>
+        <script src="~/vendor/bootstrap/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
