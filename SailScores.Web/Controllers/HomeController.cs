@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Sailscores.Web.Models.Sailscores;
+using SailScores.Web.Models.SailScores;
 using SailScores.Core.Services;
 using SailScores.Web.Models;
 

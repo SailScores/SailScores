@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SailScores.Database
 {
-    public interface ISailScoresContext {
+    public interface ISailScoresContext : IDisposable {
         DbSet<Club> Clubs { get; set; }
     }
 }

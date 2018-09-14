@@ -16,6 +16,9 @@ using Swashbuckle.AspNetCore.Swagger;
 using SailScores.Core.Services;
 using SailScores.Database;
 using AutoMapper;
+using SailScores.Web;
+using Microsoft.Extensions.Caching.Memory;
+using SailScores.Web.Services;
 
 namespace SailScores.Web
 {
@@ -35,7 +38,7 @@ namespace SailScores.Web
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Sailscores API", Version = "v1" });
+                c.SwaggerDoc("v1", new Info { Title = "SailScores API", Version = "v1" });
                 c.IncludeXmlComments(string.Format(@"{0}\SailScores.Web.xml",
                      System.AppDomain.CurrentDomain.BaseDirectory));
             });
@@ -54,6 +57,8 @@ namespace SailScores.Web
 
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<SailScoresIdentityContext>();
+
+            services.AddTransient<IEmailSender, EmailSender>();
             // Make sure API calls that require auth return 401, not redirect on auth failure.
             services.ConfigureApplicationCookie(options =>
             {
@@ -128,6 +133,28 @@ namespace SailScores.Web
                 routes.MapRoute(
                     name: "areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                routes.MapRoute(
+                    name: "ClubRoute",
+                    template: "{clubInitials}/{controller}/{action}",
+                    defaults: new { controller = "Club", action = "Index" },
+                    constraints: new
+                    {
+                        clubInitials = new ClubRouteConstraint(() =>
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
+                        )
+                    });
+                routes.MapRoute(
+                    name: "Series",
+                    template: "{clubInitials}/{season}/{seriesName}",
+                    defaults: new { controller = "Series", action = "Details" },
+                    constraints: new
+                    {
+                        clubInitials = new ClubRouteConstraint(() =>
+                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
+                        )
+                    });
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
