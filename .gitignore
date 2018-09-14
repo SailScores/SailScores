@@ -260,3 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 SailScores\.Web/SailScores\.Web\.xml
+
+SailScores\.Web/bower_components/
+SailScores\.Web/wwwroot/vendor/
