@@ -81,6 +81,7 @@ namespace SailScores.Web
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
+            .AddCookie(options => options.SlidingExpiration = true)
             .AddJwtBearer(cfg =>
             {
                 cfg.RequireHttpsMetadata = false;
@@ -92,9 +93,7 @@ namespace SailScores.Web
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
 
                     ClockSkew = TimeSpan.Zero // remove delay of token when expire
-
                 };
-
             });
 
 
