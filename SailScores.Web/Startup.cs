@@ -19,6 +19,10 @@ using AutoMapper;
 using SailScores.Web;
 using Microsoft.Extensions.Caching.Memory;
 using SailScores.Web.Services;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace SailScores.Web
 {
@@ -41,6 +45,17 @@ namespace SailScores.Web
                 c.SwaggerDoc("v1", new Info { Title = "SailScores API", Version = "v1" });
                 c.IncludeXmlComments(string.Format(@"{0}\SailScores.Web.xml",
                      System.AppDomain.CurrentDomain.BaseDirectory));
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer", new string[] { } }
+                });
             });
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -55,8 +70,33 @@ namespace SailScores.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<SailScoresIdentityContext>();
+            services.AddIdentity<IdentityUser,IdentityRole>()
+                .AddEntityFrameworkStores<SailScoresIdentityContext>()
+                .AddDefaultTokenProviders();
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication( options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = Configuration["JwtIssuer"],
+                    ValidAudience = Configuration["JwtIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
+
+                    ClockSkew = TimeSpan.Zero // remove delay of token when expire
+
+                };
+
+            });
+
 
             services.AddTransient<IEmailSender, EmailSender>();
             // Make sure API calls that require auth return 401, not redirect on auth failure.
