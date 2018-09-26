@@ -127,7 +127,10 @@ namespace SailScores.Web
 
         private void RegisterSailScoresServices(IServiceCollection services)
         {
-            services.AddScoped<IClubService, ClubService>();
+            services.AddScoped<Core.Services.IClubService, Core.Services.ClubService>();
+            services.AddScoped<ISeriesService, SeriesService>();
+            services.AddScoped<IRaceService, RaceService>();
+            
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }
 

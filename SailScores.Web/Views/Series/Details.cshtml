@@ -1,0 +1,58 @@
+﻿@using Sailscores.WebApp.Models.Sailscores
+@model Sailscores.WebApp.Models.Sailscores.SeriesViewModel
+
+@{
+    ViewBag.Title = Model.Series.Name;
+    Layout = "_ClubLayout";
+}
+
+<h2>@Model.Series.Name</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Place</th>
+            <th scope="col">Sail #</th>
+            <th scope="col">Competitor</th>
+            <th scope="col">Boat</th>
+            <th scope="col" class="text-center">Total</th>
+            @foreach (var race in Model.Series.Results.Races)
+    {
+        <th class="text-center">@race.Name</th>
+}
+        </tr>
+    </thead>
+    <tbody>
+    
+    @foreach (var comp in Model.Series.Results.Competitors)
+    {
+        <tr>
+            <th scope="row">@Model.Series.Results.Results[comp].Rank</th>
+            <th scope="row">@comp.SailNumber</th>
+            <th scope="row">@comp.Name</th>
+            <td>@comp.BoatName</td>
+            <td scope="row" class="text-center">@Model.Series.Results.Results[comp].TotalScore</td>
+
+            @foreach (var race in Model.Series.Results.Races)
+    {
+        
+            <td class="text-center">
+                @if (Model.Series.Results.GetResult(comp, race).Discard)
+    {
+            @Html.Raw("<span class='text-muted'>")
+            @Html.Raw("<s>")
+}
+                @Model.Series.Results.GetResult(comp, race)
+                @if (Model.Series.Results.GetResult(comp, race).Discard)
+    {
+            @Html.Raw("</s>")
+            @Html.Raw("</div>")
+
+}
+            </td>
+}
+        </tr>
+    }
+
+    </tbody>
+</table>
