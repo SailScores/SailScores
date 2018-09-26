@@ -28,14 +28,14 @@ namespace SailScores.Web.Services
             return _mapper.Map<IList<SeriesSummary>>(coreObject.Series);
         }
 
-        public async Task<SeriesSummary> GetSeriesAsync(string clubInitials, string season, string seriesName)
+        public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesName)
         {
             var coreObject = await _coreClubService.GetFullClub(clubInitials);
 
             var series = coreObject.Series.FirstOrDefault(s =>
                 s.Season.Name == season && s.Name == seriesName);
 
-            return _mapper.Map<SeriesSummary>(series);
+            return series;
         }
     }
 }

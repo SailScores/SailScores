@@ -45,7 +45,7 @@ namespace SailScores.Web.Controllers
 
             var series = await _seriesService.GetSeriesAsync(clubInitials, season, seriesName);
 
-            return View(new ClubItemViewModel<SeriesSummary>
+            return View(new ClubItemViewModel<Core.Model.Series>
             {
                 Item = series,
                 ClubInitials = clubInitials

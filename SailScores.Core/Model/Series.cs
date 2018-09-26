@@ -20,5 +20,8 @@ namespace SailScores.Core.Model
 
         [Required]
         public Season Season { get; set; }
+
+        [NotMapped]
+        public Results Results { get; set; }
     }
 }
