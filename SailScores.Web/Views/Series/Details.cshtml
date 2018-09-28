@@ -1,5 +1,6 @@
 ﻿@using SailScores.Web.Models.SailScores;
-@model ClubItemViewModel<SailScores.Core.Model.Series>
+@using SailScores.Core.Model;
+@model ClubItemViewModel<Series>
 
 @{
     ViewBag.Title = Model.Item.Name;
@@ -16,7 +17,7 @@
             <th scope="col">Competitor</th>
             <th scope="col">Boat</th>
             <th scope="col" class="text-center">Total</th>
-            @foreach (var race in Model.Item.Results.Races)
+            @foreach (var race in Model.Item.Results?.Races ?? Enumerable.Empty<Race>())
             {
                 <th class="text-center">@race.Name</th>
             }
@@ -24,26 +25,26 @@
     </thead>
     <tbody>
 
-        @foreach (var comp in Model.Series.Results.Competitors)
+        @foreach (var comp in Model.Item.Results?.Competitors ?? Enumerable.Empty<Competitor>())
         {
             <tr>
-                <th scope="row">@Model.Series.Results.Results[comp].Rank</th>
+                <th scope="row">@Model.Item.Results.Results[comp].Rank</th>
                 <th scope="row">@comp.SailNumber</th>
                 <th scope="row">@comp.Name</th>
                 <td>@comp.BoatName</td>
-                <td scope="row" class="text-center">@Model.Series.Results.Results[comp].TotalScore</td>
+                <td scope="row" class="text-center">@Model.Item.Results.Results[comp].TotalScore</td>
 
-                @foreach (var race in Model.Series.Results.Races)
+                @foreach (var race in Model.Item.Results.Races)
                 {
 
                     <td class="text-center">
-                        @if (Model.Series.Results.GetResult(comp, race).Discard)
+                        @if (Model.Item.Results.GetResult(comp, race).Discard)
                         {
                             @Html.Raw("<span class='text-muted'>")
                             @Html.Raw("<s>")
                         }
-                        @Model.Series.Results.GetResult(comp, race)
-                        @if (Model.Series.Results.GetResult(comp, race).Discard)
+                        @Model.Item.Results.GetResult(comp, race)
+                        @if (Model.Item.Results.GetResult(comp, race).Discard)
                         {
                             @Html.Raw("</s>")
                             @Html.Raw("</div>")

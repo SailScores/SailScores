@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Sailscores.Services.Dtos.RaceSummary>
+﻿@model IEnumerable<SailScores.Core.Model.Race>
 @using Microsoft.AspNetCore.Routing
 @{
     ViewData["Title"] = Context.GetRouteData().Values["ClubInitials"]+ " Races";
@@ -39,7 +39,7 @@
                     @Html.DisplayFor(modelItem => item.Order)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CompetitorCount)
+                    @Html.DisplayFor(modelItem => item.Scores.Count)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using SailScores.Core.Scoring;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SailScores.Core.Model
 {
@@ -22,6 +24,6 @@ namespace SailScores.Core.Model
         public Season Season { get; set; }
 
         [NotMapped]
-        public Results Results { get; set; }
+        public SeriesResults Results { get; set; }
     }
 }

@@ -14,10 +14,10 @@ namespace SailScores.Web.Controllers
     public class SeriesController : Controller
     {
 
-        private readonly ISeriesService _seriesService;
+        private readonly Web.Services.ISeriesService _seriesService;
 
         public SeriesController(
-            ISeriesService seriesService)
+            Web.Services.ISeriesService seriesService)
         {
             _seriesService = seriesService;
         }

@@ -11,13 +11,16 @@ namespace SailScores.Web.Services
     public class SeriesService : ISeriesService
     {
         private readonly Core.Services.IClubService _coreClubService;
+        private readonly Core.Services.ISeriesService _coreSeriesService;
         private readonly IMapper _mapper;
 
         public SeriesService(
             Core.Services.IClubService clubService,
+            Core.Services.ISeriesService seriesService,
             IMapper mapper)
         {
             _coreClubService = clubService;
+            _coreSeriesService = seriesService;
             _mapper = mapper;
         }
 
@@ -30,10 +33,7 @@ namespace SailScores.Web.Services
 
         public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesName)
         {
-            var coreObject = await _coreClubService.GetFullClub(clubInitials);
-
-            var series = coreObject.Series.FirstOrDefault(s =>
-                s.Season.Name == season && s.Name == seriesName);
+            var series = await _coreSeriesService.GetSeriesDetailsAsync(clubInitials, season, seriesName );
 
             return series;
         }

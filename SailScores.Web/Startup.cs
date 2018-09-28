@@ -23,6 +23,8 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SailScores.Core.Mapping;
+using System.Reflection;
 
 namespace SailScores.Web
 {
@@ -118,7 +120,7 @@ namespace SailScores.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddAutoMapper();
+            services.AddAutoMapper(typeof(DbToModelMappingProfile).GetTypeInfo().Assembly);
 
             RegisterSailScoresServices(services);
 
@@ -128,7 +130,9 @@ namespace SailScores.Web
         private void RegisterSailScoresServices(IServiceCollection services)
         {
             services.AddScoped<Core.Services.IClubService, Core.Services.ClubService>();
-            services.AddScoped<ISeriesService, SeriesService>();
+            services.AddScoped<Core.Services.ISeriesService, Core.Services.SeriesService>();
+            services.AddScoped<Core.Scoring.ISeriesCalculator, Core.Scoring.SeriesCalculator>();
+            services.AddScoped<Web.Services.ISeriesService, Web.Services.SeriesService>();
             services.AddScoped<IRaceService, RaceService>();
             
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
