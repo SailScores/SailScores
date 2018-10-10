@@ -1,8 +1,11 @@
-﻿@model IEnumerable<SailScores.Core.Model.Race>
-@using Microsoft.AspNetCore.Routing
+﻿@using Microsoft.AspNetCore.Routing
+@using SailScores.Web.Models.SailScores;
+@using SailScores.Core.Model;
+@model ClubCollectionViewModel<Race>
+
 @{
-    ViewData["Title"] = Context.GetRouteData().Values["ClubInitials"]+ " Races";
-    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+    ViewBag.Title = Model.ClubInitials + " Races";
+    Layout = "_ClubLayout";
 }
 
 <h2>@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant() Races</h2>
@@ -11,12 +14,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.List.First().Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-            <th>
+                @Html.DisplayNameFor(model => model.List.First().Date)
             </th>
             <th>
                 # of Boats
@@ -26,17 +27,14 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.List)
         {
             <tr>
                 <td>
-                    @Html.ActionLink(item.Name, "Details", new { /* id=item.PrimaryKey */ })
+                    @Html.ActionLink(item.Name, "Details", new { id=item.Id })
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Date)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Order)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Scores.Count)

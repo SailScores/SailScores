@@ -40,12 +40,13 @@ namespace SailScores.Core.Services
         public async Task<Model.Club> GetFullClub(string id)
         {
             Guid potentialClubId;
-            Db.Club club;
-            if(Guid.TryParse(id, out potentialClubId)){
-                club = await _dbContext
-                    .Clubs
-                    .Where(c => c.Id == potentialClubId)
-                    .Include(c => c.Races)
+            IQueryable<Db.Club> clubQuery =
+                Guid.TryParse(id, out potentialClubId) ?
+                _dbContext.Clubs.Where(c => c.Id == potentialClubId) :
+                _dbContext.Clubs.Where(c => c.Initials == id);
+
+            var club = await clubQuery.Include(c => c.Races)
+                    .ThenInclude(r => r.Scores)
                     .Include(c => c.ScoreCodes)
                     .Include(c => c.Seasons)
                     .Include(c => c.Series)
@@ -54,20 +55,6 @@ namespace SailScores.Core.Services
                     .Include(c => c.Competitors)
                     .Include(c => c.BoatClasses)
                     .FirstOrDefaultAsync();
-            } else
-            {
-                club = await _dbContext
-                    .Clubs
-                    .Where(c => c.Initials == id)
-                    .Include(c => c.Races)
-                    .Include(c => c.ScoreCodes)
-                    .Include(c => c.Seasons)
-                    .Include(c => c.Series)
-                    .ThenInclude(s => s.RaceSeries)
-                    .Include(c => c.Competitors)
-                    .Include(c => c.BoatClasses)
-                    .FirstOrDefaultAsync();
-            }
 
             return _mapper.Map<Model.Club>(club);
         }

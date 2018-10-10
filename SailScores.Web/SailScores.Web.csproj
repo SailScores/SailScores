@@ -31,4 +31,10 @@
     <ProjectReference Include="..\SailScores.Identity\SailScores.Identity.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Race\Details.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>

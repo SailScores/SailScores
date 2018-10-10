@@ -25,18 +25,24 @@ namespace SailScores.Web.Controllers
         // GET: Club
         public async Task<ActionResult> Index(string clubInitials)
         {
-            ViewData["ClubInitials"] = clubInitials;
+            var races = await _raceService.GetAllRaceSummariesAsync(clubInitials);
 
-            //TODO: Implement
-            throw new NotImplementedException();
-            //var races = await _raceService.GetAllRaceSummariesAsync(clubInitials);
-            //return View(races);
+            return View(new ClubCollectionViewModel<Core.Model.Race>
+            {
+                List = races,
+                ClubInitials = clubInitials
+            });
         }
 
         // GET: Club/Details/{5126225B-77AC-40EC-8FDA-9549AF7AE738}
-        public ActionResult Details(Guid id)
+        public async Task<ActionResult> Details(string clubInitials, Guid id)
         {
-            return View();
+            var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+            return View(new ClubItemViewModel<Core.Model.Race>
+            {
+                Item = race,
+                ClubInitials = clubInitials
+            });
         }
 
 

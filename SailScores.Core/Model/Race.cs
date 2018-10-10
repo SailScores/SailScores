@@ -13,6 +13,8 @@ namespace SailScores.Core.Model
         [StringLength(200)]
         public String Name { get; set; }
 
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
         public DateTime? Date { get; set; }
 
         // Typically the order of the race for a given date, but may not be.

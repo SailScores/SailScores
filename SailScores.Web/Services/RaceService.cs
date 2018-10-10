@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using SailScores.Core.Model;
+using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +21,21 @@ namespace SailScores.Web.Services
             _mapper = mapper;
         }
 
-        public async Task GetAllRaceSummariesAsync(string clubInitials)
+        public async Task<IEnumerable<Race>> GetAllRaceSummariesAsync(string clubInitials)
         {
-            throw new NotImplementedException();
+            var club = await _coreClubService.GetFullClub(clubInitials);
+
+            return club.Races;
+            //var vm = _mapper.Map<List<RaceSummaryViewModel>>(club.Races);
+            //return vm;
+        }
+
+        public async Task<Race> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
+        {
+
+            var club = await _coreClubService.GetFullClub(clubInitials);
+            return club.Races.First(r => r.Id == id);
+
         }
     }
 }

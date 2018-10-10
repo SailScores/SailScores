@@ -1,183 +1,34 @@
-﻿@model IEnumerable<SailScores.Core.Model.Race>
-@using Microsoft.AspNetCore.Routing
+﻿@using Microsoft.AspNetCore.Routing
+@using SailScores.Web.Models.SailScores;
+@using SailScores.Core.Model;
+@model ClubItemViewModel<Race>
+
 @{
-    ViewData["Title"] = Context.GetRouteData().Values["ClubInitials"]+ " Races";
-    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+    ViewBag.Title = Model.ClubInitials + " Race";
+    Layout = "_ClubLayout";
 }
 
-<h2>@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant() Races</h2>
+<h2>@Model.ClubInitials.ToUpperInvariant() @Model.Item.Name @Model.Item.Date</h2>
 
-    <div id="left" class="col-12 col-md-3 col-xl-2 bd-sidebar">
-        <nav class="collapse bd-links">
-            <div class="bd-toc-item">
-                <a class="bd-toc-link" href="/docs/4.1/getting-started/introduction/">
-                    Getting started
-                </a>
-                <ul class="nav bd-sidenav">
-                    <li>
-                        <a href="/docs/4.1/getting-started/introduction/">
-                            Introduction
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/download/">
-                            Download
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/contents/">
-                            Contents
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/browsers-devices/">
-                            Browsers &amp; devices
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/javascript/">
-                            JavaScript
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/theming/">
-                            Theming
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/build-tools/">
-                            Build tools
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/webpack/">
-                            Webpack
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/getting-started/accessibility/">
-                            Accessibility
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="bd-toc-item active">
-                <a class="bd-toc-link" href="/docs/4.1/components/alerts/">
-                    Components
-                </a>
-                <ul class="nav bd-sidenav">
-                    <li>
-                        <a href="/docs/4.1/components/alerts/">
-                            Alerts
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/badge/">
-                            Badge
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/breadcrumb/">
-                            Breadcrumb
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/buttons/">
-                            Buttons
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/button-group/">
-                            Button group
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/card/">
-                            Card
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/carousel/">
-                            Carousel
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/collapse/">
-                            Collapse
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/dropdowns/">
-                            Dropdowns
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/forms/">
-                            Forms
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/input-group/">
-                            Input group
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/jumbotron/">
-                            Jumbotron
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/list-group/">
-                            List group
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/modal/">
-                            Modal
-                        </a>
-                    </li>
-                    <li class="active bd-sidenav-active">
-                        <a href="/docs/4.1/components/navs/">
-                            Navs
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/navbar/">
-                            Navbar
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/pagination/">
-                            Pagination
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/popovers/">
-                            Popovers
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/progress/">
-                            Progress
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/scrollspy/">
-                            Scrollspy
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/docs/4.1/components/tooltips/">
-                            Tooltips
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        Static container
-    </div>
-    <div id="right" class="col-12 col-md-9 col-xl-10 py-md-3 pl-md-5 bd-content">
-        Race Info here!!!
-    </div>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @*@foreach (var score in Model.Item)
+        {
+            <tr>
+                <td>
+                    @score.Competitor.Name
+                </td>
+                <td>
+                    @score.Value
+                </td>
 
-
+            </tr>
+        }*@
+    </tbody>
+</table>

@@ -25,6 +25,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SailScores.Core.Mapping;
 using System.Reflection;
+using SailScores.Web.Mapping;
 
 namespace SailScores.Web
 {
@@ -120,7 +121,11 @@ namespace SailScores.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddAutoMapper(typeof(DbToModelMappingProfile).GetTypeInfo().Assembly);
+            services.AddAutoMapper(
+                new[] {
+                    typeof(DbToModelMappingProfile).GetTypeInfo().Assembly,
+                    typeof(ToViewModelMappingProfile).GetTypeInfo().Assembly
+                });
 
             RegisterSailScoresServices(services);
 
