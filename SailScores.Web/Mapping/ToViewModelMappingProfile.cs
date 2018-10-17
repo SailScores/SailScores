@@ -18,6 +18,8 @@ namespace SailScores.Web.Mapping
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
                 .ForMember(r => r.SeriesNames, o => o.MapFrom(s => s.Series.Select(sr => sr.Name)));
 
+            CreateMap<Model.Club, Areas.Api.Models.ClubViewModel>();
+
         }
     }
 }

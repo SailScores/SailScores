@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Services;
+using SailScores.Web.Areas.Api.Models;
+using SailScores.Web.Services;
 using Model = SailScores.Core.Model;
 
 namespace SailScores.Web.Areas.Api.Controllers
@@ -16,10 +19,14 @@ namespace SailScores.Web.Areas.Api.Controllers
     public class ClubController : ControllerBase
     {
         private readonly IClubService _clubService;
+        private readonly IMapper _mapper;
 
-        public ClubController(IClubService clubService)
+        public ClubController(
+            IClubService clubService,
+            IMapper mapper)
         {
             _clubService = clubService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -28,9 +35,10 @@ namespace SailScores.Web.Areas.Api.Controllers
         /// <returns>Array of Model.Club</returns>
         // GET: api/Club
         [HttpGet]
-        public async Task<IEnumerable<Model.Club>> Get()
+        public async Task<IEnumerable<ClubViewModel>> Get()
         {
-            return await _clubService.GetClubs(false);
+            var clubs =  await _clubService.GetClubs(false);
+            return _mapper.Map<List<ClubViewModel>>(clubs);
         }
 
         /// <summary>
@@ -41,9 +49,11 @@ namespace SailScores.Web.Areas.Api.Controllers
         // GET: api/Club/5
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{identifier}")]
-        public async Task<Model.Club> Get([FromRoute] string identifier)
+        public async Task<ClubViewModel> Get([FromRoute] string identifier)
         {
-            return await _clubService.GetFullClub(identifier);
+            var club = await _clubService.GetFullClub(identifier);
+
+            return _mapper.Map<ClubViewModel>(club); ;
         }
 
         [Authorize]

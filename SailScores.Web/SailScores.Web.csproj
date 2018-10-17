@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Api\Data\" />
-    <Folder Include="Areas\Api\Models\" />
     <Folder Include="Areas\Api\Views\" />
     <Folder Include="Data\" />
     <Folder Include="wwwroot\lib\" />

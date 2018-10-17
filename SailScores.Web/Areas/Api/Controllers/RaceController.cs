@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Services;
+using SailScores.Web.Areas.Api.Models;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -11,11 +14,24 @@ namespace SailScores.Web.Areas.Api.Controllers
     [ApiController]
     public class RaceController : ControllerBase
     {
+        private readonly IClubService _clubService;
+        private readonly IMapper _mapper;
+
+        public RaceController(
+            IClubService clubService,
+            IMapper mapper)
+        {
+            _clubService = clubService;
+            _mapper = mapper;
+        }
+
         // GET: api/Race
         [HttpGet]
-        public IEnumerable<string> Get([FromQuery] string clubIdentifier)
+        public async Task<IEnumerable<RaceViewModel>> Get([FromQuery] string clubIdentifier)
         {
-            return new string[] { "value1" + clubIdentifier, "value2" };
+            var club = await _clubService.GetFullClub(clubIdentifier);
+            return _mapper.Map<List<RaceViewModel>>(club.Races);
+
         }
 
         // GET: api/Race/5
