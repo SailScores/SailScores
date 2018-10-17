@@ -30,11 +30,11 @@ namespace SailScores.Web.Services
             //return vm;
         }
 
-        public async Task<Race> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
+        public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
         {
 
             var club = await _coreClubService.GetFullClub(clubInitials);
-            return club.Races.First(r => r.Id == id);
+            return _mapper.Map<RaceViewModel>(club.Races.First(r => r.Id == id));
 
         }
     }

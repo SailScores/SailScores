@@ -45,8 +45,11 @@ namespace SailScores.Core.Services
                 _dbContext.Clubs.Where(c => c.Id == potentialClubId) :
                 _dbContext.Clubs.Where(c => c.Initials == id);
 
-            var club = await clubQuery.Include(c => c.Races)
+            var club = await clubQuery
+                .Include(c => c.Races)
                     .ThenInclude(r => r.Scores)
+                .Include(c => c.Races)
+                    .ThenInclude(r => r.Fleet)
                     .Include(c => c.ScoreCodes)
                     .Include(c => c.Seasons)
                     .Include(c => c.Series)

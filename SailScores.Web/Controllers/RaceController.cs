@@ -38,7 +38,7 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Details(string clubInitials, Guid id)
         {
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
-            return View(new ClubItemViewModel<Core.Model.Race>
+            return View(new ClubItemViewModel<RaceViewModel>
             {
                 Item = race,
                 ClubInitials = clubInitials

@@ -9,6 +9,6 @@ namespace SailScores.Web.Services
     public interface IRaceService
     {
         Task<IEnumerable<Race>> GetAllRaceSummariesAsync(string clubInitials);
-        Task<Race> GetSingleRaceDetailsAsync(string clubInitials, Guid id);
+        Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id);
     }
 }
