@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Template10.Services.NavigationService;
 using Windows.UI.Xaml.Navigation;
+using Newtonsoft.Json;
+using SailScores.Core.Model;
 
 namespace Sailscores.Client.Uwp.ViewModels
 {
@@ -79,6 +81,8 @@ namespace Sailscores.Client.Uwp.ViewModels
                 httpResponse = await httpClient.GetAsync(requestUri);
                 httpResponse.EnsureSuccessStatusCode();
                 httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+
+                var clubs = JsonConvert.DeserializeObject<List<Club>>(httpResponseBody);
             }
             catch (Exception ex)
             {
