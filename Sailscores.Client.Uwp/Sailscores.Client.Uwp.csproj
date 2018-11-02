@@ -89,6 +89,7 @@
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Assets\localhost.crt" />
     <None Include="Hamburger_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

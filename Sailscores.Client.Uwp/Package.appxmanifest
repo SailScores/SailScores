@@ -26,4 +26,11 @@
     <Capability Name="internetClient" />
     <uap:Capability Name="userAccountInformation" />
   </Capabilities>
+  <Extensions>
+    <Extension Category="windows.certificates">
+      <Certificates>
+        <Certificate StoreName="Root" Content="Assets\localhost.crt" />
+      </Certificates>
+    </Extension>
+  </Extensions>
 </Package>
