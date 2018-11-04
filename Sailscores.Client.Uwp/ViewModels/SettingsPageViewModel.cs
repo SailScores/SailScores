@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Template10.Mvvm;
 using Template10.Services.SettingsService;
+using Windows.Security.Credentials;
 using Windows.UI.Xaml;
 
 namespace Sailscores.Client.Uwp.ViewModels
@@ -65,6 +66,58 @@ namespace Sailscores.Client.Uwp.ViewModels
             set { _settings.AppTheme = value ? ApplicationTheme.Light : ApplicationTheme.Dark; base.RaisePropertyChanged(); }
         }
 
+        public string ServerUrl
+        {
+            get { return _settings.ServerUrl; }
+            set { _settings.ServerUrl = value; }
+        }
+
+        public bool SaveUserCredentials
+        {
+            get { return _settings.SaveUserCredentials; }
+            set
+            {
+                _settings.SaveUserCredentials = value;
+                if (_userCredentials != null && value)
+                {
+                    _settings.UserCredentials = _userCredentials;
+                }
+            }
+        }
+
+        public string UserName
+        {
+            get { return _userCredentials?.UserName; }
+            set {
+                if (_userCredentials == null)
+                {
+                    _userCredentials = new PasswordCredential();
+                }
+                _userCredentials.UserName = value;
+                if (SaveUserCredentials)
+                {
+                    _settings.UserCredentials = _userCredentials;
+                }
+            }
+        }
+
+        public string Password
+        {
+            get { return _userCredentials?.Password; }
+            set
+            {
+                if (_userCredentials == null)
+                {
+                    _userCredentials = new PasswordCredential();
+                }
+                _userCredentials.Password = value;
+                if (SaveUserCredentials)
+                {
+                    _settings.UserCredentials = _userCredentials;
+                }
+            }
+        }
+
         private string _BusyText = "Please wait...";
         public string BusyText
         {
@@ -77,6 +130,8 @@ namespace Sailscores.Client.Uwp.ViewModels
         }
 
         DelegateCommand _ShowBusyCommand;
+        private PasswordCredential _userCredentials;
+
         public DelegateCommand ShowBusyCommand
             => _ShowBusyCommand ?? (_ShowBusyCommand = new DelegateCommand(async () =>
             {
@@ -84,6 +139,7 @@ namespace Sailscores.Client.Uwp.ViewModels
                 await Task.Delay(5000);
                 Views.Busy.SetBusy(false);
             }, () => !string.IsNullOrEmpty(BusyText)));
+
     }
 
     public class AboutPartViewModel : ViewModelBase

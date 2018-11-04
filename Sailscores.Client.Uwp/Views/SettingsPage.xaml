@@ -84,7 +84,7 @@
                               VerticalScrollBarVisibility="Auto">
                     <RelativePanel HorizontalAlignment="Left">
 
-                        <ToggleSwitch x:Name="UseShellDrawnBackButtonToggleSwtich"
+                            <ToggleSwitch x:Name="UseShellDrawnBackButtonToggleSwtich"
                                       Header="Shell-drawn Back Button"
                                       IsOn="{Binding UseShellBackButton, Mode=TwoWay}"
                                       OffContent="Back button is in Page Header"
@@ -92,7 +92,7 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.AlignTopWithPanel="True" />
 
-                        <ToggleSwitch x:Name="UseLightThemeToggleSwitch"
+                            <ToggleSwitch x:Name="UseLightThemeToggleSwitch"
                                       Header="Requested Application Theme"
                                       IsOn="{Binding UseLightThemeButton, Mode=TwoWay}"
                                       OffContent="Current theme is Dark"
@@ -100,7 +100,7 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.Below="UseShellDrawnBackButtonToggleSwtich" />
 
-                        <ToggleSwitch x:Name="ShowHamburgerButtonToggleSwitch"
+                            <ToggleSwitch x:Name="ShowHamburgerButtonToggleSwitch"
                                       Header="Sailscores.Client.Uwp Button Visibility"
                                       IsEnabled="{Binding IsOn, ElementName=IsFullScreenToggleSwitch, Converter={StaticResource FalseWhenTrueConverter}}"
                                       IsOn="{Binding ShowHamburgerButton, Mode=TwoWay}"
@@ -109,7 +109,7 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.Below="UseLightThemeToggleSwitch" />
 
-                        <ToggleSwitch x:Name="IsFullScreenToggleSwitch"
+                            <ToggleSwitch x:Name="IsFullScreenToggleSwitch"
                                       Header="Page content is Full Screen"
                                       IsOn="{Binding IsFullScreen, Mode=TwoWay}"
                                       OffContent="Sailscores.Client.Uwp Menu is visible"
@@ -117,7 +117,7 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.Below="ShowHamburgerButtonToggleSwitch" />
 
-                        <TextBox x:Name="BusyTextTextBox"
+                            <TextBox x:Name="BusyTextTextBox"
                                  Width="200"
                                  Margin="0,12,0,0"
                                  HorizontalAlignment="Left"
@@ -126,15 +126,29 @@
                                  RelativePanel.Below="IsFullScreenToggleSwitch"
                                  Text="{Binding BusyText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <Button Margin="12,0,0,0"
+                            <Button Margin="12,0,0,0"
                                 Command="{x:Bind ViewModel.SettingsPartViewModel.ShowBusyCommand}"
                                 Content="Show Busy"
                                 RelativePanel.AlignBottomWith="BusyTextTextBox"
                                 RelativePanel.RightOf="BusyTextTextBox" />
+                            <TextBox x:Name="UserNameTextBox"
+                                   Width="200"
+                                   Margin="0,12,0,0"
+                                   HorizontalAlignment="Left"
+                                   Header="User name"
+                                 RelativePanel.AlignLeftWithPanel="True"
+                                 RelativePanel.Below="BusyTextTextBox" />
+                        <PasswordBox x:Name="PasswordBox"
+                                     Width="200"
+                                     Margin="0,12,0,0"
+                                   HorizontalAlignment="Left"
+                                   Header="Password"
+                                 RelativePanel.AlignLeftWithPanel="True"
+                                 RelativePanel.Below="UserNameTextBox" />
 
-                    </RelativePanel>
 
-                </ScrollViewer>
+                        </RelativePanel>
+                    </ScrollViewer>
             </PivotItem>
 
             <!--  privacy  -->
