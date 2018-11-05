@@ -1,4 +1,7 @@
-﻿using System;
+﻿using SailScores.Core.Model;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Template10.Mvvm;
@@ -17,6 +20,23 @@ namespace Sailscores.Client.Uwp.ViewModels
     public class SettingsPartViewModel : ViewModelBase
     {
         Services.SettingsServices.SettingsService _settings;
+        Services.SailscoresServerService _sailscoresService;
+        ObservableCollection<Club> _clubs;
+
+        public ObservableCollection<Club> Clubs
+        {
+            get { return _clubs; }
+            private set { _clubs = value; RaisePropertyChanged(); }
+        }
+
+        public ITaskCompletionNotifier Initialization { get; private set; }
+        
+        private async Task InitializeAsync()
+        {
+            var ret = await _sailscoresService.GetClubsAsync();
+            this.Clubs = new ObservableCollection<Club>(ret);
+        }
+
 
         public SettingsPartViewModel()
         {
@@ -27,6 +47,9 @@ namespace Sailscores.Client.Uwp.ViewModels
             else
             {
                 _settings = Services.SettingsServices.SettingsService.Instance;
+                _sailscoresService = Services.SailscoresServerService.GetInstance(_settings);
+
+                Initialization = TaskCompletionNotifierFactory.Create(InitializeAsync());
             }
         }
 
@@ -82,12 +105,21 @@ namespace Sailscores.Client.Uwp.ViewModels
                 {
                     _settings.UserCredentials = _userCredentials;
                 }
+                if (!value)
+                {
+                    _settings.ClearAllCredentials();
+                }
             }
         }
 
         public string UserName
         {
-            get { return _userCredentials?.UserName; }
+            get {
+                if (_userCredentials == null)
+                {
+                    _userCredentials = _settings.UserCredentials;
+                }
+                return _userCredentials?.UserName; }
             set {
                 if (_userCredentials == null)
                 {
@@ -103,18 +135,37 @@ namespace Sailscores.Client.Uwp.ViewModels
 
         public string Password
         {
-            get { return _userCredentials?.Password; }
-            set
-            {
+            get {
                 if (_userCredentials == null)
                 {
-                    _userCredentials = new PasswordCredential();
+                    _userCredentials = _settings.UserCredentials;
                 }
-                _userCredentials.Password = value;
-                if (SaveUserCredentials)
+                return _userCredentials?.Password; }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
                 {
-                    _settings.UserCredentials = _userCredentials;
+                    if (_userCredentials == null)
+                    {
+                        _userCredentials = new PasswordCredential();
+                    }
+                    _userCredentials.Password = value;
+                    if (SaveUserCredentials)
+                    {
+                        _settings.UserCredentials = _userCredentials;
+                    }
                 }
+            }
+        }
+        public Club SelectedClub
+        {
+            get
+            {
+                return Clubs.FirstOrDefault(c => c.Id == _settings.ClubId);
+            }
+            set
+            {
+                _settings.ClubId = value.Id;
             }
         }
 

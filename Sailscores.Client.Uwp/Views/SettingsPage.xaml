@@ -83,14 +83,22 @@
                               HorizontalContentAlignment="Left"
                               VerticalScrollBarVisibility="Auto">
                     <RelativePanel HorizontalAlignment="Left">
+                        <ComboBox x:Name="ClubListBox"
+                                RelativePanel.AlignLeftWithPanel="True"
+                                RelativePanel.AlignTopWithPanel="True"
+                                 Width="300"
+                                 ItemsSource="{Binding Clubs}"
+                                 SelectedItem="{Binding SelectedClub, Mode=TwoWay}"
+                                 DisplayMemberPath="Name" />
 
-                            <ToggleSwitch x:Name="UseShellDrawnBackButtonToggleSwtich"
+
+                        <ToggleSwitch x:Name="UseShellDrawnBackButtonToggleSwtich"
                                       Header="Shell-drawn Back Button"
                                       IsOn="{Binding UseShellBackButton, Mode=TwoWay}"
                                       OffContent="Back button is in Page Header"
                                       OnContent="Back button in Title/TaskBar"
                                       RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True" />
+                                      RelativePanel.Below="ClubListBox" />
 
                             <ToggleSwitch x:Name="UseLightThemeToggleSwitch"
                                       Header="Requested Application Theme"
@@ -126,28 +134,45 @@
                                  RelativePanel.Below="IsFullScreenToggleSwitch"
                                  Text="{Binding BusyText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <Button Margin="12,0,0,0"
-                                Command="{x:Bind ViewModel.SettingsPartViewModel.ShowBusyCommand}"
-                                Content="Show Busy"
-                                RelativePanel.AlignBottomWith="BusyTextTextBox"
-                                RelativePanel.RightOf="BusyTextTextBox" />
-                            <TextBox x:Name="UserNameTextBox"
-                                   Width="200"
-                                   Margin="0,12,0,0"
-                                   HorizontalAlignment="Left"
-                                   Header="User name"
-                                 RelativePanel.AlignLeftWithPanel="True"
-                                 RelativePanel.Below="BusyTextTextBox" />
+                        <Button Margin="12,0,0,0"
+                            Command="{x:Bind ViewModel.SettingsPartViewModel.ShowBusyCommand}"
+                            Content="Show Busy"
+                            RelativePanel.AlignBottomWith="BusyTextTextBox"
+                            RelativePanel.RightOf="BusyTextTextBox" />
+                        <TextBox x:Name="UserNameTextBox"
+                            Width="200"
+                            Margin="0,12,0,0"
+                            HorizontalAlignment="Left"
+                            Header="User name"
+                            RelativePanel.AlignLeftWithPanel="True"
+                            RelativePanel.Below="BusyTextTextBox"
+                            Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <PasswordBox x:Name="PasswordBox"
                                      Width="200"
                                      Margin="0,12,0,0"
                                    HorizontalAlignment="Left"
                                    Header="Password"
                                  RelativePanel.AlignLeftWithPanel="True"
-                                 RelativePanel.Below="UserNameTextBox" />
+                                 RelativePanel.Below="UserNameTextBox" 
+                                     Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <CheckBox x:Name="SaveCredentialsCheckBox"
+                                  RelativePanel.AlignBottomWith="PasswordBox"
+                                  RelativePanel.RightOf="PasswordBox"
+                                  Margin="12,0,0,0"
+                                  Content="Save Credentials"
+                                  IsChecked="{Binding SaveUserCredentials, Mode=TwoWay}"
+                                  />
+                        <TextBox x:Name="ServerUrlTextBox"
+                            Width="200"
+                            Margin="0,12,0,0"
+                            HorizontalAlignment="Left"
+                            Header="Sailscores Server"
+                            RelativePanel.AlignLeftWithPanel="True"
+                            RelativePanel.Below="PasswordBox"
+                            Text="{Binding ServerUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
 
-                        </RelativePanel>
+                    </RelativePanel>
                     </ScrollViewer>
             </PivotItem>
 

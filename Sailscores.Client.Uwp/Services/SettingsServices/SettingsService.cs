@@ -8,12 +8,11 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
 {
     public class SettingsService
     {
-
-
-        private string resourceName = "Sailscores";
-
+                
         public static SettingsService Instance { get; } = new SettingsService();
         Template10.Services.SettingsService.ISettingsHelper _helper;
+
+        private string _appName = "Sailscores";
         private string _defaultUrl = "https://www.sailscores.com/api/";
 
         private SettingsService()
@@ -81,6 +80,16 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
             }
         }
 
+        internal void ClearAllCredentials()
+        {
+
+            Windows.Security.Credentials.PasswordCredential credential = null;
+
+            var vault = new Windows.Security.Credentials.PasswordVault();
+            var creds = vault.RetrieveAll();
+            creds.ForEach(c => vault.Remove(c));
+        }
+
         public string ServerUrl
         {
             get { return _helper.Read<string>(nameof(ServerUrl), _defaultUrl); }
@@ -126,8 +135,13 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
             }
 
             set {
-                var vault = new Windows.Security.Credentials.PasswordVault();
-                vault.Add(value);
+                value.Resource = _appName;
+                if (SaveUserCredentials && !String.IsNullOrEmpty(value.Password))
+                {
+                    ClearAllCredentials();
+                    var vault = new Windows.Security.Credentials.PasswordVault();
+                    vault.Add(value);
+                }
             }
         }
 
@@ -137,7 +151,7 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
             Windows.Security.Credentials.PasswordCredential credential = null;
 
             var vault = new Windows.Security.Credentials.PasswordVault();
-            var credentialList = vault.FindAllByResource(resourceName);
+            var credentialList = vault.FindAllByResource(_appName);
             if (credentialList.Count >= 1)
             {
                 credential = credentialList[0];
