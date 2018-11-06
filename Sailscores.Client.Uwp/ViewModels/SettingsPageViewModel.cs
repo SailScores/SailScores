@@ -23,7 +23,7 @@ namespace Sailscores.Client.Uwp.ViewModels
         Services.SettingsServices.SettingsService _settings;
         Services.SailscoresServerService _sailscoresService;
 
-        public NotifyTaskCompletion<List<Club>> Clubs;
+        public NotifyTaskCompletion<ObservableCollection<Club>> Clubs { get; private set; }
 
 
         public SettingsPartViewModel()
@@ -36,9 +36,17 @@ namespace Sailscores.Client.Uwp.ViewModels
             {
                 _settings = Services.SettingsServices.SettingsService.Instance;
                 _sailscoresService = Services.SailscoresServerService.GetInstance(_settings);
-
-                Clubs = new NotifyTaskCompletion<List<Club>>(_sailscoresService.GetClubsAsync());
+                Clubs = new NotifyTaskCompletion<ObservableCollection<Club>>(GetClubsAsync());
             }
+        }
+
+        private async Task<ObservableCollection<Club>> GetClubsAsync()
+        {
+            var clubs = await _sailscoresService.GetClubsAsync();
+            var obsCollection = new ObservableCollection<Club>();
+            clubs.ForEach(c => obsCollection.Add(c));
+            SelectedClub = clubs.FirstOrDefault(c => c.Id == _settings.ClubId);
+            return obsCollection;
         }
 
         public bool ShowHamburgerButton
@@ -145,15 +153,19 @@ namespace Sailscores.Client.Uwp.ViewModels
                 }
             }
         }
+
+        private Club _selectedClub;
         public Club SelectedClub
         {
             get
             {
-                return Clubs?.Result?.FirstOrDefault(c => c.Id == _settings.ClubId);
+                return _selectedClub;
             }
             set
             {
+                _selectedClub = value;
                 _settings.ClubId = value.Id;
+                RaisePropertyChanged(nameof(SelectedClub));
             }
         }
 
