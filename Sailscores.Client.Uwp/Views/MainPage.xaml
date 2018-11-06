@@ -92,10 +92,5 @@
                    RelativePanel.AlignLeftWith="parameterResizer"
                    RelativePanel.Below="parameterResizer"
                    Text="Current Visual State" />
-        <Button x:Name="getClubsButton"
-                Click="{x:Bind ViewModel.GetClubsAsync}" Content="Get The Clubs"
-                Margin="20,0,0,0"
-                RelativePanel.AlignBottomWith="parameterResizer"
-                RelativePanel.RightOf="submitButton" />
     </RelativePanel>
 </Page>

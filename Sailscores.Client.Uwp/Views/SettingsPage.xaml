@@ -87,8 +87,7 @@
                                 RelativePanel.AlignLeftWithPanel="True"
                                 RelativePanel.AlignTopWithPanel="True"
                                  Width="300"
-                                 ItemsSource="{Binding Clubs}"
-                                 SelectedItem="{Binding SelectedClub, Mode=TwoWay}"
+                                 ItemsSource="{Binding Clubs.Result, Mode=TwoWay}"
                                  DisplayMemberPath="Name" />
 
 

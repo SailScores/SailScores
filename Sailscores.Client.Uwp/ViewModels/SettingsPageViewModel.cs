@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Model;
+﻿using Sailscores.Client.Uwp.TaskHelpers;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,21 +22,8 @@ namespace Sailscores.Client.Uwp.ViewModels
     {
         Services.SettingsServices.SettingsService _settings;
         Services.SailscoresServerService _sailscoresService;
-        ObservableCollection<Club> _clubs;
 
-        public ObservableCollection<Club> Clubs
-        {
-            get { return _clubs; }
-            private set { _clubs = value; RaisePropertyChanged(); }
-        }
-
-        public ITaskCompletionNotifier Initialization { get; private set; }
-        
-        private async Task InitializeAsync()
-        {
-            var ret = await _sailscoresService.GetClubsAsync();
-            this.Clubs = new ObservableCollection<Club>(ret);
-        }
+        public NotifyTaskCompletion<List<Club>> Clubs;
 
 
         public SettingsPartViewModel()
@@ -49,7 +37,7 @@ namespace Sailscores.Client.Uwp.ViewModels
                 _settings = Services.SettingsServices.SettingsService.Instance;
                 _sailscoresService = Services.SailscoresServerService.GetInstance(_settings);
 
-                Initialization = TaskCompletionNotifierFactory.Create(InitializeAsync());
+                Clubs = new NotifyTaskCompletion<List<Club>>(_sailscoresService.GetClubsAsync());
             }
         }
 
@@ -161,7 +149,7 @@ namespace Sailscores.Client.Uwp.ViewModels
         {
             get
             {
-                return Clubs.FirstOrDefault(c => c.Id == _settings.ClubId);
+                return Clubs?.Result?.FirstOrDefault(c => c.Id == _settings.ClubId);
             }
             set
             {

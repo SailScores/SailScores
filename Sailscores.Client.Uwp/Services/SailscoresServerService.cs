@@ -50,6 +50,8 @@ namespace Sailscores.Client.Uwp.Services
 
         public async Task<List<Club>> GetClubsAsync()
         {
+            await Task.Delay(5000);
+            return GetClubs();
             Windows.Web.Http.HttpClient httpClient = new Windows.Web.Http.HttpClient();
 
             Uri requestUri = new Uri(new Uri(_settings.ServerUrl), "Club");
