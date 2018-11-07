@@ -164,7 +164,7 @@ namespace Sailscores.Client.Uwp.ViewModels
             set
             {
                 _selectedClub = value;
-                _settings.ClubId = value.Id;
+                _settings.ClubId = value?.Id;
                 RaisePropertyChanged(nameof(SelectedClub));
             }
         }

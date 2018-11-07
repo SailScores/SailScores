@@ -151,11 +151,15 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
             Windows.Security.Credentials.PasswordCredential credential = null;
 
             var vault = new Windows.Security.Credentials.PasswordVault();
-            var credentialList = vault.FindAllByResource(_appName);
-            if (credentialList.Count >= 1)
+            try
             {
-                credential = credentialList[0];
+                var credentialList = vault.FindAllByResource(_appName);
+                if (credentialList.Count >= 1)
+                {
+                    credential = credentialList[0];
+                }
             }
+            catch (System.Runtime.InteropServices.COMException) { }
 
             return credential;
         }

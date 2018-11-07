@@ -11,14 +11,13 @@ namespace Sailscores.Client.Uwp.Services
 {
     public class SailscoresServerService
     {
-        SettingsServices.SettingsService _settings;
-        private SettingsService settings;
+        private SettingsService _settings;
 
         private List<Club> _clubs;
 
         public SailscoresServerService(SettingsService settings)
         {
-            this.settings = settings;
+            this._settings = settings;
         }
 
         public static SailscoresServerService GetInstance(SettingsService settings)
@@ -50,8 +49,8 @@ namespace Sailscores.Client.Uwp.Services
 
         public async Task<List<Club>> GetClubsAsync()
         {
-            await Task.Delay(5000);
-            return GetClubs();
+            //await Task.Delay(5000);
+            //return GetClubs();
             Windows.Web.Http.HttpClient httpClient = new Windows.Web.Http.HttpClient();
 
             Uri requestUri = new Uri(new Uri(_settings.ServerUrl), "Club");
