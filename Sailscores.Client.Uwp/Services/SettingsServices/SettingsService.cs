@@ -13,7 +13,7 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
         Template10.Services.SettingsService.ISettingsHelper _helper;
 
         private string _appName = "Sailscores";
-        private string _defaultUrl = "https://www.sailscores.com/api/";
+        private string _defaultUrl = "https://www.sailscores.com/";
 
         private SettingsService()
         {
