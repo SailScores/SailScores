@@ -99,7 +99,34 @@ namespace Sailscores.Client.Uwp.Services
 
         public async Task<List<Club>> GetClubsAsync()
         {
-            return await GetAsync<List<Club>>("/api/Club");
+            return await GetAsync<List<Club>>("/api/club");
         }
+
+        public async Task<Club> GetClubAsync(Guid clubId)
+        {
+            return await GetAsync<Club>($"/api/club/{clubId}");
+        }
+
+        public async Task<List<Competitor>> GetCompetitorsAsync(Guid clubId)
+        {
+            return await GetAsync<List<Competitor>>($"/api/competitor/&clubId={clubId}");
+        }
+
+        public async Task<List<Series>> GetAllSeriesAsync(Guid clubId)
+        {
+            return await GetAsync<List<Series>>($"/api/series/{clubId}");
+        }
+
+        public async Task<Series> GetOneSeriesAsync(Guid clubId)
+        {
+            return await GetAsync<Series>($"/api/series/{clubId}");
+        }
+
+        //TODO: What filter do I need on this? (Don't want to load all for club.)
+        public async Task<List<Race>> GetRacesAsync(Guid clubId)
+        {
+            return await GetAsync<List<Race>>($"/api/race/{clubId}");
+        }
+
     }
 }

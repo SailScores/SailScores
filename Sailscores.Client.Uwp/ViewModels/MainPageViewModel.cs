@@ -12,11 +12,19 @@ namespace Sailscores.Client.Uwp.ViewModels
 {
     public class MainPageViewModel : ViewModelBase
     {
+
+        Services.SettingsServices.SettingsService _settings;
+        Services.SailscoresServerService _sailscoresService;
+
         public MainPageViewModel()
         {
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
             {
                 Value = "Designtime value";
+            } else
+            {
+                _settings = Services.SettingsServices.SettingsService.Instance;
+                _sailscoresService = Services.SailscoresServerService.GetInstance(_settings);
             }
         }
 
@@ -45,6 +53,12 @@ namespace Sailscores.Client.Uwp.ViewModels
         {
             args.Cancel = false;
             await Task.CompletedTask;
+        }
+
+
+        public async Task Test()
+        {
+            await _sailscoresService.LoadCurrentClubAsync();
         }
 
         public void GotoDetailsPage() =>

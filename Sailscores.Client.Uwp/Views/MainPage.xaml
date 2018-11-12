@@ -92,5 +92,11 @@
                    RelativePanel.AlignLeftWith="parameterResizer"
                    RelativePanel.Below="parameterResizer"
                    Text="Current Visual State" />
+
+        <Button x:Name="testButton"
+                Click="{x:Bind ViewModel.Test}" Content="Test"
+                RelativePanel.Below="stateTextBox"
+                RelativePanel.AlignLeftWithPanel="True"
+                Margin="16,16,0,0"/>
     </RelativePanel>
 </Page>

@@ -36,5 +36,12 @@ namespace Sailscores.Client.Uwp.Services
             return await _apiClient.GetClubsAsync();
         }
 
+        public async Task LoadCurrentClubAsync()
+        {
+            if (_settings.ClubId.HasValue)
+            {
+                var club = await _apiClient.GetClubAsync(_settings.ClubId.Value);
+            }
+        }
     }
 }
