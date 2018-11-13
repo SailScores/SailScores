@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Model.Dto;
 using SailScores.Core.Services;
-using SailScores.Web.Areas.Api.Models;
 using SailScores.Web.Services;
 using Model = SailScores.Core.Model;
 
@@ -37,10 +37,10 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
-        public async Task<IEnumerable<ClubViewModel>> Get()
+        public async Task<IEnumerable<CompetitorDto>> Get()
         {
             var clubs =  await _clubService.GetClubs(false);
-            return _mapper.Map<List<ClubViewModel>>(clubs);
+            return _mapper.Map<List<CompetitorDto>>(clubs);
         }
 
         /// <summary>
@@ -51,11 +51,11 @@ namespace SailScores.Web.Areas.Api.Controllers
         // GET: api/Club/5
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{identifier}")]
-        public async Task<ClubViewModel> Get([FromRoute] string identifier)
+        public async Task<CompetitorDto> Get([FromRoute] string identifier)
         {
             var club = await _clubService.GetFullClub(identifier);
 
-            return _mapper.Map<ClubViewModel>(club); ;
+            return _mapper.Map<CompetitorDto>(club); ;
         }
 
         [Authorize]

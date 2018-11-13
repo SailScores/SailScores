@@ -20,6 +20,9 @@ namespace SailScores.Web.Mapping
 
             CreateMap<Model.Club, Areas.Api.Models.ClubViewModel>();
 
+            CreateMap<Model.Club, Model.Club>()
+                .ForMember(d => d.Fleets, o => o.Ignore());
+            
         }
     }
 }

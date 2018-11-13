@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Web.Http;
+using SailScores.Core.Model.Dto;
 
 namespace Sailscores.Client.Uwp.Services
 {
@@ -46,8 +47,8 @@ namespace Sailscores.Client.Uwp.Services
                 httpResponse.EnsureSuccessStatusCode();
                 httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
-                var clubs = JsonConvert.DeserializeObject<T>(httpResponseBody);
-                return clubs;
+                var returnObj = JsonConvert.DeserializeObject<T>(httpResponseBody);
+                return returnObj;
             }
             catch (Exception ex)
             {
@@ -102,9 +103,9 @@ namespace Sailscores.Client.Uwp.Services
             return await GetAsync<List<Club>>("/api/club");
         }
 
-        public async Task<Club> GetClubAsync(Guid clubId)
+        public async Task<ClubDto> GetClubAsync(Guid clubId)
         {
-            return await GetAsync<Club>($"/api/club/{clubId}");
+            return await GetAsync<ClubDto>($"/api/club/{clubId}");
         }
 
         public async Task<List<Competitor>> GetCompetitorsAsync(Guid clubId)
