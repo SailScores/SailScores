@@ -8,5 +8,18 @@ namespace SailScores.Database
 {
     public interface ISailScoresContext : IDisposable {
         DbSet<Club> Clubs { get; set; }
+
+        DbSet<Fleet> Fleets { get; set; }
+        DbSet<Competitor> Competitors { get; set; }
+        DbSet<Season> Seasons { get; set; }
+        DbSet<Series> Series { get; set; }
+        DbSet<Race> Races { get; set; }
+        DbSet<Score> Scores { get; set; }
+
+        DbSet<ScoreCode> ScoreCodes { get; set; }
+
+        DbSet<UserClubPermission> UserPermissions { get; set; }
+
+        DbSet<File> Files { get; set; }
     }
 }
