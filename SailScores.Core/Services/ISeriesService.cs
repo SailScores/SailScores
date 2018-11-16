@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SailScores.Core.Services
 {
@@ -8,5 +10,7 @@ namespace SailScores.Core.Services
             string clubInitials,
             string seasonName,
             string seriesName);
+        Task<IEnumerable<Model.Series>> GetAllSeriesAsync(Guid clubId);
+        Task<Model.Series> GetOneSeriesAsync(Guid guid);
     }
 }

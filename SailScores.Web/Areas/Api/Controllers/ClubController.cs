@@ -35,7 +35,6 @@ namespace SailScores.Web.Areas.Api.Controllers
         /// <returns>Array of Model.Club</returns>
         // GET: api/Club
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<IEnumerable<ClubDto>> Get()
         {

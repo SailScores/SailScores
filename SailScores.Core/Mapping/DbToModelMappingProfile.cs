@@ -20,6 +20,7 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.Races, o => o.MapFrom(s => s.RaceSeries.Select(rs => rs.Race).ToList()));
             CreateMap<Db.Fleet, Model.Fleet>()
                 .ForMember(d => d.Competitors, o => o.MapFrom(s => s.CompetitorFleets.Select(cf => cf.Competitor).ToList()));
+            CreateMap<Db.Race, Model.Race>();
 
         }
     }

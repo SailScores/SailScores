@@ -138,10 +138,13 @@ namespace SailScores.Web
         {
             services.AddScoped<Core.Services.IClubService, Core.Services.ClubService>();
             services.AddScoped<Core.Services.ICompetitorService, Core.Services.CompetitorService>();
+            services.AddScoped<Core.Services.IScoringService, Core.Services.ScoringService>();
+            services.AddScoped<Core.Services.ISeriesService, Core.Services.SeriesService>();
+            services.AddScoped<Core.Services.IRaceService, Core.Services.RaceService>();
             services.AddScoped<Core.Services.ISeriesService, Core.Services.SeriesService>();
             services.AddScoped<Core.Scoring.ISeriesCalculator, Core.Scoring.SeriesCalculator>();
             services.AddScoped<Web.Services.ISeriesService, Web.Services.SeriesService>();
-            services.AddScoped<IRaceService, RaceService>();
+            services.AddScoped<Web.Services.IRaceService, Web.Services.RaceService>();
             
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }

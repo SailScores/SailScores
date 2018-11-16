@@ -27,7 +27,29 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<Series> GetSeriesDetailsAsync(
+        public async Task<IEnumerable<Series>> GetAllSeriesAsync(Guid clubId)
+        {
+            var seriesDb = await _dbContext
+                .Clubs
+                .Where(c => c.Id == clubId)
+                .SelectMany(c => c.Series)
+                .ToListAsync();
+
+
+            var returnObj = _mapper.Map<List<Series>>(seriesDb);
+            return returnObj;
+        }
+
+        public async Task<Series> GetOneSeriesAsync(Guid guid)
+        {
+            var seriesDb = await _dbContext
+                .Series
+                .FirstAsync(c => c.Id == guid);
+
+            return _mapper.Map<Series>(seriesDb);
+        }
+
+            public async Task<Series> GetSeriesDetailsAsync(
             string clubInitials,
             string seasonName,
             string seriesName)

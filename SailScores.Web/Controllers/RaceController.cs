@@ -14,10 +14,10 @@ namespace SailScores.Web.Controllers
     public class RaceController : Controller
     {
 
-        private readonly IRaceService _raceService;
+        private readonly Web.Services.IRaceService _raceService;
 
         public RaceController(
-            IRaceService raceService)
+            Web.Services.IRaceService raceService)
         {
             _raceService = raceService;
         }
