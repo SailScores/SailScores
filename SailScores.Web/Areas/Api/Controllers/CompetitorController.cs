@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Model;
 using SailScores.Core.Model.Dto;
 using SailScores.Core.Services;
 using SailScores.Web.Services;
@@ -45,6 +46,26 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             return _mapper.Map<CompetitorDto>(c); ;
         }
-        
+
+        [Authorize]
+        // POST: api/Club
+        [HttpPost]
+        public async Task Post([FromBody] CompetitorDto value)
+        {
+            Competitor comp = _mapper.Map<Competitor>(value);
+
+            await _service.SaveAsync(comp);
+        }
+
+        [Authorize]
+        // PUT: api/Club/5
+        [HttpPut("{id}")]
+        public async Task Put(Guid id, [FromBody] CompetitorDto value)
+        {
+            Competitor comp = _mapper.Map<Competitor>(value);
+            comp.Id = id;
+            await _service.SaveAsync(comp);
+        }
+
     }
 }
