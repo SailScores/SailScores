@@ -44,5 +44,38 @@ namespace SailScores.Core.Services
 
             return _mapper.Map<Model.Competitor>(competitor);
         }
+
+        public async Task SaveAsync(Competitor comp)
+        {
+            var dbObject = await _dbContext
+                .Competitors
+                .FirstOrDefaultAsync(
+                    c =>
+                    c.Id == comp.Id);
+            var addingNew = dbObject == null;
+            if(addingNew)
+            {
+                if(comp.Id == null || comp.Id == Guid.Empty)
+                {
+                    comp.Id = Guid.NewGuid();
+                }
+                dbObject = _mapper.Map<Db.Competitor>(comp);
+                await _dbContext.Competitors.AddAsync(dbObject);
+            }
+            else
+            {
+                dbObject.Name = comp.Name;
+                dbObject.SailNumber = comp.SailNumber;
+                dbObject.AlternativeSailNumber = comp.AlternativeSailNumber;
+                dbObject.BoatName = comp.BoatName;
+                dbObject.Notes = comp.Notes;
+                //todo: class
+                //todo: fleets
+                //todo: scores
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+        }
     }
 }

@@ -3,6 +3,8 @@ using SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SailScores.Database
 {
@@ -21,5 +23,9 @@ namespace SailScores.Database
         DbSet<UserClubPermission> UserPermissions { get; set; }
 
         DbSet<File> Files { get; set; }
+
+        int SaveChanges();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+
     }
 }
