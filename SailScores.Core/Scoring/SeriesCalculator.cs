@@ -120,8 +120,12 @@ namespace SailScores.Core.Scoring
 
         public void ValidateScores(SeriesResults results, IEnumerable<Score> scores)
         {
-            bool allRacesFound = scores.All(s => results.Races.Any(r => r.Id == s.RaceId));
-            bool allCompetitorsFound = scores.All(s => results.Competitors.Any(c => c.Id == s.CompetitorId));
+            bool allRacesFound = scores.All(s => results.Races.Any(
+                r => r.Id == s.RaceId
+                    || r == s.Race));
+            bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
+                c => c.Id == s.CompetitorId
+                    || c == s.Competitor ));
             if (!allRacesFound)
             {
                 throw new InvalidOperationException(
