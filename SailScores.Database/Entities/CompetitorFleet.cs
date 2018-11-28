@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SailScores.Database.Entities
+namespace Sailscores.Database.Entities
 {
     public class CompetitorFleet
     {

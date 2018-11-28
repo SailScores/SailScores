@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SailScores.Core.Model.Dto
+namespace Sailscores.Core.Model.Dto
 {
     public class ScoreCodeDto
     {

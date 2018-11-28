@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Web.Models.AccountViewModels;
+using Sailscores.Web.Models.AccountViewModels;
 using System.Linq;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,7 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace SailScores.Web.Areas.Api.Controllers
+namespace Sailscores.Web.Areas.Api.Controllers
 {
     //TODO: include specific endpoints for auth.
     [Authorize]

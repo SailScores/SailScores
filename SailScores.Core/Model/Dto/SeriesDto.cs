@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using SailScores.Core.Scoring;
+using Sailscores.Core.Scoring;
 
-namespace SailScores.Core.Model.Dto
+namespace Sailscores.Core.Model.Dto
 {
     public class SeriesDto
     {

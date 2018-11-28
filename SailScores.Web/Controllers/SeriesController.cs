@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Services;
-using SailScores.Web.Models.SailScores;
-using SailScores.Web.Services;
+using Sailscores.Core.Services;
+using Sailscores.Web.Models.Sailscores;
+using Sailscores.Web.Services;
 
-namespace SailScores.Web.Controllers
+namespace Sailscores.Web.Controllers
 {
     public class SeriesController : Controller
     {

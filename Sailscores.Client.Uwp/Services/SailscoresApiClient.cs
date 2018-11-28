@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Sailscores.Client.Uwp.Services.SettingsServices;
-using SailScores.Core.Model;
+using Sailscores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Web.Http;
-using SailScores.Core.Model.Dto;
+using Sailscores.Core.Model.Dto;
 
 namespace Sailscores.Client.Uwp.Services
 {

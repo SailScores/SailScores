@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace SailScores.Database.Migrations
+namespace Sailscores.Database.Migrations
 {
     public partial class Initial : Migration
     {

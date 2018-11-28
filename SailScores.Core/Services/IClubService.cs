@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SailScores.Core.Model;
+using Sailscores.Core.Model;
 
-namespace SailScores.Core.Services
+namespace Sailscores.Core.Services
 {
     public interface IClubService
     {

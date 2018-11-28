@@ -1,8 +1,8 @@
-﻿using SailScores.Core.Model;
+﻿using Sailscores.Core.Model;
 using System;
 using System.Text;
 
-namespace SailScores.Core.Scoring
+namespace Sailscores.Core.Scoring
 {
     // CalculatedScore is results for a particular series. (competitor and race)
     public class CalculatedScore

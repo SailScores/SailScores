@@ -1,6 +1,6 @@
 using System;
 
-namespace SailScores.Web.Models
+namespace Sailscores.Web.Models
 {
     public class ErrorViewModel
     {

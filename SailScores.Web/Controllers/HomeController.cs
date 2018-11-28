@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Web.Models.SailScores;
-using SailScores.Core.Services;
-using SailScores.Web.Models;
+using Sailscores.Web.Models.Sailscores;
+using Sailscores.Core.Services;
+using Sailscores.Web.Models;
 
-namespace SailScores.Web.Controllers
+namespace Sailscores.Web.Controllers
 {
     public class HomeController : Controller
     {

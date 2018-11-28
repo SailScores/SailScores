@@ -1,4 +1,4 @@
-﻿namespace SailScores.Database.Enumerations
+﻿namespace Sailscores.Database.Enumerations
 {
     public enum FleetType
     {

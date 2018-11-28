@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Template10.Services.NavigationService;
 using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
-using SailScores.Core.Model;
+using Sailscores.Core.Model;
 
 namespace Sailscores.Client.Uwp.ViewModels
 {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sailscores.Client.Uwp.Services.SettingsServices;
-using SailScores.Core.Model;
+using Sailscores.Core.Model;
 
 namespace Sailscores.Client.Uwp.Services
 {

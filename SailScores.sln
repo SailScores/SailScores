@@ -23,9 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Test.Unit", "Sai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sailscores.Client.Uwp", "Sailscores.Client.Uwp\Sailscores.Client.Uwp.csproj", "{9ACA51C0-83F0-4F4F-A02D-12E425D94398}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sailscores.ImportExport", "Sailscores.ImportExport\Sailscores.ImportExport.csproj", "{A337316C-7402-48AF-B944-836D111E06F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sailscores.ImportExport", "Sailscores.ImportExport\Sailscores.ImportExport.csproj", "{A337316C-7402-48AF-B944-836D111E06F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sailscores.ImportExport.Test", "Sailscores.ImportExport.Test\Sailscores.ImportExport.Test.csproj", "{B8DCE887-EFC1-4B51-94A0-4B84A852352A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sailscores.ImportExport.Test", "Sailscores.ImportExport.Test\Sailscores.ImportExport.Test.csproj", "{B8DCE887-EFC1-4B51-94A0-4B84A852352A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sailscores.Utility", "Sailscores.Utility\Sailscores.Utility.csproj", "{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,6 +191,22 @@ Global
 		{B8DCE887-EFC1-4B51-94A0-4B84A852352A}.Release|x64.Build.0 = Release|Any CPU
 		{B8DCE887-EFC1-4B51-94A0-4B84A852352A}.Release|x86.ActiveCfg = Release|Any CPU
 		{B8DCE887-EFC1-4B51-94A0-4B84A852352A}.Release|x86.Build.0 = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|ARM.Build.0 = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|x64.Build.0 = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Debug|x86.Build.0 = Debug|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|ARM.ActiveCfg = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|ARM.Build.0 = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|x64.ActiveCfg = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|x64.Build.0 = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|x86.ActiveCfg = Release|Any CPU
+		{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

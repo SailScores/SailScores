@@ -1,8 +1,8 @@
-﻿using SailScores.Core.Model;
+﻿using Sailscores.Core.Model;
 using System;
 using System.Collections.Generic;
 
-namespace SailScores.Core.Scoring
+namespace Sailscores.Core.Scoring
 {
     public class SeriesResults
     {

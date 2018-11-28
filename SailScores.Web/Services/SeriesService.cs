@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using SailScores.Web.Models.SailScores;
+using Sailscores.Web.Models.Sailscores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core = SailScores.Core;
+using Core = Sailscores.Core;
 
-namespace SailScores.Web.Services
+namespace Sailscores.Web.Services
 {
     public class SeriesService : ISeriesService
     {

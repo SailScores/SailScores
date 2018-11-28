@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Services;
-using SailScores.Web.Models.SailScores;
+using Sailscores.Core.Services;
+using Sailscores.Web.Models.Sailscores;
 
-namespace SailScores.Web.Controllers
+namespace Sailscores.Web.Controllers
 {
     public class ClubController : Controller
     {

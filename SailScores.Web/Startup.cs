@@ -1,35 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SailScores.Web.Data;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
-using SailScores.Core.Services;
-using SailScores.Database;
-using AutoMapper;
-using SailScores.Web;
-using Microsoft.Extensions.Caching.Memory;
-using SailScores.Web.Services;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using SailScores.Core.Mapping;
+using Sailscores.Core.Mapping;
+using Sailscores.Core.Services;
+using Sailscores.Database;
+using Sailscores.Web.Data;
+using Sailscores.Web.Mapping;
+using Sailscores.Web.Services;
+using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using SailScores.Web.Mapping;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SailScores.Web
+namespace Sailscores.Web
 {
     public class Startup
     {
@@ -47,8 +41,8 @@ namespace SailScores.Web
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "SailScores API", Version = "v1" });
-                c.IncludeXmlComments(string.Format(@"{0}\SailScores.Web.xml",
+                c.SwaggerDoc("v1", new Info { Title = "Sailscores API", Version = "v1" });
+                c.IncludeXmlComments(string.Format(@"{0}\Sailscores.Web.xml",
                      System.AppDomain.CurrentDomain.BaseDirectory));
                 c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
                 {
@@ -71,12 +65,12 @@ namespace SailScores.Web
             });
 
 
-            services.AddDbContext<SailScoresIdentityContext>(options =>
+            services.AddDbContext<SailscoresIdentityContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<IdentityUser,IdentityRole>()
-                .AddEntityFrameworkStores<SailScoresIdentityContext>()
+                .AddEntityFrameworkStores<SailscoresIdentityContext>()
                 .AddDefaultTokenProviders();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -118,7 +112,7 @@ namespace SailScores.Web
                 };
             });
 
-            services.AddDbContext<SailScoresContext>(options =>
+            services.AddDbContext<SailscoresContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
@@ -129,24 +123,17 @@ namespace SailScores.Web
                     typeof(ToViewModelMappingProfile).GetTypeInfo().Assembly
                 });
 
-            RegisterSailScoresServices(services);
+            RegisterSailscoresServices(services);
 
 
         }
 
-        private void RegisterSailScoresServices(IServiceCollection services)
+        private void RegisterSailscoresServices(IServiceCollection services)
         {
-            services.AddScoped<Core.Services.IClubService, Core.Services.ClubService>();
-            services.AddScoped<Core.Services.ICompetitorService, Core.Services.CompetitorService>();
-            services.AddScoped<Core.Services.IScoringService, Core.Services.ScoringService>();
-            services.AddScoped<Core.Services.ISeriesService, Core.Services.SeriesService>();
-            services.AddScoped<Core.Services.IRaceService, Core.Services.RaceService>();
-            services.AddScoped<Core.Services.ISeriesService, Core.Services.SeriesService>();
-            services.AddScoped<Core.Scoring.ISeriesCalculator, Core.Scoring.SeriesCalculator>();
-            services.AddScoped<Web.Services.ISeriesService, Web.Services.SeriesService>();
-            services.AddScoped<Web.Services.IRaceService, Web.Services.RaceService>();
+            services.RegisterCoreSailscoresServices();
+            services.RegisterWebSailscoresServices();
             
-            services.AddDbContext<ISailScoresContext, SailScoresContext>();
+            services.AddDbContext<ISailscoresContext, SailscoresContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -170,7 +157,7 @@ namespace SailScores.Web
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SailScores API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sailscores API V1");
             });
 
 
@@ -192,7 +179,7 @@ namespace SailScores.Web
                     constraints: new
                     {
                         clubInitials = new ClubRouteConstraint(() =>
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailscoresContext>(),
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });
@@ -203,7 +190,7 @@ namespace SailScores.Web
                     constraints: new
                     {
                         clubInitials = new ClubRouteConstraint(() =>
-                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailscoresContext>(),
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });

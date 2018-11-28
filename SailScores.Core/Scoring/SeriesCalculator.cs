@@ -1,9 +1,9 @@
-﻿using SailScores.Core.Model;
+﻿using Sailscores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SailScores.Core.Scoring
+namespace Sailscores.Core.Scoring
 {
     public class SeriesCalculator : ISeriesCalculator
     {

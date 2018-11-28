@@ -1,5 +1,5 @@
 ﻿using Sailscores.Client.Uwp.TaskHelpers;
-using SailScores.Core.Model;
+using Sailscores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

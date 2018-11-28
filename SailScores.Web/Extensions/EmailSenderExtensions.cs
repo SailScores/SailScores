@@ -1,8 +1,8 @@
-using SailScores.Web.Services;
+using Sailscores.Web.Services;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
-namespace SailScores.Web.Extensions
+namespace Sailscores.Web.Extensions
 {
     public static class EmailSenderExtensions
     {

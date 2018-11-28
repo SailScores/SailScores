@@ -1,10 +1,10 @@
-using SailScores.Core.Model;
-using SailScores.Core.Scoring;
+using Sailscores.Core.Model;
+using Sailscores.Core.Scoring;
 using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace SailScores.Test.Unit
+namespace Sailscores.Test.Unit
 {
 
 

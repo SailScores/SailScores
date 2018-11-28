@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SailScores.Web.Extensions;
-using SailScores.Web.Models.AccountViewModels;
-using SailScores.Web.Services;
-using SailScores.Web.Controllers;
-using SailScores.Web.Models.AccountViewModels;
+using Sailscores.Web.Extensions;
+using Sailscores.Web.Models.AccountViewModels;
+using Sailscores.Web.Services;
+using Sailscores.Web.Controllers;
+using Sailscores.Web.Models.AccountViewModels;
 using System.Linq;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,7 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace SailScores.Web.Controllers
+namespace Sailscores.Web.Controllers
 {
     // this keeps the controller out of swagger.
     //TODO: include specific endpoints for auth.

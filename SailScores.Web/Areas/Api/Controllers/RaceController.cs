@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Model.Dto;
-using SailScores.Core.Services;
-using SailScores.Web.Services;
-using Model = SailScores.Core.Model;
+using Sailscores.Core.Model.Dto;
+using Sailscores.Core.Services;
+using Sailscores.Web.Services;
+using Model = Sailscores.Core.Model;
 
-namespace SailScores.Web.Areas.Api.Controllers
+namespace Sailscores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

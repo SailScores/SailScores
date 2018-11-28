@@ -1,6 +1,6 @@
-﻿using SailScores.Core.Model;
+﻿using Sailscores.Core.Model;
 
-namespace SailScores.Core.Scoring
+namespace Sailscores.Core.Scoring
 {
     public interface ISeriesCalculator
     {

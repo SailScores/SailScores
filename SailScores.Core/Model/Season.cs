@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SailScores.Core.Model
+namespace Sailscores.Core.Model
 {
     public class Season
     {

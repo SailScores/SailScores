@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SailScores.Core.Model
+namespace Sailscores.Core.Model
 {
     public class Score
     {

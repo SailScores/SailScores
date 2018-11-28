@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SailScores.Core.Services
+namespace Sailscores.Core.Services
 {
     public interface ISeriesService
     {

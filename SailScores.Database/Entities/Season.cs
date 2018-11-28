@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SailScores.Database.Entities
+namespace Sailscores.Database.Entities
 {
     public class Season
     {

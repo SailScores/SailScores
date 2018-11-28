@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Web.Controllers;
+using Sailscores.Web.Controllers;
 
-namespace SailScores.Web.Extensions
+namespace Sailscores.Web.Extensions
 {
     public static class UrlHelperExtensions
     {

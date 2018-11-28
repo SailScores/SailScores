@@ -1,8 +1,8 @@
-﻿using SailScores.Web.Models.SailScores;
+﻿using Sailscores.Web.Models.Sailscores;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SailScores.Web.Services
+namespace Sailscores.Web.Services
 {
     public interface ISeriesService
     {

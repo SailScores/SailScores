@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SailScores.Web.Models.AccountViewModels
+namespace Sailscores.Web.Models.AccountViewModels
 {
     public class LoginViewModel
     {

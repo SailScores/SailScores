@@ -4,11 +4,11 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace SailScores.Web.Data
+namespace Sailscores.Web.Data
 {
-    public class SailScoresIdentityContext : IdentityDbContext
+    public class SailscoresIdentityContext : IdentityDbContext
     {
-        public SailScoresIdentityContext(DbContextOptions<SailScoresIdentityContext> options)
+        public SailscoresIdentityContext(DbContextOptions<SailscoresIdentityContext> options)
             : base(options)
         {
         }

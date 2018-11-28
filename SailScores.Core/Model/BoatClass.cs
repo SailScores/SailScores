@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SailScores.Core.Model
+namespace Sailscores.Core.Model
 {
     public class BoatClass
     {

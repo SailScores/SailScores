@@ -1,10 +1,10 @@
-﻿using SailScores.Core.Scoring;
+﻿using Sailscores.Core.Scoring;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SailScores.Core.Model
+namespace Sailscores.Core.Model
 {
     public class Series
     {
