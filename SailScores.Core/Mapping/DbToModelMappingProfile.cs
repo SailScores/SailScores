@@ -17,10 +17,14 @@ namespace Sailscores.Core.Mapping
             CreateMap<Db.Competitor, Model.Competitor>();
 
             CreateMap<Db.Series, Model.Series>()
-                .ForMember(d => d.Races, o => o.MapFrom(s => s.RaceSeries.Select(rs => rs.Race).ToList()));
+                .ForMember(d => d.Races, o => o.MapFrom(s => s.RaceSeries.Select(rs => rs.Race).ToList()))
+                .ReverseMap()
+                .ForMember(d => d.RaceSeries, o => o.Ignore());
             CreateMap<Db.Fleet, Model.Fleet>()
                 .ForMember(d => d.Competitors, o => o.MapFrom(s => s.CompetitorFleets.Select(cf => cf.Competitor).ToList()));
-            CreateMap<Db.Race, Model.Race>();
+            CreateMap<Db.Race, Model.Race>()
+                .ReverseMap()
+                .ForMember(d => d.SeriesRaces, o => o.Ignore());
 
         }
     }

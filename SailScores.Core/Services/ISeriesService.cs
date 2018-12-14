@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sailscores.Core.Model;
 
 namespace Sailscores.Core.Services
 {
@@ -12,5 +13,6 @@ namespace Sailscores.Core.Services
             string seriesName);
         Task<IEnumerable<Model.Series>> GetAllSeriesAsync(Guid clubId);
         Task<Model.Series> GetOneSeriesAsync(Guid guid);
+        Task SaveNewSeries(Series ssSeries, Club club);
     }
 }

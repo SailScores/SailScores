@@ -61,5 +61,18 @@ namespace Sailscores.Core.Services
 
             return _mapper.Map<Model.Club>(club);
         }
+
+        public async Task SaveNewClub(Club club)
+        {
+            if(_dbContext.Clubs.Any(c => c.Initials == club.Initials))
+            {
+                throw new InvalidOperationException("Cannot create club." +
+                    " A club with those initials already exists.");
+            }
+            club.Id = Guid.NewGuid();
+            var dbClub = _mapper.Map<Db.Club>(club);
+            _dbContext.Clubs.Add(dbClub);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

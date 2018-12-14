@@ -8,5 +8,6 @@ namespace Sailscores.Core.Services
     {
         Task<IList<Model.Club>> GetClubs(bool includeHidden);
         Task<Club> GetFullClub(string id);
+        Task SaveNewClub(Club club);
     }
 }

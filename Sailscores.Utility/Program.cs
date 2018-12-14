@@ -14,6 +14,7 @@ using Sailscores.Core.Services;
 using Sailscores.Core.Mapping;
 using System.Reflection;
 using AutoMapper;
+using System.Threading.Tasks;
 
 namespace Sailscores.Utility
 {
@@ -87,9 +88,9 @@ namespace Sailscores.Utility
 
         private static void StartDbImport()
         {
-            // get filestream
+            // get file path
             string fullpath = GetImportFilePath();
-            // import filestream
+            // import file
             var series = ImportSWFile(fullpath);
             // write to Db
             WriteSwSeriesToSS(series);
@@ -124,7 +125,48 @@ namespace Sailscores.Utility
         {
             Console.WriteLine($"About to import a series with {series.Races.Count} race(s).");
             SsObjects.Club club = GetClub();
+            SaveSeriesToClub(series, club);
 
+        }
+
+        private static void SaveSeriesToClub(SwObjects.Series series, SsObjects.Club club)
+        {
+            //todo: figure out fleet
+            var ssSeries = MakeSeries(club);
+            ssSeries.Races = MakeRaces(series, club);
+
+
+
+            var seriesService = _serviceProvider.GetService<ISeriesService>();
+            try
+            {
+                var createTask = seriesService.SaveNewSeries(ssSeries, club);
+                createTask.Wait();
+                //createTask.GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+            }
+        }
+
+        private static IList<SsObjects.Race> MakeRaces(SwObjects.Series series, SsObjects.Club club)
+        {
+            var retList = new List<SsObjects.Race>();
+            foreach(var swRace in series.Races)
+            {
+                retList.Add(new SsObjects.Race
+                {
+                    Name = swRace.Name,
+                    Order = swRace.Rank,
+                    ClubId = club.Id,
+                    Date = DateTime.Today
+
+                });
+                //todo: add competitors
+                //todo: add scores
+            }
+            return retList;
         }
 
         private static SsObjects.Club GetClub()
@@ -140,6 +182,17 @@ namespace Sailscores.Utility
             {
                 return MakeNewClub();
             }
+        }
+        private static SsObjects.Series MakeSeries(SsObjects.Club club)
+        {
+            Console.Write("What is the name of this series? > ");
+            var result = Console.ReadLine();
+            SsObjects.Series ssSeries = new SsObjects.Series
+            {
+                ClubId = club.Id,
+                Name = result
+            };
+            return ssSeries;
         }
 
 
@@ -177,7 +230,32 @@ namespace Sailscores.Utility
 
         private static SsObjects.Club MakeNewClub()
         {
-            throw new NotImplementedException();
+            // Get Name and initials:
+            Console.Write("Enter the new club name > ");
+            var clubName = Console.ReadLine().Trim();
+            Console.Write("Enter the club initials > ");
+            var clubInitials = Console.ReadLine().Trim();
+
+            var clubService = _serviceProvider.GetService<IClubService>();
+
+            SsObjects.Club club = new SsObjects.Club
+            {
+                Initials = clubInitials,
+                Name = clubName
+            };
+
+            try
+            {
+                var createTask = clubService.SaveNewClub(club);
+                createTask.Wait();
+                //createTask.GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+            }
+
+            return club;
         }
 
     }

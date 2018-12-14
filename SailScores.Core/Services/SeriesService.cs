@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sailscores.Core.Model;
 using Sailscores.Core.Scoring;
 using Sailscores.Database;
+using dbObj = Sailscores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,98 @@ namespace Sailscores.Core.Services
             var results = _seriesCalculator.CalculateResults(returnObj);
             returnObj.Results = results;
             return returnObj;
+        }
+
+        public async Task SaveNewSeries(Series ssSeries, Club club)
+        {
+            Database.Entities.Series dbSeries = await BuildDbSeriesAsync(ssSeries, club);
+            _dbContext.Series.Add(dbSeries);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task<dbObj.Series> BuildDbSeriesAsync(Model.Series ssSeries, Model.Club club)
+        {
+            var retObj = _mapper.Map<dbObj.Series>(ssSeries);
+            if(retObj.RaceSeries == null) 
+            {
+                retObj.RaceSeries = new List<dbObj.SeriesRaces>();
+            }
+            foreach(var race in ssSeries.Races)
+            {
+                var dbRace = _mapper.Map<dbObj.Race>(race);
+                var link = new dbObj.SeriesRaces
+                {
+                    Series = retObj,
+                    Race = dbRace
+                };
+                retObj.RaceSeries.Add(link);
+            }
+            
+            dbObj.Season dbSeason = await GetSeasonAsync(club, ssSeries);
+            retObj.Season = dbSeason;
+
+            return retObj;
+        }
+
+        private async Task<dbObj.Season> GetSeasonAsync(Club club, Series ssSeries)
+        {
+            dbObj.Season retSeason = null;
+            if (ssSeries.Season != null)
+            {
+                retSeason = await _dbContext.Seasons
+                    .FirstOrDefaultAsync(s =>
+                        s.ClubId == club.Id
+                        && ( s.Id == ssSeries.Season.Id
+                            || s.Start == ssSeries.Season.Start));
+            }
+            if (retSeason == null)
+            {
+                DateTime? firstDate = ssSeries.Races?.Min(r => r.Date);
+                DateTime? lastDate = ssSeries.Races?.Max(r => r.Date);
+                retSeason = await GetSeason(club, firstDate, lastDate, true);
+            }
+            return retSeason;
+        }
+
+        private async Task<dbObj.Season> GetSeason(
+            Club club,
+            DateTime? minDate,
+            DateTime? maxDate,
+            bool createNew)
+        {
+            var minDateToUse = minDate ?? DateTime.Today;
+            var maxDateToUse = maxDate ?? DateTime.Today;
+            var retObj = await _dbContext.Seasons
+                .FirstOrDefaultAsync(
+                s => s.ClubId == club.Id
+                && s.Start <= minDateToUse
+                && s.End > maxDateToUse);
+            if(retObj == null && createNew)
+            {
+                retObj = CreateNewSeason(club, minDateToUse, minDateToUse);
+            }
+
+            return retObj;
+        }
+
+        private dbObj.Season CreateNewSeason(Club club, DateTime minDate, DateTime maxDate)
+        {
+            DateTime beginning = GetStartOfYear(minDate);
+            DateTime end = GetStartOfYear(maxDate).AddYears(1);
+
+            var season = new dbObj.Season
+            {
+                ClubId = club.Id,
+                Name = $"{beginning:YYY}",
+                Start = beginning,
+                End = end
+            };
+            return season;
+        }
+
+        private DateTime GetStartOfYear(DateTime minDate)
+        {
+            return new DateTime(minDate.Year, 1, 1);
         }
     }
 }
