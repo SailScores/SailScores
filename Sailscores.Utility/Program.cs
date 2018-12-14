@@ -15,6 +15,7 @@ using Sailscores.Core.Mapping;
 using System.Reflection;
 using AutoMapper;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Sailscores.Utility
 {
@@ -132,10 +133,10 @@ namespace Sailscores.Utility
         private static void SaveSeriesToClub(SwObjects.Series series, SsObjects.Club club)
         {
             //todo: figure out fleet
+            //todo: figure out boatclass
+            var boatClass = GetBoatClass(club);
             var ssSeries = MakeSeries(club);
-            ssSeries.Races = MakeRaces(series, club);
-
-
+            ssSeries.Races = MakeRaces(series, club, boatClass);
 
             var seriesService = _serviceProvider.GetService<ISeriesService>();
             try
@@ -150,22 +151,52 @@ namespace Sailscores.Utility
             }
         }
 
-        private static IList<SsObjects.Race> MakeRaces(SwObjects.Series series, SsObjects.Club club)
+        private static IList<SsObjects.Race> MakeRaces(
+            SwObjects.Series series,
+            SsObjects.Club club,
+            SsObjects.BoatClass boatClass)
         {
             var retList = new List<SsObjects.Race>();
-            foreach(var swRace in series.Races)
+
+            foreach (var swRace in series.Races)
             {
-                retList.Add(new SsObjects.Race
+                var ssRace = new SsObjects.Race
                 {
                     Name = swRace.Name,
                     Order = swRace.Rank,
                     ClubId = club.Id,
-                    Date = DateTime.Today
+                    Date = DateTime.Today,
+                };
+                ssRace.Scores = MakeScores(swRace, series.Competitors, boatClass);
 
-                });
-                //todo: add competitors
-                //todo: add scores
+                retList.Add(ssRace);
             }
+            return retList;
+        }
+        
+        private static IList<SsObjects.Score> MakeScores(
+            SwObjects.Race swRace,
+            IEnumerable<SwObjects.Competitor> swCompetitors,
+            SsObjects.BoatClass boatClass)
+        {
+            var retList = new List<SsObjects.Score>();
+            foreach(var swScore in swRace.Results)
+            {
+                var ssScore = new SsObjects.Score
+                {
+                    Place = swScore.Place,
+                    Code = swScore.Code
+                };
+                var swCompetitor = swCompetitors.Single(c => c.Id == swScore.CompetitorId);
+                ssScore.Competitor = new SsObjects.Competitor
+                {
+                    Name = swCompetitor.HelmName,
+                    SailNumber = swCompetitor.SailNumber,
+                    BoatClassId = boatClass.Id
+                };
+                retList.Add(ssScore);
+            }
+
             return retList;
         }
 
@@ -183,6 +214,23 @@ namespace Sailscores.Utility
                 return MakeNewClub();
             }
         }
+
+        private static SsObjects.BoatClass GetBoatClass(SsObjects.Club club)
+        {
+            IList<SsObjects.BoatClass> existingClasses = club.BoatClasses;
+            Console.WriteLine($"There are {existingClasses.Count} classes already in this club.");
+            Console.Write("Would you like to use one of those? (Y / N)");
+            var result = Console.ReadLine();
+            if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return SelectExistingBoatClass(club);
+            }
+            else
+            {
+                return MakeNewBoatClass(club);
+            }
+        }
+
         private static SsObjects.Series MakeSeries(SsObjects.Club club)
         {
             Console.Write("What is the name of this series? > ");
@@ -258,5 +306,46 @@ namespace Sailscores.Utility
             return club;
         }
 
+
+        private static SsObjects.BoatClass SelectExistingBoatClass(SsObjects.Club club)
+        {
+            var boatClasses = club.BoatClasses;
+            Dictionary<int, SsObjects.BoatClass> classDict = new
+                Dictionary<int, SsObjects.BoatClass>();
+            int i = 1;
+            foreach (var boatClass in boatClasses)
+            {
+                classDict.Add(i++, boatClass);
+            }
+            foreach (var kvp in classDict)
+            {
+                Console.WriteLine($"{kvp.Key} - {kvp.Value.Name}");
+            }
+            int result = 0;
+            while (result == 0)
+            {
+                Console.Write("Enter a number of a class from above > ");
+                var input = Console.ReadLine();
+                Int32.TryParse(input, out result);
+            }
+
+            return classDict[result];
+        }
+
+        private static SsObjects.BoatClass MakeNewBoatClass(SsObjects.Club club)
+        {
+            // Get Name and initials:
+            Console.Write("Enter the new class name > ");
+            var className = Console.ReadLine().Trim();
+
+            SsObjects.BoatClass boatClass = new SsObjects.BoatClass
+            {
+                Id = Guid.NewGuid(),
+                Name = className,
+                ClubId = club.Id
+            };
+
+            return boatClass;
+        }
     }
 }

@@ -93,19 +93,75 @@ namespace Sailscores.Core.Services
             }
             foreach(var race in ssSeries.Races)
             {
-                var dbRace = _mapper.Map<dbObj.Race>(race);
-                var link = new dbObj.SeriesRaces
+                var dbRace = await BuildDbRaceObj(club, race);
+                retObj.RaceSeries.Add(new dbObj.SeriesRaces
                 {
                     Series = retObj,
                     Race = dbRace
-                };
-                retObj.RaceSeries.Add(link);
+                });
             }
-            
+
             dbObj.Season dbSeason = await GetSeasonAsync(club, ssSeries);
             retObj.Season = dbSeason;
 
             return retObj;
+        }
+
+        private async Task<dbObj.Race> BuildDbRaceObj(Club club, Race race)
+        {
+            var dbRace = _mapper.Map<dbObj.Race>(race);
+            dbRace.ClubId = club.Id;
+            dbRace.Scores = new List<dbObj.Score>();
+            // add scores
+            foreach(var score in race.Scores)
+            {
+                var dbScore = _mapper.Map<dbObj.Score>(score);
+                dbScore.Competitor = await FindOrBuildCompetitorAsync(club, score.Competitor);
+                dbRace.Scores.Add(dbScore);
+            }
+
+            return dbRace;
+        }
+
+        private async Task<dbObj.Competitor> FindOrBuildCompetitorAsync(
+            Club club,
+            Competitor competitor)
+        {
+            var existingCompetitors = _dbContext.Competitors
+                .Where(c => c.ClubId == club.Id);
+            foreach(var currenctDbComp in existingCompetitors)
+            {
+                if(AreCompetitorsMatch(competitor, currenctDbComp))
+                {
+                    return currenctDbComp;
+                }
+            }
+
+            var dbComp = _mapper.Map<dbObj.Competitor>(competitor);
+            dbComp.ClubId = club.Id;
+            _dbContext.Competitors.Add(dbComp);
+            return dbComp;
+        }
+
+        private bool AreCompetitorsMatch(Competitor competitor, dbObj.Competitor dbComp)
+        {
+            bool matchFound = false;
+
+            matchFound = !(String.IsNullOrWhiteSpace(competitor.SailNumber))
+                && !(String.IsNullOrWhiteSpace(dbComp.SailNumber))
+                && competitor.SailNumber.Equals(dbComp.SailNumber, StringComparison.InvariantCultureIgnoreCase);
+            matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.SailNumber))
+                && !(String.IsNullOrWhiteSpace(dbComp.AlternativeSailNumber))
+                && competitor.SailNumber.Equals(dbComp.AlternativeSailNumber, StringComparison.InvariantCultureIgnoreCase);
+
+            matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.AlternativeSailNumber))
+                && !(String.IsNullOrWhiteSpace(dbComp.SailNumber))
+                && competitor.AlternativeSailNumber.Equals(dbComp.SailNumber, StringComparison.InvariantCultureIgnoreCase);
+            matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.AlternativeSailNumber))
+                && !(String.IsNullOrWhiteSpace(dbComp.AlternativeSailNumber))
+                && competitor.AlternativeSailNumber.Equals(dbComp.AlternativeSailNumber, StringComparison.InvariantCultureIgnoreCase);
+            return matchFound;
+
         }
 
         private async Task<dbObj.Season> GetSeasonAsync(Club club, Series ssSeries)
