@@ -182,6 +182,17 @@ namespace Sailscores.Utility
             var retList = new List<SsObjects.Score>();
             foreach(var swScore in swRace.Results)
             {
+                if(String.IsNullOrWhiteSpace(swScore.Code)
+                    && swScore.Place == 0)
+                {
+                    continue;
+                }
+                // Not going to import DNCs. ?
+                if(swScore.Code == "DNC")
+                {
+                    continue;
+                }
+
                 var ssScore = new SsObjects.Score
                 {
                     Place = swScore.Place,
@@ -192,7 +203,8 @@ namespace Sailscores.Utility
                 {
                     Name = swCompetitor.HelmName,
                     SailNumber = swCompetitor.SailNumber,
-                    BoatClassId = boatClass.Id
+                    BoatClassId = boatClass.Id,
+                    BoatClass = boatClass
                 };
                 retList.Add(ssScore);
             }
@@ -218,17 +230,17 @@ namespace Sailscores.Utility
         private static SsObjects.BoatClass GetBoatClass(SsObjects.Club club)
         {
             IList<SsObjects.BoatClass> existingClasses = club.BoatClasses;
-            Console.WriteLine($"There are {existingClasses.Count} classes already in this club.");
-            Console.Write("Would you like to use one of those? (Y / N)");
-            var result = Console.ReadLine();
-            if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+            if (existingClasses != null)
             {
-                return SelectExistingBoatClass(club);
+                Console.WriteLine($"There are {existingClasses.Count} classes already in this club.");
+                Console.Write("Would you like to use one of those? (Y / N)");
+                var result = Console.ReadLine();
+                if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return SelectExistingBoatClass(club);
+                }
             }
-            else
-            {
-                return MakeNewBoatClass(club);
-            }
+            return MakeNewBoatClass(club);
         }
 
         private static SsObjects.Series MakeSeries(SsObjects.Club club)
@@ -344,6 +356,19 @@ namespace Sailscores.Utility
                 Name = className,
                 ClubId = club.Id
             };
+
+
+            var clubService = _serviceProvider.GetService<IClubService>();
+            try
+            {
+                var createTask = clubService.SaveNewBoatClass(boatClass);
+                createTask.Wait();
+                //createTask.GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+            }
 
             return boatClass;
         }

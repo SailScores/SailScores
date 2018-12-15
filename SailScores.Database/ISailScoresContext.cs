@@ -11,6 +11,7 @@ namespace Sailscores.Database
     public interface ISailscoresContext : IDisposable {
         DbSet<Club> Clubs { get; set; }
 
+        DbSet<BoatClass> BoatClasses { get; set; }
         DbSet<Fleet> Fleets { get; set; }
         DbSet<Competitor> Competitors { get; set; }
         DbSet<Season> Seasons { get; set; }

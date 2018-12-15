@@ -62,6 +62,14 @@ namespace Sailscores.Core.Services
             return _mapper.Map<Model.Club>(club);
         }
 
+        public async Task SaveNewBoatClass(BoatClass boatClass)
+        {
+            var dbBoatClass =_mapper.Map<Db.BoatClass>(boatClass);
+            _dbContext.BoatClasses.Add(dbBoatClass);
+            await _dbContext.SaveChangesAsync();
+
+        }
+
         public async Task SaveNewClub(Club club)
         {
             if(_dbContext.Clubs.Any(c => c.Initials == club.Initials))

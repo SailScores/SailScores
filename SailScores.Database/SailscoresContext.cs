@@ -12,6 +12,7 @@ namespace Sailscores.Database
     {
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Fleet> Fleets { get; set; }
+        public DbSet<BoatClass> BoatClasses { get; set; }
         public DbSet<Competitor> Competitors { get; set; }
         public DbSet<Season> Seasons { get; set; }
         public DbSet<Series> Series { get; set; }
