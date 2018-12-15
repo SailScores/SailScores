@@ -132,11 +132,10 @@ namespace Sailscores.Utility
 
         private static void SaveSeriesToClub(SwObjects.Series series, SsObjects.Club club)
         {
-            //todo: figure out fleet
-            //todo: figure out boatclass
             var boatClass = GetBoatClass(club);
+            var fleet = GetFleet(club);
             var ssSeries = MakeSeries(club);
-            ssSeries.Races = MakeRaces(series, club, boatClass);
+            ssSeries.Races = MakeRaces(series, club, boatClass, fleet);
 
             var seriesService = _serviceProvider.GetService<ISeriesService>();
             try
@@ -150,11 +149,12 @@ namespace Sailscores.Utility
                 Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
             }
         }
-
+        
         private static IList<SsObjects.Race> MakeRaces(
             SwObjects.Series series,
             SsObjects.Club club,
-            SsObjects.BoatClass boatClass)
+            SsObjects.BoatClass boatClass,
+            SsObjects.Fleet fleet)
         {
             var retList = new List<SsObjects.Race>();
 
@@ -166,8 +166,9 @@ namespace Sailscores.Utility
                     Order = swRace.Rank,
                     ClubId = club.Id,
                     Date = DateTime.Today,
+                    Fleet = fleet
                 };
-                ssRace.Scores = MakeScores(swRace, series.Competitors, boatClass);
+                ssRace.Scores = MakeScores(swRace, series.Competitors, boatClass, fleet);
 
                 retList.Add(ssRace);
             }
@@ -177,7 +178,8 @@ namespace Sailscores.Utility
         private static IList<SsObjects.Score> MakeScores(
             SwObjects.Race swRace,
             IEnumerable<SwObjects.Competitor> swCompetitors,
-            SsObjects.BoatClass boatClass)
+            SsObjects.BoatClass boatClass,
+            SsObjects.Fleet fleet)
         {
             var retList = new List<SsObjects.Score>();
             foreach(var swScore in swRace.Results)
@@ -206,6 +208,15 @@ namespace Sailscores.Utility
                     BoatClassId = boatClass.Id,
                     BoatClass = boatClass
                 };
+                if(fleet.FleetType == Database.Enumerations.FleetType.SelectedBoats)
+                {
+                    if(ssScore.Competitor.Fleets == null)
+                    {
+                        ssScore.Competitor.Fleets = new List<SsObjects.Fleet>();
+                    }
+                    ssScore.Competitor.Fleets.Add(fleet);
+                    fleet.Competitors.Add(ssScore.Competitor);
+                }
                 retList.Add(ssScore);
             }
 
@@ -230,7 +241,7 @@ namespace Sailscores.Utility
         private static SsObjects.BoatClass GetBoatClass(SsObjects.Club club)
         {
             IList<SsObjects.BoatClass> existingClasses = club.BoatClasses;
-            if (existingClasses != null)
+            if (existingClasses != null && existingClasses.Count != 0)
             {
                 Console.WriteLine($"There are {existingClasses.Count} classes already in this club.");
                 Console.Write("Would you like to use one of those? (Y / N)");
@@ -241,6 +252,22 @@ namespace Sailscores.Utility
                 }
             }
             return MakeNewBoatClass(club);
+        }
+
+        private static SsObjects.Fleet GetFleet(SsObjects.Club club)
+        {
+            IList<SsObjects.Fleet> existingFleets = club.Fleets;
+            if (existingFleets != null && existingFleets.Count != 0)
+            {
+                Console.WriteLine($"There are {existingFleets.Count} fleets already in this club.");
+                Console.Write("Would you like to use one of those? (Y / N)");
+                var result = Console.ReadLine();
+                if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return SelectExistingFleet(club);
+                }
+            }
+            return MakeNewFleet(club);
         }
 
         private static SsObjects.Series MakeSeries(SsObjects.Club club)
@@ -371,6 +398,63 @@ namespace Sailscores.Utility
             }
 
             return boatClass;
+        }
+
+
+
+        private static SsObjects.Fleet SelectExistingFleet(SsObjects.Club club)
+        {
+            var fleets = club.Fleets;
+            Dictionary<int, SsObjects.Fleet> fleetDict = new
+                Dictionary<int, SsObjects.Fleet>();
+            int i = 1;
+            foreach (var fleet in fleets)
+            {
+                fleetDict.Add(i++, fleet);
+            }
+            foreach (var kvp in fleetDict)
+            {
+                Console.WriteLine($"{kvp.Key} - {kvp.Value.Name}");
+            }
+            int result = 0;
+            while (result == 0)
+            {
+                Console.Write("Enter a number of a fleet from above > ");
+                var input = Console.ReadLine();
+                Int32.TryParse(input, out result);
+            }
+
+            return fleetDict[result];
+        }
+
+        private static SsObjects.Fleet MakeNewFleet(SsObjects.Club club)
+        {
+            // Get Name and initials:
+            Console.Write("Enter the new Fleet name > ");
+            var fleetName = Console.ReadLine().Trim();
+
+            SsObjects.Fleet fleet = new SsObjects.Fleet
+            {
+                Id = Guid.NewGuid(),
+                Name = fleetName,
+                ClubId = club.Id,
+                FleetType = Database.Enumerations.FleetType.SelectedBoats,
+                Competitors = new List<SsObjects.Competitor>()
+            };
+
+            var clubService = _serviceProvider.GetService<IClubService>();
+            try
+            {
+                var createTask = clubService.SaveNewFleet(fleet);
+                createTask.Wait();
+                //createTask.GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+            }
+
+            return fleet;
         }
     }
 }

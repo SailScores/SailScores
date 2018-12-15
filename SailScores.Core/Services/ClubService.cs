@@ -82,5 +82,12 @@ namespace Sailscores.Core.Services
             _dbContext.Clubs.Add(dbClub);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task SaveNewFleet(Fleet fleet)
+        {
+            var dbFleet = _mapper.Map<Db.Fleet>(fleet);
+            _dbContext.Fleets.Add(dbFleet);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

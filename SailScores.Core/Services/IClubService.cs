@@ -10,5 +10,6 @@ namespace Sailscores.Core.Services
         Task<Club> GetFullClub(string id);
         Task SaveNewClub(Club club);
         Task SaveNewBoatClass(BoatClass boatClass);
+        Task SaveNewFleet(Fleet fleet);
     }
 }

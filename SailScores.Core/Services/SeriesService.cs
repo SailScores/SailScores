@@ -118,9 +118,32 @@ namespace Sailscores.Core.Services
                 var dbScore = _mapper.Map<dbObj.Score>(score);
                 dbScore.Competitor = await FindOrBuildCompetitorAsync(club, score.Competitor);
                 dbRace.Scores.Add(dbScore);
+                if(race.Fleet?.FleetType == Database.Enumerations.FleetType.SelectedBoats)
+                {
+                    await EnsureCompetitorIsInFleet(dbScore.Competitor, race.Fleet);
+                }
             }
 
             return dbRace;
+        }
+
+        private async Task EnsureCompetitorIsInFleet(dbObj.Competitor competitor, Fleet fleet)
+        {
+            var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == fleet.Id);
+            var Exists = dbFleet.CompetitorFleets != null
+                && dbFleet.CompetitorFleets.Any(cf => cf.CompetitorId == competitor.Id);
+            if (!Exists)
+            {
+                if(dbFleet.CompetitorFleets == null)
+                {
+                    dbFleet.CompetitorFleets = new List<dbObj.CompetitorFleet>();
+                }
+                dbFleet.CompetitorFleets.Add(new dbObj.CompetitorFleet
+                {
+                    FleetId = dbFleet.Id,
+                    CompetitorId = competitor.Id
+                });
+            }
         }
 
         private async Task<dbObj.Competitor> FindOrBuildCompetitorAsync(
@@ -129,11 +152,11 @@ namespace Sailscores.Core.Services
         {
             var existingCompetitors = _dbContext.Competitors
                 .Where(c => c.ClubId == club.Id);
-            foreach(var currenctDbComp in existingCompetitors)
+            foreach(var currentDbComp in existingCompetitors)
             {
-                if(AreCompetitorsMatch(competitor, currenctDbComp))
+                if(AreCompetitorsMatch(competitor, currentDbComp))
                 {
-                    return currenctDbComp;
+                    return currentDbComp;
                 }
             }
 
