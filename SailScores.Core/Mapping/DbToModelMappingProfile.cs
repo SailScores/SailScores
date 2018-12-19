@@ -13,8 +13,10 @@ namespace Sailscores.Core.Mapping
         public DbToModelMappingProfile()
         {
             // ToDo: Plenty more mappings to add, including many-to-many object collections.
-            CreateMap<Db.Club, Model.Club>();
-            CreateMap<Db.Competitor, Model.Competitor>();
+            CreateMap<Db.Club, Model.Club>()
+                .MaxDepth(2);
+            CreateMap<Db.Competitor, Model.Competitor>()
+                .MaxDepth(2);
 
             CreateMap<Db.Series, Model.Series>()
                 .ForMember(d => d.Races, o => o.MapFrom(s => s.RaceSeries.Select(rs => rs.Race).ToList()))
