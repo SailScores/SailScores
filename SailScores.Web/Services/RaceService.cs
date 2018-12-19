@@ -34,8 +34,10 @@ namespace Sailscores.Web.Services
         {
 
             var club = await _coreClubService.GetFullClub(clubInitials);
-            return _mapper.Map<RaceViewModel>(club.Races.First(r => r.Id == id));
+            var retRace = _mapper.Map<RaceViewModel>(club.Races.First(r => r.Id == id));
+            retRace.Scores = retRace.Scores.OrderBy(s => s.Place ?? int.MaxValue).ToList();
 
+            return retRace;
         }
     }
 }

@@ -116,6 +116,10 @@ namespace Sailscores.Core.Services
             foreach(var score in race.Scores)
             {
                 var dbScore = _mapper.Map<dbObj.Score>(score);
+                if (!String.IsNullOrWhiteSpace(dbScore.Code))
+                {
+                    dbScore.Place = null;
+                }
                 dbScore.Competitor = await FindOrBuildCompetitorAsync(club, score.Competitor);
                 dbRace.Scores.Add(dbScore);
                 if(race.Fleet?.FleetType == Database.Enumerations.FleetType.SelectedBoats)
@@ -150,7 +154,7 @@ namespace Sailscores.Core.Services
             Club club,
             Competitor competitor)
         {
-            var existingCompetitors = _dbContext.Competitors
+            var existingCompetitors = _dbContext.Competitors.Local
                 .Where(c => c.ClubId == club.Id);
             foreach(var currentDbComp in existingCompetitors)
             {
@@ -236,7 +240,7 @@ namespace Sailscores.Core.Services
             var season = new dbObj.Season
             {
                 ClubId = club.Id,
-                Name = $"{beginning:YYY}",
+                Name = $"{beginning.Year}",
                 Start = beginning,
                 End = end
             };
