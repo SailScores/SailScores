@@ -134,8 +134,9 @@ namespace Sailscores.Utility
         {
             var boatClass = GetBoatClass(club);
             var fleet = GetFleet(club);
+            int year = GetYear();
             var ssSeries = MakeSeries(club);
-            ssSeries.Races = MakeRaces(series, club, boatClass, fleet);
+            ssSeries.Races = MakeRaces(series, club, boatClass, fleet, year);
 
             var seriesService = _serviceProvider.GetService<ISeriesService>();
             try
@@ -154,18 +155,21 @@ namespace Sailscores.Utility
             SwObjects.Series series,
             SsObjects.Club club,
             SsObjects.BoatClass boatClass,
-            SsObjects.Fleet fleet)
+            SsObjects.Fleet fleet,
+            int year)
         {
             var retList = new List<SsObjects.Race>();
 
             foreach (var swRace in series.Races)
             {
+                DateTime date = GetDate(swRace, year);
+                int rank = GetRank(swRace);
                 var ssRace = new SsObjects.Race
                 {
                     Name = swRace.Name,
                     Order = swRace.Rank,
                     ClubId = club.Id,
-                    Date = DateTime.Today,
+                    Date = date,
                     Fleet = fleet
                 };
                 ssRace.Scores = MakeScores(swRace, series.Competitors, boatClass, fleet);
@@ -174,7 +178,37 @@ namespace Sailscores.Utility
             }
             return retList;
         }
-        
+
+        private static DateTime GetDate(SwObjects.Race swRace, int year)
+        {
+            // assume race name format of "6-22 R1" or "6-23"
+            var datepart = swRace.Name.Split(' ')[0];
+            if (String.IsNullOrWhiteSpace(datepart))
+            {
+                return DateTime.Today;
+            }
+            var parts = datepart.Split('-');
+            int month = DateTime.Today.Month;
+            int day = DateTime.Today.Day;
+            Int32.TryParse(parts[0], out month);
+            Int32.TryParse(parts[1], out day);
+            return new DateTime(year, month, day);
+        }
+
+        private static int GetRank(SwObjects.Race swRace)
+        {
+            // assume race name format of "6-22 R1" or "6-23"
+            var parts = swRace.Name.Split(' ');
+            if (parts.Length < 2)
+            {
+                return 1;
+            }
+            var numberString = new String(parts[1].Where(Char.IsDigit).ToArray());
+            int rank = 1;
+            Int32.TryParse(numberString, out rank);
+            return rank;
+        }
+
         private static IList<SsObjects.Score> MakeScores(
             SwObjects.Race swRace,
             IEnumerable<SwObjects.Competitor> swCompetitors,
@@ -268,6 +302,18 @@ namespace Sailscores.Utility
                 }
             }
             return MakeNewFleet(club);
+        }
+
+        private static int GetYear()
+        {
+            Console.Write ("What year was this series? > ");
+            var result = 0;
+            while (result < 1900)
+            {
+                var input = Console.ReadLine();
+                Int32.TryParse(input, out result);
+            }
+            return result;
         }
 
         private static SsObjects.Series MakeSeries(SsObjects.Club club)
