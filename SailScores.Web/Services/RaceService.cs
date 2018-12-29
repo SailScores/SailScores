@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Sailscores.Core.Model;
+using Sailscores.Core.Services;
 using Sailscores.Web.Models.Sailscores;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,16 @@ namespace Sailscores.Web.Services
     public class RaceService : IRaceService
     {
         private readonly Core.Services.IClubService _coreClubService;
+        private readonly Core.Services.IRaceService _coreRaceService;
         private readonly IMapper _mapper;
 
         public RaceService(
             Core.Services.IClubService clubService,
+            Core.Services.IRaceService coreRaceService,
             IMapper mapper)
         {
             _coreClubService = clubService;
+            _coreRaceService = coreRaceService;
             _mapper = mapper;
         }
 
@@ -33,8 +37,8 @@ namespace Sailscores.Web.Services
         public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
         {
 
-            var club = await _coreClubService.GetFullClub(clubInitials);
-            var retRace = _mapper.Map<RaceViewModel>(club.Races.First(r => r.Id == id));
+            var raceDto = await _coreRaceService.GetRaceAsync(id);
+            var retRace = _mapper.Map<RaceViewModel>(raceDto);
             retRace.Scores = retRace.Scores.OrderBy(s => s.Place ?? int.MaxValue).ToList();
 
             return retRace;

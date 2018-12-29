@@ -40,9 +40,29 @@ namespace Sailscores.Core.Services
             var race = await 
                 _dbContext
                 .Races
+                .Include(r => r.Fleet)
+                .Include(r => r.Scores)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            return _mapper.Map<Model.Race>(race);
+            var dtoRace = _mapper.Map<Model.Race>(race);
+            await PopulateCompetitors(dtoRace);
+
+            return dtoRace;
+
+        }
+
+        private async Task PopulateCompetitors(Race race)
+        {
+            var compIds = race.Scores
+                .Select(s => s.CompetitorId);
+            var dbCompetitors = await _dbContext.Competitors.Where(c => compIds.Contains(c.Id)).ToListAsync();
+
+            var dtoComps = _mapper.Map<IList<Competitor>>(dbCompetitors);
+            
+            foreach (var score in race.Scores)
+            {
+                score.Competitor = dtoComps.First(c => c.Id == score.CompetitorId);
+            }
         }
     }
 }

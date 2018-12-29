@@ -25,5 +25,8 @@ namespace Sailscores.Core.Model
 
         [NotMapped]
         public SeriesResults Results { get; set; }
+
+        public IList<Competitor> Competitors { get; set; }
+
     }
 }

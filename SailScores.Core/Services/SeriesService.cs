@@ -64,17 +64,31 @@ namespace Sailscores.Core.Services
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
                         .ThenInclude(r => r.Scores)
-                            .ThenInclude(s => s.Competitor)
                     .Include(s => s.Season)
                 .SingleAsync(s => s.Name == seriesName
                                   && s.Season.Name == seasonName);
 
-
             var returnObj = _mapper.Map<Series>(seriesDb);
+
+            await PopulateCompetitorsAsync(returnObj);
 
             var results = _seriesCalculator.CalculateResults(returnObj);
             returnObj.Results = results;
             return returnObj;
+        }
+
+        private async Task PopulateCompetitorsAsync(Series series)
+        {
+            var compIds = series.Races.SelectMany(r => r.Scores)
+                .Select(s => s.CompetitorId);
+            var dbCompetitors = await _dbContext.Competitors.Where(c => compIds.Contains(c.Id)).ToListAsync();
+
+            series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
+
+            foreach(var score in series.Races.SelectMany(r => r.Scores))
+            {
+                score.Competitor = series.Competitors.First(c => c.Id == score.CompetitorId);
+            }
         }
 
         public async Task SaveNewSeries(Series ssSeries, Club club)

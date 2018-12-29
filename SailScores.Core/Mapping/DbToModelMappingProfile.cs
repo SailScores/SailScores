@@ -13,10 +13,8 @@ namespace Sailscores.Core.Mapping
         public DbToModelMappingProfile()
         {
             // ToDo: Plenty more mappings to add, including many-to-many object collections.
-            CreateMap<Db.Club, Model.Club>()
-                .MaxDepth(2);
-            CreateMap<Db.Competitor, Model.Competitor>()
-                .MaxDepth(2);
+            CreateMap<Db.Club, Model.Club>();
+            CreateMap<Db.Competitor, Model.Competitor>();
 
             CreateMap<Db.Series, Model.Series>()
                 .ForMember(d => d.Races, o => o.MapFrom(s => s.RaceSeries.Select(rs => rs.Race).ToList()))
@@ -27,6 +25,8 @@ namespace Sailscores.Core.Mapping
             CreateMap<Db.Race, Model.Race>()
                 .ReverseMap()
                 .ForMember(d => d.SeriesRaces, o => o.Ignore());
+            CreateMap<Db.Score, Model.Score>()
+                .ForMember(d => d.Competitor, o => o.Ignore());
 
         }
     }
