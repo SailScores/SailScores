@@ -16,6 +16,8 @@ namespace Sailscores.Database.Entities
         [StringLength(2000)]
         public String Description { get; set; }
 
+        // Should this fleet be shown on public club fleet lists.
+        public bool IsHidden { get; set; }
         public FleetType FleetType { get; set; }
         public IList<FleetBoatClass> BoatClasses {get;set;}
         public IList<CompetitorFleet> CompetitorFleets { get; set; }
