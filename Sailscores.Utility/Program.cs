@@ -167,7 +167,7 @@ namespace Sailscores.Utility
                 var ssRace = new SsObjects.Race
                 {
                     Name = swRace.Name,
-                    Order = swRace.Rank,
+                    Order = rank,
                     ClubId = club.Id,
                     Date = date,
                     Fleet = fleet
@@ -204,7 +204,7 @@ namespace Sailscores.Utility
                 return 1;
             }
             var numberString = new String(parts[1].Where(Char.IsDigit).ToArray());
-            int rank = 1;
+            int rank = swRace.Rank;
             Int32.TryParse(numberString, out rank);
             return rank;
         }

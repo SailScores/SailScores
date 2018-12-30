@@ -29,7 +29,7 @@ namespace Sailscores.Web.Services
         {
             var club = await _coreClubService.GetFullClub(clubInitials);
 
-            return club.Races;
+            return club.Races.OrderBy(r => r.Date).ThenBy(r => r.Order);
             //var vm = _mapper.Map<List<RaceSummaryViewModel>>(club.Races);
             //return vm;
         }
