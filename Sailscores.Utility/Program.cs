@@ -239,6 +239,7 @@ namespace Sailscores.Utility
                 {
                     Name = swCompetitor.HelmName,
                     SailNumber = swCompetitor.SailNumber,
+                    BoatName = swCompetitor.Boat,
                     BoatClassId = boatClass.Id,
                     BoatClass = boatClass
                 };
