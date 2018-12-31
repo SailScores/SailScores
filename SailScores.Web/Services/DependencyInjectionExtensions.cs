@@ -9,6 +9,7 @@ namespace Sailscores.Web.Services
             this IServiceCollection services)
         {
             services.AddScoped<ISeriesService, SeriesService>();
+            services.AddScoped<IFleetService, FleetService>();
             services.AddScoped<IRaceService, RaceService>();
 
         }

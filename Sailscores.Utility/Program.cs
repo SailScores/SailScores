@@ -477,13 +477,17 @@ namespace Sailscores.Utility
         private static SsObjects.Fleet MakeNewFleet(SsObjects.Club club)
         {
             // Get Name and initials:
-            Console.Write("Enter the new Fleet name > ");
+            Console.Write("Enter the new Fleet full name > ");
             var fleetName = Console.ReadLine().Trim();
+
+            Console.Write("Enter the new Fleet short name > ");
+            var fleetShortName = Console.ReadLine().Trim();
 
             SsObjects.Fleet fleet = new SsObjects.Fleet
             {
                 Id = Guid.NewGuid(),
                 Name = fleetName,
+                ShortName = fleetShortName,
                 ClubId = club.Id,
                 FleetType = Database.Enumerations.FleetType.SelectedBoats,
                 Competitors = new List<SsObjects.Competitor>()

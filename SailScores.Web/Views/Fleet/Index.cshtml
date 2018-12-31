@@ -1,0 +1,21 @@
+﻿@using Sailscores.Web.Models.Sailscores;
+@model ClubCollectionViewModel<FleetSummary>
+
+@{
+    ViewBag.Title = Model.ClubInitials + " Fleets";
+    Layout = "_ClubLayout";
+}
+
+<h2>Fleets</h2>
+
+<ul>
+    @foreach (var item in Model.List.OrderBy(f => f.Name))
+    {
+        <li>
+            <a href="~/@Model.ClubInitials/fleet/@item.ShortName">
+                @Html.DisplayFor(modelItem => item.Name)
+            </a>
+        </li>
+    }
+</ul>
+

@@ -17,10 +17,10 @@ namespace Sailscores.Web.Mapping
                 .ForMember(r => r.CompetitorCount, o => o.MapFrom(s => s.Scores.Count))
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
                 .ForMember(r => r.SeriesNames, o => o.MapFrom(s => s.Series.Select(sr => sr.Name)));
-
-            CreateMap<Model.Club, Model.Club>()
-                .ForMember(d => d.Fleets, o => o.Ignore());
             
+            CreateMap<Model.Fleet, FleetSummary>()
+                .ForMember(d => d.Series, o => o.Ignore());
+
         }
     }
 }
