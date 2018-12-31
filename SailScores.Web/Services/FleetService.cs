@@ -29,7 +29,7 @@ namespace Sailscores.Web.Services
             return _mapper.Map<IList<FleetSummary>>(coreObject.Fleets);
         }
 
-        public async Task<FleetSummary> GetFleetAsync(string clubInitials, string season, string fleetShortName)
+        public async Task<FleetSummary> GetFleetAsync(string clubInitials, string fleetShortName)
         {
             var coreObject = await _coreClubService.GetFullClub(clubInitials);
             var retFleet = _mapper.Map<FleetSummary>(coreObject.Fleets.First(f => f.ShortName == fleetShortName));

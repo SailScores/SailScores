@@ -38,12 +38,11 @@ namespace Sailscores.Web.Controllers
 
         public async Task<ActionResult> Details(
             string clubInitials,
-            string season,
-            string fleetName)
+            string fleetShortName)
         {
             ViewData["ClubInitials"] = clubInitials;
 
-            var fleet = await _fleetService.GetFleetAsync(clubInitials, season, fleetName);
+            var fleet = await _fleetService.GetFleetAsync(clubInitials, fleetShortName);
 
             return View(new ClubItemViewModel<FleetSummary>
             {

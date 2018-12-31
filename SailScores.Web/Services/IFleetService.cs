@@ -8,6 +8,6 @@ namespace Sailscores.Web.Services
     public interface IFleetService
     {
         Task<IList<FleetSummary>> GetAllFleetSummaryAsync(string clubInitials);
-        Task<FleetSummary> GetFleetAsync(string clubInitials, string season, string fleetName);
+        Task<FleetSummary> GetFleetAsync(string clubInitials, string fleetName);
     }
 }
