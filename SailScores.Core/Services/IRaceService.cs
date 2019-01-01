@@ -8,6 +8,7 @@ namespace Sailscores.Core.Services
     public interface IRaceService
     {
         Task<IList<Model.Race>> GetRacesAsync(Guid clubId);
+        Task<IList<Model.Race>> GetFullRacesAsync(Guid clubId);
         Task<Race> GetRaceAsync(Guid id);
     }
 }

@@ -16,6 +16,7 @@ namespace Sailscores.Web.Mapping
             CreateMap<Model.Race, RaceSummaryViewModel>()
                 .ForMember(r => r.CompetitorCount, o => o.MapFrom(s => s.Scores.Count))
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
+                .ForMember(r => r.FleetShortName, o => o.MapFrom(s => s.Fleet.ShortName))
                 .ForMember(r => r.SeriesNames, o => o.MapFrom(s => s.Series.Select(sr => sr.Name)));
             
             CreateMap<Model.Fleet, FleetSummary>()

@@ -28,6 +28,8 @@ namespace Sailscores.Core.Model
         
         public IList<Series> Series { get; set; }
 
+        public Season Season { get; set; }
+
         public bool Equals(Race other)
         {
             return this.Id == other.Id

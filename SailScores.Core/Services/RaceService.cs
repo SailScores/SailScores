@@ -34,6 +34,42 @@ namespace Sailscores.Core.Services
                 .ToListAsync();
             return _mapper.Map<List<Model.Race>>(dbObjects);
         }
+        public async Task<IList<Model.Race>> GetFullRacesAsync(Guid clubId)
+        {
+            var dbRaces = await _dbContext.Races
+                .Where(r => r.Club.Id == clubId)
+                .Include(r => r.Fleet)
+                .Include( r => r.Scores)
+                .Include( r => r.SeriesRaces)
+                .ToListAsync();
+            var modelRaces = _mapper.Map<List<Model.Race>>(dbRaces);
+            var dbSeries = (await _dbContext.Clubs
+                .Include(c => c.Series)
+                .FirstAsync(c => c.Id == clubId))
+                .Series;
+            var modelSeries = _mapper.Map<List<Model.Series>>(dbSeries);
+
+
+            var dbSeasons = (await _dbContext.Clubs
+                .Include(c => c.Seasons)
+                .FirstAsync(c => c.Id == clubId))
+                .Seasons;
+            var modelSeasons = _mapper.Map<List<Model.Season>>(dbSeasons);
+
+            foreach (var race in modelRaces)
+            {
+                race.Series = modelSeries.Where(s => dbRaces
+                        .First(r => r.Id == race.Id)
+                        .SeriesRaces.Any(sr => sr.SeriesId == s.Id))
+                    .ToList();
+                race.Season = modelSeasons
+                    .SingleOrDefault(s =>
+                        race.Date.HasValue
+                        && s.Start <= race.Date
+                        && s.End > race.Date);
+            }
+            return modelRaces;
+        }
 
         public async Task<Model.Race> GetRaceAsync(Guid id)
         {

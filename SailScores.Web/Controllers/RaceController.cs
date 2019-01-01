@@ -27,7 +27,7 @@ namespace Sailscores.Web.Controllers
         {
             var races = await _raceService.GetAllRaceSummariesAsync(clubInitials);
 
-            return View(new ClubCollectionViewModel<Core.Model.Race>
+            return View(new ClubCollectionViewModel<RaceSummaryViewModel>
             {
                 List = races,
                 ClubInitials = clubInitials

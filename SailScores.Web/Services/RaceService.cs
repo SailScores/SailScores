@@ -25,13 +25,14 @@ namespace Sailscores.Web.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Race>> GetAllRaceSummariesAsync(string clubInitials)
+        public async Task<IEnumerable<RaceSummaryViewModel>> GetAllRaceSummariesAsync(string clubInitials)
         {
-            var club = await _coreClubService.GetFullClub(clubInitials);
+            var club = (await _coreClubService.GetClubs(true)).First(c => c.Initials == clubInitials);
+            var races = (await _coreRaceService.GetFullRacesAsync(club.Id))
+                .OrderByDescending(r => r.Date).ThenByDescending(r => r.Order);
 
-            return club.Races.OrderBy(r => r.Date).ThenBy(r => r.Order);
-            //var vm = _mapper.Map<List<RaceSummaryViewModel>>(club.Races);
-            //return vm;
+            var vm = _mapper.Map<List<RaceSummaryViewModel>>(races);
+            return vm;
         }
 
         public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
