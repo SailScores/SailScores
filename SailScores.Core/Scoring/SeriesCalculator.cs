@@ -88,12 +88,89 @@ namespace Sailscores.Core.Scoring
                                 Race = race
                             },
                             // this line needs a where "Counts as started"
-                            ScoreValue = race.Scores.Count + 2
+                            ScoreValue = race.Scores.Where(s => CountsAsStarted(s)).Count() + 2
                         });
                 }
             }
+            //calculate non-average codes first
+
+            //then calculate average codes
+            foreach (var race in resultsWorkInProgress.Races)
+            {
+                var score = compResults.CalculatedScores[race];
+                if (score != null && !String.IsNullOrWhiteSpace(score.RawScore.Code))
+                {
+                    switch (score.RawScore.Code.ToUpperInvariant())
+                    {
+                        case "SB":
+                        case "RC":
+                        case "ORA":
+                            score.ScoreValue = CalculateAverage(compResults);
+                            break;
+                        //default:
+                        //    throw new InvalidOperationException($"Unknown Score Code: {score.RawScore.Code}");
+                    }
+                }
+            }
+
         }
 
+        private decimal? CalculateAverage(SeriesCompetitorResults compResults)
+        {
+            //int numRealResults = compResults.CalculatedScores
+            //        .Values.Count(s =>
+            //            String.IsNullOrWhiteSpace(s.RawScore.Code));
+            int numAverages = compResults.CalculatedScores
+                    .Values.Count(s =>
+                        IsAverage(s.RawScore.Code));
+            int discards = GetNumberOfDiscards(compResults.CalculatedScores.Count);
+
+            var average = compResults.CalculatedScores.Values
+                .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
+                .OrderBy(s => s.ScoreValue)
+                .Take(compResults.CalculatedScores.Count - numAverages - discards)
+                .Average(s => s.ScoreValue) ?? 0m;
+
+            return Math.Round(average, 1);
+
+        }
+
+        private bool IsAverage(string code)
+        {
+            if (String.IsNullOrWhiteSpace(code))
+            {
+                return false;
+            }
+            switch (code.ToUpperInvariant())
+            {
+                case "SB":
+                case "RC":
+                case "ORA":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private bool CountsAsStarted(Score s)
+        {
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            switch (s.Code.ToUpperInvariant())
+            {
+                case "DNF":
+                case "OCS":
+                case "DSQ":
+                // Lake harriet, a boat counts as racing if they left their buoy to race:
+                case "DNS":
+                    return true;
+                default:
+                    return false;
+            }
+        }
         private void CalculateTotal(SeriesCompetitorResults compResults)
         {
             compResults.TotalScore = compResults.CalculatedScores.Values.Sum(s => !s.Discard ? ( s.ScoreValue ?? 0.0m) : 0.0m);
@@ -113,8 +190,16 @@ namespace Sailscores.Core.Scoring
 
         private int GetNumberOfDiscards(SeriesResults resultsWorkInProgress)
         {
-            //TODO put a real formula in here. (need to figure out series scoring settings.)
-            return resultsWorkInProgress.Races.Count / 3;
+            return GetNumberOfDiscards(resultsWorkInProgress.Races.Count);
+
+        }
+        private int GetNumberOfDiscards(int numberOfRaces)
+        {
+            if (numberOfRaces > 4)
+            {
+                return numberOfRaces / 3;
+            }
+            return 0;
         }
 
 

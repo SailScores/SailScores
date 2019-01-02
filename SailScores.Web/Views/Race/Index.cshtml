@@ -24,7 +24,7 @@
                 <tr>
                     <td>
                         @Html.ActionLink(
-                            race.FleetShortName + " : Race " + @race.Order + " " + @race.Date?.ToString("dddd, MMMM d")
+                            race.FleetShortName + " : Race " + @race.Order + ", " + @race.Date?.ToString("dddd, MMMM d")
                             , "Details", new { id = race.Id })
                     </td>
                     <td>

@@ -223,8 +223,9 @@ namespace Sailscores.Utility
                 {
                     continue;
                 }
-                // Not going to import DNCs. ?
-                if(swScore.Code == "DNC")
+                // Not going to import DNCs.
+                // Sailwave can leave DNC in some codes when type is changed to scored.
+                if(swScore.Code == "DNC" && swScore.ResultType == 3)
                 {
                     continue;
                 }
@@ -232,7 +233,7 @@ namespace Sailscores.Utility
                 var ssScore = new SsObjects.Score
                 {
                     Place = swScore.Place,
-                    Code = swScore.Code
+                    Code = swScore.ResultType == 3 ? swScore.Code : null
                 };
                 var swCompetitor = swCompetitors.Single(c => c.Id == swScore.CompetitorId);
                 ssScore.Competitor = new SsObjects.Competitor
