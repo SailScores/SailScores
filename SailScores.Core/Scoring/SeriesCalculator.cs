@@ -57,7 +57,8 @@ namespace Sailscores.Core.Scoring
 
         private void CalculateRanks(SeriesResults resultsWorkInProgress)
         {
-            var orderedComps = resultsWorkInProgress.Results.Values.OrderBy(s => s.TotalScore ?? Decimal.MaxValue);
+            var orderedComps = resultsWorkInProgress.Results.Values
+                .OrderBy(s => s, new SeriesCompetitorResultComparer());
 
             int i = 1;
             foreach (var comp in orderedComps)
