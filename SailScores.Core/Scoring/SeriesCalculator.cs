@@ -45,10 +45,10 @@ namespace Sailscores.Core.Scoring
 
                 resultsWorkInProgress.Results[comp] = compResults;
             }
-
             CalculateRanks(resultsWorkInProgress);
             resultsWorkInProgress.Competitors = ReorderCompetitors(resultsWorkInProgress);
         }
+
 
         private IList<Competitor> ReorderCompetitors(SeriesResults results)
         {
@@ -87,12 +87,29 @@ namespace Sailscores.Core.Scoring
                                 Competitor = compResults.Competitor,
                                 Race = race
                             },
-                            // this line needs a where "Counts as started"
                             ScoreValue = race.Scores.Where(s => CountsAsStarted(s)).Count() + 2
                         });
                 }
             }
             //calculate non-average codes first
+            foreach (var race in resultsWorkInProgress.Races)
+            {
+                var score = compResults.CalculatedScores[race];
+                if (score != null && !String.IsNullOrWhiteSpace(score.RawScore.Code))
+                {
+                    switch (score.RawScore.Code.ToUpperInvariant())
+                    {
+                        case "SBM":
+                        case "DNS":
+                        case "DNF":
+                            score.ScoreValue = race.Scores.Where(s => CountsAsStarted(s)).Count() + 1;
+                            break;
+                        case "GST":
+                            score.ScoreValue = race.Scores.Where(s => CountsAsStarted(s)).Count() + 2;
+                            break;
+                    }
+                }
+            }
 
             //then calculate average codes
             foreach (var race in resultsWorkInProgress.Races)
@@ -107,8 +124,6 @@ namespace Sailscores.Core.Scoring
                         case "ORA":
                             score.ScoreValue = CalculateAverage(compResults);
                             break;
-                        //default:
-                        //    throw new InvalidOperationException($"Unknown Score Code: {score.RawScore.Code}");
                     }
                 }
             }
@@ -240,6 +255,25 @@ namespace Sailscores.Core.Scoring
                     RawScore = score,
                     ScoreValue = score.Place
                 };
+                returnResults.CalculatedScores[score.Race].ScoreValue =
+                    scores
+                        .Count(s =>
+                            score.Place.HasValue
+                            && s.Race == score.Race
+                            && s.Place < score.Place
+                            //todo: only exclude coded results that should not be ranked (most of them.)
+                            && String.IsNullOrWhiteSpace(score.Code)) + 1;
+
+                // if this is one, no tie. (if zero Place doesn't have a value (= coded.))
+                int numTied = scores.Count(s => score.Place.HasValue && s.Race == score.Race && s.Place == score.Place);
+                if(numTied > 1) {
+                    int total = 0;
+                    for (int i = 0; i< numTied; i++)
+                    {
+                        total += ((int)score.Place + i);
+                    }
+                    returnResults.CalculatedScores[score.Race].ScoreValue = (decimal)total / numTied;
+                }
             }
 
             return returnResults;
