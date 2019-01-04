@@ -11,7 +11,7 @@ using System.Net;
 
 namespace SailScores.ApiClient.Services
 {
-    public class SailScoresApiClient
+    public class SailScoresApiClient : ISailScoresApiClient
     {
         private ISettings _settings;
         private string _token;

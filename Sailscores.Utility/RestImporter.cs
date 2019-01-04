@@ -14,14 +14,18 @@ using System.Reflection;
 using AutoMapper;
 using System.Threading.Tasks;
 using System.Linq;
+using SailScores.ApiClient.Services;
 
 namespace SailScores.Utility
 {
     class RestImporter : IRestImporter
     {
+        private readonly ISailScoresApiClient _apiClient;
 
-        public RestImporter()
+        public RestImporter(
+            ISailScoresApiClient apiClient)
         {
+            _apiClient = apiClient;
         }
 
         public void WriteSwSeriesToSS(SwObjects.Series series)
@@ -29,6 +33,15 @@ namespace SailScores.Utility
             Console.WriteLine($"About to import a series with {series.Races.Count} race(s).");
 
             // Authenticate
+
+            try
+            {
+                _apiClient.GetClubsAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"There was an exception: {ex.ToString()}");
+            }
 
             // Get club list
 

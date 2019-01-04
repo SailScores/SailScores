@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Test.Integration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Test.Unit", "SailScores.Test.Unit\SailScores.Test.Unit.csproj", "{5D27F49A-96D0-40B1-AE68-7342A79AC6E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sailscores.Client.Uwp", "Sailscores.Client.Uwp\Sailscores.Client.Uwp.csproj", "{9ACA51C0-83F0-4F4F-A02D-12E425D94398}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Client.Uwp", "Sailscores.Client.Uwp\SailScores.Client.Uwp.csproj", "{9ACA51C0-83F0-4F4F-A02D-12E425D94398}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.ImportExport", "Sailscores.ImportExport\SailScores.ImportExport.csproj", "{A337316C-7402-48AF-B944-836D111E06F2}"
 EndProject

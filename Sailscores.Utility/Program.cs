@@ -14,6 +14,7 @@ using System.Reflection;
 using AutoMapper;
 using System.Threading.Tasks;
 using System.Linq;
+using SailScores.ApiClient.Services;
 
 namespace SailScores.Utility
 {
@@ -35,6 +36,8 @@ namespace SailScores.Utility
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
             services.AddTransient<ILocalServiceImporter, LocalServiceImporter>();
             services.AddTransient<IRestImporter, RestImporter>();
+            services.AddTransient<ISailScoresApiClient, SailScoresApiClient>();
+            services.AddSingleton<ISettings, ConsoleSettings>();
             services.AddAutoMapper(
                 new[] {
                     typeof(DbToModelMappingProfile).GetTypeInfo().Assembly
