@@ -1,13 +1,13 @@
-﻿using Sailscores.ImportExport.Sailwave;
+﻿using SailScores.ImportExport.Sailwave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sailscores.ImportExport.Sailwave.Elements.File;
-using Sailscores.ImportExport.Sailwave.Parsers;
+using SailScores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Parsers;
 using Xunit;
 
-namespace Sailscores.ImportExport.Sailwave.Tests.Unit
+namespace SailScores.ImportExport.Sailwave.Tests.Unit
 {
     public class ScoreCodeParserTests
     {

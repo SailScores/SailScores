@@ -1,25 +1,25 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Sailscores.Core.Model;
-using Sailscores.Core.Scoring;
-using Sailscores.Database;
-using dbObj = Sailscores.Database.Entities;
+using SailScores.Core.Model;
+using SailScores.Core.Scoring;
+using SailScores.Database;
+using dbObj = SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sailscores.Core.Services
+namespace SailScores.Core.Services
 {
     public class SeriesService : ISeriesService
     {
-        private readonly ISailscoresContext _dbContext;
+        private readonly ISailScoresContext _dbContext;
         private readonly ISeriesCalculator _seriesCalculator;
         private readonly IMapper _mapper;
 
         public SeriesService(
-            ISailscoresContext dbContext,
+            ISailScoresContext dbContext,
             ISeriesCalculator seriesCalculator,
             IMapper mapper)
         {

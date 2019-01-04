@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Sailscores.ImportExport.Sailwave.Tests.Utilities
+namespace SailScores.ImportExport.Sailwave.Tests.Utilities
 {
     class LhycFile
     {

@@ -1,4 +1,4 @@
-﻿namespace Sailscores.ImportExport.Sailwave.Writers
+﻿namespace SailScores.ImportExport.Sailwave.Writers
 {
     static class Utilities
     {

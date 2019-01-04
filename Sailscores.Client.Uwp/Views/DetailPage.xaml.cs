@@ -1,8 +1,8 @@
-﻿using Sailscores.Client.Uwp.ViewModels;
+﻿using SailScores.Client.Uwp.ViewModels;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Controls;
 
-namespace Sailscores.Client.Uwp.Views
+namespace SailScores.Client.Uwp.Views
 {
     public sealed partial class DetailPage : Page
     {

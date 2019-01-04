@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Elements.File;
 
-namespace Sailscores.ImportExport.Sailwave.Parsers
+namespace SailScores.ImportExport.Sailwave.Parsers
 {
     public class CompetitorSetParser
     {

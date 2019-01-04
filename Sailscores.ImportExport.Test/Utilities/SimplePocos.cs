@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Parsers;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Parsers;
 
-namespace Sailscores.ImportExport.Sailwave.Tests.Utilities
+namespace SailScores.ImportExport.Sailwave.Tests.Utilities
 {
     public class SimplePocos
     {

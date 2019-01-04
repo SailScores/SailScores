@@ -1,4 +1,4 @@
-﻿namespace Sailscores.ImportExport.Sailwave.Interfaces
+﻿namespace SailScores.ImportExport.Sailwave.Interfaces
 {
     public interface IFileWriter
     {

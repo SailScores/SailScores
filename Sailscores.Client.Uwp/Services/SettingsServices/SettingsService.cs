@@ -1,18 +1,19 @@
-﻿using System;
+﻿using SailScores.ApiClient.Services;
+using System;
 using Template10.Common;
 using Template10.Utils;
 using Windows.Security.Credentials;
 using Windows.UI.Xaml;
 
-namespace Sailscores.Client.Uwp.Services.SettingsServices
+namespace SailScores.Client.Uwp.Services.SettingsServices
 {
-    public class SettingsService
+    public class SettingsService : ISettings, IUwpSettings
     {
                 
         public static SettingsService Instance { get; } = new SettingsService();
         Template10.Services.SettingsService.ISettingsHelper _helper;
 
-        private string _appName = "Sailscores";
+        private string _appName = "SailScores";
         private string _defaultUrl = "https://www.sailscores.com/";
 
         private SettingsService()
@@ -134,7 +135,8 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
                 return loginCredential;
             }
 
-            set {
+            set
+            {
                 value.Resource = _appName;
                 if (SaveUserCredentials && !String.IsNullOrEmpty(value.Password))
                 {
@@ -145,6 +147,22 @@ namespace Sailscores.Client.Uwp.Services.SettingsServices
             }
         }
 
+        public string UserName
+        {
+            get
+            {
+                return UserCredentials.UserName;
+            }
+            set => throw new NotImplementedException();
+        }
+
+        public string Password {
+            get
+            {
+                return UserCredentials.Password;
+            }
+            set => throw new NotImplementedException();
+        }
 
         private Windows.Security.Credentials.PasswordCredential GetCredentialFromLocker()
         {

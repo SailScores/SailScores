@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sailscores.ImportExport.Sailwave.Parsers
+namespace SailScores.ImportExport.Sailwave.Parsers
 {
     static class Utilities
     {

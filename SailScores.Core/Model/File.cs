@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sailscores.Core.Model
+namespace SailScores.Core.Model
 {
     public class File
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sailscores.ImportExport.Sailwave.Elements
+namespace SailScores.ImportExport.Sailwave.Elements
 {
     public class Column
     {

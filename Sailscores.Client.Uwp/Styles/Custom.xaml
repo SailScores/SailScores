@@ -49,7 +49,7 @@
 
                 <!--
 
-                Windows 10 2015 (1511) Sailscores.Client.Uwp Menu Style
+                Windows 10 2015 (1511) SailScores.Client.Uwp Menu Style
                 Simply replace AccentColor with the follow setters.
 
                 <Setter Property="HamburgerBackground" Value="{StaticResource CustomColorBrush}" />

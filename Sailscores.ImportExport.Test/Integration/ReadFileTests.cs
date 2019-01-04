@@ -1,11 +1,11 @@
-﻿using Sailscores.ImportExport.Sailwave;
+﻿using SailScores.ImportExport.Sailwave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
 
-namespace Sailscores.ImportExport.Sailwave.Tests.Integration
+namespace SailScores.ImportExport.Sailwave.Tests.Integration
 {
     public class ReadFileTests
     {
@@ -28,7 +28,7 @@ namespace Sailscores.ImportExport.Sailwave.Tests.Integration
             var reader = new SailwaveFileReader(_simpleFilePath);
 
             Assert.Equal(2, reader.Series.Competitors.Count);
-            Assert.Equal(1, reader.Series.Competitors.Where(c => c.Id == 3).Count());
+            Assert.Single(reader.Series.Competitors.Where(c => c.Id == 3));
         }
 
         [Fact]

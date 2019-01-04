@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Sailscores.Database.Entities
+namespace SailScores.Database.Entities
 {
     public class SeriesRaces
     {

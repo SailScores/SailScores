@@ -1,11 +1,11 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using CsvHelper;
-using Sailscores.ImportExport.Sailwave.Csv;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Interfaces;
+using SailScores.ImportExport.Sailwave.Csv;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Interfaces;
 
-namespace Sailscores.ImportExport.Sailwave
+namespace SailScores.ImportExport.Sailwave
 {
     public class SailwaveFileWriter : IFileWriter
     {

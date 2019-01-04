@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Sailscores.Database.Enumerations;
+using SailScores.Database.Enumerations;
 
-namespace Sailscores.Core.Model.Dto
+namespace SailScores.Core.Model.Dto
 {
     // Fleet is a group of competitors that may be scored against one another.
     public class FleetDto

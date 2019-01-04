@@ -1,4 +1,4 @@
-﻿using Sailscores.Core.Model;
+﻿using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sailscores.Web.Models.Sailscores
+namespace SailScores.Web.Models.SailScores
 {
     public class RaceViewModel
     {

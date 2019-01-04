@@ -1,6 +1,6 @@
-﻿using Sailscores.ImportExport.Sailwave.Elements;
+﻿using SailScores.ImportExport.Sailwave.Elements;
 
-namespace Sailscores.ImportExport.Sailwave.Parsers
+namespace SailScores.ImportExport.Sailwave.Parsers
 {
     public class SeriesDetailsParser : Parser<SeriesDetails>
     {

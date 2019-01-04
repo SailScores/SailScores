@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Sailscores.Web.Data.Migrations
+namespace SailScores.Web.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

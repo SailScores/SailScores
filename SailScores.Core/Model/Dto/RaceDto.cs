@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Sailscores.Core.Model.Dto
+namespace SailScores.Core.Model.Dto
 {
     public class RaceDto : IEquatable<RaceDto>
     {

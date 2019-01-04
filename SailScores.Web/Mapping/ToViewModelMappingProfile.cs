@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using Sailscores.Web.Models.Sailscores;
+using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Db = Sailscores.Database.Entities;
-using Model = Sailscores.Core.Model;
+using Db = SailScores.Database.Entities;
+using Model = SailScores.Core.Model;
 
-namespace Sailscores.Web.Mapping
+namespace SailScores.Web.Mapping
 {
     public class ToViewModelMappingProfile : Profile
     {

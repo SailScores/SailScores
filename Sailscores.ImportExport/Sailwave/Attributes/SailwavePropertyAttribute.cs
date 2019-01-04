@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sailscores.ImportExport.Sailwave.Attributes
+namespace SailScores.ImportExport.Sailwave.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class SailwavePropertyAttribute : Attribute

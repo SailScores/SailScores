@@ -1,4 +1,4 @@
-﻿<Page x:Class="Sailscores.Client.Uwp.Views.DetailPage"
+﻿<Page x:Class="SailScores.Client.Uwp.Views.DetailPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:Behaviors="using:Template10.Behaviors"
@@ -6,9 +6,9 @@
       xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:controls="using:Template10.Controls"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="using:Sailscores.Client.Uwp.Views"
+      xmlns:local="using:SailScores.Client.Uwp.Views"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:vm="using:Sailscores.Client.Uwp.ViewModels" x:Name="ThisPage"
+      xmlns:vm="using:SailScores.Client.Uwp.ViewModels" x:Name="ThisPage"
       mc:Ignorable="d">
 
     <Page.DataContext>

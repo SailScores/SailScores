@@ -1,11 +1,11 @@
 ﻿using System;
-using Sailscores.Client.Uwp.ViewModels;
+using SailScores.Client.Uwp.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using System.Collections.ObjectModel;
 
-namespace Sailscores.Client.Uwp.Views
+namespace SailScores.Client.Uwp.Views
 {
     public sealed partial class MainPage : Page
     {

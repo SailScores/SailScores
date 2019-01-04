@@ -1,9 +1,9 @@
-﻿using Sailscores.Core.Model;
-using Sailscores.Web.Models.Sailscores;
+﻿using SailScores.Core.Model;
+using SailScores.Web.Models.SailScores;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Sailscores.Web.Services
+namespace SailScores.Web.Services
 {
     public interface IFleetService
     {

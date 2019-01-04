@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sailscores.ImportExport.Sailwave.Attributes
+namespace SailScores.ImportExport.Sailwave.Attributes
 {
     public enum SailwavePropertyType
     {

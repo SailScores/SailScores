@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Elements.File;
 
-namespace Sailscores.ImportExport.Sailwave.Writers
+namespace SailScores.ImportExport.Sailwave.Writers
 {
     public class ColumnSetWriter : GenericSetWriter<Column>
     {

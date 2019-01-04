@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using Template10.Services.NavigationService;
 using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
-using Sailscores.Core.Model;
+using SailScores.Core.Model;
 
-namespace Sailscores.Client.Uwp.ViewModels
+namespace SailScores.Client.Uwp.ViewModels
 {
     public class MainPageViewModel : ViewModelBase
     {
 
         Services.SettingsServices.SettingsService _settings;
-        Services.SailscoresServerService _sailscoresService;
+        Services.SailScoresServerService _sailscoresService;
 
         public MainPageViewModel()
         {
@@ -24,7 +24,7 @@ namespace Sailscores.Client.Uwp.ViewModels
             } else
             {
                 _settings = Services.SettingsServices.SettingsService.Instance;
-                _sailscoresService = Services.SailscoresServerService.GetInstance(_settings);
+                _sailscoresService = Services.SailScoresServerService.GetInstance(_settings);
             }
         }
 

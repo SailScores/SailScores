@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Sailscores.ImportExport.Sailwave.Attributes;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Attributes;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Elements.File;
 
-namespace Sailscores.ImportExport.Sailwave.Writers
+namespace SailScores.ImportExport.Sailwave.Writers
 {
     public abstract class GenericSetWriter<T> : GenericWriter<T>
         where T : new() 

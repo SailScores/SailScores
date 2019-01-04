@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Sailscores.Core.Model;
+using SailScores.Core.Model;
 
-namespace Sailscores.Core.Services
+namespace SailScores.Core.Services
 {
     public interface IScoringService
     {

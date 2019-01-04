@@ -1,8 +1,8 @@
-﻿using Sailscores.Core.Model;
+﻿using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 
-namespace Sailscores.Core.Scoring
+namespace SailScores.Core.Scoring
 {
     // The results for one competitor in a series
     public class SeriesCompetitorResults

@@ -1,4 +1,4 @@
-﻿using Sailscores.ImportExport.Sailwave;
+﻿using SailScores.ImportExport.Sailwave;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,12 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Parsers;
-using Sailscores.ImportExport.Sailwave.Writers;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Parsers;
+using SailScores.ImportExport.Sailwave.Writers;
 using Xunit;
 
-namespace Sailscores.ImportExport.Sailwave.Tests.Unit
+namespace SailScores.ImportExport.Sailwave.Tests.Unit
 {
     public class WriterTests
     {

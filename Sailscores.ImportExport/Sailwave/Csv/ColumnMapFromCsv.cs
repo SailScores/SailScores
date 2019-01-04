@@ -1,9 +1,9 @@
 ﻿using System;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Sailscores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Elements.File;
 
-namespace Sailscores.ImportExport.Sailwave.Csv
+namespace SailScores.ImportExport.Sailwave.Csv
 {
     public sealed class ColumnMapFromCsv :ClassMap<FileRow>
     {

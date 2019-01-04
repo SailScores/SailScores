@@ -9,7 +9,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Template10.Mvvm;
 
-namespace Sailscores.Client.Uwp.Views
+namespace SailScores.Client.Uwp.Views
 {
     public sealed partial class Shell : Page
     {

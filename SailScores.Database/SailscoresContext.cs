@@ -4,11 +4,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Sailscores.Database.Entities;
+using SailScores.Database.Entities;
 
-namespace Sailscores.Database
+namespace SailScores.Database
 {
-    public class SailscoresContext : DbContext, ISailscoresContext
+    public class SailScoresContext : DbContext, ISailScoresContext
     {
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Fleet> Fleets { get; set; }
@@ -26,8 +26,8 @@ namespace Sailscores.Database
         public DbSet<File> Files { get; set; }
 
 
-        public SailscoresContext(
-            DbContextOptions<SailscoresContext> options)
+        public SailScoresContext(
+            DbContextOptions<SailScoresContext> options)
             : base(options)
         {
         }

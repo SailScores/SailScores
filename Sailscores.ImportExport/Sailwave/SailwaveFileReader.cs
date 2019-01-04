@@ -1,9 +1,9 @@
 ﻿using System.IO;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Interfaces;
-using Sailscores.ImportExport.Sailwave.Parsers;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Interfaces;
+using SailScores.ImportExport.Sailwave.Parsers;
 
-namespace Sailscores.ImportExport.Sailwave
+namespace SailScores.ImportExport.Sailwave
 {
     public class SailwaveFileReader : IFileReader
     {

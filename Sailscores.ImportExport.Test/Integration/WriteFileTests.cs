@@ -1,13 +1,13 @@
-﻿using Sailscores.ImportExport.Sailwave;
+﻿using SailScores.ImportExport.Sailwave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sailscores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Elements;
 using Xunit;
 
-namespace Sailscores.ImportExport.Sailwave.Tests.Integration
+namespace SailScores.ImportExport.Sailwave.Tests.Integration
 {
     public class WriteFileTests
     {

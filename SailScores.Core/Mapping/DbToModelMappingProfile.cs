@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Db = Sailscores.Database.Entities;
-using Model = Sailscores.Core.Model;
+using Db = SailScores.Database.Entities;
+using Model = SailScores.Core.Model;
 
-namespace Sailscores.Core.Mapping
+namespace SailScores.Core.Mapping
 {
     public class DbToModelMappingProfile : Profile
     {

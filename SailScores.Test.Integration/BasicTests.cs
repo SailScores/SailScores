@@ -3,14 +3,14 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Sailscores.Test.Integration
+namespace SailScores.Test.Integration
 {
     public class BasicTests
-        : IClassFixture<WebApplicationFactory<Sailscores.Web.Startup>>
+        : IClassFixture<WebApplicationFactory<SailScores.Web.Startup>>
     {
-        private readonly WebApplicationFactory<Sailscores.Web.Startup> _factory;
+        private readonly WebApplicationFactory<SailScores.Web.Startup> _factory;
 
-        public BasicTests(WebApplicationFactory<Sailscores.Web.Startup> factory)
+        public BasicTests(WebApplicationFactory<SailScores.Web.Startup> factory)
         {
             _factory = factory;
         }

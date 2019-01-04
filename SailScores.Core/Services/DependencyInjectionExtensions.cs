@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Sailscores.Core.Services;
+using SailScores.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sailscores.Core.Services
+namespace SailScores.Core.Services
 {
     public static class DependencyInjectionExtensions
     {
-        public static void RegisterCoreSailscoresServices(
+        public static void RegisterCoreSailScoresServices(
             this IServiceCollection services)
         {
                 services.AddScoped<IClubService, ClubService>();
@@ -17,7 +17,7 @@ namespace Sailscores.Core.Services
                 services.AddScoped<ISeriesService, SeriesService>();
                 services.AddScoped<IRaceService, RaceService>();
                 services.AddScoped<ISeriesService, SeriesService>();
-                services.AddScoped<Sailscores.Core.Scoring.ISeriesCalculator, Sailscores.Core.Scoring.SeriesCalculator>();
+                services.AddScoped<SailScores.Core.Scoring.ISeriesCalculator, SailScores.Core.Scoring.SeriesCalculator>();
 
         }
     }

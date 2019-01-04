@@ -5,19 +5,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
-using Sailscores.Database;
+using SailScores.Database;
 
-namespace Sailscores.Web
+namespace SailScores.Web
 {
     public class ClubRouteConstraint : IRouteConstraint
     {
-        private readonly Func<ISailscoresContext> _createDbContext;
+        private readonly Func<ISailScoresContext> _createDbContext;
         private readonly IMemoryCache _cache;
 
         private const string cacheKeyName = "CachedClubList";
 
         public ClubRouteConstraint(
-            Func<ISailscoresContext> createDbContext,
+            Func<ISailScoresContext> createDbContext,
             IMemoryCache cache)
         {
             _createDbContext = createDbContext;

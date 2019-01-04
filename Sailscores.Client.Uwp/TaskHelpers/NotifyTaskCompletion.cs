@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace Sailscores.Client.Uwp.TaskHelpers
+namespace SailScores.Client.Uwp.TaskHelpers
 {
     public sealed class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
     {

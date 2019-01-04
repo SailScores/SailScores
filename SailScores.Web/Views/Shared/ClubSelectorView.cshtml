@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Http
-@model Sailscores.Web.Models.Sailscores.ClubSelectorModel
+@model SailScores.Web.Models.SailScores.ClubSelectorModel
 <select asp-for="SelectedClubInitials" class="form-control"
         onchange="var initials = this.value;
 window.location.href = '@string.Format("{0}://{1}{2}/", Context.Request.Scheme, Context.Request.Host, Url.Content("~"))' + initials;"

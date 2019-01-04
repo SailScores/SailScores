@@ -1,4 +1,4 @@
-﻿namespace Sailscores.ImportExport.Sailwave.Elements.File
+﻿namespace SailScores.ImportExport.Sailwave.Elements.File
 {
     public enum RowType
     {

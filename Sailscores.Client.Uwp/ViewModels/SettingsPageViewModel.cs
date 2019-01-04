@@ -1,5 +1,5 @@
-﻿using Sailscores.Client.Uwp.TaskHelpers;
-using Sailscores.Core.Model;
+﻿using SailScores.Client.Uwp.TaskHelpers;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +10,7 @@ using Template10.Services.SettingsService;
 using Windows.Security.Credentials;
 using Windows.UI.Xaml;
 
-namespace Sailscores.Client.Uwp.ViewModels
+namespace SailScores.Client.Uwp.ViewModels
 {
     public class SettingsPageViewModel : ViewModelBase
     {
@@ -21,7 +21,7 @@ namespace Sailscores.Client.Uwp.ViewModels
     public class SettingsPartViewModel : ViewModelBase
     {
         Services.SettingsServices.SettingsService _settings;
-        Services.SailscoresServerService _sailscoresService;
+        Services.SailScoresServerService _sailscoresService;
 
         public NotifyTaskCompletion<ObservableCollection<Club>> Clubs { get; private set; }
 
@@ -35,7 +35,7 @@ namespace Sailscores.Client.Uwp.ViewModels
             else
             {
                 _settings = Services.SettingsServices.SettingsService.Instance;
-                _sailscoresService = Services.SailscoresServerService.GetInstance(_settings);
+                _sailscoresService = Services.SailScoresServerService.GetInstance(_settings);
                 Clubs = new NotifyTaskCompletion<ObservableCollection<Club>>(GetClubsAsync());
             }
         }

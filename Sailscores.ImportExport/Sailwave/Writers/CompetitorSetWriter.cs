@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Elements.File;
-using Sailscores.ImportExport.Sailwave.Writers;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Writers;
 
-namespace Sailscores.ImportExport.Sailwave.Writers
+namespace SailScores.ImportExport.Sailwave.Writers
 {
     public class CompetitorSetWriter : GenericSetWriter<Competitor>
     {

@@ -9,12 +9,12 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Sailscores.Core.Mapping;
-using Sailscores.Core.Services;
-using Sailscores.Database;
-using Sailscores.Web.Data;
-using Sailscores.Web.Mapping;
-using Sailscores.Web.Services;
+using SailScores.Core.Mapping;
+using SailScores.Core.Services;
+using SailScores.Database;
+using SailScores.Web.Data;
+using SailScores.Web.Mapping;
+using SailScores.Web.Services;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sailscores.Web
+namespace SailScores.Web
 {
     public class Startup
     {
@@ -41,8 +41,8 @@ namespace Sailscores.Web
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Sailscores API", Version = "v1" });
-                c.IncludeXmlComments(string.Format(@"{0}\Sailscores.Web.xml",
+                c.SwaggerDoc("v1", new Info { Title = "SailScores API", Version = "v1" });
+                c.IncludeXmlComments(string.Format(@"{0}\SailScores.Web.xml",
                      System.AppDomain.CurrentDomain.BaseDirectory));
                 c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
                 {
@@ -65,12 +65,12 @@ namespace Sailscores.Web
             });
 
 
-            services.AddDbContext<SailscoresIdentityContext>(options =>
+            services.AddDbContext<SailScoresIdentityContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<IdentityUser,IdentityRole>()
-                .AddEntityFrameworkStores<SailscoresIdentityContext>()
+                .AddEntityFrameworkStores<SailScoresIdentityContext>()
                 .AddDefaultTokenProviders();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -112,7 +112,7 @@ namespace Sailscores.Web
                 };
             });
 
-            services.AddDbContext<SailscoresContext>(options =>
+            services.AddDbContext<SailScoresContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
@@ -123,17 +123,17 @@ namespace Sailscores.Web
                     typeof(ToViewModelMappingProfile).GetTypeInfo().Assembly
                 });
 
-            RegisterSailscoresServices(services);
+            RegisterSailScoresServices(services);
 
 
         }
 
-        private void RegisterSailscoresServices(IServiceCollection services)
+        private void RegisterSailScoresServices(IServiceCollection services)
         {
-            services.RegisterCoreSailscoresServices();
-            services.RegisterWebSailscoresServices();
+            services.RegisterCoreSailScoresServices();
+            services.RegisterWebSailScoresServices();
             
-            services.AddDbContext<ISailscoresContext, SailscoresContext>();
+            services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -157,7 +157,7 @@ namespace Sailscores.Web
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sailscores API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SailScores API V1");
             });
 
 
@@ -179,7 +179,7 @@ namespace Sailscores.Web
                     constraints: new
                     {
                         clubInitials = new ClubRouteConstraint(() =>
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailscoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });
@@ -191,7 +191,7 @@ namespace Sailscores.Web
                     constraints: new
                     {
                         clubInitials = new ClubRouteConstraint(() =>
-                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailscoresContext>(),
+                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });
@@ -202,7 +202,7 @@ namespace Sailscores.Web
                     constraints: new
                     {
                         clubInitials = new ClubRouteConstraint(() =>
-                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailscoresContext>(),
+                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });

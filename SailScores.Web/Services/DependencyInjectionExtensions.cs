@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Sailscores.Web.Services;
+using SailScores.Web.Services;
 
-namespace Sailscores.Web.Services
+namespace SailScores.Web.Services
 {
     public static class DependencyInjectionExtensions
     {
-        public static void RegisterWebSailscoresServices(
+        public static void RegisterWebSailScoresServices(
             this IServiceCollection services)
         {
             services.AddScoped<ISeriesService, SeriesService>();

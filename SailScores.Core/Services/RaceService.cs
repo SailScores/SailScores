@@ -1,24 +1,24 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Sailscores.Database;
+using SailScores.Database;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using System.Linq;
-using Sailscores.Core.Model;
-using Db = Sailscores.Database.Entities;
+using SailScores.Core.Model;
+using Db = SailScores.Database.Entities;
 
-namespace Sailscores.Core.Services
+namespace SailScores.Core.Services
 {
     public class RaceService : IRaceService
     {
-        private readonly ISailscoresContext _dbContext;
+        private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
 
         public RaceService(
-            ISailscoresContext dbContext,
+            ISailScoresContext dbContext,
             IMapper mapper)
         {
             _dbContext = dbContext;

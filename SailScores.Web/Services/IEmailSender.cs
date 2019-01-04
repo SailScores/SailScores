@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Sailscores.Web.Services
+namespace SailScores.Web.Services
 {
     public interface IEmailSender
     {

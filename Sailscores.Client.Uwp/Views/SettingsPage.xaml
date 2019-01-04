@@ -1,4 +1,4 @@
-﻿<Page x:Class="Sailscores.Client.Uwp.Views.SettingsPage"
+﻿<Page x:Class="SailScores.Client.Uwp.Views.SettingsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:Behaviors="using:Template10.Behaviors"
@@ -7,9 +7,9 @@
       xmlns:controls="using:Template10.Controls"
       xmlns:converter="using:Template10.Converters"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="using:Sailscores.Client.Uwp.Views"
+      xmlns:local="using:SailScores.Client.Uwp.Views"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:vm="using:Sailscores.Client.Uwp.ViewModels"
+      xmlns:vm="using:SailScores.Client.Uwp.ViewModels"
       mc:Ignorable="d">
 
     <Page.DataContext>
@@ -109,19 +109,19 @@
                                       RelativePanel.Below="UseShellDrawnBackButtonToggleSwtich" />
 
                             <ToggleSwitch x:Name="ShowHamburgerButtonToggleSwitch"
-                                      Header="Sailscores.Client.Uwp Button Visibility"
+                                      Header="SailScores.Client.Uwp Button Visibility"
                                       IsEnabled="{Binding IsOn, ElementName=IsFullScreenToggleSwitch, Converter={StaticResource FalseWhenTrueConverter}}"
                                       IsOn="{Binding ShowHamburgerButton, Mode=TwoWay}"
-                                      OffContent="Sailscores.Client.Uwp Button is hidden"
-                                      OnContent="Sailscores.Client.Uwp Button is visible"
+                                      OffContent="SailScores.Client.Uwp Button is hidden"
+                                      OnContent="SailScores.Client.Uwp Button is visible"
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.Below="UseLightThemeToggleSwitch" />
 
                             <ToggleSwitch x:Name="IsFullScreenToggleSwitch"
                                       Header="Page content is Full Screen"
                                       IsOn="{Binding IsFullScreen, Mode=TwoWay}"
-                                      OffContent="Sailscores.Client.Uwp Menu is visible"
-                                      OnContent="Sailscores.Client.Uwp Menu is hidden"
+                                      OffContent="SailScores.Client.Uwp Menu is visible"
+                                      OnContent="SailScores.Client.Uwp Menu is hidden"
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.Below="ShowHamburgerButtonToggleSwitch" />
 
@@ -166,7 +166,7 @@
                             Width="200"
                             Margin="0,12,0,0"
                             HorizontalAlignment="Left"
-                            Header="Sailscores Server"
+                            Header="SailScores Server"
                             RelativePanel.AlignLeftWithPanel="True"
                             RelativePanel.Below="PasswordBox"
                             Text="{Binding ServerUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

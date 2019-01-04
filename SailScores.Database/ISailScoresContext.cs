@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sailscores.Database.Entities;
+using SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sailscores.Database
+namespace SailScores.Database
 {
-    public interface ISailscoresContext : IDisposable {
+    public interface ISailScoresContext : IDisposable {
         DbSet<Club> Clubs { get; set; }
 
         DbSet<BoatClass> BoatClasses { get; set; }

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Sailscores.ImportExport.Sailwave.Attributes;
-using Sailscores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Attributes;
+using SailScores.ImportExport.Sailwave.Elements.File;
 
-namespace Sailscores.ImportExport.Sailwave.Parsers
+namespace SailScores.ImportExport.Sailwave.Parsers
 {
     public class Parser<T>
         where T : new()

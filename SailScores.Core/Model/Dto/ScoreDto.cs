@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sailscores.Core.Model.Dto
+namespace SailScores.Core.Model.Dto
 {
     public class ScoreDto
     {

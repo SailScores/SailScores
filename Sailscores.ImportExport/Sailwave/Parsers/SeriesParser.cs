@@ -2,11 +2,11 @@
 using System.IO;
 using System.Linq;
 using CsvHelper;
-using Sailscores.ImportExport.Sailwave.Csv;
-using Sailscores.ImportExport.Sailwave.Elements;
-using Sailscores.ImportExport.Sailwave.Elements.File;
+using SailScores.ImportExport.Sailwave.Csv;
+using SailScores.ImportExport.Sailwave.Elements;
+using SailScores.ImportExport.Sailwave.Elements.File;
 
-namespace Sailscores.ImportExport.Sailwave.Parsers
+namespace SailScores.ImportExport.Sailwave.Parsers
 {
     public class SeriesParser : Parser<Series>
     {

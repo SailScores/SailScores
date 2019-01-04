@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using Sailscores.Core.Model;
-using Sailscores.Core.Services;
-using Sailscores.Web.Models.Sailscores;
+using SailScores.Core.Model;
+using SailScores.Core.Services;
+using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sailscores.Web.Services
+namespace SailScores.Web.Services
 {
     public class RaceService : IRaceService
     {

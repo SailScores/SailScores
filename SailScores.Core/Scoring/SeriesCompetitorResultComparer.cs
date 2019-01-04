@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Sailscores.Core.Scoring
+namespace SailScores.Core.Scoring
 {
     internal class SeriesCompetitorResultComparer : IComparer<SeriesCompetitorResults>
     {

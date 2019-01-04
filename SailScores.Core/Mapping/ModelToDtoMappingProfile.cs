@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Dto = Sailscores.Core.Model.Dto;
-using Model = Sailscores.Core.Model;
+using Dto = SailScores.Core.Model.Dto;
+using Model = SailScores.Core.Model;
 
-namespace Sailscores.Core.Mapping
+namespace SailScores.Core.Mapping
 {
     public class ModelToDtoMappingProfile : Profile
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sailscores.ImportExport.Sailwave.Elements.File
+namespace SailScores.ImportExport.Sailwave.Elements.File
 {
     public static class RowNames
     {

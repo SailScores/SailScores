@@ -1,6 +1,6 @@
-﻿using Sailscores.ImportExport.Sailwave.Attributes;
+﻿using SailScores.ImportExport.Sailwave.Attributes;
 
-namespace Sailscores.ImportExport.Sailwave.Elements
+namespace SailScores.ImportExport.Sailwave.Elements
 {
     public class Competitor
     {

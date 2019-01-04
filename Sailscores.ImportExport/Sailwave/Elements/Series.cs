@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Sailscores.ImportExport.Sailwave.Elements
+namespace SailScores.ImportExport.Sailwave.Elements
 {
     public class Series
     {
