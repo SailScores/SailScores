@@ -122,6 +122,7 @@ namespace SailScores.Web
                     typeof(DbToModelMappingProfile).GetTypeInfo().Assembly,
                     typeof(ToViewModelMappingProfile).GetTypeInfo().Assembly
                 });
+            
 
             RegisterSailScoresServices(services);
 
@@ -137,7 +138,7 @@ namespace SailScores.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMapper mapper)
         {
             if (env.IsDevelopment())
             {
@@ -149,6 +150,8 @@ namespace SailScores.Web
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            mapper.ConfigurationProvider.AssertConfigurationIsValid();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

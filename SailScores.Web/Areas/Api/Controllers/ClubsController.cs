@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
+using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Services;
 using Model = SailScores.Core.Model;
@@ -16,12 +17,12 @@ namespace SailScores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClubController : ControllerBase
+    public class ClubsController : ControllerBase
     {
         private readonly IClubService _clubService;
         private readonly IMapper _mapper;
 
-        public ClubController(
+        public ClubsController(
             IClubService clubService,
             IMapper mapper)
         {
@@ -57,11 +58,15 @@ namespace SailScores.Web.Areas.Api.Controllers
             return _mapper.Map<ClubDto>(club);
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         // POST: api/Club
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<Guid> Post([FromBody] ClubDto club)
         {
+            var clubBizObj = _mapper.Map<Club>(club);
+            await _clubService.SaveNewClub(clubBizObj);
+            var savedClub = (await _clubService.GetClubs(false)).First(c => c.Initials == club.Initials);
+            return savedClub.Id;
         }
 
         [Authorize]

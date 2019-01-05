@@ -58,6 +58,51 @@ namespace SailScores.Api.Services
             }
         }
 
+        public async Task<Guid> PostAsync<T>(string urlExtension, T item, int retryCount = 0)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                if (_token != null)
+                {
+                    httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
+                }
+
+                Uri requestUri = new Uri(new Uri(_settings.ServerUrl), urlExtension);
+
+                var httpResponse = new HttpResponseMessage();
+                string httpResponseBody = "";
+
+                try
+                {
+                    var json = JsonConvert.SerializeObject(item);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    //Send the request
+                    httpResponse = await httpClient.PostAsync(requestUri, content);
+                    if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        if (retryCount < 2)
+                        {
+                            await AuthenticateAsync();
+                            return await PostAsync<T>(urlExtension, item, ++retryCount);
+                        } else
+                        {
+                            throw new UnauthorizedAccessException("Unauthorized for Web API. Check Credentials.");
+                        }
+                    }
+                    httpResponse.EnsureSuccessStatusCode();
+                    httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+
+                    var returnId = JsonConvert.DeserializeObject<Guid>(httpResponseBody);
+                    return returnId;
+                }
+                catch (Exception ex)
+                {
+                    httpResponseBody = "Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message;
+                    throw;
+                }
+            }
+        }
+
         private async Task AuthenticateAsync()
         {
             if( String.IsNullOrWhiteSpace(_settings.UserName)
@@ -81,7 +126,6 @@ namespace SailScores.Api.Services
 
                 try
                 {
-                    //Send the GET request
                     httpResponse = await httpClient.PostAsync(requestUri,
                         new StringContent(
                             content,
@@ -102,17 +146,17 @@ namespace SailScores.Api.Services
 
         public async Task<List<ClubDto>> GetClubsAsync()
         {
-            return await GetAsync<List<ClubDto>>("/api/club");
+            return await GetAsync<List<ClubDto>>("/api/clubs");
         }
 
         public async Task<ClubDto> GetClubAsync(Guid clubId)
         {
-            return await GetAsync<ClubDto>($"/api/club/{clubId}");
+            return await GetAsync<ClubDto>($"/api/clubs/{clubId}");
         }
 
         public async Task<List<CompetitorDto>> GetCompetitorsAsync(Guid clubId)
         {
-            return await GetAsync<List<CompetitorDto>>($"/api/competitor/&clubId={clubId}");
+            return await GetAsync<List<CompetitorDto>>($"/api/competitors/&clubId={clubId}");
         }
 
         public async Task<List<SeriesDto>> GetAllSeriesAsync(Guid clubId)
@@ -125,11 +169,14 @@ namespace SailScores.Api.Services
             return await GetAsync<SeriesDto>($"/api/series/{clubId}");
         }
 
-        //TODO: What filter do I need on this? (Don't want to load all for club.)
         public async Task<List<RaceDto>> GetRacesAsync(Guid clubId)
         {
-            return await GetAsync<List<RaceDto>>($"/api/race/{clubId}");
+            return await GetAsync<List<RaceDto>>($"/api/races/{clubId}");
         }
 
+        public async Task<Guid> SaveClub(ClubDto club)
+        {
+            return await PostAsync<ClubDto>($"/api/clubs/", club);
+        }
     }
 }

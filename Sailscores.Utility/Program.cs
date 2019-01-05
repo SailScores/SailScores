@@ -104,8 +104,11 @@ namespace SailScores.Utility
             // import file
             var series = ImportSWFile(fullpath);
 
+            Console.WriteLine($"About to import a series with {series.Races.Count} race(s).");
+
             var restImporter = _serviceProvider.GetService<IRestImporter>();
-            restImporter.WriteSwSeriesToSS(series);
+            var importTask = restImporter.WriteSwSeriesToSS(series);
+            importTask.Wait();
         }
 
 

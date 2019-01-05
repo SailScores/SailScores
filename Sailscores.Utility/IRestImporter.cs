@@ -1,7 +1,9 @@
-﻿namespace SailScores.Utility
+﻿using System.Threading.Tasks;
+
+namespace SailScores.Utility
 {
     internal interface IRestImporter
     {
-        void WriteSwSeriesToSS(SailScores.ImportExport.Sailwave.Elements.Series series);
+        Task WriteSwSeriesToSS(SailScores.ImportExport.Sailwave.Elements.Series series);
     }
 }

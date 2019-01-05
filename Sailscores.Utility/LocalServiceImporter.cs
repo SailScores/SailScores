@@ -249,8 +249,7 @@ namespace SailScores.Utility
         private SsObjects.Club SelectExistingClub()
         {
             var clubs = GetExistingClubs();
-            Dictionary<int, SsObjects.Club> clubDict = new
-                Dictionary<int, SsObjects.Club>();
+            var clubDict = new Dictionary<int, SsObjects.Club>();
             int i = 1;
             foreach (var club in clubs)
             {
@@ -279,7 +278,7 @@ namespace SailScores.Utility
             Console.Write("Enter the club initials > ");
             var clubInitials = Console.ReadLine().Trim();
             
-            SsObjects.Club club = new SsObjects.Club
+            var club = new SsObjects.Club
             {
                 Initials = clubInitials,
                 Name = clubName

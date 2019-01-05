@@ -71,9 +71,6 @@ namespace SailScores.Core.Scoring
 
         private void CalculateCodedResults(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
         {
-            
-            //TODO Not completely implemented.
-
             //Fill in DNCs
             foreach (var race in resultsWorkInProgress.Races)
             {

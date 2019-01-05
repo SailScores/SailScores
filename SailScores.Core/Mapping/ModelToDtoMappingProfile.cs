@@ -14,14 +14,29 @@ namespace SailScores.Core.Mapping
         {
             CreateMap<Model.BoatClass, Dto.BoatClassDto>();
             CreateMap<Model.Club, Dto.ClubDto>()
+                .ForMember(d => d.CompetitorIds, o => o.MapFrom(s => s.Competitors.Select(c => c.Id)))
+                .ForMember(d => d.FleetIds, o => o.MapFrom(s => s.Fleets.Select(c => c.Id)))
+                .ForMember(d => d.BoatClassIds, o => o.MapFrom(s => s.BoatClasses.Select(c => c.Id)))
+                .ForMember(d => d.SeasonIds, o => o.MapFrom(s => s.Seasons.Select(c => c.Id)))
+                .ForMember(d => d.RaceIds, o => o.MapFrom(s => s.Races.Select(c => c.Id)))
+                .ForMember(d => d.ScoreCodeIds, o => o.MapFrom(s => s.ScoreCodes.Select(c => c.Id)))
+                .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(c => c.Id)))
+                .ReverseMap();
+            CreateMap<Model.Competitor, Dto.CompetitorDto>()
+                .ForMember(d => d.FleetIds, o => o.MapFrom(s => s.Fleets.Select(c => c.Id)))
+                .ForMember(d => d.ScoreIds, o => o.MapFrom(s => s.Scores.Select(c => c.Id)));
+            CreateMap<Model.Fleet, Dto.FleetDto>()
+                .ForMember(d => d.BoatClassIds, o => o.MapFrom(s => s.BoatClasses.Select(c => c.Id)))
                 .ForMember(d => d.CompetitorIds, o => o.MapFrom(s => s.Competitors.Select(c => c.Id)));
-            CreateMap<Model.Competitor, Dto.CompetitorDto>();
-            CreateMap<Model.Fleet, Dto.FleetDto>();
-            CreateMap<Model.Race, Dto.RaceDto>();
+            CreateMap<Model.Race, Dto.RaceDto>()
+                .ForMember(d => d.ScoreIds, o => o.MapFrom(s => s.Scores.Select(c => c.Id)))
+                .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(c => c.Id)));
             CreateMap<Model.ScoreCode, Dto.ScoreCodeDto>();
             CreateMap<Model.Score, Dto.ScoreDto>();
-            CreateMap<Model.Season, Dto.SeasonDto>();
-            CreateMap<Model.Series, Dto.SeriesDto>();
+            CreateMap<Model.Season, Dto.SeasonDto>()
+                .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(c => c.Id)));
+            CreateMap<Model.Series, Dto.SeriesDto>()
+                .ForMember(d => d.RaceIds, o => o.MapFrom(s => s.Races.Select(c => c.Id)));
 
         }
     }
