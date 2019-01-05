@@ -1,4 +1,4 @@
-﻿using SailScores.Database.Enumerations;
+﻿using SailScores.Api.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

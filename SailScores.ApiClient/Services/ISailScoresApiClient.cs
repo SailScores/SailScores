@@ -1,11 +1,11 @@
-﻿using SailScores.Core.Model;
+﻿using SailScores.Api.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SailScores.ApiClient.Services
+namespace SailScores.Api.Services
 {
     public interface ISailScoresApiClient
     {
-        Task<List<Club>> GetClubsAsync();
+        Task<List<ClubDto>> GetClubsAsync();
     }
 }

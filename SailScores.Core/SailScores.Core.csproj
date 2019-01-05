@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SailScores.ApiClient\SailScores.Api.csproj" />
     <ProjectReference Include="..\SailScores.Database\SailScores.Database.csproj" />
   </ItemGroup>
 

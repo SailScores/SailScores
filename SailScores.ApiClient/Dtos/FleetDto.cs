@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using SailScores.Database.Enumerations;
+using SailScores.Api.Enumerations;
 
-namespace SailScores.Core.Model.Dto
+namespace SailScores.Api.Dtos
 {
     // Fleet is a group of competitors that may be scored against one another.
     public class FleetDto
     {
         public Guid Id { get; set; }
         public Guid ClubId { get; set; }
-        public Club Club { get; set; }
         [StringLength(30)]
         public String ShortName { get; set; }
         [StringLength(200)]

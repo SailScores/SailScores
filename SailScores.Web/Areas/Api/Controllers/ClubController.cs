@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Model.Dto;
+using SailScores.Api.Dtos;
 using SailScores.Core.Services;
 using SailScores.Web.Services;
 using Model = SailScores.Core.Model;

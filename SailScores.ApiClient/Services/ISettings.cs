@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-namespace SailScores.ApiClient.Services
+namespace SailScores.Api.Services
 {
     public interface ISettings
     {

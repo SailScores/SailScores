@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Dto = SailScores.Core.Model.Dto;
+using Dto = SailScores.Api.Dtos;
 using Model = SailScores.Core.Model;
 
 namespace SailScores.Core.Mapping

@@ -1,15 +1,14 @@
 ﻿using Newtonsoft.Json;
-using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SailScores.Core.Model.Dto;
+using SailScores.Api.Dtos;
 using System.Net.Http;
 using System.Net;
 
-namespace SailScores.ApiClient.Services
+namespace SailScores.Api.Services
 {
     public class SailScoresApiClient : ISailScoresApiClient
     {
@@ -101,9 +100,9 @@ namespace SailScores.ApiClient.Services
             }
         }
 
-        public async Task<List<Club>> GetClubsAsync()
+        public async Task<List<ClubDto>> GetClubsAsync()
         {
-            return await GetAsync<List<Club>>("/api/club");
+            return await GetAsync<List<ClubDto>>("/api/club");
         }
 
         public async Task<ClubDto> GetClubAsync(Guid clubId)
@@ -111,25 +110,25 @@ namespace SailScores.ApiClient.Services
             return await GetAsync<ClubDto>($"/api/club/{clubId}");
         }
 
-        public async Task<List<Competitor>> GetCompetitorsAsync(Guid clubId)
+        public async Task<List<CompetitorDto>> GetCompetitorsAsync(Guid clubId)
         {
-            return await GetAsync<List<Competitor>>($"/api/competitor/&clubId={clubId}");
+            return await GetAsync<List<CompetitorDto>>($"/api/competitor/&clubId={clubId}");
         }
 
-        public async Task<List<Series>> GetAllSeriesAsync(Guid clubId)
+        public async Task<List<SeriesDto>> GetAllSeriesAsync(Guid clubId)
         {
-            return await GetAsync<List<Series>>($"/api/series/{clubId}");
+            return await GetAsync<List<SeriesDto>>($"/api/series/{clubId}");
         }
 
-        public async Task<Series> GetOneSeriesAsync(Guid clubId)
+        public async Task<SeriesDto> GetOneSeriesAsync(Guid clubId)
         {
-            return await GetAsync<Series>($"/api/series/{clubId}");
+            return await GetAsync<SeriesDto>($"/api/series/{clubId}");
         }
 
         //TODO: What filter do I need on this? (Don't want to load all for club.)
-        public async Task<List<Race>> GetRacesAsync(Guid clubId)
+        public async Task<List<RaceDto>> GetRacesAsync(Guid clubId)
         {
-            return await GetAsync<List<Race>>($"/api/race/{clubId}");
+            return await GetAsync<List<RaceDto>>($"/api/race/{clubId}");
         }
 
     }

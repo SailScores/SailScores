@@ -136,7 +136,7 @@ namespace SailScores.Core.Services
                 }
                 dbScore.Competitor = await FindOrBuildCompetitorAsync(club, score.Competitor);
                 dbRace.Scores.Add(dbScore);
-                if(race.Fleet?.FleetType == Database.Enumerations.FleetType.SelectedBoats)
+                if(race.Fleet?.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 {
                     await EnsureCompetitorIsInFleet(dbScore.Competitor, race.Fleet);
                 }

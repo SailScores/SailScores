@@ -235,9 +235,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SailScores.ApiClient\SailScores.ApiClient.csproj">
+    <ProjectReference Include="..\SailScores.ApiClient\SailScores.Api.csproj">
       <Project>{23b034c2-1a8d-4ea9-9e62-bc59672eae91}</Project>
-      <Name>SailScores.ApiClient</Name>
+      <Name>SailScores.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\SailScores.Core\SailScores.Core.csproj">
       <Project>{6f63462d-8914-48a5-9390-5cec7dc5146b}</Project>

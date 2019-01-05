@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using SailScores.ApiClient.Services;
+using SailScores.Api.Dtos;
+using SailScores.Api.Services;
 using SailScores.Client.Uwp.Services.SettingsServices;
 using SailScores.Core.Model;
 
@@ -32,7 +33,7 @@ namespace SailScores.Client.Uwp.Services
         }
 
 
-        public async Task<List<Club>> GetClubsAsync()
+        public async Task<List<ClubDto>> GetClubsAsync()
         {
             return await _apiClient.GetClubsAsync();
         }

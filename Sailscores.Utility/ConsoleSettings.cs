@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SailScores.Utility
 {
-    class ConsoleSettings : ApiClient.Services.ISettings
+    class ConsoleSettings : Api.Services.ISettings
     {
         private string _serverUrl;
         public string ServerUrl

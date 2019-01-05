@@ -19,4 +19,12 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Enumerations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SailScores.ApiClient\SailScores.Api.csproj" />
+  </ItemGroup>
+
 </Project>

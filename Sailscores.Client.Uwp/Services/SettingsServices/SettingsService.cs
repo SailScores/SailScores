@@ -1,4 +1,4 @@
-﻿using SailScores.ApiClient.Services;
+﻿using SailScores.Api.Services;
 using System;
 using Template10.Common;
 using Template10.Utils;

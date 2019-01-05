@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.ImportExport.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Utility", "Sailscores.Utility\SailScores.Utility.csproj", "{70026DCF-3B59-4FE3-9AF5-54D7F1DFC5FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.ApiClient", "SailScores.ApiClient\SailScores.ApiClient.csproj", "{23B034C2-1A8D-4EA9-9E62-BC59672EAE91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Api", "SailScores.ApiClient\SailScores.Api.csproj", "{23B034C2-1A8D-4EA9-9E62-BC59672EAE91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

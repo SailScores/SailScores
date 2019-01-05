@@ -152,7 +152,7 @@ namespace SailScores.Utility
                     BoatClassId = boatClass.Id,
                     BoatClass = boatClass
                 };
-                if (fleet.FleetType == Database.Enumerations.FleetType.SelectedBoats)
+                if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 {
                     if (ssScore.Competitor.Fleets == null)
                     {
@@ -394,7 +394,7 @@ namespace SailScores.Utility
                 Name = fleetName,
                 ShortName = fleetShortName,
                 ClubId = club.Id,
-                FleetType = Database.Enumerations.FleetType.SelectedBoats,
+                FleetType = Api.Enumerations.FleetType.SelectedBoats,
                 Competitors = new List<SsObjects.Competitor>()
             };
 

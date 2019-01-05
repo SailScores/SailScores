@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SailScores.Core.Model.Dto
+namespace SailScores.Api.Dtos
 {
     public class SeasonDto
     {

@@ -1,4 +1,5 @@
-﻿using SailScores.Client.Uwp.TaskHelpers;
+﻿using SailScores.Api.Dtos;
+using SailScores.Client.Uwp.TaskHelpers;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace SailScores.Client.Uwp.ViewModels
         Services.SettingsServices.SettingsService _settings;
         Services.SailScoresServerService _sailscoresService;
 
-        public NotifyTaskCompletion<ObservableCollection<Club>> Clubs { get; private set; }
+        public NotifyTaskCompletion<ObservableCollection<ClubDto>> Clubs { get; private set; }
 
 
         public SettingsPartViewModel()
@@ -36,14 +37,14 @@ namespace SailScores.Client.Uwp.ViewModels
             {
                 _settings = Services.SettingsServices.SettingsService.Instance;
                 _sailscoresService = Services.SailScoresServerService.GetInstance(_settings);
-                Clubs = new NotifyTaskCompletion<ObservableCollection<Club>>(GetClubsAsync());
+                Clubs = new NotifyTaskCompletion<ObservableCollection<ClubDto>>(GetClubsAsync());
             }
         }
 
-        private async Task<ObservableCollection<Club>> GetClubsAsync()
+        private async Task<ObservableCollection<ClubDto>> GetClubsAsync()
         {
             var clubs = await _sailscoresService.GetClubsAsync();
-            var obsCollection = new ObservableCollection<Club>();
+            var obsCollection = new ObservableCollection<ClubDto>();
             clubs.ForEach(c => obsCollection.Add(c));
             SelectedClub = clubs.FirstOrDefault(c => c.Id == _settings.ClubId);
             return obsCollection;
@@ -154,8 +155,8 @@ namespace SailScores.Client.Uwp.ViewModels
             }
         }
 
-        private Club _selectedClub;
-        public Club SelectedClub
+        private ClubDto _selectedClub;
+        public ClubDto SelectedClub
         {
             get
             {
