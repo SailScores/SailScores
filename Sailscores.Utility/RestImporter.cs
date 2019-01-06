@@ -28,7 +28,7 @@ namespace SailScores.Utility
         {
             _club = await GetClub();
             _boatClass = await GetBoatClass();
-            _fleet = GetFleet();
+            _fleet = await GetFleet();
             _year = GetYear();
             _series = MakeSeries(series);
             _competitors = GetCompetitors(series);
@@ -38,17 +38,17 @@ namespace SailScores.Utility
         private async Task<ClubDto> GetClub()
         {
             var clubs = await _apiClient.GetClubsAsync();
-            Console.WriteLine($"There are {clubs.Count} clubs already in the database.");
-            Console.Write("Would you like to use one of those? (Y / N)");
-            var result = Console.ReadLine();
-            if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+            if (clubs.Count > 0)
             {
-                return SelectExistingClub(clubs);
+                Console.WriteLine($"There are {clubs.Count} clubs already in the database.");
+                Console.Write("Would you like to use one of those? (Y / N) ");
+                var result = Console.ReadLine();
+                if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return SelectExistingClub(clubs);
+                }
             }
-            else
-            {
-                return await MakeNewClub();
-            }
+            return await MakeNewClub();
         }
 
         private ClubDto SelectExistingClub(List<ClubDto> clubs)
@@ -99,17 +99,17 @@ namespace SailScores.Utility
         private async Task<BoatClassDto> GetBoatClass()
         {
             var boatClasses = await _apiClient.GetBoatClassesAsync(_club.Id);
-            Console.WriteLine($"There are {boatClasses.Count} boat classes already in the database.");
-            Console.Write("Would you like to use one of those? (Y / N)");
-            var result = Console.ReadLine();
-            if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+            if (boatClasses.Count > 0)
             {
-                return SelectExistingClass(boatClasses);
+                Console.WriteLine($"There are {boatClasses.Count} boat classes already in the database.");
+                Console.Write("Would you like to use one of those? (Y / N) ");
+                var result = Console.ReadLine();
+                if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return SelectExistingClass(boatClasses);
+                }
             }
-            else
-            {
-                return await MakeNewBoatClass();
-            }
+            return await MakeNewBoatClass();
         }
 
         private BoatClassDto SelectExistingClass(List<BoatClassDto> classes)
@@ -157,10 +157,68 @@ namespace SailScores.Utility
         }
 
 
-        private FleetDto GetFleet()
+        private async Task<FleetDto> GetFleet()
         {
-            throw new NotImplementedException();
+            var fleets = await _apiClient.GetFleetsAsync(_club.Id);
+            if (fleets.Count > 0)
+            {
+                Console.WriteLine($"There are {fleets.Count} fleets already in the database.");
+                Console.Write("Would you like to use one of those? (Y / N) ");
+                var result = Console.ReadLine();
+                if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return SelectExistingFleet(fleets);
+                }
+            }
+            return await MakeNewFleet();
         }
+
+        private FleetDto SelectExistingFleet(List<FleetDto> fleets)
+        {
+            int i = 1;
+            foreach (var fleet in fleets)
+            {
+                Console.WriteLine($"{i++} - {fleet.Name}");
+            }
+            int result = 0;
+            while (result == 0)
+            {
+                Console.Write("Enter a number of a fleet from above > ");
+                var input = Console.ReadLine();
+                Int32.TryParse(input, out result);
+            }
+
+            return fleets[result - 1];
+        }
+
+
+        private async Task<FleetDto> MakeNewFleet()
+        {
+            Console.Write("Enter the new fleet name > ");
+            var className = Console.ReadLine().Trim();
+
+            var fleet = new FleetDto
+            {
+                Name = className,
+                ClubId = _club.Id
+            };
+
+            try
+            {
+                var guid = await _apiClient.SaveFleet(fleet);
+                fleet.Id = guid;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                throw;
+            }
+
+            return fleet;
+        }
+
+
+
 
         private int GetYear()
         {
