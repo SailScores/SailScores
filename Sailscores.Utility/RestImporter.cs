@@ -167,7 +167,14 @@ namespace SailScores.Utility
                 var result = Console.ReadLine();
                 if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return SelectExistingFleet(fleets);
+                    if (fleets.Count > 1)
+                    {
+                        return SelectExistingFleet(fleets);
+                    }
+                    else
+                    {
+                        return fleets[0];
+                    }
                 }
             }
             return await MakeNewFleet();
@@ -196,10 +203,13 @@ namespace SailScores.Utility
         {
             Console.Write("Enter the new fleet name > ");
             var className = Console.ReadLine().Trim();
+            Console.Write("Enter the new fleet short name / abbreviation > ");
+            var shortName = Console.ReadLine().Trim();
 
             var fleet = new FleetDto
             {
                 Name = className,
+                ShortName = shortName,
                 ClubId = _club.Id
             };
 

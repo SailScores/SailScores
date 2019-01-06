@@ -9,8 +9,10 @@ namespace SailScores.Api.Services
     {
         Task<List<ClubDto>> GetClubsAsync();
         Task<List<BoatClassDto>> GetBoatClassesAsync(Guid clubId);
+        Task<List<FleetDto>> GetFleetsAsync(Guid clubId);
 
         Task<Guid> SaveClub(ClubDto club);
         Task<Guid> SaveBoatClass(BoatClassDto boatClass);
+        Task<Guid> SaveFleet(FleetDto fleet);
     }
 }

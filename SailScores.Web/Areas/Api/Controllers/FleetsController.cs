@@ -18,12 +18,12 @@ namespace SailScores.Web.Areas.Api.Controllers
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
-    public class BoatClassesController : ControllerBase
+    public class FleetsController : ControllerBase
     {
         private readonly IClubService _clubService;
         private readonly IMapper _mapper;
 
-        public BoatClassesController(
+        public FleetsController(
             IClubService clubService,
             IMapper mapper)
         {
@@ -32,21 +32,21 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<BoatClassDto>> Get(Guid clubId)
+        public async Task<IEnumerable<FleetDto>> Get(Guid clubId)
         {
             var club = await _clubService.GetFullClub(clubId);
-            return _mapper.Map<List<BoatClassDto>>(club.BoatClasses);
+            return _mapper.Map<List<FleetDto>>(club.Fleets);
         }
 
         [HttpPost]
-        public async Task<Guid> Post([FromBody] BoatClassDto boatClass)
+        public async Task<Guid> Post([FromBody] FleetDto fleet)
         {
-            var classBizObj = _mapper.Map<BoatClass>(boatClass);
-            await _clubService.SaveNewBoatClass(classBizObj);
+            var fleetBizObj = _mapper.Map<Fleet>(fleet);
+            await _clubService.SaveNewFleet(fleetBizObj);
             var savedClass =
-                (await _clubService.GetFullClub(boatClass.ClubId))
+                (await _clubService.GetFullClub(fleet.ClubId))
                 .BoatClasses
-                .First(c => c.Name == boatClass.Name);
+                .First(c => c.Name == fleet.Name);
             return savedClass.Id;
         }
 

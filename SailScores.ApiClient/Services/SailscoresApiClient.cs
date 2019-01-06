@@ -192,5 +192,15 @@ namespace SailScores.Api.Services
         {
             return await PostAsync<BoatClassDto>($"/api/boatClasses/", boatClass);
         }
+
+        public async Task<List<FleetDto>> GetFleetsAsync(Guid clubId)
+        {
+            return await GetAsync<List<FleetDto>>($"/api/fleets/", clubId);
+        }
+
+        public async Task<Guid> SaveFleet(FleetDto fleet)
+        {
+            return await PostAsync<FleetDto>($"/api/fleets/", fleet);
+        }
     }
 }
