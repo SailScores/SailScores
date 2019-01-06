@@ -12,7 +12,9 @@ namespace SailScores.Core.Mapping
     {
         public ModelToDtoMappingProfile()
         {
-            CreateMap<Model.BoatClass, Dto.BoatClassDto>();
+            CreateMap<Model.BoatClass, Dto.BoatClassDto>()
+                .ReverseMap()
+                .ForMember(d => d.Club, o => o.Ignore());
             CreateMap<Model.Club, Dto.ClubDto>()
                 .ForMember(d => d.CompetitorIds, o => o.MapFrom(s => s.Competitors.Select(c => c.Id)))
                 .ForMember(d => d.FleetIds, o => o.MapFrom(s => s.Fleets.Select(c => c.Id)))

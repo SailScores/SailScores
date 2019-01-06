@@ -62,6 +62,12 @@ namespace SailScores.Core.Services
             return _mapper.Map<Model.Club>(club);
         }
 
+        public async Task<Model.Club> GetFullClub(Guid id)
+        {
+            // not the best use of resources: to string, but then cast it back.
+            return await GetFullClub(id.ToString());
+        }
+
         public async Task SaveNewBoatClass(BoatClass boatClass)
         {
             var dbBoatClass =_mapper.Map<Db.BoatClass>(boatClass);

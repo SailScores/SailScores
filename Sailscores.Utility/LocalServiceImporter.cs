@@ -71,7 +71,7 @@ namespace SailScores.Utility
             foreach (var swRace in series.Races)
             {
                 DateTime date = GetDate(swRace, year);
-                int rank = GetRank(swRace);
+                int rank = GetRaceRank(swRace);
                 var ssRace = new SsObjects.Race
                 {
                     Name = swRace.Name,
@@ -103,7 +103,7 @@ namespace SailScores.Utility
             return new DateTime(year, month, day);
         }
 
-        private static int GetRank(SwObjects.Race swRace)
+        private static int GetRaceRank(SwObjects.Race swRace)
         {
             // assume race name format of "6-22 R1" or "6-23"
             var parts = swRace.Name.Split(' ');

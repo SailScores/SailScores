@@ -8,6 +8,9 @@ namespace SailScores.Api.Services
     public interface ISailScoresApiClient
     {
         Task<List<ClubDto>> GetClubsAsync();
+        Task<List<BoatClassDto>> GetBoatClassesAsync(Guid clubId);
+
         Task<Guid> SaveClub(ClubDto club);
+        Task<Guid> SaveBoatClass(BoatClassDto boatClass);
     }
 }

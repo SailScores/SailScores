@@ -1,19 +1,7 @@
-﻿using SailScores.ImportExport.Sailwave.Parsers;
-using System;
-using System.IO;
+﻿using System;
 using SwObjects = SailScores.ImportExport.Sailwave.Elements;
-using SsObjects = SailScores.Core.Model;
 using System.Collections.Generic;
-using SailScores.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
-using SailScores.Database;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using SailScores.Core.Mapping;
-using System.Reflection;
-using AutoMapper;
 using System.Threading.Tasks;
-using System.Linq;
 using SailScores.Api.Services;
 using SailScores.Api.Dtos;
 
@@ -39,7 +27,7 @@ namespace SailScores.Utility
         public async Task WriteSwSeriesToSS(SwObjects.Series series)
         {
             _club = await GetClub();
-            _boatClass = GetBoatClass();
+            _boatClass = await GetBoatClass();
             _fleet = GetFleet();
             _year = GetYear();
             _series = MakeSeries(series);
@@ -96,7 +84,8 @@ namespace SailScores.Utility
 
             try
             {
-                var createTask = await _apiClient.SaveClub(club);
+                var guid = await _apiClient.SaveClub(club);
+                club.Id = guid;
             }
             catch (Exception ex)
             {
@@ -107,10 +96,66 @@ namespace SailScores.Utility
             return club;
         }
 
-        private BoatClassDto GetBoatClass()
+        private async Task<BoatClassDto> GetBoatClass()
         {
-            throw new NotImplementedException();
+            var boatClasses = await _apiClient.GetBoatClassesAsync(_club.Id);
+            Console.WriteLine($"There are {boatClasses.Count} boat classes already in the database.");
+            Console.Write("Would you like to use one of those? (Y / N)");
+            var result = Console.ReadLine();
+            if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return SelectExistingClass(boatClasses);
+            }
+            else
+            {
+                return await MakeNewBoatClass();
+            }
         }
+
+        private BoatClassDto SelectExistingClass(List<BoatClassDto> classes)
+        {
+            int i = 1;
+            foreach (var boatClass in classes)
+            {
+                Console.WriteLine($"{i++} - {boatClass.Name}");
+            }
+            int result = 0;
+            while (result == 0)
+            {
+                Console.Write("Enter a number of a class from above > ");
+                var input = Console.ReadLine();
+                Int32.TryParse(input, out result);
+            }
+
+            return classes[result - 1];
+        }
+
+
+        private async Task<BoatClassDto> MakeNewBoatClass()
+        {
+            Console.Write("Enter the new class name > ");
+            var className = Console.ReadLine().Trim();
+
+            var boatClass = new BoatClassDto
+            {
+                Name = className,
+                ClubId = _club.Id
+            };
+
+            try
+            {
+                var guid = await _apiClient.SaveBoatClass(boatClass);
+                boatClass.Id = guid;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                throw;
+            }
+
+            return boatClass;
+        }
+
 
         private FleetDto GetFleet()
         {

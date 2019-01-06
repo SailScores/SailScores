@@ -20,6 +20,10 @@ namespace SailScores.Api.Services
             this._settings = settings;
         }
 
+        public async Task<T> GetAsync<T>(string urlExtension, Guid clubId)
+        {
+            return await GetAsync<T>($"{urlExtension}?clubId={clubId}");
+        }
         public async Task<T> GetAsync<T>(string urlExtension)
         {
             using (var httpClient = new HttpClient())
@@ -166,17 +170,27 @@ namespace SailScores.Api.Services
 
         public async Task<SeriesDto> GetOneSeriesAsync(Guid clubId)
         {
-            return await GetAsync<SeriesDto>($"/api/series/{clubId}");
+            return await GetAsync<SeriesDto>($"/api/series/");
         }
 
         public async Task<List<RaceDto>> GetRacesAsync(Guid clubId)
         {
-            return await GetAsync<List<RaceDto>>($"/api/races/{clubId}");
+            return await GetAsync<List<RaceDto>>($"/api/races/", clubId);
         }
 
         public async Task<Guid> SaveClub(ClubDto club)
         {
             return await PostAsync<ClubDto>($"/api/clubs/", club);
+        }
+
+        public async Task<List<BoatClassDto>> GetBoatClassesAsync(Guid clubId)
+        {
+            return await GetAsync<List<BoatClassDto>>($"/api/boatClasses/", clubId);
+        }
+
+        public async Task<Guid> SaveBoatClass(BoatClassDto boatClass)
+        {
+            return await PostAsync<BoatClassDto>($"/api/boatClasses/", boatClass);
         }
     }
 }
