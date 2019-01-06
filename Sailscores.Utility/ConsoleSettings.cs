@@ -6,7 +6,8 @@ namespace SailScores.Utility
 {
     class ConsoleSettings : Api.Services.ISettings
     {
-        private string _serverUrl;
+        private string _serverUrl
+            = "https://localhost:5001/";
         public string ServerUrl
         {
             get
@@ -23,7 +24,8 @@ namespace SailScores.Utility
                 _serverUrl = value;
             }
         }
-        private string _userName;
+        private string _userName
+            = "jamie@widernets.com";
         public string UserName
         {
             get
@@ -41,7 +43,8 @@ namespace SailScores.Utility
             }
         }
 
-        private string _password;
+        private string _password
+            = "P@ssw0rd";
         public string Password
         {
             get
