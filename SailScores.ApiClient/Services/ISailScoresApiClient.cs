@@ -14,5 +14,6 @@ namespace SailScores.Api.Services
         Task<Guid> SaveClub(ClubDto club);
         Task<Guid> SaveBoatClass(BoatClassDto boatClass);
         Task<Guid> SaveFleet(FleetDto fleet);
+        Task<Guid> SaveSeries(SeriesDto series);
     }
 }

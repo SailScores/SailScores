@@ -351,8 +351,6 @@ namespace SailScores.Utility
             return boatClass;
         }
 
-
-
         private static SsObjects.Fleet SelectExistingFleet(SsObjects.Club club)
         {
             var fleets = club.Fleets;

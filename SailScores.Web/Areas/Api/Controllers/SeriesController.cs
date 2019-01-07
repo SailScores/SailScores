@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
+using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Services;
 using Model = SailScores.Core.Model;
@@ -16,6 +17,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SeriesController : ControllerBase
     {
         private readonly Core.Services.ISeriesService _service;
@@ -29,7 +31,6 @@ namespace SailScores.Web.Areas.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<IEnumerable<SeriesDto>> Get(Guid clubId)
         {
@@ -37,7 +38,6 @@ namespace SailScores.Web.Areas.Api.Controllers
             return _mapper.Map<List<SeriesDto>>(competitors);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{identifier}")]
         public async Task<SeriesDto> Get([FromRoute] String identifier)
         {
@@ -45,6 +45,17 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             return _mapper.Map<SeriesDto>(c); ;
         }
-        
+
+        [HttpPost]
+        public async Task<Guid> Post([FromBody] SeriesDto series)
+        {
+            var seriesBizObj = _mapper.Map<Series>(series);
+            await _service.SaveNewSeries(seriesBizObj);
+            var savedSeries =
+                (await _service.GetAllSeriesAsync(series.ClubId))                
+                .First(s => s.Name == series.Name
+                    && s.Season.Id == series.SeasonId);
+            return savedSeries.Id;
+        }
     }
 }

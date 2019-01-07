@@ -97,6 +97,12 @@ namespace SailScores.Core.Services
             _dbContext.Series.Add(dbSeries);
             await _dbContext.SaveChangesAsync();
         }
+        public async Task SaveNewSeries(Series series)
+        {
+            Database.Entities.Series dbSeries = _mapper.Map<dbObj.Series>(series);
+            _dbContext.Series.Add(dbSeries);
+            await _dbContext.SaveChangesAsync();
+        }
 
         private async Task<dbObj.Series> BuildDbSeriesAsync(Model.Series ssSeries, Model.Club club)
         {

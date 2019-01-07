@@ -43,11 +43,11 @@ namespace SailScores.Web.Areas.Api.Controllers
         {
             var fleetBizObj = _mapper.Map<Fleet>(fleet);
             await _clubService.SaveNewFleet(fleetBizObj);
-            var savedClass =
+            var savedFleet =
                 (await _clubService.GetFullClub(fleet.ClubId))
                 .BoatClasses
                 .First(c => c.Name == fleet.Name);
-            return savedClass.Id;
+            return savedFleet.Id;
         }
 
         // PUT: api/Club/5

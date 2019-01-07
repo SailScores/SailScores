@@ -14,6 +14,7 @@ namespace SailScores.Utility
         private ClubDto _club;
         private BoatClassDto _boatClass;
         private FleetDto _fleet;
+        private SeasonDto _season;
         private SeriesDto _series;
         private IList<CompetitorDto> _competitors;
         private int _year;
@@ -30,11 +31,12 @@ namespace SailScores.Utility
             _boatClass = await GetBoatClass();
             _fleet = await GetFleet();
             _year = GetYear();
-            _series = MakeSeries(series);
-            _competitors = GetCompetitors(series);
-            SaveRaces(series);
+            _season = await GetSeason();
+            _series = await MakeSeries(series);
+            _competitors = await GetCompetitors(series);
+            await SaveRaces(series);
         }
-
+        
         private async Task<ClubDto> GetClub()
         {
             var clubs = await _apiClient.GetClubsAsync();
@@ -227,24 +229,56 @@ namespace SailScores.Utility
             return fleet;
         }
 
+        private static int GetYear()
+        {
+            Console.Write("What year was this series? > ");
+            var result = 0;
+            while (result < 1900)
+            {
+                var input = Console.ReadLine();
+                Int32.TryParse(input, out result);
+            }
+            return result;
+        }
 
+        private Task<SeasonDto> GetSeason()
+        {
+            var seasons = await _apiClient.GetSeasonsAsync(_club.Id);
 
+            var 
 
-        private int GetYear()
+        }
+
+        private async Task<SeriesDto> MakeSeries(SwObjects.Series series)
+        {
+            Console.Write("What is the name of this series? > ");
+            var result = Console.ReadLine();
+            var seriesDto = new SeriesDto
+            {
+                ClubId = _club.Id,
+                Name = result,
+                SeasonId = _season.Id
+            };
+
+            try
+            {
+                var guid = await _apiClient.SaveSeries(seriesDto);
+                seriesDto.Id = guid;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                throw;
+            }
+            return seriesDto;
+        }
+
+        private async Task<IList<CompetitorDto>> GetCompetitors(SwObjects.Series series)
         {
             throw new NotImplementedException();
         }
-        private SeriesDto MakeSeries(SwObjects.Series series)
-        {
-            throw new NotImplementedException();
-        }
 
-        private IList<CompetitorDto> GetCompetitors(SwObjects.Series series)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SaveRaces(SwObjects.Series series)
+        private async Task SaveRaces(SwObjects.Series series)
         {
             throw new NotImplementedException();
         }

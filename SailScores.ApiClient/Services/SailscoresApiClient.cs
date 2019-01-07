@@ -202,5 +202,10 @@ namespace SailScores.Api.Services
         {
             return await PostAsync<FleetDto>($"/api/fleets/", fleet);
         }
+
+        public async Task<Guid> SaveSeries(SeriesDto series)
+        {
+            return await PostAsync<SeriesDto>($"/api/series/", series);
+        }
     }
 }
