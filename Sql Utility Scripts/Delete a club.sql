@@ -1,6 +1,8 @@
+
+
 declare @ClubName NVARCHAR(200);
 
-set @ClubName = 'Bob'
+set @ClubName = 'Test Club'
 
 Declare @ClubId UNIQUEIDENTIFIER;
 

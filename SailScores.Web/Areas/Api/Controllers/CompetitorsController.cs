@@ -47,18 +47,22 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             return _mapper.Map<CompetitorDto>(c); ;
         }
-
-        [Authorize]
+        
         // POST: api/competitors
         [HttpPost]
-        public async Task Post([FromBody] CompetitorDto value)
+        public async Task<Guid> Post([FromBody] CompetitorDto competitor)
         {
-            Competitor comp = _mapper.Map<Competitor>(value);
+            
+            await _service.SaveAsync(competitor);
 
-            await _service.SaveAsync(comp);
+            var savedCompetitor =
+                (await _service.GetCompetitorsAsync(competitor.ClubId, null))
+                .First(c => c.Name == competitor.Name
+                && c.SailNumber == competitor.SailNumber
+                && c.AlternativeSailNumber == competitor.AlternativeSailNumber);
+            return savedCompetitor.Id;
         }
 
-        [Authorize]
         // PUT: api/competitors/5
         [HttpPut("{id}")]
         public async Task Put(Guid id, [FromBody] CompetitorDto value)
