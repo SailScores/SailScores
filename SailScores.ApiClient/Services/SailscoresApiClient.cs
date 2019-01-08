@@ -229,5 +229,10 @@ namespace SailScores.Api.Services
                 return await GetAsync<List<CompetitorDto>>($"/api/competitors/", clubId);
             }
         }
+
+        public async Task<Guid> SaveCompetitor(CompetitorDto competitor)
+        {
+            return await PostAsync<CompetitorDto>($"/api/competitors/", competitor);
+        }
     }
 }

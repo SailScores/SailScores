@@ -26,7 +26,13 @@ namespace SailScores.Core.Mapping
                 .ReverseMap();
             CreateMap<Model.Competitor, Dto.CompetitorDto>()
                 .ForMember(d => d.FleetIds, o => o.MapFrom(s => s.Fleets.Select(c => c.Id)))
-                .ForMember(d => d.ScoreIds, o => o.MapFrom(s => s.Scores.Select(c => c.Id)));
+                .ForMember(d => d.ScoreIds, o => o.MapFrom(s => s.Scores.Select(c => c.Id)))
+                .ReverseMap()
+                .ForMember(d => d.Club, o => o.Ignore())
+                .ForMember(d => d.BoatClass, o => o.Ignore())
+                .ForMember(d => d.Fleets, o => o.Ignore())
+                .ForMember(d => d.Scores, o => o.Ignore());
+
             CreateMap<Model.Fleet, Dto.FleetDto>()
                 .ForMember(d => d.BoatClassIds, o => o.MapFrom(s => s.BoatClasses.Select(c => c.Id)))
                 .ForMember(d => d.CompetitorIds, o => o.MapFrom(s => s.Competitors.Select(c => c.Id)))
