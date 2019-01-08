@@ -25,14 +25,23 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IList<Model.Competitor>> GetCompetitorsAsync(Guid clubId)
+        public async Task<IList<Model.Competitor>> GetCompetitorsAsync(
+            Guid clubId,
+            Guid? fleetId)
         {
-            var dbObjects = await _dbContext
-                .Clubs
+
+            var dbObjects = _dbContext.Clubs
                 .Where(c => c.Id == clubId)
-                .SelectMany(c => c.Competitors)
-                .ToListAsync();
-            return _mapper.Map<List<Model.Competitor>>(dbObjects);
+                .SelectMany(c => c.Competitors);
+
+            if (fleetId.HasValue && fleetId != Guid.Empty)
+            {
+                dbObjects = dbObjects
+                    .Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleetId));
+            }
+
+            var list = await dbObjects.ToListAsync();
+            return _mapper.Map<List<Model.Competitor>>(list);
         }
 
         public async Task<Model.Competitor> GetCompetitorAsync(Guid id)

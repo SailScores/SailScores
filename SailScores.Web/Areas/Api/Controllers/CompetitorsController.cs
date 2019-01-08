@@ -17,12 +17,13 @@ namespace SailScores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CompetitorController : ControllerBase
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class CompetitorsController : ControllerBase
     {
         private readonly ICompetitorService _service;
         private readonly IMapper _mapper;
 
-        public CompetitorController(
+        public CompetitorsController(
             ICompetitorService service,
             IMapper mapper)
         {
@@ -30,15 +31,15 @@ namespace SailScores.Web.Areas.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
-        public async Task<IEnumerable<CompetitorDto>> Get(Guid clubId)
+        public async Task<IEnumerable<CompetitorDto>> Get(
+            Guid clubId,
+            Guid? fleetId)
         {
-            var competitors =  await _service.GetCompetitorsAsync(clubId);
+            var competitors =  await _service.GetCompetitorsAsync(clubId, fleetId);
             return _mapper.Map<List<CompetitorDto>>(competitors);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{identifier}")]
         public async Task<CompetitorDto> Get([FromRoute] String identifier)
         {
@@ -48,7 +49,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [Authorize]
-        // POST: api/Club
+        // POST: api/competitors
         [HttpPost]
         public async Task Post([FromBody] CompetitorDto value)
         {
@@ -58,7 +59,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [Authorize]
-        // PUT: api/Club/5
+        // PUT: api/competitors/5
         [HttpPut("{id}")]
         public async Task Put(Guid id, [FromBody] CompetitorDto value)
         {

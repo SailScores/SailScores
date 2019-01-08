@@ -207,6 +207,7 @@ namespace SailScores.Api.Services
         {
             return await PostAsync<SeriesDto>($"/api/series/", series);
         }
+
         public async Task<List<SeasonDto>> GetSeasonsAsync(Guid clubId)
         {
 
@@ -218,6 +219,15 @@ namespace SailScores.Api.Services
             return await PostAsync<SeasonDto>($"/api/seasons/", season);
         }
 
-
+        public async Task<List<CompetitorDto>> GetCompetitors(Guid clubId, Guid? fleetId)
+        {
+            if (fleetId.HasValue)
+            {
+                return await GetAsync<List<CompetitorDto>>($"/api/competitors/?clubId={clubId}&fleetId={fleetId}");
+            } else
+            {
+                return await GetAsync<List<CompetitorDto>>($"/api/competitors/", clubId);
+            }
+        }
     }
 }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Api.Services;
 using SailScores.Api.Dtos;
+using System.Linq;
+using SailScores.Api;
 
 namespace SailScores.Utility
 {
@@ -320,7 +322,60 @@ namespace SailScores.Utility
 
         private async Task<IList<CompetitorDto>> GetCompetitors(SwObjects.Series series)
         {
-            throw new NotImplementedException();
+            var competitors = await _apiClient.GetCompetitors(_club.Id, _fleet.Id);
+
+            List<CompetitorDto> competitorsToCreate = GetCompetitorsToCreate(competitors, series);
+
+            foreach(var comp in competitorsToCreate)
+            {
+                comp.FleetIds = new List<Guid>
+                {
+                    _fleet.Id
+                };
+                await _apiClient.SaveCompetitor(comp);
+            }
+
+            return await _apiClient.GetCompetitors(_club.Id, _fleet.Id);
+
+        }
+
+        private List<CompetitorDto> GetCompetitorsToCreate(List<CompetitorDto> competitors, SwObjects.Series series)
+        {
+            var returnList = new List<CompetitorDto>();
+            foreach(var comp in series.Competitors)
+            {
+                if(!competitors.Any(c => HasAMatch(competitors, c))) {
+                    returnList.Add(
+                        new CompetitorDto
+                        {
+                            Name = comp.HelmName,
+                            BoatName = comp.Boat,
+                            SailNumber = comp.SailNumber,
+                            BoatClassId = _boatClass.Id,
+                            ClubId = _club.Id
+                        });
+                }
+            }
+            return returnList;
+        }
+
+        private static bool HasAMatch(List<CompetitorDto> competitors, CompetitorDto c)
+        {
+            foreach(var comp in competitors)
+            {
+                if ((!String.IsNullOrWhiteSpace(c.SailNumber)
+                    && c.SailNumber == comp.SailNumber)
+                    || (!String.IsNullOrWhiteSpace(c.AlternativeSailNumber)
+                        && c.AlternativeSailNumber == comp.SailNumber)
+                    || (!String.IsNullOrWhiteSpace(c.AlternativeSailNumber)
+                        && c.AlternativeSailNumber == comp.AlternativeSailNumber)
+                    || (!String.IsNullOrWhiteSpace(c.SailNumber)
+                        && c.SailNumber == c.AlternativeSailNumber))
+                    {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private async Task SaveRaces(SwObjects.Series series)
