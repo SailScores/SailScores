@@ -99,7 +99,21 @@ namespace SailScores.Core.Services
         }
         public async Task SaveNewSeries(Series series)
         {
+            var season = _dbContext.Seasons.SingleOrDefault(s => s.Id == series.Season.Id);
+            
             Database.Entities.Series dbSeries = _mapper.Map<dbObj.Series>(series);
+            if(season != null)
+            {
+                dbSeries.Season = season;
+            } else if(series.Season.Id !=Guid.Empty && series.Season.Start != default(DateTime))
+            {
+                season = _mapper.Map<dbObj.Season>(season);
+                _dbContext.Seasons.Add(season);
+                dbSeries.Season = season;
+            } else
+            {
+                dbSeries.Season = null;
+            }
             _dbContext.Series.Add(dbSeries);
             await _dbContext.SaveChangesAsync();
         }

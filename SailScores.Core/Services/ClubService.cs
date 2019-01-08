@@ -95,5 +95,12 @@ namespace SailScores.Core.Services
             _dbContext.Fleets.Add(dbFleet);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task SaveNewSeason(Season season)
+        {
+            var dbSeason = _mapper.Map<Db.Season>(season);
+            _dbContext.Seasons.Add(dbSeason);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

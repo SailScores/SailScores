@@ -38,9 +38,13 @@ namespace SailScores.Core.Mapping
             CreateMap<Model.ScoreCode, Dto.ScoreCodeDto>();
             CreateMap<Model.Score, Dto.ScoreDto>();
             CreateMap<Model.Season, Dto.SeasonDto>()
-                .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(c => c.Id)));
+                .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(c => c.Id)))
+                .ReverseMap()
+                .ForMember(d => d.Club, o => o.Ignore())
+                .ForMember(d => d.Series, o => o.Ignore());
             CreateMap<Model.Series, Dto.SeriesDto>()
-                .ForMember(d => d.RaceIds, o => o.MapFrom(s => s.Races.Select(c => c.Id)));
+                .ForMember(d => d.RaceIds, o => o.MapFrom(s => s.Races.Select(c => c.Id)))
+                .ReverseMap();
 
         }
     }

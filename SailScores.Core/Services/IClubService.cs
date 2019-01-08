@@ -13,5 +13,6 @@ namespace SailScores.Core.Services
         Task SaveNewClub(Club club);
         Task SaveNewBoatClass(BoatClass boatClass);
         Task SaveNewFleet(Fleet fleet);
+        Task SaveNewSeason(Season season);
     }
 }

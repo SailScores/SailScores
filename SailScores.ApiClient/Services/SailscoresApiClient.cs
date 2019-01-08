@@ -207,5 +207,17 @@ namespace SailScores.Api.Services
         {
             return await PostAsync<SeriesDto>($"/api/series/", series);
         }
+        public async Task<List<SeasonDto>> GetSeasonsAsync(Guid clubId)
+        {
+
+            return await GetAsync<List<SeasonDto>>($"/api/seasons/", clubId);
+        }
+
+        public async Task<Guid> SaveSeason(SeasonDto season)
+        {
+            return await PostAsync<SeasonDto>($"/api/seasons/", season);
+        }
+
+
     }
 }

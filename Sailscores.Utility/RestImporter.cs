@@ -30,7 +30,6 @@ namespace SailScores.Utility
             _club = await GetClub();
             _boatClass = await GetBoatClass();
             _fleet = await GetFleet();
-            _year = GetYear();
             _season = await GetSeason();
             _series = await MakeSeries(series);
             _competitors = await GetCompetitors(series);
@@ -241,12 +240,58 @@ namespace SailScores.Utility
             return result;
         }
 
-        private Task<SeasonDto> GetSeason()
+        private async Task<SeasonDto> GetSeason()
         {
             var seasons = await _apiClient.GetSeasonsAsync(_club.Id);
+            if (seasons.Count > 0)
+            {
+                int i = 1;
+                foreach (var season in seasons)
+                {
+                    Console.WriteLine($"{i++} - {season.Name}: {season.Start}-{season.End}");
+                }
+                int result = -1;
+                while (result == -1)
+                {
+                    Console.WriteLine($"There are {seasons.Count} seasons already in the database.");
+                    Console.Write("Enter a number of a season from above or 0 to create a new season > ");
+                    var input = Console.ReadLine();
+                    Int32.TryParse(input, out result);
+                }
 
-            var 
+                return seasons[result - 1];
+            }
+            
+            return await MakeNewSeason();
+        }
 
+        private async Task<SeasonDto> MakeNewSeason()
+        {
+            Console.Write("Enter the new season name > ");
+            var className = Console.ReadLine().Trim();
+            Console.Write("Enter the a year. The season will be created for the full year. ");
+            var year = GetYear();
+            var start = new DateTime(year, 1, 1);
+            var season = new SeasonDto
+            {
+                Name = className,
+                Start = start,
+                End = start.AddYears(1),
+                ClubId = _club.Id
+            };
+
+            try
+            {
+                var guid = await _apiClient.SaveSeason(season);
+                season.Id = guid;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                throw;
+            }
+
+            return season;
         }
 
         private async Task<SeriesDto> MakeSeries(SwObjects.Series series)

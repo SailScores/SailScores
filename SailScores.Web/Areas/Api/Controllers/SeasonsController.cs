@@ -18,12 +18,12 @@ namespace SailScores.Web.Areas.Api.Controllers
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
-    public class FleetsController : ControllerBase
+    public class SeasonsController : ControllerBase
     {
         private readonly IClubService _clubService;
         private readonly IMapper _mapper;
 
-        public FleetsController(
+        public SeasonsController(
             IClubService clubService,
             IMapper mapper)
         {
@@ -32,28 +32,23 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<FleetDto>> Get(Guid clubId)
+        public async Task<IEnumerable<SeasonDto>> Get(Guid clubId)
         {
             var club = await _clubService.GetFullClub(clubId);
-            return _mapper.Map<List<FleetDto>>(club.Fleets);
+            return _mapper.Map<List<SeasonDto>>(club.Seasons);
         }
 
         [HttpPost]
-        public async Task<Guid> Post([FromBody] FleetDto fleet)
+        public async Task<Guid> Post([FromBody] SeasonDto season)
         {
-            var fleetBizObj = _mapper.Map<Fleet>(fleet);
-            await _clubService.SaveNewFleet(fleetBizObj);
-            var savedFleet =
-                (await _clubService.GetFullClub(fleet.ClubId))
-                .Fleets
-                .First(c => c.Name == fleet.Name);
-            return savedFleet.Id;
+            var seasonBizObj = _mapper.Map<Season>(season);
+            await _clubService.SaveNewSeason(seasonBizObj);
+            var savedSeason =
+                (await _clubService.GetFullClub(season.ClubId))
+                .Seasons
+                .First(c => c.Name == season.Name);
+            return savedSeason.Id;
         }
 
-        // PUT: api/Club/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
     }
 }
