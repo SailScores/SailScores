@@ -344,7 +344,7 @@ namespace SailScores.Utility
             var returnList = new List<CompetitorDto>();
             foreach(var comp in series.Competitors)
             {
-                if(!competitors.Any(c => HasAMatch(competitors, c))) {
+                if(!HasAMatch(competitors, comp)) {
                     returnList.Add(
                         new CompetitorDto
                         {
@@ -359,18 +359,16 @@ namespace SailScores.Utility
             return returnList;
         }
 
-        private static bool HasAMatch(List<CompetitorDto> competitors, CompetitorDto c)
+        private static bool HasAMatch(
+            List<CompetitorDto> competitors,
+            SwObjects.Competitor c)
         {
             foreach(var comp in competitors)
             {
                 if ((!String.IsNullOrWhiteSpace(c.SailNumber)
                     && c.SailNumber == comp.SailNumber)
-                    || (!String.IsNullOrWhiteSpace(c.AlternativeSailNumber)
-                        && c.AlternativeSailNumber == comp.SailNumber)
-                    || (!String.IsNullOrWhiteSpace(c.AlternativeSailNumber)
-                        && c.AlternativeSailNumber == comp.AlternativeSailNumber)
                     || (!String.IsNullOrWhiteSpace(c.SailNumber)
-                        && c.SailNumber == c.AlternativeSailNumber))
+                        && c.SailNumber == comp.AlternativeSailNumber))
                     {
                     return true;
                 }

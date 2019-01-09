@@ -166,7 +166,10 @@ namespace SailScores.Core.Services
                 // should scores get added here?
                 // I don't think so. Those will be recorded as a race update or scores update.
             }
-
+            if(dbObject.CompetitorFleets == null)
+            {
+                dbObject.CompetitorFleets = new List<Db.CompetitorFleet>();
+            }
 
             if (comp.FleetIds != null)
             {
