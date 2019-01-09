@@ -19,5 +19,6 @@ namespace SailScores.Api.Services
         Task<Guid> SaveSeries(SeriesDto series);
         Task<Guid> SaveSeason(SeasonDto season);
         Task<Guid> SaveCompetitor(CompetitorDto comp);
+        Task<Guid> SaveRace(RaceDto race);
     }
 }

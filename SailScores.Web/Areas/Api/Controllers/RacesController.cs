@@ -17,12 +17,12 @@ namespace SailScores.Web.Areas.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class RaceController : ControllerBase
+    public class RacesController : ControllerBase
     {
         private readonly Core.Services.IRaceService _service;
         private readonly IMapper _mapper;
 
-        public RaceController(
+        public RacesController(
             Core.Services.IRaceService service,
             IMapper mapper)
         {

@@ -18,7 +18,7 @@ namespace SailScores.Utility
         private FleetDto _fleet;
         private SeasonDto _season;
         private SeriesDto _series;
-        private IList<CompetitorDto> _competitors;
+        private IDictionary<int, CompetitorDto> _competitors;
 
         public RestImporter(
             ISailScoresApiClient apiClient)
@@ -319,7 +319,7 @@ namespace SailScores.Utility
             return seriesDto;
         }
 
-        private async Task<IList<CompetitorDto>> GetCompetitors(SwObjects.Series series)
+        private async Task<IDictionary<int,CompetitorDto>> GetCompetitors(SwObjects.Series series)
         {
             var competitors = await _apiClient.GetCompetitors(_club.Id, _fleet.Id);
 
@@ -334,8 +334,19 @@ namespace SailScores.Utility
                 await _apiClient.SaveCompetitor(comp);
             }
 
-            return await _apiClient.GetCompetitors(_club.Id, _fleet.Id);
+            var shouldBeAllCompetitors = await _apiClient.GetCompetitors(_club.Id, _fleet.Id);
 
+            // build the dictionary
+            var returnDict = new Dictionary<int, CompetitorDto>();
+            foreach(var swComp in series.Competitors)
+            {
+                if(series.Races.SelectMany(r => r.Results).Any(r => r.CompetitorId == swComp.Id))
+                {
+                    returnDict.Add(swComp.Id, FindMatch(shouldBeAllCompetitors, swComp));
+                }
+            }
+
+            return returnDict;
         }
 
         private List<CompetitorDto> GetCompetitorsToCreate(List<CompetitorDto> competitors, SwObjects.Series series)
@@ -343,7 +354,8 @@ namespace SailScores.Utility
             var returnList = new List<CompetitorDto>();
             foreach(var comp in series.Competitors)
             {
-                if(!HasAMatch(competitors, comp)) {
+                if(series.Races.SelectMany(r => r.Results).Any(r => r.CompetitorId == comp.Id)
+                    && FindMatch(competitors, comp) == null) {
                     returnList.Add(
                         new CompetitorDto
                         {
@@ -358,7 +370,7 @@ namespace SailScores.Utility
             return returnList;
         }
 
-        private static bool HasAMatch(
+        private static CompetitorDto FindMatch(
             List<CompetitorDto> competitors,
             SwObjects.Competitor c)
         {
@@ -369,10 +381,10 @@ namespace SailScores.Utility
                     || (!String.IsNullOrWhiteSpace(c.SailNumber)
                         && c.SailNumber == comp.AlternativeSailNumber))
                     {
-                    return true;
+                    return comp;
                 }
             }
-            return false;
+            return null;
         }
 
         private async Task SaveRaces(SwObjects.Series series)
@@ -380,13 +392,15 @@ namespace SailScores.Utility
             var races = MakeRaces(series);
 
             await PostRaces(races);
-            throw new NotImplementedException();
 
         }
 
-        private Task PostRaces(IList<RaceDto> races)
+        private async Task PostRaces(IList<RaceDto> races)
         {
-            throw new NotImplementedException();
+            foreach(var race in races)
+            {
+                await _apiClient.SaveRace(race);
+            }
         }
 
         private IList<RaceDto> MakeRaces(SwObjects.Series series)
@@ -418,7 +432,33 @@ namespace SailScores.Utility
             BoatClassDto boatClass,
             FleetDto fleet)
         {
-            throw new NotImplementedException();
+            var retList = new List<ScoreDto>();
+            foreach (var swScore in swRace.Results)
+            {
+                if (String.IsNullOrWhiteSpace(swScore.Code)
+                    && swScore.Place == 0)
+                {
+                    continue;
+                }
+                // Not going to import DNCs.
+                // Sailwave can leave DNC in some codes when type is changed to scored.
+                if (swScore.Code == "DNC" && swScore.ResultType == 3)
+                {
+                    continue;
+                }
+
+                var score = new ScoreDto
+                {
+                    Place = swScore.Place,
+                    Code = swScore.ResultType == 3 ? swScore.Code : null
+                };
+                var swComp = competitors.Single(c => c.Id == swScore.CompetitorId);
+                score.CompetitorId = _competitors[swComp.Id].Id;
+
+                retList.Add(score);
+            }
+
+            return retList;
         }
 
         private static DateTime GetDate(SwObjects.Race swRace, SeasonDto season)

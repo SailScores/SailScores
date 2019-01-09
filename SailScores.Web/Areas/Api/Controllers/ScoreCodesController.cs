@@ -16,12 +16,12 @@ namespace SailScores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ScoreCodeController : ControllerBase
+    public class ScoreCodesController : ControllerBase
     {
         private readonly IScoringService _service;
         private readonly IMapper _mapper;
 
-        public ScoreCodeController(
+        public ScoreCodesController(
             IScoringService service,
             IMapper mapper)
         {

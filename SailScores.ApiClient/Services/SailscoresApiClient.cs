@@ -234,5 +234,10 @@ namespace SailScores.Api.Services
         {
             return await PostAsync<CompetitorDto>($"/api/competitors/", competitor);
         }
+
+        public async Task<Guid> SaveRace(RaceDto race)
+        {
+            return await PostAsync<RaceDto>($"/api/races/", race);
+        }
     }
 }
