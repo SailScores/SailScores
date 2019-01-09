@@ -25,7 +25,8 @@ namespace SailScores.Api.Dtos
 
         public Guid FleetId { get; set; }
         public IList<Guid> ScoreIds { get; set; }
-        
+        // Scores is the big exception to Dto opbjects not containing other non-primitive types
+        public IList<ScoreDto> Scores { get; set; }
         public IList<Guid> SeriesIds { get; set; }
 
         public bool Equals(RaceDto other)

@@ -19,7 +19,6 @@ namespace SailScores.Utility
         private SeasonDto _season;
         private SeriesDto _series;
         private IList<CompetitorDto> _competitors;
-        private int _year;
 
         public RestImporter(
             ISailScoresApiClient apiClient)
@@ -380,9 +379,14 @@ namespace SailScores.Utility
         {
             var races = MakeRaces(series);
 
-            await SaveRaces(races);
+            await PostRaces(races);
             throw new NotImplementedException();
 
+        }
+
+        private Task PostRaces(IList<RaceDto> races)
+        {
+            throw new NotImplementedException();
         }
 
         private IList<RaceDto> MakeRaces(SwObjects.Series series)
@@ -391,7 +395,7 @@ namespace SailScores.Utility
 
             foreach (var swRace in series.Races)
             {
-                DateTime date = GetDate(swRace, year);
+                DateTime date = GetDate(swRace, _season);
                 int rank = GetRaceRank(swRace);
                 var ssRace = new RaceDto
                 {
@@ -401,11 +405,50 @@ namespace SailScores.Utility
                     Date = date,
                     FleetId = _fleet.Id
                 };
-                ssRace.Scores = MakeScores(swRace, series.Competitors, boatClass, fleet);
+                ssRace.Scores = MakeScores(swRace, series.Competitors, _boatClass, _fleet);
 
                 retList.Add(ssRace);
             }
             return retList;
+        }
+
+        private IList<ScoreDto> MakeScores(
+            SwObjects.Race swRace,
+            List<SwObjects.Competitor> competitors,
+            BoatClassDto boatClass,
+            FleetDto fleet)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static DateTime GetDate(SwObjects.Race swRace, SeasonDto season)
+        {
+            // assume race name format of "6-22 R1" or "6-23"
+            var datepart = swRace.Name.Split(' ')[0];
+            if (String.IsNullOrWhiteSpace(datepart))
+            {
+                return DateTime.Today;
+            }
+            var parts = datepart.Split('-');
+            int month = season.Start.Month;
+            int day = season.Start.Day;
+            Int32.TryParse(parts[0], out month);
+            Int32.TryParse(parts[1], out day);
+            return new DateTime(season.Start.Year, month, day);
+        }
+
+        private static int GetRaceRank(SwObjects.Race swRace)
+        {
+            // assume race name format of "6-22 R1" or "6-23"
+            var parts = swRace.Name.Split(' ');
+            if (parts.Length < 2)
+            {
+                return 1;
+            }
+            var numberString = new String(parts[1].Where(Char.IsDigit).ToArray());
+            int rank = swRace.Rank;
+            Int32.TryParse(numberString, out rank);
+            return rank;
         }
 
 
