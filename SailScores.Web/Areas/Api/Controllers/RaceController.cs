@@ -16,6 +16,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class RaceController : ControllerBase
     {
         private readonly Core.Services.IRaceService _service;
@@ -29,7 +30,6 @@ namespace SailScores.Web.Areas.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<IEnumerable<RaceDto>> Get(Guid clubId)
         {
@@ -37,7 +37,6 @@ namespace SailScores.Web.Areas.Api.Controllers
             return _mapper.Map<List<RaceDto>>(races);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{identifier}")]
         public async Task<RaceDto> Get([FromRoute] String identifier)
         {
@@ -45,6 +44,12 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             return _mapper.Map<RaceDto>(r); ;
         }
-        
+
+        [HttpPost]
+        public async Task<Guid> Post([FromBody] RaceDto race)
+        {
+            return await _service.SaveAsync(race);
+        }
+
     }
 }

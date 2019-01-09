@@ -378,7 +378,34 @@ namespace SailScores.Utility
 
         private async Task SaveRaces(SwObjects.Series series)
         {
+            var races = MakeRaces(series);
+
+            await SaveRaces(races);
             throw new NotImplementedException();
+
+        }
+
+        private IList<RaceDto> MakeRaces(SwObjects.Series series)
+        {
+            var retList = new List<RaceDto>();
+
+            foreach (var swRace in series.Races)
+            {
+                DateTime date = GetDate(swRace, year);
+                int rank = GetRaceRank(swRace);
+                var ssRace = new RaceDto
+                {
+                    Name = swRace.Name,
+                    Order = rank,
+                    ClubId = _club.Id,
+                    Date = date,
+                    FleetId = _fleet.Id
+                };
+                ssRace.Scores = MakeScores(swRace, series.Competitors, boatClass, fleet);
+
+                retList.Add(ssRace);
+            }
+            return retList;
         }
 
 
