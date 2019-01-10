@@ -9,6 +9,7 @@ using AutoMapper.QueryableExtensions;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
+using SailScores.Api.Dtos;
 
 namespace SailScores.Core.Services
 {
@@ -99,6 +100,70 @@ namespace SailScores.Core.Services
             {
                 score.Competitor = dtoComps.First(c => c.Id == score.CompetitorId);
             }
+        }
+
+        public async Task<Guid> SaveAsync(RaceDto race)
+        {
+            Db.Race dbRace;
+            if (race.Id != default(Guid)) {
+               dbRace = await _dbContext.Races.SingleOrDefaultAsync(r => r.Id == race.Id);
+            } else
+            {
+                dbRace = new Db.Race
+                {
+                    Id = Guid.NewGuid(),
+                    ClubId = race.ClubId
+                };
+                _dbContext.Races.Add(dbRace);
+            }
+            dbRace.Name = race.Name;
+            dbRace.Order = race.Order;
+            dbRace.Date = race.Date;
+            dbRace.Description = race.Description;
+
+            if(race.FleetId != null)
+            {
+                dbRace.Fleet = _dbContext.Fleets.SingleOrDefault(f => f.Id == race.FleetId);
+            }
+            if(race.SeriesIds != null)
+            {
+                if(dbRace.SeriesRaces == null)
+                {
+                    dbRace.SeriesRaces = new List<Db.SeriesRaces>();
+                }
+                dbRace.SeriesRaces.Clear();
+                foreach(var seriesId in race.SeriesIds)
+                {
+                    dbRace.SeriesRaces.Add(new Db.SeriesRaces
+                    {
+                        SeriesId = seriesId,
+                        RaceId = dbRace.Id
+                    });
+                }
+
+            }
+            if (race.Scores != null)
+            {
+                if (dbRace.Scores == null)
+                {
+                    dbRace.Scores = new List<Db.Score>();
+                }
+                dbRace.Scores.Clear();
+                foreach (var score in race.Scores)
+                {
+                    dbRace.Scores.Add(new Db.Score
+                    {
+                        Id = Guid.NewGuid(),
+                        CompetitorId = score.CompetitorId,
+                        Race = dbRace,
+                        Place = score.Place,
+                        Code = score.Code
+                    });
+                }
+
+            }
+            await _dbContext.SaveChangesAsync();
+            return dbRace.Id;
         }
     }
 }

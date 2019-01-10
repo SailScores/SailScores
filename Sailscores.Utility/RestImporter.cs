@@ -340,7 +340,9 @@ namespace SailScores.Utility
             var returnDict = new Dictionary<int, CompetitorDto>();
             foreach(var swComp in series.Competitors)
             {
-                if(series.Races.SelectMany(r => r.Results).Any(r => r.CompetitorId == swComp.Id))
+                if(series.Races.SelectMany(r => r.Results)
+                    .Any(r => r.CompetitorId == swComp.Id
+                        && (r.Code != null || r.Place != 0)))
                 {
                     returnDict.Add(swComp.Id, FindMatch(shouldBeAllCompetitors, swComp));
                 }
@@ -354,7 +356,9 @@ namespace SailScores.Utility
             var returnList = new List<CompetitorDto>();
             foreach(var comp in series.Competitors)
             {
-                if(series.Races.SelectMany(r => r.Results).Any(r => r.CompetitorId == comp.Id)
+                if(series.Races.SelectMany(r => r.Results)
+                    .Any(r => r.CompetitorId == comp.Id
+                    && (r.Code != null || r.Place != 0))
                     && FindMatch(competitors, comp) == null) {
                     returnList.Add(
                         new CompetitorDto
@@ -395,13 +399,6 @@ namespace SailScores.Utility
 
         }
 
-        private async Task PostRaces(IList<RaceDto> races)
-        {
-            foreach(var race in races)
-            {
-                await _apiClient.SaveRace(race);
-            }
-        }
 
         private IList<RaceDto> MakeRaces(SwObjects.Series series)
         {
@@ -417,7 +414,8 @@ namespace SailScores.Utility
                     Order = rank,
                     ClubId = _club.Id,
                     Date = date,
-                    FleetId = _fleet.Id
+                    FleetId = _fleet.Id,
+                    SeriesIds = new List<Guid> { _series.Id }
                 };
                 ssRace.Scores = MakeScores(swRace, series.Competitors, _boatClass, _fleet);
 
@@ -459,6 +457,14 @@ namespace SailScores.Utility
             }
 
             return retList;
+        }
+
+        private async Task PostRaces(IList<RaceDto> races)
+        {
+            foreach (var race in races)
+            {
+                await _apiClient.SaveRace(race);
+            }
         }
 
         private static DateTime GetDate(SwObjects.Race swRace, SeasonDto season)
