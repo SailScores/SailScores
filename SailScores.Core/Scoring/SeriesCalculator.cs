@@ -194,7 +194,9 @@ namespace SailScores.Core.Scoring
             int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress);
 
             // todo Check for non-discardable codes
-            var compResultsOrdered = compResults.CalculatedScores.Values.OrderByDescending(s => s.ScoreValue);
+            var compResultsOrdered = compResults.CalculatedScores.Values.OrderByDescending(s => s.ScoreValue)
+                .ThenBy(s => s.RawScore.Race.Date)
+                .ThenBy(s => s.RawScore.Race.Order);
             foreach (var score in compResultsOrdered.Take(numOfDiscards))
             {
                 score.Discard = true;
@@ -260,7 +262,7 @@ namespace SailScores.Core.Scoring
                             && s.Race == score.Race
                             && s.Place < score.Place
                             //todo: only exclude coded results that should not be ranked (most of them.)
-                            && String.IsNullOrWhiteSpace(score.Code)) + 1;
+                            && String.IsNullOrWhiteSpace(s.Code)) + 1;
 
                 // if this is one, no tie. (if zero Place doesn't have a value (= coded.))
                 int numTied = scores.Count(s => score.Place.HasValue && s.Race == score.Race && s.Place == score.Place);
