@@ -15,25 +15,42 @@
 <h4>
     @Model.Item.Fleet.Name
 </h4>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Sailor</th>
-            <th>Place</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var score in Model.Item.Scores)
-        {
+<ul>
+    @foreach (var series in @Model.Item.Series)
+    {
+        <li>
+            <a href="~/@Model.ClubInitials/@Model.Item.Season.Name/@series.Name">
+                @Html.DisplayFor(modelItem => series.Name)
+            </a>
+        </li>
+    }
+</ul>
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @score.Competitor.Name
-                </td>
-                <td>
-                    @(score.Place == null ? score.Code : score.Place.ToString())
-                </td>
+                <th>Place</th>
+                <th>Sail</th>
+                <th>Sailor</th>
+                <th>Boat</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var score in Model.Item.Scores)
+            {
+                <tr>
+                    <td>
+                        @(score.Place == null ? score.Code : score.Place.ToString())
+                    </td>
+                    <td>
+                        @score.Competitor.SailNumber
+                    </td>
+                    <td>
+                        @score.Competitor.Name
+                    </td>
+                    <td>
+                        @score.Competitor.BoatName
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

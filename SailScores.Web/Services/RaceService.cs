@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
@@ -42,7 +42,10 @@ namespace SailScores.Web.Services
 
             var raceDto = await _coreRaceService.GetRaceAsync(id);
             var retRace = _mapper.Map<RaceViewModel>(raceDto);
-            retRace.Scores = retRace.Scores.OrderBy(s => s.Place ?? int.MaxValue).ToList();
+            retRace.Scores = retRace.Scores
+                .OrderBy(s => s.Place ?? int.MaxValue)
+                .ThenBy(s => s.Code)
+                .ToList();
 
             return retRace;
         }

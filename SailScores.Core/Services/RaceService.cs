@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -81,10 +81,27 @@ namespace SailScores.Core.Services
                 .Include(r => r.Scores)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            var dtoRace = _mapper.Map<Model.Race>(race);
-            await PopulateCompetitors(dtoRace);
+            var modelRace = _mapper.Map<Model.Race>(race);
+            await PopulateCompetitors(modelRace);
 
-            return dtoRace;
+
+            var dbSeason = _dbContext.Clubs
+                .Include(c => c.Seasons)
+                .First(c => c.Id == race.ClubId)
+                .Seasons
+                .SingleOrDefault(s => race.Date.HasValue
+                       && s.Start <= race.Date
+                       && s.End > race.Date);
+            modelRace.Season = _mapper.Map<Model.Season>(dbSeason);
+
+            var dbSeries = _dbContext.Clubs
+                .Where(c => c.Id == race.ClubId)
+                .SelectMany(c => c.Series)
+                .Where(s => s.RaceSeries.Any(rs => rs.RaceId == race.Id));
+            var modelSeries = _mapper.Map<List<Model.Series>>(dbSeries);
+            modelRace.Series = modelSeries;
+
+            return modelRace;
 
         }
 

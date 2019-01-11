@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,6 +18,8 @@ namespace SailScores.Web.Models.SailScores
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
         public DateTime? Date { get; set; }
+
+        public Season Season { get; set; }
 
         // Typically the order of the race for a given date, but may not be.
         // used for display order after date. 
