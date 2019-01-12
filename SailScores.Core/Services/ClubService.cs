@@ -71,7 +71,28 @@ namespace SailScores.Core.Services
         public async Task SaveNewBoatClass(BoatClass boatClass)
         {
             var dbBoatClass =_mapper.Map<Db.BoatClass>(boatClass);
+            dbBoatClass.Id = Guid.NewGuid();
             _dbContext.BoatClasses.Add(dbBoatClass);
+            var defaultShortName = boatClass.Name.Split(' ')[0];
+            var fleetId = Guid.NewGuid();
+            var dbFleet = new Db.Fleet
+            {
+                Id = fleetId,
+                ClubId = boatClass.ClubId,
+                FleetType = Api.Enumerations.FleetType.SelectedClasses,
+                IsHidden = false,
+                ShortName = defaultShortName,
+                Name = $"All {boatClass.Name}s",
+                BoatClasses = new List<Db.FleetBoatClass>
+                {
+                    new Db.FleetBoatClass
+                    {
+                        BoatClassId = dbBoatClass.Id,
+                        FleetId = fleetId
+                    }
+                }
+            };
+            _dbContext.Fleets.Add(dbFleet);
             await _dbContext.SaveChangesAsync();
 
         }
@@ -86,6 +107,16 @@ namespace SailScores.Core.Services
             club.Id = Guid.NewGuid();
             var dbClub = _mapper.Map<Db.Club>(club);
             _dbContext.Clubs.Add(dbClub);
+            var dbFleet = new Db.Fleet
+            {
+                Id = Guid.NewGuid(),
+                Club = dbClub,
+                FleetType = Api.Enumerations.FleetType.AllBoatsInClub,
+                IsHidden = false,
+                ShortName = "All",
+                Name = "All Boats in Club"
+            };
+            _dbContext.Fleets.Add(dbFleet);
             await _dbContext.SaveChangesAsync();
         }
 
