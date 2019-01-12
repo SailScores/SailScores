@@ -24,11 +24,12 @@
     <environment include="Development">
         <link rel="stylesheet" href="~/css/custom.css" />
         <link rel="stylesheet" href="~/css/site.css" />
-
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="~/css/custom.css"  asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     </environment>
 </head>
 <body>
@@ -36,23 +37,24 @@
         <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">SailScores.com</a>
         <div class="navbar-nav-scroll">
             <ul class="navbar-nav flex-row">
-                <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
                 <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
                 <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>
             </ul>
         </div>
-        @await Html.PartialAsync("_LoginPartial")
     </header>
 
-    <partial name="_CookieConsentPartial" />
-
     <div class="container body-content">
-        <main class="col-12 col-md-9 py-md-3 pl-md-5 bd-content" role="main">
+        <main class="col-12 col-lg-9 py-md-3 pl-md-5 bd-content" role="main">
             @RenderBody()
         </main>
         <hr />
         <footer>
-            <p>&copy; 2018 - J. Fraser</p>
+            <div class="row">
+                <div class="col-12 col-md-6">&copy; 2019 - J. Fraser</div>
+                <div class="col-12 col-md-6">
+                    @await Html.PartialAsync("_LoginPartial")
+                </div>
+            </div>
         </footer>
     </div>
 
