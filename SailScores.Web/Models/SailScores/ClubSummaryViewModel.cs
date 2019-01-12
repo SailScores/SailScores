@@ -18,7 +18,7 @@ namespace SailScores.Web.Models.SailScores
         public String Initials { get; set; }
         public String Description { get; set; }
         public bool IsHidden { get; set; }
-
+        public String Url { get; set; }
 
         public IList<Fleet> Fleets { get; set; }
         public IList<Competitor> Competitors { get; set; }

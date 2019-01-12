@@ -9,6 +9,14 @@
         <h1 class="d-none d-md-block display-4">@Model.Name</h1>
     </div>
 </div>
+@if (!String.IsNullOrWhiteSpace(Model.Url))
+{
+<div class="row">
+    <div class="col-12">
+        <p><a href="@Model.Url" target="_blank">Club Web Site <span class="fas fa-external-link-alt"></span></a></p>
+    </div>
+</div>
+}
 <div class="row">
     <div class="col-md-12 d-none d-md-block">
         <p><markdown>@Model.Description</markdown></p>
