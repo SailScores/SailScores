@@ -162,9 +162,20 @@ namespace SailScores.Utility
         private async Task<FleetDto> GetFleet()
         {
             var fleets = await _apiClient.GetFleetsAsync(_club.Id);
+            fleets = fleets.Where(f =>
+                    f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
+                    || f.FleetType == Api.Enumerations.FleetType.SelectedBoats
+                    || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
+                        && f.BoatClassIds.Contains(_boatClass.Id)))
+                        .OrderBy(f => f.Name)
+                        .ToList();
             if (fleets.Count > 0)
             {
-                Console.WriteLine($"There are {fleets.Count} fleets already in the database.");
+                Console.WriteLine($"There are {fleets.Count} compatible fleets already in this club:");
+                foreach(var fleet in fleets)
+                {
+                    Console.WriteLine(fleet.Name);
+                }
                 Console.Write("Would you like to use one of those? (Y / N) ");
                 var result = Console.ReadLine();
                 if (result.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase))
@@ -212,7 +223,8 @@ namespace SailScores.Utility
             {
                 Name = className,
                 ShortName = shortName,
-                ClubId = _club.Id
+                ClubId = _club.Id,
+                FleetType = Api.Enumerations.FleetType.SelectedBoats
             };
 
             try
@@ -321,9 +333,29 @@ namespace SailScores.Utility
 
         private async Task<IDictionary<int,CompetitorDto>> GetCompetitors(SwObjects.Series series)
         {
-            var competitors = await _apiClient.GetCompetitors(_club.Id, _fleet.Id);
+
+            List<CompetitorDto> competitors;
+            if (_fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+            {
+                competitors = await _apiClient.GetCompetitors(_club.Id, null);
+            }
+            else
+            {
+                competitors = await _apiClient.GetCompetitors(_club.Id, _fleet.Id);
+            }
+
+            List<CompetitorDto> existingCompetitors = GetMatchedCompetitors(competitors, series);
+            foreach(var comp in existingCompetitors)
+            {
+                if (!(comp.FleetIds.Contains(_fleet.Id)))
+                {
+                    comp.FleetIds.Add(_fleet.Id);
+                    await _apiClient.SaveCompetitor(comp);
+                }
+            }
 
             List<CompetitorDto> competitorsToCreate = GetCompetitorsToCreate(competitors, series);
+
 
             foreach(var comp in competitorsToCreate)
             {
@@ -349,6 +381,26 @@ namespace SailScores.Utility
             }
 
             return returnDict;
+        }
+
+
+        private List<CompetitorDto> GetMatchedCompetitors(List<CompetitorDto> competitors, SwObjects.Series series)
+        {
+            var returnList = new List<CompetitorDto>();
+            foreach (var comp in series.Competitors)
+            {
+                if (series.Races.SelectMany(r => r.Results)
+                    .Any(r => r.CompetitorId == comp.Id
+                    && (r.Code != null || r.Place != 0)))
+                {
+                    var match = FindMatch(competitors, comp);
+                    if (match != null)
+                    {
+                        returnList.Add(match);
+                    }
+                }
+            }
+            return returnList;
         }
 
         private List<CompetitorDto> GetCompetitorsToCreate(List<CompetitorDto> competitors, SwObjects.Series series)
