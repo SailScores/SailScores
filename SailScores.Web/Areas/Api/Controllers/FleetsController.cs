@@ -34,8 +34,8 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<FleetDto>> Get(Guid clubId)
         {
-            var club = await _clubService.GetFullClub(clubId);
-            return _mapper.Map<List<FleetDto>>(club.Fleets);
+            var fleets = await _clubService.GetAllFleets(clubId);
+            return _mapper.Map<List<FleetDto>>(fleets);
         }
 
         [HttpPost]

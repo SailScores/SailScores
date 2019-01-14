@@ -25,6 +25,32 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
+        public async Task<IList<Fleet>> GetAllFleets(Guid clubId)
+        {
+            var dbFleets = await _dbContext
+                .Fleets
+                .Include(f => f.BoatClasses)
+                .Include(f => f.CompetitorFleets)
+                .Where(f => f.ClubId == clubId)
+                .ToListAsync();
+
+            var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
+
+            // ignored in mapper to avoid loops.
+            foreach(var fleet in dbFleets)
+            {
+                var boatClasses = fleet.BoatClasses;
+                bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
+                    = _mapper.Map<IList<BoatClass>>(boatClasses);
+                var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
+
+                bizObj.First(bo => bo.Id == fleet.Id).Competitors
+                    = _mapper.Map<IList<Competitor>>(competitors);
+            }
+
+            return bizObj;
+        }
+
         public async Task<IList<Model.Club>> GetClubs(bool includeHidden)
         {
             var dbObjects = await _dbContext

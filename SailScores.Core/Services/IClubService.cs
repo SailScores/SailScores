@@ -14,5 +14,6 @@ namespace SailScores.Core.Services
         Task SaveNewBoatClass(BoatClass boatClass);
         Task SaveNewFleet(Fleet fleet);
         Task SaveNewSeason(Season season);
+        Task<IList<Fleet>> GetAllFleets(Guid clubId);
     }
 }
