@@ -54,9 +54,22 @@
 
     </header>
     <div class="container-fluid body-content">
-        <main class="col-12 py-md-3 pl-md-5 bd-content" role="main">
-            @RenderBody()
-        </main>
+        <div class="row">
+            @if (IsSectionDefined("Sidebar"))
+            {
+                @RenderSection("Sidebar")
+                <main class="col-md-9 ml-sm-auto col-lg-10 px-4" role="main">
+                    @RenderBody()
+                </main>
+            }
+            else
+            {
+                <main class="col-12 py-md-3 pl-md-5 bd-content" role="main">
+                    @RenderBody()
+                </main>
+            }
+
+            </div>
     </div>
 
     <environment include="Development">
