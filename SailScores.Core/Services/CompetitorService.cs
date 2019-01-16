@@ -119,7 +119,7 @@ namespace SailScores.Core.Services
                     .Where(f => f.ClubId == comp.ClubId
                     && (f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
                     || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
-                    && f.BoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
+                    && f.FleetBoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
                 foreach(var dbFleet in autoAddFleets)
                 {
                     if (!dbObject.CompetitorFleets.Any(
@@ -143,6 +143,7 @@ namespace SailScores.Core.Services
         {
             var dbObject = await _dbContext
                 .Competitors
+                .Include(c => c.CompetitorFleets)
                 .FirstOrDefaultAsync(
                     c =>
                     c.Id == comp.Id);
@@ -196,7 +197,9 @@ namespace SailScores.Core.Services
                             dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
                             {
                                 Competitor = dbObject,
-                                Fleet = dbFleet
+                                CompetitorId = dbObject.Id,
+                                Fleet = dbFleet,
+                                FleetId = dbFleet.Id
                             });
                         }
                         //todo: create new fleets here if needed.
@@ -207,7 +210,7 @@ namespace SailScores.Core.Services
                     .Where(f => f.ClubId == comp.ClubId
                     && (f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
                     || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
-                    && f.BoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
+                    && f.FleetBoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
                 foreach (var dbFleet in autoAddFleets)
                 {
                     if (!dbObject.CompetitorFleets.Any(

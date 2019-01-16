@@ -65,7 +65,7 @@ namespace SailScores.Database
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Fleet>()
-                .HasMany(f => f.BoatClasses)
+                .HasMany(f => f.FleetBoatClasses)
                 .WithOne(c => c.Fleet)
                 .OnDelete(DeleteBehavior.Restrict);
 

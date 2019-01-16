@@ -29,8 +29,10 @@ namespace SailScores.Core.Services
         {
             var dbFleets = await _dbContext
                 .Fleets
-                .Include(f => f.BoatClasses)
+                .Include(f => f.FleetBoatClasses)
+                    .ThenInclude(fbc => fbc.BoatClass)
                 .Include(f => f.CompetitorFleets)
+                    .ThenInclude(cf => cf.Competitor)
                 .Where(f => f.ClubId == clubId)
                 .ToListAsync();
 
@@ -39,11 +41,11 @@ namespace SailScores.Core.Services
             // ignored in mapper to avoid loops.
             foreach(var fleet in dbFleets)
             {
-                var boatClasses = fleet.BoatClasses;
+                var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
                 bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
                     = _mapper.Map<IList<BoatClass>>(boatClasses);
-                var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
 
+                var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
                 bizObj.First(bo => bo.Id == fleet.Id).Competitors
                     = _mapper.Map<IList<Competitor>>(competitors);
             }
@@ -109,7 +111,7 @@ namespace SailScores.Core.Services
                 IsHidden = false,
                 ShortName = defaultShortName,
                 Name = $"All {boatClass.Name}s",
-                BoatClasses = new List<Db.FleetBoatClass>
+                FleetBoatClasses = new List<Db.FleetBoatClass>
                 {
                     new Db.FleetBoatClass
                     {
