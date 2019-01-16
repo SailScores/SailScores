@@ -53,7 +53,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             await _service.SaveNewSeries(seriesBizObj);
             var savedSeries =
                 (await _service.GetAllSeriesAsync(series.ClubId))                
-                .First(s => s.Name == series.Name
+                .Single(s => s.Name == series.Name
                     && s.Season.Id == series.SeasonId);
             return savedSeries.Id;
         }

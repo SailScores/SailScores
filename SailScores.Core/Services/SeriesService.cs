@@ -100,12 +100,21 @@ namespace SailScores.Core.Services
         public async Task SaveNewSeries(Series series)
         {
             var season = _dbContext.Seasons.SingleOrDefault(s => s.Id == series.Season.Id);
+
+            if(_dbContext.Series.Any( s =>
+                s.Id == series.Id
+                || (s.ClubId == series.ClubId
+                    && s.Name == series.Name
+                    && s.Season.Id == series.Season.Id)))
+            {
+                throw new InvalidOperationException("Cannot create series. A series with this name in this season already exists.");
+            }
             
             Database.Entities.Series dbSeries = _mapper.Map<dbObj.Series>(series);
             if(season != null)
             {
                 dbSeries.Season = season;
-            } else if(series.Season.Id !=Guid.Empty && series.Season.Start != default(DateTime))
+            } else if(series.Season.Id != Guid.Empty && series.Season.Start != default(DateTime))
             {
                 season = _mapper.Map<dbObj.Season>(season);
                 _dbContext.Seasons.Add(season);
