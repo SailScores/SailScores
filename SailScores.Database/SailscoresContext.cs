@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database.Entities;
 
@@ -10,6 +12,7 @@ namespace SailScores.Database
     {
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Fleet> Fleets { get; set; }
+        public DbSet<BoatClass> BoatClasses { get; set; }
         public DbSet<Competitor> Competitors { get; set; }
         public DbSet<Season> Seasons { get; set; }
         public DbSet<Series> Series { get; set; }
@@ -62,7 +65,7 @@ namespace SailScores.Database
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Fleet>()
-                .HasMany(f => f.BoatClasses)
+                .HasMany(f => f.FleetBoatClasses)
                 .WithOne(c => c.Fleet)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -71,6 +74,15 @@ namespace SailScores.Database
                 .WithMany(c => c.Scores)
                 .OnDelete(DeleteBehavior.Restrict);
 
+        }
+
+        public override int SaveChanges()
+        {
+            return base.SaveChanges();
+        }
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }

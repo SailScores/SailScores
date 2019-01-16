@@ -1,0 +1,63 @@
+﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Core.Model;
+@model ClubItemViewModel<Series>
+
+@{
+    ViewBag.Title = Model.Item.Name;
+    Layout = "_ClubLayout";
+}
+
+<h2>@Model.Item.Name</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Place</th>
+            <th scope="col">Sail</th>
+            <th scope="col">Helm</th>
+            <th scope="col">Boat</th>
+            <th scope="col" class="text-center">Total</th>
+            @foreach (var race in Model.Item.Results?.Races ?? Enumerable.Empty<Race>())
+            {
+                <th class="text-center">
+                 @Html.ActionLink(
+                    @race.Date?.ToString("M-d") + " R" + @race.Order
+                    , "Details", "Race",  new { id = race.Id })
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var comp in Model.Item.Results?.Competitors ?? Enumerable.Empty<Competitor>())
+        {
+            <tr>
+                <th scope="row">@Model.Item.Results.Results[comp].Rank</th>
+                <th scope="row">@comp.SailNumber</th>
+                <th scope="row">@comp.Name</th>
+                <td>@comp.BoatName</td>
+                <td scope="row" class="text-center"><strong>@Model.Item.Results.Results[comp].TotalScore</strong></td>
+
+                @foreach (var race in Model.Item.Results.Races)
+                {
+
+                    <td class="text-center">
+                        @if (Model.Item.Results.GetResult(comp, race).Discard)
+                        {
+                            @Html.Raw("<span class='text-muted'>")
+                            @Html.Raw("<s>")
+                        }
+                        @Model.Item.Results.GetResult(comp, race)
+                        @if (Model.Item.Results.GetResult(comp, race).Discard)
+                        {
+                            @Html.Raw("</s>")
+                            @Html.Raw("</div>")
+
+                        }
+                    </td>
+                }
+            </tr>
+        }
+
+    </tbody>
+</table>

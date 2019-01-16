@@ -15,7 +15,7 @@ namespace SailScores.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.2-rtm-30932")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -36,7 +36,7 @@ namespace SailScores.Database.Migrations
 
                     b.HasIndex("ClubId");
 
-                    b.ToTable("BoatClass");
+                    b.ToTable("BoatClasses");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Club", b =>
@@ -54,6 +54,8 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200);
+
+                    b.Property<string>("Url");
 
                     b.HasKey("Id");
 
@@ -134,8 +136,13 @@ namespace SailScores.Database.Migrations
 
                     b.Property<int>("FleetType");
 
+                    b.Property<bool>("IsHidden");
+
                     b.Property<string>("Name")
                         .HasMaxLength(200);
+
+                    b.Property<string>("ShortName")
+                        .HasMaxLength(30);
 
                     b.HasKey("Id");
 
@@ -361,7 +368,7 @@ namespace SailScores.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
-                        .WithMany("BoatClasses")
+                        .WithMany("FleetBoatClasses")
                         .HasForeignKey("FleetId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });

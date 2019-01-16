@@ -6,7 +6,8 @@ var gulp = require("gulp"),
     concat = require("gulp-concat"),
     cssmin = require("gulp-cssmin"),
     uglify = require("gulp-uglify"),
-    merge = require('merge-stream'); 
+    merge = require('merge-stream'),
+    sass = require("gulp-sass");
 
 var paths = {
     webroot: "./wwwroot/"
@@ -75,4 +76,10 @@ gulp.task("scripts", function () {
 
     return merge(streams);
 
+});
+
+gulp.task("sass", function () {
+    return gulp.src('custom.scss')
+        .pipe(sass())
+        .pipe(gulp.dest('wwwroot/css'));
 });

@@ -1,24 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SailScores.Web.Data;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.IdentityModel.Tokens;
+using SailScores.Core.Mapping;
 using SailScores.Core.Services;
 using SailScores.Database;
-using AutoMapper;
-using SailScores.Web;
-using Microsoft.Extensions.Caching.Memory;
+using SailScores.Web.Data;
+using SailScores.Web.Mapping;
 using SailScores.Web.Services;
+using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SailScores.Web
 {
@@ -41,6 +44,17 @@ namespace SailScores.Web
                 c.SwaggerDoc("v1", new Info { Title = "SailScores API", Version = "v1" });
                 c.IncludeXmlComments(string.Format(@"{0}\SailScores.Web.xml",
                      System.AppDomain.CurrentDomain.BaseDirectory));
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer", new string[] { } }
+                });
             });
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -55,8 +69,27 @@ namespace SailScores.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<SailScoresIdentityContext>();
+            services.AddIdentity<IdentityUser,IdentityRole>()
+                .AddEntityFrameworkStores<SailScoresIdentityContext>()
+                .AddDefaultTokenProviders();
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication()
+            .AddCookie(options => options.SlidingExpiration = true)
+            .AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = Configuration["JwtIssuer"],
+                    ValidAudience = Configuration["JwtIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
+
+                    ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                };
+            });
+
 
             services.AddTransient<IEmailSender, EmailSender>();
             // Make sure API calls that require auth return 401, not redirect on auth failure.
@@ -84,7 +117,12 @@ namespace SailScores.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddAutoMapper();
+            services.AddAutoMapper(
+                new[] {
+                    typeof(DbToModelMappingProfile).GetTypeInfo().Assembly,
+                    typeof(ToViewModelMappingProfile).GetTypeInfo().Assembly
+                });
+            
 
             RegisterSailScoresServices(services);
 
@@ -93,12 +131,14 @@ namespace SailScores.Web
 
         private void RegisterSailScoresServices(IServiceCollection services)
         {
-            services.AddScoped<IClubService, ClubService>();
+            services.RegisterCoreSailScoresServices();
+            services.RegisterWebSailScoresServices();
+            
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMapper mapper)
         {
             if (env.IsDevelopment())
             {
@@ -110,6 +150,8 @@ namespace SailScores.Web
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            mapper.ConfigurationProvider.AssertConfigurationIsValid();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -141,6 +183,18 @@ namespace SailScores.Web
                     {
                         clubInitials = new ClubRouteConstraint(() =>
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
+                        )
+                    });
+
+                routes.MapRoute(
+                    name: "Fleet",
+                    template: "{clubInitials}/fleet/{FleetShortName}",
+                    defaults: new { controller = "Fleet", action = "Details" },
+                    constraints: new
+                    {
+                        clubInitials = new ClubRouteConstraint(() =>
+                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });

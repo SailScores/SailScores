@@ -11,6 +11,12 @@ using SailScores.Web.Models.AccountViewModels;
 using SailScores.Web.Services;
 using SailScores.Web.Controllers;
 using SailScores.Web.Models.AccountViewModels;
+using System.Linq;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace SailScores.Web.Controllers
 {
@@ -25,17 +31,20 @@ namespace SailScores.Web.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
 
         public AccountController(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [TempData]
@@ -438,6 +447,22 @@ namespace SailScores.Web.Controllers
             return View();
         }
 
+        // from https://medium.com/@ozgurgul/asp-net-core-2-0-webapi-jwt-authentication-with-identity-mysql-3698eeba6ff8
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<object> JwtToken([FromBody] LoginViewModel model)
+        {
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+
+            if (result.Succeeded)
+            {
+                var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
+                return await GenerateJwtToken(model.Email, appUser);
+            }
+
+            throw new ApplicationException("INVALID_LOGIN_ATTEMPT");
+        }
+
         #region Helpers
 
         private void AddErrors(IdentityResult result)
@@ -458,6 +483,31 @@ namespace SailScores.Web.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
+        }
+
+
+        private async Task<object> GenerateJwtToken(string email, IdentityUser user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
+
+            var token = new JwtSecurityToken(
+                _configuration["JwtIssuer"],
+                _configuration["JwtIssuer"],
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         #endregion

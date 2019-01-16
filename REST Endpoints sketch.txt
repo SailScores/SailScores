@@ -1,0 +1,22 @@
+
+
+Paths:
+
+HTML:
+/
+/{clubInitials}/
+/{clubInitials}/Race
+/{clubInitials}/Series
+/{clubInitials}/Series#2018   => anchor within series page
+/{clubInitials}/{Year}/{SeriesName}
+
+Not Done:
+/{clubInitials}/{Year}
+
+
+API:
+/api/Club/
+
+
+Auth:
+POST /account/jwttoken

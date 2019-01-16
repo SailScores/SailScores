@@ -1,0 +1,22 @@
+﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Core.Model;
+@model ClubItemViewModel<FleetSummary>
+
+@{
+    ViewBag.Title = Model.Item.Name;
+    Layout = "_ClubLayout";
+}
+
+<h2>@Model.Item.Name</h2>
+
+<ul>
+    @foreach (var item in Model.Item.Series.OrderBy(s => s.Name))
+    {
+        <li>
+            <a href="~/@Model.ClubInitials/@item.Season.Name/@item.Name">
+                @Html.DisplayFor(modelItem => item.Name) (@(item.Races?.Count.ToString() ?? "No") Races)
+            </a>
+
+        </li>
+    }
+</ul>

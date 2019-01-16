@@ -1,0 +1,13 @@
+﻿
+
+$my-dark-color: #000B38;
+$theme-colors: (
+    'dark' : $my-dark-color
+);
+
+$font-family-base: "Open Sans", "Segoe UI", sans-serif;
+
+@import "./node_modules/bootstrap/scss/bootstrap";
+
+body {
+}

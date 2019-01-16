@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SailScores.Database.Entities
 {
+    [Table("BoatClasses")]
     public class BoatClass
     {
         public Guid Id { get; set; }

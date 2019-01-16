@@ -1,0 +1,59 @@
+﻿@using Microsoft.AspNetCore.Routing
+@using SailScores.Web.Models.SailScores;
+@using SailScores.Core.Model;
+@model ClubCollectionViewModel<RaceSummaryViewModel>
+
+@{
+    ViewBag.Title = Model.ClubInitials + " Races";
+    Layout = "_ClubLayout";
+}
+
+<h2>@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant() Races</h2>
+
+<table class="table">
+    <tbody>
+        @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+        {
+            <tr id="@item.Key">
+                <td>
+                    <h2>@item.Key</h2>
+                </td>
+            </tr>
+            @foreach (var race in item)
+            {
+                <tr>
+                    <td>
+                        @Html.ActionLink(
+                            race.FleetShortName + " : Race " + @race.Order + ", " + @race.Date?.ToString("dddd, MMMM d")
+                            , "Details", new { id = race.Id })
+                    </td>
+                    <td>
+                        @foreach (var seriesName in race.SeriesNames)
+                        {
+                            <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesName">
+                                @Html.DisplayFor(modelItem => seriesName)
+                            </a>
+                        }
+                    </td>
+                    <td>
+
+                        @Html.DisplayFor(modelItem => race.Scores.Count)
+                        @if (race.Scores.Count == 1)
+                        {
+                            @:boat
+                        }
+                        else
+                        {
+                            @:boats
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => race.Name)
+                        @Html.DisplayFor(modelItem => race.Description)
+                    </td>
+
+                </tr>
+            }
+        }
+        </tbody>
+</table>

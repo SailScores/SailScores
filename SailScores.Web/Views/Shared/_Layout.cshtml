@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <meta charset="utf-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" >
     <link rel="apple-touch-icon" sizes="57x57" href="~/images/favicon/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="114x114" href="~/images/favicon/apple-touch-icon-114x114.png">
     <link rel="apple-touch-icon" sizes="72x72" href="~/images/favicon/apple-touch-icon-72x72.png">
@@ -22,36 +22,39 @@
     <title>@ViewData["Title"] - SailScores</title>
 
     <environment include="Development">
-        <link rel="stylesheet" href="~/vendor/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/custom.css" />
         <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     </environment>
 </head>
 <body>
     <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">
-        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Sailscores</a>
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">SailScores.com</a>
         <div class="navbar-nav-scroll">
             <ul class="navbar-nav flex-row">
-                <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
                 <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
                 <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>
             </ul>
         </div>
-        @await Html.PartialAsync("_LoginPartial")
     </header>
 
-    <partial name="_CookieConsentPartial" />
-
     <div class="container body-content">
-        <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+        <main class="col-12 col-lg-9 py-md-3 pl-md-5 bd-content" role="main">
             @RenderBody()
         </main>
         <hr />
         <footer>
-            <p>&copy; 2018 - J. Fraser</p>
+            <div class="row">
+                <div class="col-12 col-sm-6">&copy; 2019 - J. Fraser</div>
+                <div class="col-12 col-sm-6 text-sm-right">
+                        @await Html.PartialAsync("_LoginPartial")
+                </div>
+            </div>
         </footer>
     </div>
 
