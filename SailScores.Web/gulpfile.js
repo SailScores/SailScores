@@ -28,7 +28,7 @@ gulp.task("clean:css", function (cb) {
     rimraf(paths.concatCssDest, cb);
 });
 
-gulp.task("clean", ["clean:js", "clean:css"]);
+gulp.task("clean", gulp.parallel("clean:js", "clean:css"));
 
 gulp.task("min:js", function () {
     return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
@@ -44,7 +44,7 @@ gulp.task("min:css", function () {
         .pipe(gulp.dest("."));
 });
 
-gulp.task("min", ["min:js", "min:css"]);
+gulp.task("min", gulp.parallel("min:js", "min:css"));
 
 
 // Dependency Dirs
