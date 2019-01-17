@@ -17,16 +17,20 @@ namespace SailScores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ClubsController : ControllerBase
     {
         private readonly IClubService _clubService;
+        private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public ClubsController(
             IClubService clubService,
+            Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _authService = authService;
             _mapper = mapper;
         }
 
@@ -58,22 +62,30 @@ namespace SailScores.Web.Areas.Api.Controllers
             return _mapper.Map<ClubDto>(club);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         // POST: api/Club
         [HttpPost]
-        public async Task<Guid> Post([FromBody] ClubDto club)
+        public async Task<ActionResult<Guid>> Post([FromBody] ClubDto club)
         {
+            // special handling here, so that user can create new club if they have
+            // global permissions.
+            bool canEdit = false;
+            if(club.Id == default(Guid))
+            {
+                canEdit = await _authService.CanUserEdit(User, club.Initials);
+            } else
+            {
+                canEdit = await _authService.CanUserEdit(User, club.Id);
+            }
+            if (!canEdit)
+            {
+                return Unauthorized();
+            }
+
             var clubBizObj = _mapper.Map<Club>(club);
             await _clubService.SaveNewClub(clubBizObj);
             var savedClub = (await _clubService.GetClubs(false)).First(c => c.Initials == club.Initials);
-            return savedClub.Id;
+            return Ok(savedClub.Id);
         }
 
-        [Authorize]
-        // PUT: api/Club/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
     }
 }

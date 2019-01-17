@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
-using SailScores.Core.Services;
-using SailScores.Web.Services;
-using Model = SailScores.Core.Model;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -20,13 +15,16 @@ namespace SailScores.Web.Areas.Api.Controllers
     public class RacesController : ControllerBase
     {
         private readonly Core.Services.IRaceService _service;
+        private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public RacesController(
             Core.Services.IRaceService service,
+            Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _service = service;
+            _authService = authService;
             _mapper = mapper;
         }
 
@@ -46,9 +44,13 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<Guid> Post([FromBody] RaceDto race)
+        public async Task<ActionResult<Guid>> Post([FromBody] RaceDto race)
         {
-            return await _service.SaveAsync(race);
+            if (!await _authService.CanUserEdit(User, race.ClubId))
+            {
+                return Unauthorized();
+            }
+            return Ok( await _service.SaveAsync(race));
         }
 
     }

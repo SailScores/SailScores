@@ -11,14 +11,14 @@ namespace SailScores.Core.Services
         public static void RegisterCoreSailScoresServices(
             this IServiceCollection services)
         {
-                services.AddScoped<IClubService, ClubService>();
-                services.AddScoped<ICompetitorService, CompetitorService>();
-                services.AddScoped<IScoringService, ScoringService>();
-                services.AddScoped<ISeriesService, SeriesService>();
-                services.AddScoped<IRaceService, RaceService>();
-                services.AddScoped<ISeriesService, SeriesService>();
-                services.AddScoped<SailScores.Core.Scoring.ISeriesCalculator, SailScores.Core.Scoring.SeriesCalculator>();
-
+            services.AddScoped<IClubService, ClubService>();
+            services.AddScoped<ICompetitorService, CompetitorService>();
+            services.AddScoped<IScoringService, ScoringService>();
+            services.AddScoped<ISeriesService, SeriesService>();
+            services.AddScoped<IRaceService, RaceService>();
+            services.AddScoped<ISeriesService, SeriesService>();
+            services.AddScoped<SailScores.Core.Scoring.ISeriesCalculator, SailScores.Core.Scoring.SeriesCalculator>();
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

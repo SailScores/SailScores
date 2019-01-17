@@ -5,13 +5,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Api.Dtos;
 using SailScores.Core.Services;
-using SailScores.Web.Services;
-using Model = SailScores.Core.Model;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -21,13 +18,16 @@ namespace SailScores.Web.Areas.Api.Controllers
     public class CompetitorsController : ControllerBase
     {
         private readonly ICompetitorService _service;
+        private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public CompetitorsController(
             ICompetitorService service,
+            Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _service = service;
+            _authService = authService;
             _mapper = mapper;
         }
 
@@ -50,9 +50,12 @@ namespace SailScores.Web.Areas.Api.Controllers
         
         // POST: api/competitors
         [HttpPost]
-        public async Task<Guid> Post([FromBody] CompetitorDto competitor)
+        public async Task<ActionResult<Guid>> Post([FromBody] CompetitorDto competitor)
         {
-            
+            if (!await _authService.CanUserEdit(User, competitor.ClubId))
+            {
+                return Unauthorized();
+            }
             await _service.SaveAsync(competitor);
 
             var savedCompetitor =
@@ -60,16 +63,21 @@ namespace SailScores.Web.Areas.Api.Controllers
                 .First(c => c.Name == competitor.Name
                 && c.SailNumber == competitor.SailNumber
                 && c.AlternativeSailNumber == competitor.AlternativeSailNumber);
-            return savedCompetitor.Id;
+            return Ok(savedCompetitor.Id);
         }
 
         // PUT: api/competitors/5
         [HttpPut("{id}")]
-        public async Task Put(Guid id, [FromBody] CompetitorDto value)
+        public async Task<ActionResult> Put(Guid id, [FromBody] CompetitorDto value)
         {
+            if (!await _authService.CanUserEdit(User, value.ClubId))
+            {
+                return Unauthorized();
+            }
             Competitor comp = _mapper.Map<Competitor>(value);
             comp.Id = id;
             await _service.SaveAsync(comp);
+            return Ok();
         }
 
     }

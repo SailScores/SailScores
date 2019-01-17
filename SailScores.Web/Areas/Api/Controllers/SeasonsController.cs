@@ -21,13 +21,16 @@ namespace SailScores.Web.Areas.Api.Controllers
     public class SeasonsController : ControllerBase
     {
         private readonly IClubService _clubService;
+        private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public SeasonsController(
             IClubService clubService,
+            Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _authService = authService;
             _mapper = mapper;
         }
 
@@ -39,15 +42,19 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<Guid> Post([FromBody] SeasonDto season)
+        public async Task<ActionResult<Guid>> Post([FromBody] SeasonDto season)
         {
+            if (!await _authService.CanUserEdit(User, season.ClubId))
+            {
+                return Unauthorized();
+            }
             var seasonBizObj = _mapper.Map<Season>(season);
             await _clubService.SaveNewSeason(seasonBizObj);
             var savedSeason =
                 (await _clubService.GetFullClub(season.ClubId))
                 .Seasons
                 .First(c => c.Name == season.Name);
-            return savedSeason.Id;
+            return Ok(savedSeason.Id);
         }
 
     }

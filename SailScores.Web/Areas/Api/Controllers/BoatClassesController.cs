@@ -5,13 +5,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
-using SailScores.Web.Services;
-using Model = SailScores.Core.Model;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -21,13 +18,16 @@ namespace SailScores.Web.Areas.Api.Controllers
     public class BoatClassesController : ControllerBase
     {
         private readonly IClubService _clubService;
+        private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public BoatClassesController(
             IClubService clubService,
+            Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _authService = authService;
             _mapper = mapper;
         }
 
@@ -39,21 +39,19 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<Guid> Post([FromBody] BoatClassDto boatClass)
+        public async Task<ActionResult<Guid>> Post([FromBody] BoatClassDto boatClass)
         {
+            if(! await _authService.CanUserEdit(User, boatClass.ClubId))
+            {
+                return Unauthorized();
+            }
             var classBizObj = _mapper.Map<BoatClass>(boatClass);
             await _clubService.SaveNewBoatClass(classBizObj);
             var savedClass =
                 (await _clubService.GetFullClub(boatClass.ClubId))
                 .BoatClasses
                 .First(c => c.Name == boatClass.Name);
-            return savedClass.Id;
-        }
-
-        // PUT: api/Club/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
+            return Ok(savedClass.Id);
         }
     }
 }

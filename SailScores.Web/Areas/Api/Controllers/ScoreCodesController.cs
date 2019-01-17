@@ -16,6 +16,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ScoreCodesController : ControllerBase
     {
         private readonly IScoringService _service;
@@ -29,7 +30,6 @@ namespace SailScores.Web.Areas.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<IEnumerable<ScoreCodeDto>> Get(Guid clubId)
         {

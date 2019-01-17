@@ -60,9 +60,6 @@ namespace SailScores.Core.Services
                 .Where(c => includeHidden || !c.IsHidden)
                 .ToListAsync();
             return _mapper.Map<List<Model.Club>>(dbObjects);
-            //    .ProjectTo<Model.Club>(_mapper.ConfigurationProvider)
-            //    .ToListAsync();
-            //return returnList;
         }
 
         public async Task<Model.Club> GetFullClub(string id)

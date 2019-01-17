@@ -5,13 +5,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
-using SailScores.Web.Services;
-using Model = SailScores.Core.Model;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -21,13 +17,16 @@ namespace SailScores.Web.Areas.Api.Controllers
     public class SeriesController : ControllerBase
     {
         private readonly Core.Services.ISeriesService _service;
+        private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public SeriesController(
             Core.Services.ISeriesService service,
+            Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _service = service;
+            _authService = authService;
             _mapper = mapper;
         }
 
@@ -47,15 +46,19 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<Guid> Post([FromBody] SeriesDto series)
+        public async Task<ActionResult<Guid>> Post([FromBody] SeriesDto series)
         {
+            if (!await _authService.CanUserEdit(User, series.ClubId))
+            {
+                return Unauthorized();
+            }
             var seriesBizObj = _mapper.Map<Series>(series);
             await _service.SaveNewSeries(seriesBizObj);
             var savedSeries =
                 (await _service.GetAllSeriesAsync(series.ClubId))                
                 .Single(s => s.Name == series.Name
                     && s.Season.Id == series.SeasonId);
-            return savedSeries.Id;
+            return Ok(savedSeries.Id);
         }
     }
 }
