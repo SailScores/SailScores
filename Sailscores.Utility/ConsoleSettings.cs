@@ -24,8 +24,7 @@ namespace SailScores.Utility
                 _serverUrl = value;
             }
         }
-        private string _userName
-            = "jamie@widernets.com";
+        private string _userName;
         public string UserName
         {
             get
@@ -43,8 +42,7 @@ namespace SailScores.Utility
             }
         }
 
-        private string _password
-            = "P@ssw0rd";
+        private string _password;
         public string Password
         {
             get
