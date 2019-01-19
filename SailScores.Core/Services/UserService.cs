@@ -23,11 +23,11 @@ namespace SailScores.Core.Services
                         c.Initials.ToUpperInvariant()
                         == clubInitials.ToUpperInvariant()))
                     ?.Id;
-            return await IsUserAllowedToEdit(email, clubId.Value);
+            return await IsUserAllowedToEdit(email, clubId);
 
         }
 
-        public async Task<bool> IsUserAllowedToEdit(string email, Guid clubId)
+        public async Task<bool> IsUserAllowedToEdit(string email, Guid? clubId)
         {
             var userMatches = _dbContext.UserPermissions
                 .Where(u => u.UserEmail.ToUpperInvariant()
@@ -35,6 +35,10 @@ namespace SailScores.Core.Services
             if (await userMatches.AnyAsync(u => u.CanEditAllClubs))
             {
                 return true;
+            }
+            if (!clubId.HasValue)
+            {
+                return false;
             }
             return await userMatches.AnyAsync(u => u.ClubId == clubId);
             

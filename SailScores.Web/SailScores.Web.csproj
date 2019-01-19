@@ -44,4 +44,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SailScores.Web.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

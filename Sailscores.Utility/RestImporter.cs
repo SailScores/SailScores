@@ -376,6 +376,11 @@ namespace SailScores.Utility
                     .Any(r => r.CompetitorId == swComp.Id
                         && (r.Code != null || r.Place != 0)))
                 {
+                    var match = FindMatch(shouldBeAllCompetitors, swComp);
+                    if(match == null)
+                    {
+                        throw new InvalidOperationException("Failed to find a competitor that should have just been created.");
+                    }
                     returnDict.Add(swComp.Id, FindMatch(shouldBeAllCompetitors, swComp));
                 }
             }
@@ -437,6 +442,12 @@ namespace SailScores.Utility
                     || (!String.IsNullOrWhiteSpace(c.SailNumber)
                         && c.SailNumber == comp.AlternativeSailNumber))
                     {
+                    return comp;
+                }
+                if (String.IsNullOrWhiteSpace(c.SailNumber)
+                    && String.IsNullOrWhiteSpace(comp.SailNumber)
+                    && c.HelmName == comp.Name)
+                {
                     return comp;
                 }
             }

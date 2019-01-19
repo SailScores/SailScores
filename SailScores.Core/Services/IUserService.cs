@@ -8,6 +8,6 @@ namespace SailScores.Core.Services
     public interface IUserService
     {
         Task<bool> IsUserAllowedToEdit(string email, string clubInitials);
-        Task<bool> IsUserAllowedToEdit(string email, Guid clubId);
+        Task<bool> IsUserAllowedToEdit(string email, Guid? clubId);
     }
 }
