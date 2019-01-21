@@ -6920,3 +6920,6 @@ a.text-dark:hover, a.text-dark:focus {
   .table .thead-dark th {
     color: inherit;
     border-color: #dee2e6; } }
+
+.table-nonfluid {
+  width: auto; }
