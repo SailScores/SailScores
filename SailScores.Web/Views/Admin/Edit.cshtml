@@ -47,11 +47,11 @@
         </form>
     </div>
 </div>
+@await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
 @await Html.PartialAsync("_FleetList", Model.Fleets)
-    <div>
-        <a asp-action="Index">Back to List</a>
-    </div>
+@await Html.PartialAsync("_CompetitorList", Model.Competitors)
 
-    @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    }
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
