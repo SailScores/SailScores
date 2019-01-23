@@ -1,8 +1,8 @@
-﻿@model IEnumerable<SailScores.Core.Model.BoatClass>
+﻿@model IEnumerable<SailScores.Core.Model.Series>
 
-    <h3 id="classes">Classes</h3>
+    <h3 id="series">Series</h3>
     <p>
-        @Html.ActionLink("Create", "Create", "BoatClass", new { /* id=item.PrimaryKey */ })
+        @Html.ActionLink("Create", "Create", "Series", new { /* id=item.PrimaryKey */ })
     </p>
     <table class="table table-not-wide">
         <tbody>
@@ -16,8 +16,8 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
-                        @Html.ActionLink("Edit", "Edit", "BoatClass", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Delete", "Delete", "BoatClass", new { /* id=item.PrimaryKey */ })
+                        @Html.ActionLink("Edit", "Edit", "Series", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Delete", "Delete", "Series", new { /* id=item.PrimaryKey */ })
                     </td>
                 </tr>
             }

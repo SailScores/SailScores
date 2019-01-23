@@ -1,71 +1,34 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Competitor>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ClubId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SailNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AlternativeSailNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BoatName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BoatClassId)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ClubId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SailNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AlternativeSailNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BoatName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BoatClassId)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <h3 id="competitors">Competitors</h3>
+    <p>
+        @Html.ActionLink("Create", "Create", "Competitor", new { /* id=item.PrimaryKey */ })
+    </p>
+    <table class="table table-not-wide">
+        <tbody>
+            @foreach (var item in Model.OrderBy(c => c.Name))
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SailNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <em>@Html.DisplayFor(modelItem => item.BoatName)</em>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BoatClass.Name)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "Competitor", new { /* id=item.PrimaryKey */ }) |
+                    @Html.ActionLink("Delete", "Delete", "Competitor", new { /* id=item.PrimaryKey */ })
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>

@@ -99,10 +99,10 @@ namespace SailScores.Core.Services
             dbBoatClass.Id = Guid.NewGuid();
             _dbContext.BoatClasses.Add(dbBoatClass);
             var defaultShortName = boatClass.Name.Split(' ')[0];
-            var fleetId = Guid.NewGuid();
+            var clubId = Guid.NewGuid();
             var dbFleet = new Db.Fleet
             {
-                Id = fleetId,
+                Id = clubId,
                 ClubId = boatClass.ClubId,
                 FleetType = Api.Enumerations.FleetType.SelectedClasses,
                 IsHidden = false,
@@ -113,7 +113,7 @@ namespace SailScores.Core.Services
                     new Db.FleetBoatClass
                     {
                         BoatClassId = dbBoatClass.Id,
-                        FleetId = fleetId
+                        FleetId = Guid.NewGuid()
                     }
                 }
             };

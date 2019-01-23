@@ -12,9 +12,11 @@ namespace SailScores.Core.Model
 
         [StringLength(200)]
         public String Name { get; set; }
+        [DisplayFormat(DataFormatString = "{0:Y}")]
         public DateTime Start { get; set; }
+        [DisplayFormat(DataFormatString = "{0:Y}")]
         public DateTime End { get; set; }
-        
+
         public IEnumerable<Series> Series { get; set; }
     }
 }

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<SailScores.Core.Model.Season>
+
+    <h3 id="seasons">Seasons</h3>
+    <p>
+        @Html.ActionLink("Create", "Create", "Season", new { /* id=item.PrimaryKey */ })
+    </p>
+    <table class="table table-not-wide">
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Start)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.End)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", "Season", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Delete", "Delete", "Season", new { /* id=item.PrimaryKey */ })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

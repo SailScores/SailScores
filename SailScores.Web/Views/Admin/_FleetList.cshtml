@@ -1,35 +1,14 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Fleet>
 
 
-<h2>Fleets</h2>
-
+<h3 id="fleets">Fleets</h3>
 <p>
-    <a asp-action="Create">Create New</a>
+    @Html.ActionLink("Create", "Create", "Fleet", new { /* id=item.PrimaryKey */ })
 </p>
-<table class="table table-nonfluid">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ShortName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FleetType)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+<table class="table table-not-wide">
     <tbody>
 @foreach (var item in Model.OrderBy(f => f.Name)) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShortName)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
@@ -40,9 +19,8 @@
                 @Html.DisplayFor(modelItem => item.FleetType)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Edit", "Edit", "Fleet", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", "Fleet", new { /* id=item.PrimaryKey */ })
             </td>
         </tr>
 }

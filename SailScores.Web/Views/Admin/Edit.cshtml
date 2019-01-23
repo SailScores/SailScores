@@ -1,13 +1,48 @@
 ﻿@model SailScores.Web.Models.SailScores.AdminViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit " + Model.Name;
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Edit</h2>
+@section Sidebar {
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky sticky-top">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#classes">Classes</a>
+                </li>
 
-<h4>AdminViewModel</h4>
+                <li class="nav-item">
+                    <a class="nav-link" href="#fleets">Fleets</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#seasons">Seasons</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#series">Series</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#competitors">Competitors</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#races">Races</a>
+                </li>
+                @foreach (var item in Model.Races.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#@item.Key">
+                            @item.Key
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        </div>
+    </nav>
+}
+
+<h2>Edit @Model.Name</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -49,7 +84,10 @@
 </div>
 @await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
 @await Html.PartialAsync("_FleetList", Model.Fleets)
+@await Html.PartialAsync("_SeasonList", Model.Seasons)
+@await Html.PartialAsync("_SeriesList", Model.Series)
 @await Html.PartialAsync("_CompetitorList", Model.Competitors)
+@await Html.PartialAsync("_RaceList", Model.Races)
 
 
 @section Scripts {
