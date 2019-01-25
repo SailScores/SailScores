@@ -22,13 +22,16 @@ namespace SailScores.Utility
     {
         private readonly ISeriesService _coreSeriesService;
         private readonly IClubService _coreClubService;
+        private readonly IBoatClassService _coreClassService;
 
         public LocalServiceImporter(
             ISeriesService seriesService,
-            IClubService clubService)
+            IClubService clubService,
+            IBoatClassService classService)
         {
             _coreSeriesService = seriesService;
             _coreClubService = clubService;
+            _coreClassService = classService;
         }
 
         public void WriteSwSeriesToSS(SwObjects.Series series)
@@ -339,7 +342,7 @@ namespace SailScores.Utility
 
             try
             {
-                var createTask = _coreClubService.SaveNewBoatClass(boatClass);
+                var createTask = _coreClassService.SaveNew(boatClass);
                 createTask.Wait();
                 //createTask.GetAwaiter().GetResult();
             }

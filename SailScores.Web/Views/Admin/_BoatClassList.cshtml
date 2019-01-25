@@ -1,6 +1,9 @@
 ﻿@model IEnumerable<SailScores.Core.Model.BoatClass>
 
     <h3 id="classes">Classes</h3>
+<p>
+    Classes refer to the type of boat sailed. A competitor can only belong to one class.
+</p>
     <p>
         @Html.ActionLink("Create", "Create", "BoatClass", new { /* id=item.PrimaryKey */ })
     </p>
@@ -16,8 +19,8 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
-                        @Html.ActionLink("Edit", "Edit", "BoatClass", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Delete", "Delete", "BoatClass", new { /* id=item.PrimaryKey */ })
+                        @Html.ActionLink("Edit", "Edit", "BoatClass", new { id=item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", "BoatClass", new { id=item.Id })
                     </td>
                 </tr>
             }

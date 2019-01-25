@@ -93,35 +93,6 @@ namespace SailScores.Core.Services
             return await GetFullClub(id.ToString());
         }
 
-        public async Task SaveNewBoatClass(BoatClass boatClass)
-        {
-            var dbBoatClass =_mapper.Map<Db.BoatClass>(boatClass);
-            dbBoatClass.Id = Guid.NewGuid();
-            _dbContext.BoatClasses.Add(dbBoatClass);
-            var defaultShortName = boatClass.Name.Split(' ')[0];
-            var clubId = Guid.NewGuid();
-            var dbFleet = new Db.Fleet
-            {
-                Id = clubId,
-                ClubId = boatClass.ClubId,
-                FleetType = Api.Enumerations.FleetType.SelectedClasses,
-                IsHidden = false,
-                ShortName = defaultShortName,
-                Name = $"All {boatClass.Name}s",
-                FleetBoatClasses = new List<Db.FleetBoatClass>
-                {
-                    new Db.FleetBoatClass
-                    {
-                        BoatClassId = dbBoatClass.Id,
-                        FleetId = Guid.NewGuid()
-                    }
-                }
-            };
-            _dbContext.Fleets.Add(dbFleet);
-            await _dbContext.SaveChangesAsync();
-
-        }
-
         public async Task SaveNewClub(Club club)
         {
             if(_dbContext.Clubs.Any(c => c.Initials == club.Initials))

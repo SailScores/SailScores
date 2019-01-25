@@ -18,15 +18,18 @@ namespace SailScores.Web.Areas.Api.Controllers
     public class BoatClassesController : ControllerBase
     {
         private readonly IClubService _clubService;
+        private readonly IBoatClassService _classService;
         private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public BoatClassesController(
             IClubService clubService,
+            IBoatClassService classService,
             Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _classService = classService;
             _authService = authService;
             _mapper = mapper;
         }
@@ -46,7 +49,7 @@ namespace SailScores.Web.Areas.Api.Controllers
                 return Unauthorized();
             }
             var classBizObj = _mapper.Map<BoatClass>(boatClass);
-            await _clubService.SaveNewBoatClass(classBizObj);
+            await _classService.SaveNew(classBizObj);
             var savedClass =
                 (await _clubService.GetFullClub(boatClass.ClubId))
                 .BoatClasses

@@ -16,15 +16,18 @@ namespace SailScores.Web.Controllers
     {
 
         private readonly IClubService _clubService;
+        private readonly IBoatClassService _classService;
         private readonly IMapper _mapper;
         private readonly Services.IAuthorizationService _authService;
 
         public BoatClassController(
             IClubService clubService,
+            IBoatClassService classService,
             Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _classService = classService;
             _authService = authService;
             _mapper = mapper;
         }
@@ -46,7 +49,7 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = club.Id;
-                await _clubService.SaveNewBoatClass(model);
+                await _classService.SaveNew(model);
 
                 return RedirectToAction(nameof(Edit), "Admin");
             }
@@ -56,18 +59,32 @@ namespace SailScores.Web.Controllers
             }
         }
 
-        public ActionResult Edit(Guid id)
+        public async Task< ActionResult> Edit(string clubInitials, Guid id)
         {
-            return View();
+            var club = await _clubService.GetFullClub(clubInitials);
+            if (!await _authService.CanUserEdit(User, club.Id))
+            {
+                return Unauthorized();
+            }
+            var boatClass =
+                club.BoatClasses
+                .Single(c => c.Id == id);
+            return View(boatClass);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(string clubInitials, BoatClass model)
+        public async Task<ActionResult> Edit(string clubInitials, BoatClass model)
         {
             try
             {
-                // TODO: Add update logic here
+                var club = await _clubService.GetFullClub(clubInitials);
+                if (!await _authService.CanUserEdit(User, club.Id)
+                    || !club.BoatClasses.Any(c => c.Id == model.Id))
+                {
+                    return Unauthorized();
+                }
+                await _classService.Update(model);
 
                 return RedirectToAction(nameof(Edit), "Admin");
             }
@@ -79,7 +96,12 @@ namespace SailScores.Web.Controllers
 
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+            var club = await _clubService.GetFullClub(clubInitials);
+            if (!await _authService.CanUserEdit(User, club.Id)
+                || !club.BoatClasses.Any(c => c.Id == id))
+            {
+                return Unauthorized();
+            }
             var boatClass = club.BoatClasses.Single(c => c.Id == id);
             //todo: add blocker if class contains boats. (or way to move boats.)
             return View(boatClass);
@@ -89,9 +111,14 @@ namespace SailScores.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(string clubInitials, BoatClass model)
         {
+            var club = await _clubService.GetFullClub(clubInitials);
+            if (!await _authService.CanUserEdit(User, club.Id))
+            {
+                return Unauthorized();
+            }
             try
             {
-                // TODO: Add delete logic here
+                await _classService.Delete(model);
 
                 return RedirectToAction(nameof(Edit), "Admin");
             }
