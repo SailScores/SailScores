@@ -25,9 +25,9 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task Delete(BoatClass boatClass)
+        public async Task Delete(Guid boatClassId)
         {
-            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClass.Id);
+            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId);
             _dbContext.BoatClasses.Remove(dbClass);
             await _dbContext.SaveChangesAsync();
         }

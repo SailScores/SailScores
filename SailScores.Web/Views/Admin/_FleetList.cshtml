@@ -24,8 +24,8 @@
                 @Html.DisplayFor(modelItem => item.FleetType)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", "Fleet", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", "Fleet", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Edit", "Edit", "Fleet", new { id=item.Id }) |
+                @Html.ActionLink("Delete", "Delete", "Fleet", new { id=item.Id })
             </td>
         </tr>
 }

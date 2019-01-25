@@ -1,0 +1,61 @@
+﻿@model SailScores.Core.Model.Competitor
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Edit</h2>
+
+<h4>Competitor</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ClubId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SailNumber" class="control-label"></label>
+                <input asp-for="SailNumber" class="form-control" />
+                <span asp-validation-for="SailNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AlternativeSailNumber" class="control-label"></label>
+                <input asp-for="AlternativeSailNumber" class="form-control" />
+                <span asp-validation-for="AlternativeSailNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoatName" class="control-label"></label>
+                <input asp-for="BoatName" class="form-control" />
+                <span asp-validation-for="BoatName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoatClassId" class="control-label"></label>
+                <input asp-for="BoatClassId" class="form-control" />
+                <span asp-validation-for="BoatClassId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

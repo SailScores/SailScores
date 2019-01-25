@@ -228,5 +228,14 @@ namespace SailScores.Core.Services
 
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task DeleteCompetitorAsync(Guid competitorId)
+        {
+            var dbComp = await _dbContext
+                .Competitors
+                .SingleAsync(c => c.Id == competitorId);
+            _dbContext.Competitors.Remove(dbComp);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

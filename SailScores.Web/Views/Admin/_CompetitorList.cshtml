@@ -25,8 +25,8 @@
                     @Html.DisplayFor(modelItem => item.BoatClass.Name)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", "Competitor", new { /* id=item.PrimaryKey */ }) |
-                    @Html.ActionLink("Delete", "Delete", "Competitor", new { /* id=item.PrimaryKey */ })
+                    @Html.ActionLink("Edit", "Edit", "Competitor", new { id=item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", "Competitor", new { id=item.Id })
                 </td>
             </tr>
             }

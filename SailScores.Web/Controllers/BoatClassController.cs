@@ -108,17 +108,19 @@ namespace SailScores.Web.Controllers
         }
 
         [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(string clubInitials, BoatClass model)
+        public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
         {
             var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            if (!await _authService.CanUserEdit(User, club.Id)
+                || !club.BoatClasses.Any(c => c.Id == id))
             {
                 return Unauthorized();
             }
             try
             {
-                await _classService.Delete(model);
+                await _classService.Delete(id);
 
                 return RedirectToAction(nameof(Edit), "Admin");
             }

@@ -12,5 +12,6 @@ namespace SailScores.Core.Services
         Task<Competitor> GetCompetitorAsync(Guid id);
         Task SaveAsync(Competitor comp);
         Task SaveAsync(CompetitorDto comp);
+        Task DeleteCompetitorAsync(Guid competitorId);
     }
 }
