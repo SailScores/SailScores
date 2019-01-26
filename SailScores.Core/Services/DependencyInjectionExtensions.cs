@@ -13,6 +13,7 @@ namespace SailScores.Core.Services
         {
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IBoatClassService, BoatClassService>();
+            services.AddScoped<IFleetService, FleetService>();
             services.AddScoped<ISeasonService, SeasonService>();
             services.AddScoped<ICompetitorService, CompetitorService>();
             services.AddScoped<IScoringService, ScoringService>();
