@@ -12,8 +12,12 @@ namespace SailScores.Core.Model
 
         [StringLength(200)]
         public String Name { get; set; }
+
+        [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:Y}")]
         public DateTime Start { get; set; }
+
+        [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:Y}")]
         public DateTime End { get; set; }
 
