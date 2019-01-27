@@ -40,7 +40,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="BoatClassId" class="control-label">Class</label>
-                <select asp-for="BoatClassId">
+                <select asp-for="BoatClassId" class="form-control" >
                     <option selected="selected">Select a class...</option>
                     @foreach (var boatclass in Model.BoatClassOptions)
                     {

@@ -42,20 +42,45 @@ namespace SailScores.Web.Services
 
             return retFleet;
         }
+        public async Task<Fleet> GetFleet(Guid fleetId)
+        {
+            var coreObject = await _coreFleetService.Get(fleetId);
+            return coreObject;
+        }
 
         public async Task Delete(Guid fleetId)
         {
             await _coreFleetService.Delete(fleetId);
         }
 
-        public async Task SaveNew(Fleet fleet)
+        public async Task SaveNew(FleetCreateViewModel fleet)
         {
-            await _coreFleetService.SaveNew(fleet);
+            var coreModel = _mapper.Map<Fleet>(fleet);
+            var club = await _coreClubService.GetFullClub(fleet.ClubId);
+            if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
+                && fleet.BoatClassIds != null)
+            {
+                coreModel.BoatClasses =
+                    club.BoatClasses
+                    .Where(c => fleet.BoatClassIds.Contains(c.Id))
+                    .ToList();
+            }
+            await _coreFleetService.SaveNew(coreModel);
         }
 
-        public async Task Update(Fleet fleet)
+        public async Task Update(FleetCreateViewModel fleet)
         {
-            await _coreFleetService.Update(fleet);
+            var coreModel = _mapper.Map<Fleet>(fleet);
+            var club = await _coreClubService.GetFullClub(fleet.ClubId);
+            if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
+                && fleet.BoatClassIds != null)
+            {
+                coreModel.BoatClasses =
+                    club.BoatClasses
+                    .Where(c => fleet.BoatClassIds.Contains(c.Id))
+                    .ToList();
+            }
+            await _coreFleetService.Update(coreModel);
         }
 
     }

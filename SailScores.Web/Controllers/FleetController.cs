@@ -61,14 +61,17 @@ namespace SailScores.Web.Controllers
             });
         }
 
-        public ActionResult Create()
+        public async Task<ActionResult> Create(string clubInitials)
         {
-            return View();
+            var club = await _clubService.GetFullClub(clubInitials);
+            var vm = new FleetWithOptionsViewModel();
+            vm.BoatClassOptions = club.BoatClasses;
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials, Fleet model)
+        public async Task<ActionResult> Create(string clubInitials, FleetCreateViewModel model)
         {
             try
             {
@@ -90,20 +93,27 @@ namespace SailScores.Web.Controllers
 
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
-            {
-                return Unauthorized();
+            try {
+                var club = await _clubService.GetFullClub(clubInitials);
+                if (!await _authService.CanUserEdit(User, club.Id))
+                {
+                    return Unauthorized();
+                }
+                var fleet =
+                    await _fleetService.GetFleet(id);
+                var vm = _mapper.Map<FleetWithOptionsViewModel>(fleet);
+                vm.BoatClassOptions = club.BoatClasses;
+                return View(vm);
             }
-            var fleet =
-                club.Fleets
-                .Single(c => c.Id == id);
-            return View(fleet);
+            catch
+            {
+                return RedirectToAction(nameof(Edit), "Admin");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(string clubInitials, Fleet model)
+        public async Task<ActionResult> Edit(string clubInitials, FleetCreateViewModel model)
         {
             try
             {

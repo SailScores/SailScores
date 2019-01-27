@@ -1,4 +1,4 @@
-﻿@model SailScores.Core.Model.Fleet
+﻿@model SailScores.Web.Models.SailScores.FleetWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -30,12 +30,24 @@
             </div>
             <div class="form-group">
                 <label asp-for="FleetType" class="control-label"></label>
-                <input asp-for="FleetType" class="form-control" />
-                <span asp-validation-for="FleetType" class="text-danger"></span>
-                <hr />
-                <select asp-for="FleetType" asp-items="(Html.GetEnumSelectList<SailScores.Api.Enumerations.FleetType>())">
-                    <option selected="selected" value="">Please select</option>
+                <select id="fleetType" asp-for="FleetType" class="form-control"
+                        asp-items="(Html.GetEnumSelectList<SailScores.Api.Enumerations.FleetType>())"
+                        onchange="checkVisibility()">
+                    <option selected="selected" value="">Select the type of Fleet</option>
                 </select>
+                <span asp-validation-for="FleetType" class="text-danger"></span>
+            </div>
+            <div id="classSelectGroup" class="form-group">
+                <label asp-for="BoatClassIds" class="control-label">Class</label>
+                <select multiple asp-for="BoatClassIds" class="form-control">
+                    @foreach (var boatclass in Model.BoatClassOptions)
+                    {
+                        <option value="@boatclass.Id">
+                            @boatclass.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="BoatClassIds" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
@@ -43,6 +55,21 @@
         </form>
     </div>
 </div>
+<script type="text/javascript">
+    function checkVisibility() {
+        var f = document.getElementById('fleetType');
+        var fType = f.options[f.selectedIndex].text;
+        if (fType.indexOf('Class') > -1) {
+            console.log("Showing");
+
+            document.getElementById('classSelectGroup').style.display = 'block';
+        } else {
+            console.log("hiding");
+            document.getElementById('classSelectGroup').style.display = 'none';
+        }
+    };
+    checkVisibility();
+</script>
 
 <div>
     <a asp-action="Index">Back to List</a>
