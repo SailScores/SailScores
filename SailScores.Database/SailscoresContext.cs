@@ -37,7 +37,7 @@ namespace SailScores.Database
         {
             modelBuilder.Entity<CompetitorFleet>()
                 .HasKey(x => new {x.CompetitorId, x.FleetId});
-            modelBuilder.Entity<SeriesRaces>()
+            modelBuilder.Entity<SeriesRace>()
                 .HasKey(x => new {x.SeriesId, x.RaceId});
             modelBuilder.Entity<FleetBoatClass>()
                 .HasKey(x => new {x.FleetId, x.BoatClassId});

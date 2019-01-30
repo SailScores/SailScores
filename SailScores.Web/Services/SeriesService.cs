@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,11 @@ namespace SailScores.Web.Services
             _mapper = mapper;
         }
 
+        public async Task DeleteAsync(Guid id)
+        {
+            await _coreSeriesService.Delete(id);
+        }
+
         public async Task<IEnumerable<SeriesSummary>> GetAllSeriesSummaryAsync(string clubInitials)
         {
             var coreObject = await _coreClubService.GetFullClub(clubInitials);
@@ -36,6 +42,22 @@ namespace SailScores.Web.Services
             var series = await _coreSeriesService.GetSeriesDetailsAsync(clubInitials, season, seriesName );
 
             return series;
+        }
+
+        public async Task SaveNew(SeriesWithOptionsViewModel model)
+        {
+            var club = await _coreClubService.GetFullClub(model.ClubId);
+            var season = club.Seasons.Single(s => s.Id == model.SeasonId);
+            model.Season = season;
+            await _coreSeriesService.SaveNewSeries(model);
+        }
+
+        public async Task Update(SeriesWithOptionsViewModel model)
+        {
+            var club = await _coreClubService.GetFullClub(model.ClubId);
+            var season = club.Seasons.Single(s => s.Id == model.SeasonId);
+            model.Season = season;
+            await _coreSeriesService.Update(model);
         }
     }
 }

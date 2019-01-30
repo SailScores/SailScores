@@ -24,6 +24,6 @@ namespace SailScores.Database.Entities
         public Fleet Fleet { get; set; }
         public IList<Score> Scores { get; set; }
         
-        public IList<SeriesRaces> SeriesRaces { get; set; }
+        public IList<SeriesRace> SeriesRaces { get; set; }
     }
 }

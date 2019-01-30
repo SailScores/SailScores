@@ -99,6 +99,11 @@ namespace SailScores.Core.Services
         }
         public async Task SaveNewSeries(Series series)
         {
+            if(series.Season == null)
+            {
+                throw new InvalidOperationException("Series must have a season assigned.");
+            }
+
             var season = _dbContext.Seasons.SingleOrDefault(s => s.Id == series.Season.Id);
 
             if(_dbContext.Series.Any( s =>
@@ -132,12 +137,12 @@ namespace SailScores.Core.Services
             var retObj = _mapper.Map<dbObj.Series>(ssSeries);
             if(retObj.RaceSeries == null) 
             {
-                retObj.RaceSeries = new List<dbObj.SeriesRaces>();
+                retObj.RaceSeries = new List<dbObj.SeriesRace>();
             }
             foreach(var race in ssSeries.Races)
             {
                 var dbRace = await BuildDbRaceObj(club, race);
-                retObj.RaceSeries.Add(new dbObj.SeriesRaces
+                retObj.RaceSeries.Add(new dbObj.SeriesRace
                 {
                     Series = retObj,
                     Race = dbRace
@@ -293,6 +298,65 @@ namespace SailScores.Core.Services
         private DateTime GetStartOfYear(DateTime minDate)
         {
             return new DateTime(minDate.Year, 1, 1);
+        }
+
+        public async Task Update(Series model)
+        {
+            var existingSeries = await _dbContext.Series
+                .Include(f => f.RaceSeries)
+                .SingleAsync(c => c.Id == model.Id);
+
+            existingSeries.Name = model.Name;
+            existingSeries.Description = model.Description;
+
+            if(model.Season != null
+                && model.Season.Id != Guid.Empty
+                && existingSeries.Season?.Id != model.Season?.Id)
+            {
+                existingSeries.Season = _dbContext.Seasons.Single(s => s.Id == model.Season.Id);
+            }
+
+            var racesToRemove = new List<dbObj.SeriesRace>();
+
+            if (model.Races != null)
+            {
+                racesToRemove =
+                    existingSeries.RaceSeries
+                    .Where(f => !(model.Races.Any(c => c.Id == f.RaceId)))
+                    .ToList();
+            }
+            var racesToAdd =
+                model.Races != null ?
+                model.Races
+                .Where(c =>
+                    !(existingSeries.RaceSeries.Any(f => c.Id == f.RaceId)))
+                    .Select(c => new dbObj.SeriesRace { RaceId = c.Id, SeriesId = existingSeries.Id })
+                : new List<dbObj.SeriesRace>();
+
+            foreach (var removingClass in racesToRemove)
+            {
+                existingSeries.RaceSeries.Remove(removingClass);
+            }
+            foreach (var addClass in racesToAdd)
+            {
+                existingSeries.RaceSeries.Add(addClass);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid fleetId)
+        {
+            var dbSeries = await _dbContext.Series
+                .Include(f => f.RaceSeries)
+                .SingleAsync(c => c.Id == fleetId);
+            foreach (var link in dbSeries.RaceSeries.ToList())
+            {
+                dbSeries.RaceSeries.Remove(link);
+            }
+            _dbContext.Series.Remove(dbSeries);
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

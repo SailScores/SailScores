@@ -146,12 +146,12 @@ namespace SailScores.Core.Services
             {
                 if(dbRace.SeriesRaces == null)
                 {
-                    dbRace.SeriesRaces = new List<Db.SeriesRaces>();
+                    dbRace.SeriesRaces = new List<Db.SeriesRace>();
                 }
                 dbRace.SeriesRaces.Clear();
                 foreach(var seriesId in race.SeriesIds)
                 {
-                    dbRace.SeriesRaces.Add(new Db.SeriesRaces
+                    dbRace.SeriesRaces.Add(new Db.SeriesRace
                     {
                         SeriesId = seriesId,
                         RaceId = dbRace.Id

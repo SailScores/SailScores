@@ -16,7 +16,7 @@ namespace SailScores.Database.Entities
         [StringLength(2000)]
         public String Description { get; set; }
         
-        public IList<SeriesRaces> RaceSeries { get; set; }
+        public IList<SeriesRace> RaceSeries { get; set; }
 
         [Required]
         public Season Season { get; set; }
