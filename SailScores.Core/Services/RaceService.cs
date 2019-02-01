@@ -72,14 +72,14 @@ namespace SailScores.Core.Services
             return modelRaces;
         }
 
-        public async Task<Model.Race> GetRaceAsync(Guid id)
+        public async Task<Model.Race> GetRaceAsync(Guid raceId)
         {
             var race = await 
                 _dbContext
                 .Races
                 .Include(r => r.Fleet)
                 .Include(r => r.Scores)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == raceId);
 
             var modelRace = _mapper.Map<Model.Race>(race);
             await PopulateCompetitors(modelRace);
@@ -181,6 +181,15 @@ namespace SailScores.Core.Services
             }
             await _dbContext.SaveChangesAsync();
             return dbRace.Id;
+        }
+
+        public async Task Delete(Guid raceId)
+        {
+            var dbRace = await _dbContext
+                .Races
+                .SingleAsync(r => r.Id ==  raceId);
+            _dbContext.Races.Remove(dbRace);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

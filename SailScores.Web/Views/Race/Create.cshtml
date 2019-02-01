@@ -1,0 +1,91 @@
+﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Create</h2>
+
+<h4>Race</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order" class="control-label"></label>
+                <input asp-for="Order" class="form-control" />
+                <span asp-validation-for="Order" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FleetId" class="control-label">Fleet</label>
+                <select asp-for="FleetId" class="form-control">
+                    <option selected="selected">Select a fleet...</option>
+                    @foreach (var fleet in Model.FleetOptions)
+                    {
+                        <option value="@fleet.Id">
+                            @fleet.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="FleetId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SeriesIds" class="control-label">Series</label>
+                <select asp-for="SeriesIds" class="form-control" multiple>
+                    @foreach (var series in Model.SeriesOptions)
+                    {
+                        <option value="@series.Id">
+                            @series.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="SeriesIds" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Admin"
+       asp-action="Edit"
+       asp-fragment="races">Back to List</a>
+</div>
+
+<ul>
+    @foreach (var comp in Model.CompetitorOptions)
+    {
+        <li>@comp.Name</li>
+        <ul>
+
+            @foreach (var fleet in comp.Fleets)
+            {
+                <li>@fleet.Name</li>
+            }
+        </ul>
+    }
+</ul>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

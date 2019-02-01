@@ -10,7 +10,8 @@ namespace SailScores.Core.Services
     {
         Task<IList<Model.Race>> GetRacesAsync(Guid clubId);
         Task<IList<Model.Race>> GetFullRacesAsync(Guid clubId);
-        Task<Race> GetRaceAsync(Guid id);
+        Task<Race> GetRaceAsync(Guid raceId);
         Task<Guid> SaveAsync(RaceDto race);
+        Task Delete(Guid raceId);
     }
 }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using SailScores.Api.Dtos;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
@@ -25,6 +26,11 @@ namespace SailScores.Web.Services
             _mapper = mapper;
         }
 
+        public async Task Delete(Guid id)
+        {
+            await _coreRaceService.Delete(id);
+        }
+
         public async Task<IEnumerable<RaceSummaryViewModel>> GetAllRaceSummariesAsync(string clubInitials)
         {
             var club = (await _coreClubService.GetClubs(true)).First(c => c.Initials == clubInitials);
@@ -35,6 +41,18 @@ namespace SailScores.Web.Services
 
             var vm = _mapper.Map<List<RaceSummaryViewModel>>(races);
             return vm;
+        }
+
+        public async Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(string clubInitials)
+        {
+            var club = await _coreClubService.GetFullClub(clubInitials);
+            var model = new RaceWithOptionsViewModel();
+            model.FleetOptions = club.Fleets;
+            model.SeriesOptions = club.Series;
+            model.ScoreCodeOptions = club.ScoreCodes;
+            model.CompetitorOptions = club.Competitors;
+            return model;
+
         }
 
         public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
@@ -48,6 +66,22 @@ namespace SailScores.Web.Services
                 .ToList();
 
             return retRace;
+        }
+
+        public async Task SaveAsync(RaceWithOptionsViewModel race)
+        {
+            var club = await _coreClubService.GetFullClub(race.ClubId);
+            // fill in series and fleets
+            if (race.SeriesIds != null) {
+                race.Series = club.Series.Where(s => race.SeriesIds.Contains(s.Id)).ToList();
+            }
+            if(race.FleetId != default(Guid))
+            {
+                race.Fleet = club.Fleets.Single(f => f.Id == race.FleetId);
+            }
+
+            var raceDto = _mapper.Map<RaceDto>(race);
+            await _coreRaceService.SaveAsync(raceDto);
         }
     }
 }
