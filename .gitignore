@@ -263,3 +263,5 @@ SailScores\.Web/SailScores\.Web\.xml
 
 SailScores\.Web/bower_components/
 SailScores\.Web/wwwroot/vendor/
+
+SailScores\.Web/wwwroot/scripts/

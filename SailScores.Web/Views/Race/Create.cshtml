@@ -72,6 +72,15 @@
        asp-fragment="races">Back to List</a>
 </div>
 
+
+
+<script src="/scripts/raceEditor.js"></script>
+
+    <div id="message"></div>
+    <div>
+        Compiler: <input id="compiler" value="TypeScript" onkeyup="document.getElementById('message').innerText = sayHello()" /><br />
+        Framework: <input id="framework" value="ASP.NET" onkeyup="document.getElementById('message').innerText = sayHello()" />
+    </div>
 <ul>
     @foreach (var comp in Model.CompetitorOptions)
     {
@@ -86,6 +95,6 @@
     }
 </ul>
 
-    @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

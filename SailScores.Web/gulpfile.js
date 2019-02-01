@@ -1,4 +1,4 @@
-﻿/// <binding BeforeBuild='scripts' Clean='clean' />
+﻿/// <binding BeforeBuild='scripts' AfterBuild='typescript' Clean='clean' />
 "use strict";
 
 var gulp = require("gulp"),
@@ -19,6 +19,8 @@ paths.css = paths.webroot + "css/**/*.css";
 paths.minCss = paths.webroot + "css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "js/site.min.js";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
+paths.concatTsDest = paths.webroot + "scripts/**.*";
+paths.scripts = ['scripts/**/*.js', 'scripts/**/*.ts', 'scripts/**/*.map'];
 
 gulp.task("clean:js", function (cb) {
     rimraf(paths.concatJsDest, cb);
@@ -28,7 +30,11 @@ gulp.task("clean:css", function (cb) {
     rimraf(paths.concatCssDest, cb);
 });
 
-gulp.task("clean", gulp.parallel("clean:js", "clean:css"));
+gulp.task("clean:ts", function (cb) {
+    rimraf(paths.concatTsDest, cb);
+});
+
+gulp.task("clean", gulp.parallel("clean:js", "clean:css", "clean:ts"));
 
 gulp.task("min:js", function () {
     return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
@@ -76,6 +82,10 @@ gulp.task("scripts", function () {
 
     return merge(streams);
 
+});
+
+gulp.task('typescript', function () {
+    return gulp.src(paths.scripts).pipe(gulp.dest('wwwroot/scripts'));
 });
 
 gulp.task("sass", function () {
