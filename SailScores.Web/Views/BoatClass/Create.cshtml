@@ -30,7 +30,9 @@
 </div>
 
 <div>
-    <a asp-action="Index">Cancel and Back to Club Admin</a>
+    <a asp-controller="Admin"
+       asp-action="Edit"
+       asp-fragment="classes">Back to List</a>
 </div>
 
 @section Scripts {

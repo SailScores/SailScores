@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.CompetitorCreateViewModel
+﻿@model SailScores.Web.Models.SailScores.CompetitorWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -59,7 +59,9 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Admin"
+       asp-action="Edit"
+       asp-fragment="competitors">Back to List</a>
 </div>
 
 @section Scripts {

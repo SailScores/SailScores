@@ -48,16 +48,10 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/Create
         public async Task<ActionResult> Create(string clubInitials)
         {
-            var comp = new CompetitorCreateViewModel();
+            var comp = new CompetitorWithOptionsViewModel();
             var club = await _clubService.GetFullClub(clubInitials);
-            //var options = new List<SelectListItem>();
-            //foreach(var boatClass in club.BoatClasses)
-            //{
-            //    options.Add(
-            //        new SelectListItem { Text = boatClass.Name, Value = boatClass.Id.ToString() });
-            //}
-
             comp.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+
             return View(comp);
         }
 
@@ -87,7 +81,7 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/Edit/5
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
-            var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+            var club = await _clubService.GetFullClub(clubInitials);
             if (!await _authService.CanUserEdit(User, club.Id))
             {
                 return Unauthorized();
@@ -97,7 +91,10 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            return View(competitor);
+            var compWithOptions = _mapper.Map<CompetitorWithOptionsViewModel>(competitor);
+
+            compWithOptions.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            return View(compWithOptions);
         }
 
         // POST: Competitor/Edit/5

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SailScores.Web.Models.SailScores
 {
-    public class CompetitorCreateViewModel : Core.Model.Competitor
+    public class CompetitorWithOptionsViewModel : Core.Model.Competitor
     {
         public IOrderedEnumerable<BoatClass> BoatClassOptions { get; set; }
     }
