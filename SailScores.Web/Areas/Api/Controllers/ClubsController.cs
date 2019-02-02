@@ -38,7 +38,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         /// Get summary list of clubs: some properties may be empty.
         /// </summary>
         /// <returns>Array of Model.Club</returns>
-        // GET: api/Club
+        // GET: api/Clubs
 
         [HttpGet]
         public async Task<IEnumerable<ClubDto>> Get()

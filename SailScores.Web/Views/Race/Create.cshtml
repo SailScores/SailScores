@@ -78,9 +78,15 @@
 
     <div id="message"></div>
     <div>
-        Compiler: <input id="compiler" value="TypeScript" onkeyup="document.getElementById('message').innerText = sayHello()" /><br />
-        Framework: <input id="framework" value="ASP.NET" onkeyup="document.getElementById('message').innerText = sayHello()" />
+        Compiler: <input id="compiler" value="TypeScript" onblur="loadCompetitors()" /><br />
+        Framework: <input id="framework" value="ASP.NET" onkeyup="sayHello()" />
     </div>
+ts list:
+<ul id="compList">
+
+</ul>
+
+<hr />
 <ul>
     @foreach (var comp in Model.CompetitorOptions)
     {
