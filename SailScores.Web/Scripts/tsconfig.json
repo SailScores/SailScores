@@ -1,20 +1,23 @@
 {
   "compilerOptions": {
+    "outDir": "./build/",
     "noImplicitAny": true,
     "noEmitOnError": true,
     "removeComments": false,
     "sourceMap": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "es5",
+    "module": "es2015",
+    "target": "es2015",
+    "baseUrl": "scripts",
     "lib": [
       "es2015",
       "es5",
       "dom"
     ]
   },
-  "files": [
-    "./raceEditor.ts"
-  ],
-  "compileOnSave": true
-}
+    "files": [
+      "./guid.ts",
+      "./raceEditor.ts",
+      "./interfaces/CompetitorDto.cs.d.ts"
+
+    ]
+  }

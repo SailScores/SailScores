@@ -265,3 +265,15 @@ SailScores\.Web/bower_components/
 SailScores\.Web/wwwroot/vendor/
 
 SailScores\.Web/wwwroot/scripts/
+
+SailScores\.Web/Scripts/raceEditor\.js
+
+SailScores\.Web/Scripts/raceEditor\.js\.map
+
+SailScores\.Web/Scripts/build/
+
+SailScores\.Web/wwwroot/js/
+
+SailScores\.Web/Scripts/guid\.js\.map
+
+SailScores\.Web/Scripts/guid\.js

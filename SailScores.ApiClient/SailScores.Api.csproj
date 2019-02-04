@@ -9,4 +9,11 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Dtos\CompetitorDto.cs">
+      <Generator>DtsGenerator</Generator>
+      <LastGenOutput>CompetitorDto.cs.d.ts</LastGenOutput>
+    </Compile>
+  </ItemGroup>
+
 </Project>

@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\guid.ts" />
     <None Remove="Scripts\raceEditor.ts" />
   </ItemGroup>
 
@@ -39,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\guid.ts" />
     <TypeScriptCompile Include="Scripts\raceEditor.ts" />
   </ItemGroup>
 
@@ -57,6 +59,11 @@
   <ItemGroup>
     <None Update="SailScores.Web.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Scripts\interfaces\CompetitorDto.cs.d.ts">
+      <DependentUpon>CompetitorDto.cs</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </None>
   </ItemGroup>
 
