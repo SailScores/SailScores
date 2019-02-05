@@ -31,6 +31,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IEnumerable<CompetitorDto>> Get(
             Guid clubId,
