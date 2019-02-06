@@ -8,6 +8,40 @@
 <h2>Create</h2>
 
 <h4>Race</h4>
+
+<script src="~/js/raceEditor.build.js"></script>
+<script src="~/vendor/dragula/dragula.js"></script>
+<link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
+
+
+<h2>Race Results</h2>
+<div>
+    Competitor: <input id="newCompetitor" />
+    <input type="button" value="Add Competitor" onclick="window.SailScores.addCompetitor()" class="btn btn-default" /><br />
+</div>
+<div class="container">
+    <ul class="list-group col-md-4 col-lg-3" id="results">
+        <li class="list-group-item">
+            <span class="badge badge-secondary badge-pill">1</span> <span>2144</span> <span>J. Fraser</span>
+            <span class="fas fa-grip-lines float-right"></span>
+        </li>
+        <li class="list-group-item">
+            <span class="badge badge-secondary badge-pill">2</span> <span>2144</span> <span>J. Fraser</span>
+            <span class="fas fa-grip-lines float-right"></span>
+        </li>
+        <li class="list-group-item">
+            <span class="badge badge-secondary badge-pill">3</span> <span>2144</span> <span>J. Fraser</span>
+            <span class="fas fa-grip-lines float-right"></span>
+        </li>
+        <li class="list-group-item" id="competitorTemplate" style="display: none;">
+            <span class="badge badge-secondary badge-pill race-place">4</span> <span class="boat-number">2144</span> <span class="competitor-name h5"></span>
+            <span class="fas fa-arrows-alt-v float-right"></span>
+        </li>
+    </ul>
+</div>
+
+
+<script>dragula([document.getElementById('results')]);</script>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -74,15 +108,6 @@
 
 
 
-<script src="~/js/raceEditor.build.js"></script>
-
-<div id="message"></div>
-<div>
-    Compiler: <input id="compiler" value="TypeScript" onblur="window.SailScores.loadCompetitors()" /><br />
-    Framework: <input id="framework" value="ASP.NET" onkeyup="window.SailScores.send()" />
-</div>
-ts list:
-<ul id="compList"></ul>
 
 <hr />
 <ul>

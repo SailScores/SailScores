@@ -64,6 +64,9 @@ var deps = {
     "bootstrap": {
         "dist/**/*": ""
     },
+    "dragula": {
+        "dist/**/*": ""
+    },
     // ...
 
 };

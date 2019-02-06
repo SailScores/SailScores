@@ -18,10 +18,15 @@
   "dependencies": {
     "bootstrap": "4.2.1",
     "jquery": "~3.3.1",
-    "popper.js": "1.14.7"
+    "popper.js": "1.14.7",
+    "dragula": "3.7.2"
   },
   "scripts": {
     "build": "webpack"
+  },
+  "-vs-binding": {
+    "AfterBuild": [
+      "build"
+    ]
   }
-, "-vs-binding":{"AfterBuild":["build"]}
 }

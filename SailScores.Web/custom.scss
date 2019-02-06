@@ -15,3 +15,7 @@ body {
 .table-not-wide {
     width: auto;
 }
+
+#results li {
+    touch-action: none;
+}

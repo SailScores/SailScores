@@ -3,39 +3,36 @@ import { Guid } from "./guid";
 
 let competitors:server.competitorDto[]
 
-function sayHello() {
-    const compiler = (document.getElementById("compiler") as HTMLInputElement).value;
-    const framework = (document.getElementById("framework") as HTMLInputElement).value;
-    const msg = `Hello from ${compiler} and ${framework}!`;
-
-    document.getElementById('message').innerText = msg ;
-    return msg;
+export function addCompetitor() {
+    const compName = (document.getElementById("newCompetitor") as HTMLInputElement).value;
+    addNewCompetitor(compName);
 }
 
-export function loadCompetitors() {
-    getCompetitors();
-    competitors = [{
-        id: Guid.MakeNew(),
-        clubId: Guid.MakeNew(),
-        name: "j fraser",
-        sailNumber: "2144",
-        boatName: "hmm",
-        boatClassId: Guid.MakeNew(),
-        fleetIds: [],
-        scoreIds: []
+//export function loadCompetitors() {
+//    getCompetitors();
+//    competitors = [{
+//        id: Guid.MakeNew(),
+//        clubId: Guid.MakeNew(),
+//        name: "j fraser",
+//        sailNumber: "2144",
+//        boatName: "hmm",
+//        boatClassId: Guid.MakeNew(),
+//        fleetIds: [],
+//        scoreIds: []
 
-    }];
-    displayCompetitors();
-}
+//    }];
+//    displayCompetitors();
+//}
 
-function displayCompetitors() {
+function addNewCompetitor(competitorName: string) {
 
-    var ul = document.getElementById("compList");
-    var li = document.createElement("li");
-    for (let comp of competitors) {
-        li.appendChild(document.createTextNode(comp.name));
-        ul.appendChild(li);
-    }
+    var resultDiv = document.getElementById("results");
+    var compTemplate = document.getElementById("competitorTemplate");
+    var compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
+    var span = compListItem.getElementsByClassName("competitor-name")[0];
+    span.appendChild(document.createTextNode(competitorName));
+    compListItem.style.display = "";
+    resultDiv.appendChild(compListItem);
 
 }
 
