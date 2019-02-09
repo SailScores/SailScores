@@ -45,39 +45,29 @@ function addNewCompetitor(competitorName: string) {
 
 function getCompetitors(clubId: string, fleetId: string) {
 
-    const countries = [
-        { value: 'Andorra', data: 'A' },
-        { value: 'Bali', data: 'B' },
-        { value: 'Cameroon', data: 'C' },
-        { value: 'Doritos', data: 'D' },
-    ];
     $.getJSON("/api/Competitors",
         {
             clubId: clubId,
             fleetId: fleetId
         },
-        function (data: any) {
-            alert(data);
-            $("#newCompetitor").data("options", data);
+        function (data: server.competitorDto[]) {
+            const competitorSuggestions: AutocompleteSuggestion[] = [];
+            data.forEach(c => competitorSuggestions.push(
+                {
+                    value: c.sailNumber + " - " + c.name,
+                    data: c.id
+                }));
             $('#newCompetitor').autocomplete({
-                lookup: countries,
+                lookup: competitorSuggestions,
                 onSelect: function (suggestion:any) {
-                    alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
-                }
+                    alert('You selected: ' + suggestion.value + ' -- ' + suggestion.data);
+                    addNewCompetitor(suggestion.value);
+                },
+                autoSelectFirst: true,
+                triggerSelectOnValidInput: false
             });
             
         });
-    //var xhr = new XMLHttpRequest();
-    //xhr.open('GET', '/api/Competitors?clubId=' + clubId + '&fleetId=' + fleetId);
-    //xhr.onload = function () {
-    //    if (xhr.status === 200) {
-    //        alert('User\'s name is ' + xhr.responseText);
-    //    }
-    //    else {
-    //        alert('Request failed.  Returned status of ' + xhr.status);
-    //    }
-    //};
-    //xhr.send();
 }
 
 const tbMessage: HTMLInputElement = document.querySelector("#tbMessage");

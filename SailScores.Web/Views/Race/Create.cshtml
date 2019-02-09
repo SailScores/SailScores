@@ -15,7 +15,7 @@
             <input type="hidden" id="clubId" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"> <em>Optional</em></label>
+                <label asp-for="Name" class="control-label">Name <em>Optional</em></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
@@ -92,8 +92,6 @@
     </ul>
 </div>
 
-
-
 <div>
     <a asp-controller="Admin"
        asp-action="Edit"
@@ -101,20 +99,22 @@
 </div>
 
 <hr />
-<ul>
-    @foreach (var comp in Model.CompetitorOptions)
-    {
-        <li>
-            @comp.Name
-            <ul>
-                @foreach (var fleet in comp.Fleets)
-                {
-                    <li>@fleet.Name</li>
-                }
-            </ul>
-        </li>
-    }
-</ul>
+<small>
+    <ul>
+        @foreach (var comp in Model.CompetitorOptions)
+        {
+            <li>
+                @comp.Name
+                <ul>
+                    @foreach (var fleet in comp.Fleets)
+                    {
+                        <li>@fleet.Name</li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+</small>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/raceEditor.build.js"></script>
