@@ -37,8 +37,21 @@ namespace SailScores.Core.Services
 
             if (fleetId.HasValue && fleetId != Guid.Empty)
             {
-                dbObjects = dbObjects
-                    .Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleetId));
+
+                var fleet = await _dbContext.Fleets
+                    .Include(f => f.FleetBoatClasses)
+                    .FirstOrDefaultAsync(f =>
+                       f.Id == fleetId
+                       && f.ClubId == clubId);
+                if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses)
+                {
+                    dbObjects = dbObjects
+                        .Where(d => fleet.FleetBoatClasses
+                            .Any(fbc => fbc.BoatClassId == d.BoatClassId));
+                } else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats) {
+                    dbObjects = dbObjects
+                        .Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleetId));
+                }
             }
 
             var list = await dbObjects.ToListAsync();

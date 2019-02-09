@@ -30,7 +30,6 @@
     <Folder Include="Areas\Api\Views\" />
     <Folder Include="Data\" />
     <Folder Include="wwwroot\lib\" />
-    <Folder Include="wwwroot\scripts\" />
   </ItemGroup>
 
   <ItemGroup>

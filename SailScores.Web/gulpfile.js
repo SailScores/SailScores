@@ -67,8 +67,9 @@ var deps = {
     "dragula": {
         "dist/**/*": ""
     },
-    // ...
-
+    "devbridge-autocomplete": {
+        "dist/**/*": ""
+    }
 };
 
 gulp.task("scripts", function () {
