@@ -4,10 +4,10 @@ import { Guid } from "./guid";
 
 let competitors:server.competitorDto[]
 
-export function addCompetitor() {
-    const compName = (document.getElementById("newCompetitor") as HTMLInputElement).value;
-    addNewCompetitor(compName);
-}
+//export function addCompetitor() {
+//    const compName = (document.getElementById("newCompetitor") as HTMLInputElement).value;
+//    addNewCompetitor(compName);
+//}
 
 //export function loadCompetitors() {
 //    getCompetitors();
@@ -30,19 +30,26 @@ export function loadFleet() {
     let fleetId = ($("#fleetId").val() as string);
     getCompetitors(clubId, fleetId);
 }
-
-function addNewCompetitor(competitorName: string) {
-
+var c: number = 0;
+function addNewCompetitor(competitor: server.competitorDto) {
     var resultDiv = document.getElementById("results");
     var compTemplate = document.getElementById("competitorTemplate");
     var compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
+    compListItem.id = competitor.id.toString();
+    compListItem.setAttribute("data-competitorId", competitor.id.toString());
     var span = compListItem.getElementsByClassName("competitor-name")[0];
-    span.appendChild(document.createTextNode(competitorName));
+    span.appendChild(document.createTextNode(competitor.name));
+    span = compListItem.getElementsByClassName("sail-number")[0];
+    span.appendChild(document.createTextNode(competitor.sailNumber));
+
+    span = compListItem.getElementsByClassName("race-place")[0];
+    span.appendChild(document.createTextNode(c.toString()));
     compListItem.style.display = "";
     resultDiv.appendChild(compListItem);
 
 }
 
+var competitorOptions: server.competitorDto[];
 function getCompetitors(clubId: string, fleetId: string) {
 
     $.getJSON("/api/Competitors",
@@ -51,17 +58,22 @@ function getCompetitors(clubId: string, fleetId: string) {
             fleetId: fleetId
         },
         function (data: server.competitorDto[]) {
+            competitorOptions = data;
             const competitorSuggestions: AutocompleteSuggestion[] = [];
             data.forEach(c => competitorSuggestions.push(
                 {
                     value: c.sailNumber + " - " + c.name,
-                    data: c.id
+                    data: c
                 }));
             $('#newCompetitor').autocomplete({
                 lookup: competitorSuggestions,
-                onSelect: function (suggestion:any) {
-                    alert('You selected: ' + suggestion.value + ' -- ' + suggestion.data);
-                    addNewCompetitor(suggestion.value);
+                onSelect: function (suggestion: AutocompleteSuggestion) {
+                    console.debug(suggestion);
+                    //let comp = getCompetitor(suggestion.data as string);
+                    //alert(comp.name);
+                    addNewCompetitor(suggestion.data as server.competitorDto);
+
+                    $('#newCompetitor').val("");
                 },
                 autoSelectFirst: true,
                 triggerSelectOnValidInput: false
@@ -69,23 +81,9 @@ function getCompetitors(clubId: string, fleetId: string) {
             
         });
 }
-
-const tbMessage: HTMLInputElement = document.querySelector("#tbMessage");
-const btnSend: HTMLButtonElement = document.querySelector("#btnSend");
-const username = new Date().getTime();
-
-//tbMessage.addEventListener("keyup", (e: KeyboardEvent) => {
-//    if (e.keyCode === 13) {
-//        send();
-//    }
-//});
-
-//btnSend.addEventListener("click", send);
-
-let c: number = 0;
-export function send() {
-
-    const divMessages: HTMLDivElement = document.querySelector("#message");
-    divMessages.innerText = (c++).toString();
+function getCompetitor(compId: string): server.competitorDto {
+    return competitorOptions.find(
+        (c: server.competitorDto) => c.id.ToString() === compId);
 }
+
 

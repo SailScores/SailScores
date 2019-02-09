@@ -10,12 +10,11 @@
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+    <form asp-action="Create">
             <input type="hidden" id="clubId" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label">Name <em>Optional</em></label>
+                <label asp-for="Name" class="control-label">Name <em>(Optional)</em></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
@@ -60,44 +59,42 @@
                 <span asp-validation-for="SeriesIds" class="text-danger"></span>
             </div>
 
+            <div>
+                Add result: <input id="newCompetitor" type="text" />
+                <input type="button" value="Add Competitor" class="btn btn-default" /><br />
+            </div>
+            <div class="container">
+                <ul class="list-group col-md-8 col-lg-8" id="results">
+                    <li class="list-group-item" data-competitorId="">
+                        <span class="badge badge-secondary badge-pill">1</span> <span>2144</span> <span>J. Fraser</span>
+                        <span class="fas fa-grip-lines float-right"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <span class="badge badge-secondary badge-pill">2</span> <span>2144</span> <span>J. Fraser</span>
+                        <span class="fas fa-grip-lines float-right"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <span class="badge badge-secondary badge-pill">3</span> <span>2144</span> <span>J. Fraser</span>
+                        <span class="fas fa-grip-lines float-right"></span>
+                    </li>
+                    <li class="list-group-item" id="competitorTemplate" style="display: none;">
+                        <span class="badge badge-secondary badge-pill race-place">4</span> <span class="sail-number"></span> <span class="competitor-name h5"></span>
+                        <span class="fas fa-arrows-alt-v float-right"></span>
+                    </li>
+                </ul>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
-        </form>
-    </div>
-</div>
 
-<div>
-    Competitor: <input id="newCompetitor" type="text" />
-    <input type="button" value="Add Competitor" onclick="window.SailScores.addCompetitor()" class="btn btn-default" /><br />
+            <div>
+                <a asp-controller="Admin"
+                   asp-action="Edit"
+                   asp-fragment="races">Back to List</a>
+            </div>
+    </form>
 </div>
-<div class="container">
-    <ul class="list-group col-md-4 col-lg-3" id="results">
-        <li class="list-group-item">
-            <span class="badge badge-secondary badge-pill">1</span> <span>2144</span> <span>J. Fraser</span>
-            <span class="fas fa-grip-lines float-right"></span>
-        </li>
-        <li class="list-group-item">
-            <span class="badge badge-secondary badge-pill">2</span> <span>2144</span> <span>J. Fraser</span>
-            <span class="fas fa-grip-lines float-right"></span>
-        </li>
-        <li class="list-group-item">
-            <span class="badge badge-secondary badge-pill">3</span> <span>2144</span> <span>J. Fraser</span>
-            <span class="fas fa-grip-lines float-right"></span>
-        </li>
-        <li class="list-group-item" id="competitorTemplate" style="display: none;">
-            <span class="badge badge-secondary badge-pill race-place">4</span> <span class="boat-number">2144</span> <span class="competitor-name h5"></span>
-            <span class="fas fa-arrows-alt-v float-right"></span>
-        </li>
-    </ul>
-</div>
-
-<div>
-    <a asp-controller="Admin"
-       asp-action="Edit"
-       asp-fragment="races">Back to List</a>
-</div>
-
 <hr />
 <small>
     <ul>
