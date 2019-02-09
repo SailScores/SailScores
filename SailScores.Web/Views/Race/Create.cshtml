@@ -5,50 +5,17 @@
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Create</h2>
-
-<h4>Race</h4>
-
-<script src="~/js/raceEditor.build.js"></script>
-<script src="~/vendor/dragula/dragula.js"></script>
-<link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
+<h4>Adding a new race</h4>
 
 
-<h2>Race Results</h2>
-<div>
-    Competitor: <input id="newCompetitor" />
-    <input type="button" value="Add Competitor" onclick="window.SailScores.addCompetitor()" class="btn btn-default" /><br />
-</div>
-<div class="container">
-    <ul class="list-group col-md-4 col-lg-3" id="results">
-        <li class="list-group-item">
-            <span class="badge badge-secondary badge-pill">1</span> <span>2144</span> <span>J. Fraser</span>
-            <span class="fas fa-grip-lines float-right"></span>
-        </li>
-        <li class="list-group-item">
-            <span class="badge badge-secondary badge-pill">2</span> <span>2144</span> <span>J. Fraser</span>
-            <span class="fas fa-grip-lines float-right"></span>
-        </li>
-        <li class="list-group-item">
-            <span class="badge badge-secondary badge-pill">3</span> <span>2144</span> <span>J. Fraser</span>
-            <span class="fas fa-grip-lines float-right"></span>
-        </li>
-        <li class="list-group-item" id="competitorTemplate" style="display: none;">
-            <span class="badge badge-secondary badge-pill race-place">4</span> <span class="boat-number">2144</span> <span class="competitor-name h5"></span>
-            <span class="fas fa-arrows-alt-v float-right"></span>
-        </li>
-    </ul>
-</div>
-
-
-<script>dragula([document.getElementById('results')]);</script>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
+            <input type="hidden" id="clubId" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label"> <em>Optional</em></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
@@ -69,7 +36,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="FleetId" class="control-label">Fleet</label>
-                <select asp-for="FleetId" class="form-control">
+                <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
                     <option selected="selected">Select a fleet...</option>
                     @foreach (var fleet in Model.FleetOptions)
                     {
@@ -101,29 +68,63 @@
 </div>
 
 <div>
+    Competitor: <input id="newCompetitor" type="text" />
+    <input type="button" value="Add Competitor" onclick="window.SailScores.addCompetitor()" class="btn btn-default" /><br />
+</div>
+<div class="container">
+    <ul class="list-group col-md-4 col-lg-3" id="results">
+        <li class="list-group-item">
+            <span class="badge badge-secondary badge-pill">1</span> <span>2144</span> <span>J. Fraser</span>
+            <span class="fas fa-grip-lines float-right"></span>
+        </li>
+        <li class="list-group-item">
+            <span class="badge badge-secondary badge-pill">2</span> <span>2144</span> <span>J. Fraser</span>
+            <span class="fas fa-grip-lines float-right"></span>
+        </li>
+        <li class="list-group-item">
+            <span class="badge badge-secondary badge-pill">3</span> <span>2144</span> <span>J. Fraser</span>
+            <span class="fas fa-grip-lines float-right"></span>
+        </li>
+        <li class="list-group-item" id="competitorTemplate" style="display: none;">
+            <span class="badge badge-secondary badge-pill race-place">4</span> <span class="boat-number">2144</span> <span class="competitor-name h5"></span>
+            <span class="fas fa-arrows-alt-v float-right"></span>
+        </li>
+    </ul>
+</div>
+
+
+
+<div>
     <a asp-controller="Admin"
        asp-action="Edit"
        asp-fragment="races">Back to List</a>
 </div>
 
-
-
-
 <hr />
 <ul>
     @foreach (var comp in Model.CompetitorOptions)
     {
-        <li>@comp.Name</li>
-        <ul>
-
-            @foreach (var fleet in comp.Fleets)
-            {
-                <li>@fleet.Name</li>
-            }
-        </ul>
+        <li>
+            @comp.Name
+            <ul>
+                @foreach (var fleet in comp.Fleets)
+                {
+                    <li>@fleet.Name</li>
+                }
+            </ul>
+        </li>
     }
 </ul>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/raceEditor.build.js"></script>
+    <script src="~/vendor/dragula/dragula.js"></script>
+    <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
+    <link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
+    <script>dragula([document.getElementById('results')]);</script>
+
+    <script>
+
+    </script>
+
 }

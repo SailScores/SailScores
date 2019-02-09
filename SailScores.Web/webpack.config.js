@@ -1,6 +1,7 @@
 ﻿var path = require('path');
 
 module.exports = {
+    devtool: "inline-source-map",
     entry: {
         raceEditor: './Scripts/raceEditor'
     },
@@ -15,7 +16,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 loader: 'ts-loader',
-                exclude: /node_modules/,
+                exclude: /node_modules/
             },
         ]
     },

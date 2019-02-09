@@ -17,7 +17,8 @@
     "files": [
       "./guid.ts",
       "./raceEditor.ts",
-      "./interfaces/CompetitorDto.cs.d.ts"
+      "./interfaces/CompetitorDto.cs.d.ts",
+      "./jquery.autocomplete.d.ts"
 
     ]
   }

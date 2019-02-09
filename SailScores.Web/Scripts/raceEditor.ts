@@ -1,4 +1,5 @@
-﻿import { server } from "./interfaces/CompetitorDto.cs";
+﻿/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
+import { server } from "./interfaces/CompetitorDto.cs";
 import { Guid } from "./guid";
 
 let competitors:server.competitorDto[]
@@ -24,6 +25,12 @@ export function addCompetitor() {
 //    displayCompetitors();
 //}
 
+export function loadFleet() {
+    let clubId = ($("#clubId").val() as string);
+    let fleetId = ($("#fleetId").val() as string);
+    getCompetitors(clubId, fleetId);
+}
+
 function addNewCompetitor(competitorName: string) {
 
     var resultDiv = document.getElementById("results");
@@ -36,18 +43,41 @@ function addNewCompetitor(competitorName: string) {
 
 }
 
-function getCompetitors() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/Competitors?clubId=c67674bc-a8b1-4d37-a401-cc06129b0db8&fleetId=4fc28039-5dea-4850-8899-3f80f07e6c4b');
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            alert('User\'s name is ' + xhr.responseText);
-        }
-        else {
-            alert('Request failed.  Returned status of ' + xhr.status);
-        }
-    };
-    xhr.send();
+function getCompetitors(clubId: string, fleetId: string) {
+
+    const countries = [
+        { value: 'Andorra', data: 'A' },
+        { value: 'Bali', data: 'B' },
+        { value: 'Cameroon', data: 'C' },
+        { value: 'Doritos', data: 'D' },
+    ];
+    $.getJSON("/api/Competitors",
+        {
+            clubId: clubId,
+            fleetId: fleetId
+        },
+        function (data: any) {
+            alert(data);
+            $("#newCompetitor").data("options", data);
+            $('#newCompetitor').autocomplete({
+                lookup: countries,
+                onSelect: function (suggestion:any) {
+                    alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+                }
+            });
+            
+        });
+    //var xhr = new XMLHttpRequest();
+    //xhr.open('GET', '/api/Competitors?clubId=' + clubId + '&fleetId=' + fleetId);
+    //xhr.onload = function () {
+    //    if (xhr.status === 200) {
+    //        alert('User\'s name is ' + xhr.responseText);
+    //    }
+    //    else {
+    //        alert('Request failed.  Returned status of ' + xhr.status);
+    //    }
+    //};
+    //xhr.send();
 }
 
 const tbMessage: HTMLInputElement = document.querySelector("#tbMessage");
