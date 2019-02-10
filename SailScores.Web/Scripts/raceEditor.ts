@@ -1,6 +1,7 @@
 ﻿/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
 import { server } from "./interfaces/CompetitorDto.cs";
 import { Guid } from "./guid";
+import * as dragula from "dragula";
 
 let competitors:server.competitorDto[]
 
@@ -25,6 +26,11 @@ let competitors:server.competitorDto[]
 //    displayCompetitors();
 //}
 
+dragula([document.getElementById('results')])
+    .on('drop', function () {
+        calculatePlaces();
+    });
+
 export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
     let fleetId = ($("#fleetId").val() as string);
@@ -39,14 +45,28 @@ function addNewCompetitor(competitor: server.competitorDto) {
     compListItem.setAttribute("data-competitorId", competitor.id.toString());
     var span = compListItem.getElementsByClassName("competitor-name")[0];
     span.appendChild(document.createTextNode(competitor.name));
+
     span = compListItem.getElementsByClassName("sail-number")[0];
     span.appendChild(document.createTextNode(competitor.sailNumber));
 
     span = compListItem.getElementsByClassName("race-place")[0];
     span.appendChild(document.createTextNode(c.toString()));
+
     compListItem.style.display = "";
     resultDiv.appendChild(compListItem);
+    calculatePlaces();
+}
 
+function calculatePlaces() {
+    var resultList = document.getElementById("results");
+    var resultItems = resultList.getElementsByTagName("li");
+
+    for (var i = 0, len = resultItems.length; i < len; i++) {
+        var span = resultItems[i].getElementsByClassName("race-place")[0];
+        if (span.id != "competitorTemplate") {
+            span.textContent = (i).toString();
+        }
+    }
 }
 
 var competitorOptions: server.competitorDto[];
@@ -80,10 +100,6 @@ function getCompetitors(clubId: string, fleetId: string) {
             });
             
         });
-}
-function getCompetitor(compId: string): server.competitorDto {
-    return competitorOptions.find(
-        (c: server.competitorDto) => c.id.ToString() === compId);
 }
 
 

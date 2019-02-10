@@ -64,21 +64,11 @@
                 <input type="button" value="Add Competitor" class="btn btn-default" /><br />
             </div>
             <div class="container">
-                <ul class="list-group col-md-8 col-lg-8" id="results">
-                    <li class="list-group-item" data-competitorId="">
-                        <span class="badge badge-secondary badge-pill">1</span> <span>2144</span> <span>J. Fraser</span>
-                        <span class="fas fa-grip-lines float-right"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="badge badge-secondary badge-pill">2</span> <span>2144</span> <span>J. Fraser</span>
-                        <span class="fas fa-grip-lines float-right"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="badge badge-secondary badge-pill">3</span> <span>2144</span> <span>J. Fraser</span>
-                        <span class="fas fa-grip-lines float-right"></span>
-                    </li>
+                <ul class="list-group col-12" id="results">
                     <li class="list-group-item" id="competitorTemplate" style="display: none;">
-                        <span class="badge badge-secondary badge-pill race-place">4</span> <span class="sail-number"></span> <span class="competitor-name h5"></span>
+                        <span class="badge badge-secondary badge-pill race-place"></span>
+                        <span class="sail-number"></span>
+                        <span class="competitor-name h5"></span>
                         <span class="fas fa-arrows-alt-v float-right"></span>
                     </li>
                 </ul>
@@ -118,7 +108,6 @@
     <script src="~/vendor/dragula/dragula.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
     <link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
-    <script>dragula([document.getElementById('results')]);</script>
 
     <script>
 
