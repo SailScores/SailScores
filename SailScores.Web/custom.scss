@@ -19,3 +19,13 @@ body {
 #results li {
     touch-action: none;
 }
+
+.autocomplete-suggestion {
+    background: #ffffff;
+    z-index: 2;
+}
+
+.autocomplete-selected {
+    background: #fbef97;
+    z-index: 2;
+}

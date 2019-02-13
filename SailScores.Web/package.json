@@ -22,7 +22,7 @@
     "jquery": "~3.3.1",
     "popper.js": "1.14.7",
     "dragula": "3.7.2",
-    "devbridge-autocomplete": "1.4.9"
+    "devbridge-autocomplete": "1.4.10"
   },
   "scripts": {
     "build": "webpack"

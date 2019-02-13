@@ -5,31 +5,18 @@ import * as dragula from "dragula";
 
 let competitors:server.competitorDto[]
 
-//export function addCompetitor() {
-//    const compName = (document.getElementById("newCompetitor") as HTMLInputElement).value;
-//    addNewCompetitor(compName);
-//}
-
-//export function loadCompetitors() {
-//    getCompetitors();
-//    competitors = [{
-//        id: Guid.MakeNew(),
-//        clubId: Guid.MakeNew(),
-//        name: "j fraser",
-//        sailNumber: "2144",
-//        boatName: "hmm",
-//        boatClassId: Guid.MakeNew(),
-//        fleetIds: [],
-//        scoreIds: []
-
-//    }];
-//    displayCompetitors();
-//}
-
 dragula([document.getElementById('results')])
     .on('drop', function () {
         calculatePlaces();
     });
+
+function checkEnter(e: KeyboardEvent) {
+    const ev = e || event;
+    var txtArea = /textarea/i.test((ev.srcElement).tagName);
+    return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
+}
+
+document.querySelector('form').onkeypress = checkEnter;
 
 export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
@@ -69,7 +56,38 @@ function calculatePlaces() {
     }
 }
 
-var competitorOptions: server.competitorDto[];
+function competitorIsInResults(comp: server.competitorDto) {
+    var resultList = document.getElementById("results");
+    var resultItems = resultList.getElementsByTagName("li");
+    for (var i = 0, len = resultItems.length; i < len; i++) {
+        if (resultItems[i].getAttribute("data-competitorId")
+            === comp.id.toString()) {
+
+            console.debug("found " + comp.name);
+            return true;
+        }
+    }
+
+    console.debug("Didn't find " + comp.name);
+    return false;
+}
+
+function getSuggestions(): AutocompleteSuggestion[] {
+    const competitorSuggestions: AutocompleteSuggestion[] = [];
+    console.debug("checking for comps in results");
+    allCompetitors.forEach(c => {
+        if (!competitorIsInResults(c)) {
+            competitorSuggestions.push(
+                {
+                    value: c.sailNumber + " - " + c.name,
+                    data: c
+                });
+        }
+    });
+    return competitorSuggestions;
+}
+var allCompetitors: server.competitorDto[];
+var competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
 
     $.getJSON("/api/Competitors",
@@ -78,28 +96,33 @@ function getCompetitors(clubId: string, fleetId: string) {
             fleetId: fleetId
         },
         function (data: server.competitorDto[]) {
-            competitorOptions = data;
-            const competitorSuggestions: AutocompleteSuggestion[] = [];
-            data.forEach(c => competitorSuggestions.push(
-                {
-                    value: c.sailNumber + " - " + c.name,
-                    data: c
-                }));
-            $('#newCompetitor').autocomplete({
-                lookup: competitorSuggestions,
-                onSelect: function (suggestion: AutocompleteSuggestion) {
-                    console.debug(suggestion);
-                    //let comp = getCompetitor(suggestion.data as string);
-                    //alert(comp.name);
-                    addNewCompetitor(suggestion.data as server.competitorDto);
-
-                    $('#newCompetitor').val("");
-                },
-                autoSelectFirst: true,
-                triggerSelectOnValidInput: false
-            });
-            
+            allCompetitors = data;
+            initializeAutoComplete();
         });
 }
+var autoCompleteSetup: boolean = false;
+function initializeAutoComplete() {
+    competitorSuggestions = getSuggestions();
+    if (autoCompleteSetup) {
+        $('#newCompetitor').autocomplete().dispose();
+    }
+    $('#newCompetitor').autocomplete({
 
+        lookup: competitorSuggestions,
+        onSelect: function (suggestion: AutocompleteSuggestion) {
+            console.debug(suggestion);
+            //let comp = getCompetitor(suggestion.data as string);
+            //alert(comp.name);
+            addNewCompetitor(suggestion.data as server.competitorDto);
+
+            $('#newCompetitor').val("");
+            initializeAutoComplete();
+        },
+        autoSelectFirst: true,
+        triggerSelectOnValidInput: false,
+        noCache: true
+    });
+    autoCompleteSetup = true;
+
+}
 
