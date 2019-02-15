@@ -17,6 +17,14 @@ function checkEnter(e: KeyboardEvent) {
 }
 
 document.querySelector('form').onkeypress = checkEnter;
+$("#raceform").submit(function (e) {
+    e.preventDefault();
+    var form = this as HTMLFormElement;
+    alert("Submitting form in script");
+    addScoresFieldsToForm(form);
+    form.submit();
+    removeScoresFieldsFromForm(form);
+});
 
 export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
@@ -44,12 +52,43 @@ function addNewCompetitor(competitor: server.competitorDto) {
     calculatePlaces();
 }
 
+function addScoresFieldsToForm(form: HTMLFormElement) {
+    var resultList = document.getElementById("results");
+    var resultItems = resultList.getElementsByTagName("li");
+
+    for (var i = 1; i < resultItems.length; i++) {
+        const listIndex = (i - 1).toString();
+        var input = document.createElement("input");
+        input.type = "text";
+        input.name = "Scores\[" + listIndex + "\].competitorId";
+        input.value = resultItems[i].getAttribute("data-competitorId");
+        form.appendChild(input);
+
+        input = document.createElement("input");
+        input.type = "text";
+        input.name = "Scores\[" + listIndex + "\].place";
+        input.value = resultItems[i].getAttribute("data-place");;
+        form.appendChild(input);
+
+        input = document.createElement("input");
+        input.type = "text";
+        input.name = "Scores\[" + listIndex + "\].code";
+        input.value = null;
+        form.appendChild(input);
+
+    }
+}
+
+function removeScoresFieldsFromForm(form: HTMLFormElement) {
+    form.find("[name^=Scores]").remove();
+}
 function calculatePlaces() {
     var resultList = document.getElementById("results");
     var resultItems = resultList.getElementsByTagName("li");
 
     for (var i = 0, len = resultItems.length; i < len; i++) {
         var span = resultItems[i].getElementsByClassName("race-place")[0];
+        resultItems[i].setAttribute("data-place", i.toString());
         if (span.id != "competitorTemplate") {
             span.textContent = (i).toString();
         }
@@ -62,13 +101,9 @@ function competitorIsInResults(comp: server.competitorDto) {
     for (var i = 0, len = resultItems.length; i < len; i++) {
         if (resultItems[i].getAttribute("data-competitorId")
             === comp.id.toString()) {
-
-            console.debug("found " + comp.name);
             return true;
         }
     }
-
-    console.debug("Didn't find " + comp.name);
     return false;
 }
 
@@ -100,6 +135,7 @@ function getCompetitors(clubId: string, fleetId: string) {
             initializeAutoComplete();
         });
 }
+
 var autoCompleteSetup: boolean = false;
 function initializeAutoComplete() {
     competitorSuggestions = getSuggestions();
@@ -110,9 +146,6 @@ function initializeAutoComplete() {
 
         lookup: competitorSuggestions,
         onSelect: function (suggestion: AutocompleteSuggestion) {
-            console.debug(suggestion);
-            //let comp = getCompetitor(suggestion.data as string);
-            //alert(comp.name);
             addNewCompetitor(suggestion.data as server.competitorDto);
 
             $('#newCompetitor').val("");

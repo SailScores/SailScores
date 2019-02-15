@@ -17,7 +17,7 @@ namespace SailScores.Web.Models.SailScores
                 return this.BoatClasses?.Select(c => c.Id);
             }
             set {
-                //todo: updagte this.BoatClasses
+                //todo: update this.BoatClasses
             }
 
         }
