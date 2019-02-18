@@ -1,9 +1,12 @@
 ﻿/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
-import { server } from "./interfaces/CompetitorDto.cs";
+import { competitorDto, scoreCodeDto } from "./interfaces/server";
+
 import { Guid } from "./guid";
 import * as dragula from "dragula";
 
-let competitors:server.competitorDto[]
+let competitors: competitorDto[];
+declare var scoreCodes: scoreCodeDto[];
+const noCodeString = "No Code";
 
 dragula([document.getElementById('results')])
     .on('drop', function () {
@@ -20,7 +23,6 @@ document.querySelector('form').onkeypress = checkEnter;
 $("#raceform").submit(function (e) {
     e.preventDefault();
     var form = this as HTMLFormElement;
-    alert("Submitting form in script");
     addScoresFieldsToForm(form);
     form.submit();
     removeScoresFieldsFromForm(form);
@@ -32,7 +34,7 @@ export function loadFleet() {
     getCompetitors(clubId, fleetId);
 }
 var c: number = 0;
-function addNewCompetitor(competitor: server.competitorDto) {
+function addNewCompetitor(competitor: competitorDto) {
     var resultDiv = document.getElementById("results");
     var compTemplate = document.getElementById("competitorTemplate");
     var compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
@@ -59,21 +61,24 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
     for (var i = 1; i < resultItems.length; i++) {
         const listIndex = (i - 1).toString();
         var input = document.createElement("input");
-        input.type = "text";
+        input.type = "hidden";
         input.name = "Scores\[" + listIndex + "\].competitorId";
         input.value = resultItems[i].getAttribute("data-competitorId");
         form.appendChild(input);
 
         input = document.createElement("input");
-        input.type = "text";
+        input.type = "hidden";
         input.name = "Scores\[" + listIndex + "\].place";
-        input.value = resultItems[i].getAttribute("data-place");;
+        if (shouldCompKeepScore(resultItems[i])) {
+            input.value = resultItems[i].getAttribute("data-place");
+        } else {
+        }
         form.appendChild(input);
 
         input = document.createElement("input");
-        input.type = "text";
+        input.type = "hidden";
         input.name = "Scores\[" + listIndex + "\].code";
-        input.value = null;
+        input.value = getCompetitorCode(resultItems[i]);
         form.appendChild(input);
 
     }
@@ -85,17 +90,21 @@ function removeScoresFieldsFromForm(form: HTMLFormElement) {
 function calculatePlaces() {
     var resultList = document.getElementById("results");
     var resultItems = resultList.getElementsByTagName("li");
-
-    for (var i = 0, len = resultItems.length; i < len; i++) {
+    var scoreCount = 1;
+    for (var i = 1, len = resultItems.length; i < len; i++) {
         var span = resultItems[i].getElementsByClassName("race-place")[0];
         resultItems[i].setAttribute("data-place", i.toString());
         if (span.id != "competitorTemplate") {
-            span.textContent = (i).toString();
+            if (shouldCompKeepScore(resultItems[i])) {
+                span.textContent = (scoreCount++).toString();
+            } else {
+                span.textContent = getCompetitorCode(resultItems[i]);
+            }
         }
     }
 }
 
-function competitorIsInResults(comp: server.competitorDto) {
+function competitorIsInResults(comp: competitorDto) {
     var resultList = document.getElementById("results");
     var resultItems = resultList.getElementsByTagName("li");
     for (var i = 0, len = resultItems.length; i < len; i++) {
@@ -121,7 +130,8 @@ function getSuggestions(): AutocompleteSuggestion[] {
     });
     return competitorSuggestions;
 }
-var allCompetitors: server.competitorDto[];
+
+var allCompetitors: competitorDto[];
 var competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
 
@@ -130,7 +140,7 @@ function getCompetitors(clubId: string, fleetId: string) {
             clubId: clubId,
             fleetId: fleetId
         },
-        function (data: server.competitorDto[]) {
+        function (data: competitorDto[]) {
             allCompetitors = data;
             initializeAutoComplete();
         });
@@ -146,7 +156,7 @@ function initializeAutoComplete() {
 
         lookup: competitorSuggestions,
         onSelect: function (suggestion: AutocompleteSuggestion) {
-            addNewCompetitor(suggestion.data as server.competitorDto);
+            addNewCompetitor(suggestion.data as competitorDto);
 
             $('#newCompetitor').val("");
             initializeAutoComplete();
@@ -156,6 +166,24 @@ function initializeAutoComplete() {
         noCache: true
     });
     autoCompleteSetup = true;
+}
 
+function getCompetitorCode(compListItem: HTMLLIElement) {
+    const codeText = (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement).value;
+    if (codeText === noCodeString) {
+        return null;
+    }
+    return codeText;
+}
+
+function shouldCompKeepScore(compListItem: HTMLLIElement): boolean {
+    const codeText =
+        (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement)
+        .value;
+    if (codeText === noCodeString) {
+        return true;
+    }
+    const fullCodeObj = scoreCodes.filter(s => s.text === codeText);
+    return !!(fullCodeObj[0].countAsCompetitor);
 }
 

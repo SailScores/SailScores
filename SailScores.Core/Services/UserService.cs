@@ -29,6 +29,10 @@ namespace SailScores.Core.Services
 
         public async Task<bool> IsUserAllowedToEdit(string email, Guid? clubId)
         {
+            if(String.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
             var userMatches = _dbContext.UserPermissions
                 .Where(u => u.UserEmail.ToUpperInvariant()
                 == email.ToUpperInvariant());

@@ -28,6 +28,9 @@
     "build": "webpack"
   },
   "-vs-binding": {
+    "BeforeBuild": [
+      "build"
+    ],
     "AfterBuild": [
       "build"
     ]

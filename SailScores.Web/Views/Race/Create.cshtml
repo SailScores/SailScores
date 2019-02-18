@@ -11,78 +11,85 @@
 <hr />
 <div class="row">
     <form id="raceform" asp-action="Create">
-            <input type="hidden" id="clubId" asp-for="ClubId" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label">Name <em>(Optional)</em></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Order" class="control-label"></label>
-                <input asp-for="Order" class="form-control" />
-                <span asp-validation-for="Order" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FleetId" class="control-label">Fleet</label>
-                <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
-                    <option selected="selected">Select a fleet...</option>
-                    @foreach (var fleet in Model.FleetOptions)
-                    {
-                        <option value="@fleet.Id">
-                            @fleet.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="FleetId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SeriesIds" class="control-label">Series</label>
-                <select asp-for="SeriesIds" class="form-control" multiple>
-                    @foreach (var series in Model.SeriesOptions)
-                    {
-                        <option value="@series.Id">
-                            @series.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="SeriesIds" class="text-danger"></span>
-            </div>
+        <input type="hidden" id="clubId" asp-for="ClubId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label">Name<em>&ensp;Optional</em></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Date" class="control-label"></label>
+            <input asp-for="Date" class="form-control" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
+            <input asp-for="Order" class="form-control" />
+            <span asp-validation-for="Order" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description" class="control-label">Description<em>&ensp;Optional</em></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
+            <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
+                <option selected="selected">Select a fleet...</option>
+                @foreach (var fleet in Model.FleetOptions)
+                {
+                    <option value="@fleet.Id">
+                        @fleet.Name
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="FleetId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SeriesIds" class="control-label">Series</label>
+            <select asp-for="SeriesIds" class="form-control" multiple>
+                @foreach (var series in Model.SeriesOptions)
+                {
+                    <option value="@series.Id">
+                        @series.Name
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="SeriesIds" class="text-danger"></span>
+        </div>
 
-            <div>
-                Add result: <input id="newCompetitor" type="text" />
-                <input type="button" value="Add Competitor" class="btn btn-default" /><br />
-            </div>
-            <div class="container">
-                <ul class="list-group col-12" id="results">
-                    <li class="list-group-item" id="competitorTemplate" style="display: none;">
-                        <span class="badge badge-secondary badge-pill race-place"></span>
-                        <span class="sail-number"></span>
-                        <span class="competitor-name h5"></span>
-                        <span class="fas fa-arrows-alt-v float-right"></span>
-                    </li>
-                </ul>
-            </div>
+        <div>
+            Add result: <input id="newCompetitor" type="text" />
+            <input type="button" value="Add Competitor" class="btn btn-default" /><br />
+        </div>
+        <div class="container">
+            <ul class="list-group col-12" id="results">
+                <li class="list-group-item" id="competitorTemplate" style="display: none;">
+                    <span class="badge badge-secondary badge-pill race-place"></span>
+                    <span class="sail-number"></span>
+                    <span class="competitor-name h5"></span>
+                    <div class="float-right pl-3"><span class="fas fa-arrows-alt-v"></span></div>
+                    <select class="float-right select-code">
+                        <option>No Code</option>
+                        @foreach (var code in Model.ScoreCodeOptions)
+                        {
+                            <option>@code.Text</option>
+                        }
+                    </select>
+                </li>
+            </ul>
+        </div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-default" />
+        </div>
 
-            <div>
-                <a asp-controller="Admin"
-                   asp-action="Edit"
-                   asp-fragment="races">Back to List</a>
-            </div>
+        <div>
+            <a asp-controller="Admin"
+               asp-action="Edit"
+               asp-fragment="races">Back to List</a>
+        </div>
     </form>
 </div>
 <hr />
@@ -109,8 +116,10 @@
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
     <link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
 
-    <script>
 
+    <script>
+        
+    var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
     </script>
 
 }

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <None Remove="Scripts\guid.ts" />
+    <None Remove="Scripts\interfaces\server.ts" />
     <None Remove="Scripts\raceEditor.ts" />
   </ItemGroup>
 
@@ -40,6 +41,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\guid.ts" />
+    <TypeScriptCompile Include="Scripts\interfaces\server.ts" />
     <TypeScriptCompile Include="Scripts\raceEditor.ts" />
   </ItemGroup>
 
