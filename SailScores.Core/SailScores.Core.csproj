@@ -24,4 +24,19 @@
     <Folder Include="Scoring\Dto\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Model\ScoreCode.cs">
+      <Generator>DtsGenerator</Generator>
+      <LastGenOutput>ScoreCode.cs.d.ts</LastGenOutput>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Model\ScoreCode.cs.d.ts">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ScoreCode.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -3,10 +3,17 @@ import { Guid } from "../guid";
 export interface scoreCodeDto {
     id: Guid;
     clubId: Guid;
-	text: string;
+	name: string;
 	description: string;
-	countAsCompetitor?: boolean;
+	formula: string;
+	formulaValue?: number;
+	scoreLike: string;
 	discardable?: boolean;
-	useAverageResult?: boolean;
-	competitorCountPlus?: number;
+	cameToStart?: boolean;
+	started?: boolean;
+	finished?: boolean;
+	preserveResult?: boolean;
+	/** Should scoring of other following competitors use this as a finisher ahead? */
+	adjustOtherScores?: boolean;
 }
+

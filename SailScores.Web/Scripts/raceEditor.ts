@@ -183,7 +183,7 @@ function shouldCompKeepScore(compListItem: HTMLLIElement): boolean {
     if (codeText === noCodeString) {
         return true;
     }
-    const fullCodeObj = scoreCodes.filter(s => s.text === codeText);
-    return !!(fullCodeObj[0].countAsCompetitor);
+    const fullCodeObj = scoreCodes.filter(s => s.name === codeText);
+    return !!(fullCodeObj[0].preserveResult);
 }
 

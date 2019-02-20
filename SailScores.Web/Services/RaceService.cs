@@ -51,7 +51,7 @@ namespace SailScores.Web.Services
             model.Club = club;
             model.FleetOptions = club.Fleets;
             model.SeriesOptions = club.Series;
-            model.ScoreCodeOptions = club.ScoreCodes.OrderBy(s => s.Text).ToList();
+            model.ScoreCodeOptions = club.ScoreCodes.OrderBy(s => s.Name).ToList();
             model.CompetitorOptions = club.Competitors;
             model.Date = DateTime.Today;
             model.Order = 1;

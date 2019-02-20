@@ -70,11 +70,11 @@
                     <span class="sail-number"></span>
                     <span class="competitor-name h5"></span>
                     <div class="float-right pl-3"><span class="fas fa-arrows-alt-v"></span></div>
-                    <select class="float-right select-code">
+                    <select class="float-right select-code" onchange="calculatePlaces()">
                         <option>No Code</option>
                         @foreach (var code in Model.ScoreCodeOptions)
                         {
-                            <option>@code.Text</option>
+                            <option>@code.Name</option>
                         }
                     </select>
                 </li>

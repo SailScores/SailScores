@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20190220004607_ScoreCodeChanges")]
+    partial class ScoreCodeChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,34 +221,21 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool?>("AdjustOtherScores");
-
-                    b.Property<bool?>("CameToStart");
-
                     b.Property<Guid>("ClubId");
+
+                    b.Property<int?>("CompetitorCountPlus");
+
+                    b.Property<bool?>("CountAsCompetitor");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000);
 
                     b.Property<bool?>("Discardable");
 
-                    b.Property<bool?>("Finished");
-
-                    b.Property<string>("Formula")
-                        .HasMaxLength(100);
-
-                    b.Property<int?>("FormulaValue");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("Text")
                         .HasMaxLength(20);
 
-                    b.Property<bool?>("PreserveResult");
-
-                    b.Property<string>("ScoreLike");
-
-                    b.Property<Guid?>("ScoringSystemId");
-
-                    b.Property<bool?>("Started");
+                    b.Property<bool?>("UseAverageResult");
 
                     b.HasKey("Id");
 

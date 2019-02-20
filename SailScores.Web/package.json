@@ -27,12 +27,5 @@
   "scripts": {
     "build": "webpack"
   },
-  "-vs-binding": {
-    "BeforeBuild": [
-      "build"
-    ],
-    "AfterBuild": [
-      "build"
-    ]
-  }
+  "-vs-binding":{"BeforeBuild":["build"]}
 }
