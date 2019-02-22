@@ -65,10 +65,12 @@ namespace SailScores.Core.Services
         public async Task<Model.Club> GetFullClub(string id)
         {
             Guid potentialClubId;
+            if(!Guid.TryParse(id, out potentialClubId))
+            {
+                potentialClubId = (await _dbContext.Clubs.SingleAsync(c => c.Initials == id)).Id;
+            }
             IQueryable<Db.Club> clubQuery =
-                Guid.TryParse(id, out potentialClubId) ?
-                _dbContext.Clubs.Where(c => c.Id == potentialClubId) :
-                _dbContext.Clubs.Where(c => c.Initials == id);
+                _dbContext.Clubs.Where(c => c.Id == potentialClubId);
 
             var club = await clubQuery
                 .Include(c => c.Races)
