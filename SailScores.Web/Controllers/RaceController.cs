@@ -95,6 +95,7 @@ namespace SailScores.Web.Controllers
             }
             var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
+            await _raceService.AddOptionsToRace(raceWithOptions);
             return View(raceWithOptions);
         }
 
@@ -119,7 +120,6 @@ namespace SailScores.Web.Controllers
         }
 
         [HttpGet]
-        // GET: Competitor/Delete/5
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
             var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
@@ -135,7 +135,6 @@ namespace SailScores.Web.Controllers
             return View(race);
         }
 
-        // POST: Competitor/Delete/5
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -145,7 +144,7 @@ namespace SailScores.Web.Controllers
             {
                 var club = await _clubService.GetFullClub(clubInitials);
                 if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.Competitors.Any(c => c.Id == id))
+                    || !club.Races.Any(c => c.Id == id))
                 {
                     return Unauthorized();
                 }

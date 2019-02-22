@@ -18,15 +18,18 @@ function checkEnter(e: KeyboardEvent) {
     var txtArea = /textarea/i.test((ev.srcElement).tagName);
     return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
 }
-
-document.querySelector('form').onkeypress = checkEnter;
-$("#raceform").submit(function (e) {
-    e.preventDefault();
-    var form = this as HTMLFormElement;
-    addScoresFieldsToForm(form);
-    form.submit();
-    removeScoresFieldsFromForm(form);
-});
+export function init() {
+    document.querySelector('form').onkeypress = checkEnter;
+    $("#raceform").submit(function (e) {
+        e.preventDefault();
+        var form = this as HTMLFormElement;
+        addScoresFieldsToForm(form);
+        form.submit();
+        removeScoresFieldsFromForm(form);
+    });
+    loadFleet();
+    calculatePlaces();
+}
 
 export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
@@ -87,7 +90,7 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
 function removeScoresFieldsFromForm(form: HTMLFormElement) {
     form.find("[name^=Scores]").remove();
 }
-function calculatePlaces() {
+export function calculatePlaces() {
     var resultList = document.getElementById("results");
     var resultItems = resultList.getElementsByTagName("li");
     var scoreCount = 1;
@@ -134,16 +137,17 @@ function getSuggestions(): AutocompleteSuggestion[] {
 var allCompetitors: competitorDto[];
 var competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
-
-    $.getJSON("/api/Competitors",
-        {
-            clubId: clubId,
-            fleetId: fleetId
-        },
-        function (data: competitorDto[]) {
-            allCompetitors = data;
-            initializeAutoComplete();
-        });
+    if (clubId && fleetId) {
+        $.getJSON("/api/Competitors",
+            {
+                clubId: clubId,
+                fleetId: fleetId
+            },
+            function (data: competitorDto[]) {
+                allCompetitors = data;
+                initializeAutoComplete();
+            });
+    }
 }
 
 var autoCompleteSetup: boolean = false;

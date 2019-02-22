@@ -58,6 +58,15 @@ namespace SailScores.Web.Services
             return model;
 
         }
+        
+        public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions)
+        {
+            var club = await _coreClubService.GetFullClub(raceWithOptions.ClubId);
+            raceWithOptions.FleetOptions = club.Fleets;
+            raceWithOptions.SeriesOptions = club.Series;
+            raceWithOptions.ScoreCodeOptions = club.ScoreCodes.OrderBy(s => s.Name).ToList();
+            raceWithOptions.CompetitorOptions = club.Competitors;
+        }
 
         public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
         {

@@ -20,6 +20,7 @@
   "dependencies": {
     "bootstrap": "4.2.1",
     "jquery": "~3.3.1",
+    "jquery-validate": "2.0.0",
     "popper.js": "1.14.7",
     "dragula": "3.7.2",
     "devbridge-autocomplete": "1.4.10"
@@ -27,5 +28,9 @@
   "scripts": {
     "build": "webpack"
   },
-  "-vs-binding":{"BeforeBuild":["build"]}
+  "-vs-binding": {
+    "BeforeBuild": [
+      "build"
+    ]
+  }
 }

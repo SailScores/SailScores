@@ -58,6 +58,9 @@ var deps = {
     "jquery": {
         "dist/*": ""
     },
+    "jquery-validate": {
+        "dist/*": ""
+    },
     "popper.js": {
         "dist/**/*": ""
     },
