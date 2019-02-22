@@ -49,6 +49,18 @@
                 </select>
                 <span asp-validation-for="BoatClassIds" class="text-danger"></span>
             </div>
+            <div id="boatSelectGroup" class="form-group">
+                <label asp-for="CompetitorIds" class="control-label">Competitors</label>
+                <select multiple asp-for="CompetitorIds" class="form-control">
+                    @foreach (var competitor in Model.CompetitorOptions)
+                    {
+                        <option value="@competitor.Id">
+                            @competitor.SailNumber - @competitor.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="CompetitorIds" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
@@ -60,12 +72,14 @@
         var f = document.getElementById('fleetType');
         var fType = f.options[f.selectedIndex].text;
         if (fType.indexOf('Class') > -1) {
-            console.log("Showing");
-
             document.getElementById('classSelectGroup').style.display = 'block';
         } else {
-            console.log("hiding");
             document.getElementById('classSelectGroup').style.display = 'none';
+        }
+        if (fType.indexOf('Selected Boats') > -1) {
+            document.getElementById('boatSelectGroup').style.display = 'block';
+        } else {
+            document.getElementById('boatSelectGroup').style.display = 'none';
         }
     };
     checkVisibility();

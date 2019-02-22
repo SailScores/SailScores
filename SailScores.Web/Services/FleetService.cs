@@ -68,7 +68,7 @@ namespace SailScores.Web.Services
             await _coreFleetService.SaveNew(coreModel);
         }
 
-        public async Task Update(FleetCreateViewModel fleet)
+        public async Task Update(FleetWithOptionsViewModel fleet)
         {
             var coreModel = _mapper.Map<Fleet>(fleet);
             var club = await _coreClubService.GetFullClub(fleet.ClubId);
@@ -78,6 +78,14 @@ namespace SailScores.Web.Services
                 coreModel.BoatClasses =
                     club.BoatClasses
                     .Where(c => fleet.BoatClassIds.Contains(c.Id))
+                    .ToList();
+            }
+            else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats
+                    && fleet.CompetitorIds != null)
+            {
+                coreModel.Competitors =
+                    club.Competitors
+                    .Where(c => fleet.CompetitorIds.Contains(c.Id))
                     .ToList();
             }
             await _coreFleetService.Update(coreModel);

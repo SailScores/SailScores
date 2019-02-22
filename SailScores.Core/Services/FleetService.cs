@@ -67,16 +67,26 @@ namespace SailScores.Core.Services
         {
             var existingFleet = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
+                .Include(f => f.CompetitorFleets)
                 .SingleAsync(c => c.Id == fleet.Id);
 
             existingFleet.Name = fleet.Name;
             existingFleet.Description = fleet.Description;
             existingFleet.FleetType = fleet.FleetType;
 
+            CleanUpClasses(fleet, existingFleet);
+            CleanUpCompetitors(fleet, existingFleet);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private static void CleanUpClasses(Fleet fleet, Db.Fleet existingFleet)
+        {
             var classesToRemove = existingFleet.FleetBoatClasses.ToList();
 
             if (existingFleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
-                && fleet.BoatClasses != null) {
+                && fleet.BoatClasses != null)
+            {
                 classesToRemove =
                 existingFleet.FleetBoatClasses
                 .Where(f => !(fleet.BoatClasses.Any(c => c.Id == f.BoatClassId)))
@@ -88,7 +98,7 @@ namespace SailScores.Core.Services
                 .Where(c =>
                     !(existingFleet.FleetBoatClasses.Any(f => c.Id == f.BoatClassId)))
                     .Select(c => new Db.FleetBoatClass { BoatClassId = c.Id, FleetId = existingFleet.Id })
-                :new List<Db.FleetBoatClass>();
+                : new List<Db.FleetBoatClass>();
 
             foreach (var removingClass in classesToRemove)
             {
@@ -98,8 +108,37 @@ namespace SailScores.Core.Services
             {
                 existingFleet.FleetBoatClasses.Add(addClass);
             }
+        }
 
-            await _dbContext.SaveChangesAsync();
+        private static void CleanUpCompetitors(Fleet fleet, Db.Fleet existingFleet)
+        {
+            var competitorsToRemove = existingFleet.CompetitorFleets.ToList();
+            var competitorsToAdd =
+                fleet.Competitors != null ?
+                fleet.Competitors
+                .Where(c =>
+                    !(existingFleet.CompetitorFleets.Any(f => c.Id == f.CompetitorId)))
+                    .Select(c => new Db.CompetitorFleet { CompetitorId = c.Id, FleetId = existingFleet.Id })
+                : new List<Db.CompetitorFleet>();
+
+            if (existingFleet.FleetType == Api.Enumerations.FleetType.SelectedBoats
+                && fleet.Competitors != null)
+            {
+                competitorsToRemove =
+                existingFleet.CompetitorFleets
+                .Where(c => !(fleet.Competitors.Any(cp => cp.Id == c.CompetitorId)))
+                .ToList();
+            }
+
+
+            foreach (var removingCompetitor in competitorsToRemove)
+            {
+                existingFleet.CompetitorFleets.Remove(removingCompetitor);
+            }
+            foreach (var addCompetitor in competitorsToAdd)
+            {
+                existingFleet.CompetitorFleets.Add(addCompetitor);
+            }
         }
 
         public async Task<Fleet> Get(Guid fleetId)

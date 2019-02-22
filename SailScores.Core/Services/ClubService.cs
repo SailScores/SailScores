@@ -82,6 +82,9 @@ namespace SailScores.Core.Services
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
                 .Include(c => c.Fleets)
+                    .ThenInclude(f => f.CompetitorFleets)
+                .Include(c => c.Fleets)
+                    .ThenInclude(f => f.FleetBoatClasses)
                     .FirstOrDefaultAsync();
 
             return _mapper.Map<Model.Club>(club);

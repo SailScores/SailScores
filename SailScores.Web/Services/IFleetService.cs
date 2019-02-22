@@ -13,6 +13,6 @@ namespace SailScores.Web.Services
         Task<Fleet> GetFleet(Guid fleetId);
         Task SaveNew(FleetCreateViewModel fleet);
         Task Delete(Guid fleetId);
-        Task Update(FleetCreateViewModel fleet);
+        Task Update(FleetWithOptionsViewModel fleet);
     }
 }

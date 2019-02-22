@@ -10,16 +10,9 @@ namespace SailScores.Web.Models.SailScores
     public class FleetWithOptionsViewModel : Core.Model.Fleet
     {
         public IEnumerable<BoatClass> BoatClassOptions { get; set; }
-        public IEnumerable<Guid> BoatClassIds
-        {
-            get
-            {
-                return this.BoatClasses?.Select(c => c.Id);
-            }
-            set {
-                //todo: update this.BoatClasses
-            }
+        public IEnumerable<Guid> BoatClassIds { get; set; }
 
-        }
+        public IEnumerable<Competitor> CompetitorOptions { get; set; }
+        public IEnumerable<Guid> CompetitorIds { get; set; }
     }
 }

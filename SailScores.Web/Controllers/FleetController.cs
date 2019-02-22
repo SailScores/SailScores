@@ -66,6 +66,7 @@ namespace SailScores.Web.Controllers
             var club = await _clubService.GetFullClub(clubInitials);
             var vm = new FleetWithOptionsViewModel();
             vm.BoatClassOptions = club.BoatClasses;
+            vm.CompetitorOptions = club.Competitors;
             return View(vm);
         }
 
@@ -103,6 +104,7 @@ namespace SailScores.Web.Controllers
                     await _fleetService.GetFleet(id);
                 var vm = _mapper.Map<FleetWithOptionsViewModel>(fleet);
                 vm.BoatClassOptions = club.BoatClasses;
+                vm.CompetitorOptions = club.Competitors;
                 return View(vm);
             }
             catch
@@ -113,7 +115,7 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(string clubInitials, FleetCreateViewModel model)
+        public async Task<ActionResult> Edit(string clubInitials, FleetWithOptionsViewModel model)
         {
             try
             {
