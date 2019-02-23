@@ -165,6 +165,7 @@ namespace SailScores.Web
 
 
             app.UseHttpsRedirection();
+            app.UseMiddleware<Datalust.SerilogMiddlewareExample.Diagnostics.SerilogMiddleware>();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
