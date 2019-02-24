@@ -34,6 +34,7 @@ namespace SailScores.Core.Services
                 .Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Series)
+                .Include(s => s.Season)
                 .ToListAsync();
 
 
