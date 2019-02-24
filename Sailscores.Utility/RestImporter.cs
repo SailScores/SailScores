@@ -271,8 +271,10 @@ namespace SailScores.Utility
                     var input = Console.ReadLine();
                     Int32.TryParse(input, out result);
                 }
-
-                return seasons[result - 1];
+                if (result > 0)
+                {
+                    return seasons[result - 1];
+                }
             }
             
             return await MakeNewSeason();
@@ -282,7 +284,7 @@ namespace SailScores.Utility
         {
             Console.Write("Enter the new season name > ");
             var className = Console.ReadLine().Trim();
-            Console.Write("Enter the a year. The season will be created for the full year. ");
+            Console.Write("The season will be created for the full year. ");
             var year = GetYear();
             var start = new DateTime(year, 1, 1);
             var season = new SeasonDto
