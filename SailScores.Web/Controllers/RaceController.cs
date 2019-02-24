@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Services;
@@ -52,6 +53,7 @@ namespace SailScores.Web.Controllers
             });
         }
 
+        [Authorize]
         public async Task<ActionResult> Create(string clubInitials)
         {
             RaceWithOptionsViewModel race = await _raceService.GetBlankRaceWithOptions(clubInitials);
@@ -61,6 +63,7 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<ActionResult> Create(string clubInitials, RaceWithOptionsViewModel race)
         {
             try
@@ -81,6 +84,7 @@ namespace SailScores.Web.Controllers
             }
         }
 
+        [Authorize]
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
             var club = await _clubService.GetFullClub(clubInitials);
@@ -99,6 +103,7 @@ namespace SailScores.Web.Controllers
             return View(raceWithOptions);
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Guid id, RaceWithOptionsViewModel race)
@@ -119,6 +124,7 @@ namespace SailScores.Web.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
@@ -135,6 +141,7 @@ namespace SailScores.Web.Controllers
             return View(race);
         }
 
+        [Authorize]
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]

@@ -9,6 +9,7 @@ using SailScores.Core.Model;
 using CoreServices = SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SailScores.Web.Controllers
 {
@@ -19,7 +20,7 @@ namespace SailScores.Web.Controllers
         private readonly CoreServices.IClubService _clubService;
         private readonly IFleetService _fleetService;
         private readonly IMapper _mapper;
-        private readonly IAuthorizationService _authService;
+        private readonly Services.IAuthorizationService _authService;
 
         public FleetController(
                 CoreServices.IClubService clubService,
@@ -92,6 +93,7 @@ namespace SailScores.Web.Controllers
             }
         }
 
+        [Authorize]
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
             try {
@@ -113,6 +115,7 @@ namespace SailScores.Web.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(string clubInitials, FleetWithOptionsViewModel model)
@@ -135,6 +138,7 @@ namespace SailScores.Web.Controllers
             }
         }
 
+        [Authorize]
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
             var club = await _clubService.GetFullClub(clubInitials);
@@ -146,7 +150,8 @@ namespace SailScores.Web.Controllers
             var boatClass = club.Fleets.Single(c => c.Id == id);
             return View(boatClass);
         }
-
+        
+        [Authorize]
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]

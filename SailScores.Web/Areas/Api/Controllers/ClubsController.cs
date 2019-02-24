@@ -53,7 +53,6 @@ namespace SailScores.Web.Areas.Api.Controllers
         /// <param name="identifier">Initials or Guid for Club</param>
         /// <returns>Model.Club</returns>
         // GET: api/Club/5
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{identifier}")]
         public async Task<ClubDto> Get([FromRoute] string identifier)
         {
