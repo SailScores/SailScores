@@ -10,14 +10,14 @@ using SailScores.Database;
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    [Migration("20190112145439_ClubUrl")]
-    partial class ClubUrl
+    [Migration("20190226010858_CreateDb")]
+    partial class CreateDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -221,21 +221,34 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<bool?>("AdjustOtherScores");
+
+                    b.Property<bool?>("CameToStart");
+
                     b.Property<Guid>("ClubId");
-
-                    b.Property<int?>("CompetitorCountPlus");
-
-                    b.Property<bool?>("CountAsCompetitor");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000);
 
                     b.Property<bool?>("Discardable");
 
-                    b.Property<string>("Text")
+                    b.Property<bool?>("Finished");
+
+                    b.Property<string>("Formula")
+                        .HasMaxLength(100);
+
+                    b.Property<int?>("FormulaValue");
+
+                    b.Property<string>("Name")
                         .HasMaxLength(20);
 
-                    b.Property<bool?>("UseAverageResult");
+                    b.Property<bool?>("PreserveResult");
+
+                    b.Property<string>("ScoreLike");
+
+                    b.Property<Guid?>("ScoringSystemId");
+
+                    b.Property<bool?>("Started");
 
                     b.HasKey("Id");
 
@@ -290,7 +303,7 @@ namespace SailScores.Database.Migrations
                     b.ToTable("Series");
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.SeriesRaces", b =>
+            modelBuilder.Entity("SailScores.Database.Entities.SeriesRace", b =>
                 {
                     b.Property<Guid>("SeriesId");
 
@@ -300,7 +313,7 @@ namespace SailScores.Database.Migrations
 
                     b.HasIndex("RaceId");
 
-                    b.ToTable("SeriesRaces");
+                    b.ToTable("SeriesRace");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.UserClubPermission", b =>
@@ -370,7 +383,7 @@ namespace SailScores.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
-                        .WithMany("BoatClasses")
+                        .WithMany("FleetBoatClasses")
                         .HasForeignKey("FleetId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
@@ -429,7 +442,7 @@ namespace SailScores.Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.SeriesRaces", b =>
+            modelBuilder.Entity("SailScores.Database.Entities.SeriesRace", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Race", "Race")
                         .WithMany("SeriesRaces")

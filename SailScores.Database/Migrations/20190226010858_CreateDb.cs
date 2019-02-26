@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SailScores.Database.Migrations
 {
-    public partial class Initial : Migration
+    public partial class CreateDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,7 +15,8 @@ namespace SailScores.Database.Migrations
                     Name = table.Column<string>(maxLength: 200, nullable: false),
                     Initials = table.Column<string>(maxLength: 10, nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    IsHidden = table.Column<bool>(nullable: false)
+                    IsHidden = table.Column<bool>(nullable: false),
+                    Url = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,7 +52,7 @@ namespace SailScores.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BoatClass",
+                name: "BoatClasses",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -61,9 +62,9 @@ namespace SailScores.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BoatClass", x => x.Id);
+                    table.PrimaryKey("PK_BoatClasses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BoatClass_Clubs_ClubId",
+                        name: "FK_BoatClasses_Clubs_ClubId",
                         column: x => x.ClubId,
                         principalTable: "Clubs",
                         principalColumn: "Id",
@@ -76,8 +77,10 @@ namespace SailScores.Database.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     ClubId = table.Column<Guid>(nullable: false),
+                    ShortName = table.Column<string>(maxLength: 30, nullable: true),
                     Name = table.Column<string>(maxLength: 200, nullable: true),
                     Description = table.Column<string>(maxLength: 2000, nullable: true),
+                    IsHidden = table.Column<bool>(nullable: false),
                     FleetType = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -97,12 +100,18 @@ namespace SailScores.Database.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     ClubId = table.Column<Guid>(nullable: false),
-                    Text = table.Column<string>(maxLength: 20, nullable: true),
+                    ScoringSystemId = table.Column<Guid>(nullable: true),
+                    Name = table.Column<string>(maxLength: 20, nullable: true),
                     Description = table.Column<string>(maxLength: 1000, nullable: true),
-                    CountAsCompetitor = table.Column<bool>(nullable: true),
+                    Formula = table.Column<string>(maxLength: 100, nullable: true),
+                    FormulaValue = table.Column<int>(nullable: true),
+                    ScoreLike = table.Column<string>(nullable: true),
                     Discardable = table.Column<bool>(nullable: true),
-                    UseAverageResult = table.Column<bool>(nullable: true),
-                    CompetitorCountPlus = table.Column<int>(nullable: true)
+                    CameToStart = table.Column<bool>(nullable: true),
+                    Started = table.Column<bool>(nullable: true),
+                    Finished = table.Column<bool>(nullable: true),
+                    PreserveResult = table.Column<bool>(nullable: true),
+                    AdjustOtherScores = table.Column<bool>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -153,9 +162,9 @@ namespace SailScores.Database.Migrations
                 {
                     table.PrimaryKey("PK_Competitors", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Competitors_BoatClass_BoatClassId",
+                        name: "FK_Competitors_BoatClasses_BoatClassId",
                         column: x => x.BoatClassId,
-                        principalTable: "BoatClass",
+                        principalTable: "BoatClasses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -177,9 +186,9 @@ namespace SailScores.Database.Migrations
                 {
                     table.PrimaryKey("PK_FleetBoatClass", x => new { x.FleetId, x.BoatClassId });
                     table.ForeignKey(
-                        name: "FK_FleetBoatClass_BoatClass_BoatClassId",
+                        name: "FK_FleetBoatClass_BoatClasses_BoatClassId",
                         column: x => x.BoatClassId,
-                        principalTable: "BoatClass",
+                        principalTable: "BoatClasses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -298,7 +307,7 @@ namespace SailScores.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SeriesRaces",
+                name: "SeriesRace",
                 columns: table => new
                 {
                     RaceId = table.Column<Guid>(nullable: false),
@@ -306,15 +315,15 @@ namespace SailScores.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SeriesRaces", x => new { x.SeriesId, x.RaceId });
+                    table.PrimaryKey("PK_SeriesRace", x => new { x.SeriesId, x.RaceId });
                     table.ForeignKey(
-                        name: "FK_SeriesRaces_Races_RaceId",
+                        name: "FK_SeriesRace_Races_RaceId",
                         column: x => x.RaceId,
                         principalTable: "Races",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SeriesRaces_Series_SeriesId",
+                        name: "FK_SeriesRace_Series_SeriesId",
                         column: x => x.SeriesId,
                         principalTable: "Series",
                         principalColumn: "Id",
@@ -322,8 +331,8 @@ namespace SailScores.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BoatClass_ClubId",
-                table: "BoatClass",
+                name: "IX_BoatClasses_ClubId",
+                table: "BoatClasses",
                 column: "ClubId");
 
             migrationBuilder.CreateIndex(
@@ -392,8 +401,8 @@ namespace SailScores.Database.Migrations
                 column: "SeasonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SeriesRaces_RaceId",
-                table: "SeriesRaces",
+                name: "IX_SeriesRace_RaceId",
+                table: "SeriesRace",
                 column: "RaceId");
         }
 
@@ -415,7 +424,7 @@ namespace SailScores.Database.Migrations
                 name: "Scores");
 
             migrationBuilder.DropTable(
-                name: "SeriesRaces");
+                name: "SeriesRace");
 
             migrationBuilder.DropTable(
                 name: "UserPermissions");
@@ -430,7 +439,7 @@ namespace SailScores.Database.Migrations
                 name: "Series");
 
             migrationBuilder.DropTable(
-                name: "BoatClass");
+                name: "BoatClasses");
 
             migrationBuilder.DropTable(
                 name: "Fleets");
