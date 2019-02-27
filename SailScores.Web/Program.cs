@@ -15,6 +15,7 @@ namespace SailScores.Web
     public class Program
     {
 
+        private static int? _sslPort = null;
         public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -28,6 +29,7 @@ namespace SailScores.Web
                 .CreateLogger();
             try
             {
+                _sslPort = GetSslPort();
                 Log.Information("Starting web host");
                 CreateWebHostBuilder(args).Build().Run();
                 return 0;
@@ -43,9 +45,29 @@ namespace SailScores.Web
             }
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        private static int? GetSslPort()
+        {
+            int retVal;
+            if (Int32.TryParse(Configuration["sslPort"], out retVal))
+            {
+                return retVal;
+            }
+            return null;
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            if (_sslPort.HasValue)
+            {
+
+                return WebHost.CreateDefaultBuilder(args)
+                    .UseSetting("https_port", _sslPort.ToString())
+                    .UseStartup<Startup>()
+                    .UseSerilog();
+            }
+            return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseSerilog();
+        }
     }
 }
