@@ -5,7 +5,7 @@ var gulp = require("gulp"),
     rimraf = require("rimraf"),
     concat = require("gulp-concat"),
     cssmin = require("gulp-cssmin"),
-    uglify = require("gulp-uglify"),
+    uglify = require('gulp-uglify-es').default,
     merge = require('merge-stream'),
     sass = require("gulp-sass");
 
