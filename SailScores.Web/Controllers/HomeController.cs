@@ -35,7 +35,7 @@ namespace SailScores.Web.Controllers
             return View();
         }
 
-        public IActionResult Contact()
+        public IActionResult News()
         {
             return View();
         }
