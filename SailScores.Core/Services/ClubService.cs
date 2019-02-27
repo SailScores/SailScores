@@ -9,6 +9,7 @@ using AutoMapper.QueryableExtensions;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
+using SailScores.Api.Dtos;
 
 namespace SailScores.Core.Services
 {
@@ -132,6 +133,16 @@ namespace SailScores.Core.Services
         {
             var dbSeason = _mapper.Map<Db.Season>(season);
             _dbContext.Seasons.Add(dbSeason);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateClub(Club clubObject)
+        {
+            var dbClub = _dbContext.Clubs.Single(c => c.Id == clubObject.Id);
+            dbClub.Name = clubObject.Name;
+            dbClub.IsHidden = clubObject.IsHidden;
+            dbClub.Url = clubObject.Url;
+            dbClub.Description = clubObject.Description;
             await _dbContext.SaveChangesAsync();
         }
     }

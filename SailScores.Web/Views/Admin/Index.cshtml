@@ -1,7 +1,7 @@
 ﻿@model SailScores.Web.Models.SailScores.AdminViewModel
 
 @{
-    ViewData["Title"] = "Edit " + Model.Name;
+    ViewData["Title"] = "Admin " + Model.Name;
     Layout = "_ClubLayout";
 }
 
@@ -47,40 +47,45 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
-            <input hidden asp-for="Id" class="form-control" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Initials" class="control-label"></label>
-                <input asp-for="Initials" class="form-control" />
-                <span asp-validation-for="Initials" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" cols="60" rows="6"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="IsHidden" /> @Html.DisplayNameFor(model => model.IsHidden)
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="Url" class="control-label"></label>
-                <input asp-for="Url" class="form-control" />
-                <span asp-validation-for="Url" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Initials)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Initials)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd>
+                @Html.Raw(Markdig.Markdown.ToHtml(Model.Description))
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.IsHidden)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.IsHidden)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Url)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Url)
+            </dd>
+        </dl>
+
     </div>
 </div>
 @await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
