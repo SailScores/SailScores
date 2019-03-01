@@ -6,15 +6,13 @@
     Layout = "_ClubLayout";
 }
 
-<h2>Series</h2>
-
 <table class="table">
     <tbody>
         @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
         {
             <tr id="@item.Key">
-                <td>
-                    @item.Key
+                <td colspan="3">
+                    <h2>@item.Key</h2>
                 </td>
             </tr>
             foreach (var series in item)
