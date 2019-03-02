@@ -70,7 +70,7 @@ namespace SailScores.Web.Controllers
                 competitor.ClubId = club.Id;
                 await _competitorService.SaveAsync(competitor);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {
@@ -110,7 +110,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _competitorService.SaveAsync(competitor);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {
@@ -151,7 +151,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _competitorService.DeleteCompetitorAsync(id);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {

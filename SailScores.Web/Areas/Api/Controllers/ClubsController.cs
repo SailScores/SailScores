@@ -43,7 +43,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<ClubDto>> Get()
         {
-            var clubs =  await _clubService.GetClubs(false);
+            var clubs =  await _clubService.GetClubs(true);
             return _mapper.Map<List<ClubDto>>(clubs);
         }
 

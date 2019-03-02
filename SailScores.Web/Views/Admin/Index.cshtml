@@ -70,7 +70,7 @@
                 @Html.DisplayNameFor(model => model.Description)
             </dt>
             <dd>
-                @Html.Raw(Markdig.Markdown.ToHtml(Model.Description))
+                @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
             </dd>
             <dt>
                 @Html.DisplayNameFor(model => model.IsHidden)

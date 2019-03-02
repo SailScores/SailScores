@@ -83,13 +83,6 @@
         </form>
     </div>
 </div>
-@await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
-@await Html.PartialAsync("_FleetList", Model.Fleets)
-@await Html.PartialAsync("_SeasonList", Model.Seasons)
-@await Html.PartialAsync("_SeriesList", Model.Series)
-@await Html.PartialAsync("_CompetitorList", Model.Competitors)
-@await Html.PartialAsync("_RaceList", Model.Races)
-
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
