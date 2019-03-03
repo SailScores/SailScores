@@ -1,33 +1,45 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Fleet>
 
 
-<h3 id="fleets">Fleets</h3>
-<p>
-    Fleets group boats that should be scored against each other. A race only
-    includes boats from a single fleet. But competitors can belong to
-    multiple fleets.
-</p>
-<p>
-    @Html.ActionLink("Create", "Create", "Fleet", new { /* id=item.PrimaryKey */ })
-</p>
-<table class="table table-not-wide">
-    <tbody>
-@foreach (var item in Model.OrderBy(f => f.Name)) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FleetType)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", "Fleet", new { id=item.Id }) |
-                @Html.ActionLink("Delete", "Delete", "Fleet", new { id=item.Id })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+    <div class="card">
+        <div class="card-header" id="fleetsHeading">
+            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFleets" aria-expanded="false" aria-controls="collapseFleets">
+                <h5 id="fleets">Fleets</h5>
+            </button>
+        </div>
+        <div id="collapseFleets" class="collapse" aria-labelledby="fleetsHeading" data-parent="#accordion">
+            <div class="card-body">
+                <p>
+                    Fleets group boats that should be scored against each other. A race only
+                    includes boats from a single fleet. But competitors can belong to
+                    multiple fleets.
+                </p>
+                <p>
+                    @Html.ActionLink("Create", "Create", "Fleet", new { /* id=item.PrimaryKey */ })
+                </p>
+                <table class="table table-not-wide">
+                    <tbody>
+                        @foreach (var item in Model.OrderBy(f => f.Name))
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FleetType)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Edit", "Edit", "Fleet", new { id = item.Id }) |
+                                    @Html.ActionLink("Delete", "Delete", "Fleet", new { id = item.Id })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>            
+    </div>

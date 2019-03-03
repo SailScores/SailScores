@@ -34,7 +34,7 @@ namespace SailScores.Web.Services
         {
             var coreObject = await _coreClubService.GetFullClub(clubInitials);
 
-            return _mapper.Map<IList<SeriesSummary>>(coreObject.Series);
+            return _mapper.Map<IList<SeriesSummary>>(coreObject.Series.OrderBy(s => s.Name));
         }
 
         public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesName)

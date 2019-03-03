@@ -1,28 +1,38 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Season>
 
-    <h3 id="seasons">Seasons</h3>
-    <p>
-        @Html.ActionLink("Create", "Create", "Season", new { /* id=item.PrimaryKey */ })
-    </p>
-    <table class="table table-not-wide">
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Start)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.End)
-                    </td>
-                    <td>
-                        @Html.ActionLink("Edit", "Edit", "Season", new { id=item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", "Season", new { id=item.Id })
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="card">
+    <div class="card-header" id="seasonsHeading">
+        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeasons" aria-expanded="false" aria-controls="collapseSeasons">
+            <h4 id="seasons">Seasons</h4>
+        </button>
+    </div>
+    <div id="collapseSeasons" class="collapse" aria-labelledby="seasonsHeading" data-parent="#accordion">
+        <div class="card-body">
+            <p>
+                @Html.ActionLink("Create", "Create", "Season", new { /* id=item.PrimaryKey */ })
+            </p>
+            <table class="table table-not-wide">
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Start)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.End)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "Season", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "Season", new { id = item.Id })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

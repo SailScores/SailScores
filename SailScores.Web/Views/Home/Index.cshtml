@@ -1,6 +1,6 @@
 ﻿@model SailScores.Web.Models.SailScores.ClubSelectorModel
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "SailScores";
 }
 <h1 class="display-4">SailScores</h1>
 <p class="lead">Simple score collection and reporting for one-design sailing.</p>
@@ -18,7 +18,7 @@
         </ul>
     </div>
     <div class="col-md-6">
-        @Html.Partial("ClubSelectorView", Model)
+        @(await Html.PartialAsync("ClubSelectorView", Model))
         <hr class="my-4 d-md-none">
     </div>
 </div>

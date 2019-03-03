@@ -1,28 +1,38 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Series>
 
-    <h3 id="series">Series</h3>
-    <p>
-        @Html.ActionLink("Create", "Create", "Series", new { /* id=item.PrimaryKey */ })
-    </p>
-    <table class="table table-not-wide">
-        <tbody>
-            @foreach (var item in Model)
-            {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Season.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
+<div class="card">
+    <div class="card-header" id="seriesHeading">
+        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeries" aria-expanded="false" aria-controls="collapseSeries">
+            <h5 id="series">Series</h5>
+        </button>
+    </div>
+    <div id="collapseSeries" class="collapse" aria-labelledby="seriesHeading" data-parent="#accordion">
+            <div class="card-body">
+                <p>
+                    @Html.ActionLink("Create", "Create", "Series", new { /* id=item.PrimaryKey */ })
+                </p>
+                <table class="table table-not-wide">
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Season.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
+                                    @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
