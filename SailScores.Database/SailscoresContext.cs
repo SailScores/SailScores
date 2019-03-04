@@ -21,6 +21,8 @@ namespace SailScores.Database
 
         public DbSet<ScoreCode> ScoreCodes { get; set; }
 
+        public DbSet<ScoringSystem> ScoringSystems { get; set; }
+
         public DbSet<UserClubPermission> UserPermissions { get; set; }
 
         public DbSet<File> Files { get; set; }

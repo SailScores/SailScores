@@ -7,14 +7,14 @@ namespace SailScores.Core.Model
 {
     public class ScoringSystem
     {
-        Guid Id { get; set; }
-        Guid ClubId { get; set; }
+        public Guid Id { get; set; }
+        public Guid ClubId { get; set; }
         [StringLength(100)]
-        String Name { get; set; }
+        public String Name { get; set; }
 
-        String DiscardPattern { get; set; }
+        public String DiscardPattern { get; set; }
 
-        IList<ScoreCode> ScoreCodes { get; set; }
+        public IList<ScoreCode> ScoreCodes { get; set; }
 
     }
 }
