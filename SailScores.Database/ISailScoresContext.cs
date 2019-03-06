@@ -24,6 +24,7 @@ namespace SailScores.Database
         DbSet<UserClubPermission> UserPermissions { get; set; }
 
         DbSet<File> Files { get; set; }
+        DbSet<ScoringSystem> ScoringSystems { get; set; }
 
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
