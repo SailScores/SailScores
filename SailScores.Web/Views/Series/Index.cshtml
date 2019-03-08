@@ -6,6 +6,24 @@
     Layout = "_ClubLayout";
 }
 
+@section Sidebar {
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky sticky-top">
+            <ul class="nav flex-column">
+                @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#@item.Key">
+                            @item.Key
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        </div>
+    </nav>
+}
+
 <table class="table">
     <tbody>
         @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
@@ -17,19 +35,19 @@
             </tr>
             foreach (var series in item)
             {
-                 <tr>
-                     <td>
-                         <a href="~/@Model.ClubInitials/@series.Season.Name/@series.Name">
-                             @Html.DisplayFor(modelItem => series.Name) (@(series.Races?.Count.ToString() ?? "No") Races)
-                         </a>
-                     </td>
-                     <td>
-                         @series.DateString
-                     </td>
-                     <td>
-                         @Html.DisplayFor(modelItem => series.Description)
-                     </td>
-                 </tr>
+                <tr>
+                    <td>
+                        <a href="~/@Model.ClubInitials/@series.Season.Name/@series.Name">
+                            @Html.DisplayFor(modelItem => series.Name) (@(series.Races?.Count.ToString() ?? "No") Races)
+                        </a>
+                    </td>
+                    <td>
+                        @series.DateString
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => series.Description)
+                    </td>
+                </tr>
             }
         }
     </tbody>

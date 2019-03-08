@@ -15,21 +15,24 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Season.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Description)
-                                </td>
-                                <td>
-                                    @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
-                                    @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Season.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Races.Count) Races
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
+                            </td>
+                        </tr>
                         }
                     </tbody>
                 </table>

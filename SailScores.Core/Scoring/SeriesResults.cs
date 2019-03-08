@@ -11,7 +11,7 @@ namespace SailScores.Core.Scoring
 
         public Dictionary<Competitor, int?> Places { get; set; }
         
-        public Decimal TotalExcludingDiscards { get; set; }
+        public Decimal NumberOfDiscards { get; set; }
 
         public Dictionary<Competitor, SeriesCompetitorResults> Results { get; set; }
 

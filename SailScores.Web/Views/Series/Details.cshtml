@@ -8,7 +8,7 @@
 }
 
 <h2>@Model.Item.Name</h2>
-
+@Model.Item.Races.Count Races with @Model.Item.Results.NumberOfDiscards Discards, @Model.Item.Competitors.Count Competitors
 <table class="table">
     <thead>
         <tr>
@@ -20,9 +20,9 @@
             @foreach (var race in Model.Item.Results?.Races ?? Enumerable.Empty<Race>())
             {
                 <th class="text-center">
-                 @Html.ActionLink(
-                    @race.Date?.ToString("M-d") + " R" + @race.Order
-                    , "Details", "Race",  new { id = race.Id })
+                    @Html.ActionLink(
+                       @race.Date?.ToString("M-d") + " R" + @race.Order
+                       , "Details", "Race", new { id = race.Id })
                 </th>
             }
         </tr>
@@ -43,8 +43,8 @@
                     var result = Model.Item.Results.GetResult(comp, race);
 
                     <td class="text-center
-                        @(result.RawScore?.Place == 1 ? "finish-first":"") 
-                        @(result.RawScore?.Place == 2 ? "finish-second":"") 
+                        @(result.RawScore?.Place == 1 ? "finish-first":"")
+                        @(result.RawScore?.Place == 2 ? "finish-second":"")
                         @(result.RawScore?.Place == 3 ? "finish-third":"") ">
                         @if (Model.Item.Results.GetResult(comp, race).Discard)
                         {

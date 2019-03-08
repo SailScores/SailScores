@@ -37,6 +37,7 @@ namespace SailScores.Core.Scoring
                 .SelectMany(
                     r => r
                         .Scores));
+            returnResults.NumberOfDiscards = GetNumberOfDiscards(series.Races.Count);
             return returnResults;
         }
 
