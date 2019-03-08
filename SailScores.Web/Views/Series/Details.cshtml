@@ -8,7 +8,7 @@
 }
 
 <h2>@Model.Item.Name</h2>
-@Model.Item.Races.Count Races with @Model.Item.Results.NumberOfDiscards Discards, @Model.Item.Competitors.Count Competitors
+@Model.Item.Races.Count races with @Model.Item.Results.NumberOfDiscards discards, @Model.Item.Competitors.Count competitors
 <table class="table table-hover table-sm">
     <thead>
         <tr>
@@ -41,11 +41,7 @@
                 @foreach (var race in Model.Item.Results.Races)
                 {
                     var result = Model.Item.Results.GetResult(comp, race);
-
-                    <td class="text-center
-                        @(result.RawScore?.Place == 1 ? "finish-first":"")
-                        @(result.RawScore?.Place == 2 ? "finish-second":"")
-                        @(result.RawScore?.Place == 3 ? "finish-third":"") ">
+                    <td class="text-center @(result.RawScore?.Place == 1 ? "finish-first":"") @(result.RawScore?.Place == 2 ? "finish-second":"") @(result.RawScore?.Place == 3 ? "finish-third":"") ">
                         @if (Model.Item.Results.GetResult(comp, race).Discard)
                         {
                             @Html.Raw("<span class='text-muted'>")
@@ -55,7 +51,7 @@
                         @if (Model.Item.Results.GetResult(comp, race).Discard)
                         {
                             @Html.Raw("</s>")
-                            @Html.Raw("</div>")
+                            @Html.Raw("</span>")
 
                         }
                     </td>
