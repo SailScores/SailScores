@@ -29,6 +29,8 @@ export function init() {
     });
     loadFleet();
     calculatePlaces();
+    $("#submitButton").prop("disabled", false);
+    $("#submitDisabledMessage").prop("hidden", true);
 }
 
 export function loadFleet() {

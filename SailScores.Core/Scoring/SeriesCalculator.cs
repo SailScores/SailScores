@@ -216,7 +216,7 @@ namespace SailScores.Core.Scoring
                 .Take(compResults.CalculatedScores.Count - numAverages - discards)
                 .Average(s => s.ScoreValue) ?? 0m;
 
-            return Math.Round(average, 1);
+            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
 
         }
 

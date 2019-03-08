@@ -14,6 +14,9 @@
                 <thead>
                     <tr>
                         <th>
+                            Fleet
+                        </th>
+                        <th>
                             @Html.DisplayNameFor(model => model.Name)
                         </th>
                         <th>
@@ -31,24 +34,27 @@
                 <tbody>
                     @foreach (var item in Model.OrderByDescending(r => r.Date).ThenBy(r => r.Order))
                     {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Date)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Order)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </td>
-                            <td>
-                                @Html.ActionLink("Edit", "Edit", "Race", new { id = item.Id }) |
-                                @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id })
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Fleet.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Date)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Order)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", "Race", new { id = item.Id }) |
+                            @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id })
+                        </td>
+                    </tr>
                     }
                 </tbody>
             </table>

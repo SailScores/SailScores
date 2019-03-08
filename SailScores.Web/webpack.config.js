@@ -1,4 +1,5 @@
-﻿var path = require('path');
+/// <binding BeforeBuild='Run - Development' />
+var path = require('path');
 
 module.exports = {
     devtool: "inline-source-map",
