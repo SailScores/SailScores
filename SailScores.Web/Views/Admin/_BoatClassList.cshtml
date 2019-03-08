@@ -1,28 +1,38 @@
 ﻿@model IEnumerable<SailScores.Core.Model.BoatClass>
 
-    <h3 id="classes">Classes</h3>
-<p>
-    Class refers to the type of boat. A competitor can only belong to one class.
-</p>
-    <p>
-        @Html.ActionLink("Create", "Create", "BoatClass", new { /* id=item.PrimaryKey */ })
-    </p>
-    <table class="table table-not-wide">
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </td>
-                    <td>
-                        @Html.ActionLink("Edit", "Edit", "BoatClass", new { id=item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", "BoatClass", new { id=item.Id })
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="card">
+    <div class="card-header" id="classesHeading">
+        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseClasses" aria-expanded="false" aria-controls="collapseClasses">
+            <h4 id="classes">Classes</h4>
+        </button>
+    </div>
+    <div id="collapseClasses" class="collapse" aria-labelledby="classesHeading" data-parent="#accordion">
+        <div class="card-body">
+            <p>
+                Class refers to the type of boat. A competitor can only belong to one class.
+            </p>
+            <p>
+                @Html.ActionLink("Create", "Create", "BoatClass", new { /* id=item.PrimaryKey */ })
+            </p>
+            <table class="table table-not-wide">
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "BoatClass", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "BoatClass", new { id = item.Id })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

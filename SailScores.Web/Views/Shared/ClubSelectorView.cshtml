@@ -1,8 +1,19 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model SailScores.Web.Models.SailScores.ClubSelectorModel
-<select asp-for="SelectedClubInitials" class="form-control"
+<select id="clubSelect" hidden asp-for="SelectedClubInitials" class="form-control"
         onchange="var initials = this.value;
 window.location.href = '@string.Format("{0}://{1}{2}/", Context.Request.Scheme, Context.Request.Host, Url.Content("~"))' + initials;"
         asp-items="@(new SelectList(Model.Clubs, "Initials", "Name"))">
     <option>  ----Select a club----  </option>
-</select>
+    </select>
+<script>
+    document.getElementById("clubSelect").removeAttribute('hidden');
+</script>
+<noscript>
+    @foreach(var club in Model.Clubs)
+    {
+        <a href="'@string.Format("{0}://{1}{2}/", Context.Request.Scheme, Context.Request.Host, Url.Content("~"))' + initials;">
+            @club.Initials - @club.Name
+        </a>
+    }
+</noscript>

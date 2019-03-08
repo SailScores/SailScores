@@ -88,7 +88,7 @@ namespace SailScores.Web.Controllers
                 model.ClubId = club.Id;
                 await _seriesService.SaveNew(model);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {
@@ -127,7 +127,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _seriesService.Update(model);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {
@@ -164,7 +164,7 @@ namespace SailScores.Web.Controllers
             {
                 await _seriesService.DeleteAsync(id);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {

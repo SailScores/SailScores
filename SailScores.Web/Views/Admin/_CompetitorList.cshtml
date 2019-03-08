@@ -1,34 +1,44 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Competitor>
 
-    <h3 id="competitors">Competitors</h3>
-    <p>
-        @Html.ActionLink("Create", "Create", "Competitor", new { /* id=item.PrimaryKey */ })
-    </p>
-    <table class="table table-not-wide">
-        <tbody>
-            @foreach (var item in Model.OrderBy(c => c.Name))
-            {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SailNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    <em>@Html.DisplayFor(modelItem => item.BoatName)</em>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Notes)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BoatClass.Name)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", "Competitor", new { id=item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", "Competitor", new { id=item.Id })
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
+<div class="card">
+    <div class="card-header" id="competitorsHeading">
+        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseCompetitors" aria-expanded="false" aria-controls="collapseCompetitors">
+            <h5 id="competitors">Competitors</h5>
+        </button>
+    </div>
+    <div id="collapseCompetitors" class="collapse" aria-labelledby="competitorsHeading" data-parent="#accordion">
+        <div class="card-body">
+            <p>
+                @Html.ActionLink("Create", "Create", "Competitor", new { /* id=item.PrimaryKey */ })
+            </p>
+            <table class="table table-not-wide">
+                <tbody>
+                    @foreach (var item in Model.OrderBy(c => c.Name))
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SailNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                <em>@Html.DisplayFor(modelItem => item.BoatName)</em>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Notes)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BoatClass.Name)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "Competitor", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "Competitor", new { id = item.Id })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

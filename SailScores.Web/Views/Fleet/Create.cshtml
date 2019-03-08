@@ -63,6 +63,10 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="fleets"
+                   class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
     </div>
@@ -85,11 +89,6 @@
     checkVisibility();
 </script>
 
-<div>
-    <a asp-controller="Admin"
-       asp-action="Edit"
-       asp-fragment="fleets">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

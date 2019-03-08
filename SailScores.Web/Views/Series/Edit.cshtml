@@ -40,15 +40,13 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="series"
+                   class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-controller="Admin"
-       asp-action="Edit"
-       asp-fragment="series">Cancel</a>
 </div>
 
 @section Scripts {

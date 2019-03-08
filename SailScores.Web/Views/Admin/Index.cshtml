@@ -1,0 +1,102 @@
+﻿@model SailScores.Web.Models.SailScores.AdminViewModel
+
+@{
+    ViewData["Title"] = "Admin " + Model.Name;
+    Layout = "_ClubLayout";
+}
+
+@section Sidebar {
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky sticky-top">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#classes">Classes</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#fleets">Fleets</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#seasons">Seasons</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#series">Series</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#competitors">Competitors</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#races">Races</a>
+                </li>
+                @foreach (var item in Model.Races.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#@item.Key">
+                            @item.Key
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        </div>
+    </nav>
+}
+
+<h2>@Model.Name</h2>
+<h3>Administrator View</h3>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Initials)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Initials)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd>
+                @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.IsHidden)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.IsHidden)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Url)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Url)
+            </dd>
+        </dl>
+
+    </div>
+</div>
+<div id="accordion">
+    @await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
+    @await Html.PartialAsync("_FleetList", Model.Fleets)
+    @await Html.PartialAsync("_SeasonList", Model.Seasons)
+    @await Html.PartialAsync("_SeriesList", Model.Series)
+    @await Html.PartialAsync("_CompetitorList", Model.Competitors)
+    @await Html.PartialAsync("_RaceList", Model.Races)
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

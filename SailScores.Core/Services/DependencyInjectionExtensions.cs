@@ -20,7 +20,6 @@ namespace SailScores.Core.Services
             services.AddScoped<ISeriesService, SeriesService>();
             services.AddScoped<IRaceService, RaceService>();
             services.AddScoped<ISeriesService, SeriesService>();
-            services.AddScoped<SailScores.Core.Scoring.ISeriesCalculator, SailScores.Core.Scoring.SeriesCalculator>();
             services.AddScoped<IUserService, UserService>();
         }
     }

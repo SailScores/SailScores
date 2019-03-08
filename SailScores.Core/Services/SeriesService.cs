@@ -15,16 +15,13 @@ namespace SailScores.Core.Services
     public class SeriesService : ISeriesService
     {
         private readonly ISailScoresContext _dbContext;
-        private readonly ISeriesCalculator _seriesCalculator;
         private readonly IMapper _mapper;
 
         public SeriesService(
             ISailScoresContext dbContext,
-            ISeriesCalculator seriesCalculator,
             IMapper mapper)
         {
             _dbContext = dbContext;
-            _seriesCalculator = seriesCalculator;
             _mapper = mapper;
         }
 
@@ -36,7 +33,6 @@ namespace SailScores.Core.Services
                 .SelectMany(c => c.Series)
                 .Include(s => s.Season)
                 .ToListAsync();
-
 
             var returnObj = _mapper.Map<List<Series>>(seriesDb);
             return returnObj;
@@ -56,11 +52,15 @@ namespace SailScores.Core.Services
             string seasonName,
             string seriesName)
         {
+            var clubId = (await _dbContext.Clubs
+                .SingleAsync( c =>
+                    c.Initials == clubInitials.ToUpperInvariant()
+                )).Id;
             var seriesDb = await _dbContext
-                .Clubs
-                .Where(c => c.Initials == clubInitials)
-                .SelectMany(c => c.Series)
-                .Where(s => s.Name == seriesName
+                .Series
+                .Where(s =>
+                    s.ClubId == clubId
+                    && s.Name == seriesName
                     && s.Season.Name == seasonName)
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
@@ -69,11 +69,19 @@ namespace SailScores.Core.Services
                 .SingleAsync(s => s.Name == seriesName
                                   && s.Season.Name == seasonName);
 
-            var returnObj = _mapper.Map<Series>(seriesDb);
+            var dbScoringSystem = await _dbContext
+                .ScoringSystems
+                .Where(s => s.ClubId == clubId)
+                .Include(s => s.ScoreCodes)
+                .SingleAsync();
+            var calculator = new SeriesCalculator(
+                _mapper.Map<ScoringSystem>(dbScoringSystem));
 
+            var returnObj = _mapper.Map<Series>(seriesDb);
+            
             await PopulateCompetitorsAsync(returnObj);
 
-            var results = _seriesCalculator.CalculateResults(returnObj);
+            var results = calculator.CalculateResults(returnObj);
             returnObj.Results = results;
             return returnObj;
         }

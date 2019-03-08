@@ -28,9 +28,10 @@
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="ClubId" />
-        <input type="submit" value="Delete" class="btn btn-primary" /> |
+        <input type="submit" value="Delete" class="btn btn-primary" />
         <a asp-controller="Admin"
-           asp-action="Edit"
-           asp-fragment="classes">Back to List</a>
+           asp-action="Index"
+           asp-fragment="classes"
+           class="btn btn-outline-primary">Cancel</a>
     </form>
 </div>

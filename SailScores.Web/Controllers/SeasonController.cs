@@ -43,7 +43,7 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+                var club = (await _clubService.GetFullClub(clubInitials));
                 if (!await _authService.CanUserEdit(User, club.Id))
                 {
                     return Unauthorized();
@@ -51,7 +51,7 @@ namespace SailScores.Web.Controllers
                 model.ClubId = club.Id;
                 await _seasonService.SaveNew(model);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {
@@ -86,7 +86,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _seasonService.Update(model);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {
@@ -122,7 +122,7 @@ namespace SailScores.Web.Controllers
             {
                 await _seasonService.Delete(id);
 
-                return RedirectToAction(nameof(Edit), "Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch
             {

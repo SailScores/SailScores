@@ -540,7 +540,7 @@ namespace SailScores.Utility
             {
                 return DateTime.Today;
             }
-            var parts = datepart.Split('-');
+            var parts = datepart.Split(new [] { '-', '/' });
             int month = season.Start.Month;
             int day = season.Start.Day;
             Int32.TryParse(parts[0], out month);
@@ -551,7 +551,7 @@ namespace SailScores.Utility
         private static int GetRaceRank(SwObjects.Race swRace)
         {
             // assume race name format of "6-22 R1" or "6-23"
-            var parts = swRace.Name.Split(' ');
+            var parts = swRace.Name.Split('R');
             if (parts.Length < 2)
             {
                 return 1;

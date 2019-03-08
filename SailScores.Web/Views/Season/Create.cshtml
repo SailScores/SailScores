@@ -30,15 +30,13 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="seasons"
+                   class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-controller="Admin"
-       asp-action="Edit"
-       asp-fragment="seasons">Back to List</a>
 </div>
 
 @section Scripts {
