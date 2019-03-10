@@ -101,9 +101,12 @@ export function calculatePlaces() {
         resultItems[i].setAttribute("data-place", i.toString());
         if (span.id != "competitorTemplate") {
             if (shouldCompKeepScore(resultItems[i])) {
-                span.textContent = (scoreCount++).toString();
+                span.textContent = (scoreCount).toString();
+                resultItems[i].setAttribute("data-place", scoreCount.toString());
+                scoreCount++;
             } else {
                 span.textContent = getCompetitorCode(resultItems[i]);
+                resultItems[i].removeAttribute("data-place");
             }
         }
     }
