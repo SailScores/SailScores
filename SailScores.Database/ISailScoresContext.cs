@@ -26,6 +26,8 @@ namespace SailScores.Database
         DbSet<File> Files { get; set; }
         DbSet<ScoringSystem> ScoringSystems { get; set; }
 
+        DbSet<HistoricalResults> HistoricalResults { get; set; }
+
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 

@@ -59,9 +59,7 @@ namespace SailScores.Core.Services
             var seriesDb = await _dbContext
                 .Series
                 .Where(s =>
-                    s.ClubId == clubId
-                    && s.Name == seriesName
-                    && s.Season.Name == seasonName)
+                    s.ClubId == clubId)
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
                         .ThenInclude(r => r.Scores)
@@ -83,7 +81,40 @@ namespace SailScores.Core.Services
 
             var results = calculator.CalculateResults(returnObj);
             returnObj.Results = results;
+            await SaveHistoricalResults(returnObj.Id, returnObj.Results);
             return returnObj;
+        }
+
+        private async Task SaveHistoricalResults(
+            Guid seriesId,
+            SeriesResults results)
+        {
+            
+            foreach(var race in results.Races)
+            {
+                race.Club = null;
+                race.Season = null;
+                foreach(var score in race.Scores)
+                {
+                    score.Competitor = null;
+                    score.Race = null;
+                }
+                race.Series = null;
+            }
+            foreach(var comp in results.Competitors)
+            {
+                comp.Club = null;
+                comp.Scores = null;
+                comp.Fleets = null;
+                comp.BoatClass = null;
+            }
+            _dbContext.HistoricalResults.Add(new dbObj.HistoricalResults
+            {
+                SeriesId = seriesId,
+                Results = Newtonsoft.Json.JsonConvert.SerializeObject(results)
+            });
+
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task PopulateCompetitorsAsync(Series series)
