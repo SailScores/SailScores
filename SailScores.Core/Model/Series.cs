@@ -28,5 +28,7 @@ namespace SailScores.Core.Model
 
         public IList<Competitor> Competitors { get; set; }
 
+        public FlatModel.FlatResults FlatResults { get; set; }
+
     }
 }

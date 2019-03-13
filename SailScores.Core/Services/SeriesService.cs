@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SailScores.Core.FlatModel;
 
 namespace SailScores.Core.Services
 {
@@ -81,40 +82,83 @@ namespace SailScores.Core.Services
 
             var results = calculator.CalculateResults(returnObj);
             returnObj.Results = results;
-            await SaveHistoricalResults(returnObj.Id, returnObj.Results);
+            await SaveHistoricalResults(returnObj);
+
+            // need to separate the above logic into series / race save, and below stays here:
+
+            var flatResults = FlattenResults(returnObj);
+            //returnObj.Results = null;
+            returnObj.FlatResults = flatResults;
+
             return returnObj;
         }
 
-        private async Task SaveHistoricalResults(
-            Guid seriesId,
-            SeriesResults results)
+        private async Task SaveHistoricalResults(Series series)
         {
-            
-            foreach(var race in results.Races)
-            {
-                race.Club = null;
-                race.Season = null;
-                foreach(var score in race.Scores)
-                {
-                    score.Competitor = null;
-                    score.Race = null;
-                }
-                race.Series = null;
-            }
-            foreach(var comp in results.Competitors)
-            {
-                comp.Club = null;
-                comp.Scores = null;
-                comp.Fleets = null;
-                comp.BoatClass = null;
-            }
+            FlatModel.FlatResults results = FlattenResults(series);
+
             _dbContext.HistoricalResults.Add(new dbObj.HistoricalResults
             {
-                SeriesId = seriesId,
+                SeriesId = series.Id,
                 Results = Newtonsoft.Json.JsonConvert.SerializeObject(results)
             });
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        private FlatResults FlattenResults(Series series)
+        {
+            var flatResults = new FlatResults
+            {
+                SeriesId = series.Id,
+                Competitors = FlattenCompetitors(series),
+                Races = FlattenRaces(series),
+                CalculatedScores = FlattenScores(series)
+            };
+            return flatResults;
+        }
+
+        private IEnumerable<FlatCalculatedScore> FlattenScores(Series series)
+        {
+            return
+                series.Results.Results.SelectMany(cs =>
+                    cs.Value.CalculatedScores.Select(s =>
+                        new FlatCalculatedScore
+                        {
+                            RaceId = s.Key.Id,
+                            CompetitorId = cs.Key.Id,
+                            Place = s.Value.RawScore.Place,
+                            Code = s.Value.RawScore.Code,
+                            ScoreValue = s.Value.ScoreValue,
+                            Discard = s.Value.Discard
+
+                        }));
+        }
+
+        private IEnumerable<FlatRace> FlattenRaces(Series series)
+        {
+            return series.Races.Select(r =>
+            new FlatRace
+            {
+                Id = r.Id,
+                Name = r.Name,
+                Date = r.Date,
+                Order = r.Order,
+                Description = r.Description
+            });
+        }
+
+        private IEnumerable<FlatCompetitor> FlattenCompetitors(Series series)
+        {
+            return series.Competitors.Select(c =>
+            new FlatCompetitor
+            {
+                Id = c.Id,
+                Name = c.Name,
+                SailNumber = c.SailNumber,
+                AlternativeSailNumber = c.AlternativeSailNumber,
+                BoatName = c.BoatName
+            });
         }
 
         private async Task PopulateCompetitorsAsync(Series series)
