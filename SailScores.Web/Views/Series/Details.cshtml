@@ -9,7 +9,9 @@
 }
 
 <h2>@Model.Item.Name</h2>
-@Model.Item.Races.Count races with @Model.Item.FlatResults.NumberOfDiscards discards, @Model.Item.FlatResults.Competitors.Count() competitors
+@Model.Item.FlatResults.Races.Count() races 
+with @Model.Item.FlatResults.NumberOfDiscards discards, 
+@Model.Item.FlatResults.Competitors.Count() competitors
 <div class="table-responsive-sm">
     <table class="table table-hover table-sm">
         <thead>

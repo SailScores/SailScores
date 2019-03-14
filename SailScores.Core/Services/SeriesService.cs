@@ -118,12 +118,25 @@ namespace SailScores.Core.Services
 
         private async Task SaveHistoricalResults(Series series)
         {
+            DateTime currentDate = DateTime.Today;
             FlatModel.FlatResults results = FlattenResults(series);
 
             var oldResults = await _dbContext
                 .HistoricalResults
                 .Where(r => r.SeriesId == series.Id).ToListAsync();
             oldResults.ForEach(r => r.IsCurrent = false);
+
+            var todayPrevious = oldResults
+                .Where(r => r.Created >= currentDate)
+                .ToList();
+            todayPrevious.ForEach(r => _dbContext.HistoricalResults.Remove(r));
+
+            var older = oldResults
+                .Where(r => r.Created < currentDate)
+                .OrderByDescending(r => r.Created)
+                .Skip(1)
+                .ToList();
+            older.ForEach(r => _dbContext.HistoricalResults.Remove(r));
 
             _dbContext.HistoricalResults.Add(new dbObj.HistoricalResults
             {
