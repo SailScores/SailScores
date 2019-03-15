@@ -266,6 +266,10 @@ namespace SailScores.Core.Scoring
         }
         private int GetNumberOfDiscards(int numberOfRaces)
         {
+            if(numberOfRaces == 0)
+            {
+                return 0;
+            }
             var discardStrings = _scoringSystem.DiscardPattern.Split(',');
             string selectedString;
             if(numberOfRaces > discardStrings.Length)

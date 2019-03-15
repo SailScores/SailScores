@@ -71,6 +71,10 @@ namespace SailScores.Core.Services
         {
             var seriesDb = await _dbContext
                 .Series
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Scores)
+                    .Include(s => s.Season)
                 .SingleAsync(s => s.Id == seriesId);
 
 
@@ -113,9 +117,7 @@ namespace SailScores.Core.Services
             var flatResults = await GetHistoricalResults(fullSeries);
             if(flatResults == null)
             {
-                await UpdateSeriesResults(clubInitials,
-                    seasonName,
-                    seriesName);
+                await UpdateSeriesResults(seriesDb.Id);
                 flatResults = await GetHistoricalResults(fullSeries);
             }
             fullSeries.FlatResults = flatResults;
@@ -149,7 +151,8 @@ namespace SailScores.Core.Services
             {
                 SeriesId = series.Id,
                 Results = Newtonsoft.Json.JsonConvert.SerializeObject(results),
-                IsCurrent = true
+                IsCurrent = true,
+                Created = DateTime.Now
             });
 
             await _dbContext.SaveChangesAsync();
@@ -161,13 +164,7 @@ namespace SailScores.Core.Services
                 .SingleOrDefaultAsync(r =>
                     r.SeriesId == series.Id
                     && r.IsCurrent);
-            if(dbRow == null)
-            {
-                dbRow = await _dbContext.HistoricalResults
-                    .OrderByDescending(r => r.Created)
-                    .FirstOrDefaultAsync(r =>
-                        r.SeriesId == series.Id);
-            }
+
             if(String.IsNullOrWhiteSpace(dbRow?.Results))
             {
                 return null;
@@ -300,6 +297,8 @@ namespace SailScores.Core.Services
             }
             _dbContext.Series.Add(dbSeries);
             await _dbContext.SaveChangesAsync();
+
+            await UpdateSeriesResults(dbSeries.Id);
         }
 
         private async Task<dbObj.Series> BuildDbSeriesAsync(Model.Series ssSeries, Model.Club club)
@@ -513,6 +512,8 @@ namespace SailScores.Core.Services
             }
 
             await _dbContext.SaveChangesAsync();
+
+            await UpdateSeriesResults(existingSeries.Id);
         }
 
         public async Task Delete(Guid fleetId)
