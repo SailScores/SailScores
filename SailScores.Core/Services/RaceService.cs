@@ -16,13 +16,16 @@ namespace SailScores.Core.Services
     public class RaceService : IRaceService
     {
         private readonly ISailScoresContext _dbContext;
+        private readonly ISeriesService _seriesService;
         private readonly IMapper _mapper;
 
         public RaceService(
             ISailScoresContext dbContext,
+            ISeriesService seriesService,
             IMapper mapper)
         {
             _dbContext = dbContext;
+            _seriesService = seriesService;
             _mapper = mapper;
         }
 
@@ -180,6 +183,10 @@ namespace SailScores.Core.Services
 
             }
             await _dbContext.SaveChangesAsync();
+            foreach (var seriesId in dbRace.SeriesRaces.Select(rs => rs.SeriesId))
+            {
+                await _seriesService.UpdateSeriesResults(seriesId);
+            }
             return dbRace.Id;
         }
 
@@ -187,9 +194,14 @@ namespace SailScores.Core.Services
         {
             var dbRace = await _dbContext
                 .Races
+                .Include(r => r.SeriesRaces)
                 .SingleAsync(r => r.Id ==  raceId);
             _dbContext.Races.Remove(dbRace);
             await _dbContext.SaveChangesAsync();
+            foreach(var seriesId in dbRace.SeriesRaces.Select(rs => rs.SeriesId))
+            {
+                await _seriesService.UpdateSeriesResults(seriesId);
+            }
         }
     }
 }
