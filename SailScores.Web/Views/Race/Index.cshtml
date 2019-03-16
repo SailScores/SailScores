@@ -10,7 +10,7 @@
 
 @section Sidebar {
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-    <div class="sidebar-sticky">
+    <div class="sidebar-sticky sticky-top">
         <ul class="nav flex-column">
             @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
             {
@@ -41,9 +41,16 @@
             {
                 <tr>
                     <td>
-                        @Html.ActionLink(
-                            race.FleetShortName + " : Race " + @race.Order + ", " + @race.Date?.ToString("dddd, MMMM d")
-                            , "Details", new { id = race.Id })
+                        <span class="d-md-none">
+                            @Html.ActionLink(
+                                race.FleetShortName + ": R" + @race.Order + " " + @race.Date?.ToString("ddd, MMM d")
+                                , "Details", new { id = race.Id })
+                        </span>
+                        <span class="d-none d-md-block">
+                            @Html.ActionLink(
+                                race.FleetShortName + " : Race " + @race.Order + ", " + @race.Date?.ToString("dddd, MMMM d")
+                                , "Details", new { id = race.Id })
+                        </span>
                     </td>
                     <td>
                         @foreach (var seriesName in race.SeriesNames)

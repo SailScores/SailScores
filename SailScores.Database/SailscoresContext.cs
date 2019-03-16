@@ -27,6 +27,7 @@ namespace SailScores.Database
 
         public DbSet<File> Files { get; set; }
 
+        public DbSet<HistoricalResults> HistoricalResults { get; set; }
 
         public SailScoresContext(
             DbContextOptions<SailScoresContext> options)
@@ -75,6 +76,10 @@ namespace SailScores.Database
                 .HasOne(s => s.Competitor)
                 .WithMany(c => c.Scores)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<HistoricalResults>()
+                .Property(b => b.Created)
+                .HasDefaultValueSql("getdate()");
 
         }
 

@@ -120,7 +120,7 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                throw;
             }
         }
 

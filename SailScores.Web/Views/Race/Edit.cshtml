@@ -51,7 +51,7 @@
                 @foreach (var series in Model.SeriesOptions)
                 {
                     <option value="@series.Id">
-                        @series.Name
+                        @series.Name (@series.Season.Name)
                     </option>
                 }
             </select>
@@ -95,9 +95,10 @@
                 }
             </ul>
         </div>
-
+        <hr />
         <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-primary" />
+            <input id="submitButton" type="submit" value="Save" class="btn btn-primary" disabled="disabled" />
+            <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
             <a asp-controller="Admin"
                asp-action="Index"
                asp-fragment="races"

@@ -3,7 +3,7 @@
 <div class="card">
     <div class="card-header" id="seriesHeading">
         <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeries" aria-expanded="false" aria-controls="collapseSeries">
-            <h5 id="series">Series</h5>
+            <h4 id="series">Series</h4>
         </button>
     </div>
     <div id="collapseSeries" class="collapse" aria-labelledby="seriesHeading" data-parent="#accordion">
@@ -15,21 +15,24 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Season.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Description)
-                                </td>
-                                <td>
-                                    @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
-                                    @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Season.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Races.Count) Races
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
+                            </td>
+                        </tr>
                         }
                     </tbody>
                 </table>

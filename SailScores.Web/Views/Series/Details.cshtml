@@ -1,5 +1,6 @@
 ﻿@using SailScores.Web.Models.SailScores;
 @using SailScores.Core.Model;
+@using SailScores.Core.FlatModel;
 @model ClubItemViewModel<Series>
 
 @{
@@ -8,60 +9,60 @@
 }
 
 <h2>@Model.Item.Name</h2>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Place</th>
-            <th scope="col">Sail</th>
-            <th scope="col">Helm</th>
-            <th scope="col">Boat</th>
-            <th scope="col" class="text-center">Total</th>
-            @foreach (var race in Model.Item.Results?.Races ?? Enumerable.Empty<Race>())
-            {
-                <th class="text-center">
-                 @Html.ActionLink(
-                    @race.Date?.ToString("M-d") + " R" + @race.Order
-                    , "Details", "Race",  new { id = race.Id })
-                </th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-
-        @foreach (var comp in Model.Item.Results?.Competitors ?? Enumerable.Empty<Competitor>())
-        {
+@Model.Item.FlatResults.Races.Count() races 
+with @Model.Item.FlatResults.NumberOfDiscards discards, 
+@Model.Item.FlatResults.Competitors.Count() competitors
+<div class="table-responsive-sm">
+    <table class="table table-hover table-sm">
+        <thead>
             <tr>
-                <th scope="row">@Model.Item.Results.Results[comp].Rank</th>
-                <th scope="row">@comp.SailNumber</th>
-                <th scope="row">@comp.Name</th>
-                <td>@comp.BoatName</td>
-                <td scope="row" class="text-center"><strong>@Model.Item.Results.Results[comp].TotalScore</strong></td>
-
-                @foreach (var race in Model.Item.Results.Races)
+                <th scope="col">Place</th>
+                <th scope="col">Sail</th>
+                <th scope="col">Helm</th>
+                <th scope="col">Boat</th>
+                <th scope="col" class="text-center">Total</th>
+                @foreach (var race in Model.Item.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())
                 {
-                    var result = Model.Item.Results.GetResult(comp, race);
-
-                    <td class="text-center
-                        @(result.RawScore?.Place == 1 ? "finish-first":"") 
-                        @(result.RawScore?.Place == 2 ? "finish-second":"") 
-                        @(result.RawScore?.Place == 3 ? "finish-third":"") ">
-                        @if (Model.Item.Results.GetResult(comp, race).Discard)
-                        {
-                            @Html.Raw("<span class='text-muted'>")
-                            @Html.Raw("<s>")
-                        }
-                        @Model.Item.Results.GetResult(comp, race)
-                        @if (Model.Item.Results.GetResult(comp, race).Discard)
-                        {
-                            @Html.Raw("</s>")
-                            @Html.Raw("</div>")
-
-                        }
-                    </td>
+                    <th class="text-center">
+                        @Html.ActionLink(
+                           @race.Date?.ToString("M-d") + " R" + @race.Order
+                           , "Details", "Race", new { id = race.Id })
+                    </th>
                 }
             </tr>
-        }
+        </thead>
+        <tbody>
 
-    </tbody>
-</table>
+            @foreach (var comp in Model.Item.FlatResults?.Competitors ?? Enumerable.Empty<FlatCompetitor>())
+            {
+                <tr>
+                    <th scope="row">@Model.Item.FlatResults.GetScore(comp).Rank</th>
+                    <th scope="row">@comp.SailNumber</th>
+                    <th scope="row">@comp.Name</th>
+                    <td>@comp.BoatName</td>
+                    <td scope="row" class="text-center"><strong>@Model.Item.FlatResults.GetScore(comp).TotalScore</strong></td>
+
+                    @foreach (var race in Model.Item.FlatResults.Races)
+                    {
+                        var result = Model.Item.FlatResults.GetScore(comp, race);
+                        <td class="text-center @(result?.Place == 1 ? "finish-first":"") @(result?.Place == 2 ? "finish-second":"") @(result?.Place == 3 ? "finish-third":"") ">
+                            @if (result.Discard)
+                            {
+                                @Html.Raw("<span class='text-muted'>")
+                                @Html.Raw("<s>")
+                            }
+                            @result
+                            @if (result.Discard)
+                            {
+                                @Html.Raw("</s>")
+                                @Html.Raw("</span>")
+
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>

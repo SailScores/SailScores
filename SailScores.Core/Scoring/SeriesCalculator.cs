@@ -37,6 +37,7 @@ namespace SailScores.Core.Scoring
                 .SelectMany(
                     r => r
                         .Scores));
+            returnResults.NumberOfDiscards = GetNumberOfDiscards(series.Races.Count);
             return returnResults;
         }
 
@@ -215,7 +216,7 @@ namespace SailScores.Core.Scoring
                 .Take(compResults.CalculatedScores.Count - numAverages - discards)
                 .Average(s => s.ScoreValue) ?? 0m;
 
-            return Math.Round(average, 1);
+            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
 
         }
 
@@ -265,6 +266,10 @@ namespace SailScores.Core.Scoring
         }
         private int GetNumberOfDiscards(int numberOfRaces)
         {
+            if(numberOfRaces == 0)
+            {
+                return 0;
+            }
             var discardStrings = _scoringSystem.DiscardPattern.Split(',');
             string selectedString;
             if(numberOfRaces > discardStrings.Length)

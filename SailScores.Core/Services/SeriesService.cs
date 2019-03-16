@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SailScores.Core.FlatModel;
 
 namespace SailScores.Core.Services
 {
@@ -47,7 +48,55 @@ namespace SailScores.Core.Services
             return _mapper.Map<Series>(seriesDb);
         }
 
-            public async Task<Series> GetSeriesDetailsAsync(
+        public async Task UpdateSeriesResults(
+            string clubInitials,
+            string seasonName,
+            string seriesName)
+        {
+            var clubId = (await _dbContext.Clubs
+                .SingleAsync(c =>
+                   c.Initials == clubInitials.ToUpperInvariant()
+                )).Id;
+            var seriesDb = await _dbContext
+                .Series
+                .SingleAsync(s => s.ClubId == clubId
+                    && s.Name == seriesName
+                  && s.Season.Name == seasonName);
+
+            await UpdateSeriesResults(seriesDb.Id);
+        }
+
+        public async Task UpdateSeriesResults(
+            Guid seriesId)
+        {
+            var seriesDb = await _dbContext
+                .Series
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Scores)
+                    .Include(s => s.Season)
+                .SingleAsync(s => s.Id == seriesId);
+
+
+            var dbScoringSystem = await _dbContext
+                .ScoringSystems
+                .Where(s => s.ClubId == seriesDb.ClubId)
+                .Include(s => s.ScoreCodes)
+                .SingleAsync();
+            var calculator = new SeriesCalculator(
+                _mapper.Map<ScoringSystem>(dbScoringSystem));
+
+            var fullSeries = _mapper.Map<Series>(seriesDb);
+
+            fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
+            await PopulateCompetitorsAsync(fullSeries);
+
+            var results = calculator.CalculateResults(fullSeries);
+            fullSeries.Results = results;
+            await SaveHistoricalResults(fullSeries);
+        }
+
+        public async Task<Series> GetSeriesDetailsAsync(
             string clubInitials,
             string seasonName,
             string seriesName)
@@ -59,42 +108,151 @@ namespace SailScores.Core.Services
             var seriesDb = await _dbContext
                 .Series
                 .Where(s =>
-                    s.ClubId == clubId
-                    && s.Name == seriesName
-                    && s.Season.Name == seasonName)
-                .Include(s => s.RaceSeries)
-                    .ThenInclude(rs => rs.Race)
-                        .ThenInclude(r => r.Scores)
-                    .Include(s => s.Season)
+                    s.ClubId == clubId)
                 .SingleAsync(s => s.Name == seriesName
                                   && s.Season.Name == seasonName);
 
-            var dbScoringSystem = await _dbContext
-                .ScoringSystems
-                .Where(s => s.ClubId == clubId)
-                .Include(s => s.ScoreCodes)
-                .SingleAsync();
-            var calculator = new SeriesCalculator(
-                _mapper.Map<ScoringSystem>(dbScoringSystem));
-
-            var returnObj = _mapper.Map<Series>(seriesDb);
+            var fullSeries = _mapper.Map<Series>(seriesDb);
             
-            await PopulateCompetitorsAsync(returnObj);
+            var flatResults = await GetHistoricalResults(fullSeries);
+            if(flatResults == null)
+            {
+                await UpdateSeriesResults(seriesDb.Id);
+                flatResults = await GetHistoricalResults(fullSeries);
+            }
+            fullSeries.FlatResults = flatResults;
 
-            var results = calculator.CalculateResults(returnObj);
-            returnObj.Results = results;
-            return returnObj;
+            return fullSeries;
+        }
+
+        private async Task SaveHistoricalResults(Series series)
+        {
+            DateTime currentDate = DateTime.Today;
+            FlatModel.FlatResults results = FlattenResults(series);
+
+            var oldResults = await _dbContext
+                .HistoricalResults
+                .Where(r => r.SeriesId == series.Id).ToListAsync();
+            oldResults.ForEach(r => r.IsCurrent = false);
+
+            var todayPrevious = oldResults
+                .Where(r => r.Created >= currentDate)
+                .ToList();
+            todayPrevious.ForEach(r => _dbContext.HistoricalResults.Remove(r));
+
+            var older = oldResults
+                .Where(r => r.Created < currentDate)
+                .OrderByDescending(r => r.Created)
+                .Skip(1)
+                .ToList();
+            older.ForEach(r => _dbContext.HistoricalResults.Remove(r));
+
+            _dbContext.HistoricalResults.Add(new dbObj.HistoricalResults
+            {
+                SeriesId = series.Id,
+                Results = Newtonsoft.Json.JsonConvert.SerializeObject(results),
+                IsCurrent = true,
+                Created = DateTime.Now
+            });
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task<FlatResults> GetHistoricalResults(Series series)
+        {
+            var dbRow = await _dbContext.HistoricalResults
+                .SingleOrDefaultAsync(r =>
+                    r.SeriesId == series.Id
+                    && r.IsCurrent);
+
+            if(String.IsNullOrWhiteSpace(dbRow?.Results))
+            {
+                return null;
+            }
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
+        }
+
+        private FlatResults FlattenResults(Series series)
+        {
+            var flatResults = new FlatResults
+            {
+                SeriesId = series.Id,
+                Competitors = FlattenCompetitors(series),
+                Races = FlattenRaces(series),
+                CalculatedScores = FlattenSeriesScores(series),
+                NumberOfDiscards = series.Results.NumberOfDiscards
+            };
+            return flatResults;
+        }
+
+        private IEnumerable<FlatSeriesScore> FlattenSeriesScores(Series series)
+        {
+            return series.Results.Results.Select(
+                kvp => new FlatSeriesScore
+                {
+                    CompetitorId = kvp.Key.Id,
+                    Rank = kvp.Value.Rank,
+                    TotalScore = kvp.Value.TotalScore,
+                    Scores = FlattenScores(kvp.Value)
+                });
+        }
+
+        private IEnumerable<FlatCalculatedScore> FlattenScores(SeriesCompetitorResults results)
+        {
+            return results.CalculatedScores.Select(
+                s => new FlatCalculatedScore
+                {
+                    RaceId = s.Key.Id,
+                    Place = s.Value.RawScore.Place,
+                    Code = s.Value.RawScore.Code,
+                    ScoreValue = s.Value.ScoreValue,
+                    Discard = s.Value.Discard
+                });
+        }
+
+        private IEnumerable<FlatRace> FlattenRaces(Series series)
+        {
+            return series.Races
+                .OrderBy(r => r.Date)
+                .ThenBy(r => r.Order)
+                .Select(r =>
+                    new FlatRace
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Date = r.Date,
+                        Order = r.Order,
+                        Description = r.Description
+                    });
+        }
+
+        private IEnumerable<FlatCompetitor> FlattenCompetitors(Series series)
+        {
+            return series.Competitors
+                .OrderBy(c => series.Results.Results[c].Rank)
+                .Select(c =>
+                    new FlatCompetitor
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        SailNumber = c.SailNumber,
+                        AlternativeSailNumber = c.AlternativeSailNumber,
+                        BoatName = c.BoatName
+                    });
         }
 
         private async Task PopulateCompetitorsAsync(Series series)
         {
-            var compIds = series.Races.SelectMany(r => r.Scores)
+            var compIds = series.Races
+                .Where(r => r != null)
+                .SelectMany(r => r.Scores)
                 .Select(s => s.CompetitorId);
             var dbCompetitors = await _dbContext.Competitors.Where(c => compIds.Contains(c.Id)).ToListAsync();
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
 
-            foreach(var score in series.Races.SelectMany(r => r.Scores))
+            foreach(var score in series.Races
+                .Where(r => r != null).SelectMany(r => r.Scores))
             {
                 score.Competitor = series.Competitors.First(c => c.Id == score.CompetitorId);
             }
@@ -139,6 +297,8 @@ namespace SailScores.Core.Services
             }
             _dbContext.Series.Add(dbSeries);
             await _dbContext.SaveChangesAsync();
+
+            await UpdateSeriesResults(dbSeries.Id);
         }
 
         private async Task<dbObj.Series> BuildDbSeriesAsync(Model.Series ssSeries, Model.Club club)
@@ -352,6 +512,8 @@ namespace SailScores.Core.Services
             }
 
             await _dbContext.SaveChangesAsync();
+
+            await UpdateSeriesResults(existingSeries.Id);
         }
 
         public async Task Delete(Guid fleetId)

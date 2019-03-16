@@ -11,7 +11,7 @@ namespace SailScores.Core.Scoring
 
         public Dictionary<Competitor, int?> Places { get; set; }
         
-        public Decimal TotalExcludingDiscards { get; set; }
+        public int NumberOfDiscards { get; set; }
 
         public Dictionary<Competitor, SeriesCompetitorResults> Results { get; set; }
 
@@ -36,17 +36,5 @@ namespace SailScores.Core.Scoring
                 Discard = false
             };
         }
-
-        public int? GetPlace(Competitor comp)
-        {
-            if (Places != null && Places.ContainsKey(comp))
-            {
-                return Places[comp];
-            }
-
-            return null;
-        }
-
-
     }
 }
