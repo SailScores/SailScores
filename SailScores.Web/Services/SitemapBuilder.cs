@@ -1,7 +1,9 @@
 ﻿using SailScores.Web.Models.Sitemap;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -38,7 +40,11 @@ namespace SailScores.Web.Services
                     select CreateItemElement(item)
                     ));
 
-            return sitemap.ToString();
+            using (TextWriter writer = new Utf8StringWriter())
+            {
+                sitemap.Save(writer);
+                return writer.ToString();
+            }
         }
 
         private XElement CreateItemElement(SitemapUrl url)
@@ -61,6 +67,13 @@ namespace SailScores.Web.Services
             }
 
             return itemElement;
+        }
+    }
+    public class Utf8StringWriter : StringWriter
+    {
+        public override Encoding Encoding
+        {
+            get { return Encoding.UTF8; }
         }
     }
 }
