@@ -62,7 +62,8 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+                var club = (await _clubService.GetClubs(true)).Single(c => 
+                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
                 if (!await _authService.CanUserEdit(User, club.Id))
                 {
                     return Unauthorized();
@@ -122,7 +123,8 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/Delete/5
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+            var club = (await _clubService.GetClubs(true)).Single(c =>
+                c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
             if (!await _authService.CanUserEdit(User, club.Id))
             {
                 return Unauthorized();
