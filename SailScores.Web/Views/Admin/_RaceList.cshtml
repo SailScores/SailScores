@@ -10,54 +10,68 @@
             <p>
                 @Html.ActionLink("Create", "Create", "Race", new { /* id=item.PrimaryKey */ })
             </p>
-            <table class="table table-not-wide">
-                <thead>
-                    <tr>
-                        <th>
-                            Fleet
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Name)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Date)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Order)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Description)
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.OrderByDescending(r => r.Date).ThenBy(r => r.Order))
-                    {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Fleet.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Date)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Order)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Description)
-                        </td>
-                        <td>
-                            @Html.ActionLink("Edit", "Edit", "Race", new { id = item.Id }) |
-                            @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id })
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+            <div id="raceAccordion">
+                @foreach (var yearRaces in Model.OrderByDescending(r => r.Date)
+                   .GroupBy(r => r.Date?.Year.ToString() ?? String.Empty, r => r))
+                {
+                <div class="card">
+                    <div id="raceYearAccordion_@yearRaces.Key">
+                        <div class="card-header" id="raceYearHeading_@yearRaces.Key">
+                            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseYear_@yearRaces.Key" aria-expanded="false" aria-controls="collapseRaces">
+                                <h5 id="@yearRaces.Key">@yearRaces.Key</h5>
+                            </button>
+                        </div>
+                        <div id="collapseYear_@yearRaces.Key" class="collapse"
+                             aria-labelledby="raceYearHeading_@yearRaces.Key"
+                             data-parent="#raceYearAccordion_@yearRaces.Key">
+                            <div class="card-body">
+                                <div id="raceYearFleetAccordion_@(yearRaces.Key)">
+                                    @foreach (var fleetRaces in yearRaces.GroupBy(r => r.Fleet?.Name ?? String.Empty, r => r))
+                                    {
+                                        <div class="card">
+                                            <div class="card-header" id="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')">
+                                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" aria-expanded="false" aria-controls="collapseRaces">
+                                                    <h5 id="@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')">@fleetRaces.Key</h5>
+                                                </button>
+                                            </div>
+                                            <div id="collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" class="collapse"
+                                                 aria-labelledby="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')"
+                                                 data-parent="#raceYearFleetAccordion_@(yearRaces.Key)">
+                                                <div class="card-body">
+
+                                                    @foreach (var item in fleetRaces.OrderByDescending(r => r.Date).ThenBy(r => r.Order))
+                                                    {
+                                                        <div class="row">
+                                                            <div class="col-3 col-md-2">
+                                                                @Html.DisplayFor(modelItem => item.Name)
+                                                            </div>
+                                                            <div class="col-3">
+                                                                @Html.DisplayFor(modelItem => item.Date)
+                                                            </div>
+                                                            <div class="col-2">
+                                                                @Html.DisplayFor(modelItem => item.Order)
+                                                            </div>
+                                                            <div class="d-none d-md-block col-md-2">
+                                                                @Html.DisplayFor(modelItem => item.Description)
+                                                            </div>
+                                                            <div class="col-3">
+                                                                @Html.ActionLink("Edit", "Edit", "Race", new { id = item.Id }) |
+                                                                @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id })
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+           
+                </div>
         </div>
-    </div>
 </div>
