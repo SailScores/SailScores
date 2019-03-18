@@ -99,8 +99,10 @@ export function calculatePlaces() {
     for (var i = 1, len = resultItems.length; i < len; i++) {
         var span = resultItems[i].getElementsByClassName("race-place")[0];
         resultItems[i].setAttribute("data-place", i.toString());
+        var origScore = resultItems[i].getAttribute("data-originalScore");
         if (span.id != "competitorTemplate") {
-            if (shouldCompKeepScore(resultItems[i])) {
+            if (shouldCompKeepScore(resultItems[i]) &&
+                origScore !== "0") {
                 span.textContent = (scoreCount).toString();
                 resultItems[i].setAttribute("data-place", scoreCount.toString());
                 scoreCount++;

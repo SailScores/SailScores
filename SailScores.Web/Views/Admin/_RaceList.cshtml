@@ -17,7 +17,9 @@
                 <div class="card">
                     <div id="raceYearAccordion_@yearRaces.Key">
                         <div class="card-header" id="raceYearHeading_@yearRaces.Key">
-                            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseYear_@yearRaces.Key" aria-expanded="false" aria-controls="collapseRaces">
+                            <button class="btn btn-link collapsed" data-toggle="collapse"
+                                    data-target="#collapseYear_@yearRaces.Key"
+                                    aria-expanded="false" aria-controls="collapseRaces">
                                 <h5 id="@yearRaces.Key">@yearRaces.Key</h5>
                             </button>
                         </div>
@@ -26,7 +28,7 @@
                              data-parent="#raceYearAccordion_@yearRaces.Key">
                             <div class="card-body">
                                 <div id="raceYearFleetAccordion_@(yearRaces.Key)">
-                                    @foreach (var fleetRaces in yearRaces.GroupBy(r => r.Fleet?.Name ?? String.Empty, r => r))
+                                    @foreach (var fleetRaces in yearRaces.OrderBy(r => r.Fleet?.Name).GroupBy(r => r.Fleet?.Name ?? String.Empty, r => r))
                                     {
                                         <div class="card">
                                             <div class="card-header" id="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')">
