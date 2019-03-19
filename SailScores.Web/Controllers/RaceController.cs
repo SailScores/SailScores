@@ -46,6 +46,11 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Details(string clubInitials, Guid id)
         {
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+
+            if(race == null)
+            {
+                return NotFound();
+            }
             return View(new ClubItemViewModel<RaceViewModel>
             {
                 Item = race,
@@ -94,6 +99,10 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+            if (race == null)
+            {
+                return NotFound();
+            }
             if (race.ClubId != club.Id)
             {
                 return Unauthorized();
@@ -136,6 +145,10 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+            if (race == null)
+            {
+                return NotFound();
+            }
             if (race.ClubId != club.Id)
             {
                 return Unauthorized();
