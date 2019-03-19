@@ -77,9 +77,10 @@
                         }
                     </select>
                 </li>
-                @foreach (var score in Model.Scores.OrderBy(s => s.Place).ThenBy(s => s.Code))
+                @foreach (var score in Model.Scores.OrderBy(s => s.Place != 0 ? s.Place : 1000).ThenBy(s => s.Code))
                 {
-                    <li id="@score.CompetitorId" data-competitorid="@score.CompetitorId" class="list-group-item">
+                    <li id="@score.CompetitorId" class="list-group-item"
+                        data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
                         <span class="badge badge-secondary badge-pill race-place"></span>
                         <span class="sail-number">@score.Competitor.SailNumber</span>
                         <span class="competitor-name h5">@score.Competitor.Name</span>
