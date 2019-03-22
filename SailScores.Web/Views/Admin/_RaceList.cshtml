@@ -57,8 +57,10 @@
                                                                 @Html.DisplayFor(modelItem => item.Description)
                                                             </div>
                                                             <div class="col-3">
-                                                                @Html.ActionLink("Edit", "Edit", "Race", new { id = item.Id }) |
-                                                                @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id })
+                                                                @Html.ActionLink("Edit", "Edit", "Race", new { id = item.Id },
+                                                               new { @class = "text-primary" }) |
+                                                                @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id },
+                                                               new { @class = "text-danger" })
                                                             </div>
                                                         </div>
                                                     }
