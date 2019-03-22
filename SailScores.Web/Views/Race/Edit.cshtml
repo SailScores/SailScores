@@ -97,13 +97,26 @@
             </ul>
         </div>
         <hr />
-        <div class="form-group">
-            <input id="submitButton" type="submit" value="Save" class="btn btn-primary" disabled="disabled" />
+        <div class="row">
             <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
-            <a asp-controller="Admin"
-               asp-action="Index"
-               asp-fragment="races"
-               class="btn btn-outline-primary">Cancel</a>
+            <div class="col-md-3">
+                <input id="submitButton" type="submit" value="Save" class="btn btn-primary btn-block" disabled="disabled" />
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="Admin"
+                    asp-action="Index"
+                    asp-fragment="races"
+                    class="btn btn-outline-primary btn-block">Cancel</a>
+            </div>
+            <div class="col-md-3">
+
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="Race"
+                    asp-action="Delete"
+                    asp-route-id="@Model.Id"
+                    class="btn btn-danger btn-block">Delete</a>
+            </div>
         </div>
     </form>
 </div>
