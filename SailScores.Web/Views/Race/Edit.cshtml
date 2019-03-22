@@ -47,7 +47,7 @@
         </div>
         <div class="form-group">
             <label asp-for="SeriesIds" class="control-label">Series</label>
-            <select asp-for="SeriesIds" class="form-control" multiple>
+            <select asp-for="SeriesIds" class="form-control selectpicker" multiple>
                 @foreach (var series in Model.SeriesOptions)
                 {
                     <option value="@series.Id">
