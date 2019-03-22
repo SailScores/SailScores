@@ -88,7 +88,11 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
             var competitor = await _competitorService.GetCompetitorAsync(id);
-            if(competitor.ClubId != club.Id)
+            if (competitor == null)
+            {
+                return NotFound();
+            }
+            if (competitor.ClubId != club.Id)
             {
                 return Unauthorized();
             }
@@ -130,6 +134,10 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
             var competitor = await _competitorService.GetCompetitorAsync(id);
+            if (competitor == null)
+            {
+                return NotFound();
+            }
             if (competitor.ClubId != club.Id)
             {
                 return Unauthorized();
