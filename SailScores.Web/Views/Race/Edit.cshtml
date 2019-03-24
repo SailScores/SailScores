@@ -19,7 +19,7 @@
         </div>
         <div class="form-group">
             <label asp-for="Date" class="control-label"></label>
-            <input asp-for="Date" class="form-control" />
+            <input id="date" asp-for="Date" class="form-control" />
             <span asp-validation-for="Date" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -47,7 +47,7 @@
         </div>
         <div class="form-group">
             <label asp-for="SeriesIds" class="control-label">Series</label>
-            <select asp-for="SeriesIds" class="form-control selectpicker" multiple>
+            <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
                 @foreach (var series in Model.SeriesOptions)
                 {
                     <option value="@series.Id">

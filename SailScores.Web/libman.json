@@ -23,46 +23,11 @@
     },
     {
       "library": "jquery@3.3.1",
-      "destination": "wwwroot/vendor/jquery",
-      "files": [
-        "core.js",
-        "jquery.js",
-        "jquery.min.js",
-        "jquery.min.map",
-        "jquery.slim.js",
-        "jquery.slim.min.js",
-        "jquery.slim.min.map"
-      ]
+      "destination": "wwwroot/vendor/jquery"
     },
     {
       "library": "popper.js@1.14.7",
-      "destination": "wwwroot/vendor/popper.js",
-      "files": [
-        "esm/popper.js",
-        "esm/popper.js.map",
-        "esm/popper.min.js",
-        "esm/popper.min.js.map",
-        "esm/popper-utils.js",
-        "esm/popper-utils.js.map",
-        "esm/popper-utils.min.js",
-        "esm/popper-utils.min.js.map",
-        "umd/popper.js",
-        "umd/popper.js.map",
-        "umd/popper.min.js",
-        "umd/popper.min.js.map",
-        "umd/popper-utils.js",
-        "umd/popper-utils.js.map",
-        "umd/popper-utils.min.js",
-        "umd/popper-utils.min.js.map",
-        "popper.js",
-        "popper.js.map",
-        "popper.min.js",
-        "popper.min.js.map",
-        "popper-utils.js",
-        "popper-utils.js.map",
-        "popper-utils.min.js",
-        "popper-utils.min.js.map"
-      ]
+      "destination": "wwwroot/vendor/popper.js"
     },
     {
       "library": "dragula@3.7.2",

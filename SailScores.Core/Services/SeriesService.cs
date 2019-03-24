@@ -26,12 +26,15 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Series>> GetAllSeriesAsync(Guid clubId)
+        public async Task<IEnumerable<Series>> GetAllSeriesAsync(Guid clubId,
+            DateTime? date)
         {
             var seriesDb = await _dbContext
                 .Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Series)
+                .Where(s => date == null ||
+                    (s.Season.Start <= date && s.Season.End > date))
                 .Include(s => s.Season)
                 .ToListAsync();
 
