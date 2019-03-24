@@ -19,7 +19,8 @@
         </div>
         <div class="form-group">
             <label asp-for="Date" class="control-label"></label>
-            <input id="date" asp-for="Date" class="form-control" />
+            <input id="date" asp-for="Date" class="form-control"
+                   onchange="window.SailScores.loadSeriesOptions()" />
             <span asp-validation-for="Date" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -104,18 +105,18 @@
             </div>
             <div class="col-md-3">
                 <a asp-controller="Admin"
-                    asp-action="Index"
-                    asp-fragment="races"
-                    class="btn btn-outline-primary btn-block">Cancel</a>
+                   asp-action="Index"
+                   asp-fragment="races"
+                   class="btn btn-outline-primary btn-block">Cancel</a>
             </div>
             <div class="col-md-3">
 
             </div>
             <div class="col-md-3">
                 <a asp-controller="Race"
-                    asp-action="Delete"
-                    asp-route-id="@Model.Id"
-                    class="btn btn-danger btn-block">Delete</a>
+                   asp-action="Delete"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-danger btn-block">Delete</a>
             </div>
         </div>
     </form>
@@ -123,9 +124,11 @@
 <hr />
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/raceEditor.build.js"></script>
     <script src="~/vendor/dragula/dragula.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
+
     <link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
 
     <script>

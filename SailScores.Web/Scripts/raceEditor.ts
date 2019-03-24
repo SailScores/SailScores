@@ -190,10 +190,10 @@ function setSeries() {
         seriesSelect.append($("<option></option>")
             .attr("value", series.id.toString()).text(series.name));
     });
-    seriesSelect.val(selectedSeriesValues);
-    //seriesSelect.selectpicker('destroy');
+    seriesSelect.selectpicker('destroy');
     seriesSelect.selectpicker();
-    seriesSelect.selectpicker('render');
+    seriesSelect.val(selectedSeriesValues);
+    seriesSelect.selectpicker('refresh');
 
 }
 
