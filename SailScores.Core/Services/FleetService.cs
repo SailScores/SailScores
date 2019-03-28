@@ -41,6 +41,14 @@ namespace SailScores.Core.Services
 
         public async Task SaveNew(Fleet fleet)
         {
+
+            if (_dbContext.Fleets.Any(f =>
+                f.ClubId == fleet.ClubId
+                && (f.ShortName == fleet.ShortName
+                ||f.Name == fleet.Name)))
+            {
+                throw new InvalidOperationException("Cannot create fleet. A fleet with this name or short name already exists.");
+            }
             var dbFleet =_mapper.Map<Db.Fleet>(fleet);
             dbFleet.Id = Guid.NewGuid();
             dbFleet.FleetBoatClasses = new List<Db.FleetBoatClass>();
@@ -65,6 +73,14 @@ namespace SailScores.Core.Services
 
         public async Task Update(Fleet fleet)
         {
+            if (_dbContext.Fleets.Any(f =>
+                f.Id != fleet.Id
+                && f.ClubId == fleet.ClubId
+                && (f.ShortName == fleet.ShortName
+                || f.Name == fleet.Name)))
+            {
+                throw new InvalidOperationException("Cannot update fleet. A fleet with this name or short name already exists.");
+            }
             var existingFleet = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
                 .Include(f => f.CompetitorFleets)

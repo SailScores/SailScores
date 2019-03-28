@@ -25,32 +25,32 @@
         </li>
     }
 </ul>
-    <table class="table">
-        <thead>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Place</th>
+            <th>Sail</th>
+            <th>Sailor</th>
+            <th>Boat</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var score in Model.Item.Scores)
+        {
             <tr>
-                <th>Place</th>
-                <th>Sail</th>
-                <th>Sailor</th>
-                <th>Boat</th>
+                <td>
+                    @((score.Place == null || score.Place == 0) ? score.Code : score.Place.ToString())
+                </td>
+                <td>
+                    @score.Competitor.SailNumber
+                </td>
+                <td>
+                    @score.Competitor.Name
+                </td>
+                <td>
+                    @score.Competitor.BoatName
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var score in Model.Item.Scores)
-            {
-                <tr>
-                    <td>
-                        @((score.Place == null || score.Place == 0) ? score.Code : score.Place.ToString())
-                    </td>
-                    <td>
-                        @score.Competitor.SailNumber
-                    </td>
-                    <td>
-                        @score.Competitor.Name
-                    </td>
-                    <td>
-                        @score.Competitor.BoatName
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        }
+    </tbody>
+</table>

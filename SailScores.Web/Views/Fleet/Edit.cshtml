@@ -35,7 +35,6 @@
                 <select id="fleetType" asp-for="FleetType" class="form-control"
                         asp-items="(Html.GetEnumSelectList<SailScores.Api.Enumerations.FleetType>())"
                         onchange="checkVisibility()">
-                    <option selected="selected" value="">Select the type of Fleet</option>
                 </select>
                 <span asp-validation-for="FleetType" class="text-danger"></span>
             </div>

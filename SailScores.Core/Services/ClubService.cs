@@ -136,13 +136,19 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateClub(Club clubObject)
+        public async Task UpdateClub(Club club)
         {
-            var dbClub = _dbContext.Clubs.Single(c => c.Id == clubObject.Id);
-            dbClub.Name = clubObject.Name;
-            dbClub.IsHidden = clubObject.IsHidden;
-            dbClub.Url = clubObject.Url;
-            dbClub.Description = clubObject.Description;
+            if (_dbContext.Clubs.Any(s =>
+                s.Id != club.Id
+                && s.Initials == club.Initials))
+            {
+                throw new InvalidOperationException("Cannot update club. A club with these initials already exists.");
+            }
+            var dbClub = _dbContext.Clubs.Single(c => c.Id == club.Id);
+            dbClub.Name = club.Name;
+            dbClub.IsHidden = club.IsHidden;
+            dbClub.Url = club.Url;
+            dbClub.Description = club.Description;
             await _dbContext.SaveChangesAsync();
         }
     }

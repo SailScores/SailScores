@@ -147,6 +147,7 @@ namespace SailScores.Core.Services
             dbRace.Order = race.Order;
             dbRace.Date = race.Date;
             dbRace.Description = race.Description;
+            dbRace.State = race.State;
 
             if(race.FleetId != null)
             {

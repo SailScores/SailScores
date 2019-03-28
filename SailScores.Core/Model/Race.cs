@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -30,11 +31,12 @@ namespace SailScores.Core.Model
 
         public Season Season { get; set; }
 
+        public RaceState? State { get; set; }
+
         public bool Equals(Race other)
         {
             return this.Id == other.Id
                 && (this.ClubId == other.ClubId || this.Club == other.Club)
-                && (this.Name == other.Name)
                 && (this.Name == other.Name)
                 && (this.Date == other.Date)
                 && (this.Order == other.Order)

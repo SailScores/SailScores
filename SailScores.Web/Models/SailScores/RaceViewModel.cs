@@ -26,6 +26,15 @@ namespace SailScores.Web.Models.SailScores
                 {
                     sb.Append("(");
                 }
+                switch (State)
+                {
+                    case Api.Enumerations.RaceState.Scheduled:
+                        sb.Append("Scheduled for ");
+                        break;
+                    case Api.Enumerations.RaceState.Canceled:
+                        sb.Append("Canceled. ");
+                        break;
+                }
                 if (Date.HasValue)
                 {
                     sb.Append(Date.Value.ToString("MMMM d, yyyy"));

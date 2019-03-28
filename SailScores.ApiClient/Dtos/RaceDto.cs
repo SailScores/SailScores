@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -28,6 +29,8 @@ namespace SailScores.Api.Dtos
         // Scores is the big exception to Dto opbjects not containing other non-primitive types
         public IList<ScoreDto> Scores { get; set; }
         public IList<Guid> SeriesIds { get; set; }
+
+        public RaceState State { get; set; }
 
         public bool Equals(RaceDto other)
         {

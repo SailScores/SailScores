@@ -48,7 +48,7 @@
                         </span>
                         <span class="d-none d-md-block">
                             @Html.ActionLink(
-                                race.FleetShortName + " : Race " + @race.Order + ", " + @race.Date?.ToString("dddd, MMMM d")
+                                race.CalculatedName
                                 , "Details", new { id = race.Id })
                         </span>
                     </td>

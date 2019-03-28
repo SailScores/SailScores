@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Model;
+﻿using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,8 @@ namespace SailScores.Core.Scoring
                 .SelectMany(
                     r => r
                         .Scores));
-            returnResults.NumberOfDiscards = GetNumberOfDiscards(series.Races.Count);
+            var sailedRaceCount = returnResults.GetSailedRaceCount();
+            returnResults.NumberOfDiscards = GetNumberOfDiscards(sailedRaceCount);
             return returnResults;
         }
 
@@ -81,7 +83,7 @@ namespace SailScores.Core.Scoring
         private void CalculateCodedResults(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
         {
             //Fill in DNCs
-            foreach (var race in resultsWorkInProgress.Races)
+            foreach (var race in resultsWorkInProgress.SailedRaces)
             {
                 if (!compResults.CalculatedScores.ContainsKey(race))
                 {
@@ -106,7 +108,7 @@ namespace SailScores.Core.Scoring
         private void CalculateRaceDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
         {
             //calculate non-average codes first
-            foreach (var race in resultsWorkInProgress.Races)
+            foreach (var race in resultsWorkInProgress.SailedRaces)
             {
                 var score = compResults.CalculatedScores[race];
                 var scoreCode = GetScoreCode(score.RawScore);
@@ -126,7 +128,7 @@ namespace SailScores.Core.Scoring
 
         private void CalculateSeriesDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
         {
-            foreach (var race in resultsWorkInProgress.Races)
+            foreach (var race in resultsWorkInProgress.SailedRaces)
             {
                 var score = compResults.CalculatedScores[race];
                 var scoreCode = GetScoreCode(score.RawScore);
@@ -261,7 +263,7 @@ namespace SailScores.Core.Scoring
 
         private int GetNumberOfDiscards(SeriesResults resultsWorkInProgress)
         {
-            return GetNumberOfDiscards(resultsWorkInProgress.Races.Count);
+            return GetNumberOfDiscards(resultsWorkInProgress.GetSailedRaceCount());
 
         }
         private int GetNumberOfDiscards(int numberOfRaces)
@@ -324,6 +326,9 @@ namespace SailScores.Core.Scoring
             };
             foreach (var score in scores.Where(s => s.Competitor == comp))
             {
+                if((score.Race?.State ?? RaceState.Raced) != RaceState.Raced) {
+                    continue;
+                }
                 returnResults.CalculatedScores[score.Race] = new CalculatedScore
                 {
                     Discard = false,
