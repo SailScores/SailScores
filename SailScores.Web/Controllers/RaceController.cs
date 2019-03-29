@@ -51,10 +51,20 @@ namespace SailScores.Web.Controllers
             {
                 return NotFound();
             }
+            var canEdit = false;
+            if(User != null && (User.Identity?.IsAuthenticated ?? false))
+            {
+
+                var club = (await _clubService.GetClubs(true)).Single(c =>
+                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
+                canEdit = await _authService.CanUserEdit(User, club.Id);
+            }
+
             return View(new ClubItemViewModel<RaceViewModel>
             {
                 Item = race,
-                ClubInitials = clubInitials
+                ClubInitials = clubInitials,
+                CanEdit = canEdit
             });
         }
 

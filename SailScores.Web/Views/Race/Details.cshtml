@@ -11,7 +11,11 @@
 <h2>
     @Model.Item.DisplayName
 </h2>
-
+@if (Model.CanEdit)
+{
+    @Html.ActionLink("Edit", "Edit", "Race", new { id = Model.Item.Id },
+        new { @class = "btn btn-outline-primary btn-sm" })
+}
 <h4>
     @Model.Item.Fleet.Name
 </h4>

@@ -90,7 +90,10 @@ namespace SailScores.Core.Services
                     .ThenInclude(f => f.FleetBoatClasses)
                     .FirstOrDefaultAsync();
 
-            return _mapper.Map<Model.Club>(club);
+            var retClub = _mapper.Map<Model.Club>(club);
+
+            retClub.Seasons = retClub.Seasons.OrderByDescending(s => s.Start).ToList();
+            return retClub;
         }
 
         public async Task<Model.Club> GetFullClub(Guid id)

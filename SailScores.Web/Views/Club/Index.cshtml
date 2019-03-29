@@ -59,8 +59,9 @@
                 {
                     <li>
                         <a asp-controller="Race"
+                           asp-action="Details"
                            asp-route-clubInitials="@Model.Initials"
-                           asp-route-id="@race.Id">@(race.Name ?? race.Date?.ToString())</a>
+                           asp-route-id="@race.Id">@race.CalculatedName</a>
                     </li>
                 }
             </ul>
