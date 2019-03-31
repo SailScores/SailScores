@@ -93,6 +93,10 @@ namespace SailScores.Core.Services
             var retClub = _mapper.Map<Model.Club>(club);
 
             retClub.Seasons = retClub.Seasons.OrderByDescending(s => s.Start).ToList();
+            retClub.Series = retClub.Series
+                .OrderByDescending(s => s.Season.Start)
+                .ThenBy(s => s.Name)
+                .ToList();
             return retClub;
         }
 

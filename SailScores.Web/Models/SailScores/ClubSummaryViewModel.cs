@@ -45,6 +45,7 @@ namespace SailScores.Web.Models.SailScores
             && (r.State ?? RaceState.Raced) == RaceState.Scheduled)
             .OrderBy(r => r.Date)
             .ThenBy(r => r.Order)
+            .ThenBy(r => r.FleetName)
             .Take(6);
     }
 }

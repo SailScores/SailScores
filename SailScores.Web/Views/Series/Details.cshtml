@@ -42,7 +42,7 @@ with @Model.Item.FlatResults.NumberOfDiscards discards,
                         new FlatCompetitor {
                             Name= "No competitors"}
                         };
-                } 
+                }
             }
             @foreach (var comp in compList)
             {
@@ -96,10 +96,10 @@ with @Model.Item.FlatResults.NumberOfDiscards discards,
                         else
                         {
                             <td></td>
-
                         }
                     }
-                    firstRow = false;
+                }
+                @{firstRow = false;
                 }
             </tr>
             }
