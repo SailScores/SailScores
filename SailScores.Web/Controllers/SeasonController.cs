@@ -68,7 +68,11 @@ namespace SailScores.Web.Controllers
             }
             var season =
                 club.Seasons
-                .Single(c => c.Id == id);
+                .SingleOrDefault(c => c.Id == id);
+            if (season == null)
+            {
+                return NotFound();
+            }
             return View(season);
         }
 
@@ -102,7 +106,11 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            var season = club.Seasons.Single(c => c.Id == id);
+            var season = club.Seasons.SingleOrDefault(c => c.Id == id);
+            if (season == null)
+            {
+                return NotFound();
+            }
             //todo: add blocker if class contains boats. (or way to move boats.)
             return View(season);
         }

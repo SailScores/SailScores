@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SailScores.Api.Enumerations;
 using SailScores.Database.Entities;
 
 namespace SailScores.Database
@@ -80,6 +81,13 @@ namespace SailScores.Database
             modelBuilder.Entity<HistoricalResults>()
                 .Property(b => b.Created)
                 .HasDefaultValueSql("getdate()");
+
+            modelBuilder
+                .Entity<Race>()
+                .Property(e => e.State)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (RaceState)Enum.Parse(typeof(RaceState), v));
 
         }
 

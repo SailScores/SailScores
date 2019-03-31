@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Model;
+﻿using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -33,5 +34,14 @@ namespace SailScores.Web.Models.SailScores
 
         public IList<Score> Scores { get; set; }
 
+        public RaceState? State { get; set; }
+
+        public String CalculatedName
+        {
+            get
+            {
+                return FleetShortName + ": Race " + Order + " " + Date?.ToString("ddd, MMM d");
+            }
+        }
     }
 }

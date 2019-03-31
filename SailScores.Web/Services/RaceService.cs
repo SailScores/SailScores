@@ -72,6 +72,10 @@ namespace SailScores.Web.Services
         {
 
             var raceDto = await _coreRaceService.GetRaceAsync(id);
+            if(raceDto == null)
+            {
+                return null;
+            }
             var retRace = _mapper.Map<RaceViewModel>(raceDto);
             retRace.Scores = retRace.Scores
                 .OrderBy(s => (s.Place == null || s.Place == 0) ? int.MaxValue : s.Place)

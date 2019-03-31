@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Api.Enumerations;
+using System;
 
 namespace SailScores.Core.FlatModel
 {
@@ -11,6 +12,7 @@ namespace SailScores.Core.FlatModel
         public int Order { get; set; }
         public String Description { get; set; }
 
+        public RaceState? State { get; set; }
 
     }
 }

@@ -46,10 +46,25 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Details(string clubInitials, Guid id)
         {
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+
+            if(race == null)
+            {
+                return NotFound();
+            }
+            var canEdit = false;
+            if(User != null && (User.Identity?.IsAuthenticated ?? false))
+            {
+
+                var club = (await _clubService.GetClubs(true)).Single(c =>
+                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
+                canEdit = await _authService.CanUserEdit(User, club.Id);
+            }
+
             return View(new ClubItemViewModel<RaceViewModel>
             {
                 Item = race,
-                ClubInitials = clubInitials
+                ClubInitials = clubInitials,
+                CanEdit = canEdit
             });
         }
 
@@ -68,7 +83,8 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+                var club = (await _clubService.GetClubs(true)).Single(c =>
+                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
                 if (!await _authService.CanUserEdit(User, club.Id))
                 {
                     return Unauthorized();
@@ -85,14 +101,22 @@ namespace SailScores.Web.Controllers
         }
 
         [Authorize]
-        public async Task<ActionResult> Edit(string clubInitials, Guid id)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            Guid id,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             var club = await _clubService.GetFullClub(clubInitials);
             if (!await _authService.CanUserEdit(User, club.Id))
             {
                 return Unauthorized();
             }
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+            if (race == null)
+            {
+                return NotFound();
+            }
             if (race.ClubId != club.Id)
             {
                 return Unauthorized();
@@ -100,14 +124,19 @@ namespace SailScores.Web.Controllers
             var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
             await _raceService.AddOptionsToRace(raceWithOptions);
+
             return View(raceWithOptions);
         }
 
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(Guid id, RaceWithOptionsViewModel race)
+        public async Task<IActionResult> Edit(
+            Guid id,
+            RaceWithOptionsViewModel race,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             try
             {
                 if (!await _authService.CanUserEdit(User, race.ClubId))
@@ -116,7 +145,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _raceService.SaveAsync(race);
 
-                return RedirectToAction("Index", "Admin");
+                return RedirectToLocal(returnUrl);
             }
             catch
             {
@@ -128,12 +157,17 @@ namespace SailScores.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+            var club = (await _clubService.GetClubs(true)).Single(c =>
+                c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
             if (!await _authService.CanUserEdit(User, club.Id))
             {
                 return Unauthorized();
             }
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+            if (race == null)
+            {
+                return NotFound();
+            }
             if (race.ClubId != club.Id)
             {
                 return Unauthorized();
@@ -162,6 +196,17 @@ namespace SailScores.Web.Controllers
             catch
             {
                 return View();
+            }
+        }
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
         }
 

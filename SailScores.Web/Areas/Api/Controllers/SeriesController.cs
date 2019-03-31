@@ -31,9 +31,13 @@ namespace SailScores.Web.Areas.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<SeriesDto>> Get(Guid clubId)
+        [AllowAnonymous]
+        public async Task<IEnumerable<SeriesDto>> Get(
+            Guid clubId,
+            DateTime? date
+            )
         {
-            var competitors =  await _service.GetAllSeriesAsync(clubId);
+            var competitors =  await _service.GetAllSeriesAsync(clubId, date);
             return _mapper.Map<List<SeriesDto>>(competitors);
         }
 
@@ -55,7 +59,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             var seriesBizObj = _mapper.Map<Series>(series);
             await _service.SaveNewSeries(seriesBizObj);
             var savedSeries =
-                (await _service.GetAllSeriesAsync(series.ClubId))                
+                (await _service.GetAllSeriesAsync(series.ClubId,null))                
                 .Single(s => s.Name == series.Name
                     && s.Season.Id == series.SeasonId);
             return Ok(savedSeries.Id);

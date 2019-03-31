@@ -8,7 +8,7 @@
 <h4>Update a race</h4>
 <hr />
 <div class="row">
-    <form id="raceform" asp-action="Edit">
+    <form id="raceform" asp-action="Edit" asp-route-returnurl="@ViewData["ReturnUrl"]">
         <input type="hidden" id="clubId" asp-for="ClubId" />
         <input type="hidden" id="Id" asp-for="Id" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -19,13 +19,22 @@
         </div>
         <div class="form-group">
             <label asp-for="Date" class="control-label"></label>
-            <input asp-for="Date" class="form-control" />
+            <input id="date" asp-for="Date" class="form-control"
+                   onchange="window.SailScores.loadSeriesOptions()" />
             <span asp-validation-for="Date" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
             <input asp-for="Order" class="form-control" />
             <span asp-validation-for="Order" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="State" class="control-label"></label>
+            <select id="fleetType" asp-for="State" class="form-control"
+                    asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())">
+            </select>
+            <span asp-validation-for="State" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="Description" class="control-label">Description<em>&ensp;Optional</em></label>
@@ -47,7 +56,7 @@
         </div>
         <div class="form-group">
             <label asp-for="SeriesIds" class="control-label">Series</label>
-            <select asp-for="SeriesIds" class="form-control" multiple>
+            <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
                 @foreach (var series in Model.SeriesOptions)
                 {
                     <option value="@series.Id">
@@ -77,9 +86,10 @@
                         }
                     </select>
                 </li>
-                @foreach (var score in Model.Scores.OrderBy(s => s.Place).ThenBy(s => s.Code))
+                @foreach (var score in Model.Scores.OrderBy(s => s.Place != 0 ? s.Place : 1000).ThenBy(s => s.Code))
                 {
-                    <li id="@score.CompetitorId" data-competitorid="@score.CompetitorId" class="list-group-item">
+                    <li id="@score.CompetitorId" class="list-group-item"
+                        data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
                         <span class="badge badge-secondary badge-pill race-place"></span>
                         <span class="sail-number">@score.Competitor.SailNumber</span>
                         <span class="competitor-name h5">@score.Competitor.Name</span>
@@ -96,22 +106,37 @@
             </ul>
         </div>
         <hr />
-        <div class="form-group">
-            <input id="submitButton" type="submit" value="Save" class="btn btn-primary" disabled="disabled" />
+        <div class="row">
             <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
-            <a asp-controller="Admin"
-               asp-action="Index"
-               asp-fragment="races"
-               class="btn btn-outline-primary">Cancel</a>
+            <div class="col-md-3">
+                <input id="submitButton" type="submit" value="Save" class="btn btn-primary btn-block" disabled="disabled" />
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="races"
+                   class="btn btn-outline-primary btn-block">Cancel</a>
+            </div>
+            <div class="col-md-3">
+
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="Race"
+                   asp-action="Delete"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-danger btn-block">Delete</a>
+            </div>
         </div>
     </form>
 </div>
 <hr />
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/raceEditor.build.js"></script>
     <script src="~/vendor/dragula/dragula.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
+
     <link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
 
     <script>

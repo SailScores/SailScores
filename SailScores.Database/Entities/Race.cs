@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,6 +15,8 @@ namespace SailScores.Database.Entities
         public String Name { get; set; }
 
         public DateTime? Date { get; set; }
+
+        public RaceState? State { get; set; }
 
         // Typically the order of the race for a given date, but may not be.
         // used for display order after date. 

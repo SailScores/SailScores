@@ -39,3 +39,25 @@ body {
 .finish-third {
     background: #f3cf9b;
 }
+
+.canceled {
+    background: #FFBBBB;
+    align-content: center;
+    text-align: center;
+
+    span {
+        writing-mode: vertical-lr;
+        text-orientation: upright;
+    }
+}
+
+.scheduled {
+    background: #DDDDDD;
+    align-content: center;
+    text-align: center;
+
+    span {
+        writing-mode: vertical-lr;
+        text-orientation: upright;
+    }
+}

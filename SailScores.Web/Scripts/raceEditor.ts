@@ -1,5 +1,6 @@
 ﻿/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
-import { competitorDto, scoreCodeDto } from "./interfaces/server";
+///
+import { competitorDto, scoreCodeDto, seriesDto } from "./interfaces/server";
 
 import { Guid } from "./guid";
 import * as dragula from "dragula";
@@ -28,16 +29,22 @@ export function init() {
         removeScoresFieldsFromForm(form);
     });
     loadFleet();
+    loadSeriesOptions();
     calculatePlaces();
     $("#submitButton").prop("disabled", false);
     $("#submitDisabledMessage").prop("hidden", true);
 }
-
+export function loadSeriesOptions() {
+    let clubId = ($("#clubId").val() as string);
+    let dateStr = $("#date").val() as string;
+    getSeries(clubId, dateStr);
+}
 export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
     let fleetId = ($("#fleetId").val() as string);
     getCompetitors(clubId, fleetId);
 }
+
 var c: number = 0;
 function addNewCompetitor(competitor: competitorDto) {
     var resultDiv = document.getElementById("results");
@@ -99,8 +106,10 @@ export function calculatePlaces() {
     for (var i = 1, len = resultItems.length; i < len; i++) {
         var span = resultItems[i].getElementsByClassName("race-place")[0];
         resultItems[i].setAttribute("data-place", i.toString());
+        var origScore = resultItems[i].getAttribute("data-originalScore");
         if (span.id != "competitorTemplate") {
-            if (shouldCompKeepScore(resultItems[i])) {
+            if (shouldCompKeepScore(resultItems[i]) &&
+                origScore !== "0") {
                 span.textContent = (scoreCount).toString();
                 resultItems[i].setAttribute("data-place", scoreCount.toString());
                 scoreCount++;
@@ -153,6 +162,39 @@ function getCompetitors(clubId: string, fleetId: string) {
                 initializeAutoComplete();
             });
     }
+}
+
+
+var seriesOptions: seriesDto[];
+function getSeries(clubId: string, date: string) {
+    if (clubId && date) {
+        $.getJSON("/api/Series",
+            {
+                clubId: clubId,
+                date: date
+            },
+            function (data: seriesDto[]) {
+                seriesOptions = data;
+                setSeries();
+            });
+    }
+}
+
+function setSeries() {
+    let seriesSelect = $('#seriesIds') as JQuery;
+    var selectedSeriesValues = seriesSelect.val();
+    seriesSelect.empty();
+
+    $.each(seriesOptions, function (key, value) {
+        let series = value as seriesDto;
+        seriesSelect.append($("<option></option>")
+            .attr("value", series.id.toString()).text(series.name));
+    });
+    seriesSelect.selectpicker('destroy');
+    seriesSelect.selectpicker();
+    seriesSelect.val(selectedSeriesValues);
+    seriesSelect.selectpicker('refresh');
+
 }
 
 var autoCompleteSetup: boolean = false;

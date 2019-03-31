@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using SailScores.Api.Enumerations;
 
 namespace SailScores.Web.Models.SailScores
 {
@@ -25,15 +26,26 @@ namespace SailScores.Web.Models.SailScores
         public IList<BoatClass> BoatClasses { get; set; }
         public IList<Season> Seasons { get; set; }
         public IList<Series> Series { get; set; }
-        public IList<Race> Races { get; set; }
+        public IList<RaceSummaryViewModel> Races { get; set; }
         public IList<ScoreCode> ScoreCodes { get; set; }
 
         private DateTime recentCutoff = DateTime.Now.AddDays(-8);
-        public IEnumerable<Race> RecentRaces => Races?.Where(r => r.Date > recentCutoff);
+        public IEnumerable<RaceSummaryViewModel> RecentRaces => Races?.Where(r => r.Date > recentCutoff
+            && (r.State ?? RaceState.Raced) == RaceState.Raced)
+            .OrderByDescending(r => r.Date)
+            .ThenBy(r => r.Order);
 
         public IEnumerable<Series> RecentSeries => Series
                 ?.Where(s =>
                     s.Races
-                    ?.Any(r => r.Date > recentCutoff) ?? false);
+                    ?.Any(r => r.Date > recentCutoff
+                        && (r.State ?? RaceState.Raced) == RaceState.Raced) ?? false);
+
+        public IEnumerable<RaceSummaryViewModel> UpcomingRaces => Races?.Where(r => r.Date >= DateTime.Today.AddDays(-1)
+            && (r.State ?? RaceState.Raced) == RaceState.Scheduled)
+            .OrderBy(r => r.Date)
+            .ThenBy(r => r.Order)
+            .ThenBy(r => r.FleetName)
+            .Take(6);
     }
 }

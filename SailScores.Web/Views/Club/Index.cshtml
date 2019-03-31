@@ -27,79 +27,101 @@
     </div>
 }
 <div class="row">
-        <div class="col-4 order-md-first order-last">
+    <div class="col-3 order-md-first order-last">
 
-            <h3>Seasons</h3>
-            @if (Model.Seasons.Count > 0)
-            {
-                <ul class="list-unstyled">
-                    @foreach (var season in Model.Seasons)
-                    {
-                        <li>
-                            <a asp-controller="Series"
-                               asp-route-clubInitials="@Model.Initials"
-                               asp-fragment="@season.Name">
-                                @season.Name
-                            </a>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p><i>No seasons are set up.</i></p>
-            }
-        </div>
-        <div class="col-sm-6 col-md-4">
-            <h3>Recent Races</h3>
-            @if (Model.RecentRaces.Count() > 0)
-            {
-                <ul class="list-unstyled">
-                    @foreach (var race in Model.RecentRaces)
-                    {
-                        <li>
-                            <a asp-controller="Race"
-                               asp-route-clubInitials="@Model.Initials"
-                               asp-route-id="@race.Id">@(race.Name ?? race.Date?.ToString())</a>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p><i>No recent races found.</i></p>
-            }
-            <p>
-                <a asp-controller="Race"
-                   asp-route-clubInitials="@Model.Initials">
-                    All Races
-                </a>
-            </p>
-        </div>
-        <div class="col-sm-4 col-md-4">
-            <h3>Recent Series</h3>
-            @if (Model.RecentSeries.Count() > 0)
-            {
-                <ul class="list-unstyled">
-                    @foreach (var series in Model.RecentSeries)
-                    {
-                        <li>
-                            <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
-                                @series.Name
-                            </a>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p><i>No recent Series found.</i></p>
-            }
-            <p>
-                <a asp-controller="Series"
-                   asp-route-clubInitials="@Model.Initials">
-                    All Series
-                </a>
-            </p>
-        </div>
+        <h3>Seasons</h3>
+        @if (Model.Seasons.Count > 0)
+        {
+            <ul class="list-unstyled">
+                @foreach (var season in Model.Seasons)
+                {
+                    <li>
+                        <a asp-controller="Series"
+                           asp-route-clubInitials="@Model.Initials"
+                           asp-fragment="@season.Name">
+                            @season.Name
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p><i>No seasons are set up.</i></p>
+        }
     </div>
+    <div class="col-sm-6 col-md-3">
+        <h3>Recent Races</h3>
+        @if (Model.RecentRaces.Count() > 0)
+        {
+            <ul class="list-unstyled">
+                @foreach (var race in Model.RecentRaces)
+                {
+                    <li>
+                        <a asp-controller="Race"
+                           asp-action="Details"
+                           asp-route-clubInitials="@Model.Initials"
+                           asp-route-id="@race.Id">@race.CalculatedName</a>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p><i>No recent races found.</i></p>
+        }
+        <p>
+            <a asp-controller="Race"
+               asp-route-clubInitials="@Model.Initials">
+                All Races
+            </a>
+        </p>
+    </div>
+    <div class="col-sm-4 col-md-3">
+        <h3>Recent Series</h3>
+        @if (Model.RecentSeries.Count() > 0)
+        {
+            <ul class="list-unstyled">
+                @foreach (var series in Model.RecentSeries)
+                {
+                    <li>
+                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
+                            @series.Name
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p><i>No recent Series found.</i></p>
+        }
+        <p>
+            <a asp-controller="Series"
+               asp-route-clubInitials="@Model.Initials">
+                All Series
+            </a>
+        </p>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <h3>Upcoming Races</h3>
+        @if (Model.UpcomingRaces.Count() > 0)
+        {
+            <ul class="list-unstyled">
+                @foreach (var race in Model.UpcomingRaces)
+                {
+                <li>
+                    <a asp-controller="Race"
+                       asp-action="Details"
+                       asp-route-clubInitials="@Model.Initials"
+                       asp-route-id="@race.Id">@race.CalculatedName</a>
+                </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p><i>No scheduled races found.</i></p>
+        }
+    </div>
+</div>

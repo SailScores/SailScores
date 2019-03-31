@@ -83,10 +83,13 @@ namespace SailScores.Core.Services
                 .Include(r => r.Fleet)
                 .Include(r => r.Scores)
                 .FirstOrDefaultAsync(c => c.Id == raceId);
-
+            if (race == null)
+            {
+                return null;
+            }
             var modelRace = _mapper.Map<Model.Race>(race);
+            
             await PopulateCompetitors(modelRace);
-
 
             var dbSeason = _dbContext.Clubs
                 .Include(c => c.Seasons)
@@ -110,6 +113,10 @@ namespace SailScores.Core.Services
 
         private async Task PopulateCompetitors(Race race)
         {
+            if (race?.Scores == null || !race.Scores.Any())
+            {
+                return;
+            }
             var compIds = race.Scores
                 .Select(s => s.CompetitorId);
             var dbCompetitors = await _dbContext.Competitors.Where(c => compIds.Contains(c.Id)).ToListAsync();
@@ -140,6 +147,7 @@ namespace SailScores.Core.Services
             dbRace.Order = race.Order;
             dbRace.Date = race.Date;
             dbRace.Description = race.Description;
+            dbRace.State = race.State;
 
             if(race.FleetId != null)
             {

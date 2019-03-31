@@ -1,6 +1,8 @@
-﻿using SailScores.Core.Model;
+﻿using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
@@ -35,6 +37,20 @@ namespace SailScores.Core.Scoring
                 },
                 Discard = false
             };
+        }
+
+
+        public int GetSailedRaceCount()
+        {
+            return Races?.Count(r =>
+            (r.State ?? RaceState.Raced) == RaceState.Raced)
+                ?? 0;
+        }
+
+        public IEnumerable<Race> SailedRaces { get
+            {
+                return Races.Where(r => (r?.State ?? RaceState.Raced) == RaceState.Raced);
+            }
         }
     }
 }

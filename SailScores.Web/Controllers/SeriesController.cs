@@ -80,7 +80,8 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c => c.Initials == clubInitials);
+                var club = (await _clubService.GetClubs(true)).Single(c =>
+                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
                 if (!await _authService.CanUserEdit(User, club.Id))
                 {
                     return Unauthorized();
@@ -106,7 +107,11 @@ namespace SailScores.Web.Controllers
             }
             var series =
                 club.Series
-                .Single(c => c.Id == id);
+                .SingleOrDefault(c => c.Id == id);
+            if (series == null)
+            {
+                return NotFound();
+            }
             var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
             seriesWithOptions.SeasonOptions = club.Seasons;
             return View(seriesWithOptions);
@@ -144,7 +149,11 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            var series = club.Series.Single(c => c.Id == id);
+            var series = club.Series.SingleOrDefault(c => c.Id == id);
+            if (series == null)
+            {
+                return NotFound();
+            }
             return View(series);
         }
 

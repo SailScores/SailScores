@@ -11,7 +11,9 @@ namespace SailScores.Core.Services
             string clubInitials,
             string seasonName,
             string seriesName);
-        Task<IEnumerable<Model.Series>> GetAllSeriesAsync(Guid clubId);
+        Task<IEnumerable<Model.Series>> GetAllSeriesAsync(
+            Guid clubId,
+            DateTime? date);
         Task<Model.Series> GetOneSeriesAsync(Guid guid);
         Task SaveNewSeries(Series series, Club club);
         Task SaveNewSeries(Series series);

@@ -26,12 +26,15 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Series>> GetAllSeriesAsync(Guid clubId)
+        public async Task<IEnumerable<Series>> GetAllSeriesAsync(Guid clubId,
+            DateTime? date)
         {
             var seriesDb = await _dbContext
                 .Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Series)
+                .Where(s => date == null ||
+                    (s.Season.Start <= date && s.Season.End > date))
                 .Include(s => s.Season)
                 .ToListAsync();
 
@@ -180,7 +183,8 @@ namespace SailScores.Core.Services
                 Competitors = FlattenCompetitors(series),
                 Races = FlattenRaces(series),
                 CalculatedScores = FlattenSeriesScores(series),
-                NumberOfDiscards = series.Results.NumberOfDiscards
+                NumberOfDiscards = series.Results.NumberOfDiscards,
+                NumberOfSailedRaces = series.Results.SailedRaces.Count()
             };
             return flatResults;
         }
@@ -222,7 +226,8 @@ namespace SailScores.Core.Services
                         Name = r.Name,
                         Date = r.Date,
                         Order = r.Order,
-                        Description = r.Description
+                        Description = r.Description,
+                        State = r.State
                     });
         }
 
@@ -471,6 +476,14 @@ namespace SailScores.Core.Services
 
         public async Task Update(Series model)
         {
+            if (_dbContext.Series.Any(s =>
+                s.Id != model.Id
+                && s.ClubId == model.ClubId
+                && s.Name == model.Name
+                && s.Season.Id == model.Season.Id))
+            {
+                throw new InvalidOperationException("Cannot update series. A series with this name in this season already exists.");
+            }
             var existingSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
                 .SingleAsync(c => c.Id == model.Id);

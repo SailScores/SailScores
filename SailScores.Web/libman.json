@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "twitter-bootstrap@4.3.1",
+      "destination": "wwwroot/vendor/bootstrap",
+      "files": [
+        "js/bootstrap.min.js",
+        "css/bootstrap.css",
+        "css/bootstrap.css.map",
+        "css/bootstrap.min.css",
+        "css/bootstrap.min.css.map",
+        "css/bootstrap-grid.css",
+        "css/bootstrap-grid.css.map",
+        "css/bootstrap-grid.min.css",
+        "css/bootstrap-grid.min.css.map",
+        "css/bootstrap-reboot.css",
+        "css/bootstrap-reboot.css.map",
+        "css/bootstrap-reboot.min.css",
+        "css/bootstrap-reboot.min.css.map"
+      ]
+    },
+    {
+      "library": "jquery@3.3.1",
+      "destination": "wwwroot/vendor/jquery"
+    },
+    {
+      "library": "popper.js@1.14.7",
+      "destination": "wwwroot/vendor/popper.js"
+    },
+    {
+      "library": "dragula@3.7.2",
+      "destination": "wwwroot/vendor/dragula",
+      "files": [
+        "dragula.css",
+        "dragula.min.css",
+        "dragula.js",
+        "dragula.min.js"
+      ]
+    },
+    {
+      "library": "jquery.devbridge-autocomplete@1.4.9",
+      "destination": "wwwroot/vendor/devbridge-autocomplete",
+      "files": [
+        "jquery.autocomplete.js",
+        "jquery.autocomplete.min.js"
+      ]
+    },
+    {
+      "library": "bootstrap-select@1.13.8",
+      "destination": "wwwroot/vendor/bootstrap-select"
+    }
+  ]
+}
