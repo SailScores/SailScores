@@ -42,9 +42,10 @@
                 <tr>
                     <td>
                         <span class="d-md-none">
-                            @Html.ActionLink(
-                                race.FleetShortName + ": R" + @race.Order + " " + @race.Date?.ToString("ddd, MMM d")
-                                , "Details", new { id = race.Id })
+                            <a asp-action="Details"
+                               asp-controller="Race"
+                               asp-route-id=@race.Id
+                               >@race.FleetShortName: R@(race.Order) @race.Date?.ToString("ddd, MMM d")</a>
                         </span>
                         <span class="d-none d-md-block">
                             @Html.ActionLink(

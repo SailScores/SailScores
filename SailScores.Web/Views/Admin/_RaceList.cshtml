@@ -43,26 +43,30 @@
 
                                                     @foreach (var item in fleetRaces.OrderByDescending(r => r.Date).ThenBy(r => r.Order))
                                                     {
-                                                        <div class="row">
-                                                            <div class="col-3 col-md-2">
-                                                                @Html.DisplayFor(modelItem => item.Name)
-                                                            </div>
-                                                            <div class="col-3">
-                                                                @Html.DisplayFor(modelItem => item.Date)
-                                                            </div>
-                                                            <div class="col-2">
-                                                                @Html.DisplayFor(modelItem => item.Order)
-                                                            </div>
-                                                            <div class="d-none d-md-block col-md-2">
-                                                                @Html.DisplayFor(modelItem => item.Description)
-                                                            </div>
-                                                            <div class="col-3">
-                                                                @Html.ActionLink("Edit", "Edit", "Race", new { id = item.Id },
-                                                               new { @class = "text-primary" }) |
-                                                                @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id },
-                                                               new { @class = "text-danger" })
-                                                            </div>
+                                                    <div class="row">
+                                                        <div class="col-2 col-md-2">
+                                                            @Html.DisplayFor(modelItem => item.Name)
                                                         </div>
+                                                        <div class="col-2">
+                                                            @Html.DisplayFor(modelItem => item.Date)
+                                                        </div>
+                                                        <div class="col-2">
+                                                            @Html.DisplayFor(modelItem => item.Order)
+                                                        </div>
+                                                        <div class="d-none d-md-block col-md-2">
+                                                            @Html.DisplayFor(modelItem => item.Description)
+                                                        </div>
+                                                        <div class="d-none d-md-block col-md-2">
+                                                            (@(item.Series?.Count ?? 0) series)
+                                                        </div>
+                                                        <div class="col-2">
+                                                            @Html.ActionLink("Edit", "Edit", "Race",
+                                                           new { id = item.Id },
+                                                           new { @class = "text-primary" }) |
+                                                            @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id },
+                                                           new { @class = "text-danger" })
+                                                        </div>
+                                                    </div>
                                                     }
                                                 </div>
                                             </div>

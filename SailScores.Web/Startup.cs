@@ -178,7 +178,7 @@ namespace SailScores.Web
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 routes.MapRoute(
                     name: "ClubRoute",
-                    template: "{clubInitials}/{controller}/{action}",
+                    template: "{clubInitials}/{controller}/{action}/{id?}",
                     defaults: new { controller = "Club", action = "Index" },
                     constraints: new
                     {
@@ -188,17 +188,6 @@ namespace SailScores.Web
                         )
                     });
 
-                routes.MapRoute(
-                    name: "Fleet",
-                    template: "{clubInitials}/fleet/{FleetShortName}",
-                    defaults: new { controller = "Fleet", action = "Details" },
-                    constraints: new
-                    {
-                        clubInitials = new ClubRouteConstraint(() =>
-                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
-                        )
-                    });
                 routes.MapRoute(
                     name: "Series",
                     template: "{clubInitials}/{season}/{seriesName}",

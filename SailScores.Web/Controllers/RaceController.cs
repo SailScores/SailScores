@@ -101,8 +101,12 @@ namespace SailScores.Web.Controllers
         }
 
         [Authorize]
-        public async Task<ActionResult> Edit(string clubInitials, Guid id)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            Guid id,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             var club = await _clubService.GetFullClub(clubInitials);
             if (!await _authService.CanUserEdit(User, club.Id))
             {
@@ -120,14 +124,19 @@ namespace SailScores.Web.Controllers
             var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
             await _raceService.AddOptionsToRace(raceWithOptions);
+
             return View(raceWithOptions);
         }
 
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(Guid id, RaceWithOptionsViewModel race)
+        public async Task<IActionResult> Edit(
+            Guid id,
+            RaceWithOptionsViewModel race,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             try
             {
                 if (!await _authService.CanUserEdit(User, race.ClubId))
@@ -136,7 +145,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _raceService.SaveAsync(race);
 
-                return RedirectToAction("Index", "Admin");
+                return RedirectToLocal(returnUrl);
             }
             catch
             {
@@ -187,6 +196,17 @@ namespace SailScores.Web.Controllers
             catch
             {
                 return View();
+            }
+        }
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
         }
 

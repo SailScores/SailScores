@@ -8,7 +8,7 @@
 <h4>Update a race</h4>
 <hr />
 <div class="row">
-    <form id="raceform" asp-action="Edit">
+    <form id="raceform" asp-action="Edit" asp-route-returnurl="@ViewData["ReturnUrl"]">
         <input type="hidden" id="clubId" asp-for="ClubId" />
         <input type="hidden" id="Id" asp-for="Id" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
