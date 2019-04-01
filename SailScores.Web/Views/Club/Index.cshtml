@@ -105,19 +105,27 @@
     </div>
     <div class="col-sm-6 col-md-3">
         <h3>Upcoming Races</h3>
-        @if (Model.UpcomingRaces.Count() > 0)
+        @if(Model.UpcomingRaces.Count() > 0)
         {
-            <ul class="list-unstyled">
-                @foreach (var race in Model.UpcomingRaces)
-                {
+        <ul class="list-unstyled">
+            @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
+            {
                 <li>
-                    <a asp-controller="Race"
-                       asp-action="Details"
-                       asp-route-clubInitials="@Model.Initials"
-                       asp-route-id="@race.Id">@race.CalculatedName</a>
+                    @item.Key
+                    <ul>
+                        @foreach (var race in item)
+                        {
+                            <li>
+                                <a asp-controller="Race"
+                                    asp-action="Details"
+                                    asp-route-clubInitials="@Model.Initials"
+                                    asp-route-id="@race.Id">@race.CalculatedName</a>
+                            </li>
+                        }
+                    </ul>
                 </li>
-                }
-            </ul>
+            }
+        </ul>   
         }
         else
         {

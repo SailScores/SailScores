@@ -40,7 +40,7 @@ namespace SailScores.Web.Models.SailScores
         {
             get
             {
-                return FleetShortName + ": Race " + Order + " " + Date?.ToString("ddd, MMM d");
+                return Date?.ToString("ddd, MMM d") + " Race " + Order;
             }
         }
     }
