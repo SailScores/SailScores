@@ -5,8 +5,8 @@
 }
 <div class="row">
     <div class="col-12">
-        <h1 class="d-md-none">@Model.Name</h1>
-        <h1 class="d-none d-md-block display-4">@Model.Name</h1>
+        <h1 class="d-md-none display-2">@Model.Name</h1>
+        <h1 class="d-none d-md-block display-3">@Model.Name</h1>
     </div>
 </div>
 @if (!String.IsNullOrWhiteSpace(Model.Url))
@@ -17,7 +17,6 @@
         </div>
     </div>
 }
-
 @if (!String.IsNullOrWhiteSpace(Model.Description))
 {
     <div class="row">
@@ -28,7 +27,6 @@
 }
 <div class="row">
     <div class="col-3 order-md-first order-last">
-
         <h3>Seasons</h3>
         @if (Model.Seasons.Count > 0)
         {

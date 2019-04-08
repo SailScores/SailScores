@@ -39,46 +39,48 @@
             </tr>
             @foreach (var race in item)
             {
-                <tr>
-                    <td>
-                        <span class="d-md-none">
-                            <a asp-action="Details"
-                               asp-controller="Race"
-                               asp-route-id=@race.Id
-                               >@race.FleetShortName: R@(race.Order) @race.Date?.ToString("ddd, MMM d")</a>
-                        </span>
-                        <span class="d-none d-md-block">
-                            @Html.ActionLink(
-                                race.CalculatedName
-                                , "Details", new { id = race.Id })
-                        </span>
-                    </td>
-                    <td>
-                        @foreach (var seriesName in race.SeriesNames)
-                        {
-                            <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesName">
-                                @Html.DisplayFor(modelItem => seriesName)
-                            </a>
-                        }
-                    </td>
-                    <td>
+    <tr>
+        <td>
+            <span class="d-md-none">
+                <a asp-action="Details"
+                   asp-controller="Race"
+                   asp-route-id=@race.Id>@race.FleetShortName: R@(race.Order)@race.Date?.ToString("ddd, MMM d")</a>
+            </span>
+            <span class="d-none d-md-block">
+                @Html.ActionLink(
+                    race.CalculatedName
+                    , "Details", new { id = race.Id })
+            </span>
+        </td>
+        <td>
+            @{ var lastSeries = race.SeriesNames.LastOrDefault(); }
+            @foreach (var seriesName in race.SeriesNames)
+            {
+                var separator = seriesName != lastSeries ? $", " : "";
+                <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesName">@seriesName</a>@separator
+            }
+        </td>
+        <td>
 
-                        @Html.DisplayFor(modelItem => race.Scores.Count)
-                        @if (race.Scores.Count == 1)
-                        {
-                            @:boat
-                        }
-                        else
-                        {
-                            @:boats
-                        }
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => race.Name)
-                        @Html.DisplayFor(modelItem => race.Description)
-                    </td>
+            @Html.DisplayFor(modelItem => race.Scores.Count)
+            @if (race.Scores.Count == 1)
+            {
+                @:boat
+            }
+            else
+            {
+                @:boats
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => race.Name)
+            @Html.DisplayFor(modelItem => race.Description)
+        </td>
+        <td>
+            @race.State
+        </td>
 
-                </tr>
+    </tr>
             }
         }
     </tbody>
