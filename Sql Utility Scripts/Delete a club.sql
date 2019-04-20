@@ -1,58 +1,117 @@
+DECLARE @ClubName NVARCHAR(200);
+
+SET @ClubName = 'Lake Harriet Yacht Club2'
+
+DECLARE @ClubId UNIQUEIDENTIFIER;
+
+SET @ClubId = (
+        SELECT TOP 1 Id
+        FROM Clubs
+        WHERE Name = @ClubName
+        )
 
 
-declare @ClubName NVARCHAR(200);
+PRINT N'Deleting Scores'
 
-set @ClubName = 'Test Club'
-
-Declare @ClubId UNIQUEIDENTIFIER;
-
-set @ClubId = (Select Id from Clubs where Name = @ClubName)
-
-Delete Scores
-from  Scores s
-inner join Races r
-on r.Id = s.RaceId
-where r.ClubId = @ClubId
-
-Delete races
-from Races r
-where r.ClubId = @ClubId ;
-
-Delete BoatClasses
-from BoatClasses bc
-inner join Competitors c
-on c.BoatClassId = bc.Id
-where c.ClubId = @ClubId
-
-Delete Competitors
-from Competitors c
-where c.ClubId = @ClubId
-
-Delete Fleets
-where ClubId = @ClubId
-
-;
-Delete ScoreCodes
-where ClubId = @ClubId
-
-Delete SeriesRaces
-from SeriesRaces
-inner join Series
-on Series.Id = SeriesRaces.SeriesId
-where ClubId = @ClubId
+DELETE Scores
+FROM Scores s
+INNER JOIN Races r
+    ON r.Id = s.RaceId
+WHERE r.ClubId = @ClubId
 
 
-Delete Series
-where ClubId = @ClubId
+PRINT N'Deleting Races'
+DELETE
+FROM races
+FROM Races r
+WHERE r.ClubId = @ClubId;
+
+PRINT N'Deleting FleetBoatClass'
+DELETE fbc
+FROM FleetBoatClass AS fbc
+INNER JOIN BoatClasses bc
+    ON bc.Id = fbc.BoatClassId
+INNER JOIN Competitors c
+    ON c.BoatClassId = bc.Id
+WHERE c.ClubId = @ClubId
 
 
-Delete Seasons
-where ClubId = @ClubId
-
-Delete UserPermissions
-where ClubId = @ClubId
-
-Delete Clubs
-where Id = @ClubId
+PRINT N'Deleting BoatClass'
+DELETE bc
+FROM BoatClasses bc
+INNER JOIN Competitors c
+    ON c.BoatClassId = bc.Id
+WHERE c.ClubId = @ClubId
 
 
+PRINT N'Deleting CompetitorFleet'
+DELETE cf
+FROM CompetitorFleet AS cf
+INNER JOIN Fleets AS f
+    ON cf.FleetId = f.Id
+WHERE f.ClubId = @ClubId
+
+
+PRINT N'Deleting Competitors'
+DELETE
+FROM Competitors
+WHERE ClubId = @ClubId
+
+
+PRINT N'Deleting Fleets'
+DELETE
+FROM Fleets
+WHERE ClubId = @ClubId
+
+
+PRINT N'Deleting ScoreCodes'
+DELETE
+FROM ScoreCodes
+WHERE ClubId = @ClubId
+
+PRINT N'Deleting ScoringSystems'
+DELETE
+FROM ScoringSystems
+WHERE ClubId = @ClubId
+
+PRINT N'Deleting SeriesRace'
+DELETE
+FROM SeriesRace
+FROM SeriesRace
+INNER JOIN Series
+    ON Series.Id = SeriesRace.SeriesId
+WHERE ClubId = @ClubId
+
+
+PRINT N'Deleting HistoricalResults'
+DELETE
+FROM HistoricalResults
+WHERE SeriesId IN (
+        SELECT Id
+        FROM Series
+        WHERE ClubId = @ClubId
+        )
+
+
+PRINT N'Deleting Series'
+DELETE
+FROM Series
+WHERE ClubId = @ClubId
+
+
+PRINT N'Deleting Seasons'
+DELETE
+FROM Seasons
+WHERE ClubId = @ClubId
+
+
+PRINT N'Deleting UserPermissions'
+DELETE
+FROM UserPermissions
+WHERE ClubId = @ClubId
+
+
+PRINT N'Deleting Clubs'
+DELETE
+FROM Clubs
+WHERE Id = @ClubId
