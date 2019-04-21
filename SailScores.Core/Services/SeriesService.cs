@@ -26,7 +26,7 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Series>> GetAllSeriesAsync(Guid clubId,
+        public async Task<IList<Series>> GetAllSeriesAsync(Guid clubId,
             DateTime? date)
         {
             var seriesDb = await _dbContext

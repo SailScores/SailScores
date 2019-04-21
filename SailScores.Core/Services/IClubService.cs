@@ -16,5 +16,7 @@ namespace SailScores.Core.Services
         Task SaveNewSeason(Season season);
         Task<IList<Fleet>> GetAllFleets(Guid clubId);
         Task UpdateClub(Club clubObject);
+        Task<Club> GetMinimalClub(Guid id);
+        Task<Guid> GetClubId(string id);
     }
 }

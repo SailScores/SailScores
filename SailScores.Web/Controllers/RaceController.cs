@@ -15,13 +15,13 @@ namespace SailScores.Web.Controllers
     public class RaceController : Controller
     {
 
-        private readonly IClubService _clubService;
+        private readonly Core.Services.IClubService _clubService;
         private readonly Web.Services.IRaceService _raceService;
         private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public RaceController(
-            IClubService clubService,
+            Core.Services.IClubService clubService,
             Web.Services.IRaceService raceService,
             Services.IAuthorizationService authService,
             IMapper mapper)

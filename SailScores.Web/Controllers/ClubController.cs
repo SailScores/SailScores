@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
@@ -28,7 +28,7 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ClubInitials"] = clubInitials;
 
-            var club = await _clubService.GetFullClub(clubInitials);
+            var club = await _clubService.GetClubForClubHome(clubInitials);
             return View(_mapper.Map<ClubSummaryViewModel>(club));
         }
 

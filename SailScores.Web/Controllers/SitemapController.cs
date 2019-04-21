@@ -15,10 +15,10 @@ namespace SailScores.Web.Controllers
     public class SitemapController : Controller
     {
 
-        private readonly IClubService _clubservice;
+        private readonly Core.Services.IClubService _clubservice;
 
         public SitemapController(
-            IClubService clubService)
+            Core.Services.IClubService clubService)
         {
             _clubservice = clubService;
         }
