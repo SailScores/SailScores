@@ -56,11 +56,11 @@
         </div>
         <div class="form-group">
             <label asp-for="SeriesIds" class="control-label">Series</label>
-            <select asp-for="SeriesIds" class="form-control" multiple>
+            <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
                 @foreach (var series in Model.SeriesOptions)
                 {
                     <option value="@series.Id">
-                        @series.Name
+                        @series.Name (@series.Season.Name)
                     </option>
                 }
             </select>
@@ -88,18 +88,24 @@
                 </li>
             </ul>
         </div>
-
-        <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-primary" />
-            <a asp-controller="Admin"
-               asp-action="Index"
-               asp-fragment="races"
-               class="btn btn-outline-primary">Cancel</a>
+        <hr />
+        <div class="row">
+            <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
+            <div class="col-md-3">
+                <input id="submitButton" type="submit" value="Create" class="btn btn-primary btn-block" disabled="disabled" />
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="races"
+                   class="btn btn-outline-primary btn-block">Cancel</a>
+            </div>
         </div>
     </form>
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/raceEditor.build.js"></script>
     <script src="~/vendor/dragula/dragula.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
@@ -107,8 +113,8 @@
 
 
     <script>
-        
-    var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
+        var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
+        window.SailScores.init()
     </script>
 
 }

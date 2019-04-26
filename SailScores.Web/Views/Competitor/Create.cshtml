@@ -14,12 +14,12 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label">Name <em>Required</em></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SailNumber" class="control-label"></label>
+                <label asp-for="SailNumber" class="control-label">Sail Number<em>Required</em></label>
                 <input asp-for="SailNumber" class="form-control" />
                 <span asp-validation-for="SailNumber" class="text-danger"></span>
             </div>
@@ -39,7 +39,7 @@
                 <span asp-validation-for="Notes" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="BoatClassId" class="control-label">Class</label>
+                <label asp-for="BoatClassId" class="control-label">Class <em>Required</em></label>
                 <select asp-for="BoatClassId" class="form-control" >
                     <option selected="selected">Select a class...</option>
                     @foreach (var boatclass in Model.BoatClassOptions)
