@@ -20,6 +20,7 @@ Properties.value('(/properties/property[@key="StatusCode"])[1]', 'nvarchar(20)')
 order by Id  desc
 
 
+Select DATEADD(day, DATEDIFF(day, 0, TimeStamp), 0), count(*) from Logs
+group by DATEADD(day, DATEDIFF(day, 0, TimeStamp), 0)
+order by DATEADD(day, DATEDIFF(day, 0, TimeStamp), 0)
 
-
-Select * from AspNetUsers
