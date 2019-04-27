@@ -36,7 +36,10 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Index(string clubInitials)
         {
             ViewData["ClubInitials"] = clubInitials;
-
+            if (!await _authService.CanUserEdit(User, clubInitials))
+            {
+                return Unauthorized();
+            }
             var club = await _clubService.GetFullClub(clubInitials);
             return View(_mapper.Map<AdminViewModel>(club));
         }
@@ -46,6 +49,10 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Edit(string clubInitials)
         {
             ViewData["ClubInitials"] = clubInitials;
+            if (!await _authService.CanUserEdit(User, clubInitials))
+            {
+                return Unauthorized();
+            }
 
             var club = await _clubService.GetFullClub(clubInitials);
             return View(_mapper.Map<AdminViewModel>(club));

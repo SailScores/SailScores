@@ -13,13 +13,16 @@ namespace SailScores.Web.Controllers
     public class ClubController : Controller
     {
         private readonly IClubService _clubService;
+        private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public ClubController(
             IClubService clubService,
+            Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _authService = authService;
             _mapper = mapper;
         }
         
@@ -29,7 +32,9 @@ namespace SailScores.Web.Controllers
             ViewData["ClubInitials"] = clubInitials;
 
             var club = await _clubService.GetClubForClubHome(clubInitials);
-            return View(_mapper.Map<ClubSummaryViewModel>(club));
+            var viewModel = _mapper.Map<ClubSummaryViewModel>(club);
+            viewModel.CanEdit = await _authService.CanUserEdit(User, clubInitials);
+            return View(viewModel);
         }
 
     }

@@ -22,6 +22,10 @@ namespace SailScores.Web.Services
             string clubInitials)
         {
             var email = claimsPrincipal.FindFirst("sub")?.Value;
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                email = claimsPrincipal.Identity.Name;
+            }
             return await _userService.IsUserAllowedToEdit(
                 email,
                 clubInitials);

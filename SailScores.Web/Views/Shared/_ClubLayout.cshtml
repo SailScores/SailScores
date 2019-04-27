@@ -72,8 +72,17 @@
                     @RenderBody()
                 </main>
             }
+        </div>
 
+        <hr />
+        <footer>
+            <div class="row">
+                <div class="col-12 col-sm-6"><small>&copy; 2019 - J. Fraser</small></div>
+                <div class="col-12 col-sm-6 text-sm-right">
+                    @await Html.PartialAsync("_LoginPartial")
+                </div>
             </div>
+        </footer>
     </div>
 
     <environment include="Development">
