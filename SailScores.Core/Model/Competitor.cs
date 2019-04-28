@@ -9,14 +9,22 @@ namespace SailScores.Core.Model
         public Guid Id { get; set; }
         public Guid ClubId { get; set; }
         public Club Club { get; set; }
+        
         [StringLength(200)]
         public String Name { get; set; }
+
+        [Display(Name = "Sail Number")]
         [StringLength(20)]
         public String SailNumber { get; set; }
+
+        [Display(Name = "Alternative Sail Number")]
         [StringLength(20)]
         public String AlternativeSailNumber { get; set; }
+
+        [Display(Name = "Boat Name")]
         [StringLength(200)]
         public String BoatName { get; set; }
+
         [StringLength(2000)]
         public String Notes { get; set; }
 
