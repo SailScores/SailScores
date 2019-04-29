@@ -1,4 +1,6 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
 ﻿@using SailScores.Web.Extensions;
+@inject IViewLocalizer Localizer
 @model SailScores.Web.Models.SailScores.ClubSummaryViewModel
 @{
     ViewBag.Title = Model.Name + " Scores";
