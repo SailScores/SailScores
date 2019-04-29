@@ -36,6 +36,8 @@ namespace SailScores.Core.Services
                 .Where(s => date == null ||
                     (s.Season.Start <= date && s.Season.End > date))
                 .Include(s => s.Season)
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
                 .ToListAsync();
 
             var returnObj = _mapper.Map<List<Series>>(seriesDb);

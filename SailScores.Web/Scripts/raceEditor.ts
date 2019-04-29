@@ -16,7 +16,7 @@ dragula([document.getElementById('results')])
 
 function checkEnter(e: KeyboardEvent) {
     const ev = e || event;
-    var txtArea = /textarea/i.test((ev.srcElement).tagName);
+    var txtArea = /textarea/i.test((ev.srcElement as HTMLElement).tagName);
     return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
 }
 export function init() {
