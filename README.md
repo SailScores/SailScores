@@ -20,10 +20,14 @@ Sailscores aims to be:
 This code is designed to be multitenant, and I'm very open to hosting other clubs. Site
 is live in spring of 2019. I expect there will be plenty of fixes and enhancements in the next year.
 
-Open source, license not yet determined, but likely to be MIT license. Please contact
-@jbfraser1 (jamie@widernets.com) with any interest in using this, and I'll push this up
-on my priorities.
+Licensed with Mozilla Public License Version 2.0 : You may use this software, but
+share the source for modifications that you distribute.
 
-Contributions welcome. 
+Contributions welcome. Feedback requested: There are many features I'm working
+on, and it's nice to prioritize them with input from other users.
+
+
+Sail fast...
+jamie@widernets.com
 
 [1]: https://sailscores.com
