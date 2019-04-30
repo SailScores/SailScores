@@ -12,6 +12,7 @@ namespace SailScores.Web.Services
             services.AddScoped<IFleetService, FleetService>();
             services.AddScoped<IRaceService, RaceService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
+            services.AddScoped<IClubService, ClubService>();
 
         }
     }

@@ -12,6 +12,8 @@ namespace SailScores.Web.Models.SailScores
     {
         public Guid Id { get; set; }
 
+        public bool CanEdit { get; set; }
+
         [Required]
         [StringLength(200)]
         public String Name { get; set; }

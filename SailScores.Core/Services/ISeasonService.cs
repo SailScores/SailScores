@@ -1,5 +1,6 @@
 ﻿using SailScores.Core.Model;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SailScores.Core.Services
@@ -9,5 +10,6 @@ namespace SailScores.Core.Services
         Task SaveNew(Season season);
         Task Delete(Guid seasonId);
         Task Update(Season season);
+        Task<IList<Season>> GetSeasons(Guid clubId);
     }
 }

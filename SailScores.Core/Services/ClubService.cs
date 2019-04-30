@@ -63,15 +63,28 @@ namespace SailScores.Core.Services
             return _mapper.Map<List<Model.Club>>(dbObjects);
         }
 
+        public async Task<Guid> GetClubId(string id)
+        {
+            Guid clubGuid;
+            if (!Guid.TryParse(id, out clubGuid))
+            {
+                clubGuid = (await _dbContext.Clubs.SingleAsync(c => c.Initials == id)).Id;
+            }
+
+            return clubGuid;
+        }
+
         public async Task<Model.Club> GetFullClub(string id)
         {
-            Guid potentialClubId;
-            if(!Guid.TryParse(id, out potentialClubId))
-            {
-                potentialClubId = (await _dbContext.Clubs.SingleAsync(c => c.Initials == id)).Id;
-            }
+            var guid = await GetClubId(id);
+
+            return await GetFullClub(guid);
+        }
+
+        public async Task<Model.Club> GetFullClub(Guid id)
+        {
             IQueryable<Db.Club> clubQuery =
-                _dbContext.Clubs.Where(c => c.Id == potentialClubId);
+                            _dbContext.Clubs.Where(c => c.Id == id);
 
             var club = await clubQuery
                 .Include(c => c.Races)
@@ -100,10 +113,15 @@ namespace SailScores.Core.Services
             return retClub;
         }
 
-        public async Task<Model.Club> GetFullClub(Guid id)
+        public async Task<Model.Club> GetMinimalClub(Guid id)
         {
-            // not the best use of resources: to string, but then cast it back.
-            return await GetFullClub(id.ToString());
+
+            var dbClub = await _dbContext.Clubs.FirstAsync(c => c.Id == id);
+
+            var retClub = _mapper.Map<Model.Club>(dbClub);
+
+            return retClub;
+
         }
 
         public async Task SaveNewClub(Club club)

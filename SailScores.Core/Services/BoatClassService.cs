@@ -46,7 +46,7 @@ namespace SailScores.Core.Services
                 FleetType = Api.Enumerations.FleetType.SelectedClasses,
                 IsHidden = false,
                 ShortName = defaultShortName,
-                Name = $"All {boatClass.Name}s",
+                Name = $"{boatClass.Name}s",
                 FleetBoatClasses = new List<Db.FleetBoatClass>
                 {
                     new Db.FleetBoatClass

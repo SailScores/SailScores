@@ -25,6 +25,14 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
+        public async Task<IList<Season>> GetSeasons(Guid clubId)
+        {
+            var dbSeasons = _dbContext.Seasons.Where(s => s.ClubId == clubId)
+                .OrderByDescending(s => s.Start);
+            return _mapper.Map<List<Season>>(await dbSeasons.ToListAsync());
+
+        }
+
         public async Task Delete(Guid seasonId)
         {
             var dbSeason = await _dbContext.Seasons.SingleAsync(c => c.Id == seasonId);

@@ -45,6 +45,18 @@
 <h2>@Model.Name</h2>
 <h3>Administrator View</h3>
 <hr />
+
+<div class="row">
+    <div class="col-sm-2">
+        <strong>Quick Access</strong>
+    </div>
+    <div class="col-sm-2">
+        <a asp-controller="Race"
+           asp-action="Create"
+           class="btn btn-primary btn-sm">Create New Race</a>
+    </div>
+</div>
+<hr />
 <div class="row">
     <div class="col-md-4">
         <dl class="dl-horizontal">
@@ -99,4 +111,12 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+$('.collapse').on('show.bs.collapse', function(e) {
+  var $card = $(this).closest('.card');
+  $('html,body').animate({
+    scrollTop: $card.offset().top - 50
+  }, 300);
+});
+</script>
 }

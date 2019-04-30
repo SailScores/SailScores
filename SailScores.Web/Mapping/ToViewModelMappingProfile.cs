@@ -13,6 +13,8 @@ namespace SailScores.Web.Mapping
     {
         public ToViewModelMappingProfile()
         {
+            CreateMap<Model.Club, ClubSummaryViewModel>()
+                .ForMember(d => d.CanEdit, o => o.Ignore());
             CreateMap<Model.Race, RaceSummaryViewModel>()
                 .ForMember(r => r.CompetitorCount, o => o.MapFrom(s => s.Scores.Count))
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))

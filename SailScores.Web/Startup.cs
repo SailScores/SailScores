@@ -42,7 +42,7 @@ namespace SailScores.Web
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "SailScores API", Version = "v1" });
-                c.IncludeXmlComments(string.Format(@"{0}\SailScores.Web.xml",
+                c.IncludeXmlComments(string.Format(@"{0}/SailScores.Web.xml",
                      System.AppDomain.CurrentDomain.BaseDirectory));
                 c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
                 {

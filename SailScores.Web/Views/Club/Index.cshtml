@@ -5,8 +5,7 @@
 }
 <div class="row">
     <div class="col-12">
-        <h1 class="d-md-none">@Model.Name</h1>
-        <h1 class="d-none d-md-block display-4">@Model.Name</h1>
+        <h1 class="display-4">@Model.Name</h1>
     </div>
 </div>
 @if (!String.IsNullOrWhiteSpace(Model.Url))
@@ -17,7 +16,6 @@
         </div>
     </div>
 }
-
 @if (!String.IsNullOrWhiteSpace(Model.Description))
 {
     <div class="row">
@@ -28,7 +26,6 @@
 }
 <div class="row">
     <div class="col-3 order-md-first order-last">
-
         <h3>Seasons</h3>
         @if (Model.Seasons.Count > 0)
         {
@@ -108,14 +105,22 @@
         @if (Model.UpcomingRaces.Count() > 0)
         {
             <ul class="list-unstyled">
-                @foreach (var race in Model.UpcomingRaces)
+                @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
-                <li>
-                    <a asp-controller="Race"
-                       asp-action="Details"
-                       asp-route-clubInitials="@Model.Initials"
-                       asp-route-id="@race.Id">@race.CalculatedName</a>
-                </li>
+                    <li>
+                        @item.Key
+                        <ul>
+                            @foreach (var race in item)
+                            {
+                                <li>
+                                    <a asp-controller="Race"
+                                       asp-action="Details"
+                                       asp-route-clubInitials="@Model.Initials"
+                                       asp-route-id="@race.Id">@race.CalculatedName</a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
                 }
             </ul>
         }
@@ -125,3 +130,27 @@
         }
     </div>
 </div>
+@if (Model.CanEdit) {
+    <br />
+    <hr />
+<div class="row">
+    <div class="col-sm-2">
+        <strong>Quick Access</strong>
+    </div>
+
+    <div class="col-sm-2">
+        <a asp-controller="Admin"
+           class="btn btn-primary">Admin Page</a>
+    </div>
+    <div class="col-sm-2">
+        <a asp-controller="Competitor"
+           asp-action="Create"
+           class="btn btn-primary">New Competitor</a>
+    </div>
+    <div class="col-sm-2">
+        <a asp-controller="Race"
+           asp-action="Create"
+           class="btn btn-primary">New Race</a>
+    </div>
+</div>
+}

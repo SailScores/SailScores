@@ -20,12 +20,12 @@ namespace SailScores.Web.Areas.Api.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ClubsController : ControllerBase
     {
-        private readonly IClubService _clubService;
+        private readonly Core.Services.IClubService _clubService;
         private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public ClubsController(
-            IClubService clubService,
+            Core.Services.IClubService clubService,
             Services.IAuthorizationService authService,
             IMapper mapper)
         {

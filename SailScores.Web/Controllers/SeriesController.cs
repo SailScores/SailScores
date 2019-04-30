@@ -17,13 +17,13 @@ namespace SailScores.Web.Controllers
     {
 
         private readonly Web.Services.ISeriesService _seriesService;
-        private readonly IClubService _clubService;
+        private readonly Core.Services.IClubService _clubService;
         private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public SeriesController(
             Web.Services.ISeriesService seriesService,
-            IClubService clubService,
+            Core.Services.IClubService clubService,
             Services.IAuthorizationService authService,
             IMapper mapper)
         {

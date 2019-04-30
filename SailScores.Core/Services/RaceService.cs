@@ -32,9 +32,11 @@ namespace SailScores.Core.Services
         public async Task<IList<Model.Race>> GetRacesAsync(Guid clubId)
         {
             var dbObjects = await _dbContext
-                .Clubs
-                .Where(c => c.Id == clubId)
-                .SelectMany(c => c.Races)
+                .Races
+                .Where(r => r.ClubId == clubId)
+                .OrderByDescending(r => r.Date)
+                .ThenBy(r => r.Order)
+                .Include(r => r.Fleet)
                 .ToListAsync();
             return _mapper.Map<List<Model.Race>>(dbObjects);
         }

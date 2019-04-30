@@ -26,7 +26,7 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Series>> GetAllSeriesAsync(Guid clubId,
+        public async Task<IList<Series>> GetAllSeriesAsync(Guid clubId,
             DateTime? date)
         {
             var seriesDb = await _dbContext
@@ -36,6 +36,8 @@ namespace SailScores.Core.Services
                 .Where(s => date == null ||
                     (s.Season.Start <= date && s.Season.End > date))
                 .Include(s => s.Season)
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
                 .ToListAsync();
 
             var returnObj = _mapper.Map<List<Series>>(seriesDb);
