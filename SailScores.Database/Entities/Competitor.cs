@@ -20,6 +20,9 @@ namespace SailScores.Database.Entities
         [StringLength(2000)]
         public String Notes { get; set; }
 
+        // Will the competitor be available in creating or editting a race?
+        public bool? IsActive { get; set; }
+
         public Guid BoatClassId { get; set; }
         public BoatClass BoatClass { get; set; }
         public IList<CompetitorFleet> CompetitorFleets { get; set; }
