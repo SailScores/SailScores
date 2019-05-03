@@ -133,24 +133,20 @@
 @if (Model.CanEdit) {
     <br />
     <hr />
-<div class="row">
-    <div class="col-sm-2">
-        <strong>Quick Access</strong>
-    </div>
-
-    <div class="col-sm-2">
+<div class="row bg-light">
+    <div class="col-sm-3 my-2">
         <a asp-controller="Admin"
-           class="btn btn-primary">Admin Page</a>
+           class="btn btn-outline-primary">Admin Page</a>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3 my-2">
         <a asp-controller="Competitor"
            asp-action="Create"
-           class="btn btn-primary">New Competitor</a>
+           class="btn btn-outline-primary">New Competitor</a>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3 my-2">
         <a asp-controller="Race"
            asp-action="Create"
-           class="btn btn-primary">New Race</a>
+           class="btn btn-outline-primary">New Race</a>
     </div>
 </div>
 }

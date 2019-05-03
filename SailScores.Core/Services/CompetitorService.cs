@@ -33,7 +33,8 @@ namespace SailScores.Core.Services
 
             var dbObjects = _dbContext.Clubs
                 .Where(c => c.Id == clubId)
-                .SelectMany(c => c.Competitors);
+                .SelectMany(c => c.Competitors)
+                .Where(c => c.IsActive ?? true);
 
             if (fleetId.HasValue && fleetId != Guid.Empty)
             {
@@ -92,6 +93,7 @@ namespace SailScores.Core.Services
                 dbObject.AlternativeSailNumber = comp.AlternativeSailNumber;
                 dbObject.BoatName = comp.BoatName;
                 dbObject.Notes = comp.Notes;
+                dbObject.IsActive = comp.IsActive;
                 // should scores get added here?
                 // I don't think so. Those will be recorded as a race update or scores update.
             }

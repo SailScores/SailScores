@@ -19,6 +19,7 @@ namespace SailScores.Api.Dtos
         public String BoatName { get; set; }
         [StringLength(2000)]
         public String Notes { get; set; }
+        public bool IsActive { get; set; }
 
         public Guid BoatClassId { get; set; }
 
