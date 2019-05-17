@@ -116,7 +116,9 @@ namespace SailScores.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services
+                .AddMvc(options => options.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper(
                 new[] {
                     typeof(DbToModelMappingProfile).GetTypeInfo().Assembly,

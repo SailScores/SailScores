@@ -14,7 +14,13 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label">Name<br />
+                <em>
+                    Used for links to this series. If the name is
+                    changed after creation, external links to this series will
+                    probably fail. SailScores automatically updates internal links.
+                </em>
+                </label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
