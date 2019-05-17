@@ -10,7 +10,6 @@ namespace SailScores.Core.Model
         public Guid Id { get; set; }
         
         public Guid ClubId { get; set; }
-        public Club Club { get; set; }
         [StringLength(200)]
         public String Name { get; set; }
 
@@ -36,7 +35,7 @@ namespace SailScores.Core.Model
         public bool Equals(Race other)
         {
             return this.Id == other.Id
-                && (this.ClubId == other.ClubId || this.Club == other.Club)
+                && (this.ClubId == other.ClubId)
                 && (this.Name == other.Name)
                 && (this.Date == other.Date)
                 && (this.Order == other.Order)

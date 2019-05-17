@@ -48,7 +48,6 @@ namespace SailScores.Web.Services
             var club = await _coreClubService.GetFullClub(clubInitials);
             var model = new RaceWithOptionsViewModel();
             model.ClubId = club.Id;
-            model.Club = club;
             model.FleetOptions = club.Fleets;
             model.SeriesOptions = club.Series;
             model.ScoreCodeOptions = club.ScoreCodes.OrderBy(s => s.Name).ToList();
