@@ -16,8 +16,25 @@ body {
     width: auto;
 }
 
-#results li {
-    touch-action: none;
+.btn {
+    margin: 2px;
+}
+
+#results {
+    padding: 0;
+
+    li {
+        padding: 4px 0px;
+        margin: 1px 0;
+
+        .btn {
+            padding: 4px 6px 4px 6px;
+        }
+    }
+
+    div {
+        padding: 0px 5px 0px 5px;
+    }
 }
 
 .autocomplete-suggestion {
@@ -61,3 +78,4 @@ body {
         text-orientation: upright;
     }
 }
+

@@ -9,11 +9,6 @@ let competitors: competitorDto[];
 declare var scoreCodes: scoreCodeDto[];
 const noCodeString = "No Code";
 
-dragula([document.getElementById('results')])
-    .on('drop', function () {
-        calculatePlaces();
-    });
-
 function checkEnter(e: KeyboardEvent) {
     const ev = e || event;
     var txtArea = /textarea/i.test((ev.srcElement as HTMLElement).tagName);
@@ -43,6 +38,22 @@ export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
     let fleetId = ($("#fleetId").val() as string);
     getCompetitors(clubId, fleetId);
+}
+
+
+export function moveUp() {
+    var btn = <Node>event.target;
+    var resultItem = $(btn).closest("li");
+    // move up:
+    resultItem.prev().insertAfter(resultItem);
+    calculatePlaces();
+}
+
+export function moveDown() {
+    var btn = <Node>event.target;
+    var resultItem = $(btn).closest("li");
+    resultItem.next().insertBefore(resultItem);
+    calculatePlaces();
 }
 
 var c: number = 0;

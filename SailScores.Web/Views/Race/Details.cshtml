@@ -14,7 +14,7 @@
 @if (Model.CanEdit)
 {
     @Html.ActionLink("Edit", "Edit", "Race",
-    new { id = Model.Item.Id, returnUrl=Context.Request.Path},
+    new { id = Model.Item.Id, returnUrl = Context.Request.Path },
         new { @class = "btn btn-outline-primary btn-sm" })
 }
 <h4>
@@ -30,6 +30,7 @@
         </li>
     }
 </ul>
+<p>@Model.Item.Description</p>
 <table class="table">
     <thead>
         <tr>
