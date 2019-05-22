@@ -51,17 +51,25 @@
         <h3>Recent Races</h3>
         @if (Model.RecentRaces.Count() > 0)
         {
-            <ul class="list-unstyled">
-                @foreach (var race in Model.RecentRaces)
-                {
-                    <li>
-                        <a asp-controller="Race"
-                           asp-action="Details"
-                           asp-route-clubInitials="@Model.Initials"
-                           asp-route-id="@race.Id">@race.CalculatedName</a>
-                    </li>
-                }
-            </ul>
+    <ul class="list-unstyled">
+        @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
+        {
+            <li>
+                @item.Key
+                <ul>
+                    @foreach (var race in item)
+                    {
+                        <li>
+                            <a asp-controller="Race"
+                               asp-action="Details"
+                               asp-route-clubInitials="@Model.Initials"
+                               asp-route-id="@race.Id">@race.CalculatedName</a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
         }
         else
         {
