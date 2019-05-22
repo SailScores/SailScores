@@ -5,179 +5,222 @@
     Layout = "_ClubLayout";
 }
 
-    <div class="container p-0 justify-content-between">
-        <h4>Update a race</h4>
-        <hr />
-        <form id="raceform" asp-action="Edit" asp-route-returnurl="@ViewData["ReturnUrl"]">
-            <input type="hidden" id="clubId" asp-for="ClubId" />
-            <input type="hidden" id="Id" asp-for="Id" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label">Name<em>&ensp;Optional</em></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input id="date" asp-for="Date" class="form-control"
-                       onchange="window.SailScores.loadSeriesOptions()" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
-                <input asp-for="Order" class="form-control" />
-                <span asp-validation-for="Order" class="text-danger"></span>
-            </div>
+<div class="container p-0 justify-content-between">
+    <h4>Update a race</h4>
+    <hr />
+    <form id="raceform" asp-action="Edit" asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <input type="hidden" id="clubId" asp-for="ClubId" />
+        <input type="hidden" id="Id" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label">Name<em>&ensp;Optional</em></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Date" class="control-label"></label>
+            <input id="date" asp-for="Date" class="form-control"
+                   onchange="window.SailScores.loadSeriesOptions()" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
+            <input asp-for="Order" class="form-control" />
+            <span asp-validation-for="Order" class="text-danger"></span>
+        </div>
 
-            <div class="form-group">
-                <label asp-for="State" class="control-label"></label>
-                <select id="fleetType" asp-for="State" class="form-control"
-                        asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
-                <span asp-validation-for="State" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label">Description<em>&ensp;Optional</em></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
-                <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
-                    <option selected="selected">Select a fleet...</option>
-                    @foreach (var fleet in Model.FleetOptions)
-                    {
-                        <option value="@fleet.Id">
-                            @fleet.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="FleetId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SeriesIds" class="control-label">Series</label>
-                <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
-                    @foreach (var series in Model.SeriesOptions)
-                    {
-                        <option value="@series.Id">
-                            @series.Name (@series.Season.Name)
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="SeriesIds" class="text-danger"></span>
-            </div>
+        <div class="form-group">
+            <label asp-for="State" class="control-label"></label>
+            <select id="fleetType" asp-for="State" class="form-control"
+                    asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
+            <span asp-validation-for="State" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description" class="control-label">Description<em>&ensp;Optional</em></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
+            <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
+                <option selected="selected">Select a fleet...</option>
+                @foreach (var fleet in Model.FleetOptions)
+                {
+                    <option value="@fleet.Id">
+                        @fleet.Name
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="FleetId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SeriesIds" class="control-label">Series</label>
+            <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
+                @foreach (var series in Model.SeriesOptions)
+                {
+                    <option value="@series.Id">
+                        @series.Name (@series.Season.Name)
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="SeriesIds" class="text-danger"></span>
+        </div>
 
-            <div>
-                Add result: <input id="newCompetitor" type="text" />
-                <input type="button" value="Add Competitor" class="btn btn-primary" /><br />
-            </div>
-            <ul class="list-group col-12" id="results">
-                <li class="list-group-item" id="competitorTemplate" style="display: none;">
-                    <div class="d-flex w-100">
+        <div>
+            Add result: <input id="newCompetitor" type="text" />
+            <input type="button" value="Add Competitor" class="btn btn-primary" /><br />
+        </div>
+        <ul class="list-group col-12" id="results">
+            <li class="list-group-item" id="competitorTemplate" style="display: none;">
+                <div class="d-flex w-100">
 
-                        <div class="d-none d-md-block">
-                            <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
-                            <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
-                        </div>
-                        <div>
-                            <span class="badge badge-secondary badge-pill race-place"></span>
-                        </div>
-                        <div>
-                            <span class="sail-number"></span>
-                        </div>
-                        <div>
-                            <span class="competitor-name h5"></span>
-                        </div>
-                    </div>
-                    <div class="float-left pl-3 d-block d-md-none">
+                    <div class="d-none d-md-block">
                         <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
                         <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                        &ensp;
+                        <button class="btn btn-light" type="button" onclick="window.SailScores.deleteResult()"><span class="fa fa-trash-o"></span></button>
                     </div>
-                    <div class="float-right">
+                    <div>
+                        <span class="badge badge-secondary badge-pill race-place"></span>
+                    </div>
+                    <div>
+                        <span class="sail-number"></span>
+                    </div>
+                    <div>
+                        <span class="competitor-name h5"></span>
+                    </div>
+                </div>
+                <div class="float-left pl-3 d-block d-md-none">
+                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
+                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                    &ensp;
+                    <button class="btn btn-light" type="button" onclick="window.SailScores.deleteResult()"><span class="fa fa-trash-o"></span></button>
+                </div>
+                <div class="float-right">
+                    <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
+                        <option>No Code</option>
+                        @foreach (var code in Model.ScoreCodeOptions)
+                        {
+                            <option>@code.Name</option>
+                        }
+                    </select>
+                </div>
+            </li>
+            @foreach (var score in Model.Scores.OrderBy(s => s.Place != 0 ? s.Place : 1000).ThenBy(s => s.Code))
+            {
+        <li id="@score.CompetitorId" class="list-group-item"
+            data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
+            <div class="d-flex w-100">
+                <div class="d-none d-md-block">
+                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
+                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                    &ensp;
+                    <button class="btn btn-light" type="button" data-toggle="modal"
+                            data-target="#deleteConfirm" data-competitorid="@score.CompetitorId"
+                            onclick="window.SailScores.confirmDelete()">
+                        <span class="far fa-trash-alt text-danger"></span>
+                    </button>
+                </div>
+                &ensp;
+                <div>
+                    <span class="badge badge-secondary badge-pill race-place"></span>
+                </div>
+                <div>
+                    <span class="sail-number">@score.Competitor.SailNumber</span>
+                </div>
+                <div>
+                    <span class="competitor-name h5">@score.Competitor.Name</span>
+                </div>
+                <div class="float-right d-none d-md-flex ml-auto">
+                    <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
+                        <option>No Code</option>
+                        @foreach (var code in Model.ScoreCodeOptions)
+                        {
+                            <option selected="@(score.Code == code.Name)">@code.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="float-left pl-3 d-block d-md-none">
+                <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
+                <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                &ensp;
+                <button class="btn btn-light" type="button" data-toggle="modal"
+                        data-target="#deleteConfirm" data-competitorid="@score.CompetitorId"
+                        onclick="window.SailScores.confirmDelete()"><span class="far fa-trash-alt text-danger"></span></button>
+            </div>
+            &ensp;
+                    <div class="float-right d-block d-md-none">
                         <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
                             <option>No Code</option>
                             @foreach (var code in Model.ScoreCodeOptions)
                             {
-                                <option>@code.Name</option>
+                                <option selected="@(score.Code == code.Name)">@code.Name</option>
                             }
                         </select>
                     </div>
                 </li>
-                @foreach (var score in Model.Scores.OrderBy(s => s.Place != 0 ? s.Place : 1000).ThenBy(s => s.Code))
-                {
-                    <li id="@score.CompetitorId" class="list-group-item"
-                        data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
-                        <div class="d-flex w-100">
-                            <div class="d-none d-md-block">
-                                <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
-                                <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
-                            </div>
-                            <div>
-                                <span class="badge badge-secondary badge-pill race-place"></span>
-                            </div>
-                            <div>
-                                <span class="sail-number">@score.Competitor.SailNumber</span>
-                            </div>
-                            <div>
-                                <span class="competitor-name h5">@score.Competitor.Name</span>
-                            </div>
-                            <div class="float-right d-none d-md-flex ml-auto">
-                                <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                                    <option>No Code</option>
-                                    @foreach (var code in Model.ScoreCodeOptions)
-                                    {
-                                        <option selected="@(score.Code == code.Name)">@code.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        <div class="float-left pl-3 d-block d-md-none">
-                            <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
-                            <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
-                        </div>
-                        <div class="float-right d-block d-md-none">
-                            <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                                <option>No Code</option>
-                                @foreach (var code in Model.ScoreCodeOptions)
-                                {
-                                    <option selected="@(score.Code == code.Name)">@code.Name</option>
-                                }
-                            </select>
-                        </div>
-                    </li>
-                }
-            </ul>
-            <hr />
-            <div class="row">
-                <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
-                <div class="col-md-3">
-                    <input id="submitButton" type="submit" value="Save" class="btn btn-primary btn-block" disabled="disabled" />
-                </div>
-                <div class="col-md-3">
-                    <a asp-controller="Admin"
-                       asp-action="Index"
-                       asp-fragment="races"
-                       class="btn btn-outline-primary btn-block">Cancel</a>
-                </div>
-                <div class="col-md-3">
-
-                </div>
-                <div class="col-md-3">
-                    <a asp-controller="Race"
-                       asp-action="Delete"
-                       asp-route-id="@Model.Id"
-                       class="btn btn-danger btn-block">Delete</a>
-                </div>
-            </div>
-        </form>
+            }
+        </ul>
         <hr />
+        <div class="row">
+            <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
+            <div class="col-md-3">
+                <input id="submitButton" type="submit" value="Save" class="btn btn-primary btn-block" disabled="disabled" />
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="races"
+                   class="btn btn-outline-primary btn-block">Cancel</a>
+            </div>
+            <div class="col-md-3">
+
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="Race"
+                   asp-action="Delete"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-danger btn-block">Delete</a>
+            </div>
+        </div>
+    </form>
+    <hr />
+</div>
+
+<div class="modal fade" id="deleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmLabel">Delete result?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">Recipient:</label>
+                        <input type="text" class="form-control" id="recipient-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="col-form-label">Message:</label>
+                        <textarea class="form-control" id="message-text"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Delete</button>
+            </div>
+        </div>
     </div>
+</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/raceEditor.build.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
-
-    <link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
 
     <script>
         var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));

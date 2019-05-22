@@ -1,4 +1,4 @@
-﻿/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
+/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
 ///
 import { competitorDto, scoreCodeDto, seriesDto } from "./interfaces/server";
 
@@ -54,6 +54,24 @@ export function moveDown() {
     var resultItem = $(btn).closest("li");
     resultItem.next().insertBefore(resultItem);
     calculatePlaces();
+}
+export function deleteResult() {
+    var btn = <Node>event.target;
+    var resultItem = $(btn).closest("li");
+    resultItem.remove();
+    calculatePlaces();
+}
+
+export function confirmDelete() {
+
+    var btn = <Node>event.target;
+    var recipient = $(btn).data('competitorid'); // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $('#deleteConfirm');
+    modal.find('.modal-title').text('New message to ' + recipient);
+    modal.find('.modal-body input').val(recipient);
+    modal.show();
 }
 
 var c: number = 0;
