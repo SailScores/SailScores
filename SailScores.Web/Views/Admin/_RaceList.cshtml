@@ -6,7 +6,7 @@
         </button>
     </div>
     <div id="collapseRaces" class="collapse" aria-labelledby="racesHeading" data-parent="#accordion">
-        <div class="card-body">
+        <div class="card-body p-1 p-md-20">
             <p>
                 @Html.ActionLink("Create", "Create", "Race", new { /* id=item.PrimaryKey */ })
             </p>
@@ -26,7 +26,7 @@
                         <div id="collapseYear_@yearRaces.Key" class="collapse"
                              aria-labelledby="raceYearHeading_@yearRaces.Key"
                              data-parent="#raceYearAccordion_@yearRaces.Key">
-                            <div class="card-body">
+                            <div class="card-body p-1 p-md-20">
                                 <div id="raceYearFleetAccordion_@(yearRaces.Key)">
                                     @foreach (var fleetRaces in yearRaces.OrderBy(r => r.Fleet?.Name).GroupBy(r => r.Fleet?.Name ?? String.Empty, r => r))
                                     {
@@ -39,27 +39,27 @@
                                             <div id="collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" class="collapse"
                                                  aria-labelledby="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')"
                                                  data-parent="#raceYearFleetAccordion_@(yearRaces.Key)">
-                                                <div class="card-body">
+                                                <div class="card-body p-1 p-md-20">
 
                                                     @foreach (var item in fleetRaces.OrderByDescending(r => r.Date).ThenBy(r => r.Order))
                                                     {
-                                                    <div class="row">
-                                                        <div class="col-2 col-md-2">
-                                                            @Html.DisplayFor(modelItem => item.Name)
-                                                        </div>
-                                                        <div class="col-2">
+                                                    <div class="row mb-3 mb-md-1">
+                                                        <div class="col-sm-2">
                                                             @Html.DisplayFor(modelItem => item.Date)
                                                         </div>
-                                                        <div class="col-2">
+                                                        <div class="col-sm-1">
                                                             @Html.DisplayFor(modelItem => item.Order)
                                                         </div>
-                                                        <div class="d-none d-md-block col-md-2">
+                                                        <div class="col-sm-2">
+                                                            @Html.DisplayFor(modelItem => item.Name)
+                                                        </div>
+                                                        <div class="d-none d-lg-block col-lg-3">
                                                             @Html.DisplayFor(modelItem => item.Description)
                                                         </div>
                                                         <div class="d-none d-md-block col-md-2">
                                                             (@(item.Series?.Count ?? 0) series)
                                                         </div>
-                                                        <div class="col-2">
+                                                        <div class="col-sm-3 col-md-2">
                                                             @Html.ActionLink("Edit", "Edit", "Race",
                                                            new { id = item.Id },
                                                            new { @class = "text-primary" }) |

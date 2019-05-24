@@ -56,21 +56,27 @@ export function moveDown() {
     calculatePlaces();
 }
 export function deleteResult() {
-    var btn = <Node>event.target;
-    var resultItem = $(btn).closest("li");
+
+    var modal = $("#deleteConfirm");
+    var compId = modal.find("#compIdToDelete").val();
+    var resultList = $("#results");
+    var resultItem = resultList.find(`[data-competitorid='${compId}']`);
     resultItem.remove();
     calculatePlaces();
+    (<any>modal).modal("hide");
+    console.log("Hiding...");
 }
+
 
 export function confirmDelete() {
 
     var btn = <Node>event.target;
-    var recipient = $(btn).data('competitorid'); // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var resultItem = $(btn).closest("li");
+    var compId = resultItem.data('competitorid');
+    var compName = resultItem.find(".competitor-name").text();
     var modal = $('#deleteConfirm');
-    modal.find('.modal-title').text('New message to ' + recipient);
-    modal.find('.modal-body input').val(recipient);
+    modal.find('#competitorNameToDelete').text(compName);
+    modal.find('#compIdToDelete').val(compId);
     modal.show();
 }
 
@@ -89,6 +95,12 @@ function addNewCompetitor(competitor: competitorDto) {
 
     span = compListItem.getElementsByClassName("race-place")[0];
     span.appendChild(document.createTextNode(c.toString()));
+
+    var deleteButtons = compListItem.getElementsByClassName("delete-button");
+
+    for (var i = 0; i < deleteButtons.length; i++) {
+        deleteButtons[i].setAttribute("data-competitorId", competitor.id.toString());
+    }
 
     compListItem.style.display = "";
     resultDiv.appendChild(compListItem);
