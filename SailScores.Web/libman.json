@@ -22,22 +22,12 @@
       ]
     },
     {
-      "library": "jquery@3.3.1",
+      "library": "jquery@3.4.1",
       "destination": "wwwroot/vendor/jquery"
     },
     {
-      "library": "popper.js@1.14.7",
+      "library": "popper.js@1.15.0",
       "destination": "wwwroot/vendor/popper.js"
-    },
-    {
-      "library": "dragula@3.7.2",
-      "destination": "wwwroot/vendor/dragula",
-      "files": [
-        "dragula.css",
-        "dragula.min.css",
-        "dragula.js",
-        "dragula.min.js"
-      ]
     },
     {
       "library": "jquery.devbridge-autocomplete@1.4.9",
@@ -48,7 +38,7 @@
       ]
     },
     {
-      "library": "bootstrap-select@1.13.8",
+      "library": "bootstrap-select@1.13.10",
       "destination": "wwwroot/vendor/bootstrap-select"
     }
   ]
