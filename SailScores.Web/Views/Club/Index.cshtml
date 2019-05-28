@@ -25,65 +25,11 @@
     </div>
 }
 <div class="row">
-    <div class="col-3 order-md-first order-last">
-        <h3>Seasons</h3>
-        @if (Model.Seasons.Count > 0)
-        {
-            <ul class="list-unstyled">
-                @foreach (var season in Model.Seasons)
-                {
-                    <li>
-                        <a asp-controller="Series"
-                           asp-route-clubInitials="@Model.Initials"
-                           asp-fragment="@season.Name">
-                            @season.Name
-                        </a>
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <p><i>No seasons are set up.</i></p>
-        }
+    <div class="col-6">
+        <h3>Top Series</h3>
     </div>
-    <div class="col-sm-6 col-md-3">
-        <h3>Recent Races</h3>
-        @if (Model.RecentRaces.Count() > 0)
-        {
-    <ul class="list-unstyled">
-        @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
-        {
-            <li>
-                @item.Key
-                <ul>
-                    @foreach (var race in item)
-                    {
-                        <li>
-                            <a asp-controller="Race"
-                               asp-action="Details"
-                               asp-route-clubInitials="@Model.Initials"
-                               asp-route-id="@race.Id">@race.CalculatedName</a>
-                        </li>
-                    }
-                </ul>
-            </li>
-        }
-    </ul>
-        }
-        else
-        {
-            <p><i>No recent races found.</i></p>
-        }
-        <p>
-            <a asp-controller="Race"
-               asp-route-clubInitials="@Model.Initials">
-                All Races
-            </a>
-        </p>
-    </div>
-    <div class="col-sm-4 col-md-3">
-        <h3>Recent Series</h3>
+    <div class="col-3">
+        <h3>Series with recent races</h3>
         @if (Model.RecentSeries.Count() > 0)
         {
             <ul class="list-unstyled">
@@ -97,21 +43,33 @@
                 }
             </ul>
         }
-        else
+        else if (Model.RecentRaces.Count() > 0)
         {
-            <p><i>No recent Series found.</i></p>
+            <ul class="list-unstyled">
+                @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
+                {
+                    <li>
+                        @item.Key
+                        <ul>
+                            @foreach (var race in item)
+                            {
+                                <li>
+                                    <a asp-controller="Race"
+                                       asp-action="Details"
+                                       asp-route-clubInitials="@Model.Initials"
+                                       asp-route-id="@race.Id">@race.CalculatedName</a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+            </ul>
         }
-        <p>
-            <a asp-controller="Series"
-               asp-route-clubInitials="@Model.Initials">
-                All Series
-            </a>
-        </p>
     </div>
-    <div class="col-sm-6 col-md-3">
-        <h3>Upcoming Races</h3>
+    <div class="col-3">
         @if (Model.UpcomingRaces.Count() > 0)
         {
+            <h3>Upcoming Races</h3>
             <ul class="list-unstyled">
                 @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
@@ -131,10 +89,6 @@
                     </li>
                 }
             </ul>
-        }
-        else
-        {
-            <p><i>No scheduled races found.</i></p>
         }
     </div>
 </div>
