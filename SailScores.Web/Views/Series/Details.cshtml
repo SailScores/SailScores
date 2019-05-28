@@ -59,12 +59,12 @@ with @Model.Item.FlatResults.NumberOfDiscards discards,
 
                 @foreach (var race in Model.Item.FlatResults.Races)
                 {
-                    if (race.State == RaceState.Canceled)
+                    if (race.State == RaceState.Abandoned)
                     {
                         if (firstRow)
                         {
-                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="canceled">
-                                <span>CANCELED</span>
+                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned">
+                                <span>ABANDONED</span>
                             </td>
                         }
                     }

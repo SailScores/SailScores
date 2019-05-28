@@ -54,7 +54,7 @@ namespace SailScores.Core.Services
                 .ToListAsync()
                 ).Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced ||
                         (includeScheduled && (r.State == RaceState.Scheduled)) ||
-                        (includeAbandoned && (r.State == RaceState.Canceled)));
+                        (includeAbandoned && (r.State == RaceState.Abandoned)));
             var modelRaces = _mapper.Map<List<Model.Race>>(dbRaces);
             var dbSeries = (await _dbContext.Clubs
                 .Include(c => c.Series)
