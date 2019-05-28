@@ -10,6 +10,7 @@ using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
 using SailScores.Api.Dtos;
+using SailScores.Api.Enumerations;
 
 namespace SailScores.Core.Services
 {
@@ -40,14 +41,20 @@ namespace SailScores.Core.Services
                 .ToListAsync();
             return _mapper.Map<List<Model.Race>>(dbObjects);
         }
-        public async Task<IList<Model.Race>> GetFullRacesAsync(Guid clubId)
+        public async Task<IList<Model.Race>> GetFullRacesAsync(
+            Guid clubId,
+            bool includeScheduled = true,
+            bool includeAbandoned = true)
         {
-            var dbRaces = await _dbContext.Races
+            var dbRaces = (await _dbContext.Races
                 .Where(r => r.Club.Id == clubId)
                 .Include(r => r.Fleet)
                 .Include( r => r.Scores)
                 .Include( r => r.SeriesRaces)
-                .ToListAsync();
+                .ToListAsync()
+                ).Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced ||
+                        (includeScheduled && (r.State == RaceState.Scheduled)) ||
+                        (includeAbandoned && (r.State == RaceState.Canceled)));
             var modelRaces = _mapper.Map<List<Model.Race>>(dbRaces);
             var dbSeries = (await _dbContext.Clubs
                 .Include(c => c.Series)

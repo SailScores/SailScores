@@ -8,7 +8,7 @@ namespace SailScores.Api.Enumerations
         Raced = 1,
         [Display(Name = "Scheduled")]
         Scheduled = 2,
-        [Display(Name = "Canceled")]
-        Canceled = 3
+        [Display(Name = "Abandoned")]
+        Abandoned = 3
     }
 }

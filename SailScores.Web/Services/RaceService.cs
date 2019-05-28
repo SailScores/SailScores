@@ -31,10 +31,13 @@ namespace SailScores.Web.Services
             await _coreRaceService.Delete(id);
         }
 
-        public async Task<IEnumerable<RaceSummaryViewModel>> GetAllRaceSummariesAsync(string clubInitials)
+        public async Task<IEnumerable<RaceSummaryViewModel>> GetAllRaceSummariesAsync(
+            string clubInitials,
+            bool includeScheduled,
+            bool includeAbandoned)
         {
             var club = (await _coreClubService.GetClubs(true)).First(c => c.Initials == clubInitials);
-            var races = (await _coreRaceService.GetFullRacesAsync(club.Id))
+            var races = (await _coreRaceService.GetFullRacesAsync(club.Id, includeScheduled, includeAbandoned))
                 .OrderByDescending(r => r.Date)
                 .ThenBy(r => r.Fleet.Name)
                 .ThenBy(r => r.Order);

@@ -8,7 +8,10 @@ namespace SailScores.Web.Services
 {
     public interface IRaceService
     {
-        Task<IEnumerable<RaceSummaryViewModel>> GetAllRaceSummariesAsync(string clubInitials);
+        Task<IEnumerable<RaceSummaryViewModel>> GetAllRaceSummariesAsync(
+            string clubInitials,
+            bool includeScheduled,
+            bool includeAbandoned);
         Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id);
         Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(string clubInitials);
         Task SaveAsync(RaceWithOptionsViewModel race);

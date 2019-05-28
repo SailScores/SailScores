@@ -41,7 +41,9 @@ namespace SailScores.Web.Models.SailScores
                 ?.Where(s =>
                     s.Races
                     ?.Any(r => r.Date > recentCutoff
-                        && (r.State ?? RaceState.Raced) == RaceState.Raced) ?? false);
+                        && (r.State ?? RaceState.Raced) == RaceState.Raced) ?? false)
+            .OrderByDescending(s => s.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced).Max(r => r.Date))
+            .ThenBy(s => s.Name);
 
         public IEnumerable<RaceSummaryViewModel> UpcomingRaces => Races?.Where(r => r.Date >= DateTime.Today.AddDays(-1)
             && (r.State ?? RaceState.Raced) == RaceState.Scheduled)
