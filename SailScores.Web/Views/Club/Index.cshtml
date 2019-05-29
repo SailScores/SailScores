@@ -19,32 +19,46 @@
 @if (!String.IsNullOrWhiteSpace(Model.Description))
 {
     <div class="row">
-        <div class="col-md-12 d-none d-md-block">
+        <div class="col-md-6 d-none d-md-block">
             @Html.Raw(Markdig.Markdown.ToHtml(Model.Description))
         </div>
     </div>
 }
 <div class="row">
-    <div class="col-6">
-        <h3>Top Series</h3>
-    </div>
-    <div class="col-3">
-        <h3>Series with recent races</h3>
-        @if (Model.RecentSeries.Count() > 0)
-        {
+    @if (Model.ImportantSeries.Any())
+    {
+        <div class="col-md-6">
+            <h2>Top Series</h2>
             <ul class="list-unstyled">
-                @foreach (var series in Model.RecentSeries)
+                @foreach (var series in Model.ImportantSeries)
                 {
                     <li>
                         <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
-                            @series.Name
+                            @series.Season.Name  @series.Name
                         </a>
                     </li>
                 }
             </ul>
-        }
-        else if (Model.RecentRaces.Count() > 0)
-        {
+        </div>
+    }
+    @if (Model.RecentSeries.Any())
+    {
+        <div class="col-sm-6 col-md-3">
+            <h4>Recent Series</h4>
+            <ul class="list-unstyled">
+                @foreach (var series in Model.RecentSeries)
+                {
+                <li>
+                    <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
+                        @series.Name
+                    </a>
+                </li>
+                }
+            </ul>
+        </div>
+    } else if (Model.RecentRaces.Count() > 0) {
+        <div class="col-sm-6 col-md-3">
+            <h4>Recent races</h4>
             <ul class="list-unstyled">
                 @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
@@ -64,18 +78,30 @@
                     </li>
                 }
             </ul>
-        }
-    </div>
-    <div class="col-3">
+        </div>
+    }
+    else
+    {
+        <div class="col-sm-6 col-md-3">
+            <p><i>No recent series found.</i></p>
+            <p>
+                <a asp-controller="Series"
+                   asp-route-clubInitials="@Model.Initials">
+                    All Series
+                </a>
+            </p>
+        </div>
+    }
+    <div class="col-sm-6 col-md-3">
         @if (Model.UpcomingRaces.Count() > 0)
         {
-            <h3>Upcoming Races</h3>
+            <h4>Upcoming Races</h4>
             <ul class="list-unstyled">
                 @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
                     <li>
-                        @item.Key
-                        <ul>
+                        <b>@item.Key</b>
+                        <ul class="list-unstyled">
                             @foreach (var race in item)
                             {
                                 <li>
@@ -92,23 +118,24 @@
         }
     </div>
 </div>
-@if (Model.CanEdit) {
+@if (Model.CanEdit)
+{
     <br />
     <hr />
-<div class="row bg-light">
-    <div class="col-sm-3 my-2">
-        <a asp-controller="Admin"
-           class="btn btn-outline-primary">Admin Page</a>
+    <div class="row bg-light">
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Admin"
+               class="btn btn-outline-primary">Admin Page</a>
+        </div>
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Competitor"
+               asp-action="Create"
+               class="btn btn-outline-primary">New Competitor</a>
+        </div>
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Race"
+               asp-action="Create"
+               class="btn btn-outline-primary">New Race</a>
+        </div>
     </div>
-    <div class="col-sm-3 my-2">
-        <a asp-controller="Competitor"
-           asp-action="Create"
-           class="btn btn-outline-primary">New Competitor</a>
-    </div>
-    <div class="col-sm-3 my-2">
-        <a asp-controller="Race"
-           asp-action="Create"
-           class="btn btn-outline-primary">New Race</a>
-    </div>
-</div>
 }

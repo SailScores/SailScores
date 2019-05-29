@@ -22,5 +22,7 @@ namespace SailScores.Api.Dtos
         [Required]
         public Guid SeasonId { get; set; }
 
+        public bool? IsImportantSeries { get; set; }
+
     }
 }

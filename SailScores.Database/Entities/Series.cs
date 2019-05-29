@@ -20,5 +20,7 @@ namespace SailScores.Database.Entities
 
         [Required]
         public Season Season { get; set; }
+
+        public bool? IsImportantSeries { get; set; }
     }
 }
