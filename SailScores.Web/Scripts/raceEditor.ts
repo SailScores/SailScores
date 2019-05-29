@@ -1,4 +1,4 @@
-﻿/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
+/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
 ///
 import { competitorDto, scoreCodeDto, seriesDto } from "./interfaces/server";
 
@@ -8,11 +8,6 @@ import * as dragula from "dragula";
 let competitors: competitorDto[];
 declare var scoreCodes: scoreCodeDto[];
 const noCodeString = "No Code";
-
-dragula([document.getElementById('results')])
-    .on('drop', function () {
-        calculatePlaces();
-    });
 
 function checkEnter(e: KeyboardEvent) {
     const ev = e || event;
@@ -45,6 +40,46 @@ export function loadFleet() {
     getCompetitors(clubId, fleetId);
 }
 
+
+export function moveUp() {
+    var btn = <Node>event.target;
+    var resultItem = $(btn).closest("li");
+    // move up:
+    resultItem.prev().insertAfter(resultItem);
+    calculatePlaces();
+}
+
+export function moveDown() {
+    var btn = <Node>event.target;
+    var resultItem = $(btn).closest("li");
+    resultItem.next().insertBefore(resultItem);
+    calculatePlaces();
+}
+export function deleteResult() {
+
+    var modal = $("#deleteConfirm");
+    var compId = modal.find("#compIdToDelete").val();
+    var resultList = $("#results");
+    var resultItem = resultList.find(`[data-competitorid='${compId}']`);
+    resultItem.remove();
+    calculatePlaces();
+    (<any>modal).modal("hide");
+    console.log("Hiding...");
+}
+
+
+export function confirmDelete() {
+
+    var btn = <Node>event.target;
+    var resultItem = $(btn).closest("li");
+    var compId = resultItem.data('competitorid');
+    var compName = resultItem.find(".competitor-name").text();
+    var modal = $('#deleteConfirm');
+    modal.find('#competitorNameToDelete').text(compName);
+    modal.find('#compIdToDelete').val(compId);
+    modal.show();
+}
+
 var c: number = 0;
 function addNewCompetitor(competitor: competitorDto) {
     var resultDiv = document.getElementById("results");
@@ -60,6 +95,12 @@ function addNewCompetitor(competitor: competitorDto) {
 
     span = compListItem.getElementsByClassName("race-place")[0];
     span.appendChild(document.createTextNode(c.toString()));
+
+    var deleteButtons = compListItem.getElementsByClassName("delete-button");
+
+    for (var i = 0; i < deleteButtons.length; i++) {
+        deleteButtons[i].setAttribute("data-competitorId", competitor.id.toString());
+    }
 
     compListItem.style.display = "";
     resultDiv.appendChild(compListItem);

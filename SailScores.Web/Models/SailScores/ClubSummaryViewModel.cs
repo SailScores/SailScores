@@ -27,7 +27,7 @@ namespace SailScores.Web.Models.SailScores
         public IList<Competitor> Competitors { get; set; }
         public IList<BoatClass> BoatClasses { get; set; }
         public IList<Season> Seasons { get; set; }
-        public IList<Series> Series { get; set; }
+        public IList<SeriesSummary> Series { get; set; }
         public IList<RaceSummaryViewModel> Races { get; set; }
         public IList<ScoreCode> ScoreCodes { get; set; }
 
@@ -37,11 +37,13 @@ namespace SailScores.Web.Models.SailScores
             .OrderByDescending(r => r.Date)
             .ThenBy(r => r.Order);
 
-        public IEnumerable<Series> RecentSeries => Series
+        public IEnumerable<SeriesSummary> RecentSeries => Series
                 ?.Where(s =>
                     s.Races
                     ?.Any(r => r.Date > recentCutoff
-                        && (r.State ?? RaceState.Raced) == RaceState.Raced) ?? false);
+                        && (r.State ?? RaceState.Raced) == RaceState.Raced) ?? false)
+            .OrderByDescending(s => s.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced).Max(r => r.Date))
+            .ThenBy(s => s.Name);
 
         public IEnumerable<RaceSummaryViewModel> UpcomingRaces => Races?.Where(r => r.Date >= DateTime.Today.AddDays(-1)
             && (r.State ?? RaceState.Raced) == RaceState.Scheduled)
@@ -49,5 +51,11 @@ namespace SailScores.Web.Models.SailScores
             .ThenBy(r => r.Order)
             .ThenBy(r => r.FleetName)
             .Take(6);
+
+        public IEnumerable<SeriesSummary> ImportantSeries => Series
+                ?.Where(s =>
+                    s.IsImportantSeries ?? false)
+            .OrderBy(s => s.Season.Name)
+            .ThenBy(s => s.Name);
     }
 }

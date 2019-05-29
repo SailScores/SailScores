@@ -1,14 +1,13 @@
 ﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 
 @{
-    ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+    ViewBag.Title = "Edit Race";
+    Layout = "_ClubLayout";
 }
 
-<h4>Add a new race</h4>
-
-<hr />
-<div class="row">
+<div class="container p-0 justify-content-between">
+    <h4>Add a new race</h4>
+    <hr />
     <form id="raceform" asp-action="Create">
         <input type="hidden" id="clubId" asp-for="ClubId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -71,23 +70,52 @@
             Add result: <input id="newCompetitor" type="text" />
             <input type="button" value="Add Competitor" class="btn btn-primary" /><br />
         </div>
-        <div class="container">
-            <ul class="list-group col-12" id="results">
-                <li class="list-group-item" id="competitorTemplate" style="display: none;">
-                    <span class="badge badge-secondary badge-pill race-place"></span>
-                    <span class="sail-number"></span>
-                    <span class="competitor-name h5"></span>
-                    <div class="float-right pl-3"><span class="fas fa-arrows-alt-v"></span></div>
-                    <select class="float-right select-code" onchange="window.SailScores.calculatePlaces()">
+        <ul class="list-group col-12" id="results">
+            <li class="list-group-item" id="competitorTemplate" style="display: none;">
+                <div class="d-flex w-100">
+
+                    <div class="d-none d-md-block">
+                        <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
+                        <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                        &ensp;
+                        <button class="btn btn-light delete-button" type="button" data-toggle="modal"
+                                data-target="#deleteConfirm"
+                                onclick="window.SailScores.confirmDelete()">
+                            <span class="far fa-trash-alt text-danger"></span>
+                        </button>
+                    </div>
+                    <div>
+                        <span class="badge badge-secondary badge-pill race-place"></span>
+                    </div>
+                    <div>
+                        <span class="sail-number"></span>
+                    </div>
+                    <div>
+                        <span class="competitor-name h5"></span>
+                    </div>
+                </div>
+                <div class="float-left pl-3 d-block d-md-none">
+                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
+                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                    &ensp;
+                    <button class="btn btn-light delete-button" type="button" data-toggle="modal"
+                            data-target="#deleteConfirm"
+                            onclick="window.SailScores.confirmDelete()">
+                        <span class="far fa-trash-alt text-danger"></span>
+                    </button>
+                </div>
+                &ensp;
+                <div class="float-right">
+                    <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
                         <option>No Code</option>
                         @foreach (var code in Model.ScoreCodeOptions)
                         {
                             <option>@code.Name</option>
                         }
                     </select>
-                </li>
-            </ul>
-        </div>
+                </div>
+            </li>
+        </ul>
         <hr />
         <div class="row">
             <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
@@ -102,15 +130,39 @@
             </div>
         </div>
     </form>
+    <hr />
 </div>
+
+<div class="modal fade" id="deleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmLabel">Delete result?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <p> Delete the result for <span id="competitorNameToDelete"></span>?</p>
+                    </div>
+                    <input id="compIdToDelete" type="hidden" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="window.SailScores.deleteResult()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/raceEditor.build.js"></script>
-    <script src="~/vendor/dragula/dragula.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
-    <link href="~/vendor/dragula/dragula.css" rel="stylesheet" />
-
 
     <script>
         var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));

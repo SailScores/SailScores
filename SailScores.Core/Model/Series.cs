@@ -30,5 +30,7 @@ namespace SailScores.Core.Model
 
         public FlatModel.FlatResults FlatResults { get; set; }
 
+        public bool IsImportantSeries { get; set; }
+
     }
 }

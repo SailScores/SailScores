@@ -15,6 +15,8 @@ namespace SailScores.Web.Models.SailScores
         public IList<Race> Races { get; set; }
         public Season Season { get; set; }
 
+        public bool? IsImportantSeries { get; set; }
+
         public String DateString
         {
             get
@@ -25,7 +27,7 @@ namespace SailScores.Web.Models.SailScores
                 }
                 else if (Races?.Count == 1)
                 {
-                    return Races[0]?.Date?.ToShortDateString() ?? "Not dated";
+                    return Races[0]?.Date?.ToString("M") ?? String.Empty;
                 }
 
                 var maxDate = Races.Max(r => r.Date);
@@ -35,15 +37,15 @@ namespace SailScores.Web.Models.SailScores
                 {
                     if (maxDate?.Date != minDate?.Date)
                     {
-                        return minDate?.ToShortDateString() + " - " + maxDate?.ToShortDateString();
+                        return minDate?.ToString("M") + " - " + maxDate?.ToString("M");
                     }
                     else
                     {
-                        return minDate?.ToShortDateString();
+                        return minDate?.ToString("M");
                     }
                 }
                 // no max or min date
-                return "Not dated";
+                return String.Empty;
             }
         }
     }
