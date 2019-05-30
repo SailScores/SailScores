@@ -73,7 +73,6 @@
         <ul class="list-group col-12" id="results">
             <li class="list-group-item" id="competitorTemplate" style="display: none;">
                 <div class="d-flex w-100">
-
                     <div class="d-none d-md-block">
                         <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
                         <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
@@ -84,6 +83,7 @@
                             <span class="far fa-trash-alt text-danger"></span>
                         </button>
                     </div>
+                    &ensp;
                     <div>
                         <span class="badge badge-secondary badge-pill race-place"></span>
                     </div>
@@ -92,6 +92,15 @@
                     </div>
                     <div>
                         <span class="competitor-name h5"></span>
+                    </div>
+                    <div class="float-right d-none d-md-flex ml-auto">
+                        <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
+                            <option>No Code</option>
+                            @foreach (var code in Model.ScoreCodeOptions)
+                            {
+                                <option>@code.Name</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="float-left pl-3 d-block d-md-none">
@@ -104,7 +113,8 @@
                         <span class="far fa-trash-alt text-danger"></span>
                     </button>
                 </div>
-                <div class="float-right">
+                &ensp;
+                <div class="float-right d-block d-md-none">
                     <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
                         <option>No Code</option>
                         @foreach (var code in Model.ScoreCodeOptions)
@@ -123,7 +133,7 @@
                     <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
                     <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
                     &ensp;
-                    <button class="btn btn-light" type="button" data-toggle="modal"
+                    <button class="btn btn-light delete-button" type="button" data-toggle="modal"
                             data-target="#deleteConfirm" data-competitorid="@score.CompetitorId"
                             onclick="window.SailScores.confirmDelete()">
                         <span class="far fa-trash-alt text-danger"></span>
@@ -153,9 +163,10 @@
                 <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
                 <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
                 &ensp;
-                <button class="btn btn-light" type="button" data-toggle="modal"
+                <button class="btn btn-light delete-button" type="button" data-toggle="modal"
                         data-target="#deleteConfirm" data-competitorid="@score.CompetitorId"
-                        onclick="window.SailScores.confirmDelete()"><span class="far fa-trash-alt text-danger"></span></button>
+                        onclick="window.SailScores.confirmDelete()">
+                <span class="far fa-trash-alt text-danger"></span></button>
             </div>
             &ensp;
                     <div class="float-right d-block d-md-none">

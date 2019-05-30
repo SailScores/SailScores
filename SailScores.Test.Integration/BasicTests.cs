@@ -18,7 +18,7 @@ namespace SailScores.Test.Integration
         [Theory]
         [InlineData("/")]
         [InlineData("/Home/About")]
-        [InlineData("/Home/Contact")]
+        [InlineData("/Home/News")]
         public async Task MvcEndpoints_ReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange
