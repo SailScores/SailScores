@@ -11,5 +11,6 @@ namespace SailScores.Core.Model
         public Guid RaceId { get; set; }
         public int? Place { get; set; }
         public string Code { get; set; }
+
     }
 }

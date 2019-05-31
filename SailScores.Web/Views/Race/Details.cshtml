@@ -45,7 +45,7 @@
         {
             <tr>
                 <td>
-                    @((score.Place == null || score.Place == 0) ? score.Code : score.Place.ToString())
+                    @((score.Place == null || score.Place == 0) ? $"{score.Code} - {score.ScoreCode.Description}" : score.Place.ToString())
                 </td>
                 <td>
                     @score.Competitor.SailNumber

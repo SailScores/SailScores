@@ -16,11 +16,12 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Club, ClubSummaryViewModel>()
                 .ForMember(d => d.CanEdit, o => o.Ignore());
             CreateMap<Model.Race, RaceSummaryViewModel>()
-                .ForMember(r => r.CompetitorCount, o => o.MapFrom(s => s.Scores.Count))
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
                 .ForMember(r => r.FleetShortName, o => o.MapFrom(s => s.Fleet.ShortName))
                 .ForMember(r => r.SeriesNames, o => o.MapFrom(s => s.Series.Select(sr => sr.Name)));
-            
+            CreateMap<Model.Score, ScoreViewModel>()
+                .ForMember(s => s.ScoreCode, o => o.Ignore());
+
             CreateMap<Model.Fleet, FleetSummary>()
                 .ForMember(d => d.Series, o => o.Ignore());
             CreateMap<Model.Fleet, FleetWithOptionsViewModel>()
@@ -38,7 +39,7 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Competitor, CompetitorWithOptionsViewModel>()
                 .ForMember(d => d.BoatClassOptions, o => o.Ignore());
 
-            CreateMap<Model.Race, RaceWithOptionsViewModel>()
+            CreateMap<RaceViewModel, RaceWithOptionsViewModel>()
                 .ForMember(d => d.FleetOptions, o => o.Ignore())
                 .ForMember(d => d.SeriesOptions, o => o.Ignore())
                 .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())

@@ -1,4 +1,5 @@
 ﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
+@using SailScores.Web.Extensions;
 
 @{
     ViewBag.Title = "Edit Race";
@@ -95,10 +96,10 @@
                     </div>
                     <div class="float-right d-none d-md-flex ml-auto">
                         <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                            <option>No Code</option>
+                            <option value="No Code">No Code</option>
                             @foreach (var code in Model.ScoreCodeOptions)
                             {
-                                <option>@code.Name</option>
+                                <option value="@code.Name">@code.Name: @code.Description.Left(40)</option>
                             }
                         </select>
                     </div>
@@ -119,7 +120,7 @@
                         <option>No Code</option>
                         @foreach (var code in Model.ScoreCodeOptions)
                         {
-                            <option>@code.Name</option>
+                            <option value="@code.Name">@code.Name: @code.Description.Left(20)</option>
                         }
                     </select>
                 </div>
@@ -151,10 +152,10 @@
                 </div>
                 <div class="float-right d-none d-md-flex ml-auto">
                     <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                        <option>No Code</option>
+                        <option value="No Code">No Code</option>
                         @foreach (var code in Model.ScoreCodeOptions)
                         {
-                            <option selected="@(score.Code == code.Name)">@code.Name</option>
+                            <option value="@code.Name" selected="@(score.Code == code.Name)">@code.Name: @code.Description.Left(40)</option>
                         }
                     </select>
                 </div>
@@ -169,16 +170,16 @@
                 <span class="far fa-trash-alt text-danger"></span></button>
             </div>
             &ensp;
-                    <div class="float-right d-block d-md-none">
-                        <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                            <option>No Code</option>
-                            @foreach (var code in Model.ScoreCodeOptions)
-                            {
-                                <option selected="@(score.Code == code.Name)">@code.Name</option>
-                            }
-                        </select>
-                    </div>
-                </li>
+                <div class="float-right d-block d-md-none">
+                    <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
+                        <option value="No Code">No Code</option>
+                        @foreach (var code in Model.ScoreCodeOptions)
+                        {
+                            <option value="@code.Name" selected="@(score.Code == code.Name)">@code.Name: @code.Description.Left(20)</option>
+                        }
+                    </select>
+                </div>
+            </li>
             }
         </ul>
         <hr />

@@ -1,4 +1,5 @@
 ﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
+@using SailScores.Web.Extensions
 
 @{
     ViewBag.Title = "Edit Race";
@@ -107,10 +108,10 @@
                 &ensp;
                 <div class="float-right">
                     <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                        <option>No Code</option>
+                        <option value="No Code">No Code</option>
                         @foreach (var code in Model.ScoreCodeOptions)
                         {
-                            <option>@code.Name</option>
+                            <option value="@code.Name">@code.Name: @code.Description.Left(40)</option>
                         }
                     </select>
                 </div>

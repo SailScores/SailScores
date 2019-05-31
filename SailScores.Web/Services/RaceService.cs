@@ -14,15 +14,18 @@ namespace SailScores.Web.Services
     {
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IRaceService _coreRaceService;
+        private readonly IScoringService _coreScoringService;
         private readonly IMapper _mapper;
 
         public RaceService(
             Core.Services.IClubService clubService,
             Core.Services.IRaceService coreRaceService,
+            Core.Services.IScoringService coreScoringService,
             IMapper mapper)
         {
             _coreClubService = clubService;
             _coreRaceService = coreRaceService;
+            _coreScoringService = coreScoringService;
             _mapper = mapper;
         }
 
@@ -42,8 +45,21 @@ namespace SailScores.Web.Services
                 .ThenBy(r => r.Fleet.Name)
                 .ThenBy(r => r.Order);
 
+            var scoreCodes = await _coreScoringService.GetScoreCodesAsync(club.Id);
             var vm = _mapper.Map<List<RaceSummaryViewModel>>(races);
+            foreach(var race in vm)
+            {
+                foreach(var score in race.Scores)
+                {
+                    score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
+                }
+            }
             return vm;
+        }
+
+        private static ScoreCode GetScoreCode(string code, IEnumerable<ScoreCode> scoreCodes)
+        {
+            return scoreCodes.FirstOrDefault(sc => sc.Name == code);
         }
 
         public async Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(string clubInitials)
@@ -84,6 +100,12 @@ namespace SailScores.Web.Services
                 .OrderBy(s => (s.Place == null || s.Place == 0) ? int.MaxValue : s.Place)
                 .ThenBy(s => s.Code)
                 .ToList();
+
+            var scoreCodes = await _coreScoringService.GetScoreCodesAsync(raceDto.ClubId);
+            foreach (var score in retRace.Scores)
+            {
+                score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
+            }
 
             return retRace;
         }

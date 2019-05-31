@@ -62,15 +62,8 @@
         </td>
         <td>
 
-            @Html.DisplayFor(modelItem => race.Scores.Count)
-            @if (race.Scores.Count == 1)
-            {
-                @:boat
-            }
-            else
-            {
-                @:boats
-            }
+            @Html.DisplayFor(modelItem => race.CompetitorCount)
+            @(race.CompetitorCount == 1 ? "boat" : "boats")
         </td>
         <td>
             @Html.DisplayFor(modelItem => race.Name)

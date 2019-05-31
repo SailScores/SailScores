@@ -26,13 +26,12 @@ namespace SailScores.Web.Models.SailScores
 
         public String FleetName { get; set; }
         public String FleetShortName { get; set; }
-        public int CompetitorCount { get; set; }
 
         public IList<string> SeriesNames { get; set; }
 
         public Season Season { get; set; }
 
-        public IList<Score> Scores { get; set; }
+        public IList<ScoreViewModel> Scores { get; set; }
 
         public RaceState? State { get; set; }
 
@@ -41,6 +40,19 @@ namespace SailScores.Web.Models.SailScores
             get
             {
                 return Date?.ToString("ddd, MMM d") + " Race " + Order;
+            }
+        }
+
+        public int CompetitorCount
+        {
+            get
+            {
+                if(Scores == null)
+                {
+                    return 0;
+                }
+                return Scores.Where(s => s.ScoreCode?.CameToStart ??
+                    (s.Place.HasValue && s.Place != 0)).Count();
             }
         }
     }
