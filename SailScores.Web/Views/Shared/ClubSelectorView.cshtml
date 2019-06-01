@@ -12,10 +12,10 @@
     document.getElementById("clubSelect").removeAttribute('hidden');
 </script>
 <noscript>
-    @foreach(var club in Model.Clubs)
+    @foreach (var club in Model.Clubs)
     {
-        <a href="'@string.Format("{0}://{1}{2}/", Context.Request.Scheme, Context.Request.Host, Url.Content("~"))' + initials;">
-            @club.Initials - @club.Name
-        </a>
+        <a href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~")}/{club.Initials}")">
+        @club.Initials - @club.Name
+        </a><br />
     }
 </noscript>
