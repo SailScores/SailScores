@@ -492,6 +492,7 @@ namespace SailScores.Core.Services
 
             existingSeries.Name = model.Name;
             existingSeries.Description = model.Description;
+            existingSeries.IsImportantSeries = model.IsImportantSeries;
 
             if(model.Season != null
                 && model.Season.Id != Guid.Empty
