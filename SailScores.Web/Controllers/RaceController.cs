@@ -111,8 +111,8 @@ namespace SailScores.Web.Controllers
             string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            ViewData["ClubInitials"] = clubInitials;
+            if (!await _authService.CanUserEdit(User, clubInitials))
             {
                 return Unauthorized();
             }
@@ -121,7 +121,7 @@ namespace SailScores.Web.Controllers
             {
                 return NotFound();
             }
-            if (race.ClubId != club.Id)
+            if (race.Club.Initials.ToUpperInvariant() != clubInitials.ToUpperInvariant())
             {
                 return Unauthorized();
             }
