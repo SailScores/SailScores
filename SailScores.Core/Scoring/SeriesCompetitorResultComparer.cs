@@ -7,9 +7,20 @@ namespace SailScores.Core.Scoring
     {
         public int Compare(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
-            if(x.TotalScore != y.TotalScore)
+            //put zeroes at the end of rankings 
+            decimal? xScoreToUse =
+                (x.TotalScore.HasValue && x.TotalScore == 0
+                ? decimal.MaxValue
+                : x.TotalScore);
+            decimal? yScoreToUse =
+                (y.TotalScore.HasValue && y.TotalScore == 0
+                ? decimal.MaxValue
+                : y.TotalScore);
+
+
+            if (xScoreToUse != yScoreToUse)
             {
-                return x.TotalScore < y.TotalScore ? -1 : 1;
+                return xScoreToUse < yScoreToUse ? -1 : 1;
             }
 
             // tied total, so return the score with the most firsts, then seconds, etc.
