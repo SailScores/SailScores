@@ -31,6 +31,14 @@
     }
 </ul>
 <p>@Model.Item.Description</p>
+@if (!String.IsNullOrWhiteSpace(Model.Item.TrackingUrl))
+{
+    <div class="row">
+        <div class="col-12">
+            <p><a href="@Model.Item.TrackingUrl" target="_blank"><span class="fas fa-external-link-alt"></span> Race Tracking</a></p>
+        </div>
+    </div>
+}
 <table class="table">
     <thead>
         <tr>

@@ -23,6 +23,7 @@ namespace SailScores.Api.Dtos
         public int Order { get; set; }
         [StringLength(1000)]
         public String Description { get; set; }
+        public String TrackingUrl { get; set; }
 
         public Guid FleetId { get; set; }
         public IList<Guid> ScoreIds { get; set; }

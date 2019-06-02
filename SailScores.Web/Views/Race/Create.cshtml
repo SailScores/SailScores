@@ -42,6 +42,11 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="form-group">
+            <label asp-for="TrackingUrl" class="control-label">Tracking Url<em>&ensp;Optional</em></label>
+            <input asp-for="TrackingUrl" class="form-control" />
+            <span asp-validation-for="TrackingUrl" class="text-danger"></span>
+        </div>
+        <div class="form-group">
             <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
             <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
                 <option selected="selected">Select a fleet...</option>

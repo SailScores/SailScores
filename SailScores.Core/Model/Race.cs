@@ -23,6 +23,7 @@ namespace SailScores.Core.Model
         public int Order { get; set; }
         [StringLength(1000)]
         public String Description { get; set; }
+        public String TrackingUrl { get; set; }
 
         public Fleet Fleet { get; set; }
         public virtual IList<Score> Scores { get; set; }
