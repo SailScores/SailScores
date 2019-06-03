@@ -28,12 +28,24 @@
                 <th scope="col" class="text-center">Total</th>
                 @foreach (var race in Model.Item.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())
                 {
+                    if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
+                    {
 
-                    <th class="text-center">
-                        @Html.ActionLink(
-@race.Date?.ToString("M-d") + " R" + @race.Order
-, "Details", "Race", new { id = race.Id })
-                    </th>
+                        <th class="text-center d-none d-sm-table-cell">
+                            @Html.ActionLink(
+    @race.Date?.ToString("M-d") + " R" + @race.Order
+    , "Details", "Race", new { id = race.Id })
+                        </th>
+                    }
+                    else
+                    {
+
+                        <th class="text-center">
+                            @Html.ActionLink(
+    @race.Date?.ToString("M-d") + " R" + @race.Order
+    , "Details", "Race", new { id = race.Id })
+                        </th>
+                    }
                 }
                 @if ((Model.Item.FlatResults?.Races?.Count() ?? 0) > 4)
                 {
