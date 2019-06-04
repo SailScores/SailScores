@@ -47,7 +47,7 @@
                         </th>
                     }
                 }
-                @if ((Model.Item.FlatResults?.Races?.Count() ?? 0) > 4)
+                @if ((Model.Item.FlatResults.NumberOfSailedRaces) > 4)
                 {
                     <th scope="col" class="d-table-cell d-md-none">Helm</th>
                 }
