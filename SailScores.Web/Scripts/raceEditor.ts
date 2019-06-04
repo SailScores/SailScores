@@ -14,6 +14,7 @@ function checkEnter(e: KeyboardEvent) {
     var txtArea = /textarea/i.test((ev.srcElement as HTMLElement).tagName);
     return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
 }
+
 export function init() {
     document.querySelector('form').onkeypress = checkEnter;
     $("#raceform").submit(function (e) {
@@ -29,17 +30,18 @@ export function init() {
     $("#submitButton").prop("disabled", false);
     $("#submitDisabledMessage").prop("hidden", true);
 }
+
 export function loadSeriesOptions() {
     let clubId = ($("#clubId").val() as string);
     let dateStr = $("#date").val() as string;
     getSeries(clubId, dateStr);
 }
+
 export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
     let fleetId = ($("#fleetId").val() as string);
     getCompetitors(clubId, fleetId);
 }
-
 
 export function moveUp() {
     var btn = <Node>event.target;
@@ -55,8 +57,8 @@ export function moveDown() {
     resultItem.next().insertBefore(resultItem);
     calculatePlaces();
 }
-export function deleteResult() {
 
+export function deleteResult() {
     var modal = $("#deleteConfirm");
     var compId = modal.find("#compIdToDelete").val();
     var resultList = $("#results");
@@ -64,12 +66,9 @@ export function deleteResult() {
     resultItem.remove();
     calculatePlaces();
     (<any>modal).modal("hide");
-    console.log("Hiding...");
 }
 
-
 export function confirmDelete() {
-
     var btn = <Node>event.target;
     var resultItem = $(btn).closest("li");
     var compId = resultItem.data('competitorid');
