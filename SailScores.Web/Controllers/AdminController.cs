@@ -19,15 +19,18 @@ namespace SailScores.Web.Controllers
     {
 
         private readonly IClubService _clubService;
+        private readonly IScoringService _scoringService;
         private readonly Services.IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public AdminController(
             IClubService clubService,
+            IScoringService scoringService,
             Services.IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _scoringService = scoringService;
             _authService = authService;
             _mapper = mapper;
         }
@@ -41,7 +44,11 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
             var club = await _clubService.GetFullClub(clubInitials);
-            return View(_mapper.Map<AdminViewModel>(club));
+
+            var vm = _mapper.Map<AdminViewModel>(club);
+            vm.ScoringSystems = await _scoringService.GetScoringSystemsAsync(club.Id);
+
+            return View(vm);
         }
 
        
@@ -55,7 +62,11 @@ namespace SailScores.Web.Controllers
             }
 
             var club = await _clubService.GetFullClub(clubInitials);
-            return View(_mapper.Map<AdminViewModel>(club));
+
+            var vm = _mapper.Map<AdminViewModel>(club);
+            vm.ScoringSystems = await _scoringService.GetScoringSystemsAsync(club.Id);
+
+            return View(vm);
         }
 
         // POST: Admin/Edit/5

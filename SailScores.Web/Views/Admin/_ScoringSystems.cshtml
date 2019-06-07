@@ -1,0 +1,40 @@
+﻿@model IEnumerable<SailScores.Core.Model.ScoringSystem>
+
+<div class="card">
+    <div class="card-header" id="scoringHeading">
+        <h5>
+            <span id="scoring" class="btn-link collapsed" data-toggle="collapse" data-target="#collapseScoring"
+                  aria-expanded="false" aria-controls="collapseScoring">
+                Scoring Systems
+            </span>
+            <span class="text-danger">&ensp;<span class="small"><em>Advanced</em></span></span>
+        </h5>
+    </div>
+    <div id="collapseScoring" class="collapse" aria-labelledby="scoringHeading" data-parent="#accordion">
+        <div class="card-body">
+            <p>
+                Need to replace this with a copy from existing system. Probably shouldn't allow
+                creation of new scoring system: too many details to inherit
+                <s>
+                    @Html.ActionLink("Create", "Create", "ScoringSystem", new { /* id=item.PrimaryKey */ })
+                </s>
+</p>
+            <table class="table table-not-wide">
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "ScoringSystem", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "ScoringSystem", new { id = item.Id })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

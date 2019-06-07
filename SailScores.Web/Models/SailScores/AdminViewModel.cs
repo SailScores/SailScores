@@ -36,5 +36,7 @@ namespace SailScores.Web.Models.SailScores
                 ?.Where(s =>
                     s.Races
                     ?.Any(r => r.Date > recentCutoff) ?? false);
+
+        public IEnumerable<ScoringSystem> ScoringSystems { get; set; }
     }
 }
