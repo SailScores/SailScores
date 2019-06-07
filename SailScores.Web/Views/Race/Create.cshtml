@@ -88,45 +88,55 @@
             </div>
         </div>
         <br />
-        <div>
-            Add result: <input id="newCompetitor" type="text" />
-            <input type="button" value="Add Competitor" class="btn btn-primary" /><br />
-        </div>
-        <ul class="list-group col-12" id="results">
-            <li class="list-group-item" id="competitorTemplate" style="display: none;">
-                <div class="d-flex w-100 flex-wrap">
-                    <div>
-                        <span class="badge badge-secondary badge-pill race-place"></span>
-                    </div>
-                    <div>
-                        <span class="sail-number"></span>
-                    </div>
-                    <div>
-                        <span class="competitor-name h5"></span>
-                    </div>
-                    <div class="float-right ml-auto d-flex">
-                        <div>
-                            <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                                <option value="No Code">No Code</option>
-                                @foreach (var code in Model.ScoreCodeOptions)
-                                {
-                                    <option value="@code.Name">@code.Name: @code.Description.Left(40)</option>
-                                }
-                            </select>
+
+        <div class="row">
+            <div class="col-12 col-lg-8 pb-3">
+
+                <ul class="list-group" id="results">
+                    <li class="list-group-item" id="competitorTemplate" style="display: none;">
+                        <div class="d-flex w-100 flex-wrap">
+                            <div>
+                                <span class="badge badge-secondary badge-pill race-place"></span>
+                            </div>
+                            <div>
+                                <span class="sail-number"></span>
+                            </div>
+                            <div>
+                                <span class="competitor-name h5"></span>
+                            </div>
+                            <div class="float-right ml-auto d-flex">
+                                <div>
+                                    <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
+                                        <option value="No Code">No Code</option>
+                                        @foreach (var code in Model.ScoreCodeOptions)
+                                        {
+                                            <option value="@code.Name">@code.Name: @code.Description.Left(40)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
+                                <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                                &ensp;
+                                <button class="btn btn-light delete-button" type="button" data-toggle="modal"
+                                        data-target="#deleteConfirm"
+                                        onclick="window.SailScores.confirmDelete()">
+                                    <span class="far fa-trash-alt text-danger"></span>
+                                </button>
+                            </div>
                         </div>
-                        <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
-                        <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
-                        &ensp;
-                        <button class="btn btn-light delete-button" type="button" data-toggle="modal"
-                                data-target="#deleteConfirm"
-                                onclick="window.SailScores.confirmDelete()">
-                            <span class="far fa-trash-alt text-danger"></span>
-                        </button>
-                    </div>
+                    </li>
+                </ul>
+ 
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-4 mb-3">
+                <div class="form-group">
+                    <label class="contorl-label h4">Add result:</label>
+                    <input id="newCompetitor" type="text" class="form-control" />
                 </div>
-            </li>
-        </ul>
-        <hr />
+            </div>
+        </div>
         <div class="row">
             <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
             <div class="col-md-3">
@@ -134,9 +144,9 @@
             </div>
             <div class="col-md-3">
                 <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="races"
-                   class="btn btn-outline-primary btn-block">Cancel</a>
+                    asp-action="Index"
+                    asp-fragment="races"
+                    class="btn btn-outline-primary btn-block">Cancel</a>
             </div>
         </div>
     </form>

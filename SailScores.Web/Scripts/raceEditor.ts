@@ -104,6 +104,9 @@ function addNewCompetitor(competitor: competitorDto) {
     compListItem.style.display = "";
     resultDiv.appendChild(compListItem);
     calculatePlaces();
+    $('html, body').animate({
+        scrollTop: $(compListItem).offset().top - 100
+    }, 500);
 }
 
 function addScoresFieldsToForm(form: HTMLFormElement) {

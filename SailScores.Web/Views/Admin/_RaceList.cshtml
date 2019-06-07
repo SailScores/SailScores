@@ -1,9 +1,11 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Race>
 <div class="card">
     <div class="card-header" id="racesHeading">
-        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseRaces" aria-expanded="false" aria-controls="collapseRaces">
-            <h4 id="races">Races</h4>
-        </button>
+        <h5>
+            <span id="races" class="btn-link collapsed" data-toggle="collapse" data-target="#collapseRaces" aria-expanded="false" aria-controls="collapseRaces">
+                Races
+            </span>
+        </h5>
     </div>
     <div id="collapseRaces" class="collapse" aria-labelledby="racesHeading" data-parent="#accordion">
         <div class="card-body p-1 p-md-20">
@@ -17,11 +19,13 @@
                 <div class="card">
                     <div id="raceYearAccordion_@yearRaces.Key">
                         <div class="card-header" id="raceYearHeading_@yearRaces.Key">
-                            <button class="btn btn-link collapsed" data-toggle="collapse"
-                                    data-target="#collapseYear_@yearRaces.Key"
-                                    aria-expanded="false" aria-controls="collapseRaces">
-                                <h5 id="@yearRaces.Key">@yearRaces.Key</h5>
-                            </button>
+                            <h5>
+                                <span id="@yearRaces.Key" class="btn-link collapsed" data-toggle="collapse"
+                                      data-target="#collapseYear_@yearRaces.Key"
+                                      aria-expanded="false" aria-controls="collapseRaces">
+                                    @yearRaces.Key
+                                </span>
+                            </h5>
                         </div>
                         <div id="collapseYear_@yearRaces.Key" class="collapse"
                              aria-labelledby="raceYearHeading_@yearRaces.Key"
@@ -32,9 +36,11 @@
                                     {
                                         <div class="card">
                                             <div class="card-header" id="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')">
-                                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" aria-expanded="false" aria-controls="collapseRaces">
-                                                    <h5 id="@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')">@fleetRaces.Key</h5>
-                                                </button>
+                                                <h5>
+                                                    <span id="@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" class="btn-link collapsed" data-toggle="collapse" data-target="#collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" aria-expanded="false" aria-controls="collapseRaces">
+                                                        @fleetRaces.Key
+                                                    </span>
+                                                </h5>
                                             </div>
                                             <div id="collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" class="collapse"
                                                  aria-labelledby="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')"
