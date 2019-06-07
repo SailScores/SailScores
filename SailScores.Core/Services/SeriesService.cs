@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
@@ -268,9 +268,21 @@ namespace SailScores.Core.Services
         public async Task SaveNewSeries(Series ssSeries, Club club)
         {
             Database.Entities.Series dbSeries = await BuildDbSeriesAsync(ssSeries, club);
+            dbSeries.Name = RemoveDisallowedCharacters(ssSeries.Name);
             _dbContext.Series.Add(dbSeries);
             await _dbContext.SaveChangesAsync();
         }
+
+        private string RemoveDisallowedCharacters(string str)
+        { 
+            var charsToRemove = new string[] { ":", "/", "?", "#", "[", "]", "@", "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
+            foreach (var c in charsToRemove)
+            {
+                str = str.Replace(c, string.Empty);
+            }
+            return str;
+        }
+
         public async Task SaveNewSeries(Series series)
         {
             if(series.Season == null)
@@ -290,7 +302,9 @@ namespace SailScores.Core.Services
             }
             
             Database.Entities.Series dbSeries = _mapper.Map<dbObj.Series>(series);
-            if(season != null)
+            dbSeries.Name = RemoveDisallowedCharacters(series.Name);
+
+            if (season != null)
             {
                 dbSeries.Season = season;
             } else if(series.Season.Id != Guid.Empty && series.Season.Start != default(DateTime))
@@ -490,7 +504,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.RaceSeries)
                 .SingleAsync(c => c.Id == model.Id);
 
-            existingSeries.Name = model.Name;
+            existingSeries.Name = RemoveDisallowedCharacters(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
 
