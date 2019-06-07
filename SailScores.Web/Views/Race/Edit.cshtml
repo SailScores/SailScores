@@ -56,14 +56,14 @@
                     <h5 class="mb-0">
                         <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
                             Additional Fields
-                        </a>
+                        </a> <span class="small"><em>&ensp;Optional</em></span>
                     </h5>
                 </div>
 
                 <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                     <div class="card-body">
                         <div class="form-group">
-                            <label asp-for="Name" class="control-label">Name<em>&ensp;Optional</em></label>
+                            <label asp-for="Name" class="control-label">Name</label>
                             <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
@@ -74,12 +74,12 @@
                             <span asp-validation-for="State" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Description" class="control-label">Description<em>&ensp;Optional</em></label>
+                            <label asp-for="Description" class="control-label">Description</label>
                             <input asp-for="Description" class="form-control" />
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="TrackingUrl" class="control-label">Tracking Url<em>&ensp;Optional</em></label>
+                            <label asp-for="TrackingUrl" class="control-label">Tracking Url</label>
                             <input asp-for="TrackingUrl" class="form-control" />
                             <span asp-validation-for="TrackingUrl" class="text-danger"></span>
                         </div>
