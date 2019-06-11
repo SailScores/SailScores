@@ -66,19 +66,7 @@ namespace SailScores.Web.Controllers
 
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.Seasons.Any(c => c.Id == id))
-            {
-                return Unauthorized();
-            }
-            var season = club.Seasons.SingleOrDefault(c => c.Id == id);
-            if (season == null)
-            {
-                return NotFound();
-            }
-            //todo: add blocker if class contains boats. (or way to move boats.)
-            return View(season);
+            throw new NotImplementedException();
         }
 
         [HttpPost]
