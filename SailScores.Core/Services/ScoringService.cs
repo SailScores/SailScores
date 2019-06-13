@@ -27,12 +27,13 @@ namespace SailScores.Core.Services
 
         public async Task<IEnumerable<Model.ScoreCode>> GetScoreCodesAsync(Guid clubId)
         {
-            var dbObjects = await _dbContext
-                .Clubs
-                .Where(c => c.Id == clubId)
-                .SelectMany(c => c.ScoreCodes)
+            var scoreCodes = await _dbContext
+                .ScoringSystems
+                .Where(s => s.ClubId == clubId || s.ClubId == null)
+                .GroupBy(s => s.Name, (key, g) => g.OrderBy(e => e.Name).First())
                 .ToListAsync();
-            return _mapper.Map<List<Model.ScoreCode>>(dbObjects);
+
+            return _mapper.Map<List<Model.ScoreCode>>(scoreCodes);
         }
 
         public async Task<IEnumerable<Model.ScoringSystem>> GetScoringSystemsAsync(Guid clubId)
