@@ -6,8 +6,7 @@ namespace SailScores.Database.Entities
     public class ScoreCode
     {
         public Guid Id { get; set; }
-        public Guid ClubId { get; set; }
-        public Guid? ScoringSystemId { get; set; }
+        public Guid ScoringSystemId { get; set; }
         [StringLength(20)]
         public String Name { get; set; }
         [StringLength(1000)]
