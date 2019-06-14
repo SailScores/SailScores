@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +48,46 @@ namespace SailScores.Core.Services
                 .Include(s => s.ScoreCodes)
                 .ToListAsync();
             return _mapper.Map<List<Model.ScoringSystem>>(dbObjects);
+        }
+
+        // This is a big one: returns a scoring system, including inherited ScoreCodes.
+        // So all score codes that will work in this scoring system will be returned.
+        public async Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId)
+        {
+            var requestedDbSystem = await _dbContext
+                .ScoringSystems
+                .Include(s => s.ScoreCodes)
+                .SingleAsync(s => s.Id == scoringSystemId);
+
+            var requestedSystem = _mapper.Map<Model.ScoringSystem>(requestedDbSystem);
+
+            requestedSystem.InheritedScoreCodes = await GetAllCodesAsync(requestedSystem.ParentSystemId);
+
+            return requestedSystem;
+
+        }
+
+        private async Task<IEnumerable<ScoreCode>> GetAllCodesAsync(
+            Guid? systemId)
+        {
+            if(systemId == null)
+            {
+                return new List<Model.ScoreCode>();
+            }
+            var requestedDbSystem = await _dbContext
+                .ScoringSystems
+                .Include(s => s.ScoreCodes)
+                .SingleAsync(s => s.Id == systemId);
+            var thisSystemCodes = _mapper.Map<IList<ScoreCode>>(requestedDbSystem.ScoreCodes);
+
+            var parentCodes = await GetAllCodesAsync(requestedDbSystem.ParentSystemId);
+            var parentCodesToUse = parentCodes
+                    .Where(pc => !requestedDbSystem.ScoreCodes.Any(cc => cc.Name == pc.Name))
+                    .ToList();
+
+            var returnCodes = thisSystemCodes.Concat(parentCodesToUse);
+
+            return returnCodes;
         }
     }
 }

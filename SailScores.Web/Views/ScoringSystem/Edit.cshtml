@@ -1,4 +1,4 @@
-﻿@model SailScores.Core.Model.ScoringSystem
+﻿@model SailScores.Web.Models.SailScores.ScoringSystemWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -15,6 +15,18 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ParentSystemId">Parent Scoring System</label>
+                <select id="parentSystemId" asp-for="ParentSystemId" class="form-control">
+                    @foreach (var scoringSystem in Model.ParentSystemOptions)
+                    {
+                        <option value="@scoringSystem.Id">
+                            @scoringSystem.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="ParentSystemId" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -33,6 +45,15 @@
                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
+        <h3>Score Codes</h3>
+        <ul>
+            @foreach (var code in Model.ScoreCodeOptions)
+            {
+                //Todo
+                <li>@code.Name</li>
+
+            }
+        </ul>
     </div>
 </div>
 
