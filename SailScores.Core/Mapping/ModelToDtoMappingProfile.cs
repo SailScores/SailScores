@@ -21,7 +21,8 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.BoatClassIds, o => o.MapFrom(s => s.BoatClasses.Select(c => c.Id)))
                 .ForMember(d => d.SeasonIds, o => o.MapFrom(s => s.Seasons.Select(c => c.Id)))
                 .ForMember(d => d.RaceIds, o => o.MapFrom(s => s.Races.Select(c => c.Id)))
-                .ForMember(d => d.ScoreCodeIds, o => o.MapFrom(s => s.ScoreCodes.Select(c => c.Id)))
+                .ForMember(d => d.ScoringSystemIds, o => o.MapFrom(s => s.ScoringSystems.Select(c => c.Id)))
+                .ForMember(d => d.DefaultScoringSystemId, o => o.MapFrom(s => s.DefaultScoringSystem.Id))
                 .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(c => c.Id)))
                 .ReverseMap();
             CreateMap<Model.Competitor, Dto.CompetitorDto>()

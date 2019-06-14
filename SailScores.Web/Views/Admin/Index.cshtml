@@ -80,6 +80,12 @@
             <dd>
                 @Html.DisplayFor(model => model.Url)
             </dd>
+            <dt>
+                <label asp-for="DefaultScoringSystem">Default Scoring System</label>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.DefaultScoringSystem.Name)
+            </dd>
         </dl>
 
     </div>

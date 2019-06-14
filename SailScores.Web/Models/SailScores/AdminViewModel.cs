@@ -27,7 +27,10 @@ namespace SailScores.Web.Models.SailScores
         public IList<Season> Seasons { get; set; }
         public IList<Series> Series { get; set; }
         public IList<Race> Races { get; set; }
-        public IList<ScoreCode> ScoreCodes { get; set; }
+
+        public ScoringSystem DefaultScoringSystem { get; set; }
+
+        public IList<ScoringSystem> ScoringSystems { get; set; }
 
         private DateTime recentCutoff = DateTime.Now.AddDays(-8);
         public IEnumerable<Race> RecentRaces => Races?.Where(r => r.Date > recentCutoff);
@@ -37,6 +40,5 @@ namespace SailScores.Web.Models.SailScores
                     s.Races
                     ?.Any(r => r.Date > recentCutoff) ?? false);
 
-        public IEnumerable<ScoringSystem> ScoringSystems { get; set; }
     }
 }

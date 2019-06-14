@@ -29,7 +29,10 @@ namespace SailScores.Web.Models.SailScores
         public IList<Season> Seasons { get; set; }
         public IList<SeriesSummary> Series { get; set; }
         public IList<RaceSummaryViewModel> Races { get; set; }
-        public IList<ScoreCode> ScoreCodes { get; set; }
+
+        public ScoringSystem DefaultScoringSystem { get; set; }
+
+        public IList<ScoringSystem> ScoringSystems { get; set; }
 
         private DateTime recentCutoff = DateTime.Now.AddDays(-8);
         public IEnumerable<RaceSummaryViewModel> RecentRaces => Races?.Where(r => r.Date > recentCutoff

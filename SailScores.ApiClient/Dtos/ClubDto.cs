@@ -23,7 +23,8 @@ namespace SailScores.Api.Dtos
         public IList<Guid> SeasonIds { get; set; }
         public IList<Guid> SeriesIds { get; set; }
         public IList<Guid> RaceIds { get; set; }
-        public IList<Guid> ScoreCodeIds {get; set;}
-        
+
+        public Guid DefaultScoringSystemId { get; set; }
+        public IList<Guid> ScoringSystemIds { get; set; }
     }
 }

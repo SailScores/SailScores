@@ -23,7 +23,10 @@ namespace SailScores.Core.Model
         public IList<Season> Seasons { get; set; }
         public IList<Series> Series { get; set; }
         public IList<Race> Races { get; set; }
-        public IList<ScoreCode> ScoreCodes {get; set;}
+
+        public ScoringSystem DefaultScoringSystem { get; set; }
+
+        public IList<ScoringSystem> ScoringSystems { get; set; }
         
     }
 }

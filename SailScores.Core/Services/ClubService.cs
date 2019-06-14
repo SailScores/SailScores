@@ -96,6 +96,8 @@ namespace SailScores.Core.Services
                     .ThenInclude(s => s.RaceSeries)
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
+                .Include(c => c.DefaultScoringSystem)
+                .Include(c => c.ScoringSystems)
                 .Include(c => c.Fleets)
                     .ThenInclude(f => f.CompetitorFleets)
                 .Include(c => c.Fleets)
