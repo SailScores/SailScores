@@ -52,7 +52,8 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            var scoringSystems = await _scoringService.GetScoringSystemsAsync(clubId);
+            //todo: select the right scoring system
+            var scoringSystems = await _scoringService.GetScoringSystemsAsync(clubId, false);
 
             return View(scoringSystems.First());
         }

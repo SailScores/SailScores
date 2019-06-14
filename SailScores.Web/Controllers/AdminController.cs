@@ -46,7 +46,7 @@ namespace SailScores.Web.Controllers
             var club = await _clubService.GetFullClub(clubInitials);
 
             var vm = _mapper.Map<AdminViewModel>(club);
-            vm.ScoringSystems = await _scoringService.GetScoringSystemsAsync(club.Id);
+            vm.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
 
             return View(vm);
         }
@@ -64,7 +64,7 @@ namespace SailScores.Web.Controllers
             var club = await _clubService.GetFullClub(clubInitials);
 
             var vm = _mapper.Map<AdminViewModel>(club);
-            vm.ScoringSystems = await _scoringService.GetScoringSystemsAsync(club.Id);
+            vm.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
 
             return View(vm);
         }
@@ -82,6 +82,9 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 var clubObject = _mapper.Map<Club>(clubAdmin);
+                clubObject.DefaultScoringSystemId =
+                    clubAdmin.DefaultScoringSystemId ?? clubAdmin?.DefaultScoringSystem?.Id;
+
                 await _clubService.UpdateClub(clubObject);
 
                 return RedirectToAction(nameof(Index), "Admin", new { clubInitials = clubInitials });

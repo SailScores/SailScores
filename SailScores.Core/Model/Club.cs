@@ -25,6 +25,7 @@ namespace SailScores.Core.Model
         public IList<Race> Races { get; set; }
 
         public ScoringSystem DefaultScoringSystem { get; set; }
+        public Guid? DefaultScoringSystemId { get; set; }
 
         public IList<ScoringSystem> ScoringSystems { get; set; }
         

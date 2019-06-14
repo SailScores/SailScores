@@ -175,6 +175,7 @@ namespace SailScores.Core.Services
             dbClub.IsHidden = club.IsHidden;
             dbClub.Url = club.Url;
             dbClub.Description = club.Description;
+            dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
             await _dbContext.SaveChangesAsync();
         }
     }

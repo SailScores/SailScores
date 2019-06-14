@@ -36,11 +36,14 @@ namespace SailScores.Core.Services
             return _mapper.Map<List<Model.ScoreCode>>(scoreCodes);
         }
 
-        public async Task<IList<Model.ScoringSystem>> GetScoringSystemsAsync(Guid clubId)
+        public async Task<IList<Model.ScoringSystem>> GetScoringSystemsAsync(
+            Guid clubId,
+            bool includeBaseSystems)
         {
             var dbObjects = await _dbContext
                 .ScoringSystems
-                .Where(s => s.ClubId == clubId)
+                .Where(s => s.ClubId == clubId ||
+                (includeBaseSystems && s.ClubId == null))
                 .Include(s => s.ScoreCodes)
                 .ToListAsync();
             return _mapper.Map<List<Model.ScoringSystem>>(dbObjects);
