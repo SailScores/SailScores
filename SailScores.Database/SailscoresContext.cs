@@ -63,6 +63,13 @@ namespace SailScores.Database
                 .WithMany(s => s.Series)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Series>()
+                .Property(e => e.UpdatedDate)
+                .HasConversion(v => v, v =>
+                    v.HasValue ?
+                    DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) :
+                    v);
+
             modelBuilder.Entity<Fleet>()
                 .HasMany(f => f.CompetitorFleets)
                 .WithOne(cf => cf.Fleet)

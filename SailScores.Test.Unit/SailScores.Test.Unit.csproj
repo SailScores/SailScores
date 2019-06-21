@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SailScores.Core\SailScores.Core.csproj" />
+    <ProjectReference Include="..\SailScores.Web\SailScores.Web.csproj" />
   </ItemGroup>
 
 </Project>

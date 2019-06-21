@@ -74,7 +74,7 @@ namespace SailScores.Core.Services
         public async Task UpdateSeriesResults(
             Guid seriesId)
         {
-            var seriesDb = await _dbContext
+            var dbSeries = await _dbContext
                 .Series
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
@@ -85,19 +85,20 @@ namespace SailScores.Core.Services
 
             var dbScoringSystem = await _dbContext
                 .ScoringSystems
-                .Where(s => s.ClubId == seriesDb.ClubId)
+                .Where(s => s.ClubId == dbSeries.ClubId)
                 .Include(s => s.ScoreCodes)
                 .SingleAsync();
             var calculator = new SeriesCalculator(
                 _mapper.Map<ScoringSystem>(dbScoringSystem));
 
-            var fullSeries = _mapper.Map<Series>(seriesDb);
+            var fullSeries = _mapper.Map<Series>(dbSeries);
 
             fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
             await PopulateCompetitorsAsync(fullSeries);
 
             var results = calculator.CalculateResults(fullSeries);
             fullSeries.Results = results;
+            dbSeries.UpdatedDate = DateTime.UtcNow;
             await SaveHistoricalResults(fullSeries);
         }
 
@@ -265,16 +266,72 @@ namespace SailScores.Core.Services
             }
         }
 
-        public async Task SaveNewSeries(Series ssSeries, Club club)
+        public async Task SaveNewSeries(Series series, Club club)
         {
-            Database.Entities.Series dbSeries = await BuildDbSeriesAsync(ssSeries, club);
-            dbSeries.Name = RemoveDisallowedCharacters(ssSeries.Name);
-            _dbContext.Series.Add(dbSeries);
-            await _dbContext.SaveChangesAsync();
+            series.ClubId = club.Id;
+            await SaveNewSeries(series);
         }
 
+        public async Task SaveNewSeries(Series series)
+        {
+
+            
+            Database.Entities.Series dbSeries = await BuildDbSeriesAsync(series);
+            dbSeries.Name = RemoveDisallowedCharacters(series.Name);
+            dbSeries.UpdatedDate = DateTime.UtcNow;
+            if (dbSeries.Season == null && series.Season.Id != Guid.Empty && series.Season.Start != default(DateTime))
+            {
+                var season = _mapper.Map<dbObj.Season>(series.Season);
+                _dbContext.Seasons.Add(season);
+                dbSeries.Season = season;
+            }
+            if (dbSeries.Season == null)
+            {
+                throw new InvalidOperationException("Could not find or create season for new series.");
+            }
+
+            if (_dbContext.Series.Any(s =>
+                s.Id == series.Id
+                || (s.ClubId == series.ClubId
+                    && s.Name == series.Name
+                    && s.Season.Id == series.Season.Id)))
+            {
+                throw new InvalidOperationException("Cannot create series. A series with this name in this season already exists.");
+            }
+
+            _dbContext.Series.Add(dbSeries);
+            await _dbContext.SaveChangesAsync();
+
+            await UpdateSeriesResults(dbSeries.Id);
+        }
+
+        private async Task<dbObj.Series> BuildDbSeriesAsync(Model.Series series)
+        {
+            var retObj = _mapper.Map<dbObj.Series>(series);
+            if(retObj.RaceSeries == null) 
+            {
+                retObj.RaceSeries = new List<dbObj.SeriesRace>();
+            }
+            foreach(var race in series.Races)
+            {
+                var dbRace = await BuildDbRaceObj(series.ClubId, race);
+                retObj.RaceSeries.Add(new dbObj.SeriesRace
+                {
+                    Series = retObj,
+                    Race = dbRace
+                });
+            }
+
+            var dbSeason = await GetSeasonAsync(series.ClubId, series);
+
+            retObj.Season = dbSeason;
+
+            return retObj;
+        }
+
+
         private string RemoveDisallowedCharacters(string str)
-        { 
+        {
             var charsToRemove = new string[] { ":", "/", "?", "#", "[", "]", "@", "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
             foreach (var c in charsToRemove)
             {
@@ -283,72 +340,10 @@ namespace SailScores.Core.Services
             return str;
         }
 
-        public async Task SaveNewSeries(Series series)
-        {
-            if(series.Season == null)
-            {
-                throw new InvalidOperationException("Series must have a season assigned.");
-            }
-
-            var season = _dbContext.Seasons.SingleOrDefault(s => s.Id == series.Season.Id);
-
-            if(_dbContext.Series.Any( s =>
-                s.Id == series.Id
-                || (s.ClubId == series.ClubId
-                    && s.Name == series.Name
-                    && s.Season.Id == series.Season.Id)))
-            {
-                throw new InvalidOperationException("Cannot create series. A series with this name in this season already exists.");
-            }
-            
-            Database.Entities.Series dbSeries = _mapper.Map<dbObj.Series>(series);
-            dbSeries.Name = RemoveDisallowedCharacters(series.Name);
-
-            if (season != null)
-            {
-                dbSeries.Season = season;
-            } else if(series.Season.Id != Guid.Empty && series.Season.Start != default(DateTime))
-            {
-                season = _mapper.Map<dbObj.Season>(season);
-                _dbContext.Seasons.Add(season);
-                dbSeries.Season = season;
-            } else
-            {
-                dbSeries.Season = null;
-            }
-            _dbContext.Series.Add(dbSeries);
-            await _dbContext.SaveChangesAsync();
-
-            await UpdateSeriesResults(dbSeries.Id);
-        }
-
-        private async Task<dbObj.Series> BuildDbSeriesAsync(Model.Series ssSeries, Model.Club club)
-        {
-            var retObj = _mapper.Map<dbObj.Series>(ssSeries);
-            if(retObj.RaceSeries == null) 
-            {
-                retObj.RaceSeries = new List<dbObj.SeriesRace>();
-            }
-            foreach(var race in ssSeries.Races)
-            {
-                var dbRace = await BuildDbRaceObj(club, race);
-                retObj.RaceSeries.Add(new dbObj.SeriesRace
-                {
-                    Series = retObj,
-                    Race = dbRace
-                });
-            }
-
-            dbObj.Season dbSeason = await GetSeasonAsync(club, ssSeries);
-            retObj.Season = dbSeason;
-
-            return retObj;
-        }
-
-        private async Task<dbObj.Race> BuildDbRaceObj(Club club, Race race)
+        private async Task<dbObj.Race> BuildDbRaceObj(Guid clubId, Race race)
         {
             var dbRace = _mapper.Map<dbObj.Race>(race);
-            dbRace.ClubId = club.Id;
+            dbRace.ClubId = clubId;
             dbRace.Scores = new List<dbObj.Score>();
             // add scores
             foreach(var score in race.Scores)
@@ -358,7 +353,7 @@ namespace SailScores.Core.Services
                 {
                     dbScore.Place = null;
                 }
-                dbScore.Competitor = await FindOrBuildCompetitorAsync(club, score.Competitor);
+                dbScore.Competitor = await FindOrBuildCompetitorAsync(clubId, score.Competitor);
                 dbRace.Scores.Add(dbScore);
                 if(race.Fleet?.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 {
@@ -389,11 +384,11 @@ namespace SailScores.Core.Services
         }
 
         private async Task<dbObj.Competitor> FindOrBuildCompetitorAsync(
-            Club club,
+            Guid clubId,
             Competitor competitor)
         {
             var existingCompetitors = _dbContext.Competitors.Local
-                .Where(c => c.ClubId == club.Id);
+                .Where(c => c.ClubId == clubId);
             foreach(var currentDbComp in existingCompetitors)
             {
                 if(AreCompetitorsMatch(competitor, currentDbComp))
@@ -403,7 +398,7 @@ namespace SailScores.Core.Services
             }
 
             var dbComp = _mapper.Map<dbObj.Competitor>(competitor);
-            dbComp.ClubId = club.Id;
+            dbComp.ClubId = clubId;
             _dbContext.Competitors.Add(dbComp);
             return dbComp;
         }
@@ -429,28 +424,28 @@ namespace SailScores.Core.Services
 
         }
 
-        private async Task<dbObj.Season> GetSeasonAsync(Club club, Series ssSeries)
+        private async Task<dbObj.Season> GetSeasonAsync(Guid clubId, Series series)
         {
             dbObj.Season retSeason = null;
-            if (ssSeries.Season != null)
+            if (series.Season != null)
             {
                 retSeason = await _dbContext.Seasons
                     .FirstOrDefaultAsync(s =>
-                        s.ClubId == club.Id
-                        && ( s.Id == ssSeries.Season.Id
-                            || s.Start == ssSeries.Season.Start));
+                        s.ClubId == clubId
+                        && ( s.Id == series.Season.Id
+                            || s.Start == series.Season.Start));
             }
             if (retSeason == null)
             {
-                DateTime? firstDate = ssSeries.Races?.Min(r => r.Date);
-                DateTime? lastDate = ssSeries.Races?.Max(r => r.Date);
-                retSeason = await GetSeason(club, firstDate, lastDate, true);
+                DateTime? firstDate = series.Races?.Min(r => r.Date);
+                DateTime? lastDate = series.Races?.Max(r => r.Date);
+                retSeason = await GetSeason(clubId, firstDate, lastDate, true);
             }
             return retSeason;
         }
 
         private async Task<dbObj.Season> GetSeason(
-            Club club,
+            Guid clubId,
             DateTime? minDate,
             DateTime? maxDate,
             bool createNew)
@@ -459,25 +454,25 @@ namespace SailScores.Core.Services
             var maxDateToUse = maxDate ?? DateTime.Today;
             var retObj = await _dbContext.Seasons
                 .FirstOrDefaultAsync(
-                s => s.ClubId == club.Id
+                s => s.ClubId == clubId
                 && s.Start <= minDateToUse
                 && s.End > maxDateToUse);
             if(retObj == null && createNew)
             {
-                retObj = CreateNewSeason(club, minDateToUse, minDateToUse);
+                retObj = CreateNewSeason(clubId, minDateToUse, minDateToUse);
             }
 
             return retObj;
         }
 
-        private dbObj.Season CreateNewSeason(Club club, DateTime minDate, DateTime maxDate)
+        private dbObj.Season CreateNewSeason(Guid clubId, DateTime minDate, DateTime maxDate)
         {
             DateTime beginning = GetStartOfYear(minDate);
             DateTime end = GetStartOfYear(maxDate).AddYears(1);
 
             var season = new dbObj.Season
             {
-                ClubId = club.Id,
+                ClubId = clubId,
                 Name = $"{beginning.Year}",
                 Start = beginning,
                 End = end

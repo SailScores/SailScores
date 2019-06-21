@@ -24,5 +24,7 @@ namespace SailScores.Api.Dtos
 
         public bool? IsImportantSeries { get; set; }
 
+        public DateTime? UpdatedDate { get; set; }
+
     }
 }
