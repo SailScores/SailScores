@@ -93,7 +93,9 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                var club = await _clubService.GetFullClub(clubInitials);
+                model.SeasonOptions = club.Seasons;
+                return View(model);
             }
         }
 
