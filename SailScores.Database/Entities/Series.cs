@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SailScores.Database.Entities
 {
@@ -15,12 +16,15 @@ namespace SailScores.Database.Entities
 
         [StringLength(2000)]
         public String Description { get; set; }
-        
+
         public IList<SeriesRace> RaceSeries { get; set; }
 
         [Required]
         public Season Season { get; set; }
 
         public bool? IsImportantSeries { get; set; }
+
+        [Column("UpdatedDateUtc")]
+        public DateTime? UpdatedDate { get; set; }
     }
 }

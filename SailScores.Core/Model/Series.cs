@@ -32,5 +32,7 @@ namespace SailScores.Core.Model
 
         public bool IsImportantSeries { get; set; }
 
+        public DateTime? UpdatedDate { get; set; }
+
     }
 }

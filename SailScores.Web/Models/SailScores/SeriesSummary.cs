@@ -17,6 +17,8 @@ namespace SailScores.Web.Models.SailScores
 
         public bool? IsImportantSeries { get; set; }
 
+        public DateTime? UpdatedDate { get; set; }
+
         public String DateString
         {
             get

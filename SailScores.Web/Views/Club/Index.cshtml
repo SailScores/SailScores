@@ -1,4 +1,5 @@
-﻿@model SailScores.Web.Models.SailScores.ClubSummaryViewModel
+﻿@using SailScores.Web.Extensions;
+@model SailScores.Web.Models.SailScores.ClubSummaryViewModel
 @{
     ViewBag.Title = Model.Name + " Scores";
     Layout = "_ClubLayout";
@@ -32,11 +33,15 @@
             <ul class="list-unstyled">
                 @foreach (var series in Model.ImportantSeries)
                 {
-                    <li>
-                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
-                            @series.Season.Name  @series.Name
-                        </a>
-                    </li>
+                <li>
+                    <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
+                        @series.Season.Name  @series.Name
+                    </a>
+                    @if (series.UpdatedDate.HasValue)
+                    {
+                        <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                    }
+                </li>
                 }
             </ul>
         </div>
@@ -52,6 +57,10 @@
                     <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
                         @series.Name
                     </a>
+                    @if (series.UpdatedDate.HasValue)
+                    {
+                        <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                    }
                 </li>
                 }
             </ul>
