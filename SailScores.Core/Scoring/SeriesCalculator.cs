@@ -181,6 +181,9 @@ namespace SailScores.Core.Scoring
                 case "FIN+":
                     return race.Scores.Where(s => CountsAsStarted(s)).Count() + 
                         scoreCode.FormulaValue;
+                case "CTS+":
+                    return race.Scores.Where(s => CameToStart(s)).Count() +
+                        scoreCode.FormulaValue;
                 case "PLC%":
                     return GetPenaltyScore(score, race, scoreCode);
             }
@@ -240,6 +243,17 @@ namespace SailScores.Core.Scoring
             }
             var scoreCode = GetScoreCode(s);
             return scoreCode.Started ?? false;
+        }
+
+        private bool CameToStart(Score s)
+        {
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            var scoreCode = GetScoreCode(s);
+            return scoreCode.CameToStart ?? false;
         }
 
         private void CalculateTotal(SeriesCompetitorResults compResults)

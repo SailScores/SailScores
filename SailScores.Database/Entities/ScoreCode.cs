@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Database.Entities
@@ -19,6 +19,7 @@ namespace SailScores.Database.Entities
         // AVE - average of all non-discarded races
         // PLC% - Place + xx% of DNF score (xx is stored FormulaValue)
         // MAN - allow scorer to enter score manually
+        // CTS+ - competitors who came to starting area in this race.
         [StringLength(100)]
         public string Formula { get; set; }
         public int? FormulaValue { get; set; }

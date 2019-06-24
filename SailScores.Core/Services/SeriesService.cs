@@ -274,8 +274,6 @@ namespace SailScores.Core.Services
 
         public async Task SaveNewSeries(Series series)
         {
-
-            
             Database.Entities.Series dbSeries = await BuildDbSeriesAsync(series);
             dbSeries.Name = RemoveDisallowedCharacters(series.Name);
             dbSeries.UpdatedDate = DateTime.UtcNow;
