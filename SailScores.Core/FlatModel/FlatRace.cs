@@ -14,5 +14,6 @@ namespace SailScores.Core.FlatModel
 
         public RaceState? State { get; set; }
 
+        public DateTime? UpdatedDate { get; set; }
     }
 }

@@ -35,6 +35,8 @@ namespace SailScores.Web.Models.SailScores
 
         public RaceState? State { get; set; }
 
+        public DateTime? UpdatedDate { get; set; }
+
         public String CalculatedName
         {
             get
