@@ -131,3 +131,7 @@
         </tbody>
     </table>
 </div>
+@if(Model.Item.UpdatedDate.HasValue)
+{
+<i>Last updated @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
+}
