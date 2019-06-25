@@ -158,6 +158,7 @@ namespace SailScores.Core.Services
             dbRace.Description = race.Description;
             dbRace.State = race.State;
             dbRace.TrackingUrl = race.TrackingUrl;
+            dbRace.UpdatedDate = DateTime.UtcNow;
 
             if(race.FleetId != null)
             {

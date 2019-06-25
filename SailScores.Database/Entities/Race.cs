@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SailScores.Database.Entities
 {
@@ -32,5 +33,8 @@ namespace SailScores.Database.Entities
         public IList<Score> Scores { get; set; }
         
         public IList<SeriesRace> SeriesRaces { get; set; }
+
+        [Column("UpdatedDateUtc")]
+        public DateTime? UpdatedDate { get; set; }
     }
 }

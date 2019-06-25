@@ -33,6 +33,8 @@ namespace SailScores.Api.Dtos
 
         public RaceState State { get; set; }
 
+        public DateTime? UpdatedDate { get; set; }
+
         public bool Equals(RaceDto other)
         {
             return this.Id == other.Id
