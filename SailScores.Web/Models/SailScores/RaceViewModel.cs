@@ -38,6 +38,8 @@ namespace SailScores.Web.Models.SailScores
 
         public RaceState? State { get; set; }
 
+        public DateTime? UpdatedDate { get; set; }
+
         public string DisplayName { get
             {
                 StringBuilder sb = new StringBuilder();
