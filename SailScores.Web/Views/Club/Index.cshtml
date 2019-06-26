@@ -1,7 +1,8 @@
-﻿@using Microsoft.Extensions.Localization
-@using SailScores.Web.Resources
-﻿@using SailScores.Web.Extensions;
+@using Microsoft.Extensions.Localization;
+@using SailScores.Web.Resources;
+@using SailScores.Web.Extensions;
 @inject IStringLocalizer<SharedResource> localizer
+
 @model SailScores.Web.Models.SailScores.ClubSummaryViewModel
 @{
     ViewBag.Title = Model.Name + " " + localizer["Scores"];
@@ -38,15 +39,15 @@
             <ul class="list-unstyled">
                 @foreach (var series in Model.ImportantSeries)
                 {
-                <li>
-                    <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
-                        @series.Season.Name  @series.Name
-                    </a>
-                    @if (series.UpdatedDate.HasValue)
-                    {
-                        <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
-                    }
-                </li>
+                    <li>
+                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
+                            @series.Season.Name  @series.Name
+                        </a>
+                        @if (series.UpdatedDate.HasValue)
+                        {
+                            <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                        }
+                    </li>
                 }
             </ul>
         </div>
@@ -58,19 +59,21 @@
             <ul class="list-unstyled">
                 @foreach (var series in Model.RecentSeries)
                 {
-                <li>
-                    <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
-                        @series.Name
-                    </a>
-                    @if (series.UpdatedDate.HasValue)
-                    {
-                        <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
-                    }
-                </li>
+                    <li>
+                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
+                            @series.Name
+                        </a>
+                        @if (series.UpdatedDate.HasValue)
+                        {
+                            <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                        }
+                    </li>
                 }
             </ul>
         </div>
-    } else if (Model.RecentRaces.Count() > 0) {
+    }
+    else if (Model.RecentRaces.Count() > 0)
+    {
         <div class="col-sm-6 col-md-3">
             <h4>Recent races</h4>
             <ul class="list-unstyled">
