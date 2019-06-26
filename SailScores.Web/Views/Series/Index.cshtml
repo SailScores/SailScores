@@ -1,7 +1,11 @@
 ﻿@using SailScores.Web.Models.SailScores;
 @using SailScores.Web.Extensions;
-@model ClubCollectionViewModel<SeriesSummary>
+@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
 
+@inject IStringLocalizer<SharedResource> localizer
+
+@model ClubCollectionViewModel<SeriesSummary>
 @{
     ViewBag.Title = Model.ClubInitials + " " + localizer["Series"];
     Layout = "_ClubLayout";
@@ -50,7 +54,7 @@
                         @Html.DisplayFor(modelItem => series.Description)
                         @if (series.UpdatedDate.HasValue)
                         {
-                        <span class="d-none d-md-table-cell"><i>Updated @(series.UpdatedDate.Value.ToString("d"))</i></span>
+                            <span class="d-none d-md-table-cell"><i>Updated @(series.UpdatedDate.Value.ToString("d"))</i></span>
                         }
                     </td>
                 </tr>

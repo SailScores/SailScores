@@ -82,46 +82,47 @@
                 {
                     if (race.State == RaceState.Abandoned)
                     {
-                        if (race.State == RaceState.Canceled)
+                        if (firstRow)
                         {
-                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
-                                <span>ABANDONED</span>
-                            </td>
+                        <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
+                            <span>ABANDONED</span>
+                        </td>
                         }
-                        else if (race.State == RaceState.Scheduled)
+                    }
+                    else if (race.State == RaceState.Scheduled)
+                    {
+                        if (firstRow)
                         {
-                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
-                                <span>SCHEDULED</span>
+                        <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
+                            <span>SCHEDULED</span>
+                        </td>
+                        }
+                    }
+                    else
+                    {
+                        var result = Model.Item.FlatResults.GetScore(comp, race);
+                        @if (result != null)
+                        {
+                            <td class="text-center @(result?.Place == 1 ? "finish-first " : "") @(result?.Place == 2 ? "finish-second " : "") @(result?.Place == 3 ? "finish-third " : "") ">
+                                @if (result.Discard)
+                                {
+                                    @Html.Raw("<span class='text-muted'>")
+                                    @Html.Raw("<s>")
+                                }
+                                @result
+                                @if (result.Discard)
+                                {
+                                    @Html.Raw("</s>")
+                                    @Html.Raw("</span>")
+
+                                }
                             </td>
                         }
                         else
                         {
-                            var result = Model.Item.FlatResults.GetScore(comp, race);
-                            @if (result != null)
-                            {
-                                <td class="text-center @(result?.Place == 1 ? "finish-first " : "") @(result?.Place == 2 ? "finish-second " : "") @(result?.Place == 3 ? "finish-third " : "") ">
-                                    @if (result.Discard)
-                                    {
-                                        @Html.Raw("<span class='text-muted'>")
-                                        @Html.Raw("<s>")
-                                    }
-                                    @result
-                                    @if (result.Discard)
-                                    {
-                                        @Html.Raw("</s>")
-                                        @Html.Raw("</span>")
-
-                                    }
-                                </td>
-                            }
-                            else
-                            {
-                                <td></td>
-                            }
+                            <td></td>
                         }
-
                     }
-
                 }
                 @if ((Model.Item.FlatResults.NumberOfSailedRaces) > 4)
                 {

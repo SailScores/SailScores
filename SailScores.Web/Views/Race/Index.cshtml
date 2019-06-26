@@ -56,7 +56,7 @@
                             <a asp-action="Details"
                                asp-controller="Race"
                                asp-route-id=@race.Id>@race.FleetShortName:
-                                R@(race.Order)@race.Date.GetShortString()</a>
+                                R@(race.Order)@race.Date.ToShortString()</a>
                         </span>
                         <span class="d-none d-md-block">
                             @Html.ActionLink(
