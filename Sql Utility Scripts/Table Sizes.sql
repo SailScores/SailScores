@@ -27,4 +27,4 @@ WHERE
 GROUP BY 
     t.Name, s.Name, p.Rows
 ORDER BY 
-    a.total_pages desc
+    SUM(a.total_pages) desc
