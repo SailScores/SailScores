@@ -3,7 +3,7 @@
 @model ClubCollectionViewModel<SeriesSummary>
 
 @{
-    ViewBag.Title = Model.ClubInitials + " Series";
+    ViewBag.Title = Model.ClubInitials + " " + localizer["Series"];
     Layout = "_ClubLayout";
 }
 
@@ -58,4 +58,3 @@
         }
     </tbody>
 </table>
-

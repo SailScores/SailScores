@@ -17,6 +17,8 @@ namespace SailScores.Database.Entities
         public bool IsHidden { get; set; }
         public String Url { get; set; }
 
+        public String Locale { get; set; }
+
         public IList<Fleet> Fleets { get; set; }
         public IList<Competitor> Competitors { get; set; }
         public IList<BoatClass> BoatClasses { get; set; }
@@ -24,6 +26,7 @@ namespace SailScores.Database.Entities
         public IList<Series> Series { get; set; }
         public IList<Race> Races { get; set; }
         public IList<ScoreCode> ScoreCodes {get; set;}
+
         
     }
 }

@@ -1,9 +1,10 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
+﻿@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
 ﻿@using SailScores.Web.Extensions;
-@inject IViewLocalizer Localizer
+@inject IStringLocalizer<SharedResource> localizer
 @model SailScores.Web.Models.SailScores.ClubSummaryViewModel
 @{
-    ViewBag.Title = Model.Name + " Scores";
+    ViewBag.Title = Model.Name + " " + localizer["Scores"];
     Layout = "_ClubLayout";
 }
 <div class="row">
@@ -15,7 +16,9 @@
 {
     <div class="row">
         <div class="col-12">
-            <p><a href="@Model.Url" target="_blank"><span class="fas fa-external-link-alt"></span> Club Web Site</a></p>
+            <p><a href="@Model.Url" target="_blank">
+                <span class="fas fa-external-link-alt"></span> @localizer["Club Web Site"]
+            </a></p>
         </div>
     </div>
 }
