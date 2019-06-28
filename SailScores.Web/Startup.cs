@@ -110,7 +110,6 @@ namespace SailScores.Web
                 });
 
 
-            services.AddTransient<IEmailSender, EmailSender>();
             // Make sure API calls that require auth return 401, not redirect on auth failure.
             services.ConfigureApplicationCookie(options =>
             {
@@ -137,6 +136,9 @@ namespace SailScores.Web
 
             services
                 .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
+            services.AddTransient<IEmailSender, EmailSender>();
             services.AddAutoMapper(
                 new[] {
                     typeof(DbToModelMappingProfile).GetTypeInfo().Assembly,

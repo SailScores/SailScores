@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
+using System.Threading.Tasks;
 
 namespace SailScores.Web.Services
 {
@@ -6,9 +9,36 @@ namespace SailScores.Web.Services
     // For more details see https://go.microsoft.com/fwlink/?LinkID=532713
     public class EmailSender : IEmailSender
     {
-        public Task SendEmailAsync(string email, string subject, string message)
+        private readonly IEmailConfiguration _emailConfiguration;
+
+        public EmailSender(IEmailConfiguration emailConfiguration)
         {
-            return Task.CompletedTask;
+            _emailConfiguration = emailConfiguration;
+        }
+
+        public async Task SendEmailAsync(string email, string subject, string message)
+        {
+            var mimeMessage = new MimeMessage();
+            mimeMessage.To.Add(new MailboxAddress(email));
+            mimeMessage.From.Add(new MailboxAddress(_emailConfiguration.SmtpFromAddress));
+
+            mimeMessage.Subject = subject; 
+            mimeMessage.Body = new TextPart(TextFormat.Text)
+            {
+                Text = message
+            };
+
+            // MailKit's SmtpClient not System.Net...!
+            using (var emailClient = new SmtpClient())
+            {
+                emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort);
+
+                emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
+                
+                emailClient.Send(mimeMessage);
+
+                emailClient.Disconnect(true);
+            }
         }
     }
 }
