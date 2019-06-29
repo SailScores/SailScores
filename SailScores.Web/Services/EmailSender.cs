@@ -23,7 +23,7 @@ namespace SailScores.Web.Services
             mimeMessage.From.Add(new MailboxAddress(_emailConfiguration.SmtpFromAddress));
 
             mimeMessage.Subject = subject; 
-            mimeMessage.Body = new TextPart(TextFormat.Text)
+            mimeMessage.Body = new TextPart(TextFormat.Html)
             {
                 Text = message
             };
@@ -31,10 +31,12 @@ namespace SailScores.Web.Services
             // MailKit's SmtpClient not System.Net...!
             using (var emailClient = new SmtpClient())
             {
-                emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort);
+                emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, MailKit.Security.SecureSocketOptions.Auto);
 
                 emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
-                
+
+                emailClient.Authenticate(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
+
                 emailClient.Send(mimeMessage);
 
                 emailClient.Disconnect(true);

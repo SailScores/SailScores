@@ -312,14 +312,17 @@ namespace SailScores.Core.Services
             {
                 retObj.RaceSeries = new List<dbObj.SeriesRace>();
             }
-            foreach(var race in series.Races)
+            if (series.Races != null)
             {
-                var dbRace = await BuildDbRaceObj(series.ClubId, race);
-                retObj.RaceSeries.Add(new dbObj.SeriesRace
+                foreach (var race in series.Races)
                 {
-                    Series = retObj,
-                    Race = dbRace
-                });
+                    var dbRace = await BuildDbRaceObj(series.ClubId, race);
+                    retObj.RaceSeries.Add(new dbObj.SeriesRace
+                    {
+                        Series = retObj,
+                        Race = dbRace
+                    });
+                }
             }
 
             var dbSeason = await GetSeasonAsync(series.ClubId, series);
