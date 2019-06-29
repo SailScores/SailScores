@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +20,7 @@ using SailScores.Web.Services;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
@@ -37,6 +40,21 @@ namespace SailScores.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
+
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                //options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("fi-FI");
+                ////By default the below will be set to whatever the server culture is. 
+                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("fi-FI"), new CultureInfo("en-US"),
+              new CultureInfo("es-ES")};
+                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("fi-FI"), new CultureInfo("en-US"),
+              new CultureInfo("es-ES")};
+
+                options.RequestCultureProviders = new List<IRequestCultureProvider>
+                { new ClubCultureProvider()
+                };
+            });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -74,24 +92,24 @@ namespace SailScores.Web
                 .AddDefaultTokenProviders();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            services.AddAuthentication()
-            .AddCookie(options => options.SlidingExpiration = true)
-            .AddJwtBearer(cfg =>
-            {
-                cfg.RequireHttpsMetadata = false;
-                cfg.SaveToken = true;
-                cfg.TokenValidationParameters = new TokenValidationParameters
+            services
+                .AddAuthentication()
+                .AddCookie(options => options.SlidingExpiration = true)
+                .AddJwtBearer(cfg =>
                 {
-                    ValidIssuer = Configuration["JwtIssuer"],
-                    ValidAudience = Configuration["JwtIssuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = Configuration["JwtIssuer"],
+                        ValidAudience = Configuration["JwtIssuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
 
-                    ClockSkew = TimeSpan.Zero // remove delay of token when expire
-                };
-            });
+                        ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                    };
+                });
 
 
-            services.AddTransient<IEmailSender, EmailSender>();
             // Make sure API calls that require auth return 401, not redirect on auth failure.
             services.ConfigureApplicationCookie(options =>
             {
@@ -116,7 +134,11 @@ namespace SailScores.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services
+                .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
+            services.AddTransient<IEmailSender, EmailSender>();
             services.AddAutoMapper(
                 new[] {
                     typeof(DbToModelMappingProfile).GetTypeInfo().Assembly,
@@ -162,6 +184,9 @@ namespace SailScores.Web
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "SailScores API V1");
             });
+
+
+            app.UseRequestLocalization();
 
 
             app.UseHttpsRedirection();

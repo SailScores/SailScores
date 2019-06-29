@@ -141,8 +141,10 @@ namespace SailScores.Core.Services
         public async Task<Guid> SaveAsync(RaceDto race)
         {
             Db.Race dbRace;
+            IEnumerable<Guid> seriesIdsToUpdate = new List<Guid>();
             if (race.Id != default(Guid)) {
-               dbRace = await _dbContext.Races.SingleOrDefaultAsync(r => r.Id == race.Id);
+                dbRace = await _dbContext.Races.SingleOrDefaultAsync(r => r.Id == race.Id);
+                seriesIdsToUpdate = dbRace.SeriesRaces.Select(r => r.SeriesId).ToList();
             } else
             {
                 dbRace = new Db.Race
@@ -179,7 +181,6 @@ namespace SailScores.Core.Services
                         RaceId = dbRace.Id
                     });
                 }
-
             }
             if (race.Scores != null)
             {
@@ -202,7 +203,8 @@ namespace SailScores.Core.Services
 
             }
             await _dbContext.SaveChangesAsync();
-            foreach (var seriesId in dbRace.SeriesRaces.Select(rs => rs.SeriesId))
+            seriesIdsToUpdate = seriesIdsToUpdate.Union(dbRace.SeriesRaces.Select(rs => rs.SeriesId).ToList());
+            foreach (var seriesId in seriesIdsToUpdate)
             {
                 await _seriesService.UpdateSeriesResults(seriesId);
             }

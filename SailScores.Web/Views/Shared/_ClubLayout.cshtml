@@ -1,4 +1,8 @@
-﻿@using Microsoft.AspNetCore.Routing
+﻿@using Microsoft.Extensions.Localization
+@using Microsoft.AspNetCore.Routing
+@using SailScores.Web.Resources
+
+@inject IStringLocalizer<SharedResource> localizer
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,8 +48,24 @@
            class="navbar-brand">@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()</a>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item"><a asp-area="" asp-controller="Series" asp-action="Index" asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]" class="nav-link">Series</a></li>
-                <li class="nav-item"><a asp-area="" asp-controller="Race" asp-action="Index" asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]" class="nav-link">Races</a></li>
+                <li class="nav-item">
+                    <a asp-area=""
+                       asp-controller="Series"
+                       asp-action="Index"
+                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]"
+                       class="nav-link">
+                        @localizer["Series"]
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-area=""
+                       asp-controller="Race"
+                       asp-action="Index"
+                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]"
+                       class="nav-link">
+                        @localizer["Races"]
+                    </a>
+                </li>
             </ul>
             <ul class="navbar-nav navbar-right">
                 <li class="nav-item"><a href="~/" class="nav-link">SailScores.com</a></li>

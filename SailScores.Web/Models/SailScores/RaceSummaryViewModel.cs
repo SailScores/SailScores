@@ -15,7 +15,7 @@ namespace SailScores.Web.Models.SailScores
         [StringLength(200)]
         public String Name { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
+        [DisplayFormat(DataFormatString = "{0:D}")]
         public DateTime? Date { get; set; }
 
         // Typically the order of the race for a given date, but may not be.
@@ -41,7 +41,8 @@ namespace SailScores.Web.Models.SailScores
         {
             get
             {
-                return Date?.ToString("ddd, MMM d") + " Race " + Order;
+                return Date?.ToString("ddd") +", " +
+                    Date?.ToString("M") + " Race " + Order;
             }
         }
 

@@ -3,19 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20190505223042_addLocale")]
+    partial class addLocale
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.11-servicing-32099")
+                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -44,8 +46,6 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid?>("DefaultScoringSystemId");
-
                     b.Property<string>("Description");
 
                     b.Property<string>("Initials")
@@ -62,8 +62,6 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Url");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DefaultScoringSystemId");
 
                     b.ToTable("Clubs");
                 });
@@ -213,14 +211,7 @@ namespace SailScores.Database.Migrations
 
                     b.Property<int>("Order");
 
-                    b.Property<string>("State")
-                        .HasMaxLength(30);
-
-                    b.Property<string>("TrackingUrl")
-                        .HasMaxLength(500);
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnName("UpdatedDateUtc");
+                    b.Property<string>("State");
 
                     b.HasKey("Id");
 
@@ -262,6 +253,8 @@ namespace SailScores.Database.Migrations
 
                     b.Property<bool?>("CameToStart");
 
+                    b.Property<Guid>("ClubId");
+
                     b.Property<string>("Description")
                         .HasMaxLength(1000);
 
@@ -281,11 +274,13 @@ namespace SailScores.Database.Migrations
 
                     b.Property<string>("ScoreLike");
 
-                    b.Property<Guid>("ScoringSystemId");
+                    b.Property<Guid?>("ScoringSystemId");
 
                     b.Property<bool?>("Started");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClubId");
 
                     b.HasIndex("ScoringSystemId");
 
@@ -297,20 +292,14 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid?>("ClubId");
+                    b.Property<Guid>("ClubId");
 
                     b.Property<string>("DiscardPattern");
 
                     b.Property<string>("Name")
                         .HasMaxLength(100);
 
-                    b.Property<Guid?>("ParentSystemId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ClubId");
-
-                    b.HasIndex("ParentSystemId");
 
                     b.ToTable("ScoringSystems");
                 });
@@ -346,16 +335,11 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(2000);
 
-                    b.Property<bool?>("IsImportantSeries");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200);
 
                     b.Property<Guid>("SeasonId");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnName("UpdatedDateUtc");
 
                     b.HasKey("Id");
 
@@ -402,13 +386,6 @@ namespace SailScores.Database.Migrations
                         .WithMany("BoatClasses")
                         .HasForeignKey("ClubId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.Club", b =>
-                {
-                    b.HasOne("SailScores.Database.Entities.ScoringSystem", "DefaultScoringSystem")
-                        .WithMany()
-                        .HasForeignKey("DefaultScoringSystemId");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Competitor", b =>
@@ -493,21 +470,14 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.ScoreCode", b =>
                 {
+                    b.HasOne("SailScores.Database.Entities.Club")
+                        .WithMany("ScoreCodes")
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("SailScores.Database.Entities.ScoringSystem")
                         .WithMany("ScoreCodes")
-                        .HasForeignKey("ScoringSystemId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.ScoringSystem", b =>
-                {
-                    b.HasOne("SailScores.Database.Entities.Club")
-                        .WithMany("ScoringSystems")
-                        .HasForeignKey("ClubId");
-
-                    b.HasOne("SailScores.Database.Entities.ScoringSystem", "ParentSystem")
-                        .WithMany()
-                        .HasForeignKey("ParentSystemId");
+                        .HasForeignKey("ScoringSystemId");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Season", b =>

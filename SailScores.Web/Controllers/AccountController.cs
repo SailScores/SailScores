@@ -9,8 +9,6 @@ using Microsoft.Extensions.Logging;
 using SailScores.Web.Extensions;
 using SailScores.Web.Models.AccountViewModels;
 using SailScores.Web.Services;
-using SailScores.Web.Controllers;
-using SailScores.Web.Models.AccountViewModels;
 using System.Linq;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;

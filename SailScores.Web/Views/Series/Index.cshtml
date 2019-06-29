@@ -1,8 +1,13 @@
 ﻿@using SailScores.Web.Models.SailScores;
-@model ClubCollectionViewModel<SeriesSummary>
+@using SailScores.Web.Extensions;
+@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
 
+@inject IStringLocalizer<SharedResource> localizer
+
+@model ClubCollectionViewModel<SeriesSummary>
 @{
-    ViewBag.Title = Model.ClubInitials + " Series";
+    ViewBag.Title = Model.ClubInitials + " " + localizer["Series"];
     Layout = "_ClubLayout";
 }
 
@@ -38,18 +43,22 @@
                 <tr>
                     <td>
                         <a href="~/@Model.ClubInitials/@series.Season.Name/@series.Name">
-                            @Html.DisplayFor(modelItem => series.Name) (@(series.Races?.Count.ToString() ?? "No") Races)
+                            @Html.DisplayFor(modelItem => series.Name)
                         </a>
+                        (@(series.Races?.Count.ToString() ?? "No") Races)
                     </td>
                     <td>
                         @series.DateString
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => series.Description)
+                        @if (series.UpdatedDate.HasValue)
+                        {
+                            <span class="d-none d-md-table-cell"><i>Updated @(series.UpdatedDate.Value.ToString("d"))</i></span>
+                        }
                     </td>
                 </tr>
             }
         }
     </tbody>
 </table>
-
