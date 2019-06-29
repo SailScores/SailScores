@@ -4,7 +4,7 @@
 var gulp = require("gulp"),
     rimraf = require("rimraf"),
     concat = require("gulp-concat"),
-    cssmin = require("gulp-cssmin"),
+    cleanCSS = require('gulp-clean-css'),
     uglify = require('gulp-uglify-es').default,
     merge = require('merge-stream'),
     sass = require("gulp-sass");
@@ -46,7 +46,7 @@ gulp.task("min:js", function () {
 gulp.task("min:css", function () {
     return gulp.src([paths.css, "!" + paths.minCss])
         .pipe(concat(paths.concatCssDest))
-        .pipe(cssmin())
+        .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(gulp.dest("."));
 });
 
