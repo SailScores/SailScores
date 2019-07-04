@@ -9,14 +9,14 @@ namespace SailScores.Test.Unit
 {
 
 
-    public class SeriesCalculatorTests
+    public class AppendixACalculatorTests
     {
 
-        private SeriesCalculator _defaultCalculator;
+        private AppendixACalculator _defaultCalculator;
 
-        public SeriesCalculatorTests()
+        public AppendixACalculatorTests()
         {
-            _defaultCalculator = new SeriesCalculator(MakeDefaultScoringSystem());
+            _defaultCalculator = new AppendixACalculator(MakeDefaultScoringSystem());
         }
 
         private ScoringSystem MakeDefaultScoringSystem()

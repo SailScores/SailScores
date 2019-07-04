@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    public class SeriesCalculator : ISeriesCalculator
+    public class AppendixACalculator : IScoringCalculator
     {
         private const string AVERAGE_FORMULANAME = "AVE";
         private readonly ScoringSystem _scoringSystem;
 
-        public SeriesCalculator(ScoringSystem scoringsystem)
+        public AppendixACalculator(ScoringSystem scoringsystem)
         {
             _scoringSystem = scoringsystem;
         }

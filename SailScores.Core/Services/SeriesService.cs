@@ -15,13 +15,16 @@ namespace SailScores.Core.Services
 {
     public class SeriesService : ISeriesService
     {
+        private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
 
         public SeriesService(
+            IScoringCalculatorFactory scoringCalculatorFactory,
             ISailScoresContext dbContext,
             IMapper mapper)
         {
+            _scoringCalculatorFactory = scoringCalculatorFactory;
             _dbContext = dbContext;
             _mapper = mapper;
         }
@@ -88,8 +91,10 @@ namespace SailScores.Core.Services
                 .Where(s => s.ClubId == dbSeries.ClubId)
                 .Include(s => s.ScoreCodes)
                 .SingleAsync();
-            var calculator = new SeriesCalculator(
-                _mapper.Map<ScoringSystem>(dbScoringSystem));
+            // I suspect the line above is not good here: need to load the base scoring systems, I think.
+            // so this class might get a reference (DI) to IScoringService.
+            var calculator = _scoringCalculatorFactory
+                .CreateScoringCalculator(_mapper.Map<ScoringSystem>(dbScoringSystem));
 
             var fullSeries = _mapper.Map<Series>(dbSeries);
 

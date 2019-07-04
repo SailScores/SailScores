@@ -10,5 +10,6 @@ namespace SailScores.Core.Services
         Task<IEnumerable<ScoreCode>> GetScoreCodesAsync(Guid clubId);
         Task<IList<ScoringSystem>> GetScoringSystemsAsync(Guid clubId, bool includeBaseSystems);
         Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId);
+        Task<ScoringSystem> GetScoringSystemAsync(Series series);
     }
 }

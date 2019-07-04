@@ -67,6 +67,22 @@ namespace SailScores.Core.Services
 
         }
 
+        public async Task<ScoringSystem> GetScoringSystemAsync(Series series)
+        {
+            Guid? scoringSystemId = series.ScoringSystemId;
+            if(scoringSystemId == null)
+            {
+                scoringSystemId = (await _dbContext.Clubs.Where(c => c.Id == series.ClubId)
+                    .FirstOrDefaultAsync())
+                    .DefaultScoringSystemId;
+            }
+            if(scoringSystemId == null)
+            {
+                throw new InvalidOperationException("Scoring system for series not found and club default scoring system not found.");
+            }
+            return await GetScoringSystemAsync(scoringSystemId.Value);
+        }
+
         private async Task<IEnumerable<ScoreCode>> GetAllCodesAsync(
             Guid? systemId)
         {
@@ -89,5 +105,6 @@ namespace SailScores.Core.Services
 
             return returnCodes;
         }
+
     }
 }
