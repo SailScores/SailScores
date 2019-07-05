@@ -237,9 +237,6 @@ namespace SailScores.Core.Scoring
         private decimal? CalculateAverage(
             SeriesCompetitorResults compResults)
         {
-            //int numRealResults = compResults.CalculatedScores
-            //        .Values.Count(s =>
-            //            String.IsNullOrWhiteSpace(s.RawScore.Code));
             int numAverages = compResults.CalculatedScores
                     .Values.Count(s =>
                         IsAverage(s.RawScore.Code));
