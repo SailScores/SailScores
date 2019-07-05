@@ -9,7 +9,17 @@ namespace SailScores.Core.Scoring
     public class AppendixACalculator : IScoringCalculator
     {
         private const string AVERAGE_FORMULANAME = "AVE";
+        private const string SERIESCOMPETITORS_FORMULANAME = "SER+";
+
+        private const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
+
+
         private readonly ScoringSystem _scoringSystem;
+
+        //Code to use if no result is found or if scorecode is not found in the system.
+        //  This will be used if code defined in a child scoring system is used but the
+        // series is scored with the ancestor
+        private readonly string DEFAULT_CODE = "DNC";
 
         public AppendixACalculator(ScoringSystem scoringsystem)
         {
@@ -125,7 +135,6 @@ namespace SailScores.Core.Scoring
             }
         }
 
-
         private void CalculateSeriesDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
         {
             foreach (var race in resultsWorkInProgress.SailedRaces)
@@ -140,13 +149,16 @@ namespace SailScores.Core.Scoring
             }
         }
 
-
         private bool IsSeriesBasedScore(ScoreCode scoreCode)
         {
             // defaults to false if not a coded score.
-            return scoreCode?.Formula?.Equals(AVERAGE_FORMULANAME, StringComparison.InvariantCultureIgnoreCase)
+            bool average = scoreCode?.Formula?.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE) 
                 ?? false;
+            bool seriesCompPlus = scoreCode?.Formula?.Equals(SERIESCOMPETITORS_FORMULANAME, CASE_INSENSITIVE)
+                ?? false;
+            return average || seriesCompPlus;
         }
+
         private decimal? CalculateSeriesBasedValue(CalculatedScore score, SeriesCompetitorResults compResults)
         {
             // right now the only kind of series based value is Average, so not much to do here.
@@ -155,7 +167,7 @@ namespace SailScores.Core.Scoring
 
         private bool IsTrivialCalculation(ScoreCode scoreCode)
         {
-            return scoreCode.Formula.Equals("MAN", StringComparison.InvariantCultureIgnoreCase);
+            return scoreCode.Formula.Equals("MAN", CASE_INSENSITIVE);
         }
 
         private decimal? GetTrivialScoreValue(CalculatedScore score)
@@ -169,8 +181,8 @@ namespace SailScores.Core.Scoring
 
         private bool IsRaceBasedValue(ScoreCode scoreCode)
         {
-            return scoreCode.Formula.Equals("FIN+", StringComparison.InvariantCultureIgnoreCase)
-                || scoreCode.Formula.Equals("PLC%", StringComparison.InvariantCultureIgnoreCase);
+            return scoreCode.Formula.Equals("FIN+", CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals("PLC%", CASE_INSENSITIVE);
         }
 
         private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race)
@@ -205,7 +217,8 @@ namespace SailScores.Core.Scoring
                         dnfCode.FormulaValue;
         }
 
-        private decimal? CalculateAverage(SeriesCompetitorResults compResults)
+        private decimal? CalculateAverage(
+            SeriesCompetitorResults compResults)
         {
             //int numRealResults = compResults.CalculatedScores
             //        .Values.Count(s =>
@@ -231,7 +244,7 @@ namespace SailScores.Core.Scoring
             {
                 return false;
             }
-            return GetScoreCode(code).Formula.Equals(AVERAGE_FORMULANAME, StringComparison.InvariantCultureIgnoreCase);
+            return GetScoreCode(code).Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE);
         }
 
         private bool CountsAsStarted(Score s)
@@ -308,9 +321,8 @@ namespace SailScores.Core.Scoring
             bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
                 c => c.Id == s.CompetitorId
                     || c == s.Competitor ));
-            bool allCodesFound = scores.All(s => String.IsNullOrWhiteSpace(s.Code)
-                || _scoringSystem.ScoreCodes.Any(
-                sc => sc.Name == s.Code));
+
+            //Used to check and make sure all score codes were found. but no more.
 
             if (!allRacesFound)
             {
@@ -323,11 +335,6 @@ namespace SailScores.Core.Scoring
                 throw new InvalidOperationException(
                     "A score for a competitor that is not in the series was provided to SeriesCalculator");
 
-            }
-            if (!allCodesFound)
-            {
-                throw new InvalidOperationException(
-                    "A code that is not defined in the selected scoring system was provided to SeriesCalculator");
             }
         }
 
@@ -403,13 +410,23 @@ namespace SailScores.Core.Scoring
         private ScoreCode GetScoreCode(Score score)
         {
             return GetScoreCode(score.Code);
-            
         }
+
         private ScoreCode GetScoreCode(string scoreCodeName)
         {
-            return _scoringSystem.ScoreCodes
+            if (String.IsNullOrWhiteSpace(scoreCodeName))
+            {
+                return null;
+            }
+            var returnScoreCode = _scoringSystem.ScoreCodes
                     .SingleOrDefault(c =>
                         c.Name.Equals(scoreCodeName, StringComparison.InvariantCultureIgnoreCase));
+
+            if(returnScoreCode == null)
+            {
+                returnScoreCode = GetScoreCode(DEFAULT_CODE);
+            }
+            return returnScoreCode;
         }
     }
 

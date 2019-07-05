@@ -16,15 +16,18 @@ namespace SailScores.Core.Services
     public class SeriesService : ISeriesService
     {
         private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
+        private readonly IScoringService _scoringService;
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
 
         public SeriesService(
             IScoringCalculatorFactory scoringCalculatorFactory,
+            IScoringService scoringService,
             ISailScoresContext dbContext,
             IMapper mapper)
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
+            _scoringService = scoringService;
             _dbContext = dbContext;
             _mapper = mapper;
         }
@@ -85,19 +88,13 @@ namespace SailScores.Core.Services
                     .Include(s => s.Season)
                 .SingleAsync(s => s.Id == seriesId);
 
-
-            var dbScoringSystem = await _dbContext
-                .ScoringSystems
-                .Where(s => s.ClubId == dbSeries.ClubId)
-                .Include(s => s.ScoreCodes)
-                .SingleAsync();
-            // I suspect the line above is not good here: need to load the base scoring systems, I think.
-            // so this class might get a reference (DI) to IScoringService.
+            var fullSeries = _mapper.Map<Series>(dbSeries);
+            var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
+                fullSeries); 
+            
             var calculator = _scoringCalculatorFactory
                 .CreateScoringCalculator(_mapper.Map<ScoringSystem>(dbScoringSystem));
-
-            var fullSeries = _mapper.Map<Series>(dbSeries);
-
+            
             fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
             await PopulateCompetitorsAsync(fullSeries);
 
