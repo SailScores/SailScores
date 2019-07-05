@@ -119,6 +119,36 @@ namespace SailScores.Test.Unit
                 results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
+
+        [Fact]
+        public void CalculateResults_Dnc_GetsRaceCmopetitorsPlusTwo()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(4, 6);
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNC";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = null;
+
+            basicSeries.Races[basicSeries.Races.Count - 2].Scores.First(s => s.Competitor == testComp).Code = "DNC";
+            basicSeries.Races[basicSeries.Races.Count - 2].Scores.First(s => s.Competitor == testComp).Place = null;
+
+            basicSeries.Races[1].Scores.First(s => s.Competitor == testComp).Place = 2;
+            basicSeries.Races[1].Scores.First(s => s.Competitor != testComp).Place = 1;
+
+            basicSeries.Races[2].Scores.First(s => s.Competitor == testComp).Place = 3;
+            basicSeries.Races[2].Scores.Last().Place = 1;
+
+            basicSeries.Races[3].Scores.First(s => s.Competitor == testComp).Place = 3;
+            basicSeries.Races[3].Scores.Last().Place = 1;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            // three sailed in the race plus 2 = 5
+            Assert.Equal(5m,
+                results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
+        }
+
+
         private Series GetBasicSeries(
             int competitorCount,
             int raceCount)

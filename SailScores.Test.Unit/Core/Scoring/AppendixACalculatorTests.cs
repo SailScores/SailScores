@@ -23,9 +23,10 @@ namespace SailScores.Test.Unit
         {
             var system = new ScoringSystem
             {
-                Name = "Default scoring system",
-                DiscardPattern = "0,0,0,0,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6," +
-                    "6,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,12,13,13,13"
+                Id = Guid.NewGuid(),
+                Name = "Appendix A Low Point",
+                DiscardPattern = "0,1",
+                ParentSystemId = null
             };
 
             system.ScoreCodes = new List<ScoreCode>
@@ -33,30 +34,242 @@ namespace SailScores.Test.Unit
                 new ScoreCode
                 {
                     Id = Guid.NewGuid(),
-                    Name = "DNC",
-                    PreserveResult = false,
+                    Name = "TIE",
+                    Description = "Tied Result",
+                    PreserveResult = true,
                     Discardable = true,
-                    Started = false,
-                    FormulaValue = 2,
-                    AdjustOtherScores = null,
-                    CameToStart = false,
-                    Finished = false,
-                    Formula = "FIN+",
-                    ScoreLike = null
+                    Started = true,
+                    FormulaValue = null,
+                    AdjustOtherScores = false,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "MAN",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
                 },
-                                new ScoreCode
+                new ScoreCode
                 {
                     Id = Guid.NewGuid(),
-                    Name = "SB",
+                    Name = "SCP",
+                    Description = "Scoring Penalty Rule 44.3",
+                    PreserveResult = true,
+                    Discardable = true,
+                    Started = true,
+                    FormulaValue = 20,
+                    AdjustOtherScores = false,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "PLC%",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "DNS",
+                    Description = "Came to start area but did not start",
                     PreserveResult = false,
                     Discardable = true,
                     Started = false,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = true,
+                    Finished = false,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "RET",
+                    Description = "Retired",
+                    PreserveResult = true,
+                    Discardable = true,
+                    Started = true,
+                    FormulaValue = 1,
+                    AdjustOtherScores = true,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "ZFP",
+                    Description = "20% Penalty under rule 30.2",
+                    PreserveResult = true,
+                    Discardable = true,
+                    Started = true,
+                    FormulaValue = 20,
+                    AdjustOtherScores = false,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "PLC%",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "DPI",
+                    Description = "Discretionary Penalty",
+                    PreserveResult = true,
+                    Discardable = true,
+                    Started = true,
+                    FormulaValue = 20,
+                    AdjustOtherScores = false,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "PLC%",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "RDGAve",
+                    Description = "Redress: average of other races",
+                    PreserveResult = true,
+                    Discardable = true,
+                    Started = true,
                     FormulaValue = null,
+                    AdjustOtherScores = false,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "AVE",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "UFD",
+                    Description = "Disqualification under rule 30.3",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = true,
+                    Finished = false,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "BFD",
+                    Description = "Disqualification under rule 30.4",
+                    PreserveResult = false,
+                    Discardable = false,
+                    Started = false,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = true,
+                    Finished = false,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "DNF",
+                    Description = "Started but did not finish",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = true,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = true,
+                    Finished = false,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "OCS",
+                    Description = "On course side as start or broke rule 30.1",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = true,
+                    Finished = false,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "DSQ",
+                    Description = "Disqualification",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = true,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "RDG",
+                    Description = "Redress: points set by protest hearing",
+                    PreserveResult = true,
+                    Discardable = true,
+                    Started = true,
+                    FormulaValue = null,
+                    AdjustOtherScores = false,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "MAN",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "DNE",
+                    Description = "Disqualification that is not excludable",
+                    PreserveResult = false,
+                    Discardable = false,
+                    Started = true,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = true,
+                    Finished = true,
+                    Formula = "CTS+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "DNC",
+                    Description = "Did not come to starting area",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = 1,
                     AdjustOtherScores = null,
                     CameToStart = false,
                     Finished = false,
-                    Formula = "AVE",
-                    ScoreLike = null
+                    Formula = "SER+",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
                 },
             };
 
@@ -72,28 +285,17 @@ namespace SailScores.Test.Unit
         }
 
         [Fact]
-        public void CalculateResults_3Races_NoDiscards()
+        public void CalculateResults_3Races_OneDiscard()
         {
             var results = _defaultCalculator.CalculateResults(GetBasicSeries(3, 3));
 
-            Assert.True(results.Results.All(r => r.Value.CalculatedScores.All(c => !c.Value.Discard)));
+            var firstCompetitor = results.Competitors.First();
+            Assert.Equal(1, results.Results[firstCompetitor].CalculatedScores.Count(r => r.Value.Discard));
         }
 
-        [Fact]
-        public void CalculateResults_SafetyBoat_GetsAValue()
-        {
-            // Arrange: put in some coded results: SB
-            var basicSeries = GetBasicSeries(3, 3);
-            basicSeries.Races.First().Scores.First().Code = "SB";
-            basicSeries.Races.First().Scores.First().Place = null;
-            var results = _defaultCalculator.CalculateResults(basicSeries);
-
-            Assert.True(results.Results.First().Value.CalculatedScores.First().Value.RawScore.Place !=
-                results.Results.First().Value.CalculatedScores.First().Value.ScoreValue);
-        }
 
         [Fact]
-        public void CalculateResults_SafetyBoat_GetsAverageOfTwoRacesValue()
+        public void CalculateResults_SafetyBoat_GetsDnc()
         {
             // Arrange: put in some coded results: SB
             var basicSeries = GetBasicSeries(3, 6);
@@ -115,7 +317,34 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(1.5m,
+            Assert.Equal(4m,
+                results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
+        }
+
+        [Fact]
+        public void CalculateResults_DNC_GetsSeriesCompetitorsPlusOne()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(3, 6);
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNC";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = null;
+
+            basicSeries.Races[basicSeries.Races.Count - 2].Scores.First(s => s.Competitor == testComp).Code = "DNC";
+            basicSeries.Races[basicSeries.Races.Count - 2].Scores.First(s => s.Competitor == testComp).Place = null;
+
+            basicSeries.Races[1].Scores.First(s => s.Competitor == testComp).Place = 2;
+            basicSeries.Races[1].Scores.First(s => s.Competitor != testComp).Place = 1;
+
+            basicSeries.Races[2].Scores.First(s => s.Competitor == testComp).Place = 3;
+            basicSeries.Races[2].Scores.Last().Place = 1;
+
+            basicSeries.Races[3].Scores.First(s => s.Competitor == testComp).Place = 3;
+            basicSeries.Races[3].Scores.Last().Place = 1;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(4m,
                 results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
         }
 

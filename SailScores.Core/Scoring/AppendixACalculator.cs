@@ -16,7 +16,7 @@ namespace SailScores.Core.Scoring
 
         private readonly ScoringSystem _scoringSystem;
 
-        //Code to use if no result is found or if scorecode is not found in the system.
+        // Code to use if no result is found or if scorecode is not found in the system.
         //  This will be used if code defined in a child scoring system is used but the
         // series is scored with the ancestor
         private readonly string DEFAULT_CODE = "DNC";
@@ -102,7 +102,7 @@ namespace SailScores.Core.Scoring
                         {
                             RawScore = new Score
                             {
-                                Code ="DNC",
+                                Code = DEFAULT_CODE,
                                 Competitor = compResults.Competitor,
                                 Race = race
                             }
@@ -143,10 +143,24 @@ namespace SailScores.Core.Scoring
                 var scoreCode = GetScoreCode(score.RawScore);
                 if (score != null && IsSeriesBasedScore(scoreCode))
                 {
-                    score.ScoreValue = CalculateSeriesBasedValue(score, compResults);
+
+                    switch (scoreCode.Formula.ToUpperInvariant())
+                    {
+                        case "AVE":
+                            score.ScoreValue = CalculateAverage(compResults);
+                            break;
+                        case "SER+":
+                            score.ScoreValue = GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0);
+                            break;
+                    }
 
                 }
             }
+        }
+
+        private int GetNumberOfCompetitors(SeriesResults seriesResults)
+        {
+            return seriesResults.Competitors.Count();
         }
 
         private bool IsSeriesBasedScore(ScoreCode scoreCode)
@@ -159,7 +173,10 @@ namespace SailScores.Core.Scoring
             return average || seriesCompPlus;
         }
 
-        private decimal? CalculateSeriesBasedValue(CalculatedScore score, SeriesCompetitorResults compResults)
+        private decimal? CalculateSeriesBasedValue(
+            CalculatedScore score,
+            SeriesCompetitorResults compResults,
+            SeriesResults seriesResults)
         {
             // right now the only kind of series based value is Average, so not much to do here.
             return CalculateAverage(compResults);
