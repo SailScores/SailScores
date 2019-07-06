@@ -8,7 +8,6 @@ using Xunit;
 namespace SailScores.Test.Unit
 {
 
-
     public class AppendixACalculatorTests
     {
 
@@ -43,7 +42,7 @@ namespace SailScores.Test.Unit
                     AdjustOtherScores = false,
                     CameToStart = true,
                     Finished = true,
-                    Formula = "MAN",
+                    Formula = "TIE",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -104,7 +103,7 @@ namespace SailScores.Test.Unit
                     Discardable = true,
                     Started = true,
                     FormulaValue = 20,
-                    AdjustOtherScores = false,
+                    AdjustOtherScores = true,
                     CameToStart = true,
                     Finished = true,
                     Formula = "PLC%",
@@ -187,7 +186,7 @@ namespace SailScores.Test.Unit
                     AdjustOtherScores = null,
                     CameToStart = true,
                     Finished = false,
-                    Formula = "CTS+",
+                    Formula = "SER+",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -200,7 +199,7 @@ namespace SailScores.Test.Unit
                     Discardable = true,
                     Started = false,
                     FormulaValue = 1,
-                    AdjustOtherScores = null,
+                    AdjustOtherScores = true,
                     CameToStart = true,
                     Finished = false,
                     Formula = "CTS+",
@@ -216,7 +215,7 @@ namespace SailScores.Test.Unit
                     Discardable = true,
                     Started = true,
                     FormulaValue = 1,
-                    AdjustOtherScores = null,
+                    AdjustOtherScores = true,
                     CameToStart = true,
                     Finished = true,
                     Formula = "CTS+",
@@ -303,6 +302,25 @@ namespace SailScores.Test.Unit
             Assert.Equal(1, results.Results[firstCompetitor].CalculatedScores.Count(r => r.Value.Discard));
         }
 
+        [Fact]
+        public void CalculateResults_DNE_IsNotExcluded()
+        {
+            var basicSeries = GetBasicSeries(10, 6);
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNE";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = 1;
+
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(15m,
+                results.Results[testComp].TotalScore);
+            Assert.True(
+                results.Results[testComp].Rank > 1);
+        }
+
+        // This is a test of what happens to an undefined code: SB is not defined in the appenidx A system,
+        // so the default (DNC) should be used instead. 
         [Fact]
         public void CalculateResults_SafetyBoat_GetsDnc()
         {
@@ -491,7 +509,7 @@ namespace SailScores.Test.Unit
             var thirdComp = basicSeries.Competitors.Skip(2).First();
             var fourthComp = basicSeries.Competitors.Skip(3).First();
             basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Code = "TIE";
-            basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Place = 4;
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Place = 3;
             
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
@@ -570,8 +588,7 @@ namespace SailScores.Test.Unit
         // A8.1 does not break any tie, as they each have scores of 3, 4, 5 that count.
         // A8.2 applies, and the tie is broken in the order of D, C, B, A, the order of their last race scores.Note that A’s race 4 result was
         // her discard, but it is still used to break the tie.
-        // Ties in A8.1 and A8.2 are broken on scores, not finishing places.If this had been a 40-boat entry, and A had been second in
-        // race 4, only to receive a 20% (8-place) ZFP, the outcome of the tie-break is the same.
+
         // Normally, the last race will resolve most ties.The next-to-last race (and so on) will need to be used only if two boats have the
         // same score in the last race, which might result from a ZFP, from a tie on the water or on handicap, or from both receiving nonfinishing points resulting from DNC, DNS, OCS, BFD, DNF, RAF, DSQ, DNE or DGM.
         [Fact]
@@ -620,9 +637,12 @@ namespace SailScores.Test.Unit
 
             Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank);
             Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank);
-            Assert.True(results.Results[secondComp].Rank < results.Results[fourthComp].Rank);
+            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank);
         }
 
+        // [Same setup as previous test except...]
+        // Ties in A8.1 and A8.2 are broken on scores, not finishing places.If this had been a 40-boat entry, and A had been second in
+        // race 4, only to receive a 20% (8-place) ZFP, the outcome of the tie-break is the same.
         [Fact]
         public void CalculateResults_SeriesTieBreaker_UsesLastRaceIncludingPenalty()
         {
@@ -670,7 +690,7 @@ namespace SailScores.Test.Unit
 
             Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank);
             Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank);
-            Assert.True(results.Results[secondComp].Rank < results.Results[fourthComp].Rank);
+            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank);
         }
 
 
@@ -696,6 +716,8 @@ namespace SailScores.Test.Unit
                     {
                         Id = Guid.NewGuid(),
                         Name = $"Race {i}",
+                        Order = i + 1,
+                        Date = DateTime.UtcNow
 
                     };
                 var scores = new List<Score>();

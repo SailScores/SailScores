@@ -199,7 +199,8 @@ namespace SailScores.Core.Scoring
         private bool IsRaceBasedValue(ScoreCode scoreCode)
         {
             return scoreCode.Formula.Equals("FIN+", CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals("PLC%", CASE_INSENSITIVE);
+                || scoreCode.Formula.Equals("PLC%", CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals("CTS+", CASE_INSENSITIVE);
         }
 
         private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race)
@@ -224,7 +225,7 @@ namespace SailScores.Core.Scoring
             var dnfScore = GetDnfScore(race) ?? 1;
             var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
             var percent = Math.Round(dnfScore * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
-            return Math.Min(dnfScore, percent + (score.RawScore.Place ?? 0));
+            return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
         }
 
         private decimal? GetDnfScore(Race race)
@@ -391,7 +392,7 @@ namespace SailScores.Core.Scoring
                     {
                         total += ((int)score.Place + i);
                     }
-                    returnResults.CalculatedScores[score.Race].ScoreValue = (decimal)total / numTied;
+                    returnResults.CalculatedScores[score.Race].ScoreValue = (decimal)total / (decimal)numTied;
                 }
             }
 
