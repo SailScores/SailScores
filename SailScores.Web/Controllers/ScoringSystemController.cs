@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Controllers
 {
@@ -52,10 +53,14 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            //todo: select the right scoring system
-            var scoringSystems = await _scoringService.GetScoringSystemsAsync(clubId, false);
 
-            return View(scoringSystems.First());
+            var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
+
+            var vm = _mapper.Map<ScoringSystemWithOptionsViewModel>(scoringSystem);
+            var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
+            vm.ParentSystemOptions = potentialParents.Where(s => s.Id != id).ToList();
+            //vm.ScoreCodeOptions = new List<ScoreCode>();
+            return View(vm);
         }
 
         [HttpPost]

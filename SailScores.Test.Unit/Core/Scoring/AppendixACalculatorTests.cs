@@ -28,6 +28,8 @@ namespace SailScores.Test.Unit
                 ParentSystemId = null
             };
 
+            system.InheritedScoreCodes = new List<ScoreCode>();
+
             system.ScoreCodes = new List<ScoreCode>
             {
                 new ScoreCode

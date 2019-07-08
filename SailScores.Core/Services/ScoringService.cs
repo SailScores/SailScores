@@ -62,7 +62,12 @@ namespace SailScores.Core.Services
 
             var requestedSystem = _mapper.Map<Model.ScoringSystem>(requestedDbSystem);
 
-            requestedSystem.InheritedScoreCodes = await GetAllCodesAsync(requestedSystem.ParentSystemId);
+            // Should inherited codes include the codes that are overriden in this system?
+            // For now, going to say no.  but the call below does include those, so
+            // need to remove them
+            var allInheritedCodes = await GetAllCodesAsync(requestedSystem.ParentSystemId);
+            requestedSystem.InheritedScoreCodes = allInheritedCodes
+                .Where(c => !requestedSystem.ScoreCodes.Any(ec => ec.Name == c.Name));
 
             return requestedSystem;
 

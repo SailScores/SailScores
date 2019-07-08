@@ -10,16 +10,23 @@ namespace SailScores.Core.Scoring
     {
         private const string AVERAGE_FORMULANAME = "AVE";
         private const string SERIESCOMPETITORS_FORMULANAME = "SER+";
+        private const string MANUAL_FORMULANAME = "MAN";
+        private const string FINISHERSPLUS_FORMULANAME = "FIN+";
+        private const string PLACEPLUSPERCENT_FORMULANAME = "PLC%";
+        private const string CAMETOSTARTPLUS_FORMULANAME = "CTS+";
+
+        private const string DNF_SCORENAME = "DNF";
+
+        // Code to use if no result is found or if scorecode is not found in the system.
+        //  This will be used if code defined in a child scoring system is used but the
+        // series is scored with the ancestor
+        private readonly string DEFAULT_CODE = "DNC";
 
         private const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
 
 
         private readonly ScoringSystem _scoringSystem;
 
-        // Code to use if no result is found or if scorecode is not found in the system.
-        //  This will be used if code defined in a child scoring system is used but the
-        // series is scored with the ancestor
-        private readonly string DEFAULT_CODE = "DNC";
 
         public AppendixACalculator(ScoringSystem scoringsystem)
         {
@@ -146,10 +153,10 @@ namespace SailScores.Core.Scoring
 
                     switch (scoreCode.Formula.ToUpperInvariant())
                     {
-                        case "AVE":
+                        case AVERAGE_FORMULANAME:
                             score.ScoreValue = CalculateAverage(compResults);
                             break;
-                        case "SER+":
+                        case SERIESCOMPETITORS_FORMULANAME:
                             score.ScoreValue = GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0);
                             break;
                     }
@@ -184,7 +191,7 @@ namespace SailScores.Core.Scoring
 
         private bool IsTrivialCalculation(ScoreCode scoreCode)
         {
-            return scoreCode.Formula.Equals("MAN", CASE_INSENSITIVE);
+            return scoreCode.Formula.Equals(MANUAL_FORMULANAME, CASE_INSENSITIVE);
         }
 
         private decimal? GetTrivialScoreValue(CalculatedScore score)
@@ -198,9 +205,9 @@ namespace SailScores.Core.Scoring
 
         private bool IsRaceBasedValue(ScoreCode scoreCode)
         {
-            return scoreCode.Formula.Equals("FIN+", CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals("PLC%", CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals("CTS+", CASE_INSENSITIVE);
+            return scoreCode.Formula.Equals(FINISHERSPLUS_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(PLACEPLUSPERCENT_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(CAMETOSTARTPLUS_FORMULANAME, CASE_INSENSITIVE);
         }
 
         private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race)
@@ -208,13 +215,13 @@ namespace SailScores.Core.Scoring
             var scoreCode = GetScoreCode(score.RawScore);
             switch (scoreCode.Formula.ToUpperInvariant())
             {
-                case "FIN+":
+                case FINISHERSPLUS_FORMULANAME:
                     return race.Scores.Where(s => CountsAsStarted(s)).Count() + 
                         scoreCode.FormulaValue;
-                case "CTS+":
+                case CAMETOSTARTPLUS_FORMULANAME:
                     return race.Scores.Where(s => CameToStart(s)).Count() +
                         scoreCode.FormulaValue;
-                case "PLC%":
+                case PLACEPLUSPERCENT_FORMULANAME:
                     return GetPenaltyScore(score, race, scoreCode);
             }
             throw new InvalidOperationException("Score code definition issue with race based score code.");
@@ -230,7 +237,7 @@ namespace SailScores.Core.Scoring
 
         private decimal? GetDnfScore(Race race)
         {
-            var dnfCode = _scoringSystem.ScoreCodes.FirstOrDefault(c => c.Name.Equals("DNF", StringComparison.InvariantCultureIgnoreCase));
+            var dnfCode = GetScoreCode(DNF_SCORENAME);
             return race.Scores.Where(s => CountsAsStarted(s)).Count() +
                         dnfCode.FormulaValue;
         }
@@ -435,9 +442,16 @@ namespace SailScores.Core.Scoring
             }
             var returnScoreCode = _scoringSystem.ScoreCodes
                     .SingleOrDefault(c =>
-                        c.Name.Equals(scoreCodeName, StringComparison.InvariantCultureIgnoreCase));
+                        c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
 
-            if(returnScoreCode == null)
+            if (returnScoreCode == null)
+            {
+                returnScoreCode = _scoringSystem.InheritedScoreCodes
+                    .SingleOrDefault(c =>
+                        c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
+            }
+
+            if (returnScoreCode == null)
             {
                 returnScoreCode = GetScoreCode(DEFAULT_CODE);
             }

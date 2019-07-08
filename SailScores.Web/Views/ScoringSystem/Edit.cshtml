@@ -46,14 +46,57 @@
             </div>
         </form>
         <h3>Score Codes</h3>
-        <ul>
-            @foreach (var code in Model.ScoreCodeOptions)
-            {
-                //Todo
-                <li>@code.Name</li>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Formula</th>
+                    <th>Can be Discarded?</th>
+                    <th>Came To Start?</th>
+                    <th>Started?</th>
+                    <th>Finished?</th>
+                    <th>Keep Result?</th>
+                    <th>Adjust other scores?</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var code in Model.ScoreCodes.OrderBy(c => c.Name))
+                {
+                <tr>
+                    <td>@code.Name</td>
+                    <td>@code.Description</td>
+                    <td>@code.Formula@code.FormulaValue</td>
+                    <td>@((code.Discardable ?? false) ? "Y" : "N")</td>
+                    <td>@((code.CameToStart ?? false) ? "Y" : "N")</td>
+                    <td>@((code.Started ?? false) ? "Y" : "N")</td>
+                    <td>@((code.Finished ?? false) ? "Y" : "N")</td>
+                    <td>@((code.PreserveResult ?? false) ? "Y" : "N")</td>
+                    <td>@((code.AdjustOtherScores ?? false) ? "Y" : "N")</td>
+                </tr>
+                }
+                <tr>
+                <td colspan="9">
+                    <h4>Inherited codes</h4>
+                </td>
+                </tr>
 
-            }
-        </ul>
+                @foreach (var code in Model.InheritedScoreCodes.OrderBy(c => c.Name))
+                {
+                    <tr>
+                        <td>@code.Name</td>
+                        <td>@code.Description</td>
+                        <td>@code.Formula@code.FormulaValue</td>
+                        <td>@((code.Discardable ?? false) ? "Y" : "N")</td>
+                        <td>@((code.CameToStart ?? false) ? "Y" : "N")</td>
+                        <td>@((code.Started ?? false) ? "Y" : "N")</td>
+                        <td>@((code.Finished ?? false) ? "Y" : "N")</td>
+                        <td>@((code.PreserveResult ?? false) ? "Y" : "N")</td>
+                        <td>@((code.AdjustOtherScores ?? false) ? "Y" : "N")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
