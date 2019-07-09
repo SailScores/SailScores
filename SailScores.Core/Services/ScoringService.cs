@@ -89,6 +89,12 @@ namespace SailScores.Core.Services
             return await GetScoringSystemAsync(scoringSystemId.Value);
         }
 
+        public async Task<ScoreCode> GetScoreCodeAsync(Guid id)
+        {
+            var dbObj = await _dbContext.ScoreCodes.Where(sc => sc.Id == id).FirstOrDefaultAsync();
+            return _mapper.Map<ScoreCode>(dbObj);
+        }
+
         private async Task<IEnumerable<ScoreCode>> GetAllCodesAsync(
             Guid? systemId)
         {

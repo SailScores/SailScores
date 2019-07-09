@@ -460,6 +460,3 @@ namespace SailScores.Core.Scoring
     }
 
 }
-
-
-

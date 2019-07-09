@@ -1,0 +1,78 @@
+﻿@model SailScores.Web.Models.SailScores.ScoreCodeWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Edit</h2>
+
+<h4>Score Code</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ClubId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Formula" class="control-label">Formula</label>
+                <select asp-for="Formula" class="form-control"
+                        asp-items="Model.FormulaOptions"
+                        ></select>
+                <span asp-validation-for="Formula" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FormulaValue" class="control-label"></label>
+                <input asp-for="FormulaValue" class="form-control" type="number" />
+                <span asp-validation-for="FormulaValue" class="text-danger"></span>
+            </div>
+            <div class="form-check">
+                <input asp-for="Discardable" class="form-check-input" />
+                <label asp-for="Discardable" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="CameToStart" class="form-check-input" />
+                <label asp-for="CameToStart" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="Started" class="form-check-input" />
+                <label asp-for="Started" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="Finished" class="form-check-input" />
+                <label asp-for="Finished" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="PreserveResult" class="form-check-input" />
+                <label asp-for="PreserveResult" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="AdjustOtherScores" class="form-check-input" />
+                <label asp-for="AdjustOtherScores" class="form-check-label"></label>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="scoringsystems"
+                   class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -7,7 +7,7 @@
 
 <h2>Edit</h2>
 
-<h4>Season</h4>
+<h4>ScoringSystem</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -73,6 +73,13 @@
                     <td>@((code.Finished ?? false) ? "Y" : "N")</td>
                     <td>@((code.PreserveResult ?? false) ? "Y" : "N")</td>
                     <td>@((code.AdjustOtherScores ?? false) ? "Y" : "N")</td>
+                    <td>
+                        <a asp-action="Edit" asp-controller="ScoreCode" asp-route-id="@code.Id"
+                           asp-route-returnUrl=
+                           "@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
+                        |
+                        @Html.ActionLink("Delete", "Delete", "ScoreCode", new { id = code.Id })
+                    </td>
                 </tr>
                 }
                 <tr>

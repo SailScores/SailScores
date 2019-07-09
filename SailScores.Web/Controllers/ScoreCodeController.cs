@@ -13,7 +13,7 @@ using SailScores.Web.Models.SailScores;
 namespace SailScores.Web.Controllers
 {
     [Authorize]
-    public class ScoringSystemController : Controller
+    public class ScoreCodeController : Controller
     {
 
         private readonly IClubService _clubService;
@@ -21,7 +21,7 @@ namespace SailScores.Web.Controllers
         private readonly IMapper _mapper;
         private readonly Services.IAuthorizationService _authService;
 
-        public ScoringSystemController(
+        public ScoreCodeController(
             IClubService clubService,
             IScoringService scoringService,
             Services.IAuthorizationService authService,
@@ -40,12 +40,15 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials)
+        public async Task<ActionResult> Create(string clubInitials, Season model)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ActionResult> Edit(string clubInitials, Guid id)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            Guid id,
+            string returnUrl = null)
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             if (!await _authService.CanUserEdit(User, clubId))
@@ -53,24 +56,21 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
 
-            var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
-            if (scoringSystem.ClubId != clubId)
-            {
-                return Unauthorized();
-            }
+            var scoreCode = await _scoringService.GetScoreCodeAsync(id);
 
-            var vm = _mapper.Map<ScoringSystemWithOptionsViewModel>(scoringSystem);
-            var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
-            vm.ParentSystemOptions = potentialParents.Where(s => s.Id != id).ToList();
-            //vm.ScoreCodeOptions = new List<ScoreCode>();
+            if(scoreCode == null)
+            {
+                return new NotFoundResult();
+            }
+            ViewData["ReturnUrl"] = returnUrl;
+
+            var vm = _mapper.Map<ScoreCodeWithOptionsViewModel>(scoreCode);
             return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(
-            string clubInitials,
-            ScoringSystemWithOptionsViewModel model)
+        public async Task<ActionResult> Edit(string clubInitials)
         {
             throw new NotImplementedException();
         }
