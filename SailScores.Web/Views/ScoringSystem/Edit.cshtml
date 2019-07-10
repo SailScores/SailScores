@@ -76,7 +76,7 @@
                     <td>
                         <a asp-action="Edit" asp-controller="ScoreCode" asp-route-id="@code.Id"
                            asp-route-returnUrl=
-                           "@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
+                           "@($"{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
                         |
                         @Html.ActionLink("Delete", "Delete", "ScoreCode", new { id = code.Id })
                     </td>

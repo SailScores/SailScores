@@ -95,6 +95,21 @@ namespace SailScores.Core.Services
             return _mapper.Map<ScoreCode>(dbObj);
         }
 
+        public async Task SaveScoreCodeAsync(ScoreCode scoreCode)
+        {
+            if(scoreCode.Id != null && scoreCode.Id != Guid.Empty)
+            {
+                Db.ScoreCode dbObject = await _dbContext.ScoreCodes.Where(sc => sc.Id == scoreCode.Id).SingleAsync();
+                _mapper.Map(scoreCode, dbObject);
+            } else
+            {
+                Db.ScoreCode dbObject = _mapper.Map<Db.ScoreCode>(scoreCode);
+                dbObject.Id = Guid.NewGuid();
+                _dbContext.ScoreCodes.Add(dbObject);
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
         private async Task<IEnumerable<ScoreCode>> GetAllCodesAsync(
             Guid? systemId)
         {

@@ -70,9 +70,32 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(string clubInitials)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            ScoreCodeWithOptionsViewModel model,
+            string returnUrl = null)
         {
-            throw new NotImplementedException();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+            var scoreSystem = await _scoringService.GetScoringSystemAsync(model.ScoringSystemId);
+            if(scoreSystem.ClubId != clubId)
+            {
+                throw new InvalidOperationException("Score code is not for current club.");
+            }
+
+            var coreObj = _mapper.Map<ScoreCode>(model);
+            await _scoringService.SaveScoreCodeAsync(coreObj);
+
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
+            return View(model);
         }
 
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
