@@ -44,7 +44,7 @@ namespace SailScores.Web.Controllers
             try
             {
                 var club = (await _clubService.GetClubs(true)).Single(c =>
-                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
+                    c.Initials == clubInitials);
                 if (!await _authService.CanUserEdit(User, club.Id))
                 {
                     return Unauthorized();

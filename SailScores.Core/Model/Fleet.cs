@@ -10,7 +10,6 @@ namespace SailScores.Core.Model
     {
         public Guid Id { get; set; }
         public Guid ClubId { get; set; }
-        public Club Club { get; set; }
 
         [StringLength(30)]
         public String ShortName { get; set; }

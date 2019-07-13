@@ -47,7 +47,7 @@ namespace SailScores.Core.Services
             bool includeAbandoned = true)
         {
             var dbRaces = (await _dbContext.Races
-                .Where(r => r.Club.Id == clubId)
+                .Where(r => r.ClubId == clubId)
                 .Include(r => r.Fleet)
                 .Include( r => r.Scores)
                 .Include( r => r.SeriesRaces)

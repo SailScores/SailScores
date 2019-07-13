@@ -58,10 +58,8 @@ namespace SailScores.Web.Controllers
             var canEdit = false;
             if(User != null && (User.Identity?.IsAuthenticated ?? false))
             {
-
-                var club = (await _clubService.GetClubs(true)).Single(c =>
-                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
-                canEdit = await _authService.CanUserEdit(User, club.Id);
+                var clubId = await _clubService.GetClubId(clubInitials);
+                canEdit = await _authService.CanUserEdit(User, clubId);
             }
 
             return View(new ClubItemViewModel<RaceViewModel>
@@ -87,13 +85,12 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c =>
-                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
-                if (!await _authService.CanUserEdit(User, club.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
                 }
-                race.ClubId = club.Id;
+                race.ClubId = clubId;
                 await _raceService.SaveAsync(race);
 
                 return RedirectToAction("Index", "Admin");
@@ -112,7 +109,8 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             ViewData["ClubInitials"] = clubInitials;
-            if (!await _authService.CanUserEdit(User, clubInitials))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
@@ -121,7 +119,7 @@ namespace SailScores.Web.Controllers
             {
                 return NotFound();
             }
-            if (race.Club.Initials.ToUpperInvariant() != clubInitials.ToUpperInvariant())
+            if (race.ClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -161,9 +159,8 @@ namespace SailScores.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = (await _clubService.GetClubs(true)).Single(c =>
-                c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
@@ -172,7 +169,7 @@ namespace SailScores.Web.Controllers
             {
                 return NotFound();
             }
-            if (race.ClubId != club.Id)
+            if (race.ClubId != clubId)
             {
                 return Unauthorized();
             }

@@ -49,9 +49,7 @@ namespace SailScores.Database
 
             // Following lines resolve multiple deletion paths to entities.
             modelBuilder.Entity<Club>()
-                .HasMany(c => c.Competitors)
-                .WithOne(c => c.Club)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasMany(c => c.Competitors);
 
             modelBuilder.Entity<Series>()
                 .HasMany(s => s.RaceSeries)
