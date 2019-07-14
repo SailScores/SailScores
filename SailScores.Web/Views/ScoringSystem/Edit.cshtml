@@ -75,10 +75,10 @@
                     <td>@((code.AdjustOtherScores ?? false) ? "Y" : "N")</td>
                     <td>
                         <a asp-action="Edit" asp-controller="ScoreCode" asp-route-id="@code.Id"
-                           asp-route-returnUrl=
-                           "@($"{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
+                           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
                         |
-                        @Html.ActionLink("Delete", "Delete", "ScoreCode", new { id = code.Id })
+                        <a asp-action="Delete" asp-controller="ScoreCode" asp-route-id="@code.Id"
+                           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Delete</a>
                     </td>
                 </tr>
                 }
@@ -100,6 +100,12 @@
                         <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
                         <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
                         <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-action="Override" asp-controller="ScoreCode"
+                               asp-route-code="@code.Name"
+                               asp-route-scoringsystemid="@Model.Id"
+                               asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Override</a>
+                        </td>
                     </tr>
                 }
             </tbody>

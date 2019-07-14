@@ -1,0 +1,80 @@
+﻿@model SailScores.Web.Models.SailScores.ScoreCodeWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Override</h2>
+
+<h4>a score code defined in the base system</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" asp-route-returnurl="@ViewData["ReturnUrl"]">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ScoringSystemId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Formula" class="control-label">Formula</label>
+                <select asp-for="Formula" class="form-control"
+                        asp-items="Model.FormulaOptions"></select>
+                <span asp-validation-for="Formula" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FormulaValue" class="control-label"></label>
+                <input asp-for="FormulaValue" class="form-control" type="number" />
+                <span asp-validation-for="FormulaValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ScoreLike" class="control-label"></label>
+                <input asp-for="ScoreLike" class="form-control"/>
+                <span asp-validation-for="ScoreLike" class="text-danger"></span>
+            </div>
+            <div class="form-check">
+                <input asp-for="Discardable" class="form-check-input" />
+                <label asp-for="Discardable" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="CameToStart" class="form-check-input" />
+                <label asp-for="CameToStart" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="Started" class="form-check-input" />
+                <label asp-for="Started" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="Finished" class="form-check-input" />
+                <label asp-for="Finished" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="PreserveResult" class="form-check-input" />
+                <label asp-for="PreserveResult" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="AdjustOtherScores" class="form-check-input" />
+                <label asp-for="AdjustOtherScores" class="form-check-label"></label>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a href="@ViewData["returnUrl"]"
+                   class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

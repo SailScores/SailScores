@@ -33,14 +33,59 @@ namespace SailScores.Web.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult Create()
+        public async Task<ActionResult> Override(
+            string clubInitials,
+            Guid scoringSystemId,
+            string code,
+            string returnUrl = null)
         {
-            return View();
+
+            var clubId = await _clubService.GetClubId(clubInitials);
+            ViewData["ReturnUrl"] = returnUrl;
+
+
+            var scoringSystem = await _scoringService.GetScoringSystemAsync(scoringSystemId);
+            if (scoringSystem.ClubId != clubId)
+            {
+                return Unauthorized();
+            }
+            var vm = _mapper.Map<ScoreCodeWithOptionsViewModel>(scoringSystem.InheritedScoreCodes
+                 .FirstOrDefault(sc => sc.Name == code));
+            vm.ClubId = clubId;
+            vm.ScoringSystemId = scoringSystemId;
+            vm.Name = code;
+            vm.Id = Guid.Empty;
+            return View(vm);
+        }
+
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            Guid scoringSystemId,
+            string returnUrl = null)
+        {
+
+            var clubId = await _clubService.GetClubId(clubInitials);
+            ViewData["ReturnUrl"] = returnUrl;
+            
+            var scoringSystem = await _scoringService.GetScoringSystemAsync(scoringSystemId);
+            if (scoringSystem.ClubId != clubId)
+            {
+                return Unauthorized();
+            }
+            var vm = new ScoreCodeWithOptionsViewModel
+            {
+                ClubId = clubId,
+                ScoringSystemId = scoringSystemId
+            };
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials, Season model)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            ScoreCodeWithOptionsViewModel model,
+            string returnUrl)
         {
             throw new NotImplementedException();
         }
