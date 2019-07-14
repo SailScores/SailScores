@@ -66,7 +66,7 @@ namespace SailScores.Core.Services
         {
             var clubId = (await _dbContext.Clubs
                 .SingleAsync(c =>
-                   c.Initials == clubInitials.ToUpperInvariant()
+                   c.Initials == clubInitials
                 )).Id;
             var seriesDb = await _dbContext
                 .Series
@@ -111,7 +111,7 @@ namespace SailScores.Core.Services
         {
             var clubId = (await _dbContext.Clubs
                 .SingleAsync( c =>
-                    c.Initials == clubInitials.ToUpperInvariant()
+                    c.Initials == clubInitials
                 )).Id;
             var seriesDb = await _dbContext
                 .Series

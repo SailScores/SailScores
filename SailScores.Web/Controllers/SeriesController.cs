@@ -80,13 +80,12 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c =>
-                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
-                if (!await _authService.CanUserEdit(User, club.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
                 }
-                model.ClubId = club.Id;
+                model.ClubId = clubId;
                 await _seriesService.SaveNew(model);
 
                 return RedirectToAction("Index", "Admin");

@@ -63,12 +63,12 @@ namespace SailScores.Core.Services
             return _mapper.Map<List<Model.Club>>(dbObjects);
         }
 
-        public async Task<Guid> GetClubId(string id)
+        public async Task<Guid> GetClubId(string initials)
         {
             Guid clubGuid;
-            if (!Guid.TryParse(id, out clubGuid))
+            if (!Guid.TryParse(initials, out clubGuid))
             {
-                clubGuid = (await _dbContext.Clubs.SingleAsync(c => c.Initials == id)).Id;
+                clubGuid = (await _dbContext.Clubs.SingleAsync(c => c.Initials == initials)).Id;
             }
 
             return clubGuid;
@@ -138,7 +138,7 @@ namespace SailScores.Core.Services
             var dbFleet = new Db.Fleet
             {
                 Id = Guid.NewGuid(),
-                Club = dbClub,
+                ClubId = dbClub.Id,
                 FleetType = Api.Enumerations.FleetType.AllBoatsInClub,
                 IsHidden = false,
                 ShortName = "All",

@@ -11,7 +11,6 @@ namespace SailScores.Database.Entities
         public Guid Id { get; set; }
         
         public Guid ClubId { get; set; }
-        public Club Club { get; set; }
         [StringLength(200)]
         public String Name { get; set; }
 

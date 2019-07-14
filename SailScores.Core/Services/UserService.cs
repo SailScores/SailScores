@@ -20,8 +20,8 @@ namespace SailScores.Core.Services
         {
             var clubId = ( await _dbContext.Clubs
                     .SingleOrDefaultAsync(c =>
-                        c.Initials.ToUpperInvariant()
-                        == clubInitials.ToUpperInvariant()))
+                        c.Initials
+                        == clubInitials))
                     ?.Id;
             return await IsUserAllowedToEdit(email, clubId);
 
@@ -34,8 +34,8 @@ namespace SailScores.Core.Services
                 return false;
             }
             var userMatches = _dbContext.UserPermissions
-                .Where(u => u.UserEmail.ToUpperInvariant()
-                == email.ToUpperInvariant());
+                .Where(u => u.UserEmail
+                == email);
             if (await userMatches.AnyAsync(u => u.CanEditAllClubs))
             {
                 return true;

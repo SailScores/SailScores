@@ -16,7 +16,6 @@ namespace SailScores.Core.Mapping
         public DbToDtoMappingProfile()
         {
             CreateMap<Dto.CompetitorDto, Db.Competitor>()
-                .ForMember(d => d.Club, o => o.Ignore())
                 .ForMember(d => d.BoatClass, o => o.Ignore())
                 .ForMember(d => d.CompetitorFleets, o => o.Ignore())
                 .ForMember(d => d.Scores, o => o.Ignore());

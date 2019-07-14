@@ -63,13 +63,12 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c => 
-                    c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
-                if (!await _authService.CanUserEdit(User, club.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
                 }
-                competitor.ClubId = club.Id;
+                competitor.ClubId = clubId;
                 await _competitorService.SaveAsync(competitor);
 
                 return RedirectToAction("Index", "Admin");
@@ -129,9 +128,8 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/Delete/5
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = (await _clubService.GetClubs(true)).Single(c =>
-                c.Initials.ToUpperInvariant() == clubInitials.ToUpperInvariant());
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
@@ -140,7 +138,7 @@ namespace SailScores.Web.Controllers
             {
                 return NotFound();
             }
-            if (competitor.ClubId != club.Id)
+            if (competitor.ClubId != clubId)
             {
                 return Unauthorized();
             }
