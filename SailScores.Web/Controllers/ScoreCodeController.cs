@@ -87,7 +87,28 @@ namespace SailScores.Web.Controllers
             ScoreCodeWithOptionsViewModel model,
             string returnUrl)
         {
-            throw new NotImplementedException();
+
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+            var scoreSystem = await _scoringService.GetScoringSystemAsync(model.ScoringSystemId);
+            if (scoreSystem.ClubId != clubId)
+            {
+                throw new InvalidOperationException("Score code is not for the current club.");
+            }
+
+            var coreObj = _mapper.Map<ScoreCode>(model);
+            await _scoringService.SaveScoreCodeAsync(coreObj);
+
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
+            return View(model);
         }
 
         public async Task<ActionResult> Edit(
@@ -143,18 +164,57 @@ namespace SailScores.Web.Controllers
             return View(model);
         }
 
-        public async Task<ActionResult> Delete(string clubInitials, Guid id)
+        public async Task<ActionResult> Delete(
+            string clubInitials,
+            Guid id,
+            string returnUrl = null)
         {
-            throw new NotImplementedException();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+
+            var scoreCode = await _scoringService.GetScoreCodeAsync(id);
+
+            if (scoreCode == null)
+            {
+                return new NotFoundResult();
+            }
+            ViewData["ReturnUrl"] = returnUrl;
+
+            var vm = _mapper.Map<ScoreCodeWithOptionsViewModel>(scoreCode);
+            return View(vm);
         }
 
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
+        public async Task<ActionResult> PostDelete(
+            string clubInitials,
+            Guid id,
+            Guid scoringSystemId,
+            string returnUrl)
         {
-            throw new NotImplementedException();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+            var scoreSystem = await _scoringService.GetScoringSystemAsync(scoringSystemId);
+            if (scoreSystem.ClubId != clubId)
+            {
+                throw new InvalidOperationException("Score code is not for current club.");
+            }
+            if(!(scoreSystem.ScoreCodes.Any(s => s.Id == id)))
+            {
+                throw new InvalidOperationException("Score code is not for current scoring system.");
+            }
+            var scoreCode = await _scoringService.GetScoreCodeAsync(id);
 
+            await _scoringService.DeleteScoreCodeAsync(id);
+
+            return Redirect(returnUrl);
         }
     }
 }

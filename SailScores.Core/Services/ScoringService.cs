@@ -110,6 +110,12 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task DeleteScoreCodeAsync(Guid id)
+        {
+            var scoreCode = await _dbContext.ScoreCodes.SingleAsync(s => s.Id == id);
+            _dbContext.ScoreCodes.Remove(scoreCode);
+            await _dbContext.SaveChangesAsync();
+        }
         private async Task<IEnumerable<ScoreCode>> GetAllCodesAsync(
             Guid? systemId)
         {

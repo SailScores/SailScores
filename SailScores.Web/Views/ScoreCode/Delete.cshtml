@@ -1,0 +1,21 @@
+﻿@model SailScores.Web.Models.SailScores.ScoreCodeWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this score code?</h3>
+<div>
+    <h4>@Model.Name</h4>
+    <hr />
+    <form asp-action="Delete" asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ScoringSystemId" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a href="@ViewData["ReturnUrl"]"
+           class="btn btn-outline-primary">Cancel</a>
+    </form>
+</div>

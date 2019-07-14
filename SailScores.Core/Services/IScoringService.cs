@@ -13,5 +13,6 @@ namespace SailScores.Core.Services
         Task<ScoringSystem> GetScoringSystemAsync(Series series);
         Task<ScoreCode> GetScoreCodeAsync(Guid id);
         Task SaveScoreCodeAsync(ScoreCode scoreCode);
+        Task DeleteScoreCodeAsync(Guid id);
     }
 }
