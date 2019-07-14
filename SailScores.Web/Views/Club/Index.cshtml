@@ -43,7 +43,7 @@
                         <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
                             @series.Season.Name  @series.Name
                         </a>
-                        @if (series.UpdatedDate.HasValue)
+                        @if(series.UpdatedDate.HasValue && series.UpdatedDate > DateTime.Now.AddDays(-15))
                         {
                             <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
                         }
