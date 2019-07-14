@@ -46,6 +46,9 @@
             </div>
         </form>
         <h3>Score Codes</h3>
+        <a asp-action="Create" asp-controller="ScoreCode"           
+            asp-route-scoringsystemid="@Model.Id"
+            asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Create</a>
         <table class="table">
             <thead>
                 <tr>
@@ -63,29 +66,29 @@
             <tbody>
                 @foreach (var code in Model.ScoreCodes.OrderBy(c => c.Name))
                 {
-                <tr>
-                    <td>@code.Name</td>
-                    <td>@code.Description</td>
-                    <td>@code.Formula@code.FormulaValue</td>
-                    <td>@((code.Discardable ?? false) ? "Y" : "N")</td>
-                    <td>@((code.CameToStart ?? false) ? "Y" : "N")</td>
-                    <td>@((code.Started ?? false) ? "Y" : "N")</td>
-                    <td>@((code.Finished ?? false) ? "Y" : "N")</td>
-                    <td>@((code.PreserveResult ?? false) ? "Y" : "N")</td>
-                    <td>@((code.AdjustOtherScores ?? false) ? "Y" : "N")</td>
-                    <td>
-                        <a asp-action="Edit" asp-controller="ScoreCode" asp-route-id="@code.Id"
-                           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
-                        |
-                        <a asp-action="Delete" asp-controller="ScoreCode" asp-route-id="@code.Id"
-                           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Delete</a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>@code.Name</td>
+                        <td>@code.Description</td>
+                        <td>@code.Formula@code.FormulaValue</td>
+                        <td>@((code.Discardable ?? false) ? "Y" : "N")</td>
+                        <td>@((code.CameToStart ?? false) ? "Y" : "N")</td>
+                        <td>@((code.Started ?? false) ? "Y" : "N")</td>
+                        <td>@((code.Finished ?? false) ? "Y" : "N")</td>
+                        <td>@((code.PreserveResult ?? false) ? "Y" : "N")</td>
+                        <td>@((code.AdjustOtherScores ?? false) ? "Y" : "N")</td>
+                        <td>
+                            <a asp-action="Edit" asp-controller="ScoreCode" asp-route-id="@code.Id"
+                               asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
+                            |
+                            <a asp-action="Delete" asp-controller="ScoreCode" asp-route-id="@code.Id"
+                               asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Delete</a>
+                        </td>
+                    </tr>
                 }
                 <tr>
-                <td colspan="9">
-                    <h4>Inherited codes</h4>
-                </td>
+                    <td colspan="9">
+                        <h4>Inherited codes</h4>
+                    </td>
                 </tr>
 
                 @foreach (var code in Model.InheritedScoreCodes.OrderBy(c => c.Name))
