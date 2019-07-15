@@ -63,7 +63,6 @@ namespace SailScores.Web.Controllers
             Guid scoringSystemId,
             string returnUrl = null)
         {
-
             var clubId = await _clubService.GetClubId(clubInitials);
             ViewData["ReturnUrl"] = returnUrl;
             

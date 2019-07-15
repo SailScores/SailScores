@@ -52,6 +52,9 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())
                 .ForMember(d => d.ParentSystemOptions, o => o.Ignore());
 
+            CreateMap<Model.ScoringSystem, ScoringSystemCanBeDeletedViewModel>()
+                .ForMember(d => d.InUse, o => o.Ignore());
+
             CreateMap<Model.ScoreCode, ScoreCodeWithOptionsViewModel>()
                 .ForMember(d => d.FormulaOptions, o => o.Ignore());
         }

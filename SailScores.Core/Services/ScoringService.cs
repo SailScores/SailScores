@@ -88,6 +88,32 @@ namespace SailScores.Core.Services
             }
             return await GetScoringSystemAsync(scoringSystemId.Value);
         }
+        
+        public async Task SaveScoringSystemAsync(ScoringSystem scoringSystem)
+        {
+            if (scoringSystem.Id == null && scoringSystem.Id == Guid.Empty)
+            {
+                scoringSystem.Id = Guid.NewGuid();
+            }
+            var dbObject = await _dbContext.ScoringSystems.Where(s => s.Id == scoringSystem.Id).SingleOrDefaultAsync();
+            if(dbObject == null)
+            {
+                var newDbObject = _mapper.Map<Db.ScoringSystem>(scoringSystem);
+                _dbContext.ScoringSystems.Add(newDbObject);
+            } else {
+                _mapper.Map(scoringSystem, dbObject);
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteScoringSystemAsync(Guid systemId)
+        {
+            var scoreCodes = _dbContext.ScoreCodes.Where(c => c.ScoringSystemId == systemId);
+            _dbContext.ScoreCodes.RemoveRange(scoreCodes);
+            var system = await _dbContext.ScoringSystems.SingleAsync(s => s.Id == systemId);
+            _dbContext.ScoringSystems.Remove(system);
+            await _dbContext.SaveChangesAsync();
+        }
 
         public async Task<ScoreCode> GetScoreCodeAsync(Guid id)
         {
@@ -116,6 +142,18 @@ namespace SailScores.Core.Services
             _dbContext.ScoreCodes.Remove(scoreCode);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> IsScoringSystemInUseAsync(
+            Guid scoringSystemId)
+        {
+            return (await _dbContext.Series.AnyAsync(s =>
+                    s.ScoringSystemId == scoringSystemId))
+                || (await _dbContext.Clubs.AnyAsync(c =>
+                    c.DefaultScoringSystemId == scoringSystemId))
+                || (await _dbContext.ScoringSystems.AnyAsync(s =>
+                    s.ParentSystemId == scoringSystemId));
+        }
+
         private async Task<IEnumerable<ScoreCode>> GetAllCodesAsync(
             Guid? systemId)
         {
@@ -138,6 +176,5 @@ namespace SailScores.Core.Services
 
             return returnCodes;
         }
-
     }
 }

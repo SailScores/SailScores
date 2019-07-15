@@ -33,16 +33,41 @@ namespace SailScores.Web.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult Create()
+        public async Task<ActionResult> Create(
+            string clubInitials)
         {
-            return View();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+            var vm = new ScoringSystemWithOptionsViewModel
+            {
+                ClubId = clubId
+            };
+            var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
+            vm.ParentSystemOptions = potentialParents.ToList();
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            ScoringSystemWithOptionsViewModel model)
         {
-            throw new NotImplementedException();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+            model.ClubId = clubId;
+            model.Id = Guid.NewGuid();
+
+            await _scoringService.SaveScoringSystemAsync(
+                _mapper.Map<ScoringSystem>(model));
+
+           return RedirectToAction("Edit", "ScoringSystem", new { id = model.Id });
         }
 
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
@@ -62,7 +87,7 @@ namespace SailScores.Web.Controllers
             var vm = _mapper.Map<ScoringSystemWithOptionsViewModel>(scoringSystem);
             var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
             vm.ParentSystemOptions = potentialParents.Where(s => s.Id != id).ToList();
-            //vm.ScoreCodeOptions = new List<ScoreCode>();
+
             return View(vm);
         }
 
@@ -72,12 +97,38 @@ namespace SailScores.Web.Controllers
             string clubInitials,
             ScoringSystemWithOptionsViewModel model)
         {
-            throw new NotImplementedException();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId)
+                || model.ClubId != clubId)
+            {
+                return Unauthorized();
+            }
+
+            var system = _mapper.Map<ScoringSystem>(model);
+            await _scoringService.SaveScoringSystemAsync(system);
+            
+            return RedirectToAction("Index","Admin");
+
         }
 
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            throw new NotImplementedException();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+
+            var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
+            if (scoringSystem.ClubId != clubId)
+            {
+                return Unauthorized();
+            }
+
+            var vm = _mapper.Map<ScoringSystemCanBeDeletedViewModel>(scoringSystem);
+            vm.InUse = await _scoringService.IsScoringSystemInUseAsync(vm.Id);
+
+            return View(vm);
         }
 
         [HttpPost]
@@ -85,8 +136,25 @@ namespace SailScores.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
         {
-            throw new NotImplementedException();
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
 
+            var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
+            if (scoringSystem.ClubId != clubId)
+            {
+                return Unauthorized();
+            }
+
+            if (await _scoringService.IsScoringSystemInUseAsync(id))
+            {
+                return StatusCode(500);
+            }
+
+            await _scoringService.DeleteScoringSystemAsync(id);
+            return RedirectToAction("Index", "Admin");
         }
     }
 }

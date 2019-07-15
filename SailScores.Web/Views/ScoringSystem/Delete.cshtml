@@ -1,0 +1,34 @@
+﻿@model SailScores.Web.Models.SailScores.ScoringSystemCanBeDeletedViewModel
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Delete</h2>
+@if (Model.InUse)
+{
+    <h3>This scoring system is currently in use and can not be deleted.</h3>
+    <h4>@Model.Name</h4>
+    <hr />
+
+    <a asp-controller="Admin"
+       asp-action="Index"
+       class="btn btn-outline-primary">Cancel</a>
+}
+else
+{
+    <h3>Are you sure you want to delete this scoring system?</h3>
+    <h4>@Model.Name</h4>
+    <hr />
+    <div>
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ClubId" />
+            <input type="submit" value="Delete" class="btn btn-danger" />
+            <a asp-controller="Admin"
+               asp-action="Index"
+               class="btn btn-outline-primary">Cancel</a>
+        </form>
+    </div>
+}
