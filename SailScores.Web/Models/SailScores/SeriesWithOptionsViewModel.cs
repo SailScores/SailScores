@@ -11,6 +11,8 @@ namespace SailScores.Web.Models.SailScores
     {
         public IEnumerable<Season> SeasonOptions { get; set; }
 
+        public IList<ScoringSystem> ScoringSystemOptions { get; set; }
+
         private Guid _seasonId;
         public Guid SeasonId
         {

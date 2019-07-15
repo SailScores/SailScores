@@ -19,17 +19,20 @@ namespace SailScores.Web.Controllers
         private readonly Web.Services.ISeriesService _seriesService;
         private readonly Core.Services.IClubService _clubService;
         private readonly Services.IAuthorizationService _authService;
+        private readonly IScoringService _scoringService;
         private readonly IMapper _mapper;
 
         public SeriesController(
             Web.Services.ISeriesService seriesService,
             Core.Services.IClubService clubService,
             Services.IAuthorizationService authService,
+            IScoringService scoringService,
             IMapper mapper)
         {
             _seriesService = seriesService;
             _clubService = clubService;
             _authService = authService;
+            _scoringService = scoringService;
             _mapper = mapper;
         }
 
@@ -70,6 +73,13 @@ namespace SailScores.Web.Controllers
             var club = await _clubService.GetFullClub(clubInitials);
             var vm = new SeriesWithOptionsViewModel();
             vm.SeasonOptions = club.Seasons;
+            var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+            scoringSystemOptions.Add(new ScoringSystem
+            {
+                Id = Guid.Empty,
+                Name = "<Use Club Default>"
+            });
+            vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
             return View(vm);
         }
 
@@ -115,6 +125,14 @@ namespace SailScores.Web.Controllers
             }
             var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
             seriesWithOptions.SeasonOptions = club.Seasons;
+
+            var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+            scoringSystemOptions.Add(new ScoringSystem
+            {
+                Id = Guid.Empty,
+                Name = "<Use Club Default>"
+            });
+            seriesWithOptions.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
             return View(seriesWithOptions);
         }
 

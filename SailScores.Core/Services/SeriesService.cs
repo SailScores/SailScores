@@ -505,6 +505,7 @@ namespace SailScores.Core.Services
             existingSeries.Name = RemoveDisallowedCharacters(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
+            existingSeries.ScoringSystemId = model.ScoringSystemId;
 
             if(model.Season != null
                 && model.Season.Id != Guid.Empty
