@@ -6,61 +6,13 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    public class AppendixACalculator : IScoringCalculator
+    public class HighPointPercentageCalculator : BaseScoringCalculator, IScoringCalculator
     {
-        private const string AVERAGE_FORMULANAME = "AVE";
-        private const string AVE_AFTER_DISCARDS_FORMULANAME = "AVE ND";
-        private const string AVE_PRIOR_RACES_FORMULANAME = "AVE P";
-        private const string SERIESCOMPETITORS_FORMULANAME = "SER+";
-        private const string MANUAL_FORMULANAME = "MAN";
-        private const string FINISHERSPLUS_FORMULANAME = "FIN+";
-        private const string PLACEPLUSPERCENT_FORMULANAME = "PLC%";
-        private const string CAMETOSTARTPLUS_FORMULANAME = "CTS+";
 
-        private const string DNF_SCORENAME = "DNF";
-
-        // Code to use if no result is found or if scorecode is not found in the system.
-        //  This will be used if code defined in a child scoring system is used but the
-        // series is scored with the ancestor
-        private readonly string DEFAULT_CODE = "DNC";
-
-        private const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
-
-
-        private readonly ScoringSystem _scoringSystem;
-
-
-        public AppendixACalculator(ScoringSystem scoringsystem)
+        public HighPointPercentageCalculator(ScoringSystem scoringSystem) : base(scoringSystem)
         {
-            _scoringSystem = scoringsystem;
         }
 
-        public SeriesResults CalculateResults(Series series)
-        {
-            var returnResults = new SeriesResults
-            {
-                Races = series.Races.OrderBy(r => r.Date).ThenBy(r => r.Order).ToList(),
-                Competitors = series
-                    .Races
-                    .SelectMany(
-                        r => r
-                            .Scores
-                            .Select(s => s.Competitor))
-                    .Distinct()
-                    .ToList(),
-                Results = new Dictionary<Competitor, SeriesCompetitorResults>()
-            };
-
-            SetScores(returnResults,
-                series
-                .Races
-                .SelectMany(
-                    r => r
-                        .Scores));
-            var sailedRaceCount = returnResults.GetSailedRaceCount();
-            returnResults.NumberOfDiscards = GetNumberOfDiscards(sailedRaceCount);
-            return returnResults;
-        }
 
         private void SetScores(SeriesResults resultsWorkInProgress, IEnumerable<Score> scores)
         {
@@ -376,32 +328,7 @@ namespace SailScores.Core.Scoring
             return int.Parse(selectedString);
         }
 
-
-        public void ValidateScores(SeriesResults results, IEnumerable<Score> scores)
-        {
-            bool allRacesFound = scores.All(s => results.Races.Any(
-                r => r.Id == s.RaceId
-                    || r == s.Race));
-            bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
-                c => c.Id == s.CompetitorId
-                    || c == s.Competitor ));
-
-            //Used to check and make sure all score codes were found. but no more.
-
-            if (!allRacesFound)
-            {
-                throw new InvalidOperationException(
-                    "A score for a race that is not in the series was provided to SeriesCalculator");
-            }
-
-            if (!allCompetitorsFound)
-            {
-                throw new InvalidOperationException(
-                    "A score for a competitor that is not in the series was provided to SeriesCalculator");
-
-            }
-        }
-
+        
         private SeriesCompetitorResults GenerateBasicScores(Competitor comp, IEnumerable<Score> scores)
         {
             var returnResults = new SeriesCompetitorResults

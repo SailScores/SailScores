@@ -6,33 +6,32 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    public class AppendixACalculator : IScoringCalculator
+    public abstract class BaseScoringCalculator : IScoringCalculator
     {
-        private const string AVERAGE_FORMULANAME = "AVE";
-        private const string AVE_AFTER_DISCARDS_FORMULANAME = "AVE ND";
-        private const string AVE_PRIOR_RACES_FORMULANAME = "AVE P";
-        private const string SERIESCOMPETITORS_FORMULANAME = "SER+";
-        private const string MANUAL_FORMULANAME = "MAN";
-        private const string FINISHERSPLUS_FORMULANAME = "FIN+";
-        private const string PLACEPLUSPERCENT_FORMULANAME = "PLC%";
-        private const string CAMETOSTARTPLUS_FORMULANAME = "CTS+";
+        protected const string AVERAGE_FORMULANAME = "AVE";
+        protected const string AVE_AFTER_DISCARDS_FORMULANAME = "AVE ND";
+        protected const string AVE_PRIOR_RACES_FORMULANAME = "AVE P";
+        protected const string SERIESCOMPETITORS_FORMULANAME = "SER+";
+        protected const string MANUAL_FORMULANAME = "MAN";
+        protected const string FINISHERSPLUS_FORMULANAME = "FIN+";
+        protected const string PLACEPLUSPERCENT_FORMULANAME = "PLC%";
+        protected const string CAMETOSTARTPLUS_FORMULANAME = "CTS+";
 
-        private const string DNF_SCORENAME = "DNF";
+        protected const string DNF_SCORENAME = "DNF";
 
         // Code to use if no result is found or if scorecode is not found in the system.
         //  This will be used if code defined in a child scoring system is used but the
         // series is scored with the ancestor
-        private readonly string DEFAULT_CODE = "DNC";
+        protected readonly string DEFAULT_CODE = "DNC";
 
-        private const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
-
-
-        private readonly ScoringSystem _scoringSystem;
+        protected const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
 
 
-        public AppendixACalculator(ScoringSystem scoringsystem)
+        protected readonly ScoringSystem _scoringSystem;
+
+        protected BaseScoringCalculator(ScoringSystem scoringSystem)
         {
-            _scoringSystem = scoringsystem;
+            _scoringSystem = scoringSystem;
         }
 
         public SeriesResults CalculateResults(Series series)
@@ -62,12 +61,14 @@ namespace SailScores.Core.Scoring
             return returnResults;
         }
 
+        //todo: keep in base?
         private void SetScores(SeriesResults resultsWorkInProgress, IEnumerable<Score> scores)
         {
             ValidateScores(resultsWorkInProgress, scores);
             ClearRawScores(scores);
             foreach (var comp in resultsWorkInProgress.Competitors)
             {
+                //todo: seems clear down to here.
                 SeriesCompetitorResults compResults = GenerateBasicScores(comp, scores);
                 CalculateCodedResults(resultsWorkInProgress, compResults);
                 DiscardScores(resultsWorkInProgress, compResults);
