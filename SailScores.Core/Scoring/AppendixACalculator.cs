@@ -181,12 +181,10 @@ namespace SailScores.Core.Scoring
         private bool IsSeriesBasedScore(ScoreCode scoreCode)
         {
             // defaults to false if not a coded score.
-            bool average = ( scoreCode?.Formula?.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
-                ?? false)
-                || (scoreCode?.Formula?.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
-                ?? false)
-                || (scoreCode?.Formula?.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE)
-                ?? false);
+            string formula = scoreCode?.Formula ?? String.Empty;
+            bool average = formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
             bool seriesCompPlus = scoreCode?.Formula?.Equals(SERIESCOMPETITORS_FORMULANAME, CASE_INSENSITIVE)
                 ?? false;
             return average || seriesCompPlus;
