@@ -9,6 +9,8 @@ namespace SailScores.Core.Scoring
     public class AppendixACalculator : IScoringCalculator
     {
         private const string AVERAGE_FORMULANAME = "AVE";
+        private const string AVE_AFTER_DISCARDS_FORMULANAME = "AVE ND";
+        private const string AVE_PRIOR_RACES_FORMULANAME = "AVE P";
         private const string SERIESCOMPETITORS_FORMULANAME = "SER+";
         private const string MANUAL_FORMULANAME = "MAN";
         private const string FINISHERSPLUS_FORMULANAME = "FIN+";
@@ -156,6 +158,12 @@ namespace SailScores.Core.Scoring
                         case AVERAGE_FORMULANAME:
                             score.ScoreValue = CalculateAverage(compResults);
                             break;
+                        case AVE_AFTER_DISCARDS_FORMULANAME:
+                            score.ScoreValue = CalculateAverageNoDiscards(compResults);
+                            break;
+                        case AVE_PRIOR_RACES_FORMULANAME:
+                            score.ScoreValue = CalculateAverageOfPrior(compResults, race);
+                            break;
                         case SERIESCOMPETITORS_FORMULANAME:
                             score.ScoreValue = GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0);
                             break;
@@ -173,20 +181,15 @@ namespace SailScores.Core.Scoring
         private bool IsSeriesBasedScore(ScoreCode scoreCode)
         {
             // defaults to false if not a coded score.
-            bool average = scoreCode?.Formula?.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE) 
-                ?? false;
+            bool average = ( scoreCode?.Formula?.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
+                ?? false)
+                || (scoreCode?.Formula?.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
+                ?? false)
+                || (scoreCode?.Formula?.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE)
+                ?? false);
             bool seriesCompPlus = scoreCode?.Formula?.Equals(SERIESCOMPETITORS_FORMULANAME, CASE_INSENSITIVE)
                 ?? false;
             return average || seriesCompPlus;
-        }
-
-        private decimal? CalculateSeriesBasedValue(
-            CalculatedScore score,
-            SeriesCompetitorResults compResults,
-            SeriesResults seriesResults)
-        {
-            // right now the only kind of series based value is Average, so not much to do here.
-            return CalculateAverage(compResults);
         }
 
         private bool IsTrivialCalculation(ScoreCode scoreCode)
@@ -248,6 +251,20 @@ namespace SailScores.Core.Scoring
             int numAverages = compResults.CalculatedScores
                     .Values.Count(s =>
                         IsAverage(s.RawScore.Code));
+
+            var average = compResults.CalculatedScores.Values
+                .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
+                .Average(s => s.ScoreValue) ?? 0m;
+
+            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+
+        }
+        private decimal? CalculateAverageNoDiscards(
+            SeriesCompetitorResults compResults)
+        {
+            int numAverages = compResults.CalculatedScores
+                    .Values.Count(s =>
+                        IsAverage(s.RawScore.Code));
             int discards = GetNumberOfDiscards(compResults.CalculatedScores.Count);
 
             var average = compResults.CalculatedScores.Values
@@ -260,13 +277,40 @@ namespace SailScores.Core.Scoring
 
         }
 
+        private decimal? CalculateAverageOfPrior(
+            SeriesCompetitorResults compResults,
+            Race race)
+        {
+            var beforeDate = race.Date;
+            var beforeOrder = race.Order;
+
+            var racesToUse = compResults.CalculatedScores.Keys
+                .Where(r => r.Date < beforeDate || (r.Date == beforeDate && r.Order < beforeOrder));
+            var resultsToUse = compResults.CalculatedScores
+                .Where(s => racesToUse.Contains(s.Key))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            int numAverages = resultsToUse
+                    .Values.Count(s =>
+                        IsAverage(s.RawScore.Code));
+            var average = resultsToUse.Values
+                .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
+                .Average(s => s.ScoreValue) ?? 0m;
+
+            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+
+        }
+
         private bool IsAverage(string code)
         {
             if (String.IsNullOrWhiteSpace(code))
             {
                 return false;
             }
-            return GetScoreCode(code).Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE);
+            var scoreCode = GetScoreCode(code);
+            return scoreCode.Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
         }
 
         private bool CountsAsStarted(Score s)

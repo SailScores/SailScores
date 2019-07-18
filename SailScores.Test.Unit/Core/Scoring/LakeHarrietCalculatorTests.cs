@@ -55,7 +55,7 @@ namespace SailScores.Test.Unit
                     AdjustOtherScores = null,
                     CameToStart = false,
                     Finished = false,
-                    Formula = "AVE",
+                    Formula = "AVE ND",
                     ScoreLike = null
                 },
             };
