@@ -61,7 +61,6 @@ namespace SailScores.Core.Scoring
             return returnResults;
         }
 
-        //todo: keep in base?
         private void SetScores(SeriesResults resultsWorkInProgress, IEnumerable<Score> scores)
         {
             ValidateScores(resultsWorkInProgress, scores);
@@ -169,12 +168,11 @@ namespace SailScores.Core.Scoring
                             score.ScoreValue = GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0);
                             break;
                     }
-
                 }
             }
         }
 
-        private int GetNumberOfCompetitors(SeriesResults seriesResults)
+        protected int GetNumberOfCompetitors(SeriesResults seriesResults)
         {
             return seriesResults.Competitors.Count();
         }
@@ -300,7 +298,7 @@ namespace SailScores.Core.Scoring
 
         }
 
-        private bool IsAverage(string code)
+        protected bool IsAverage(string code)
         {
             if (String.IsNullOrWhiteSpace(code))
             {
@@ -312,7 +310,7 @@ namespace SailScores.Core.Scoring
                 || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
         }
 
-        private bool CountsAsStarted(Score s)
+        protected bool CountsAsStarted(Score s)
         {
             if (String.IsNullOrWhiteSpace(s.Code) &&
                 (s.Place ?? 0) != 0)
@@ -323,7 +321,7 @@ namespace SailScores.Core.Scoring
             return scoreCode.Started ?? false;
         }
 
-        private bool CameToStart(Score s)
+        protected bool CameToStart(Score s)
         {
             if (String.IsNullOrWhiteSpace(s.Code) &&
                 (s.Place ?? 0) != 0)
@@ -353,12 +351,12 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        private int GetNumberOfDiscards(SeriesResults resultsWorkInProgress)
+        protected int GetNumberOfDiscards(SeriesResults resultsWorkInProgress)
         {
             return GetNumberOfDiscards(resultsWorkInProgress.GetSailedRaceCount());
-
         }
-        private int GetNumberOfDiscards(int numberOfRaces)
+
+        protected int GetNumberOfDiscards(int numberOfRaces)
         {
             if(numberOfRaces == 0)
             {
@@ -378,7 +376,7 @@ namespace SailScores.Core.Scoring
         }
 
 
-        public void ValidateScores(SeriesResults results, IEnumerable<Score> scores)
+        protected void ValidateScores(SeriesResults results, IEnumerable<Score> scores)
         {
             bool allRacesFound = scores.All(s => results.Races.Any(
                 r => r.Id == s.RaceId
@@ -412,44 +410,28 @@ namespace SailScores.Core.Scoring
             };
             foreach (var score in scores.Where(s => s.Competitor == comp))
             {
-                if((score.Race?.State ?? RaceState.Raced) != RaceState.Raced) {
+                if ((score.Race?.State ?? RaceState.Raced) != RaceState.Raced)
+                {
                     continue;
                 }
                 returnResults.CalculatedScores[score.Race] = new CalculatedScore
                 {
                     Discard = false,
-                    RawScore = score,
-                    ScoreValue = score.Place
+                    RawScore = score
                 };
-                returnResults.CalculatedScores[score.Race].ScoreValue =
-                    scores
-                        .Count(s =>
-                            score.Place.HasValue
-                            && s.Race == score.Race
-                            && s.Place < score.Place
-                            && !ShouldAdjustOtherScores(s)
-                            ) + 1;
+                returnResults.CalculatedScores[score.Race].ScoreValue = 
+                    GetBasicScore(scores, score);
 
-                // if this is one, no tie. (if zero Place doesn't have a value (= coded.))
-                int numTied = scores.Count(s =>
-                    score.Place.HasValue
-                    && s.Race == score.Race
-                    && s.Place == score.Place
-                    && !ShouldAdjustOtherScores(s));
-                if(numTied > 1) {
-                    int total = 0;
-                    for (int i = 0; i< numTied; i++)
-                    {
-                        total += ((int)score.Place + i);
-                    }
-                    returnResults.CalculatedScores[score.Race].ScoreValue = (decimal)total / (decimal)numTied;
-                }
             }
 
             return returnResults;
         }
 
-        private bool ShouldAdjustOtherScores(Score score)
+        protected abstract Decimal? GetBasicScore(
+            IEnumerable<Score> allScores,
+            Score currentScore);
+
+        protected bool ShouldAdjustOtherScores(Score score)
         {
             return !String.IsNullOrWhiteSpace(score.Code)
             && (GetScoreCode(score)?.AdjustOtherScores ?? true);
@@ -472,12 +454,12 @@ namespace SailScores.Core.Scoring
                 || ( GetScoreCode(score)?.PreserveResult ?? true);
         }
 
-        private ScoreCode GetScoreCode(Score score)
+        protected ScoreCode GetScoreCode(Score score)
         {
             return GetScoreCode(score.Code);
         }
 
-        private ScoreCode GetScoreCode(string scoreCodeName)
+        protected ScoreCode GetScoreCode(string scoreCodeName)
         {
             if (String.IsNullOrWhiteSpace(scoreCodeName))
             {
