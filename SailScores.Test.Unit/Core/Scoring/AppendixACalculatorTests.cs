@@ -377,6 +377,27 @@ namespace SailScores.Test.Unit
                 results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
+
+        [Fact]
+        public void CalculateResults_Penalty_GetsDnf()
+        {
+            var basicSeries = GetBasicSeries(20, 1);
+
+            var lastComp = basicSeries.Competitors.Skip(19).First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == lastComp).Code = "DPI";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == lastComp).Place = 20;
+
+            var nextToLastComp = basicSeries.Competitors.Skip(18).First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == nextToLastComp).Code = "DNF";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == nextToLastComp).Place = null;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(
+                results.Results[nextToLastComp].CalculatedScores.Last().Value.ScoreValue,
+                results.Results[lastComp].CalculatedScores.Last().Value.ScoreValue);
+        }
+
         // https://www.rya.org.uk/SiteCollectionDocuments/Racing/RacingInformation/RaceOfficials/Resource%20Centre/Best%20Practice%20Guidelines%20Policies/Scoring.pdf
 
         // Example 1: 23 boats entered the series. Boat A finishes 3rd in the race but is ZFP. The penalty is 20% of 23 = 4.6 places,

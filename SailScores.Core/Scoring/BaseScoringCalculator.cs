@@ -36,9 +36,24 @@ namespace SailScores.Core.Scoring
 
         public SeriesResults CalculateResults(Series series)
         {
+            SeriesResults returnResults = BuildResults(series);
+
+            SetScores(returnResults,
+                series
+                .Races
+                .SelectMany(
+                    r => r
+                        .Scores));
+            return returnResults;
+        }
+
+        private SeriesResults BuildResults(Series series)
+        {
             var returnResults = new SeriesResults
             {
-                Races = series.Races.OrderBy(r => r.Date).ThenBy(r => r.Order).ToList(),
+                Races = series.Races
+                    .OrderBy(r => r.Date)
+                    .ThenBy(r => r.Order).ToList(),
                 Competitors = series
                     .Races
                     .SelectMany(
@@ -50,20 +65,13 @@ namespace SailScores.Core.Scoring
                 Results = new Dictionary<Competitor, SeriesCompetitorResults>()
             };
 
-            SetScores(returnResults,
-                series
-                .Races
-                .SelectMany(
-                    r => r
-                        .Scores));
-            var sailedRaceCount = returnResults.GetSailedRaceCount();
-            returnResults.NumberOfDiscards = GetNumberOfDiscards(sailedRaceCount);
+            returnResults.NumberOfDiscards = GetNumberOfDiscards(returnResults);
             return returnResults;
         }
 
         private void SetScores(SeriesResults resultsWorkInProgress, IEnumerable<Score> scores)
         {
-            ValidateScores(resultsWorkInProgress, scores);
+            ValidateSeries(resultsWorkInProgress, scores);
             ClearRawScores(scores);
             foreach (var comp in resultsWorkInProgress.Competitors)
             {
@@ -232,6 +240,7 @@ namespace SailScores.Core.Scoring
             var dnfScore = GetDnfScore(race) ?? 1;
             var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
             var percent = Math.Round(dnfScore * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
+
             return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
         }
 
@@ -376,7 +385,7 @@ namespace SailScores.Core.Scoring
         }
 
 
-        protected void ValidateScores(SeriesResults results, IEnumerable<Score> scores)
+        protected void ValidateSeries(SeriesResults results, IEnumerable<Score> scores)
         {
             bool allRacesFound = scores.All(s => results.Races.Any(
                 r => r.Id == s.RaceId
@@ -397,7 +406,6 @@ namespace SailScores.Core.Scoring
             {
                 throw new InvalidOperationException(
                     "A score for a competitor that is not in the series was provided to SeriesCalculator");
-
             }
         }
 
