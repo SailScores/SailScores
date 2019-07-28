@@ -37,8 +37,8 @@ namespace SailScores.Web.Areas.Api.Controllers
             DateTime? date
             )
         {
-            var competitors =  await _service.GetAllSeriesAsync(clubId, date);
-            return _mapper.Map<List<SeriesDto>>(competitors);
+            var series =  await _service.GetAllSeriesAsync(clubId, date);
+            return _mapper.Map<List<SeriesDto>>(series);
         }
 
         [HttpGet("{identifier}")]
