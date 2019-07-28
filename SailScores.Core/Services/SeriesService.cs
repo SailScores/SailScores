@@ -44,6 +44,7 @@ namespace SailScores.Core.Services
                 .Include(s => s.Season)
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
+                .OrderBy(s => s.Name)
                 .ToListAsync();
 
             var returnObj = _mapper.Map<List<Series>>(seriesDb);
