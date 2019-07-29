@@ -8,14 +8,14 @@ using Xunit;
 namespace SailScores.Test.Unit
 {
 
-    public class AppendixACalculatorTests
+    public class HighPointPercCalculatorTests
     {
 
-        private AppendixACalculator _defaultCalculator;
+        private HighPointPercentageCalculator _defaultCalculator;
 
-        public AppendixACalculatorTests()
+        public HighPointPercCalculatorTests()
         {
-            _defaultCalculator = new AppendixACalculator(MakeDefaultScoringSystem());
+            _defaultCalculator = new HighPointPercentageCalculator(MakeDefaultScoringSystem());
         }
 
         private ScoringSystem MakeDefaultScoringSystem()
@@ -23,7 +23,7 @@ namespace SailScores.Test.Unit
             var system = new ScoringSystem
             {
                 Id = Guid.NewGuid(),
-                Name = "Appendix A Low Point",
+                Name = "High Point Percentage",
                 DiscardPattern = "0,1",
                 ParentSystemId = null
             };
@@ -72,11 +72,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = false,
                     Discardable = true,
                     Started = false,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = null,
                     CameToStart = true,
                     Finished = false,
-                    Formula = "CTS+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -88,11 +88,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = true,
                     Discardable = true,
                     Started = true,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = true,
                     CameToStart = true,
                     Finished = true,
-                    Formula = "CTS+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -152,11 +152,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = false,
                     Discardable = true,
                     Started = false,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = null,
                     CameToStart = true,
                     Finished = false,
-                    Formula = "CTS+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -168,11 +168,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = false,
                     Discardable = false,
                     Started = false,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = null,
                     CameToStart = true,
                     Finished = false,
-                    Formula = "CTS+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -184,11 +184,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = false,
                     Discardable = true,
                     Started = true,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = null,
                     CameToStart = true,
                     Finished = false,
-                    Formula = "SER+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -200,11 +200,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = false,
                     Discardable = true,
                     Started = false,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = true,
                     CameToStart = true,
                     Finished = false,
-                    Formula = "CTS+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -213,14 +213,14 @@ namespace SailScores.Test.Unit
                     Id = Guid.NewGuid(),
                     Name = "DSQ",
                     Description = "Disqualification",
-                    PreserveResult = false,
+                    PreserveResult = true,
                     Discardable = true,
                     Started = true,
-                    FormulaValue = 1,
-                    AdjustOtherScores = true,
+                    FormulaValue = 0,
+                    AdjustOtherScores = false,
                     CameToStart = true,
                     Finished = true,
-                    Formula = "CTS+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -248,11 +248,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = false,
                     Discardable = false,
                     Started = true,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = null,
                     CameToStart = true,
                     Finished = true,
-                    Formula = "CTS+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -264,11 +264,11 @@ namespace SailScores.Test.Unit
                     PreserveResult = false,
                     Discardable = true,
                     Started = false,
-                    FormulaValue = 1,
+                    FormulaValue = 0,
                     AdjustOtherScores = null,
                     CameToStart = false,
                     Finished = false,
-                    Formula = "SER+",
+                    Formula = "FIX",
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
@@ -310,18 +310,18 @@ namespace SailScores.Test.Unit
             var basicSeries = GetBasicSeries(10, 6);
             var testComp = basicSeries.Competitors.First();
             basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNE";
-            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = 1;
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = null;
 
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(15m,
+            Assert.NotEqual(100m,
                 results.Results[testComp].TotalScore);
             Assert.True(
                 results.Results[testComp].Rank > 1);
         }
 
-        // This is a test of what happens to an undefined code: SB is not defined in the appenidx A system,
+        // This is a test of what happens to an undefined code: SB is not defined in the base system,
         // so the default (DNC) should be used instead. 
         [Fact]
         public void CalculateResults_SafetyBoat_GetsDnc()
@@ -346,12 +346,12 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(4m,
+            Assert.Equal(0m,
                 results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
         [Fact]
-        public void CalculateResults_DNC_GetsSeriesCompetitorsPlusOne()
+        public void CalculateResults_DNC_GetsZero()
         {
             // Arrange: put in some coded results: SB
             var basicSeries = GetBasicSeries(3, 6);
@@ -373,9 +373,40 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(4m,
+            Assert.Equal(0m,
                 results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
         }
+
+        [Fact]
+        public void CalculateResults_DNF_GetsZero()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(3, 6);
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNF";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = null;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(0m,
+                results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
+        }
+
+        [Fact]
+        public void CalculateResults_DSQ_GetsZero()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(3, 6);
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DSQ";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = null;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(0m,
+                results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
+        }
+
 
 
         [Fact]
@@ -462,15 +493,12 @@ namespace SailScores.Test.Unit
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
-        // https://www.rya.org.uk/SiteCollectionDocuments/Racing/RacingInformation/RaceOfficials/Resource%20Centre/Best%20Practice%20Guidelines%20Policies/Scoring.pdf
-        // The score of a boat receiving a scoring penalty may be affected by the disqualification of a boat whose finishing place is ahead of her.
-        // Example 3: Same as Example 1 above except that the boat that finished second is disqualified(and receives 24 points). All
-        // boats with a finishing place after the disqualified boat move up one place(see rule A6(1)). Boat A receives points for 7th place,
-        // namely her adjusted finishing place of 2nd(as a result of the disqualification) plus 5 penalty places, leaving that ‘ 2 point slot’
-        // vacant.Points for that race would be: 1, 3, 4, 5, 6, 7, 7, 8, 9, … 22, 24. 
-
+        // In appendix A, DSQ pulls scores after that up. In the reference for the High Point percent system I used, the opposite is the case:
+        // 
+        // https://www.ussailing.org/competition/rules-officiating/racing-rules/scoring-a-long-series/
+        // 
         [Fact]
-        public void CalculateResults_Dsq_IgnoredForPenaltyAfter()
+        public void CalculateResults_Dsq_NotIgnoredForPenaltyAfter()
         {
             var basicSeries = GetBasicSeries(23, 1);
             var thirdComp = basicSeries.Competitors.Skip(2).First();
@@ -483,12 +511,13 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(7m,
+            // 20% scoring penalty in fleet is minus 5
+            Assert.Equal(22m - 5m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
         [Fact]
-        public void CalculateResults_Dsq_GetsCompPlusOne()
+        public void CalculateResults_Dsq_GetsZero()
         {
             var basicSeries = GetBasicSeries(23, 1);
 
@@ -498,7 +527,7 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(24m,
+            Assert.Equal(0m,
                 results.Results[secondComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -536,9 +565,9 @@ namespace SailScores.Test.Unit
             
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(3.5m,
+            Assert.Equal(8.5m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
-            Assert.Equal(3.5m,
+            Assert.Equal(8.5m,
                 results.Results[fourthComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -705,15 +734,15 @@ namespace SailScores.Test.Unit
             fourthRace.Scores.First(s => s.Competitor == secondComp).Place = 5;
             fourthRace.Scores.First(s => s.Competitor == thirdComp).Place = 4;
             fourthRace.Scores.First(s => s.Competitor == fourthComp).Place = 3;
-            fourthRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(4).First()).Place = 10;
+            fourthRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(4).First()).Place = 2;
             fourthRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(9).First()).Place = 1;
 
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank, "Fourth comp should be after third.");
-            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank, "third comp should be after second.");
-            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank, "Second comp should be after first.");
+            Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank);
+            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank);
+            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank);
         }
 
 
