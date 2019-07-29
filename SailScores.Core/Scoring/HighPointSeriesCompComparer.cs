@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    internal class SeriesCompetitorResultComparer : IComparer<SeriesCompetitorResults>
+    internal class HighPointSeriesCompComparer : IComparer<SeriesCompetitorResults>
     {
         public int Compare(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
@@ -20,7 +20,7 @@ namespace SailScores.Core.Scoring
 
             if (xScoreToUse != yScoreToUse)
             {
-                return xScoreToUse < yScoreToUse ? -1 : 1;
+                return xScoreToUse > yScoreToUse ? -1 : 1;
             }
 
             // tied total, so return the score with the most firsts, then seconds, etc.
@@ -29,12 +29,12 @@ namespace SailScores.Core.Scoring
                     x.CalculatedScores.Values
                     .Where(s => !s.Discard)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
-                    .OrderBy(s => s).ToArray();
+                    .OrderByDescending(s => s).ToArray();
             var yScoresLowToHigh =
                     y.CalculatedScores.Values
                     .Where(s => !s.Discard)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
-                    .OrderBy(s => s).ToArray();
+                    .OrderByDescending(s => s).ToArray();
 
 
             for (int i = 0; i < xScoresLowToHigh.Length; i++)
@@ -47,7 +47,7 @@ namespace SailScores.Core.Scoring
                 if( xScoresLowToHigh[i] !=
                     yScoresLowToHigh[i])
                 {
-                    return xScoresLowToHigh[i] <
+                    return xScoresLowToHigh[i] >
                     yScoresLowToHigh[i] ? -1 : 1;
                 }
             }
@@ -73,7 +73,7 @@ namespace SailScores.Core.Scoring
                 if (xScore != yScore)
                 {
                     return
-                        xScore < yScore
+                        xScore > yScore
                         ? -1
                         : 1;
                 }

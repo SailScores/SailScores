@@ -14,6 +14,7 @@ namespace SailScores.Core.Scoring
     {
         public HighPointPercentageCalculator(ScoringSystem scoringSystem) : base(scoringSystem)
         {
+            CompetitorComparer = new HighPointSeriesCompComparer();
         }
 
         protected override decimal? GetBasicScore(IEnumerable<Score> allScores, Score currentScore)
@@ -101,5 +102,6 @@ namespace SailScores.Core.Scoring
 
             return Math.Max(dnfScore, (score.ScoreValue ?? 0) - percent);
         }
+
     }
 }

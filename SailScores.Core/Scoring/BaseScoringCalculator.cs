@@ -30,9 +30,12 @@ namespace SailScores.Core.Scoring
 
         protected readonly ScoringSystem _scoringSystem;
 
+        protected IComparer<SeriesCompetitorResults> CompetitorComparer;
+
         protected BaseScoringCalculator(ScoringSystem scoringSystem)
         {
             _scoringSystem = scoringSystem;
+            CompetitorComparer = new LowPointSeriesCompComparer();
         }
 
         public SeriesResults CalculateResults(Series series)
@@ -199,10 +202,10 @@ namespace SailScores.Core.Scoring
         }
 
 
-        private void CalculateRanks(SeriesResults resultsWorkInProgress)
+        protected virtual void CalculateRanks(SeriesResults resultsWorkInProgress)
         {
             var orderedComps = resultsWorkInProgress.Results.Values
-                .OrderBy(s => s, new SeriesCompetitorResultComparer());
+                .OrderBy(s => s, CompetitorComparer);
 
             int i = 1;
             foreach (var comp in orderedComps)

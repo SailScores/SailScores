@@ -10,8 +10,8 @@ namespace SailScores.Core.Scoring
     {
         public AppendixACalculator(ScoringSystem scoringSystem) : base(scoringSystem)
         {
+            CompetitorComparer = new LowPointSeriesCompComparer();
         }
-        
 
         protected override decimal? GetBasicScore(
             IEnumerable<Score> allScores,

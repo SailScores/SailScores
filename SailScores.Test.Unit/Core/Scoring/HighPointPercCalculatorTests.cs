@@ -439,7 +439,7 @@ namespace SailScores.Test.Unit
         // score that is worse than DNF would receive.A DNF score in this race would be 24 (23 series entrants, plus 1), which would be
         // the penalty for a ZFP boat with a finishing position of 20th or worse.
         [Fact]
-        public void CalculateResults_ZFP_ThirdOf23GetsEighth()
+        public void CalculateResults_ZFP_ThirdOf23GetsEighthPlace()
         {
             var basicSeries = GetBasicSeries(23, 1);
             var thirdComp = basicSeries.Competitors.Skip(2).First();
@@ -448,12 +448,15 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(8m,
+            // third is 21 penalty is 5
+            Assert.Equal(16m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
+
+            Assert.Equal(8, results.Results[thirdComp].Rank);
         }
 
         [Fact]
-        public void CalculateResults_ZFP_20Of23Gets24()
+        public void CalculateResults_ZFP_20Of23Gets0()
         {
             var basicSeries = GetBasicSeries(23, 1);
             var twentiethComp = basicSeries.Competitors.Skip(19).First();
@@ -462,7 +465,7 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(24m,
+            Assert.Equal(0m,
                 results.Results[twentiethComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -512,7 +515,7 @@ namespace SailScores.Test.Unit
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
             // 20% scoring penalty in fleet is minus 5
-            Assert.Equal(22m - 5m,
+            Assert.Equal(21m - 5m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -531,11 +534,6 @@ namespace SailScores.Test.Unit
                 results.Results[secondComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
-        // https://www.rya.org.uk/SiteCollectionDocuments/Racing/RacingInformation/RaceOfficials/Resource%20Centre/Best%20Practice%20Guidelines%20Policies/Scoring.pdf
-        // Example 4: Same as Example 3 above except that the boat that is disqualified finished sixth(not second). All boats with a
-        // finishing place after the disqualified boat move up one place(see rule A6(1)). Boat A receives points for 8th place, namely her
-        // finishing place of 3rd(not changed as the result of the disqualification of a boat whose finishing place is after her) plus 5 penalty
-        // places.The ‘3 point slot’ remains vacant. Points for that race would be: 1, 2, 4, 5, 6, 7, 8, 8, 9, … 22, 24.
         [Fact]
         public void CalculateResults_SixthDsq_DoesNotChangethirdPlusPenalty()
         {
@@ -550,7 +548,8 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(8m,
+            // third place is 21, penalty is 5
+            Assert.Equal(21m - 5m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -687,9 +686,9 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank);
-            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank);
-            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank);
+            Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank, "Comp 3 beats Comp 2");
+            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank, "Comp 2 beats comp 1");
+            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank, "Comp 1 beats comp 0");
         }
 
         // [Same setup as previous test except...]
@@ -740,9 +739,9 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank);
-            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank);
-            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank);
+            Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank, "Comp 3 beats comp 2");
+            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank, "Comp 2 beats comp 1");
+            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank, "Comp 1 beats comp 0");
         }
 
 
