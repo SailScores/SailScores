@@ -452,7 +452,8 @@ namespace SailScores.Test.Unit
             Assert.Equal(16m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
 
-            Assert.Equal(8, results.Results[thirdComp].Rank);
+            //tied for seventh place
+            Assert.Equal(7, results.Results[thirdComp].Rank);
         }
 
         [Fact]
@@ -544,7 +545,7 @@ namespace SailScores.Test.Unit
 
             var sixthComp = basicSeries.Competitors.Skip(5).First();
             basicSeries.Races.Last().Scores.First(s => s.Competitor == sixthComp).Code = "DSQ";
-            basicSeries.Races.Last().Scores.First(s => s.Competitor == sixthComp).Place = 2;
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == sixthComp).Place = 6;
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
@@ -564,9 +565,9 @@ namespace SailScores.Test.Unit
             
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.Equal(8.5m,
+            Assert.Equal(7.5m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
-            Assert.Equal(8.5m,
+            Assert.Equal(7.5m,
                 results.Results[fourthComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -626,17 +627,17 @@ namespace SailScores.Test.Unit
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank);
-            Assert.True(results.Results[thirdComp].Rank < results.Results[firstComp].Rank);
+            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank, "Comp 2 beats Comp 1");
+            Assert.True(results.Results[thirdComp].Rank < results.Results[firstComp].Rank, "Comp 2 beats Comp 0");
         }
 
-        // Example: Scoring: Low Point – one score excluded.
-        // Race No:  1  2  3  4  TOTAL
-        // Boat A    3  4  5  10 12
-        // Boat B    11 3  4  5  12
-        // Boat C    5  15 3  4  12
-        // Boat D    4  5  6  3  12
-        // A8.1 does not break any tie, as they each have scores of 3, 4, 5 that count.
+        // Example: Scoring: High Point Percent – one score excluded.
+        // Race No:  1  2  3  4  TOTAL   1  2  3  4  TotalwDDisc
+        // Boat A    3  4  5  10 12      13 12 11 6   36/48
+        // Boat B    11 3  4  5  12      5  13 12 11  36/48
+        // Boat C    5  15 3  4  12      11 1  13 12  36/48
+        // Boat D    4  5  6  3  12      12 11 10 13  36/48
+        // A8.1 does not break any tie, as they each have scores of 13, 12, 11 that count.
         // A8.2 applies, and the tie is broken in the order of D, C, B, A, the order of their last race scores.Note that A’s race 4 result was
         // her discard, but it is still used to break the tie.
 
@@ -691,58 +692,6 @@ namespace SailScores.Test.Unit
             Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank, "Comp 1 beats comp 0");
         }
 
-        // [Same setup as previous test except...]
-        // Ties in A8.1 and A8.2 are broken on scores, not finishing places.If this had been a 40-boat entry, and A had been second in
-        // race 4, only to receive a 20% (8-place) ZFP, the outcome of the tie-break is the same.
-        [Fact]
-        public void CalculateResults_SeriesTieBreaker_UsesLastRaceIncludingPenalty()
-        {
-            var basicSeries = GetBasicSeries(40, 4);
-            var firstComp = basicSeries.Competitors.First();
-            var secondComp = basicSeries.Competitors.Skip(1).First();
-            var thirdComp = basicSeries.Competitors.Skip(2).First();
-            var fourthComp = basicSeries.Competitors.Skip(3).First();
-
-            var firstRace = basicSeries.Races.First();
-            firstRace.Scores.First(s => s.Competitor == firstComp).Place = 3;
-            firstRace.Scores.First(s => s.Competitor == secondComp).Place = 11;
-            firstRace.Scores.First(s => s.Competitor == thirdComp).Place = 5;
-            firstRace.Scores.First(s => s.Competitor == fourthComp).Place = 4;
-            firstRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(10).First()).Place = 2;
-            firstRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(4).First()).Place = 1;
-
-            var secondRace = basicSeries.Races.Skip(1).First();
-            secondRace.Scores.First(s => s.Competitor == firstComp).Place = 4;
-            secondRace.Scores.First(s => s.Competitor == secondComp).Place = 3;
-            secondRace.Scores.First(s => s.Competitor == thirdComp).Place = 15;
-            secondRace.Scores.First(s => s.Competitor == fourthComp).Place = 5;
-            secondRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(14).First()).Place = 2;
-            secondRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(4).First()).Place = 1;
-
-            var thirdRace = basicSeries.Races.Skip(2).First();
-            thirdRace.Scores.First(s => s.Competitor == firstComp).Place = 5;
-            thirdRace.Scores.First(s => s.Competitor == secondComp).Place = 4;
-            thirdRace.Scores.First(s => s.Competitor == thirdComp).Place = 3;
-            thirdRace.Scores.First(s => s.Competitor == fourthComp).Place = 6;
-            thirdRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(4).First()).Place = 2;
-            thirdRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(5).First()).Place = 1;
-
-            var fourthRace = basicSeries.Races.Skip(3).First();
-            fourthRace.Scores.First(s => s.Competitor == firstComp).Place = 2;
-            fourthRace.Scores.First(s => s.Competitor == firstComp).Code = "ZFP";
-            fourthRace.Scores.First(s => s.Competitor == secondComp).Place = 5;
-            fourthRace.Scores.First(s => s.Competitor == thirdComp).Place = 4;
-            fourthRace.Scores.First(s => s.Competitor == fourthComp).Place = 3;
-            fourthRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(4).First()).Place = 2;
-            fourthRace.Scores.First(s => s.Competitor == basicSeries.Competitors.Skip(9).First()).Place = 1;
-
-
-            var results = _defaultCalculator.CalculateResults(basicSeries);
-
-            Assert.True(results.Results[fourthComp].Rank < results.Results[thirdComp].Rank, "Comp 3 beats comp 2");
-            Assert.True(results.Results[thirdComp].Rank < results.Results[secondComp].Rank, "Comp 2 beats comp 1");
-            Assert.True(results.Results[secondComp].Rank < results.Results[firstComp].Rank, "Comp 1 beats comp 0");
-        }
 
 
         private Series GetBasicSeries(

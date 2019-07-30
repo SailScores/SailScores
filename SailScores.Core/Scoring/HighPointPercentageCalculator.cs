@@ -31,7 +31,7 @@ namespace SailScores.Core.Scoring
                         && s.Race == currentScore.Race
                         && s.Place < currentScore.Place
                         && !ShouldAdjustOtherScores(s)
-                        ) - 1);
+                        ));
 
             // if this is one, no tie. (if zero Place doesn't have a value (= coded.))
             int numTied = allScores.Count(s =>
@@ -46,7 +46,7 @@ namespace SailScores.Core.Scoring
                 {
                     total += ((int)currentScore.Place + i);
                 }
-                baseScore = (decimal)total / (decimal)numTied;
+                baseScore = ((decimal)total / (decimal)numTied) - 1;
             }
 
             return competitorsInRace - baseScore;
@@ -77,6 +77,22 @@ namespace SailScores.Core.Scoring
 
                 currentCompResults.TotalScore = compTotal * 100 / perfectScore;
 
+            }
+        }
+
+        protected override void DiscardScores(
+            SeriesResults resultsWorkInProgress,
+            SeriesCompetitorResults compResults)
+        {
+            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress);
+
+            var compResultsOrdered = compResults.CalculatedScores.Values.OrderBy(s => s.ScoreValue)
+                .ThenBy(s => s.RawScore.Race.Date)
+                .ThenBy(s => s.RawScore.Race.Order)
+                .Where(s => GetScoreCode(s.RawScore)?.Discardable ?? true);
+            foreach (var score in compResultsOrdered.Take(numOfDiscards))
+            {
+                score.Discard = true;
             }
         }
 

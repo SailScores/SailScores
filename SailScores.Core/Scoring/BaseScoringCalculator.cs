@@ -208,11 +208,19 @@ namespace SailScores.Core.Scoring
                 .OrderBy(s => s, CompetitorComparer);
 
             int i = 1;
+            SeriesCompetitorResults prevComp = null;
             foreach (var comp in orderedComps)
             {
-                comp.Rank = i;
-
+                if (prevComp != null && CompetitorComparer.Compare(comp, prevComp) == 0)
+                {
+                    comp.Rank = prevComp.Rank;
+                }
+                else
+                {
+                    comp.Rank = i;
+                }
                 i++;
+                prevComp = comp;
             }
         }
 
@@ -438,7 +446,7 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        private void DiscardScores(
+        protected virtual void DiscardScores(
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)
         {
