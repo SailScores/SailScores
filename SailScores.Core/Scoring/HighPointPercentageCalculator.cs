@@ -62,21 +62,30 @@ namespace SailScores.Core.Scoring
             SeriesResults results,
             IEnumerable<Score> allScores)
         {
+            var raceCount = results.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced).Count();
+            var requiredRaces = raceCount * ((_scoringSystem.ParticipationPercent ?? 0) / 100m);
             foreach ( var comp in results.Competitors)
             {
                 var currentCompResults = results.Results[comp];
-                var racesToExclude = currentCompResults
-                    .CalculatedScores
-                    .Where(s => s.Value.Discard)
-                    .Select(s => s.Key.Id);
-                var perfectScore = allScores.Where(s => !racesToExclude.Contains(s.RaceId))
-                    .Count(s => CameToStart(s));
-                var compTotal = currentCompResults
-                    .CalculatedScores.Values
-                    .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
+                if (currentCompResults.CalculatedScores.Where(s => s.Value.RawScore.Code != DEFAULT_CODE).Count()
+                    < requiredRaces)
+                {
+                    currentCompResults.TotalScore = null;
+                }
+                else
+                {
+                    var racesToExclude = currentCompResults
+                        .CalculatedScores
+                        .Where(s => s.Value.Discard)
+                        .Select(s => s.Key.Id);
+                    var perfectScore = allScores.Where(s => !racesToExclude.Contains(s.RaceId))
+                        .Count(s => CameToStart(s));
+                    var compTotal = currentCompResults
+                        .CalculatedScores.Values
+                        .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
 
-                currentCompResults.TotalScore = compTotal * 100 / perfectScore;
-
+                    currentCompResults.TotalScore = compTotal * 100 / perfectScore;
+                }
             }
         }
 

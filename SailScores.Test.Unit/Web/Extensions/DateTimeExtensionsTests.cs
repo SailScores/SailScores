@@ -27,7 +27,7 @@ namespace SailScores.Test.Unit
         [InlineData( 200, "3 hours ago")]
         [InlineData( 630, "10 hours ago")]
         [InlineData( 1380, "23 hours ago")]
-        [InlineData( 1500, "yesterday")]
+        [InlineData( 1440, "yesterday")]
         [InlineData( 3000, "2 days ago")]
         [InlineData( 14400, "10 days ago")]
         [InlineData(1440 * 15, "15 days ago")]

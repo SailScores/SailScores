@@ -93,8 +93,8 @@ namespace SailScores.Core.Services
             var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
                 fullSeries); 
             
-            var calculator = _scoringCalculatorFactory
-                .CreateScoringCalculator(_mapper.Map<ScoringSystem>(dbScoringSystem));
+            var calculator = await _scoringCalculatorFactory
+                .CreateScoringCalculatorAsync(_mapper.Map<ScoringSystem>(dbScoringSystem));
             
             fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
             await PopulateCompetitorsAsync(fullSeries);

@@ -23,9 +23,10 @@ namespace SailScores.Test.Unit
             var system = new ScoringSystem
             {
                 Id = Guid.NewGuid(),
-                Name = "High Point Percentage",
+                Name = "High Point Percentage For Series",
                 DiscardPattern = "0,1",
-                ParentSystemId = null
+                ParentSystemId = null,
+                ParticipationPercent = 60m
             };
 
             system.InheritedScoreCodes = new List<ScoreCode>();
@@ -569,6 +570,19 @@ namespace SailScores.Test.Unit
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
             Assert.Equal(7.5m,
                 results.Results[fourthComp].CalculatedScores.Last().Value.ScoreValue);
+        }
+
+        [Fact]
+        public void CalculateResults_CompWithHalfRaces_NotRanked()
+        {
+            var basicSeries = GetBasicSeries(4, 4);
+            var firstComp = basicSeries.Competitors.First();
+            basicSeries.Races.First().Scores.First(s => s.Competitor == firstComp).Code = "DNC";
+            basicSeries.Races.Skip(1).First().Scores.First(s => s.Competitor == firstComp).Code = "DNC";
+            
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+            Assert.Null(results.Results[firstComp].TotalScore);
+            Assert.True(results.Results[firstComp].Rank == null || results.Results[firstComp].Rank > 3);
         }
 
         // https://www.rya.org.uk/SiteCollectionDocuments/Racing/RacingInformation/RaceOfficials/Resource%20Centre/Best%20Practice%20Guidelines%20Policies/Scoring.pdf

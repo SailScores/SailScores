@@ -2,22 +2,51 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using SailScores.Database;
 
 namespace SailScores.Core.Scoring
 {
     public class ScoringCalculatorFactory : IScoringCalculatorFactory
     {
-        public IScoringCalculator CreateScoringCalculator(
+        private readonly ISailScoresContext _dbContext;
+
+        public ScoringCalculatorFactory(
+            ISailScoresContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+        public async Task<IScoringCalculator> CreateScoringCalculatorAsync(
             Model.ScoringSystem scoringSystem)
         {
-            // I expect there will be one base Scoring Calculator per scroing system type.
-            // They will use the base system and any overridden rules.
 
-            // So we will need to inspect scoring system to determine base type.
-            // but for now, only one type set up, so handle trivially:
-            return new AppendixACalculator(scoringSystem);
+            var baseSystemName = await GetBaseScoringSystemNameAsync(scoringSystem);
+
+            if (baseSystemName.Contains("High Point"))
+            {
+                return new HighPointPercentageCalculator(scoringSystem);
+            }
+            else
+            {
+                return new AppendixACalculator(scoringSystem);
+            }
+        }
+
+        private async Task<string> GetBaseScoringSystemNameAsync(ScoringSystem scoringSystem)
+        {
+            if(scoringSystem.ParentSystemId == null)
+            {
+                return scoringSystem.Name;
+            }
+            Database.Entities.ScoringSystem currentSystem =
+                await _dbContext.ScoringSystems.SingleAsync(s => s.Id == scoringSystem.ParentSystemId); 
+            while (scoringSystem.ParentSystemId != null)
+            {
+                currentSystem = await _dbContext.ScoringSystems.SingleAsync(s => s.Id == currentSystem.ParentSystemId);
+            }
+            return currentSystem.Name;
         }
     }
 }

@@ -37,6 +37,13 @@
                 <input asp-for="DiscardPattern" class="form-control" />
                 <span asp-validation-for="DiscardPattern" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="ParticipationPercent" class="control-label"></label>
+                <span class="small"><em>&ensp;Used for High Score Percent systems</em></span>
+                <input asp-for="ParticipationPercent" class="form-control" type="number"/>
+                <span asp-validation-for="ParticipationPercent" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 <a asp-controller="Admin"

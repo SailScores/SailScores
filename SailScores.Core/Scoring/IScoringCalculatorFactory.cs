@@ -1,7 +1,9 @@
-﻿namespace SailScores.Core.Scoring
+﻿using System.Threading.Tasks;
+
+namespace SailScores.Core.Scoring
 {
     public interface IScoringCalculatorFactory
     {
-        IScoringCalculator CreateScoringCalculator(Model.ScoringSystem scoringSystem);
+        Task<IScoringCalculator> CreateScoringCalculatorAsync(Model.ScoringSystem scoringSystem);
     }
 }

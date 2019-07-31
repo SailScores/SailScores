@@ -22,5 +22,7 @@ namespace SailScores.Database.Entities
         [ForeignKey("ParentSystemId")]
         public ScoringSystem ParentSystem { get; set; }
 
+        public Decimal? ParticipationPercent { get; set; }
+
     }
 }

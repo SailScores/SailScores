@@ -7,15 +7,15 @@ namespace SailScores.Core.Scoring
     {
         public int Compare(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
-            //put zeroes at the end of rankings 
+            //put nulls at the end of rankings 
             decimal? xScoreToUse =
-                (x.TotalScore.HasValue && x.TotalScore == 0
-                ? decimal.MaxValue
-                : x.TotalScore);
+                !x.TotalScore.HasValue
+                ? -1
+                : x.TotalScore;
             decimal? yScoreToUse =
-                (y.TotalScore.HasValue && y.TotalScore == 0
-                ? decimal.MaxValue
-                : y.TotalScore);
+                !y.TotalScore.HasValue
+                ? -1
+                : y.TotalScore;
 
 
             if (xScoreToUse != yScoreToUse)

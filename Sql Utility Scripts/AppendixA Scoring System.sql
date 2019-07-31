@@ -48,7 +48,7 @@ set @SystemId = (
   (NewId(),'SCP','Scoring Penalty rule 44.3',1,1,1,20,0,1,1,'PLC%',NULL, @SystemId),
   (NewId(),'DNS','Came to start area but did not start',0,1,0,1,null,1,0,'CTS+',NULL,@SystemId),
   (NewId(),'RET','Retired',1,1,1,1,1,1,1,'CTS+',NULL,@SystemId),
-  (NewId(),'ZFP','20% Penalty under rule 30.2',1,1,1,20,1,1,1,'PLC%',NULL,@SystemId),
+  (NewId(),'ZFP','20% Penalty under rule 30.2',1,1,1,20,0,1,1,'PLC%',NULL,@SystemId),
   (NewId(),'DPI','Discretionary penalty',1,1,1,20,0,1,1,'PLC%',NULL,@SystemId),
   (NewId(),'RDGAve','Redress: average of other races',1,1,1,NULL,0,1,1,'AVE',NULL,@SystemId),
   (NewId(),'UFD','Disqualification under rule 30.3',0,1,0,1,1,1,0,'CTS+',NULL,@SystemId),  

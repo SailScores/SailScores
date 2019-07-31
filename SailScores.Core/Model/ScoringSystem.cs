@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -21,6 +22,9 @@ namespace SailScores.Core.Model
         public ScoringSystem ParentSystem { get; set; }
 
         public IEnumerable<ScoreCode> InheritedScoreCodes { get; set; }
+
+        [DisplayName("Participation Percent")]
+        public Decimal? ParticipationPercent { get; set; }
 
     }
 }
