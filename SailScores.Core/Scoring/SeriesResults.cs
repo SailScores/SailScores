@@ -17,6 +17,8 @@ namespace SailScores.Core.Scoring
 
         public bool IsPercentSystem { get; set; }
 
+        public Decimal? PercentRequired { get; set; }
+
         public Dictionary<Competitor, SeriesCompetitorResults> Results { get; set; }
 
         public CalculatedScore GetResult(

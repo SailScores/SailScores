@@ -230,7 +230,7 @@ namespace SailScores.Core.Scoring
 
         private IList<Competitor> ReorderCompetitors(SeriesResults results)
         {
-            return results.Competitors.OrderBy(c => results.Results[c].Rank).ToList();
+            return results.Competitors.OrderBy(c => results.Results[c].Rank ?? int.MaxValue).ToList();
         }
 
         protected int GetNumberOfCompetitors(SeriesResults seriesResults)

@@ -63,6 +63,7 @@ namespace SailScores.Core.Scoring
             IEnumerable<Score> allScores)
         {
             results.IsPercentSystem = true;
+            results.PercentRequired = _scoringSystem.ParticipationPercent;
             var raceCount = results.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced).Count();
             var requiredRaces = raceCount * ((_scoringSystem.ParticipationPercent ?? 0) / 100m);
             foreach ( var comp in results.Competitors)

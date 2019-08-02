@@ -1,0 +1,29 @@
+﻿@using Humanizer
+
+@model SailScores.Core.FlatModel.FlatCalculatedScore
+
+@if (Model != null)
+{
+    <td class="text-center @(Model.Place == 1 ? "finish-first " : "") @(Model.Place == 2 ? "finish-second " : "") @(Model.Place == 3 ? "finish-third " : "") ">
+        <span class="@(Model.Discard ? "text-muted" : "")">
+            @if (Model.Discard)
+            {
+                @Html.Raw("<s>")
+            }
+            @Model.Code @((Model.ScoreValue ?? Model.Place)?.ToString("N1"))
+            @if ((bool)ViewData["IsPercentSystem"]
+            && Model.Place.HasValue)
+            {
+                <span class="small">(@Model.Place.Value.Ordinalize())</span>
+            }
+            @if (Model.Discard)
+            {
+                @Html.Raw("</s>")
+            }
+        </span>
+    </td>
+}
+else
+{
+    <td></td>
+}

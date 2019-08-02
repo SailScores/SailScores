@@ -191,7 +191,8 @@ namespace SailScores.Core.Services
                 CalculatedScores = FlattenSeriesScores(series),
                 NumberOfDiscards = series.Results.NumberOfDiscards,
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),
-                IsPercentSystem = series.Results.IsPercentSystem
+                IsPercentSystem = series.Results.IsPercentSystem,
+                PercentRequired = series.Results.PercentRequired
             };
             return flatResults;
         }
@@ -219,8 +220,7 @@ namespace SailScores.Core.Services
                     Place = s.Value.RawScore.Place,
                     Code = s.Value.RawScore.Code,
                     ScoreValue = s.Value.ScoreValue,
-                    Discard = s.Value.Discard,
-                    RawScoreValue = s.Value.RawScore.Place
+                    Discard = s.Value.Discard
                 });
         }
 
@@ -244,7 +244,7 @@ namespace SailScores.Core.Services
         private IEnumerable<FlatCompetitor> FlattenCompetitors(Series series)
         {
             return series.Competitors
-                .OrderBy(c => series.Results.Results[c].Rank)
+                .OrderBy(c => series.Results.Results[c].Rank ?? int.MaxValue)
                 .Select(c =>
                     new FlatCompetitor
                     {
