@@ -31,6 +31,7 @@
                 <th scope="col">@localizer["Helm"]</th>
                 <th scope="col" class="d-none d-sm-table-cell">@localizer["Boat"]</th>
                 <th scope="col" class="text-center">@localizer["Total"]</th>
+                @{ var colCount = 0;}
                 @foreach (var race in Model.Item.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())
                 {
                     if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
@@ -51,10 +52,16 @@
     , "Details", "Race", new { id = race.Id })
                         </th>
                     }
+                    if (++colCount % 25 == 0 && (Model.Item.FlatResults.NumberOfSailedRaces - colCount) > 10)
+                    {
+                        <th scope="col">@localizer["Helm"]</th>
+                    }
                 }
                 @if ((Model.Item.FlatResults.NumberOfSailedRaces) > 4)
                 {
-                    <th scope="col" class="d-table-cell d-md-none">@localizer["Helm"]</th>
+                    <th scope="col" class="d-table-cell @((Model.Item.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")">
+                        @localizer["Helm"]
+                    </th>
                 }
             </tr>
         </thead>
@@ -71,12 +78,13 @@
             }
             @foreach (var comp in compList)
             {
-                <tr>
-                    <th scope="row">@Model.Item.FlatResults.GetScore(comp)?.Rank</th>
-                    <th scope="row">@comp.SailNumber</th>
-                    <th scope="row">@comp.Name</th>
-                    <td class="d-none d-sm-table-cell">@comp.BoatName</td>
-                    <td scope="row" class="text-center"><strong>@Model.Item.FlatResults.GetScore(comp)?.TotalScore</strong></td>
+                colCount = 0;
+            <tr>
+                <th scope="row">@Model.Item.FlatResults.GetScore(comp)?.Rank</th>
+                <th scope="row">@comp.SailNumber</th>
+                <th scope="row">@comp.Name</th>
+                <td class="d-none d-sm-table-cell">@comp.BoatName</td>
+                <td scope="row" class="text-center"><strong>@Model.Item.FlatResults.GetScore(comp)?.TotalScore</strong></td>
 
                 @foreach (var race in Model.Item.FlatResults.Races)
                 {
@@ -84,18 +92,18 @@
                     {
                         if (firstRow)
                         {
-                        <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
-                            <span>ABANDONED</span>
-                        </td>
+                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
+                                <span>ABANDONED</span>
+                            </td>
                         }
                     }
                     else if (race.State == RaceState.Scheduled)
                     {
                         if (firstRow)
                         {
-                        <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
-                            <span>SCHEDULED</span>
-                        </td>
+                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
+                                <span>SCHEDULED</span>
+                            </td>
                         }
                     }
                     else
@@ -123,14 +131,18 @@
                             <td></td>
                         }
                     }
+                    if (++colCount % 25 == 0 && (Model.Item.FlatResults.NumberOfSailedRaces - colCount) > 10)
+                    {
+                        <td>@comp.Name</td>
+                    }
                 }
                 @if ((Model.Item.FlatResults.NumberOfSailedRaces) > 4)
                 {
-                    <th class="d-table-cell d-md-none">@comp.Name</th>
+                    <th class="d-table-cell @(( Model.Item.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")">@comp.Name</th>
                 }
                 @{firstRow = false;
                 }
-            </tr>
+                </tr>
             }
 
         </tbody>
