@@ -15,6 +15,8 @@ namespace SailScores.Core.Scoring
         
         public int NumberOfDiscards { get; set; }
 
+        public bool IsPercentSystem { get; set; }
+
         public Dictionary<Competitor, SeriesCompetitorResults> Results { get; set; }
 
         public CalculatedScore GetResult(
@@ -38,7 +40,6 @@ namespace SailScores.Core.Scoring
                 Discard = false
             };
         }
-
 
         public int GetSailedRaceCount()
         {

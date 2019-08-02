@@ -9,6 +9,8 @@ namespace SailScores.Core.FlatModel
         public Guid CompetitorId { get; set; }
         public int? Rank { get; set; }
         public Decimal? TotalScore { get; set; }
+        public Decimal? PointsEarned { get; set; }
+        public Decimal? PointsPossible { get; set; }
         public IEnumerable<FlatCalculatedScore> Scores { get; set; }
     }
 }

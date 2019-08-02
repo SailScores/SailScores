@@ -84,7 +84,16 @@
                 <th scope="row">@comp.SailNumber</th>
                 <th scope="row">@comp.Name</th>
                 <td class="d-none d-sm-table-cell">@comp.BoatName</td>
-                <td scope="row" class="text-center"><strong>@Model.Item.FlatResults.GetScore(comp)?.TotalScore</strong></td>
+                <td scope="row" class="text-center">
+                    <strong>
+                        @String.Format("{0:0.##}", Model.Item.FlatResults.GetScore(comp)?.TotalScore)
+
+                        @if (Model.Item.FlatResults.IsPercentSystem)
+                        {
+                            @:(@Model.Item.FlatResults.GetScore(comp).PointsEarned / 
+                            @Model.Item.FlatResults.GetScore(comp).PointsPossible@:)
+                        }
+                    </strong></td>
 
                 @foreach (var race in Model.Item.FlatResults.Races)
                 {
@@ -118,6 +127,10 @@
                                     @Html.Raw("<s>")
                                 }
                                 @result
+                                @if (Model.Item.FlatResults.IsPercentSystem)
+                                {
+                                    @:(@result.RawScoreValue)
+                                }
                                 @if (result.Discard)
                                 {
                                     @Html.Raw("</s>")

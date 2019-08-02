@@ -15,6 +15,7 @@ namespace SailScores.Core.FlatModel
         public IEnumerable<FlatSeriesScore> CalculatedScores { get; set; }
         public int NumberOfDiscards { get; set; }
         public int NumberOfSailedRaces { get; set; }
+        public bool IsPercentSystem { get; set; }
 
         public FlatSeriesScore GetScore(FlatCompetitor comp)
         {

@@ -17,7 +17,7 @@ namespace SailScores.Core.Model
 
         [StringLength(2000)]
         public String Description { get; set; }
-        
+
         public IList<Race> Races { get; set; }
 
         [Required]
@@ -36,5 +36,6 @@ namespace SailScores.Core.Model
 
         public Guid? ScoringSystemId { get; set; }
         public ScoringSystem ScoringSystem { get; set; }
+
     }
 }

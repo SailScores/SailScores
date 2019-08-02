@@ -211,7 +211,11 @@ namespace SailScores.Core.Scoring
             SeriesCompetitorResults prevComp = null;
             foreach (var comp in orderedComps)
             {
-                if (prevComp != null && CompetitorComparer.Compare(comp, prevComp) == 0)
+                if(comp.TotalScore == null)
+                {
+                    comp.Rank = null;
+                }
+                else if (prevComp != null && CompetitorComparer.Compare(comp, prevComp) == 0)
                 {
                     comp.Rank = prevComp.Rank;
                 }

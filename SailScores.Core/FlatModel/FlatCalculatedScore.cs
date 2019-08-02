@@ -9,6 +9,7 @@ namespace SailScores.Core.FlatModel
         public int? Place { get; set; }
         public string Code { get; set; }
         public Decimal? ScoreValue { get; set; }
+        public Decimal? RawScoreValue { get; set; }
         public bool Discard { get; set; }
 
         public override string ToString()

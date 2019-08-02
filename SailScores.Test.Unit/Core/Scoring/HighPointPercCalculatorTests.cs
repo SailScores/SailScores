@@ -585,6 +585,25 @@ namespace SailScores.Test.Unit
             Assert.True(results.Results[firstComp].Rank == null || results.Results[firstComp].Rank > 3);
         }
 
+        [Fact]
+        public void CalculateResults_TwoCompWithHalfRaces_NotRankedAndTied()
+        {
+            var basicSeries = GetBasicSeries(6, 4);
+            var firstComp = basicSeries.Competitors.First();
+            basicSeries.Races.First().Scores.First(s => s.Competitor == firstComp).Code = "DNC";
+            basicSeries.Races.Skip(1).First().Scores.First(s => s.Competitor == firstComp).Code = "DNC";
+
+            var secondComp = basicSeries.Competitors.Skip(1).First();
+            basicSeries.Races.First().Scores.First(s => s.Competitor == secondComp).Code = "DNC";
+            basicSeries.Races.Skip(1).First().Scores.First(s => s.Competitor == secondComp).Code = "DNC";
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Null(results.Results[firstComp].TotalScore);
+            Assert.Null(results.Results[secondComp].TotalScore);
+            Assert.Equal(results.Results[firstComp].Rank, results.Results[secondComp].Rank);
+        }
+
         // https://www.rya.org.uk/SiteCollectionDocuments/Racing/RacingInformation/RaceOfficials/Resource%20Centre/Best%20Practice%20Guidelines%20Policies/Scoring.pdf
 
         // Example: Scoring: Low Point – one score excluded

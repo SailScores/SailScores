@@ -190,7 +190,8 @@ namespace SailScores.Core.Services
                 Races = FlattenRaces(series),
                 CalculatedScores = FlattenSeriesScores(series),
                 NumberOfDiscards = series.Results.NumberOfDiscards,
-                NumberOfSailedRaces = series.Results.SailedRaces.Count()
+                NumberOfSailedRaces = series.Results.SailedRaces.Count(),
+                IsPercentSystem = series.Results.IsPercentSystem
             };
             return flatResults;
         }
@@ -203,6 +204,8 @@ namespace SailScores.Core.Services
                     CompetitorId = kvp.Key.Id,
                     Rank = kvp.Value.Rank,
                     TotalScore = kvp.Value.TotalScore,
+                    PointsEarned = kvp.Value.PointsEarned,
+                    PointsPossible = kvp.Value.PointsPossible,
                     Scores = FlattenScores(kvp.Value)
                 });
         }
@@ -216,7 +219,8 @@ namespace SailScores.Core.Services
                     Place = s.Value.RawScore.Place,
                     Code = s.Value.RawScore.Code,
                     ScoreValue = s.Value.ScoreValue,
-                    Discard = s.Value.Discard
+                    Discard = s.Value.Discard,
+                    RawScoreValue = s.Value.RawScore.Place
                 });
         }
 

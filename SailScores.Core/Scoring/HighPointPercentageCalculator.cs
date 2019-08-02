@@ -62,6 +62,7 @@ namespace SailScores.Core.Scoring
             SeriesResults results,
             IEnumerable<Score> allScores)
         {
+            results.IsPercentSystem = true;
             var raceCount = results.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced).Count();
             var requiredRaces = raceCount * ((_scoringSystem.ParticipationPercent ?? 0) / 100m);
             foreach ( var comp in results.Competitors)
@@ -84,6 +85,8 @@ namespace SailScores.Core.Scoring
                         .CalculatedScores.Values
                         .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
 
+                    currentCompResults.PointsEarned = compTotal;
+                    currentCompResults.PointsPossible = perfectScore;
                     currentCompResults.TotalScore = compTotal * 100 / perfectScore;
                 }
             }
