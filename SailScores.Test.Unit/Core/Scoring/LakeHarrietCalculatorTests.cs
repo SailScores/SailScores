@@ -91,9 +91,9 @@ namespace SailScores.Test.Unit
             Assert.True(results.Results.First().Value.CalculatedScores.First().Value.RawScore.Place !=
                 results.Results.First().Value.CalculatedScores.First().Value.ScoreValue);
         }
-
+        
         [Fact]
-        public void CalculateResults_SafetyBoat_GetsAverageOfTwoRacesValue()
+        public void CalculateResults_SafetyBoat_IgnoresDiscard()
         {
             // Arrange: put in some coded results: SB
             var basicSeries = GetBasicSeries(3, 6);
@@ -118,7 +118,6 @@ namespace SailScores.Test.Unit
             Assert.Equal(1.5m,
                 results.Results[testComp].CalculatedScores.Last().Value.ScoreValue);
         }
-
 
         [Fact]
         public void CalculateResults_Dnc_GetsRaceCmopetitorsPlusTwo()

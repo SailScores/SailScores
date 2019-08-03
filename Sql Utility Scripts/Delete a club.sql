@@ -1,6 +1,8 @@
+Select * from Clubs
+
 DECLARE @ClubName NVARCHAR(200);
 
-SET @ClubName = 'Lake Harriet Yacht Club2'
+SET @ClubName = 'SS Ägir2'
 
 DECLARE @ClubId UNIQUEIDENTIFIER;
 
@@ -67,7 +69,10 @@ WHERE ClubId = @ClubId
 PRINT N'Deleting ScoreCodes'
 DELETE
 FROM ScoreCodes
-WHERE ClubId = @ClubId
+WHERE ScoreCodes.ScoringSystemId in (Select Id from ScoringSystems where ScoringSystems.ClubId = @ClubId)
+
+
+update Clubs set DefaultScoringSystemId = null where Id = @ClubId
 
 PRINT N'Deleting ScoringSystems'
 DELETE
@@ -115,3 +120,4 @@ PRINT N'Deleting Clubs'
 DELETE
 FROM Clubs
 WHERE Id = @ClubId
+

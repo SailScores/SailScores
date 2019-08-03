@@ -1,5 +1,5 @@
 
-Select * from ScoringSys.dbo.ScoringSystems
+Select * from ScoringSystems
 
 
   Insert into ScoringSystems

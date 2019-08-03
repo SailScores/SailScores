@@ -23,6 +23,7 @@ namespace SailScores.Core.Model
         // AVE P - average of prior races
         // PLC% - Place + xx% of DNF score (xx is stored FormulaValue)
         // MAN - allow scorer to enter score manually
+        // FIX - always use the value supplied in FormulaValue for this result
         // TIE - Tied with previous finisher
         public string Formula { get; set; }
         public int? FormulaValue { get; set; }
