@@ -42,7 +42,7 @@ namespace SailScores.Core.Scoring
             }
             Database.Entities.ScoringSystem currentSystem =
                 await _dbContext.ScoringSystems.SingleAsync(s => s.Id == scoringSystem.ParentSystemId); 
-            while (scoringSystem.ParentSystemId != null)
+            while (currentSystem.ParentSystemId != null)
             {
                 currentSystem = await _dbContext.ScoringSystems.SingleAsync(s => s.Id == currentSystem.ParentSystemId);
             }

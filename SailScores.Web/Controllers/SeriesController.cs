@@ -104,6 +104,13 @@ namespace SailScores.Web.Controllers
             {
                 var club = await _clubService.GetFullClub(clubInitials);
                 model.SeasonOptions = club.Seasons;
+                var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+                scoringSystemOptions.Add(new ScoringSystem
+                {
+                    Id = Guid.Empty,
+                    Name = "<Use Club Default>"
+                });
+                model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
                 return View(model);
             }
         }
@@ -199,6 +206,5 @@ namespace SailScores.Web.Controllers
                 return View();
             }
         }
-
     }
 }
