@@ -49,6 +49,7 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Create(string clubInitials)
         {
             var comp = new CompetitorWithOptionsViewModel();
+            //todo: remove getfullclub
             var club = await _clubService.GetFullClub(clubInitials);
             comp.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
 
@@ -81,6 +82,7 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/Edit/5
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
+            //todo: replace getfullclub
             var club = await _clubService.GetFullClub(clubInitials);
             if (!await _authService.CanUserEdit(User, club.Id))
             {
@@ -151,6 +153,7 @@ namespace SailScores.Web.Controllers
         {
             try
             {
+                //todo: replace GetFullClub
                 var club = await _clubService.GetFullClub(clubInitials);
                 if (!await _authService.CanUserEdit(User, club.Id)
                     || !club.Competitors.Any(c => c.Id == id))

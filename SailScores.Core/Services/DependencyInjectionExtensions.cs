@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace SailScores.Core.Services
             services.AddScoped<IRaceService, RaceService>();
             services.AddScoped<ISeriesService, SeriesService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IScoringCalculatorFactory, ScoringCalculatorFactory>();
         }
     }
 }

@@ -12,7 +12,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#classes">Classes</a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="#fleets">Fleets</a>
                 </li>
@@ -81,6 +80,12 @@
             <dd>
                 @Html.DisplayFor(model => model.Url)
             </dd>
+            <dt>
+                <label asp-for="DefaultScoringSystem">Default Scoring System</label>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.DefaultScoringSystem.Name)
+            </dd>
         </dl>
 
     </div>
@@ -92,6 +97,8 @@
     @await Html.PartialAsync("_SeriesList", Model.Series)
     @await Html.PartialAsync("_CompetitorList", Model.Competitors)
     @await Html.PartialAsync("_RaceList", Model.Races)
+    @await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
+
 </div>
 
 @section Scripts {

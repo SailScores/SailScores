@@ -57,7 +57,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Initials" class="control-label"></label>
-                <input asp-for="Initials" class="form-control disabled" />
+                <input asp-for="Initials" class="form-control disabled" disabled />
                 <span asp-validation-for="Initials" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -76,6 +76,18 @@
                 <label asp-for="Url" class="control-label"></label>
                 <input asp-for="Url" class="form-control" />
                 <span asp-validation-for="Url" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DefaultScoringSystem">Default Scoring System</label>
+                <select id="defaultScoringSystemId" asp-for="DefaultScoringSystem.Id" class="form-control">
+                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                    {
+                        <option value="@scoringSystem.Id">
+                            @scoringSystem.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="DefaultScoringSystem" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

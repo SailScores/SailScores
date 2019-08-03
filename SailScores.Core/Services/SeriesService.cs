@@ -15,13 +15,19 @@ namespace SailScores.Core.Services
 {
     public class SeriesService : ISeriesService
     {
+        private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
+        private readonly IScoringService _scoringService;
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
 
         public SeriesService(
+            IScoringCalculatorFactory scoringCalculatorFactory,
+            IScoringService scoringService,
             ISailScoresContext dbContext,
             IMapper mapper)
         {
+            _scoringCalculatorFactory = scoringCalculatorFactory;
+            _scoringService = scoringService;
             _dbContext = dbContext;
             _mapper = mapper;
         }
@@ -83,17 +89,13 @@ namespace SailScores.Core.Services
                     .Include(s => s.Season)
                 .SingleAsync(s => s.Id == seriesId);
 
-
-            var dbScoringSystem = await _dbContext
-                .ScoringSystems
-                .Where(s => s.ClubId == dbSeries.ClubId)
-                .Include(s => s.ScoreCodes)
-                .SingleAsync();
-            var calculator = new SeriesCalculator(
-                _mapper.Map<ScoringSystem>(dbScoringSystem));
-
             var fullSeries = _mapper.Map<Series>(dbSeries);
-
+            var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
+                fullSeries); 
+            
+            var calculator = await _scoringCalculatorFactory
+                .CreateScoringCalculatorAsync(_mapper.Map<ScoringSystem>(dbScoringSystem));
+            
             fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
             await PopulateCompetitorsAsync(fullSeries);
 
@@ -188,7 +190,9 @@ namespace SailScores.Core.Services
                 Races = FlattenRaces(series),
                 CalculatedScores = FlattenSeriesScores(series),
                 NumberOfDiscards = series.Results.NumberOfDiscards,
-                NumberOfSailedRaces = series.Results.SailedRaces.Count()
+                NumberOfSailedRaces = series.Results.SailedRaces.Count(),
+                IsPercentSystem = series.Results.IsPercentSystem,
+                PercentRequired = series.Results.PercentRequired
             };
             return flatResults;
         }
@@ -201,6 +205,8 @@ namespace SailScores.Core.Services
                     CompetitorId = kvp.Key.Id,
                     Rank = kvp.Value.Rank,
                     TotalScore = kvp.Value.TotalScore,
+                    PointsEarned = kvp.Value.PointsEarned,
+                    PointsPossible = kvp.Value.PointsPossible,
                     Scores = FlattenScores(kvp.Value)
                 });
         }
@@ -238,7 +244,7 @@ namespace SailScores.Core.Services
         private IEnumerable<FlatCompetitor> FlattenCompetitors(Series series)
         {
             return series.Competitors
-                .OrderBy(c => series.Results.Results[c].Rank)
+                .OrderBy(c => series.Results.Results[c].Rank ?? int.MaxValue)
                 .Select(c =>
                     new FlatCompetitor
                     {
@@ -275,8 +281,6 @@ namespace SailScores.Core.Services
 
         public async Task SaveNewSeries(Series series)
         {
-
-            
             Database.Entities.Series dbSeries = await BuildDbSeriesAsync(series);
             dbSeries.Name = RemoveDisallowedCharacters(series.Name);
             dbSeries.UpdatedDate = DateTime.UtcNow;
@@ -506,6 +510,7 @@ namespace SailScores.Core.Services
             existingSeries.Name = RemoveDisallowedCharacters(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
+            existingSeries.ScoringSystemId = model.ScoringSystemId;
 
             if(model.Season != null
                 && model.Season.Id != Guid.Empty

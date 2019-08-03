@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Database.Entities
@@ -6,20 +6,11 @@ namespace SailScores.Database.Entities
     public class ScoreCode
     {
         public Guid Id { get; set; }
-        public Guid ClubId { get; set; }
-        public Guid? ScoringSystemId { get; set; }
+        public Guid ScoringSystemId { get; set; }
         [StringLength(20)]
         public String Name { get; set; }
         [StringLength(1000)]
         public String Description { get; set; }
-
-        // can be:
-        // COD - Use value of ScoreLike to find another code to use
-        // FIN+ - competitors who finished this race + FormulaValue
-        // SER+ - competitors in this series + FormulaValue
-        // AVE - average of all non-discarded races
-        // PLC% - Place + xx% of DNF score (xx is stored FormulaValue)
-        // MAN - allow scorer to enter score manually
         [StringLength(100)]
         public string Formula { get; set; }
         public int? FormulaValue { get; set; }

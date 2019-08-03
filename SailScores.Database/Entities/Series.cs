@@ -26,5 +26,8 @@ namespace SailScores.Database.Entities
 
         [Column("UpdatedDateUtc")]
         public DateTime? UpdatedDate { get; set; }
+
+        public Guid? ScoringSystemId { get; set; }
+        public ScoringSystem ScoringSystem { get; set; }
     }
 }

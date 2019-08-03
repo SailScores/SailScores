@@ -69,7 +69,8 @@ namespace SailScores.Web.Services
             model.ClubId = club.Id;
             model.FleetOptions = club.Fleets;
             model.SeriesOptions = club.Series;
-            model.ScoreCodeOptions = club.ScoreCodes.OrderBy(s => s.Name).ToList();
+            model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+                .OrderBy(s => s.Name).ToList();
             model.CompetitorOptions = club.Competitors;
             model.Date = DateTime.Today;
             model.Order = 1;
@@ -82,7 +83,8 @@ namespace SailScores.Web.Services
             var club = await _coreClubService.GetFullClub(raceWithOptions.ClubId);
             raceWithOptions.FleetOptions = club.Fleets;
             raceWithOptions.SeriesOptions = club.Series;
-            raceWithOptions.ScoreCodeOptions = club.ScoreCodes.OrderBy(s => s.Name).ToList();
+            raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+                .OrderBy(s => s.Name).ToList();
             raceWithOptions.CompetitorOptions = club.Competitors;
         }
 

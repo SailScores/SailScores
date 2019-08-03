@@ -91,12 +91,13 @@ namespace SailScores.Core.Services
                     .ThenInclude(r => r.Scores)
                 .Include(c => c.Races)
                     .ThenInclude(r => r.Fleet)
-                .Include(c => c.ScoreCodes)
                 .Include(c => c.Seasons)
                 .Include(c => c.Series)
                     .ThenInclude(s => s.RaceSeries)
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
+                .Include(c => c.DefaultScoringSystem)
+                .Include(c => c.ScoringSystems)
                 .Include(c => c.Fleets)
                     .ThenInclude(f => f.CompetitorFleets)
                 .Include(c => c.Fleets)
@@ -174,6 +175,7 @@ namespace SailScores.Core.Services
             dbClub.IsHidden = club.IsHidden;
             dbClub.Url = club.Url;
             dbClub.Description = club.Description;
+            dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
             await _dbContext.SaveChangesAsync();
         }
     }

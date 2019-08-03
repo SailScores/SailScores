@@ -51,6 +51,10 @@ namespace SailScores.Web.Services
             var club = await _coreClubService.GetFullClub(model.ClubId);
             var season = club.Seasons.Single(s => s.Id == model.SeasonId);
             model.Season = season;
+            if(model.ScoringSystemId == Guid.Empty)
+            {
+                model.ScoringSystemId = null;
+            }
             await _coreSeriesService.SaveNewSeries(model);
         }
 
@@ -59,6 +63,10 @@ namespace SailScores.Web.Services
             var club = await _coreClubService.GetFullClub(model.ClubId);
             var season = club.Seasons.Single(s => s.Id == model.SeasonId);
             model.Season = season;
+            if (model.ScoringSystemId == Guid.Empty)
+            {
+                model.ScoringSystemId = null;
+            }
             await _coreSeriesService.Update(model);
         }
     }

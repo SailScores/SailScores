@@ -1,30 +1,30 @@
 # SailScores
 
 
-ASP.NET Core website and API for one-design sailboat scores. This is the code
+An ASP.NET Core website and API for sailboat scoring. This is the code
 for the site hosted at [sailscores.com][1].
 
-I've been keeping scores for our club for a few years and want to fix a bunch of
-weaknesses with the options I've seen for scorekeeping. Much of the software I've seen is
-dated, lacking support for mobile devices, expensive, or aimed at scoring a
-single regatta as an event.
+I've been keeping scores for our club for a few years and wanted to fix a bunch of
+weaknesses with available options I've seen for scorekeeping. I haven't
+seen any other software that has a modern interface, supports mobile devices, is inexpensive, and supports club series scoring as much as regatta scoring. SailScores scratches those itches.
 
-Sailscores aims to be:
+SailScores top priorities:
 - easy to navigate and bookmark.
 - fast to use, particularly for entering new results.
 - web and mobile friendly.
-- Open REST API: I've got plans for some nicer client software but all using a common, straightforward API.
-- Crazy cheap for the foreseeable future. At some point I might ask for help covering expenses. (But I'm not quitting my day job any time soon.)
-- On the roadmap: analytics for race data.
+- Open REST API: I have plans for nice client software but all using a common, straightforward API.
+- Crazy cheap for the foreseeable future, currently free. At some point
+I might ask for help covering expenses. (But I'm not quitting my day job any time soon.)
+- On the roadmap: analytics for race and competitor data.
 
-This code is designed to be multitenant, and I'm very open to hosting other clubs. Site
-is live in spring of 2019. I expect there will be plenty of fixes and enhancements in the next year.
+This code supports multiple tenants, including visible and hidden clubs.
+I'm very open to hosting other clubs at the public site. The site went live in spring of 2019 and two clubs have been using it for the 2019 season. Enhancements and fixes and enhancements are coming weekly. Some bigger features will get worked on over the 2019-2020 winter.
 
 Licensed with Mozilla Public License Version 2.0 : You may use this software, but
 share the source for modifications that you distribute.
 
-Contributions welcome. Feedback requested: There are many features I'm working
-on, and it's nice to prioritize them with input from other users.
+Contributions welcome. Feedback requested: I'm trying to keep the github issues list current with features I'm working
+on; it's nice to prioritize them with input from other users.
 
 
 Sail fast...

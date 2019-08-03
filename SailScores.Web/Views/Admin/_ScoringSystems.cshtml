@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SailScores.Core.Model.ScoringSystem>
+
+<div class="card">
+    <div class="card-header" id="scoringHeading">
+        <h5>
+            <a id="scoring" class="collapsed" data-toggle="collapse" href="#collapseScoring"
+                  aria-expanded="false" aria-controls="collapseScoring">
+                Scoring Systems
+            </a>
+            <span class="text-danger">&ensp;<span class="small"><em>Advanced</em></span></span>
+        </h5>
+    </div>
+    <div id="collapseScoring" class="collapse" aria-labelledby="scoringHeading" data-parent="#accordion">
+        <div class="card-body">
+            <p>
+                 @Html.ActionLink("Create", "Create", "ScoringSystem")
+            </p>
+            <table class="table table-not-wide">
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "ScoringSystem", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "ScoringSystem", new { id = item.Id })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

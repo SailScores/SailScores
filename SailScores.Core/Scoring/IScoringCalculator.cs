@@ -2,7 +2,7 @@
 
 namespace SailScores.Core.Scoring
 {
-    public interface ISeriesCalculator
+    public interface IScoringCalculator
     {
         SeriesResults CalculateResults(Series series);
     }

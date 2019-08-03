@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    internal class SeriesCompetitorResultComparer : IComparer<SeriesCompetitorResults>
+    internal class LowPointSeriesCompComparer : IComparer<SeriesCompetitorResults>
     {
         public int Compare(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {

@@ -15,6 +15,8 @@ namespace SailScores.Web.Mapping
         {
             CreateMap<Model.Club, ClubSummaryViewModel>()
                 .ForMember(d => d.CanEdit, o => o.Ignore());
+            CreateMap<Model.Club, AdminViewModel>()
+                .ForMember(d => d.ScoringSystemOptions, o => o.Ignore());
             CreateMap<Model.Race, RaceSummaryViewModel>()
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
                 .ForMember(r => r.FleetShortName, o => o.MapFrom(s => s.Fleet.ShortName))
@@ -35,7 +37,8 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Series, SeriesWithOptionsViewModel>()
                 .ForMember(d => d.SeasonOptions, o => o.Ignore())
                 .ForMember(d => d.SeasonId, o => o.MapFrom(s =>
-                    s.Season.Id));
+                    s.Season.Id))
+                .ForMember(d => d.ScoringSystemOptions, o => o.Ignore());
             CreateMap<Model.Competitor, CompetitorWithOptionsViewModel>()
                 .ForMember(d => d.BoatClassOptions, o => o.Ignore());
 
@@ -46,6 +49,15 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.CompetitorOptions, o => o.Ignore())
                 .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(sr => sr.Id)));
 
+            CreateMap<Model.ScoringSystem, ScoringSystemWithOptionsViewModel>()
+                .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())
+                .ForMember(d => d.ParentSystemOptions, o => o.Ignore());
+
+            CreateMap<Model.ScoringSystem, ScoringSystemCanBeDeletedViewModel>()
+                .ForMember(d => d.InUse, o => o.Ignore());
+
+            CreateMap<Model.ScoreCode, ScoreCodeWithOptionsViewModel>()
+                .ForMember(d => d.FormulaOptions, o => o.Ignore());
         }
     }
 }
