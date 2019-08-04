@@ -17,7 +17,7 @@ namespace SailScores.Core.FlatModel
         public int NumberOfSailedRaces { get; set; }
         public bool IsPercentSystem { get; set; }
         public decimal? PercentRequired { get; set; }
-
+        public string ScoringSystemName { get; set; }
         public FlatSeriesScore GetScore(FlatCompetitor comp)
         {
             return CalculatedScores.FirstOrDefault(s => s.CompetitorId == comp.Id);

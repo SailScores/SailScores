@@ -18,9 +18,12 @@
 @if(!String.IsNullOrWhiteSpace(Model.Item.Description)) {
     <h5>@Model.Item.Description</h5>
 }
-    @Model.Item.FlatResults.NumberOfSailedRaces races sailed
-    with @Model.Item.FlatResults.NumberOfDiscards discards,
-    @Model.Item.FlatResults.Competitors.Count() competitors
+@Model.Item.FlatResults.NumberOfSailedRaces races sailed
+with @Model.Item.FlatResults.NumberOfDiscards discards,
+@Model.Item.FlatResults.Competitors.Count() competitors
+@if(!String.IsNullOrWhiteSpace(@Model.Item.FlatResults.ScoringSystemName)) {
+    @:&ndash; @Model.Item.FlatResults.ScoringSystemName 
+}
 @if(Model.Item.FlatResults.IsPercentSystem && Model.Item.FlatResults.PercentRequired.HasValue)
 {
     @:&ndash; @Model.Item.FlatResults.PercentRequired.Value.ToString("G5")% participation required for ranking
@@ -39,7 +42,6 @@
                 {
                     if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                     {
-
                         <th class="text-center d-none d-sm-table-cell">
                             @Html.ActionLink(
     @race.Date?.ToString("M-d") + " R" + @race.Order
@@ -48,7 +50,6 @@
                     }
                     else
                     {
-
                         <th class="text-center">
                             @Html.ActionLink(
     @race.Date?.ToString("M-d") + " R" + @race.Order
@@ -80,9 +81,7 @@
                 }
             }
             @{ var cellViewData = new ViewDataDictionary(ViewData)
-                                    {
-                                    { "IsPercentSystem", Model.Item.FlatResults.IsPercentSystem }
-                                };
+               {{ "IsPercentSystem", Model.Item.FlatResults.IsPercentSystem }};
             }
             @foreach (var comp in compList)
             {
@@ -147,11 +146,10 @@
                     }
                 </tr>
             }
-
         </tbody>
     </table>
 </div>
 @if(Model.Item.UpdatedDate.HasValue)
 {
-<i>Last updated @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
+    <i>Last updated @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
 }

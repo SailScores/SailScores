@@ -91,10 +91,11 @@ namespace SailScores.Core.Services
 
             var fullSeries = _mapper.Map<Series>(dbSeries);
             var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
-                fullSeries); 
-            
+                fullSeries);
+
+            fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
             var calculator = await _scoringCalculatorFactory
-                .CreateScoringCalculatorAsync(_mapper.Map<ScoringSystem>(dbScoringSystem));
+                .CreateScoringCalculatorAsync(fullSeries.ScoringSystem);
             
             fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
             await PopulateCompetitorsAsync(fullSeries);
@@ -192,7 +193,8 @@ namespace SailScores.Core.Services
                 NumberOfDiscards = series.Results.NumberOfDiscards,
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),
                 IsPercentSystem = series.Results.IsPercentSystem,
-                PercentRequired = series.Results.PercentRequired
+                PercentRequired = series.Results.PercentRequired,
+                ScoringSystemName = series.ScoringSystem?.Name
             };
             return flatResults;
         }

@@ -77,16 +77,15 @@
                         <td>@code.Name</td>
                         <td>@code.Description</td>
                         <td>@code.Formula@code.FormulaValue</td>
-                        <td>@((code.Discardable ?? false) ? "Y" : "N")</td>
-                        <td>@((code.CameToStart ?? false) ? "Y" : "N")</td>
-                        <td>@((code.Started ?? false) ? "Y" : "N")</td>
-                        <td>@((code.Finished ?? false) ? "Y" : "N")</td>
-                        <td>@((code.PreserveResult ?? false) ? "Y" : "N")</td>
-                        <td>@((code.AdjustOtherScores ?? false) ? "Y" : "N")</td>
+                        <td>@((code.Discardable ?? false) ? "Yes" : "No")</td>
+                        <td>@((code.CameToStart ?? false) ? "Yes" : "No")</td>
+                        <td>@((code.Started ?? false) ? "Yes" : "No")</td>
+                        <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
+                        <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
+                        <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
                         <td>
                             <a asp-action="Edit" asp-controller="ScoreCode" asp-route-id="@code.Id"
                                asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
-                            |
                             <a asp-action="Delete" asp-controller="ScoreCode" asp-route-id="@code.Id"
                                asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Delete</a>
                         </td>
