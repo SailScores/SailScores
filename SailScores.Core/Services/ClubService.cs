@@ -102,6 +102,10 @@ namespace SailScores.Core.Services
                     .ThenInclude(f => f.CompetitorFleets)
                 .Include(c => c.Fleets)
                     .ThenInclude(f => f.FleetBoatClasses)
+                .Include(c => c.Regattas)
+                    .ThenInclude(r => r.RegattaSeries)
+                .Include(c => c.Regattas)
+                    .ThenInclude(r => r.RegattaFleet)
                     .FirstOrDefaultAsync();
 
             var retClub = _mapper.Map<Model.Club>(club);

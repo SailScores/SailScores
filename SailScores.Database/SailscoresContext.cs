@@ -72,6 +72,13 @@ namespace SailScores.Database
                     DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) :
                     v);
 
+            modelBuilder.Entity<Regatta>()
+                .Property(e => e.UpdatedDate)
+                .HasConversion(v => v, v =>
+                    v.HasValue ?
+                    DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) :
+                    v);
+
             modelBuilder.Entity<Fleet>()
                 .HasMany(f => f.CompetitorFleets)
                 .WithOne(cf => cf.Fleet)
@@ -80,6 +87,21 @@ namespace SailScores.Database
             modelBuilder.Entity<Fleet>()
                 .HasMany(f => f.FleetBoatClasses)
                 .WithOne(c => c.Fleet)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Regatta>()
+                .HasMany(f => f.RegattaFleet)
+                .WithOne(c => c.Regatta)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Regatta>()
+                .HasMany(f => f.RegattaSeries)
+                .WithOne(c => c.Regatta)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Regatta>()
+                .HasOne(f => f.Season)
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Score>()
