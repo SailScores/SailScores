@@ -42,7 +42,6 @@
     <Folder Include="Areas\Api\Models\" />
     <Folder Include="Areas\Api\Views\" />
     <Folder Include="Data\" />
-    <Folder Include="Views\Regatta\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 

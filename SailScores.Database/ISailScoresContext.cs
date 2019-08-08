@@ -19,6 +19,8 @@ namespace SailScores.Database
         DbSet<Race> Races { get; set; }
         DbSet<Score> Scores { get; set; }
 
+        DbSet<Regatta> Regattas { get; set; }
+
         DbSet<ScoreCode> ScoreCodes { get; set; }
 
         DbSet<UserClubPermission> UserPermissions { get; set; }
