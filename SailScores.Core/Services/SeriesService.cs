@@ -111,10 +111,10 @@ namespace SailScores.Core.Services
             string seasonName,
             string seriesName)
         {
-            var clubId = (await _dbContext.Clubs
-                .SingleAsync( c =>
-                    c.Initials == clubInitials
-                )).Id;
+            var clubId = await _dbContext.Clubs
+                .Where(c =>
+                   c.Initials == clubInitials
+                ).Select(c => c.Id).SingleAsync();
             var seriesDb = await _dbContext
                 .Series
                 .Where(s =>
@@ -552,11 +552,11 @@ namespace SailScores.Core.Services
             await UpdateSeriesResults(existingSeries.Id);
         }
 
-        public async Task Delete(Guid fleetId)
+        public async Task Delete(Guid seriesId)
         {
             var dbSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
-                .SingleAsync(c => c.Id == fleetId);
+                .SingleAsync(c => c.Id == seriesId);
             foreach (var link in dbSeries.RaceSeries.ToList())
             {
                 dbSeries.RaceSeries.Remove(link);

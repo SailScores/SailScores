@@ -9,5 +9,6 @@ namespace SailScores.Web.Services
     public interface IRegattaService
     {
         Task<IEnumerable<RegattaSummary>> GetAllRegattaSummaryAsync(string clubInitials);
+        Task<Regatta> GetRegattaAsync(string clubInitials, string season, string regattaName);
     }
 }

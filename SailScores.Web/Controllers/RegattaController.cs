@@ -49,22 +49,21 @@ namespace SailScores.Web.Controllers
             });
         }
 
-        //public async Task<ActionResult> Details(
-        //    string clubInitials,
-        //    string season,
-        //    string seriesName)
-        //{
-        //    ViewData["ClubInitials"] = clubInitials;
+        public async Task<ActionResult> Details(
+            string clubInitials,
+            string season,
+            string regattaName)
+        {
+            ViewData["ClubInitials"] = clubInitials;
 
-        //    var series = await _seriesService.GetSeriesAsync(clubInitials, season, seriesName);
+            var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
 
-        //    return View(new ClubItemViewModel<Core.Model.Series>
-        //    {
-        //        Item = series,
-        //        ClubInitials = clubInitials
-        //    });
-        //}
-
+            return View(new ClubItemViewModel<Core.Model.Regatta>
+            {
+                Item = regatta,
+                ClubInitials = clubInitials
+            });
+        }
 
         //[Authorize]
         //public async Task<ActionResult> Create(string clubInitials)
