@@ -21,16 +21,24 @@
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="msapplication-TileImage" content="~/images/favicon/mstile-144x144.png">
     <title>@ViewData["Title"] - SailScores</title>
+    @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaDescription"]))
+    {
+        <meta name="description" content="@ViewData["MetaDescription"]" />
+    }
+    @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaKeywords"]))
+    {
+        <meta name="keywords" content="@ViewData["MetaKeywords"]" />
+    }
 
-    <environment include="Development">
-        <link rel="stylesheet" href="~/css/custom.css" />
-        <link rel="stylesheet" href="~/css/site.css" />
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    </environment>
+<environment include="Development">
+    <link rel="stylesheet" href="~/css/custom.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+</environment>
+<environment exclude="Development">
+    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+</environment>
 </head>
 <body>
     <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">

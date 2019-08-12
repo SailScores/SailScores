@@ -1,6 +1,8 @@
 ﻿@model SailScores.Web.Models.SailScores.ClubSelectorModel
 @{
     ViewData["Title"] = "SailScores";
+    ViewData["MetaDescription"] = "Fast mobile-friendly web-based sailing scores";
+    ViewData["MetaKeywords"] = "sailing results scores web mobile-friendly";
 }
 <h1 class="display-4">SailScores</h1>
 <p class="lead">Simple score collection and reporting for one-design sailing.</p>
@@ -9,11 +11,10 @@
     <div class="col-md-6 order-md-first order-last">
         <h4>SailScores features</h4>
         <ul>
-            <li>Fast, simple result entry using the web.</li>
+            <li>Fast, simple result sharing using the web.</li>
             <li>Easy-to-remember and shareable direct links to series and landing pages.</li>
-            <li>Support for overlapping series. (Races can be included in multiple series.)</li>
-            <li>Options available to import results from SailWave.</li>
-            <li>Open-source, volunteer-driven.</li>
+            <li>Support for overlapping series: count the same race towards the weekend series as well as the season champ series.</li>
+            <li>Historical results can be imported from SailWave.</li>
             <li>Club landing page can include links to home page or results on other systems.</li>
             <li>Smartphone, MacOS, and Windows friendly.</li>
             <li>Support for Appendix A Low Point Scoring, 
@@ -25,5 +26,7 @@
     <div class="col-md-6">
         @(await Html.PartialAsync("ClubSelectorView", Model))
         <hr class="my-4 d-md-none">
+        <p class="d-md-none">SailScores is <a href="https://github.com/jbfraser1/SailScores">open source</a> and volunteer driven.</p>
+        <p class="d-md-none">Host your club's scores on this site for free. <a href="mailto:info@sailscores.com">Contact us</a> and we'll help you get started.</p>
     </div>
 </div>
