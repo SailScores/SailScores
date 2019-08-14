@@ -24,6 +24,8 @@ namespace SailScores.Database.Entities
 
         public bool? IsImportantSeries { get; set; }
 
+        public bool? ResultsLocked { get; set; }
+
         [Column("UpdatedDateUtc")]
         public DateTime? UpdatedDate { get; set; }
 
