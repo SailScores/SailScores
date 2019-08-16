@@ -1,4 +1,7 @@
-﻿@model SailScores.Web.Models.SailScores.SeriesWithOptionsViewModel
+﻿@using SailScores.Web.Services
+@using SailScores.Api.Enumerations
+
+@model SailScores.Web.Models.SailScores.SeriesWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -55,6 +58,19 @@
                     }
                 </select>
                 <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TrendOption">Show Rank Trend</label>
+                <select id="ScoringSystemId" asp-for="TrendOption" class="form-control">
+                    @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+                    {
+                        <option value="@trendOption">
+                            @(EnumHelper<TrendOption>.GetDisplayValue(trendOption))
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="TrendOption" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

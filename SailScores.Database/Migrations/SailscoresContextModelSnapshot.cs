@@ -357,9 +357,7 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid?>("ScoringSystemId");
 
                     b.Property<Guid>("SeasonId");
-
-                    b.Property<string>("TrendOption");
-
+                    
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnName("UpdatedDateUtc");
 
