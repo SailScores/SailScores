@@ -19,19 +19,26 @@
             <span asp-validation-for="Date" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
-            <input asp-for="Order" class="form-control" />
-            <span asp-validation-for="Order" class="text-danger"></span>
-        </div>
-        <div class="form-group">
             <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
             <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
-                <option selected="selected">Select a fleet...</option>
+                @if (Model.FleetOptions.Count > 1)
+                {
+                    <option selected="selected">Select a fleet...</option>
+                }
                 @foreach (var fleet in Model.FleetOptions)
                 {
-                    <option value="@fleet.Id">
-                        @fleet.Name
-                    </option>
+                    @if (Model.FleetOptions.Count == 1)
+                    {
+                        <option selected="selected" value="@fleet.Id">
+                            @fleet.Name
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@fleet.Id">
+                            @fleet.Name
+                        </option>
+                    }
                 }
             </select>
             <span asp-validation-for="FleetId" class="text-danger"></span>
@@ -61,6 +68,11 @@
 
                 <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                     <div class="card-body">
+                        <div class="form-group">
+                            <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
+                            <input asp-for="InitialOrder" class="form-control" />
+                            <span asp-validation-for="InitialOrder" class="text-danger"></span>
+                        </div>
                         <div class="form-group">
                             <label asp-for="Name" class="control-label">Name</label>
                             <input asp-for="Name" class="form-control" />

@@ -124,12 +124,19 @@ namespace SailScores.Web.Services
             }
             if(race.Order == 0)
             {
-                var maxOrder = club.Races
-                    .Where(r =>
-                        r.Date == race.Date
-                        && r.Fleet.Id == race.FleetId)
-                    .Max(r => r.Order);
-                race.Order = maxOrder + 1;
+                if (race.InitialOrder.HasValue && race.InitialOrder.Value != 0)
+                {
+                    race.Order = race.InitialOrder.Value;
+                }
+                else
+                {
+                    var maxOrder = club.Races
+                        .Where(r =>
+                            r.Date == race.Date
+                            && r.Fleet.Id == race.FleetId)
+                        .Max(r => r.Order);
+                    race.Order = maxOrder + 1;
+                }
             }
             var raceDto = _mapper.Map<RaceDto>(race);
             await _coreRaceService.SaveAsync(raceDto);
