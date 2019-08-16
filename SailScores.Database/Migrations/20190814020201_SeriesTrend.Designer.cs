@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20190814020201_SeriesTrend")]
+    partial class SeriesTrend
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -358,7 +360,8 @@ namespace SailScores.Database.Migrations
 
                     b.Property<Guid>("SeasonId");
 
-                    b.Property<string>("TrendOption");
+                    b.Property<string>("TrendOption")
+                        .IsRequired();
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnName("UpdatedDateUtc");

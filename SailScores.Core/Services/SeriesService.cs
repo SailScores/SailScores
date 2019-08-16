@@ -209,7 +209,8 @@ namespace SailScores.Core.Services
                     TotalScore = kvp.Value.TotalScore,
                     PointsEarned = kvp.Value.PointsEarned,
                     PointsPossible = kvp.Value.PointsPossible,
-                    Scores = FlattenScores(kvp.Value)
+                    Scores = FlattenScores(kvp.Value),
+                    Trend = kvp.Value.Trend
                 });
         }
 
@@ -513,6 +514,7 @@ namespace SailScores.Core.Services
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
             existingSeries.ScoringSystemId = model.ScoringSystemId;
+            existingSeries.TrendOption = model.TrendOption;
 
             if(model.Season != null
                 && model.Season.Id != Guid.Empty

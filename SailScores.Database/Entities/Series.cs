@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -29,5 +30,7 @@ namespace SailScores.Database.Entities
 
         public Guid? ScoringSystemId { get; set; }
         public ScoringSystem ScoringSystem { get; set; }
+
+        public TrendOption? TrendOption { get; set; }
     }
 }

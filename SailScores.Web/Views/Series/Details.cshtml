@@ -4,6 +4,8 @@
 @using SailScores.Api.Enumerations
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
+@using SailScores.Web.Services
+@using SailScores.Api.Enumerations
 
 @inject IStringLocalizer<SharedResource> localizer
 
@@ -15,16 +17,18 @@
 }
 
 <h2>@Model.Item.Name</h2>
-@if(!String.IsNullOrWhiteSpace(Model.Item.Description)) {
+@if (!String.IsNullOrWhiteSpace(Model.Item.Description))
+{
     <h5>@Model.Item.Description</h5>
 }
 @Model.Item.FlatResults.NumberOfSailedRaces races sailed
 with @Model.Item.FlatResults.NumberOfDiscards discards,
 @Model.Item.FlatResults.Competitors.Count() competitors
-@if(!String.IsNullOrWhiteSpace(@Model.Item.FlatResults.ScoringSystemName)) {
-    @:&ndash; @Model.Item.FlatResults.ScoringSystemName 
+@if (!String.IsNullOrWhiteSpace(@Model.Item.FlatResults.ScoringSystemName))
+{
+    @:&ndash; @Model.Item.FlatResults.ScoringSystemName
 }
-@if(Model.Item.FlatResults.IsPercentSystem && Model.Item.FlatResults.PercentRequired.HasValue)
+@if (Model.Item.FlatResults.IsPercentSystem && Model.Item.FlatResults.PercentRequired.HasValue)
 {
     @:&ndash; @Model.Item.FlatResults.PercentRequired.Value.ToString("G5")% participation required for ranking
 }
@@ -33,6 +37,10 @@ with @Model.Item.FlatResults.NumberOfDiscards discards,
         <thead>
             <tr>
                 <th scope="col">@localizer["Place"]</th>
+                @if ((Model.Item.TrendOption ?? TrendOption.None) != TrendOption.None)
+                {
+            <th scope="col" class="small">@localizer["Change"] <small>@localizer["from"] @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.Item.TrendOption.Value)]</small></th>
+                }
                 <th scope="col">@localizer["Sail"]</th>
                 <th scope="col">@localizer["Helm"]</th>
                 <th scope="col" class="d-none d-sm-table-cell">@localizer["Boat"]</th>
@@ -81,75 +89,95 @@ with @Model.Item.FlatResults.NumberOfDiscards discards,
                 }
             }
             @{ var cellViewData = new ViewDataDictionary(ViewData)
-               {{ "IsPercentSystem", Model.Item.FlatResults.IsPercentSystem }};
+                   {{ "IsPercentSystem", Model.Item.FlatResults.IsPercentSystem }};
             }
             @foreach (var comp in compList)
             {
                 colCount = 0;
-                <tr>
-                    <th scope="row">@Model.Item.FlatResults.GetScore(comp)?.Rank</th>
-                    <th scope="row">@comp.SailNumber</th>
-                    <th scope="row">@comp.Name</th>
-                    <td class="d-none d-sm-table-cell">@comp.BoatName</td>
-                    <td scope="row" class="text-center">
-                        <strong>
-                            @String.Format("{0:0.##}", Model.Item.FlatResults.GetScore(comp)?.TotalScore)
+            <tr>
+                <th scope="row">@Model.Item.FlatResults.GetScore(comp)?.Rank</th>
+                @if ((Model.Item.TrendOption ?? TrendOption.None) != TrendOption.None)
+                {
+                    <th scope="row">
+                        @if (Model.Item.FlatResults.GetScore(comp)?.Trend > 0)
+                        {
+                        <span class="text-success">
+                            <span class="fas fa-arrow-up"></span>
+                            @Model.Item.FlatResults.GetScore(comp).Trend.Value
+                        </span>
+                        }
+                        else if (Model.Item.FlatResults.GetScore(comp)?.Trend < 0)
+                        {
+                        <span class="text-danger">
+                            <span class="fas fa-arrow-down"></span>
+                            @Math.Abs(Model.Item.FlatResults.GetScore(comp).Trend.Value)
+                        </span>
+                    }
 
-                            @if (Model.Item.FlatResults.IsPercentSystem &&
-                               Model.Item.FlatResults.GetScore(comp)?.TotalScore != null)
-                            {
-                                <br />
-                                <span class="small">
-                                    (@Model.Item.FlatResults.GetScore(comp).PointsEarned /
-                                    @Model.Item.FlatResults.GetScore(comp).PointsPossible.Value.ToString("N0"))
-                                </span>
-                            }
-                        </strong>
-                    </td>
+                    </th>
+                }
+                <th scope="row">@comp.SailNumber</th>
+                <th scope="row">@comp.Name</th>
+                <td class="d-none d-sm-table-cell">@comp.BoatName</td>
+                <td scope="row" class="text-center">
+                    <strong>
+                        @String.Format("{0:0.##}", Model.Item.FlatResults.GetScore(comp)?.TotalScore)
 
-                    @foreach (var race in Model.Item.FlatResults.Races)
+                        @if (Model.Item.FlatResults.IsPercentSystem &&
+                       Model.Item.FlatResults.GetScore(comp)?.TotalScore != null)
+                        {
+                            <br />
+                            <span class="small">
+                                (@Model.Item.FlatResults.GetScore(comp).PointsEarned /
+                                @Model.Item.FlatResults.GetScore(comp).PointsPossible.Value.ToString("N0"))
+                            </span>
+                        }
+                    </strong>
+                </td>
+
+                @foreach (var race in Model.Item.FlatResults.Races)
+                {
+                    if (race.State == RaceState.Abandoned)
                     {
-                        if (race.State == RaceState.Abandoned)
+                        if (firstRow)
                         {
-                            if (firstRow)
-                            {
-                                <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
-                                    <span>ABANDONED</span>
-                                </td>
-                            }
-                        }
-                        else if (race.State == RaceState.Scheduled)
-                        {
-                            if (firstRow)
-                            {
-                                <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
-                                    <span>SCHEDULED</span>
-                                </td>
-                            }
-                        }
-                        else
-                        {
-                            var result = Model.Item.FlatResults.GetScore(comp, race);
-
-                            @await Html.PartialAsync("_ScoreCell", result, cellViewData)
-                        }
-                        if (++colCount % 25 == 0 && (Model.Item.FlatResults.NumberOfSailedRaces - colCount) > 10)
-                        {
-                            <td>@comp.Name</td>
+                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
+                                <span>ABANDONED</span>
+                            </td>
                         }
                     }
-                    @if ((Model.Item.FlatResults.NumberOfSailedRaces) > 4)
+                    else if (race.State == RaceState.Scheduled)
                     {
-                        <th class="d-table-cell @(( Model.Item.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")">@comp.Name</th>
+                        if (firstRow)
+                        {
+                            <td rowspan="@(Model.Item.FlatResults?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
+                                <span>SCHEDULED</span>
+                            </td>
+                        }
                     }
-                    @{firstRow = false;
+                    else
+                    {
+                        var result = Model.Item.FlatResults.GetScore(comp, race);
+
+                        @await Html.PartialAsync("_ScoreCell", result, cellViewData)
                     }
-                </tr>
+                    if (++colCount % 25 == 0 && (Model.Item.FlatResults.NumberOfSailedRaces - colCount) > 10)
+                    {
+                        <td>@comp.Name</td>
+                    }
+                }
+                @if ((Model.Item.FlatResults.NumberOfSailedRaces) > 4)
+                {
+                    <th class="d-table-cell @(( Model.Item.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")">@comp.Name</th>
+                }
+                @{firstRow = false;
+                }
+            </tr>
             }
         </tbody>
     </table>
 </div>
-@if(Model.Item.UpdatedDate.HasValue)
+@if (Model.Item.UpdatedDate.HasValue)
 {
     <i>Last updated @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
 }

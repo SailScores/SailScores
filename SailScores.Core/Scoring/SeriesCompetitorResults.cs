@@ -11,6 +11,7 @@ namespace SailScores.Core.Scoring
 
         public Dictionary<Race, CalculatedScore> CalculatedScores { get; set; }
         public int? Rank { get; set; }
+        public int? Trend { get; set; }
         public Decimal? TotalScore { get; set; }
 
         public Decimal? PointsEarned { get; set; }

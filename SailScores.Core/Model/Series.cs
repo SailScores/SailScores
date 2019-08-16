@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Scoring;
+﻿using SailScores.Api.Enumerations;
+using SailScores.Core.Scoring;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -37,5 +38,11 @@ namespace SailScores.Core.Model
         public Guid? ScoringSystemId { get; set; }
         public ScoringSystem ScoringSystem { get; set; }
 
+        public TrendOption? TrendOption { get; set; }
+
+        public Series ShallowCopy()
+        {
+            return (Series)this.MemberwiseClone();
+        }
     }
 }
