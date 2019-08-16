@@ -77,6 +77,10 @@ namespace SailScores.Core.Scoring
                     newSeries.Races = RemoveLastWeeksRaces(series.Races);
                     break;
             }
+            if(newSeries.Races.Count() == 0)
+            {
+                return;
+            }
 
             var oldResults = GetResults(newSeries);
             int maxOldRank = oldResults.Results.Values.Max(v => v.Rank) ?? 0;
