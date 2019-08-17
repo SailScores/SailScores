@@ -9,13 +9,12 @@
 <hr class="my-4">
 <div class="row">
     <div class="col-md-6 order-md-first order-last">
-        <h4>SailScores features</h4>
+        <h4>What's important in sailing club scoring software?</h4>
         <ul>
-            <li>Fast, simple result sharing using the web.</li>
-            <li>Easy-to-remember and shareable direct links to series and landing pages.</li>
+            <li>Fast, simple result entry and sharing using the web.</li>
+            <li>Easy-to-remember and shareable direct links to series and club landing pages.</li>
             <li>Support for overlapping series: count the same race towards the weekend series as well as the season champ series.</li>
-            <li>Historical results can be imported from SailWave.</li>
-            <li>Club landing page can include links to home page or results on other systems.</li>
+            <li>Club landing page can include links to home page or other results.</li>
             <li>Smartphone, MacOS, and Windows friendly.</li>
             <li>Support for Appendix A Low Point Scoring, 
                 <a href="https://www.ussailing.org/competition/rules-officiating/racing-rules/scoring-a-long-series/">
@@ -24,9 +23,12 @@
         </ul>
     </div>
     <div class="col-md-6">
+        <br class="d-none d-md-inline" />
         @(await Html.PartialAsync("ClubSelectorView", Model))
-        <hr class="my-4 d-md-none">
-        <p class="d-md-none">SailScores is <a href="https://github.com/jbfraser1/SailScores">open source</a> and volunteer driven.</p>
-        <p class="d-md-none">Host your club's scores on this site for free. <a href="mailto:info@sailscores.com">Contact us</a> and we'll help you get started.</p>
+        <br />
+        <hr class="my-4">
+        <br class="d-none d-md-inline" />
+        <p class="d-none d-md-inline">SailScores is <a href="https://github.com/jbfraser1/SailScores">open source</a> and volunteer driven.</p>
+        <p class="d-none d-md-inline">Host your club's scores on this site for free. <a href="mailto:info@sailscores.com">Contact us</a> and we'll help you get started.</p>
     </div>
 </div>
