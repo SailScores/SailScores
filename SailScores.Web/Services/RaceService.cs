@@ -134,7 +134,8 @@ namespace SailScores.Web.Services
                         .Where(r =>
                             r.Date == race.Date
                             && r.Fleet.Id == race.FleetId)
-                        .Max(r => r.Order);
+                        .DefaultIfEmpty()
+                        .Max(r => r?.Order ?? 0);
                     race.Order = maxOrder + 1;
                 }
             }

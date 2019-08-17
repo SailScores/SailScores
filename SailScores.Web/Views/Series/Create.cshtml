@@ -48,6 +48,18 @@
                 <span asp-validation-for="SeasonId" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="TrendOption">Calculate Rank Trend</label>
+                <select id="ScoringSystemId" asp-for="TrendOption" class="form-control">
+                    @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+                    {
+                        <option value="@trendOption">
+                            @(EnumHelper<TrendOption>.GetDisplayValue(trendOption))
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="TrendOption" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="ScoringSystemId">Default Scoring System</label>
                 <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-control">
                     @foreach (var scoringSystem in Model.ScoringSystemOptions)
@@ -58,19 +70,6 @@
                     }
                 </select>
                 <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="TrendOption">Show Rank Trend</label>
-                <select id="ScoringSystemId" asp-for="TrendOption" class="form-control">
-                    @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
-                    {
-                        <option value="@trendOption">
-                            @(EnumHelper<TrendOption>.GetDisplayValue(trendOption))
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="TrendOption" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
