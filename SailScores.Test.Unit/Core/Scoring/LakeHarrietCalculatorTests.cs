@@ -204,5 +204,25 @@ namespace SailScores.Test.Unit
 
             };
         }
+
+        [Fact]
+        public void CalculateResults_Trend_GivesNumber()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(10, 3);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
+            var firstComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == firstComp).Code = "DNC";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == firstComp).Place = null;
+
+            var secondComp = basicSeries.Competitors.Skip(1).First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == secondComp).Code = null;
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == secondComp).Place = 1;
+            
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.True(results.Results[firstComp].Trend < 0);
+            Assert.Equal(1, results.Results[secondComp].Trend);
+        }
     }
 }

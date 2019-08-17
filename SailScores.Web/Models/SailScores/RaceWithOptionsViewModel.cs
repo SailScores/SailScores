@@ -14,5 +14,7 @@ namespace SailScores.Web.Models.SailScores
 
         public Guid FleetId { get; set; }
         public IList<Guid> SeriesIds { get; set; }
+
+        public int? InitialOrder { get; set; }
     }
 }

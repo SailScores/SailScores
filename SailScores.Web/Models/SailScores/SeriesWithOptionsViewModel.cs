@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace SailScores.Web.Models.SailScores
         public IEnumerable<Season> SeasonOptions { get; set; }
 
         public IList<ScoringSystem> ScoringSystemOptions { get; set; }
-
+        
         private Guid _seasonId;
         public Guid SeasonId
         {

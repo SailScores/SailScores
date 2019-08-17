@@ -1,4 +1,7 @@
-﻿@model SailScores.Web.Models.SailScores.SeriesWithOptionsViewModel
+﻿@using SailScores.Web.Services
+@using SailScores.Api.Enumerations
+
+@model SailScores.Web.Models.SailScores.SeriesWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -22,13 +25,6 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="IsImportantSeries" /> List as Top Series
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
@@ -46,17 +42,61 @@
                 </select>
                 <span asp-validation-for="SeasonId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ScoringSystemId">Default Scoring System</label>
-                <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-control">
-                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
-                    {
-                        <option value="@scoringSystem.Id">
-                            @scoringSystem.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+
+            <div id="advancedFields" role="tablist">
+                <div class="card">
+                    <div class="card-header" role="tab" id="advancedHeading">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                Additional Settings
+                            </a> <span class="small"><em>&ensp;Optional</em></span>
+                        </h5>
+                    </div>
+
+                    <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input asp-for="IsImportantSeries" /> List as Top Series
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input asp-for="ResultsLocked" /> Lock Results
+                                    </label>
+                                    <span class="small">Prevents scores from recalculating for this series</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="TrendOption">Calculate Rank Trend</label>
+                                <select id="ScoringSystemId" asp-for="TrendOption" class="form-control">
+                                    @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+                                    {
+                                        <option value="@trendOption">
+                                            @(EnumHelper<TrendOption>.GetDisplayValue(trendOption))
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="TrendOption" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ScoringSystemId">Default Scoring System</label>
+                                <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-control">
+                                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                                    {
+                                        <option value="@scoringSystem.Id">
+                                            @scoringSystem.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -65,6 +105,7 @@
                    asp-fragment="series"
                    class="btn btn-outline-primary">Cancel</a>
             </div>
+
         </form>
     </div>
 </div>

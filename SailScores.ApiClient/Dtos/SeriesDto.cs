@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,7 +17,7 @@ namespace SailScores.Api.Dtos
 
         [StringLength(2000)]
         public String Description { get; set; }
-        
+
         public IList<Guid> RaceIds { get; set; }
 
         [Required]
@@ -24,7 +25,11 @@ namespace SailScores.Api.Dtos
 
         public bool? IsImportantSeries { get; set; }
 
+        public bool? ResultsLocked { get; set; }
+
         public DateTime? UpdatedDate { get; set; }
+
+        public TrendOption? TrendOption { get; set; }
 
     }
 }

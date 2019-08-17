@@ -13,5 +13,6 @@
 }
 else
 {
-    <a class="nav-link pt-0" asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.GetDisplayUrl()">Log in</a>
+    <a class="nav-link pt-0" asp-area="" asp-controller="Account" asp-action="Login"
+       asp-route-returnUrl="@Context.Request.GetEncodedUrl()">Log in</a>
 }

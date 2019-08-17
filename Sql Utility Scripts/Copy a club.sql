@@ -43,7 +43,7 @@ Insert into UserPermissions
     UserEmail,
     ClubId,
     CanEditAllClubs)
-Select Id, UserEmail, @NewClubId, CanEditAllClubs
+Select NEWID(), UserEmail, @NewClubId, CanEditAllClubs
 from UserPermissions
 where ClubId = @FromClubId
 

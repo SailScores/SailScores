@@ -40,6 +40,13 @@ namespace SailScores.Core.Scoring
 
         public SeriesResults CalculateResults(Series series)
         {
+            SeriesResults returnResults = GetResults(series);
+            AddTrend(returnResults,series);
+            return returnResults;
+        }
+
+        private SeriesResults GetResults(Series series)
+        {
             SeriesResults returnResults = BuildResults(series);
 
             SetScores(returnResults,
@@ -49,6 +56,78 @@ namespace SailScores.Core.Scoring
                     r => r
                         .Scores));
             return returnResults;
+        }
+
+        private void AddTrend(SeriesResults results, Series series)
+        {
+            if((series.TrendOption ?? TrendOption.None) == TrendOption.None)
+            {
+                return;
+            }
+            var newSeries = series.ShallowCopy();
+            switch (series.TrendOption)
+            {
+                case TrendOption.PreviousDay:
+                    newSeries.Races = RemoveLastDaysRaces(series.Races);
+                    break;
+                case TrendOption.PreviousRace:
+                    newSeries.Races = RemoveLastRace(series.Races);
+                    break;
+                case TrendOption.PreviousWeek:
+                    newSeries.Races = RemoveLastWeeksRaces(series.Races);
+                    break;
+            }
+            if(newSeries.Races.Count() == 0)
+            {
+                return;
+            }
+
+            var oldResults = GetResults(newSeries);
+            int maxOldRank = oldResults.Results.Values.Max(v => v.Rank) ?? 0;
+            foreach(var comp in results.Competitors)
+            {
+                int oldRank;
+
+                if(oldResults.Results.ContainsKey(comp)
+                    && oldResults.Results[comp]?.Rank != null)
+                {
+                    oldRank = oldResults.Results[comp].Rank.Value;
+                } else
+                {
+                    oldRank = maxOldRank + 1;
+                }
+                if (results.Results[comp]?.Rank != null)
+                {
+                    results.Results[comp].Trend =
+                       0 - (results.Results[comp].Rank -
+                       oldRank);
+                }
+            }
+        }
+
+        private IList<Race> RemoveLastDaysRaces(IList<Race> races)
+        {
+            var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
+                .Max(r => r.Date) ?? DateTime.Today;
+            return races.Where(r => r.Date == null || r.Date < lastRaceDate.AddDays(-1)).ToList();
+        }
+
+        private IList<Race> RemoveLastWeeksRaces(IList<Race> races)
+        {
+            var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
+                .Max(r => r.Date) ?? DateTime.Today;
+            return races.Where(r => r.Date == null || r.Date < lastRaceDate.AddDays(-7)).ToList();
+        }
+        private IList<Race> RemoveLastRace(IList<Race> races)
+        {
+            if(races.Count <= 1)
+            {
+                return new List<Race>();
+            }
+            var lastRaceId = races
+                .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
+                .OrderBy(r => r.Date).ThenBy(r => r.Order).Last().Id;
+            return races.Where(r => r.Id != lastRaceId).ToList();
         }
 
         private SeriesResults BuildResults(Series series)

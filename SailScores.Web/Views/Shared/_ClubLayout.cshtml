@@ -26,6 +26,14 @@
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="msapplication-TileImage" content="~/images/favicon/mstile-144x144.png">
     <title>@ViewData["Title"]</title>
+    @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaDescription"]))
+    {
+        <meta name="description" content="@ViewData["MetaDescription"]" />
+    }
+    @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaKeywords"]))
+    {
+        <meta name="keywords" content="@ViewData["MetaKeywords"]" />
+    }
 
     <environment include="Development">
         <link rel="stylesheet" href="~/css/custom.css" />

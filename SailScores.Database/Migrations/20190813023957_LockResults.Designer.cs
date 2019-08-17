@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20190813023957_LockResults")]
+    partial class LockResults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,67 +233,6 @@ namespace SailScores.Database.Migrations
                     b.ToTable("Races");
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.Regatta", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("ClubId");
-
-                    b.Property<string>("Description");
-
-                    b.Property<DateTime?>("EndDate");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200);
-
-                    b.Property<Guid?>("ScoringSystemId");
-
-                    b.Property<Guid>("SeasonId");
-
-                    b.Property<DateTime?>("StartDate");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnName("UpdatedDateUtc");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClubId");
-
-                    b.HasIndex("ScoringSystemId");
-
-                    b.HasIndex("SeasonId");
-
-                    b.ToTable("Regattas");
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.RegattaFleet", b =>
-                {
-                    b.Property<Guid>("RegattaId");
-
-                    b.Property<Guid>("FleetId");
-
-                    b.HasKey("RegattaId", "FleetId");
-
-                    b.HasIndex("FleetId");
-
-                    b.ToTable("RegattaFleet");
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.RegattaSeries", b =>
-                {
-                    b.Property<Guid>("RegattaId");
-
-                    b.Property<Guid>("SeriesId");
-
-                    b.HasKey("RegattaId", "SeriesId");
-
-                    b.HasIndex("SeriesId");
-
-                    b.ToTable("RegattaSeries");
-                });
-
             modelBuilder.Entity("SailScores.Database.Entities.Score", b =>
                 {
                     b.Property<Guid>("Id")
@@ -421,8 +362,6 @@ namespace SailScores.Database.Migrations
 
                     b.Property<Guid>("SeasonId");
 
-                    b.Property<string>("TrendOption");
-
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnName("UpdatedDateUtc");
 
@@ -547,49 +486,6 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
                         .WithMany()
                         .HasForeignKey("FleetId");
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.Regatta", b =>
-                {
-                    b.HasOne("SailScores.Database.Entities.Club")
-                        .WithMany("Regattas")
-                        .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("SailScores.Database.Entities.ScoringSystem", "ScoringSystem")
-                        .WithMany()
-                        .HasForeignKey("ScoringSystemId");
-
-                    b.HasOne("SailScores.Database.Entities.Season", "Season")
-                        .WithMany()
-                        .HasForeignKey("SeasonId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.RegattaFleet", b =>
-                {
-                    b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
-                        .WithMany()
-                        .HasForeignKey("FleetId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("SailScores.Database.Entities.Regatta", "Regatta")
-                        .WithMany("RegattaFleet")
-                        .HasForeignKey("RegattaId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.RegattaSeries", b =>
-                {
-                    b.HasOne("SailScores.Database.Entities.Regatta", "Regatta")
-                        .WithMany("RegattaSeries")
-                        .HasForeignKey("RegattaId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("SailScores.Database.Entities.BoatClass", "Series")
-                        .WithMany()
-                        .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Score", b =>

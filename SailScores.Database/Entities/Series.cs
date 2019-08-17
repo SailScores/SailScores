@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,10 +25,14 @@ namespace SailScores.Database.Entities
 
         public bool? IsImportantSeries { get; set; }
 
+        public bool? ResultsLocked { get; set; }
+
         [Column("UpdatedDateUtc")]
         public DateTime? UpdatedDate { get; set; }
 
         public Guid? ScoringSystemId { get; set; }
         public ScoringSystem ScoringSystem { get; set; }
+
+        public TrendOption? TrendOption { get; set; }
     }
 }

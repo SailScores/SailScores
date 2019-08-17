@@ -120,6 +120,15 @@ namespace SailScores.Database
                     v => v.ToString(),
                     v => (RaceState)Enum.Parse(typeof(RaceState), v));
 
+            modelBuilder
+                .Entity<Series>()
+                .Property(e => e.TrendOption)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (TrendOption)Enum.Parse(typeof(TrendOption), v));
+
+
+
         }
 
         public override int SaveChanges()
