@@ -89,6 +89,11 @@ namespace SailScores.Core.Services
                     .Include(s => s.Season)
                 .SingleAsync(s => s.Id == seriesId);
 
+            if(dbSeries.ResultsLocked ?? false)
+            {
+                return;
+            }
+
             var fullSeries = _mapper.Map<Series>(dbSeries);
             var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
                 fullSeries);
@@ -513,10 +518,11 @@ namespace SailScores.Core.Services
             existingSeries.Name = RemoveDisallowedCharacters(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
+            existingSeries.ResultsLocked = model.ResultsLocked;
             existingSeries.ScoringSystemId = model.ScoringSystemId;
             existingSeries.TrendOption = model.TrendOption;
 
-            if(model.Season != null
+            if (model.Season != null
                 && model.Season.Id != Guid.Empty
                 && existingSeries.Season?.Id != model.Season?.Id)
             {
@@ -550,8 +556,10 @@ namespace SailScores.Core.Services
             }
 
             await _dbContext.SaveChangesAsync();
-
-            await UpdateSeriesResults(existingSeries.Id);
+            if (!(existingSeries.ResultsLocked ?? false))
+            {
+                await UpdateSeriesResults(existingSeries.Id);
+            }
         }
 
         public async Task Delete(Guid fleetId)
