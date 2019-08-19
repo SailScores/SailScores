@@ -1,4 +1,4 @@
-using SailScores.Api.Enumerations;
+﻿using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -687,7 +687,7 @@ namespace SailScores.Core.Scoring
             if (returnScoreCode == null)
             {
                 returnScoreCode = _scoringSystem.InheritedScoreCodes
-                    .SingleOrDefault(c =>
+                    ?.SingleOrDefault(c =>
                         c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
             }
 
