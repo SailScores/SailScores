@@ -44,10 +44,24 @@ namespace SailScores.Test.Unit
                     Formula = "FIN+",
                     ScoreLike = null
                 },
-                                new ScoreCode
+                new ScoreCode
                 {
                     Id = Guid.NewGuid(),
                     Name = "SB",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = null,
+                    AdjustOtherScores = null,
+                    CameToStart = false,
+                    Finished = false,
+                    Formula = "AVE ND",
+                    ScoreLike = null
+                },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "ORA",
                     PreserveResult = false,
                     Discardable = true,
                     Started = false,
@@ -223,6 +237,25 @@ namespace SailScores.Test.Unit
 
             Assert.True(results.Results[firstComp].Trend < 0);
             Assert.Equal(1, results.Results[secondComp].Trend);
+        }
+
+
+        [Fact]
+        public void CalculateResults_LotsOfAverage_GivesNonZero()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(10, 6);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
+            var firstComp = basicSeries.Competitors.First();
+            for(int i = 0; i < 4; i++)
+            {
+                basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Code = "ORA";
+                basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Place = null;
+            }
+            
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.True(results.Results[firstComp].TotalScore > 0);
         }
     }
 }
