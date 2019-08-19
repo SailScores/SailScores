@@ -65,53 +65,53 @@ namespace SailScores.Web.Controllers
             });
         }
 
-        //[Authorize]
-        //public async Task<ActionResult> Create(string clubInitials)
-        //{
-        //    var club = await _clubService.GetFullClub(clubInitials);
-        //    var vm = new SeriesWithOptionsViewModel();
-        //    vm.SeasonOptions = club.Seasons;
-        //    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-        //    scoringSystemOptions.Add(new ScoringSystem
-        //    {
-        //        Id = Guid.Empty,
-        //        Name = "<Use Club Default>"
-        //    });
-        //    vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
-        //    return View(vm);
-        //}
+        [Authorize]
+        public async Task<ActionResult> Create(string clubInitials)
+        {
+            var club = await _clubService.GetFullClub(clubInitials);
+            var vm = new RegattaWithOptionsViewModel();
+            vm.SeasonOptions = club.Seasons;
+            var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+            scoringSystemOptions.Add(new ScoringSystem
+            {
+                Id = Guid.Empty,
+                Name = "<Use Club Default>"
+            });
+            vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+            return View(vm);
+        }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Authorize]
-        //public async Task<ActionResult> Create(string clubInitials, SeriesWithOptionsViewModel model)
-        //{
-        //    try
-        //    {
-        //        var clubId = await _clubService.GetClubId(clubInitials);
-        //        if (!await _authService.CanUserEdit(User, clubId))
-        //        {
-        //            return Unauthorized();
-        //        }
-        //        model.ClubId = clubId;
-        //        await _seriesService.SaveNew(model);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<ActionResult> Create(string clubInitials, SeriesWithOptionsViewModel model)
+        {
+            try
+            {
+                var clubId = await _clubService.GetClubId(clubInitials);
+                if (!await _authService.CanUserEdit(User, clubId))
+                {
+                    return Unauthorized();
+                }
+                model.ClubId = clubId;
+                //await _seriesService.SaveNew(model);
 
-        //        return RedirectToAction("Index", "Admin");
-        //    }
-        //    catch
-        //    {
-        //        var club = await _clubService.GetFullClub(clubInitials);
-        //        model.SeasonOptions = club.Seasons;
-        //        var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-        //        scoringSystemOptions.Add(new ScoringSystem
-        //        {
-        //            Id = Guid.Empty,
-        //            Name = "<Use Club Default>"
-        //        });
-        //        model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
-        //        return View(model);
-        //    }
-        //}
+                return RedirectToAction("Index", "Admin");
+            }
+            catch
+            {
+                var club = await _clubService.GetFullClub(clubInitials);
+                model.SeasonOptions = club.Seasons;
+                var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+                scoringSystemOptions.Add(new ScoringSystem
+                {
+                    Id = Guid.Empty,
+                    Name = "<Use Club Default>"
+                });
+                model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                return View(model);
+            }
+        }
 
         //[Authorize]
         //public async Task<ActionResult> Edit(string clubInitials, Guid id)
