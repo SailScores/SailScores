@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -445,14 +445,26 @@ namespace SailScores.Core.Scoring
             int numAverages = compResults.CalculatedScores
                     .Values.Count(s =>
                         IsAverage(s.RawScore.Code));
+            int numNoDiscardAverages = compResults.CalculatedScores
+                .Values.Count(s =>
+                    IsNonDiscardAverage(s.RawScore.Code));
             int discards = GetNumberOfDiscards(compResults.CalculatedScores.Count);
 
-            var average = compResults.CalculatedScores.Values
-                .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
-                .OrderBy(s => s.ScoreValue)
-                .Take(compResults.CalculatedScores.Count - numAverages - discards)
-                .Average(s => s.ScoreValue) ?? 0m;
-
+            decimal average;
+            if (compResults.CalculatedScores.Count - discards <= numNoDiscardAverages)
+            {
+                average = compResults.CalculatedScores.Values
+                    .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
+                    .OrderBy(s => s.ScoreValue)
+                    .FirstOrDefault().ScoreValue ?? 0m;
+            } else
+            {
+                average = compResults.CalculatedScores.Values
+                   .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
+                   .OrderBy(s => s.ScoreValue)
+                   .Take(compResults.CalculatedScores.Count - numAverages - discards)
+                   .Average(s => s.ScoreValue) ?? 0m;
+            }
             return Math.Round(average, 1, MidpointRounding.AwayFromZero);
 
         }
@@ -491,6 +503,16 @@ namespace SailScores.Core.Scoring
             return scoreCode.Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
                 || scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
                 || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
+        }
+
+        protected bool IsNonDiscardAverage(string code)
+        {
+            if (String.IsNullOrWhiteSpace(code))
+            {
+                return false;
+            }
+            var scoreCode = GetScoreCode(code);
+            return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE);
         }
 
         protected bool CountsAsStarted(Score s)
