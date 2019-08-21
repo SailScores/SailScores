@@ -28,7 +28,19 @@ namespace SailScores.Core.Services
             _dbObjectBuilder = dbObjBuilder;
             _mapper = mapper;
         }
-        
+        public async Task<IList<Regatta>> GetAllRegattasAsync(Guid clubId)
+        {
+            var regattaDb = await _dbContext
+                .Clubs
+                .Where(c => c.Id == clubId)
+                .SelectMany(c => c.Regattas)
+                .OrderBy(r => r.StartDate)
+                .ToListAsync();
+
+            var returnObj = _mapper.Map<List<Regatta>>(regattaDb);
+            return returnObj;
+        }
+
         public async Task<Regatta> GetRegattaAsync(string clubInitials, string seasonName, string regattaName)
         {
             var clubId = await _dbContext.Clubs
@@ -95,6 +107,5 @@ namespace SailScores.Core.Services
 
             await _dbContext.SaveChangesAsync();
         }
-
     }
 }

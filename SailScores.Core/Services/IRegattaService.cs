@@ -7,6 +7,8 @@ namespace SailScores.Core.Services
 {
     public interface IRegattaService
     {
+        Task<IList<Model.Regatta>> GetAllRegattasAsync(
+            Guid clubId);
         Task<Core.Model.Regatta> GetRegattaAsync(
             string clubInitials,
             string seasonName,

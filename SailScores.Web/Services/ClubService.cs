@@ -16,6 +16,7 @@ namespace SailScores.Web.Services
         private readonly Core.Services.ISeasonService _coreSeasonService;
         private readonly Core.Services.IRaceService _coreRaceService;
         private readonly Core.Services.ISeriesService _coreSeriesService;
+        private readonly Core.Services.IRegattaService _coreRegattaService;
 
         private readonly IMapper _mapper;
 
@@ -24,12 +25,14 @@ namespace SailScores.Web.Services
             Core.Services.ISeasonService seasonService,
             Core.Services.IRaceService raceService,
             Core.Services.ISeriesService seriesService,
+            Core.Services.IRegattaService regattaService,
             IMapper mapper)
         {
             _coreClubService = clubService;
             _coreSeasonService = seasonService;
             _coreRaceService = raceService;
             _coreSeriesService = seriesService;
+            _coreRegattaService = regattaService;
             _mapper = mapper;
         }
 
@@ -45,6 +48,7 @@ namespace SailScores.Web.Services
             club.Seasons = await _coreSeasonService.GetSeasons(clubId);
             club.Races = await _coreRaceService.GetRacesAsync(clubId);
             club.Series = await _coreSeriesService.GetAllSeriesAsync(clubId, null);
+            club.Regattas = await _coreRegattaService.GetAllRegattasAsync(clubId);
             return club;
         }
     }

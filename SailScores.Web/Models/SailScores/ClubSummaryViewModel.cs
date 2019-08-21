@@ -29,6 +29,7 @@ namespace SailScores.Web.Models.SailScores
         public IList<Season> Seasons { get; set; }
         public IList<SeriesSummary> Series { get; set; }
         public IList<RaceSummaryViewModel> Races { get; set; }
+        public IList<RegattaSummary> Regattas { get; set; }
 
         public ScoringSystem DefaultScoringSystem { get; set; }
 
@@ -60,5 +61,12 @@ namespace SailScores.Web.Models.SailScores
                     s.IsImportantSeries ?? false)
             .OrderBy(s => s.Season.Name)
             .ThenBy(s => s.Name);
+
+        public IEnumerable<RegattaSummary> CurrentRegattas => Regattas
+        ?.Where(r =>
+            (r.EndDate.HasValue && r.EndDate.Value > DateTime.Today.AddDays(-14))
+            ||
+            (r.StartDate.HasValue && r.StartDate.Value < DateTime.Today.AddDays(14)))
+        .OrderBy(r => r.Name);
     }
 }

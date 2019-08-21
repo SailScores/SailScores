@@ -31,6 +31,32 @@
         </div>
     </div>
 }
+@if (Model.CurrentRegattas.Any())
+{
+<div class="row">
+    <div class="col-md-12">
+        <h2>Regatta!</h2>
+        <ul class="list-unstyled">
+            @foreach (var regatta in Model.CurrentRegattas)
+            {
+            <li>
+                @regatta.StartDate?.ToString("D") - @regatta.EndDate?.ToString("D") <br />
+                <h3>
+                    <a href="~/@ViewData["ClubInitials"]/@regatta.Season.Name/@regatta.Name">
+                        @regatta.Season.Name  @regatta.Name
+
+                    </a>
+                    @if (regatta.UpdatedDate.HasValue && regatta.UpdatedDate > DateTime.Now.AddDays(-15))
+                    {
+                        <i><small>Updated @regatta.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                    }
+                </h3>
+            </li>
+            }
+        </ul>
+    </div>
+</div>
+}
 <div class="row">
     @if (Model.ImportantSeries.Any())
     {
