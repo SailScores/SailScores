@@ -26,7 +26,13 @@ namespace SailScores.Core.Model
         public IList<Fleet> Fleets { get; set; }
         
         public DateTime? UpdatedDate { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
         public DateTime? StartDate { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
         public DateTime? EndDate { get; set; }
 
         public Guid? ScoringSystemId { get; set; }

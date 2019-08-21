@@ -10,7 +10,7 @@
 
 <h2>Create</h2>
 
-<h4>Series</h4>
+<h4>Regatta</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -19,7 +19,6 @@
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
-                <span class="small">Some special characters are not allowed: : / ? # [ ] @@ ! $ & ' ( ) * + , ; =</span>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -27,18 +26,15 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div id="seasonSelectGroup" class="form-group">
-                <label asp-for="SeasonId" class="control-label">Season</label>
-                <select asp-for="SeasonId" class="form-control">
-                    <option selected="selected">Select a season...</option>
-                    @foreach (var season in Model.SeasonOptions)
-                    {
-                        <option value="@season.Id">
-                            @season.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="SeasonId" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input id="date" asp-for="StartDate" class="form-control"/>
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndDate" class="control-label"></label>
+                <input id="date" asp-for="EndDate" class="form-control"/>
+                <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
             <div id="advancedFields" role="tablist">
                 <div class="card">

@@ -38,8 +38,22 @@ namespace SailScores.Web.Services
 
         public async Task<Regatta> GetRegattaAsync(string clubInitials, string season, string regattaName)
         {
-            // todo
             return await _coreRegattaService.GetRegattaAsync(clubInitials, season, regattaName);
+        }
+
+        public async Task SaveNew(RegattaWithOptionsViewModel model)
+        {
+            var club = await _clubService.GetFullClub(model.ClubId);
+            if (model.StartDate.HasValue)
+            {
+                model.Season = club.Seasons.Single(s => s.Start <= model.StartDate.Value
+                && s.End >= model.StartDate.Value);
+            }
+            if (model.ScoringSystemId == Guid.Empty)
+            {
+                model.ScoringSystemId = null;
+            }
+            await _coreRegattaService.SaveNewRegatta(model);
         }
     }
 }

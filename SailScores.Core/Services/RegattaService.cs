@@ -16,13 +16,16 @@ namespace SailScores.Core.Services
     public class RegattaService : IRegattaService
     {
         private readonly ISailScoresContext _dbContext;
+        private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly IMapper _mapper;
 
         public RegattaService(
             ISailScoresContext dbContext,
+            IDbObjectBuilder dbObjBuilder,
             IMapper mapper)
         {
             _dbContext = dbContext;
+            _dbObjectBuilder = dbObjBuilder;
             _mapper = mapper;
         }
         
@@ -49,9 +52,33 @@ namespace SailScores.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task SaveNewRegatta(Regatta regatta)
+        public async Task SaveNewRegatta(Regatta regatta)
         {
-            throw new NotImplementedException();
+            Database.Entities.Regatta dbRegatta = await _dbObjectBuilder.BuildDbRegattaAsync(regatta);
+            
+            dbRegatta.UpdatedDate = DateTime.UtcNow;
+            if (dbRegatta.Season == null && regatta.Season.Id != Guid.Empty && regatta.Season.Start != default(DateTime))
+            {
+                var season = _mapper.Map<dbObj.Season>(regatta.Season);
+                _dbContext.Seasons.Add(season);
+                dbRegatta.Season = season;
+            }
+            if (dbRegatta.Season == null)
+            {
+                throw new InvalidOperationException("Could not find or create season for new Regatta.");
+            }
+
+            if (_dbContext.Series.Any(s =>
+                s.Id == regatta.Id
+                || (s.ClubId == regatta.ClubId
+                    && s.Name == regatta.Name
+                    && s.Season.Id == regatta.Season.Id)))
+            {
+                throw new InvalidOperationException("Cannot create regatta. A regatta with this name in this season already exists.");
+            }
+
+            _dbContext.Regattas.Add(dbRegatta);
+            await _dbContext.SaveChangesAsync();
         }
 
         public Task Update(Regatta model)

@@ -10,5 +10,6 @@ namespace SailScores.Web.Services
     {
         Task<IEnumerable<RegattaSummary>> GetAllRegattaSummaryAsync(string clubInitials);
         Task<Regatta> GetRegattaAsync(string clubInitials, string season, string regattaName);
+        Task SaveNew(RegattaWithOptionsViewModel model);
     }
 }

@@ -17,6 +17,7 @@ namespace SailScores.Test.Unit.Core.Services
     public class SeriesServiceTests
     {
         private readonly Series _fakeSeries;
+        private readonly DbObjectBuilder _dbObjectBuilder;
         private readonly SeriesService _service;
 
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
@@ -73,9 +74,16 @@ namespace SailScores.Test.Unit.Core.Services
 
             _context.Series.Add(_mapper.Map<Database.Entities.Series>(_fakeSeries));
             _context.SaveChanges();
+
+            //yep, this means we are testing the real DbObjectBuilder as well:
+            _dbObjectBuilder = new DbObjectBuilder(
+                _context,
+                _mapper
+                );
             _service = new SailScores.Core.Services.SeriesService(
                 _mockScoringCalculatorFactory.Object,
                 _mockScoringService.Object,
+                _dbObjectBuilder,
                 _context,
                 _mapper
                 );

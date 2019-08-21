@@ -12,6 +12,7 @@ namespace SailScores.Core.Services
         public static void RegisterCoreSailScoresServices(
             this IServiceCollection services)
         {
+            services.AddScoped<IDbObjectBuilder, DbObjectBuilder>();
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IBoatClassService, BoatClassService>();
             services.AddScoped<IFleetService, FleetService>();

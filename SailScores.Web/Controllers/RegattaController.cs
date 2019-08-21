@@ -84,7 +84,7 @@ namespace SailScores.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> Create(string clubInitials, SeriesWithOptionsViewModel model)
+        public async Task<ActionResult> Create(string clubInitials, RegattaWithOptionsViewModel model)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = clubId;
-                //await _seriesService.SaveNew(model);
+                await _regattaService.SaveNew(model);
 
                 return RedirectToAction("Index", "Admin");
             }
@@ -113,96 +113,97 @@ namespace SailScores.Web.Controllers
             }
         }
 
-        //[Authorize]
-        //public async Task<ActionResult> Edit(string clubInitials, Guid id)
-        //{
-        //    var club = await _clubService.GetFullClub(clubInitials);
-        //    if (!await _authService.CanUserEdit(User, club.Id))
-        //    {
-        //        return Unauthorized();
-        //    }
-        //    var series =
-        //        club.Series
-        //        .SingleOrDefault(c => c.Id == id);
-        //    if (series == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
-        //    seriesWithOptions.SeasonOptions = club.Seasons;
+        [Authorize]
+        public async Task<ActionResult> Edit(string clubInitials, Guid id)
+        {
+            var club = await _clubService.GetFullClub(clubInitials);
+            if (!await _authService.CanUserEdit(User, club.Id))
+            {
+                return Unauthorized();
+            }
+            var regatta =
+                club.Regattas
+                .SingleOrDefault(c => c.Id == id);
+            if (regatta == null)
+            {
+                return NotFound();
+            }
+            throw new NotImplementedException();
+            //    var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
+            //    seriesWithOptions.SeasonOptions = club.Seasons;
 
-        //    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-        //    scoringSystemOptions.Add(new ScoringSystem
-        //    {
-        //        Id = Guid.Empty,
-        //        Name = "<Use Club Default>"
-        //    });
-        //    seriesWithOptions.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
-        //    return View(seriesWithOptions);
-        //}
+            //    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+            //    scoringSystemOptions.Add(new ScoringSystem
+            //    {
+            //        Id = Guid.Empty,
+            //        Name = "<Use Club Default>"
+            //    });
+            //    seriesWithOptions.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+            //    return View(seriesWithOptions);
+        }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Authorize]
-        //public async Task<ActionResult> Edit(string clubInitials, SeriesWithOptionsViewModel model)
-        //{
-        //    try
-        //    {
-        //        var club = await _clubService.GetFullClub(clubInitials);
-        //        if (!await _authService.CanUserEdit(User, club.Id)
-        //            || !club.Series.Any(c => c.Id == model.Id))
-        //        {
-        //            return Unauthorized();
-        //        }
-        //        await _seriesService.Update(model);
+            //[HttpPost]
+            //[ValidateAntiForgeryToken]
+            //[Authorize]
+            //public async Task<ActionResult> Edit(string clubInitials, SeriesWithOptionsViewModel model)
+            //{
+            //    try
+            //    {
+            //        var club = await _clubService.GetFullClub(clubInitials);
+            //        if (!await _authService.CanUserEdit(User, club.Id)
+            //            || !club.Series.Any(c => c.Id == model.Id))
+            //        {
+            //            return Unauthorized();
+            //        }
+            //        await _seriesService.Update(model);
 
-        //        return RedirectToAction("Index", "Admin");
-        //    }
-        //    catch
-        //    {
-        //        return View(model);
-        //    }
-        //}
+            //        return RedirectToAction("Index", "Admin");
+            //    }
+            //    catch
+            //    {
+            //        return View(model);
+            //    }
+            //}
 
-        //[Authorize]
-        //public async Task<ActionResult> Delete(string clubInitials, Guid id)
-        //{
-        //    var club = await _clubService.GetFullClub(clubInitials);
-        //    if (!await _authService.CanUserEdit(User, club.Id)
-        //        || !club.Series.Any(c => c.Id == id))
-        //    {
-        //        return Unauthorized();
-        //    }
-        //    var series = club.Series.SingleOrDefault(c => c.Id == id);
-        //    if (series == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(series);
-        //}
+            //[Authorize]
+            //public async Task<ActionResult> Delete(string clubInitials, Guid id)
+            //{
+            //    var club = await _clubService.GetFullClub(clubInitials);
+            //    if (!await _authService.CanUserEdit(User, club.Id)
+            //        || !club.Series.Any(c => c.Id == id))
+            //    {
+            //        return Unauthorized();
+            //    }
+            //    var series = club.Series.SingleOrDefault(c => c.Id == id);
+            //    if (series == null)
+            //    {
+            //        return NotFound();
+            //    }
+            //    return View(series);
+            //}
 
-        //[HttpPost]
-        //[ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //[Authorize]
-        //public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
-        //{
-        //    var club = await _clubService.GetFullClub(clubInitials);
-        //    if (!await _authService.CanUserEdit(User, club.Id)
-        //        || !club.Series.Any(c => c.Id == id))
-        //    {
-        //        return Unauthorized();
-        //    }
-        //    try
-        //    {
-        //        await _seriesService.DeleteAsync(id);
+            //[HttpPost]
+            //[ActionName("Delete")]
+            //[ValidateAntiForgeryToken]
+            //[Authorize]
+            //public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
+            //{
+            //    var club = await _clubService.GetFullClub(clubInitials);
+            //    if (!await _authService.CanUserEdit(User, club.Id)
+            //        || !club.Series.Any(c => c.Id == id))
+            //    {
+            //        return Unauthorized();
+            //    }
+            //    try
+            //    {
+            //        await _seriesService.DeleteAsync(id);
 
-        //        return RedirectToAction("Index", "Admin");
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-    }
+            //        return RedirectToAction("Index", "Admin");
+            //    }
+            //    catch
+            //    {
+            //        return View();
+            //    }
+            //}
+        }
 }

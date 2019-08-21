@@ -8,6 +8,6 @@ namespace SailScores.Database.Entities
         public Regatta Regatta { get; set; }
 
         public Guid SeriesId { get; set; }
-        public BoatClass Series { get; set; }
+        public Series Series { get; set; }
     }
 }
