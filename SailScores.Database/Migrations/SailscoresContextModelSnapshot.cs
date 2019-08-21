@@ -586,7 +586,7 @@ namespace SailScores.Database.Migrations
                         .HasForeignKey("RegattaId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SailScores.Database.Entities.BoatClass", "Series")
+                    b.HasOne("SailScores.Database.Entities.Series", "Series")
                         .WithMany()
                         .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.Cascade);

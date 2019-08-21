@@ -10,8 +10,8 @@ using SailScores.Database;
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    [Migration("20190808012242_CreateRegatta")]
-    partial class CreateRegatta
+    [Migration("20190821010048_Regatta")]
+    partial class Regatta
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -417,9 +417,13 @@ namespace SailScores.Database.Migrations
                         .IsRequired()
                         .HasMaxLength(200);
 
+                    b.Property<bool?>("ResultsLocked");
+
                     b.Property<Guid?>("ScoringSystemId");
 
                     b.Property<Guid>("SeasonId");
+
+                    b.Property<string>("TrendOption");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnName("UpdatedDateUtc");
@@ -584,7 +588,7 @@ namespace SailScores.Database.Migrations
                         .HasForeignKey("RegattaId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SailScores.Database.Entities.BoatClass", "Series")
+                    b.HasOne("SailScores.Database.Entities.Series", "Series")
                         .WithMany()
                         .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.Cascade);

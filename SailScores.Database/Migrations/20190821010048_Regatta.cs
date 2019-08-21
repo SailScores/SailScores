@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SailScores.Database.Migrations
 {
-    public partial class CreateRegatta : Migration
+    public partial class Regatta : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -85,9 +85,9 @@ namespace SailScores.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_RegattaSeries_BoatClasses_SeriesId",
+                        name: "FK_RegattaSeries_Series_SeriesId",
                         column: x => x.SeriesId,
-                        principalTable: "BoatClasses",
+                        principalTable: "Series",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
