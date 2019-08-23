@@ -1,0 +1,146 @@
+@using Microsoft.Extensions.Localization;
+@using SailScores.Web.Resources;
+@using SailScores.Web.Extensions;
+
+@using SailScores.Web.Models.SailScores
+@using SailScores.Core.FlatModel
+
+@inject IStringLocalizer<SharedResource> localizer
+
+@model ClubItemViewModel<RegattaViewModel>
+@{
+    ViewBag.Title = Model.Item.Name;
+    Layout = "_ClubLayout";
+}
+
+@section Sidebar {
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky sticky-top">
+            <ul class="nav flex-column">
+                @foreach (var fleet in
+               Model.Item?.Fleets)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#@fleet.ShortName">
+                            @fleet.NickName
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        </div>
+    </nav>
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4">
+            @Model.Item.Name
+        </h1>
+        <h3 class="text-muted d-none d-md-inline">
+            @Model.Item.StartDate?.ToString("D") -
+            @Model.Item.EndDate?.ToString("D")
+            <br />
+            <br />
+        </h3>
+        <span class="text-muted d-md-none">
+            @Model.Item.StartDate?.ToString("d") -
+            @Model.Item.EndDate?.ToString("d")
+        </span>
+    </div>
+</div>
+@if (!String.IsNullOrWhiteSpace(Model.Item.Description))
+{
+    <div class="row">
+        <div class="col-md-6 d-none d-md-block">
+            @Html.Raw(Markdig.Markdown.ToHtml(Model.Item.Description))
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-md-4">
+        <h2>Notices</h2>
+        <p>
+            <strong>Official notices located on bulletin board at lake</strong><br />
+            Notices provided here as a courtesy.
+        </p>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <h4>Recent Series</h4>
+        <ul class="list-unstyled">
+            <li>
+                blah blah blah
+            </li>
+        </ul>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <h4>Recent races</h4>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <p> blah blah</p>
+    </div>
+</div>
+
+@foreach (var fleet in Model.Item.Fleets)
+{
+    <div id="@fleet.ShortName">
+        <h3>@fleet.NickName</h3>
+        <ul class="nav nav-tabs" id="@($"Tab{fleet.ShortName}")" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="@($"Competitors{fleet.ShortName}-tab")" data-toggle="tab"
+                   href="@($"#Competitors{fleet.ShortName}")" role="tab"
+                   aria-controls="@($"Competitors{fleet.ShortName}")" aria-selected="true">
+                    Competitors
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="@($"Results{fleet.ShortName}-tab")" data-toggle="tab"
+                   href="@($"#Results{fleet.ShortName}")" role="tab"
+                   aria-controls="@($"Results{fleet.ShortName}")" aria-selected="false">
+                    Results
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content" id="@($"Tab{fleet.ShortName}Content")">
+            <div class="tab-pane fade show active" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
+                 aria-labelledby="@($"Competitors{fleet.ShortName}-tab")">
+
+                <ul>
+                    @foreach (var comp in fleet.Competitors)
+                    {
+                        <li>@comp.Name</li>
+                    }
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="@($"Results{fleet.ShortName}")" role="tabpanel"
+                 aria-labelledby="@($"Results{fleet.ShortName}-tab")"><span>Nothing here.</span>No Results posted.</div>
+        </div>
+    </div>
+}
+
+@if (Model.CanEdit)
+{
+    <br />
+    <hr />
+    <div class="row bg-light">
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Admin"
+               class="btn btn-outline-primary">Admin Page</a>
+        </div>
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Competitor"
+               asp-action="Create"
+               class="btn btn-outline-primary">New Competitor</a>
+        </div>
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Race"
+               asp-action="Create"
+               class="btn btn-outline-primary">New Race</a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/vendor/bootstrap/js/bootstrap.js"></script>
+
+}

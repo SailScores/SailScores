@@ -53,6 +53,12 @@ namespace SailScores.Web.Services
             {
                 model.ScoringSystemId = null;
             }
+            model.Fleets = new List<Fleet>();
+            foreach(var fleetId in model.FleetIds)
+            {
+                model.Fleets.Add(club.Fleets
+                    .Single(f => f.Id == fleetId));
+            }
             await _coreRegattaService.SaveNewRegatta(model);
         }
     }

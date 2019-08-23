@@ -38,23 +38,23 @@
                     <h2>@item.Key</h2>
                 </td>
             </tr>
-            foreach (var series in item)
+            foreach (var regatta in item)
             {
                 <tr>
                     <td>
-                        <a href="~/@Model.ClubInitials/Regatta/@series.Season.Name/@series.Name">
-                            @Html.DisplayFor(modelItem => series.Name)
+                        <a href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.Name">
+                            @Html.DisplayFor(modelItem => regatta.Name)
                         </a>
-                        (@(series.Fleets?.Count.ToString() ?? "No") Races)
+                        (@(regatta.Fleets?.Count.ToString() ?? "No") Races)
                     </td>
                     <td>
-                        @series.StartDate
+                        @regatta.StartDate
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => series.Description)
-                        @if (series.UpdatedDate.HasValue)
+                        @Html.DisplayFor(modelItem => regatta.Description)
+                        @if (regatta.UpdatedDate.HasValue)
                         {
-                            <span class="d-none d-md-table-cell"><i>Updated @(series.UpdatedDate.Value.ToString("d"))</i></span>
+                            <span class="d-none d-md-table-cell"><i>Updated @(regatta.UpdatedDate.Value.ToString("d"))</i></span>
                         }
                     </td>
                 </tr>

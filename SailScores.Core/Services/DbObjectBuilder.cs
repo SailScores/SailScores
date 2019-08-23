@@ -46,6 +46,22 @@ namespace SailScores.Core.Services
                 }
             }
 
+            if (retObj.RegattaFleet == null)
+            {
+                retObj.RegattaFleet = new List<dbObj.RegattaFleet>();
+            }
+            if (regatta.Fleets != null)
+            {
+                foreach (var fleet in regatta.Fleets)
+                {
+                    retObj.RegattaFleet.Add(new dbObj.RegattaFleet
+                    {
+                        Regatta = retObj,
+                        FleetId = fleet.Id
+                    });
+                }
+            }
+
             var dbSeason = await GetSeasonAsync(regatta.ClubId, regatta);
 
             retObj.Season = dbSeason;

@@ -15,6 +15,10 @@ namespace SailScores.Database.Entities
         public String ShortName { get; set; }
         [StringLength(200)]
         public String Name { get; set; }
+
+        [StringLength(30)]
+        public String NickName { get; set; }
+
         [StringLength(2000)]
         public String Description { get; set; }
 

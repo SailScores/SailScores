@@ -58,9 +58,9 @@ namespace SailScores.Web.Controllers
 
             var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
 
-            return View(new ClubItemViewModel<Core.Model.Regatta>
+            return View(new ClubItemViewModel<RegattaViewModel>
             {
-                Item = regatta,
+                Item = _mapper.Map<RegattaViewModel>(regatta),
                 ClubInitials = clubInitials
             });
         }
@@ -78,6 +78,7 @@ namespace SailScores.Web.Controllers
                 Name = "<Use Club Default>"
             });
             vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+            vm.FleetOptions = club.Fleets;
             return View(vm);
         }
 

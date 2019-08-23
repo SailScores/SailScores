@@ -17,6 +17,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ShortName" class="control-label"></label>
+                <small>Should be unique within this club; for URLs, e.g. 2019DieHardMCs</small>
                 <input asp-for="ShortName" class="form-control" />
                 <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
@@ -24,6 +25,12 @@
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NickName" class="control-label"></label>
+                <small>Does not need to be unique, used for display only, e.g. MC Scows</small>
+                <input asp-for="NickName" class="form-control" />
+                <span asp-validation-for="NickName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
@@ -55,7 +62,7 @@
                 <select multiple asp-for="CompetitorIds" class="form-control">
                     @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber))
                     {
-                        <option value="@competitor.Id"  selected="@(Model.CompetitorIds.Contains(competitor.Id))">
+                        <option value="@competitor.Id" selected="@(Model.CompetitorIds.Contains(competitor.Id))">
                             @competitor.SailNumber - @competitor.Name
                         </option>
                     }

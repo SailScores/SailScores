@@ -20,8 +20,8 @@
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
                 @foreach (var item in
-                    Model.List.GroupBy(s =>
-                        s.Season?.Name ?? String.Empty, s => s))
+                   Model.List.GroupBy(s =>
+                       s.Season?.Name ?? String.Empty, s => s))
                 {
                     <li class="nav-item">
                         <a class="nav-link active" href="#@item.Key">
@@ -35,13 +35,15 @@
     </nav>
 }
 
-<h2>@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()
-    @localizer["Races"]</h2>
+<h2>
+    @Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()
+@localizer["Races"]
+</h2>
 
 <table class="table">
     <tbody>
         @foreach (var item in
-            Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+           Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
         {
             <tr id="@item.Key">
                 <td>
@@ -55,38 +57,39 @@
                         <span class="d-md-none">
                             <a asp-action="Details"
                                asp-controller="Race"
-                               asp-route-id=@race.Id>@race.FleetShortName:
-                                R@(race.Order)@race.Date.ToShortString()</a>
-                        </span>
-                        <span class="d-none d-md-block">
-                            @Html.ActionLink(
-                                race.CalculatedName
-                                , "Details", new { id = race.Id })
-                        </span>
-                    </td>
-                    <td>
-                        @{ var lastSeries = race.SeriesNames.LastOrDefault(); }
-                        @foreach (var seriesName in race.SeriesNames)
-                        {
-                            var separator = seriesName != lastSeries ? $", " : "";
-                            <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesName">@seriesName</a>@separator
-                        }
-                    </td>
-                    <td>
+                               asp-route-id=@race.Id>
+                                @race.FleetShortName:
+                            R@(race.Order) @race.Date.ToShortString()
+                        </a>
+                    </span>
+                    <span class="d-none d-md-block">
+                        @Html.ActionLink(
+                            race.CalculatedName
+                            , "Details", new { id = race.Id })
+                    </span>
+                </td>
+                <td>
+                    @{ var lastSeries = race.SeriesNames.LastOrDefault(); }
+                    @foreach (var seriesName in race.SeriesNames)
+                    {
+                        var separator = seriesName != lastSeries ? $", " : "";
+                        <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesName">@seriesName</a>@separator
+                    }
+                </td>
+                <td>
 
-            @Html.DisplayFor(modelItem => race.CompetitorCount)
-            @(race.CompetitorCount == 1 ? "boat" : "boats")
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => race.Name)
-            @Html.DisplayFor(modelItem => race.Description)
-        </td>
-        <td>
-            @race.State
-        </td>
-
-                </tr>
-            }
+                    @Html.DisplayFor(modelItem => race.CompetitorCount)
+                    @(race.CompetitorCount == 1 ? "boat" : "boats")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => race.Name)
+                    @Html.DisplayFor(modelItem => race.Description)
+                </td>
+                <td class="d-none d-md-table-cell">
+                    @race.State
+                </td>
+            </tr>
+        }
         }
     </tbody>
 </table>

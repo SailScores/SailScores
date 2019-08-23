@@ -86,7 +86,9 @@ namespace SailScores.Core.Services
                 .Include(f => f.CompetitorFleets)
                 .SingleAsync(c => c.Id == fleet.Id);
 
+            existingFleet.ShortName = fleet.ShortName;
             existingFleet.Name = fleet.Name;
+            existingFleet.NickName = fleet.NickName;
             existingFleet.Description = fleet.Description;
             existingFleet.FleetType = fleet.FleetType;
 

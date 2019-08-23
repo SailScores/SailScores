@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace SailScores.Web.Models.SailScores
 {
-    public class RegattaWithOptionsViewModel : Core.Model.Regatta
-    {
-        public IEnumerable<Season> SeasonOptions { get; set; }
-
-        public IList<ScoringSystem> ScoringSystemOptions { get; set; }
-        
+    public class RegattaViewModel : Core.Model.Regatta
+    {        
         private Guid _seasonId;
         public Guid SeasonId
         {
@@ -30,8 +26,5 @@ namespace SailScores.Web.Models.SailScores
             }
 
         }
-
-        public IEnumerable<Fleet> FleetOptions { get; internal set; }
-        public IEnumerable<Guid> FleetIds { get; set; }
     }
 }

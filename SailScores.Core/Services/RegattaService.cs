@@ -51,6 +51,12 @@ namespace SailScores.Core.Services
                 .Regattas
                 .Where(r =>
                     r.ClubId == clubId)
+                .Include(r => r.RegattaFleet)
+                .ThenInclude(rf => rf.Fleet)
+                .ThenInclude(f => f.CompetitorFleets)
+                .ThenInclude(cf => cf.Competitor)
+                .Include(r => r.RegattaSeries)
+                .ThenInclude(rs => rs.Series)
                 .SingleAsync(r => r.Name == regattaName
                                   && r.Season.Name == seasonName);
 
@@ -80,7 +86,7 @@ namespace SailScores.Core.Services
                 throw new InvalidOperationException("Could not find or create season for new Regatta.");
             }
 
-            if (_dbContext.Series.Any(s =>
+            if (_dbContext.Regattas.Any(s =>
                 s.Id == regatta.Id
                 || (s.ClubId == regatta.ClubId
                     && s.Name == regatta.Name
