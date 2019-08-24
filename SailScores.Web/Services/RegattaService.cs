@@ -41,7 +41,13 @@ namespace SailScores.Web.Services
             return await _coreRegattaService.GetRegattaAsync(clubInitials, season, regattaName);
         }
 
-        public async Task SaveNew(RegattaWithOptionsViewModel model)
+        public async Task SaveNewAsync(RegattaWithOptionsViewModel model)
+        {
+            await PrepRegattaVmAsync(model);
+            await _coreRegattaService.SaveNewRegattaAsync(model);
+        }
+
+        private async Task PrepRegattaVmAsync(RegattaWithOptionsViewModel model)
         {
             var club = await _clubService.GetFullClub(model.ClubId);
             if (model.StartDate.HasValue)
@@ -54,12 +60,17 @@ namespace SailScores.Web.Services
                 model.ScoringSystemId = null;
             }
             model.Fleets = new List<Fleet>();
-            foreach(var fleetId in model.FleetIds)
+            foreach (var fleetId in model.FleetIds)
             {
                 model.Fleets.Add(club.Fleets
                     .Single(f => f.Id == fleetId));
             }
-            await _coreRegattaService.SaveNewRegatta(model);
+        }
+
+        public async Task UpdateAsync(RegattaWithOptionsViewModel model)
+        {
+            await PrepRegattaVmAsync(model);
+            await _coreRegattaService.UpdateAsync(model);
         }
     }
 }

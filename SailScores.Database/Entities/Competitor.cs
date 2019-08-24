@@ -16,6 +16,10 @@ namespace SailScores.Database.Entities
         public String AlternativeSailNumber { get; set; }
         [StringLength(200)]
         public String BoatName { get; set; }
+
+        [StringLength(200)]
+        public String HomeClubName { get; set; }
+
         [StringLength(2000)]
         public String Notes { get; set; }
 

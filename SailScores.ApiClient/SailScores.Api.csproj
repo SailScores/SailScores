@@ -20,4 +20,12 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Dtos\CompetitorDto.cs.d.ts">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CompetitorDto.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>

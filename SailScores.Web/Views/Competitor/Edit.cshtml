@@ -26,24 +26,9 @@
                 <span asp-validation-for="SailNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="AlternativeSailNumber" class="control-label"></label>
-                <input asp-for="AlternativeSailNumber" class="form-control" />
-                <span asp-validation-for="AlternativeSailNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="BoatName" class="control-label"></label>
                 <input asp-for="BoatName" class="form-control" />
                 <span asp-validation-for="BoatName" class="text-danger"></span>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" name="IsActive" value="true" class="form-check-input" checked />
-                <label asp-for="IsActive" class="control-label"></label>
-                <span asp-validation-for="IsActive" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Notes" class="control-label"></label>
-                <input asp-for="Notes" class="form-control" />
-                <span asp-validation-for="Notes" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="BoatClassId" class="control-label">Class</label>
@@ -58,6 +43,42 @@
                 </select>
                 <span asp-validation-for="BoatClassId" class="text-danger"></span>
             </div>
+            <div id="advancedFields" role="tablist">
+                <div class="card">
+                    <div class="card-header" role="tab" id="advancedHeading">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                Additional Settings
+                            </a> <span class="small"><em>&ensp;Optional</em></span>
+                        </h5>
+                    </div>
+                    <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="HomeClubName" class="control-label"></label>
+                                <input asp-for="HomeClubName" class="form-control" />
+                                <span asp-validation-for="HomeClubName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="AlternativeSailNumber" class="control-label"></label>
+                                <input asp-for="AlternativeSailNumber" class="form-control" />
+                                <span asp-validation-for="AlternativeSailNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="IsActive" value="true" class="form-check-input" checked />
+                                <label asp-for="IsActive" class="control-label"></label>
+                                <span asp-validation-for="IsActive" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Notes" class="control-label"></label>
+                                <input asp-for="Notes" class="form-control" />
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 <a asp-controller="Admin"

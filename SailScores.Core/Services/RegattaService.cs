@@ -70,7 +70,7 @@ namespace SailScores.Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task SaveNewRegatta(Regatta regatta)
+        public async Task SaveNewRegattaAsync(Regatta regatta)
         {
             Database.Entities.Regatta dbRegatta = await _dbObjectBuilder.BuildDbRegattaAsync(regatta);
             
@@ -99,11 +99,72 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public Task Update(Regatta model)
+        public async Task UpdateAsync(Regatta model)
         {
-            throw new NotImplementedException();
+            if (_dbContext.Regattas.Any(r =>
+                r.Id != model.Id
+                && r.ClubId == model.ClubId
+                && r.Name == model.Name
+                && r.Season.Id == model.Season.Id))
+            {
+                throw new InvalidOperationException("Cannot update Regatta. A regatta with this name in this season already exists.");
+            }
+            var existingRegatta = await _dbContext.Regattas
+                .Include(r => r.RegattaFleet)
+                .SingleAsync(c => c.Id == model.Id);
+
+            existingRegatta.Name = model.Name;
+            existingRegatta.Description = model.Description;
+            existingRegatta.StartDate = model.StartDate;
+            existingRegatta.EndDate = model.EndDate;
+            existingRegatta.UpdatedDate = DateTime.UtcNow;
+            existingRegatta.ScoringSystemId = model.ScoringSystemId;
+
+            if (model.Season != null
+                && model.Season.Id != Guid.Empty
+                && existingRegatta.Season?.Id != model.Season?.Id)
+            {
+                existingRegatta.Season = _dbContext.Seasons.Single(s => s.Id == model.Season.Id);
+            }
+
+            CleanupFleets(model, existingRegatta);
+
+            await _dbContext.SaveChangesAsync();
         }
-        
+
+        private static void CleanupFleets(Regatta model, dbObj.Regatta existingRegatta)
+        {
+            var fleetsToRemove = new List<dbObj.RegattaFleet>();
+
+            if (model.Fleets != null)
+            {
+                fleetsToRemove =
+                    existingRegatta.RegattaFleet
+                    .Where(f => !(model.Fleets.Any(f2 => f2.Id == f.FleetId)))
+                    .ToList();
+            }
+            var fleetsToAdd =
+                model.Fleets != null ?
+                model.Fleets
+                .Where(c =>
+                    !(existingRegatta.RegattaFleet.Any(f => c.Id == f.FleetId)))
+                    .Select(c => new dbObj.RegattaFleet
+                    {
+                        FleetId = c.Id,
+                        RegattaId = existingRegatta.Id
+                    })
+                : new List<dbObj.RegattaFleet>();
+
+            foreach (var removingFleet in fleetsToRemove)
+            {
+                existingRegatta.RegattaFleet.Remove(removingFleet);
+            }
+            foreach (var addFleet in fleetsToAdd)
+            {
+                existingRegatta.RegattaFleet.Add(addFleet);
+            }
+        }
+
         public async Task Delete(Guid regattaId)
         {
             var dbRegatta = await _dbContext.Regattas

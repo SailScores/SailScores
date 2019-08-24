@@ -24,6 +24,10 @@ namespace SailScores.Core.Model
         [StringLength(200)]
         public String BoatName { get; set; }
 
+        [Display(Name = "Home Club")]
+        [StringLength(200)]
+        public String HomeClubName { get; set; }
+
         [Display(Name = "Active?")]
         public bool IsActive { get; set; }
 

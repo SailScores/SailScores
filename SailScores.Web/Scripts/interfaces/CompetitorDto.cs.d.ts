@@ -7,6 +7,7 @@ export interface competitorDto {
 	sailNumber: string;
 	alternativeSailNumber?: string;
 	boatName: string;
+    homeClubName: string;
 	notes?: string;
     isActive?: boolean;
     boatClassId: Guid;

@@ -377,13 +377,13 @@ namespace SailScores.Core.Services
                     .Select(c => new dbObj.SeriesRace { RaceId = c.Id, SeriesId = existingSeries.Id })
                 : new List<dbObj.SeriesRace>();
 
-            foreach (var removingClass in racesToRemove)
+            foreach (var removingRace in racesToRemove)
             {
-                existingSeries.RaceSeries.Remove(removingClass);
+                existingSeries.RaceSeries.Remove(removingRace);
             }
-            foreach (var addClass in racesToAdd)
+            foreach (var addRace in racesToAdd)
             {
-                existingSeries.RaceSeries.Add(addClass);
+                existingSeries.RaceSeries.Add(addRace);
             }
 
             await _dbContext.SaveChangesAsync();

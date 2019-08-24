@@ -59,6 +59,14 @@ namespace SailScores.Web.Mapping
 
             CreateMap<Model.ScoreCode, ScoreCodeWithOptionsViewModel>()
                 .ForMember(d => d.FormulaOptions, o => o.Ignore());
+
+            CreateMap<Model.Regatta, RegattaWithOptionsViewModel>()
+                .ForMember(d => d.SeasonOptions, o => o.Ignore())
+                .ForMember(d => d.ScoringSystemOptions, o => o.Ignore())
+                .ForMember(d => d.FleetOptions, o => o.Ignore())
+                .ForMember(d => d.FleetIds, o => o.MapFrom(s =>
+                    s.Fleets.Select(c => c.Id)));
+
         }
     }
 }

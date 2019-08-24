@@ -104,16 +104,30 @@
         <div class="tab-content" id="@($"Tab{fleet.ShortName}Content")">
             <div class="tab-pane fade show active" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
                  aria-labelledby="@($"Competitors{fleet.ShortName}-tab")">
-
-                <ul>
-                    @foreach (var comp in fleet.Competitors)
-                    {
-                        <li>@comp.Name</li>
-                    }
-                </ul>
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">@localizer["Sail Number"]</th>
+                            <th scope="col">@localizer["Name"]</th>
+                            <th scope="col">@localizer["Boat"]</th>
+                            <th scope="col">@localizer["Club"]</th>
+                        </tr>
+                        </thead>
+                    <tbody>
+                        @foreach (var comp in fleet.Competitors)
+                        {
+                        <tr>
+                            <td>@comp.SailNumber</td>
+                            <td>@comp.Name</td>
+                            <td>@comp.BoatName</td>
+                            <td>@(comp.HomeClubName??Model.ClubInitials)</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
             <div class="tab-pane fade" id="@($"Results{fleet.ShortName}")" role="tabpanel"
-                 aria-labelledby="@($"Results{fleet.ShortName}-tab")"><span>Nothing here.</span>No Results posted.</div>
+                 aria-labelledby="@($"Results{fleet.ShortName}-tab")"><span>No Results posted.</span></div>
         </div>
     </div>
 }

@@ -1,0 +1,98 @@
+﻿@using SailScores.Web.Services
+@using SailScores.Api.Enumerations
+
+@model SailScores.Web.Models.SailScores.RegattaWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Edit "+ Model.Name;
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Edit</h2>
+
+<h4>@Model.Name</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <input type="hidden" id="clubId" asp-for="ClubId" />
+            <input type="hidden" id="Id" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input id="date" asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndDate" class="control-label"></label>
+                <input id="date" asp-for="EndDate" class="form-control" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+            <div id="fleets" class="form-group">
+                <label asp-for="FleetIds" class="control-label">Fleets</label>
+                <small>Each fleet will be scored separately.</small>
+                <select multiple asp-for="FleetIds" class="form-control custom-select">
+                    @foreach (var fleet in Model.FleetOptions.OrderBy(c => c.Name))
+                    {
+                        <option value="@fleet.Id">
+                            @fleet.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="FleetIds" class="text-danger"></span>
+            </div>
+            <div id="advancedFields" role="tablist">
+                <div class="card">
+                    <div class="card-header" role="tab" id="advancedHeading">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                Additional Settings
+                            </a> <span class="small"><em>&ensp;Optional</em></span>
+                        </h5>
+                    </div>
+
+                    <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label asp-for="ScoringSystemId">Default Scoring System</label>
+                                <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-control">
+                                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                                    {
+                                        <option value="@scoringSystem.Id">
+                                            @scoringSystem.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="series"
+                   class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

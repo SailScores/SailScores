@@ -94,6 +94,7 @@ namespace SailScores.Core.Services
                 dbObject.BoatName = comp.BoatName;
                 dbObject.Notes = comp.Notes;
                 dbObject.IsActive = comp.IsActive;
+                dbObject.HomeClubName = comp.HomeClubName;
                 // should scores get added here?
                 // I don't think so. Those will be recorded as a race update or scores update.
             }
