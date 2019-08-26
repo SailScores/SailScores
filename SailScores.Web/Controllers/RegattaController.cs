@@ -58,10 +58,18 @@ namespace SailScores.Web.Controllers
 
             var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
 
+            var canEdit = false;
+            if (User != null && (User.Identity?.IsAuthenticated ?? false))
+            {
+                var clubId = await _clubService.GetClubId(clubInitials);
+                canEdit = await _authService.CanUserEdit(User, clubId);
+            }
+
             return View(new ClubItemViewModel<RegattaViewModel>
             {
                 Item = _mapper.Map<RegattaViewModel>(regatta),
-                ClubInitials = clubInitials
+                ClubInitials = clubInitials,
+                CanEdit = canEdit
             });
         }
 

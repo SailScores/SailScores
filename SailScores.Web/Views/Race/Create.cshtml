@@ -7,10 +7,11 @@
 }
 
 <div class="container p-0 justify-content-between">
-    <h4>Add a new race</h4>
+    <h4>Add a new race@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
     <hr />
     <form id="raceform" asp-action="Create">
         <input type="hidden" id="clubId" asp-for="ClubId" />
+        <input type="hidden" id="regattaId" asp-for="RegattaId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label asp-for="Date" class="control-label"></label>
@@ -138,7 +139,7 @@
                         </div>
                     </li>
                 </ul>
- 
+
             </div>
         </div>
         <div class="row">
@@ -156,9 +157,9 @@
             </div>
             <div class="col-md-3">
                 <a asp-controller="Admin"
-                    asp-action="Index"
-                    asp-fragment="races"
-                    class="btn btn-outline-primary btn-block">Cancel</a>
+                   asp-action="Index"
+                   asp-fragment="races"
+                   class="btn btn-outline-primary btn-block">Cancel</a>
             </div>
         </div>
     </form>

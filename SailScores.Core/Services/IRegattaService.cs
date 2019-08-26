@@ -17,5 +17,6 @@ namespace SailScores.Core.Services
         Task SaveNewRegattaAsync(Regatta regatta);
         Task UpdateAsync(Regatta model);
         Task Delete(Guid regattaId);
+        Task AddRaceToRegattaAsync(Race race, Guid regattaId);
     }
 }

@@ -75,7 +75,7 @@ namespace SailScores.Core.Services
             Database.Entities.Regatta dbRegatta = await _dbObjectBuilder.BuildDbRegattaAsync(regatta);
             
             dbRegatta.UpdatedDate = DateTime.UtcNow;
-            if (dbRegatta.Season == null && regatta.Season.Id != Guid.Empty && regatta.Season.Start != default(DateTime))
+            if (dbRegatta.Season == null && regatta.Season.Id != Guid.Empty && regatta.Season.Start != default)
             {
                 var season = _mapper.Map<dbObj.Season>(regatta.Season);
                 _dbContext.Seasons.Add(season);
@@ -171,6 +171,42 @@ namespace SailScores.Core.Services
                 .SingleAsync(c => c.Id == regattaId);
 
             _dbContext.Regattas.Remove(dbRegatta);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        // based on the fleet of the race, find the correct series from the regatta
+        // and then add race to that series. Create the series if necessary.
+        public async Task AddRaceToRegattaAsync(Race race, Guid regattaId)
+        {
+            var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == race.Fleet.Id);
+            var dbRegatta = await _dbContext.Regattas
+                .SingleAsync(c => c.Id == regattaId);
+
+            var series = await _dbContext.Regattas.SelectMany(r => r.RegattaSeries.Select(rs => rs.Series))
+                .SingleOrDefaultAsync(s => s.FleetId == dbFleet.Id);
+
+            if(series == null)
+            {
+                // create a new series for this fleet.
+                series = new Database.Entities.Series
+                {
+                    ClubId = race.ClubId,
+                    Name = $"{dbRegatta.Season.Name} {dbRegatta.Name} {dbFleet.NickName}",
+                    Season = dbRegatta.Season,
+                    UpdatedDate = DateTime.UtcNow,
+                    ScoringSystem = dbRegatta.ScoringSystem,
+                    TrendOption = Api.Enumerations.TrendOption.PreviousRace,
+                    FleetId = dbFleet.Id,
+                    RaceSeries = new List<Database.Entities.SeriesRace>()
+                };
+                _dbContext.Series.Add(series);
+            }
+            series.RaceSeries.Add(new dbObj.SeriesRace
+            {
+                RaceId = race.Id,
+                SeriesId = series.Id
+            });
 
             await _dbContext.SaveChangesAsync();
         }

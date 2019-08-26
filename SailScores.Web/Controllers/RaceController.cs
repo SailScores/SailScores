@@ -71,9 +71,14 @@ namespace SailScores.Web.Controllers
         }
 
         [Authorize]
-        public async Task<ActionResult> Create(string clubInitials)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            Guid? regattaId)
         {
-            RaceWithOptionsViewModel race = await _raceService.GetBlankRaceWithOptions(clubInitials);
+            RaceWithOptionsViewModel race =
+                await _raceService.GetBlankRaceWithOptions(
+                    clubInitials,
+                    regattaId);
 
             return View(race);
         }

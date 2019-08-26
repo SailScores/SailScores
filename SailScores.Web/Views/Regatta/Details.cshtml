@@ -58,27 +58,36 @@
     </div>
 }
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <h2>Notices</h2>
         <p>
             <strong>Official notices located on bulletin board at lake</strong><br />
             Notices provided here as a courtesy.
         </p>
     </div>
-    <div class="col-sm-6 col-md-3">
-        <h4>Recent Series</h4>
-        <ul class="list-unstyled">
-            <li>
-                blah blah blah
-            </li>
-        </ul>
-    </div>
-    <div class="col-sm-6 col-md-3">
-        <h4>Recent races</h4>
-    </div>
-    <div class="col-sm-6 col-md-3">
-        <p> blah blah</p>
-    </div>
+
+    @if (Model.CanEdit)
+    {
+        <br />
+        <hr />
+        <div class="row bg-light">
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Admin"
+                   class="btn btn-outline-primary">Admin Page</a>
+            </div>
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Competitor"
+                   asp-action="Create"
+                   class="btn btn-outline-primary">New Competitor</a>
+            </div>
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Race"
+                   asp-action="Create"
+                   asp-route-regattaId="@Model.Item.Id"
+                   class="btn btn-outline-primary">New Regatta Race</a>
+            </div>
+        </div>
+    }
 </div>
 
 @foreach (var fleet in Model.Item.Fleets)
@@ -127,32 +136,17 @@
                 </table>
             </div>
             <div class="tab-pane fade" id="@($"Results{fleet.ShortName}")" role="tabpanel"
-                 aria-labelledby="@($"Results{fleet.ShortName}-tab")"><span>No Results posted.</span></div>
+                 aria-labelledby="@($"Results{fleet.ShortName}-tab")">
+                @if(Model.Item.Series.Any(s => s.FleetId == fleet.Id)){
+                    <span>HI There!!!</span>
+                } else {
+                    <span>No Results posted.</span>
+                }
+            </div>
         </div>
     </div>
 }
 
-@if (Model.CanEdit)
-{
-    <br />
-    <hr />
-    <div class="row bg-light">
-        <div class="col-sm-3 my-2">
-            <a asp-controller="Admin"
-               class="btn btn-outline-primary">Admin Page</a>
-        </div>
-        <div class="col-sm-3 my-2">
-            <a asp-controller="Competitor"
-               asp-action="Create"
-               class="btn btn-outline-primary">New Competitor</a>
-        </div>
-        <div class="col-sm-3 my-2">
-            <a asp-controller="Race"
-               asp-action="Create"
-               class="btn btn-outline-primary">New Race</a>
-        </div>
-    </div>
-}
 
 @section Scripts {
     <script src="~/vendor/bootstrap/js/bootstrap.js"></script>
