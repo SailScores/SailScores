@@ -176,7 +176,7 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task<FlatResults> GetHistoricalResults(Series series)
+        public async Task<FlatResults> GetHistoricalResults(Series series)
         {
             var dbRow = await _dbContext.HistoricalResults
                 .SingleOrDefaultAsync(r =>

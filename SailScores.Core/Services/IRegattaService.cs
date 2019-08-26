@@ -13,7 +13,6 @@ namespace SailScores.Core.Services
             string clubInitials,
             string seasonName,
             string regattaName);
-        Task SaveNewRegatta(Regatta regatta, Club club);
         Task SaveNewRegattaAsync(Regatta regatta);
         Task UpdateAsync(Regatta model);
         Task Delete(Guid regattaId);

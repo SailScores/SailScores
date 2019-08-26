@@ -21,5 +21,6 @@ namespace SailScores.Core.Services
         Task Delete(Guid fleetId);
         Task UpdateSeriesResults(string clubInitials, string seasonName, string seriesName);
         Task UpdateSeriesResults(Guid seriesId);
+        Task<FlatModel.FlatResults> GetHistoricalResults(Series series);
     }
 }

@@ -15,15 +15,18 @@ namespace SailScores.Core.Services
 {
     public class RegattaService : IRegattaService
     {
+        private readonly ISeriesService _seriesService;
         private readonly ISailScoresContext _dbContext;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly IMapper _mapper;
 
         public RegattaService(
+            ISeriesService seriesService,
             ISailScoresContext dbContext,
             IDbObjectBuilder dbObjBuilder,
             IMapper mapper)
         {
+            _seriesService = seriesService;
             _dbContext = dbContext;
             _dbObjectBuilder = dbObjBuilder;
             _mapper = mapper;
@@ -62,12 +65,11 @@ namespace SailScores.Core.Services
 
             var fullRegatta = _mapper.Map<Regatta>(regattaDb);
 
+            foreach(var series in fullRegatta.Series)
+            {
+                series.FlatResults = await _seriesService.GetHistoricalResults(series);
+            }
             return fullRegatta;
-        }
-
-        public Task SaveNewRegatta(Regatta regatta, Club club)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task SaveNewRegattaAsync(Regatta regatta)
@@ -200,6 +202,11 @@ namespace SailScores.Core.Services
                     FleetId = dbFleet.Id,
                     RaceSeries = new List<Database.Entities.SeriesRace>()
                 };
+                dbRegatta.RegattaSeries.Add(new dbObj.RegattaSeries
+                {
+                    Regatta = dbRegatta,
+                    Series = series
+                });
                 _dbContext.Series.Add(series);
             }
             series.RaceSeries.Add(new dbObj.SeriesRace
@@ -209,6 +216,8 @@ namespace SailScores.Core.Services
             });
 
             await _dbContext.SaveChangesAsync();
+            await _seriesService.UpdateSeriesResults(series.Id);
+
         }
     }
 }

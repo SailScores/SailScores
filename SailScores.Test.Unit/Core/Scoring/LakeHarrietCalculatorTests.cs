@@ -12,7 +12,7 @@ namespace SailScores.Test.Unit
     public class LakeHarrietCalculatorTests
     {
 
-        private AppendixACalculator _defaultCalculator;
+        private readonly AppendixACalculator _defaultCalculator;
 
         public LakeHarrietCalculatorTests()
         {

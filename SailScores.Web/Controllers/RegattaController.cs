@@ -77,8 +77,10 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Create(string clubInitials)
         {
             var club = await _clubService.GetFullClub(clubInitials);
-            var vm = new RegattaWithOptionsViewModel();
-            vm.SeasonOptions = club.Seasons;
+            var vm = new RegattaWithOptionsViewModel
+            {
+                SeasonOptions = club.Seasons
+            };
             var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
             scoringSystemOptions.Add(new ScoringSystem
             {
