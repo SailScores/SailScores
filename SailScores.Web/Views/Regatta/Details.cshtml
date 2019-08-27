@@ -49,21 +49,12 @@
         </span>
     </div>
 </div>
-@if (!String.IsNullOrWhiteSpace(Model.Item.Description))
-{
-    <div class="row">
-        <div class="col-md-6 d-none d-md-block">
-            @Html.Raw(Markdig.Markdown.ToHtml(Model.Item.Description))
-        </div>
-    </div>
-}
 <div class="row">
     <div class="col-md-6">
-        <h2>Notices</h2>
-        <p>
-            <strong>Official notices located on bulletin board at lake</strong><br />
-            Notices provided here as a courtesy.
-        </p>
+        @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
+        {
+            @Html.Raw(Markdig.Markdown.ToHtml(Model.Item.Description))
+        }
     </div>
 
     @if (Model.CanEdit)
@@ -71,16 +62,17 @@
         <br />
         <hr />
         <div class="row bg-light">
-            <div class="col-sm-3 my-2">
+            <div class="col-sm-4 my-2">
                 <a asp-controller="Admin"
+                   asp-action="Index"
                    class="btn btn-outline-primary">Admin Page</a>
             </div>
-            <div class="col-sm-3 my-2">
+            <div class="col-sm-4 my-2">
                 <a asp-controller="Competitor"
                    asp-action="Create"
                    class="btn btn-outline-primary">New Competitor</a>
             </div>
-            <div class="col-sm-3 my-2">
+            <div class="col-sm-4 my-2">
                 <a asp-controller="Race"
                    asp-action="Create"
                    asp-route-regattaId="@Model.Item.Id"
@@ -92,18 +84,19 @@
 
 @foreach (var fleet in Model.Item.Fleets)
 {
+    var fleetHasResults = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id)?.FlatResults?.NumberOfSailedRaces > 0;
     <div id="@fleet.ShortName">
         <h3>@fleet.NickName</h3>
         <ul class="nav nav-tabs" id="@($"Tab{fleet.ShortName}")" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="@($"Competitors{fleet.ShortName}-tab")" data-toggle="tab"
+                <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{fleet.ShortName}-tab")" data-toggle="tab"
                    href="@($"#Competitors{fleet.ShortName}")" role="tab"
                    aria-controls="@($"Competitors{fleet.ShortName}")" aria-selected="true">
                     Competitors
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="@($"Results{fleet.ShortName}-tab")" data-toggle="tab"
+                <a class="nav-link @(fleetHasResults ? "active" : "")" id="@($"Results{fleet.ShortName}-tab")" data-toggle="tab"
                    href="@($"#Results{fleet.ShortName}")" role="tab"
                    aria-controls="@($"Results{fleet.ShortName}")" aria-selected="false">
                     Results
@@ -111,7 +104,7 @@
             </li>
         </ul>
         <div class="tab-content" id="@($"Tab{fleet.ShortName}Content")">
-            <div class="tab-pane fade show active" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
+            <div class="tab-pane fade @(fleetHasResults ? "" : "show active")" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
                  aria-labelledby="@($"Competitors{fleet.ShortName}-tab")">
                 <table class="table table-hover table-sm">
                     <thead>
@@ -135,7 +128,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="tab-pane fade" id="@($"Results{fleet.ShortName}")" role="tabpanel"
+            <div class="tab-pane fade @(fleetHasResults ? "show active" : "")" id="@($"Results{fleet.ShortName}")" role="tabpanel"
                  aria-labelledby="@($"Results{fleet.ShortName}-tab")">
                 @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
                 {

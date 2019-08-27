@@ -12,5 +12,6 @@ namespace SailScores.Web.Services
         Task<Regatta> GetRegattaAsync(string clubInitials, string season, string regattaName);
         Task SaveNewAsync(RegattaWithOptionsViewModel model);
         Task UpdateAsync(RegattaWithOptionsViewModel model);
+        Task DeleteAsync(Guid regattaId);
     }
 }
