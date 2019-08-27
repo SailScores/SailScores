@@ -167,7 +167,8 @@ namespace SailScores.Core.Services
             }
         }
 
-        public async Task Delete(Guid regattaId)
+
+        public async Task DeleteAsync(Guid regattaId)
         {
             var dbRegatta = await _dbContext.Regattas
                 .SingleAsync(c => c.Id == regattaId);
@@ -219,5 +220,6 @@ namespace SailScores.Core.Services
             await _seriesService.UpdateSeriesResults(series.Id);
 
         }
+
     }
 }

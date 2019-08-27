@@ -72,5 +72,10 @@ namespace SailScores.Web.Services
             await PrepRegattaVmAsync(model);
             await _coreRegattaService.UpdateAsync(model);
         }
+
+        public async Task DeleteAsync(Guid regattaId)
+        {
+            await _coreRegattaService.DeleteAsync(regattaId);
+        }
     }
 }

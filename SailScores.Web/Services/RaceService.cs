@@ -179,6 +179,22 @@ namespace SailScores.Web.Services
             if(race.FleetId != default(Guid))
             {
                 race.Fleet = club.Fleets.Single(f => f.Id == race.FleetId);
+                // if a regatta race, give everyone in the fleet a result
+                if (race.RegattaId.HasValue)
+                {
+                    foreach (var competitor in race.Fleet.Competitors)
+                    {
+                        if (!race.Scores.Any(s => s.CompetitorId == competitor.Id))
+                        {
+                            race.Scores.Add(new Score
+                            {
+                                CompetitorId = competitor.Id,
+                                Code = "DNC",
+                                Race = race
+                            });
+                        }
+                    }
+                }
             }
             if(race.Order == 0)
             {
