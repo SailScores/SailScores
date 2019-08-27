@@ -22,7 +22,7 @@ $BakFile = Get-ChildItem $TempPath *.bak | Sort-Object -Descending -Property Las
 Move-Item  $BakFile.Fullname "$UnzipPath/sailscores.bak"
 
 
-docker cp c:\Temp\sailscores.bak sssql1:/var/opt/mssql/backup
+docker cp c:\Temp\sailscores.bak sssql1:/var/opt/mssql/backup/
 
 $dataSource = "localhost"
 $database = "master"
