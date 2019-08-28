@@ -35,10 +35,16 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IList<Series>> GetAllSeriesAsync(Guid clubId,
-            DateTime? date)
+        public async Task<IList<Series>> GetAllSeriesAsync(
+            Guid clubId,
+            DateTime? date,
+            bool includeRegattaSeries)
         {
-            var seriesDb = await _dbContext
+
+            var regattaSeriesId = _dbContext.Regattas.SelectMany(r =>
+            r.RegattaSeries).Select(rs => rs.SeriesId);
+
+            var series = await _dbContext
                 .Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Series)
@@ -47,10 +53,10 @@ namespace SailScores.Core.Services
                 .Include(s => s.Season)
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
-                .OrderBy(s => s.Name)
-                .ToListAsync();
+                .Where(s => includeRegattaSeries || !regattaSeriesId.Contains(s.Id))
+                .OrderBy(s => s.Name).ToListAsync();
 
-            var returnObj = _mapper.Map<List<Series>>(seriesDb);
+            var returnObj = _mapper.Map<List<Series>>(series);
             return returnObj;
         }
 
@@ -294,9 +300,9 @@ namespace SailScores.Core.Services
         {
             Database.Entities.Series dbSeries = await 
                 _dbObjectBuilder.BuildDbSeriesAsync(series);
-            dbSeries.Name = RemoveDisallowedCharacters(series.Name);
+            dbSeries.Name = UrlUtility.RemoveDisallowedCharacters(series.Name);
             dbSeries.UpdatedDate = DateTime.UtcNow;
-            if (dbSeries.Season == null && series.Season.Id != Guid.Empty && series.Season.Start != default(DateTime))
+            if (dbSeries.Season == null && series.Season.Id != Guid.Empty && series.Season.Start != default)
             {
                 var season = _mapper.Map<dbObj.Season>(series.Season);
                 _dbContext.Seasons.Add(season);
@@ -322,15 +328,6 @@ namespace SailScores.Core.Services
             await UpdateSeriesResults(dbSeries.Id);
         }
 
-        private string RemoveDisallowedCharacters(string str)
-        {
-            var charsToRemove = new string[] { ":", "/", "?", "#", "[", "]", "@", "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
-            foreach (var c in charsToRemove)
-            {
-                str = str.Replace(c, string.Empty);
-            }
-            return str;
-        }
 
         public async Task Update(Series model)
         {
@@ -346,7 +343,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.RaceSeries)
                 .SingleAsync(c => c.Id == model.Id);
 
-            existingSeries.Name = RemoveDisallowedCharacters(model.Name);
+            existingSeries.Name = UrlUtility.RemoveDisallowedCharacters(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
             existingSeries.ResultsLocked = model.ResultsLocked;

@@ -47,7 +47,7 @@ namespace SailScores.Web.Services
             var club = await _coreClubService.GetMinimalClub(clubId);
             club.Seasons = await _coreSeasonService.GetSeasons(clubId);
             club.Races = await _coreRaceService.GetRacesAsync(clubId);
-            club.Series = await _coreSeriesService.GetAllSeriesAsync(clubId, null);
+            club.Series = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
             club.Regattas = await _coreRegattaService.GetAllRegattasAsync(clubId);
             return club;
         }

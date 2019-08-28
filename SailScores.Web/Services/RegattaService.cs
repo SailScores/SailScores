@@ -60,10 +60,13 @@ namespace SailScores.Web.Services
                 model.ScoringSystemId = null;
             }
             model.Fleets = new List<Fleet>();
-            foreach (var fleetId in model.FleetIds)
+            if (model.FleetIds != null)
             {
-                model.Fleets.Add(club.Fleets
-                    .Single(f => f.Id == fleetId));
+                foreach (var fleetId in model.FleetIds)
+                {
+                    model.Fleets.Add(club.Fleets
+                        .Single(f => f.Id == fleetId));
+                }
             }
         }
 

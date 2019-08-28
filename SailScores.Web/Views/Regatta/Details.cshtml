@@ -36,13 +36,21 @@
     <div class="col-12">
         <h1 class="display-4">
             @Model.Item.Name
+            @if (!String.IsNullOrWhiteSpace(Model.Item.Url))
+            {
+            <span class="h5">
+                <a href="@Model.Item.Url" target="_blank">
+                    <span class="fas fa-external-link-alt"></span> @localizer["Regatta Web Site"]
+                </a>
+            </span>
+            }
         </h1>
-        <h3 class="text-muted d-none d-md-inline">
+        <h5 class="text-muted d-none d-md-inline">
             @Model.Item.StartDate?.ToString("D") -
             @Model.Item.EndDate?.ToString("D")
             <br />
             <br />
-        </h3>
+        </h5>
         <span class="text-muted d-md-none">
             @Model.Item.StartDate?.ToString("d") -
             @Model.Item.EndDate?.ToString("d")
@@ -62,21 +70,27 @@
         <br />
         <hr />
         <div class="row bg-light">
-            <div class="col-sm-4 my-2">
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   class="btn btn-outline-primary">Admin Page</a>
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Regatta"
+                   asp-action="Edit"
+                   asp-route-Id="@Model.Item.Id"
+                   class="btn btn-outline-primary">Edit Regatta</a>
             </div>
-            <div class="col-sm-4 my-2">
+            <div class="col-sm-3 my-2">
                 <a asp-controller="Competitor"
                    asp-action="Create"
                    class="btn btn-outline-primary">New Competitor</a>
             </div>
-            <div class="col-sm-4 my-2">
+            <div class="col-sm-3 my-2">
                 <a asp-controller="Race"
                    asp-action="Create"
                    asp-route-regattaId="@Model.Item.Id"
                    class="btn btn-outline-primary">New Regatta Race</a>
+            </div>
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">Club Admin</a>
             </div>
         </div>
     }

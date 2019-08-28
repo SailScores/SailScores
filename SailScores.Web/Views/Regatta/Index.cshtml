@@ -42,16 +42,16 @@
             {
                 <tr>
                     <td>
-                        <a href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.Name">
+                        <a href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.UrlName">
                             @Html.DisplayFor(modelItem => regatta.Name)
                         </a>
-                        (@(regatta.Fleets?.Count.ToString() ?? "No") Races)
+                        (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
                     </td>
                     <td>
-                        @regatta.StartDate
+                        @regatta.StartDate?.ToString("d") -
+                        @regatta.EndDate?.ToString("d")
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => regatta.Description)
                         @if (regatta.UpdatedDate.HasValue)
                         {
                             <span class="d-none d-md-table-cell"><i>Updated @(regatta.UpdatedDate.Value.ToString("d"))</i></span>

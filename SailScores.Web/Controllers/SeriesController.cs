@@ -41,7 +41,7 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ClubInitials"] = clubInitials;
 
-            var series = await _seriesService.GetAllSeriesSummaryAsync(clubInitials);
+            var series = await _seriesService.GetNonRegattaSeriesSummariesAsync(clubInitials);
 
             return View(new ClubCollectionViewModel<SeriesSummary>
             {

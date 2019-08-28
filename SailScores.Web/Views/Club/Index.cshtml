@@ -43,7 +43,7 @@
                 @regatta.StartDate?.ToString("D") @:- @regatta.EndDate?.ToString("D")
             }
             <h3>
-                <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.Name/@regatta.Name">
+                <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.Name/@regatta.UrlName">
                     @regatta.Season.Name  @regatta.Name
                 </a>
             </h3>

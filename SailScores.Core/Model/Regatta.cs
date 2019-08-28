@@ -15,8 +15,13 @@ namespace SailScores.Core.Model
         [StringLength(200)]
         public String Name { get; set; }
 
+        public String UrlName { get; set; }
+
         [StringLength(2000)]
         public String Description { get; set; }
+
+        // Url of external regatta site
+        public String Url { get; set; }
 
         public IList<Series> Series { get; set; }
 

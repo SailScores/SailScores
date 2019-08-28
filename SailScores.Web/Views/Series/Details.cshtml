@@ -33,15 +33,9 @@ with @Model.Item.FlatResults.NumberOfDiscards discards,
 }
 
 @await Html.PartialAsync("_ResultsTable", Model.Item)
-                        
-@if ((Model.Item.TrendOption ?? TrendOption.None) != TrendOption.None)
-{
-    <span class="d-none d-sm-inline">
-        * Rank change from @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.Item.TrendOption.Value)]
-    </span>
-    <br />
-}
+
 @if (Model.Item.UpdatedDate.HasValue)
 {
+    <br />
     <i>Last updated @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
 }

@@ -60,7 +60,7 @@ namespace SailScores.Core.Services
                 .ThenInclude(cf => cf.Competitor)
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
-                .SingleAsync(r => r.Name == regattaName
+                .SingleAsync(r => r.UrlName == regattaName
                                   && r.Season.Name == seasonName);
 
             var fullRegatta = _mapper.Map<Regatta>(regattaDb);
@@ -75,7 +75,7 @@ namespace SailScores.Core.Services
         public async Task SaveNewRegattaAsync(Regatta regatta)
         {
             Database.Entities.Regatta dbRegatta = await _dbObjectBuilder.BuildDbRegattaAsync(regatta);
-            
+            dbRegatta.UrlName = UrlUtility.GetUrlName(dbRegatta.Name);
             dbRegatta.UpdatedDate = DateTime.UtcNow;
             if (dbRegatta.Season == null && regatta.Season.Id != Guid.Empty && regatta.Season.Start != default)
             {
@@ -91,8 +91,8 @@ namespace SailScores.Core.Services
             if (_dbContext.Regattas.Any(s =>
                 s.Id == regatta.Id
                 || (s.ClubId == regatta.ClubId
-                    && s.Name == regatta.Name
-                    && s.Season.Id == regatta.Season.Id)))
+                    && s.UrlName == regatta.UrlName
+                    && s.Season.Id == dbRegatta.Season.Id)))
             {
                 throw new InvalidOperationException("Cannot create regatta. A regatta with this name in this season already exists.");
             }
@@ -116,6 +116,7 @@ namespace SailScores.Core.Services
                 .SingleAsync(c => c.Id == model.Id);
 
             existingRegatta.Name = model.Name;
+            existingRegatta.Url = model.Url;
             existingRegatta.Description = model.Description;
             existingRegatta.StartDate = model.StartDate;
             existingRegatta.EndDate = model.EndDate;

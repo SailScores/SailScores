@@ -13,7 +13,13 @@ namespace SailScores.Database.Entities
         [Required]
         [StringLength(200)]
         public String Name { get; set; }
+
+        [StringLength(200)]
+        public String UrlName { get; set; }
         public String Description { get; set; }
+
+        [StringLength(1000)]
+        public String Url { get; set; }
 
         public IList<RegattaSeries> RegattaSeries { get; set; }
 

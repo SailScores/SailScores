@@ -69,7 +69,7 @@
                     }
                 }
                 @{ var cellViewData = new ViewDataDictionary(ViewData)
-                                           {{ "IsPercentSystem", Model.FlatResults.IsPercentSystem }};
+                                               {{ "IsPercentSystem", Model.FlatResults.IsPercentSystem }};
                 }
                 @foreach (var comp in compList)
                 {
@@ -104,7 +104,7 @@
                                 @String.Format("{0:0.##}", Model.FlatResults.GetScore(comp)?.TotalScore)
 
                                 @if (Model.FlatResults.IsPercentSystem &&
-                         Model.FlatResults.GetScore(comp)?.TotalScore != null)
+                        Model.FlatResults.GetScore(comp)?.TotalScore != null)
                                 {
                                     <br />
                                     <span class="small">
@@ -156,6 +156,12 @@
                 }
             </tbody>
         </table>
+        @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None)
+        {
+            <span class="d-none d-sm-inline">
+                * Rank change from @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
+            </span>
+        }
     </div>
 }
 else
