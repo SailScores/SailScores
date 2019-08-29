@@ -50,7 +50,7 @@
 <body>
     <header class="navbar navbar-expand-md navbar-dark bg-dark">
         <a asp-area="" asp-controller="Club" asp-action="Index"
-           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]"
+           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
            class="navbar-brand">@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()</a>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav mr-auto">
@@ -58,7 +58,7 @@
                     <a asp-area=""
                        asp-controller="Series"
                        asp-action="Index"
-                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]"
+                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
                        class="nav-link">
                         @localizer["Series"]
                     </a>
@@ -67,17 +67,17 @@
                     <a asp-area=""
                        asp-controller="Race"
                        asp-action="Index"
-                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]"
+                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
                        class="nav-link">
                         @localizer["Races"]
                     </a>
                 </li>
                 <li class="nav-item">
                     <a asp-area=""
-                       asp-controller="Regatta"
-                       asp-action="Index"
-                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"]"
-                       class="nav-link">
+                        asp-controller="Regatta"
+                        asp-action="Index"
+                        asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                        class="nav-link">
                         @localizer["Regattas"]
                     </a>
                 </li>
