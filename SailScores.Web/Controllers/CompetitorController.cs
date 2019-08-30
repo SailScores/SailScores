@@ -78,7 +78,11 @@ namespace SailScores.Web.Controllers
                 {
                     competitor.Fleets = new List<Fleet>();
                 }
-                foreach(var fleetId in competitor.FleetIds)
+                if (competitor.FleetIds == null)
+                {
+                    competitor.FleetIds = new List<Guid>();
+                }
+                foreach (var fleetId in competitor.FleetIds)
                 {
                     competitor.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
                 }
@@ -133,10 +137,14 @@ namespace SailScores.Web.Controllers
                 {
                     return Unauthorized();
                 }
-                var club = await _clubService.GetFullClub(competitor.Id);
+                var club = await _clubService.GetFullClub(competitor.ClubId);
                 if (competitor.Fleets == null)
                 {
                     competitor.Fleets = new List<Fleet>();
+                }
+                if (competitor.FleetIds == null)
+                {
+                    competitor.FleetIds = new List<Guid>();
                 }
                 foreach (var fleetId in competitor.FleetIds)
                 {

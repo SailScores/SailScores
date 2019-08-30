@@ -44,7 +44,7 @@
             </select>
             <span asp-validation-for="FleetId" class="text-danger"></span>
         </div>
-        @if (!Model.RegattaId.HasValue)
+        @if (!Model.RegattaId.HasValue && Model.Regatta == null)
         {
         <div class="form-group">
             <label asp-for="SeriesIds" class="control-label">Series</label>

@@ -103,6 +103,10 @@ namespace SailScores.Core.Services
             if (comp.Fleets != null)
             {
                 // remove fleets
+                if(dbObject.CompetitorFleets == null)
+                {
+                    dbObject.CompetitorFleets = new List<Db.CompetitorFleet>();
+                }
                 foreach (var existingFleet in dbObject.CompetitorFleets.ToList())
                 {
                     if (!comp.Fleets.Any(f => f.Id == existingFleet.FleetId))

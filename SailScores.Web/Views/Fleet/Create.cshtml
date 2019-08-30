@@ -58,7 +58,7 @@
             </div>
             <div id="boatSelectGroup" class="form-group">
                 <label asp-for="CompetitorIds" class="control-label">Competitors</label>
-                <select multiple asp-for="CompetitorIds" class="form-control custom-select">
+                <select multiple asp-for="CompetitorIds" class="form-control custom-select selectpicker">
                     @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber)
                     .ThenBy(c => c.AlternativeSailNumber)
                     .ThenBy(c => c.Name))

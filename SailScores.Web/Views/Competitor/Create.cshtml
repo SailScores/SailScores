@@ -55,7 +55,7 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label asp-for="FleetIds" class="control-label">Fleets</label>
-                                <select id="seriesIds" asp-for="FleetIds" class="form-control" multiple>
+                                <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
                                     @foreach (var fleet in Model.FleetOptions)
                                     {
                                         <option value="@fleet.Id">
@@ -103,4 +103,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 }

@@ -47,7 +47,7 @@
             </div>
             <div id="classSelectGroup" class="form-group">
                 <label asp-for="BoatClassIds" class="control-label">Class</label>
-                <select multiple asp-for="BoatClassIds" class="form-control">
+                <select multiple asp-for="BoatClassIds" class="form-control selectpicker">
                     @foreach (var boatclass in Model.BoatClassOptions)
                     {
                         <option value="@boatclass.Id">
@@ -59,7 +59,7 @@
             </div>
             <div id="boatSelectGroup" class="form-group">
                 <label asp-for="CompetitorIds" class="control-label">Competitors</label>
-                <select multiple asp-for="CompetitorIds" class="form-control">
+                <select multiple asp-for="CompetitorIds" class="form-control selectpicker">
                     @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber))
                     {
                         <option value="@competitor.Id" selected="@(Model.CompetitorIds.Contains(competitor.Id))">
@@ -100,4 +100,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 }

@@ -29,6 +29,9 @@
     </nav>
 }
 
+@if (Model.List.Any())
+{
+
 <table class="table">
     <tbody>
         @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
@@ -62,3 +65,8 @@
         }
     </tbody>
 </table>
+} else
+{
+    <br />
+    <h4>This club has not shared any regattas.</h4>
+}

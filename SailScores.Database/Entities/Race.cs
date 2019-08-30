@@ -19,7 +19,7 @@ namespace SailScores.Database.Entities
         [StringLength(30)]
         public RaceState? State { get; set; }
 
-        // Typically the order of the race for a given date, but may not be.
+        // Typically the order of the race for a given date.
         // used for display order after date. 
         public int Order { get; set; }
         [StringLength(1000)]

@@ -44,7 +44,7 @@
             <div id="fleets" class="form-group">
                 <label asp-for="FleetIds" class="control-label">Fleets</label>
                 <small>Each fleet will be scored separately.</small>
-                <select multiple asp-for="FleetIds" class="form-control custom-select">
+                <select multiple asp-for="FleetIds" class="form-control custom-select selectpicker">
                     @foreach (var fleet in Model.FleetOptions.OrderBy(c => c.Name))
                     {
                         <option value="@fleet.Id">
@@ -98,4 +98,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 }
