@@ -44,6 +44,18 @@ namespace SailScores.Core.Services
             return returnObj;
         }
 
+        public async Task<IList<Regatta>> GetRegattasDuringSpanAsync(DateTime start, DateTime end)
+        {
+            var regattaDb = await _dbContext
+                .Regattas
+                .Where(r => r.StartDate <= end && (r.EndDate >= start || r.StartDate >= start))
+                .Include(r => r.Season)
+                .ToListAsync();
+
+            var returnObj = _mapper.Map<List<Regatta>>(regattaDb);
+            return returnObj;
+        }
+
         public async Task<Regatta> GetRegattaAsync(string clubInitials, string seasonName, string regattaName)
         {
             var clubId = await _dbContext.Clubs
@@ -68,6 +80,7 @@ namespace SailScores.Core.Services
             foreach(var series in fullRegatta.Series)
             {
                 series.FlatResults = await _seriesService.GetHistoricalResults(series);
+                series.PreferAlternativeSailNumbers = fullRegatta.PreferAlternateSailNumbers;
             }
             return fullRegatta;
         }
@@ -122,6 +135,7 @@ namespace SailScores.Core.Services
             existingRegatta.EndDate = model.EndDate;
             existingRegatta.UpdatedDate = DateTime.UtcNow;
             existingRegatta.ScoringSystemId = model.ScoringSystemId;
+            existingRegatta.PreferAlternateSailNumbers = model.PreferAlternateSailNumbers;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty

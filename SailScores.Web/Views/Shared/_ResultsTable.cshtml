@@ -96,7 +96,15 @@
 
                             </th>
                         }
-                        <th scope="row">@comp.SailNumber</th>
+                        <th scope="row">
+                            @if ((Model.PreferAlternativeSailNumbers ?? false)
+                               && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber)) {
+                                    @comp.AlternativeSailNumber 
+                            } else
+                            {
+                                @comp.SailNumber
+                            }
+                        </th>
                         <th scope="row">@comp.Name</th>
                         <td class="d-none d-sm-table-cell">@comp.BoatName</td>
                         <td scope="row" class="text-center">

@@ -37,5 +37,7 @@ namespace SailScores.Database.Entities
 
         // used for connecting series to correct fleet. Particularly for Regatta use.
         public Guid? FleetId { get; set; }
+
+        public bool? PreferAlternativeSailNumbers { get; set; }
     }
 }

@@ -104,7 +104,7 @@ namespace SailScores.Web.Services
             var regatta = club.Regattas.Single(r => r.Id == regattaId);
             var model = new RaceWithOptionsViewModel();
             model.ClubId = club.Id;
-            model.Regatta = _mapper.Map<RegattaSummary>(regatta);
+            model.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
             model.FleetOptions = regatta.Fleets;
             model.SeriesOptions = club.Series;
             if (regatta.ScoringSystemId.HasValue)

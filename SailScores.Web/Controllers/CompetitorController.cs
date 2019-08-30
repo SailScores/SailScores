@@ -52,6 +52,9 @@ namespace SailScores.Web.Controllers
             //todo: remove getfullclub
             var club = await _clubService.GetFullClub(clubInitials);
             comp.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                .OrderBy(f => f.Name);
+            comp.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
 
             return View(comp);
         }
@@ -100,6 +103,10 @@ namespace SailScores.Web.Controllers
             var compWithOptions = _mapper.Map<CompetitorWithOptionsViewModel>(competitor);
 
             compWithOptions.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                .OrderBy(f => f.Name);
+            compWithOptions.FleetOptions = _mapper.Map<IList<FleetSummary>>(fleets);
+
             return View(compWithOptions);
         }
 

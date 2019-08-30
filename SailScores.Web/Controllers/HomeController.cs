@@ -5,27 +5,41 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
-using SailScores.Core.Services;
+using CoreServices = SailScores.Core.Services;
 using SailScores.Web.Models;
+using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
     public class HomeController : Controller
     {
 
-        private readonly IClubService _clubservice;
+        private readonly CoreServices.IClubService _clubservice;
+        private readonly IRegattaService _regattaService;
 
         public HomeController(
-            IClubService clubService)
+            CoreServices.IClubService clubService,
+            IRegattaService regattaService)
+
         {
             _clubservice = clubService;
+            _regattaService = regattaService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var model = new ClubSelectorModel
+            var clubSelector = new ClubSelectorModel
             {
                 Clubs = (await _clubservice.GetClubs(false)).ToList()
+            };
+            var regattaSelector = new RegattaSelectorModel
+            {
+                Regattas = (await _regattaService.GetCurrentRegattas()).ToList()
+            };
+            var model = new SiteHomePageModel
+            {
+                ClubSelectorModel = clubSelector,
+                RegattaSelectorModel = regattaSelector
             };
             return View(model);
         }

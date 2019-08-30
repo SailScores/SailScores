@@ -44,6 +44,8 @@
             </select>
             <span asp-validation-for="FleetId" class="text-danger"></span>
         </div>
+        @if (!Model.RegattaId.HasValue)
+        {
         <div class="form-group">
             <label asp-for="SeriesIds" class="control-label">Series</label>
             <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
@@ -56,6 +58,7 @@
             </select>
             <span asp-validation-for="SeriesIds" class="text-danger"></span>
         </div>
+        }
 
         <div id="advancedFields" role="tablist">
             <div class="card">
@@ -112,7 +115,7 @@
                                 <span class="badge badge-secondary badge-pill race-place"></span>
                             </div>
                             <div>
-                                <span class="sail-number"></span>
+                                <span class="sail-number"></span><span class="alt-sail-number" style="display: none"></span>
                             </div>
                             <div>
                                 <span class="competitor-name h5"></span>

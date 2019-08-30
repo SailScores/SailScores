@@ -40,7 +40,9 @@ namespace SailScores.Web.Mapping
                     s.Season.Id))
                 .ForMember(d => d.ScoringSystemOptions, o => o.Ignore());
             CreateMap<Model.Competitor, CompetitorWithOptionsViewModel>()
-                .ForMember(d => d.BoatClassOptions, o => o.Ignore());
+                .ForMember(d => d.BoatClassOptions, o => o.Ignore())
+                .ForMember(d => d.FleetOptions, o => o.Ignore())
+                .ForMember(d => d.FleetIds, o => o.MapFrom(s => s.Fleets.Select(f => f.Id)));
 
             CreateMap<RaceViewModel, RaceWithOptionsViewModel>()
                 .ForMember(d => d.FleetOptions, o => o.Ignore())

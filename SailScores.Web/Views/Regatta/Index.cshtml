@@ -5,7 +5,7 @@
 
 @inject IStringLocalizer<SharedResource> localizer
 
-@model ClubCollectionViewModel<RegattaSummary>
+@model ClubCollectionViewModel<RegattaSummaryViewModel>
 @{
     ViewBag.Title = Model.ClubInitials + " " + localizer["Regattas"];
     Layout = "_ClubLayout";

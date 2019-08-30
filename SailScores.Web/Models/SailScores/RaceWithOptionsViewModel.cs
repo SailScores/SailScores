@@ -17,7 +17,7 @@ namespace SailScores.Web.Models.SailScores
 
         public int? InitialOrder { get; set; }
 
-        public RegattaSummary Regatta { get; set; }
+        public RegattaSummaryViewModel Regatta { get; set; }
 
         public Guid? RegattaId { get; set; }
     }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20190829121901_RegattaAltSailNum")]
+    partial class RegattaAltSailNum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -430,8 +432,6 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200);
-
-                    b.Property<bool?>("PreferAlternativeSailNumbers");
 
                     b.Property<bool?>("ResultsLocked");
 

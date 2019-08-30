@@ -26,14 +26,33 @@ namespace SailScores.Web.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<RegattaSummary>> GetAllRegattaSummaryAsync(string clubInitials)
+        public async Task<IEnumerable<RegattaSummaryViewModel>> GetAllRegattaSummaryAsync(string clubInitials)
         {
             var coreObject = await _clubService.GetFullClub(clubInitials);
             var orderedRegattas = coreObject.Regattas
                 .OrderByDescending(s => s.Season.Start)
                 .ThenBy(s => s.StartDate)
                 .ThenBy(s => s.Name);
-            return _mapper.Map<IList<RegattaSummary>>(orderedRegattas);
+            return _mapper.Map<IList<RegattaSummaryViewModel>>(orderedRegattas);
+        }
+        
+        public async Task<IEnumerable<RegattaSummaryViewModel>> GetCurrentRegattas()
+        {
+            var start = DateTime.Today.AddDays(-7);
+            var end = DateTime.Today.AddDays(7);
+
+            var coreRegattas = await _coreRegattaService.GetRegattasDuringSpanAsync(start, end);
+            var filteredRegattas = coreRegattas
+                .OrderBy(s => s.StartDate)
+                .ThenBy(s => s.Name);
+            var vm = _mapper.Map<IList<RegattaSummaryViewModel>>(filteredRegattas);
+            foreach(var regatta in vm)
+            {
+                var club = await _clubService.GetMinimalClub(regatta.ClubId);
+                regatta.ClubInitials = club.Initials;
+                regatta.ClubName = club.Name;
+            }
+            return vm;
         }
 
         public async Task<Regatta> GetRegattaAsync(string clubInitials, string season, string regattaName)
@@ -80,5 +99,6 @@ namespace SailScores.Web.Services
         {
             await _coreRegattaService.DeleteAsync(regattaId);
         }
+
     }
 }

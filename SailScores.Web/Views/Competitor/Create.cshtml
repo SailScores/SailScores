@@ -54,6 +54,18 @@
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
                             <div class="form-group">
+                                <label asp-for="FleetIds" class="control-label">Fleets</label>
+                                <select id="seriesIds" asp-for="FleetIds" class="form-control" multiple>
+                                    @foreach (var fleet in Model.FleetOptions)
+                                    {
+                                        <option value="@fleet.Id">
+                                            @fleet.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="FleetIds" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
                                 <label asp-for="HomeClubName" class="control-label"></label>
                                 <input asp-for="HomeClubName" class="form-control" />
                                 <span asp-validation-for="HomeClubName" class="text-danger"></span>

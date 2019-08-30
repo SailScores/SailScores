@@ -42,7 +42,7 @@ namespace SailScores.Web.Controllers
 
             var regattas = await _regattaService.GetAllRegattaSummaryAsync(clubInitials);
 
-            return View(new ClubCollectionViewModel<RegattaSummary>
+            return View(new ClubCollectionViewModel<RegattaSummaryViewModel>
             {
                 List = regattas,
                 ClubInitials = clubInitials

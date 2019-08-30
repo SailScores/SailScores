@@ -43,5 +43,6 @@ namespace SailScores.Core.Model
         public Guid? ScoringSystemId { get; set; }
         public ScoringSystem ScoringSystem { get; set; }
 
+        public bool PreferAlternateSailNumbers { get; set; }
     }
 }

@@ -9,6 +9,9 @@ namespace SailScores.Core.Services
     {
         Task<IList<Model.Regatta>> GetAllRegattasAsync(
             Guid clubId);
+        Task<IList<Model.Regatta>> GetRegattasDuringSpanAsync(
+            DateTime start,
+            DateTime end);
         Task<Core.Model.Regatta> GetRegattaAsync(
             string clubInitials,
             string seasonName,
