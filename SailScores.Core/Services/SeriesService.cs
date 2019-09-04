@@ -17,25 +17,34 @@ namespace SailScores.Core.Services
     {
         private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
         private readonly IScoringService _scoringService;
+        private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
 
         public SeriesService(
             IScoringCalculatorFactory scoringCalculatorFactory,
             IScoringService scoringService,
+            IDbObjectBuilder dbObjBuilder,
             ISailScoresContext dbContext,
             IMapper mapper)
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
             _scoringService = scoringService;
+            _dbObjectBuilder = dbObjBuilder;
             _dbContext = dbContext;
             _mapper = mapper;
         }
 
-        public async Task<IList<Series>> GetAllSeriesAsync(Guid clubId,
-            DateTime? date)
+        public async Task<IList<Series>> GetAllSeriesAsync(
+            Guid clubId,
+            DateTime? date,
+            bool includeRegattaSeries)
         {
-            var seriesDb = await _dbContext
+
+            var regattaSeriesId = _dbContext.Regattas.SelectMany(r =>
+            r.RegattaSeries).Select(rs => rs.SeriesId);
+
+            var series = await _dbContext
                 .Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Series)
@@ -44,10 +53,10 @@ namespace SailScores.Core.Services
                 .Include(s => s.Season)
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
-                .OrderBy(s => s.Name)
-                .ToListAsync();
+                .Where(s => includeRegattaSeries || !regattaSeriesId.Contains(s.Id))
+                .OrderBy(s => s.Name).ToListAsync();
 
-            var returnObj = _mapper.Map<List<Series>>(seriesDb);
+            var returnObj = _mapper.Map<List<Series>>(series);
             return returnObj;
         }
 
@@ -116,10 +125,10 @@ namespace SailScores.Core.Services
             string seasonName,
             string seriesName)
         {
-            var clubId = (await _dbContext.Clubs
-                .SingleAsync( c =>
-                    c.Initials == clubInitials
-                )).Id;
+            var clubId = await _dbContext.Clubs
+                .Where(c =>
+                   c.Initials == clubInitials
+                ).Select(c => c.Id).SingleAsync();
             var seriesDb = await _dbContext
                 .Series
                 .Where(s =>
@@ -173,7 +182,7 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task<FlatResults> GetHistoricalResults(Series series)
+        public async Task<FlatResults> GetHistoricalResults(Series series)
         {
             var dbRow = await _dbContext.HistoricalResults
                 .SingleOrDefaultAsync(r =>
@@ -289,10 +298,11 @@ namespace SailScores.Core.Services
 
         public async Task SaveNewSeries(Series series)
         {
-            Database.Entities.Series dbSeries = await BuildDbSeriesAsync(series);
-            dbSeries.Name = RemoveDisallowedCharacters(series.Name);
+            Database.Entities.Series dbSeries = await 
+                _dbObjectBuilder.BuildDbSeriesAsync(series);
+            dbSeries.Name = UrlUtility.RemoveDisallowedCharacters(series.Name);
             dbSeries.UpdatedDate = DateTime.UtcNow;
-            if (dbSeries.Season == null && series.Season.Id != Guid.Empty && series.Season.Start != default(DateTime))
+            if (dbSeries.Season == null && series.Season.Id != Guid.Empty && series.Season.Start != default)
             {
                 var season = _mapper.Map<dbObj.Season>(series.Season);
                 _dbContext.Seasons.Add(season);
@@ -318,188 +328,6 @@ namespace SailScores.Core.Services
             await UpdateSeriesResults(dbSeries.Id);
         }
 
-        private async Task<dbObj.Series> BuildDbSeriesAsync(Model.Series series)
-        {
-            var retObj = _mapper.Map<dbObj.Series>(series);
-            if(retObj.RaceSeries == null) 
-            {
-                retObj.RaceSeries = new List<dbObj.SeriesRace>();
-            }
-            if (series.Races != null)
-            {
-                foreach (var race in series.Races)
-                {
-                    var dbRace = await BuildDbRaceObj(series.ClubId, race);
-                    retObj.RaceSeries.Add(new dbObj.SeriesRace
-                    {
-                        Series = retObj,
-                        Race = dbRace
-                    });
-                }
-            }
-
-            var dbSeason = await GetSeasonAsync(series.ClubId, series);
-
-            retObj.Season = dbSeason;
-
-            return retObj;
-        }
-
-
-        private string RemoveDisallowedCharacters(string str)
-        {
-            var charsToRemove = new string[] { ":", "/", "?", "#", "[", "]", "@", "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
-            foreach (var c in charsToRemove)
-            {
-                str = str.Replace(c, string.Empty);
-            }
-            return str;
-        }
-
-        private async Task<dbObj.Race> BuildDbRaceObj(Guid clubId, Race race)
-        {
-            var dbRace = _mapper.Map<dbObj.Race>(race);
-            dbRace.ClubId = clubId;
-            dbRace.Scores = new List<dbObj.Score>();
-            // add scores
-            foreach(var score in race.Scores)
-            {
-                var dbScore = _mapper.Map<dbObj.Score>(score);
-                if (!String.IsNullOrWhiteSpace(dbScore.Code))
-                {
-                    dbScore.Place = null;
-                }
-                dbScore.Competitor = await FindOrBuildCompetitorAsync(clubId, score.Competitor);
-                dbRace.Scores.Add(dbScore);
-                if(race.Fleet?.FleetType == Api.Enumerations.FleetType.SelectedBoats)
-                {
-                    await EnsureCompetitorIsInFleet(dbScore.Competitor, race.Fleet);
-                }
-            }
-
-            return dbRace;
-        }
-
-        private async Task EnsureCompetitorIsInFleet(dbObj.Competitor competitor, Fleet fleet)
-        {
-            var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == fleet.Id);
-            var Exists = dbFleet.CompetitorFleets != null
-                && dbFleet.CompetitorFleets.Any(cf => cf.CompetitorId == competitor.Id);
-            if (!Exists)
-            {
-                if(dbFleet.CompetitorFleets == null)
-                {
-                    dbFleet.CompetitorFleets = new List<dbObj.CompetitorFleet>();
-                }
-                dbFleet.CompetitorFleets.Add(new dbObj.CompetitorFleet
-                {
-                    FleetId = dbFleet.Id,
-                    CompetitorId = competitor.Id
-                });
-            }
-        }
-
-        private async Task<dbObj.Competitor> FindOrBuildCompetitorAsync(
-            Guid clubId,
-            Competitor competitor)
-        {
-            var existingCompetitors = _dbContext.Competitors.Local
-                .Where(c => c.ClubId == clubId);
-            foreach(var currentDbComp in existingCompetitors)
-            {
-                if(AreCompetitorsMatch(competitor, currentDbComp))
-                {
-                    return currentDbComp;
-                }
-            }
-
-            var dbComp = _mapper.Map<dbObj.Competitor>(competitor);
-            dbComp.ClubId = clubId;
-            _dbContext.Competitors.Add(dbComp);
-            return dbComp;
-        }
-
-        private bool AreCompetitorsMatch(Competitor competitor, dbObj.Competitor dbComp)
-        {
-            bool matchFound = false;
-
-            matchFound = !(String.IsNullOrWhiteSpace(competitor.SailNumber))
-                && !(String.IsNullOrWhiteSpace(dbComp.SailNumber))
-                && competitor.SailNumber.Equals(dbComp.SailNumber, StringComparison.InvariantCultureIgnoreCase);
-            matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.SailNumber))
-                && !(String.IsNullOrWhiteSpace(dbComp.AlternativeSailNumber))
-                && competitor.SailNumber.Equals(dbComp.AlternativeSailNumber, StringComparison.InvariantCultureIgnoreCase);
-
-            matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.AlternativeSailNumber))
-                && !(String.IsNullOrWhiteSpace(dbComp.SailNumber))
-                && competitor.AlternativeSailNumber.Equals(dbComp.SailNumber, StringComparison.InvariantCultureIgnoreCase);
-            matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.AlternativeSailNumber))
-                && !(String.IsNullOrWhiteSpace(dbComp.AlternativeSailNumber))
-                && competitor.AlternativeSailNumber.Equals(dbComp.AlternativeSailNumber, StringComparison.InvariantCultureIgnoreCase);
-            return matchFound;
-
-        }
-
-        private async Task<dbObj.Season> GetSeasonAsync(Guid clubId, Series series)
-        {
-            dbObj.Season retSeason = null;
-            if (series.Season != null)
-            {
-                retSeason = await _dbContext.Seasons
-                    .FirstOrDefaultAsync(s =>
-                        s.ClubId == clubId
-                        && ( s.Id == series.Season.Id
-                            || s.Start == series.Season.Start));
-            }
-            if (retSeason == null)
-            {
-                DateTime? firstDate = series.Races?.Min(r => r.Date);
-                DateTime? lastDate = series.Races?.Max(r => r.Date);
-                retSeason = await GetSeason(clubId, firstDate, lastDate, true);
-            }
-            return retSeason;
-        }
-
-        private async Task<dbObj.Season> GetSeason(
-            Guid clubId,
-            DateTime? minDate,
-            DateTime? maxDate,
-            bool createNew)
-        {
-            var minDateToUse = minDate ?? DateTime.Today;
-            var maxDateToUse = maxDate ?? DateTime.Today;
-            var retObj = await _dbContext.Seasons
-                .FirstOrDefaultAsync(
-                s => s.ClubId == clubId
-                && s.Start <= minDateToUse
-                && s.End > maxDateToUse);
-            if(retObj == null && createNew)
-            {
-                retObj = CreateNewSeason(clubId, minDateToUse, minDateToUse);
-            }
-
-            return retObj;
-        }
-
-        private dbObj.Season CreateNewSeason(Guid clubId, DateTime minDate, DateTime maxDate)
-        {
-            DateTime beginning = GetStartOfYear(minDate);
-            DateTime end = GetStartOfYear(maxDate).AddYears(1);
-
-            var season = new dbObj.Season
-            {
-                ClubId = clubId,
-                Name = $"{beginning.Year}",
-                Start = beginning,
-                End = end
-            };
-            return season;
-        }
-
-        private DateTime GetStartOfYear(DateTime minDate)
-        {
-            return new DateTime(minDate.Year, 1, 1);
-        }
 
         public async Task Update(Series model)
         {
@@ -515,7 +343,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.RaceSeries)
                 .SingleAsync(c => c.Id == model.Id);
 
-            existingSeries.Name = RemoveDisallowedCharacters(model.Name);
+            existingSeries.Name = UrlUtility.RemoveDisallowedCharacters(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
             existingSeries.ResultsLocked = model.ResultsLocked;
@@ -546,13 +374,13 @@ namespace SailScores.Core.Services
                     .Select(c => new dbObj.SeriesRace { RaceId = c.Id, SeriesId = existingSeries.Id })
                 : new List<dbObj.SeriesRace>();
 
-            foreach (var removingClass in racesToRemove)
+            foreach (var removingRace in racesToRemove)
             {
-                existingSeries.RaceSeries.Remove(removingClass);
+                existingSeries.RaceSeries.Remove(removingRace);
             }
-            foreach (var addClass in racesToAdd)
+            foreach (var addRace in racesToAdd)
             {
-                existingSeries.RaceSeries.Add(addClass);
+                existingSeries.RaceSeries.Add(addRace);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -562,11 +390,11 @@ namespace SailScores.Core.Services
             }
         }
 
-        public async Task Delete(Guid fleetId)
+        public async Task Delete(Guid seriesId)
         {
             var dbSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
-                .SingleAsync(c => c.Id == fleetId);
+                .SingleAsync(c => c.Id == seriesId);
             foreach (var link in dbSeries.RaceSeries.ToList())
             {
                 dbSeries.RaceSeries.Remove(link);

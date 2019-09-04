@@ -98,7 +98,7 @@
                                 <span class="badge badge-secondary badge-pill race-place"></span>
                             </div>
                             <div>
-                                <span class="sail-number"></span>
+                                <span class="sail-number"></span><span class="alt-sail-number" style="display: none"></span>
                             </div>
                             <div>
                                 <span class="competitor-name h5"></span>
@@ -134,6 +134,9 @@
                                 </div>
                                 <div>
                                     <span class="sail-number">@score.Competitor.SailNumber</span>
+                                    @if(!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber)) {
+                                        <span class="alt-sail-number"> (@score.Competitor.AlternativeSailNumber)</span>
+                                    }
                                 </div>
                                 <div>
                                     <span class="competitor-name h5">@score.Competitor.Name</span>

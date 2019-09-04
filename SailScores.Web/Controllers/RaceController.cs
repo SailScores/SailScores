@@ -71,9 +71,16 @@ namespace SailScores.Web.Controllers
         }
 
         [Authorize]
-        public async Task<ActionResult> Create(string clubInitials)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            Guid? regattaId,
+            string returnUrl = null)
         {
-            RaceWithOptionsViewModel race = await _raceService.GetBlankRaceWithOptions(clubInitials);
+            ViewData["ReturnUrl"] = returnUrl;
+            RaceWithOptionsViewModel race =
+                await _raceService.GetBlankRaceWithOptions(
+                    clubInitials,
+                    regattaId);
 
             return View(race);
         }
@@ -81,8 +88,12 @@ namespace SailScores.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> Create(string clubInitials, RaceWithOptionsViewModel race)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            RaceWithOptionsViewModel race,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             try
             {
                 var clubId = await _clubService.GetClubId(clubInitials);
@@ -92,12 +103,15 @@ namespace SailScores.Web.Controllers
                 }
                 race.ClubId = clubId;
                 await _raceService.SaveAsync(race);
-
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
                 return RedirectToAction("Index", "Admin");
             }
             catch
             {
-                return View();
+                return View(race);
             }
         }
 

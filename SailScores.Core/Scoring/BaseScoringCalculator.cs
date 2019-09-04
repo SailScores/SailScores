@@ -109,14 +109,14 @@ namespace SailScores.Core.Scoring
         {
             var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
                 .Max(r => r.Date) ?? DateTime.Today;
-            return races.Where(r => r.Date == null || r.Date < lastRaceDate.AddDays(-1)).ToList();
+            return races.Where(r => r.Date == null || r.Date <= lastRaceDate.AddDays(-1)).ToList();
         }
 
         private IList<Race> RemoveLastWeeksRaces(IList<Race> races)
         {
             var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
                 .Max(r => r.Date) ?? DateTime.Today;
-            return races.Where(r => r.Date == null || r.Date < lastRaceDate.AddDays(-7)).ToList();
+            return races.Where(r => r.Date == null || r.Date <= lastRaceDate.AddDays(-7)).ToList();
         }
         private IList<Race> RemoveLastRace(IList<Race> races)
         {

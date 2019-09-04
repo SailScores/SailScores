@@ -225,6 +225,17 @@ namespace SailScores.Web
                         )
                     });
                 routes.MapRoute(
+                    name: "Regatta",
+                    template: "{clubInitials}/Regatta/{season}/{regattaName}",
+                    defaults: new { controller = "Regatta", action = "Details" },
+                    constraints: new
+                    {
+                        clubInitials = new ClubRouteConstraint(() =>
+                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
+                        )
+                    });
+                routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });

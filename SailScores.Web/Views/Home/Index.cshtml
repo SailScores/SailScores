@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.ClubSelectorModel
+﻿@model SailScores.Web.Models.SailScores.SiteHomePageModel
 @{
     ViewData["Title"] = "SailScores";
     ViewData["MetaDescription"] = "Fast mobile-friendly web-based sailing scores";
@@ -24,8 +24,13 @@
     </div>
     <div class="col-md-6">
         <br class="d-none d-md-inline" />
-        @(await Html.PartialAsync("ClubSelectorView", Model))
+        @(await Html.PartialAsync("_ClubSelectorView", Model.ClubSelectorModel))
         <br />
+        @if (Model.RegattaSelectorModel?.Regattas?.Any() ?? false)
+        {
+        @(await Html.PartialAsync("_RegattaSelectorView", Model.RegattaSelectorModel))
+        <br />
+        }
         <hr class="my-4">
         <br class="d-none d-md-inline" />
         <p class="d-none d-md-inline">SailScores is <a href="https://github.com/jbfraser1/SailScores">open source</a> and volunteer driven.</p>

@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Http
+@model SailScores.Web.Models.SailScores.RegattaSelectorModel
+    <select id="regattaSelect" hidden asp-for="SelectedRegattaName" class="form-control"
+            onchange="window.location.href =
+        '@string.Format("{0}://{1}{2}/", Context.Request.Scheme, Context.Request.Host, Url.Content("~"))' + this.value;"
+            autocomplete="off">
+        <option selected>  ----or a current Regatta----  </option>
+        @foreach (var regatta in Model.Regattas)
+        {
+            <option value="@($"{regatta.ClubInitials}/Regatta/{regatta.Season.Name}/{regatta.UrlName}")">
+                @regatta.ClubInitials @regatta.Season.Name @regatta.Name
+            </option>
+        }
+    </select>
+<script>
+    document.getElementById("regattaSelect").selectedIndex = 0;
+    document.getElementById("regattaSelect").removeAttribute('hidden');
+</script>
+<noscript>
+    @foreach (var regatta in Model.Regattas)
+    {
+        <a href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~")}/{regatta.ClubInitials}/Regatta/{regatta.Season.Name}/{regatta.UrlName}")">
+            @regatta.ClubInitials - @regatta.Season.Name - @regatta.Name
+        </a><br />
+        }
+</noscript>

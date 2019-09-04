@@ -46,12 +46,18 @@ namespace SailScores.Web.Controllers
         }
 
         // GET: Competitor/Create
-        public async Task<ActionResult> Create(string clubInitials)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             var comp = new CompetitorWithOptionsViewModel();
             //todo: remove getfullclub
             var club = await _clubService.GetFullClub(clubInitials);
             comp.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                .OrderBy(f => f.Name);
+            comp.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
 
             return View(comp);
         }
@@ -59,18 +65,37 @@ namespace SailScores.Web.Controllers
         // POST: Competitor/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials, Competitor competitor)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            CompetitorWithOptionsViewModel competitor,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             try
             {
-                var clubId = await _clubService.GetClubId(clubInitials);
-                if (!await _authService.CanUserEdit(User, clubId))
+                var club = await _clubService.GetFullClub(clubInitials);
+                if (!await _authService.CanUserEdit(User, club.Id))
                 {
                     return Unauthorized();
                 }
-                competitor.ClubId = clubId;
+                competitor.ClubId = club.Id;
+                if(competitor.Fleets == null)
+                {
+                    competitor.Fleets = new List<Fleet>();
+                }
+                if (competitor.FleetIds == null)
+                {
+                    competitor.FleetIds = new List<Guid>();
+                }
+                foreach (var fleetId in competitor.FleetIds)
+                {
+                    competitor.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
+                }
                 await _competitorService.SaveAsync(competitor);
-
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
                 return RedirectToAction("Index", "Admin");
             }
             catch
@@ -100,19 +125,38 @@ namespace SailScores.Web.Controllers
             var compWithOptions = _mapper.Map<CompetitorWithOptionsViewModel>(competitor);
 
             compWithOptions.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                .OrderBy(f => f.Name);
+            compWithOptions.FleetOptions = _mapper.Map<IList<FleetSummary>>(fleets);
+
             return View(compWithOptions);
         }
 
         // POST: Competitor/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(Guid id, Competitor competitor)
+        public async Task<ActionResult> Edit(
+            Guid id,
+            CompetitorWithOptionsViewModel competitor)
         {
             try
             {
                 if (!await _authService.CanUserEdit(User, competitor.ClubId))
                 {
                     return Unauthorized();
+                }
+                var club = await _clubService.GetFullClub(competitor.ClubId);
+                if (competitor.Fleets == null)
+                {
+                    competitor.Fleets = new List<Fleet>();
+                }
+                if (competitor.FleetIds == null)
+                {
+                    competitor.FleetIds = new List<Guid>();
+                }
+                foreach (var fleetId in competitor.FleetIds)
+                {
+                    competitor.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
                 }
                 await _competitorService.SaveAsync(competitor);
 

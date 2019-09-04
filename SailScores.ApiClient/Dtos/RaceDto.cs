@@ -26,6 +26,7 @@ namespace SailScores.Api.Dtos
         public String TrackingUrl { get; set; }
 
         public Guid FleetId { get; set; }
+        public Guid? RegattaId { get; set; }
         public IList<Guid> ScoreIds { get; set; }
         // Scores is the big exception to Dto opbjects not containing other non-primitive types
         public IList<ScoreDto> Scores { get; set; }

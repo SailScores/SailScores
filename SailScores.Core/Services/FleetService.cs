@@ -39,7 +39,7 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task SaveNew(Fleet fleet)
+        public async Task<Guid> SaveNew(Fleet fleet)
         {
 
             if (_dbContext.Fleets.Any(f =>
@@ -64,10 +64,24 @@ namespace SailScores.Core.Services
                         });
                 }
             }
+            dbFleet.CompetitorFleets = new List<Db.CompetitorFleet>();
+            if ((fleet.Competitors?.Count() ?? 0) != 0)
+            {
+                foreach (var newComp in fleet.Competitors)
+                {
+                    dbFleet.CompetitorFleets.Add(
+                        new Db.CompetitorFleet
+                        {
+                            CompetitorId = newComp.Id,
+                            FleetId = dbFleet.Id
+                        });
+                }
+            }
             _dbContext.Fleets.Add(dbFleet);
 
             //todo: save classes.
             await _dbContext.SaveChangesAsync();
+            return dbFleet.Id;
 
         }
 
@@ -86,7 +100,9 @@ namespace SailScores.Core.Services
                 .Include(f => f.CompetitorFleets)
                 .SingleAsync(c => c.Id == fleet.Id);
 
+            existingFleet.ShortName = fleet.ShortName;
             existingFleet.Name = fleet.Name;
+            existingFleet.NickName = fleet.NickName;
             existingFleet.Description = fleet.Description;
             existingFleet.FleetType = fleet.FleetType;
 

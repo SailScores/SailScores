@@ -13,7 +13,9 @@ namespace SailScores.Web.Services
             bool includeScheduled,
             bool includeAbandoned);
         Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id);
-        Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(string clubInitials);
+        Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(
+            string clubInitials,
+            Guid? RegattaId);
         Task SaveAsync(RaceWithOptionsViewModel race);
         Task Delete(Guid id);
         Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions);

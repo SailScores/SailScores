@@ -1,0 +1,40 @@
+﻿@model IEnumerable<SailScores.Core.Model.Regatta>
+
+<div class="card">
+    <div class="card-header" id="regattaHeading">
+        <h5>
+            <a id="regatta" class="collapsed" data-toggle="collapse" href="#collapseRegatta" aria-expanded="false" aria-controls="collapseRegatta">
+                Regattas
+            </a>
+        </h5>
+    </div>
+    <div id="collapseRegatta" class="collapse" aria-labelledby="regattaHeading" data-parent="#accordion">
+            <div class="card-body">
+                <p>
+                    @Html.ActionLink("Create", "Create", "Regatta", new { /* id=item.PrimaryKey */ })
+                </p>
+                <table class="table table-not-wide">
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @item.Series.Sum(s => s.Races.Count()) Races
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "Regatta", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", "Regatta", new { id = item.Id })
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>

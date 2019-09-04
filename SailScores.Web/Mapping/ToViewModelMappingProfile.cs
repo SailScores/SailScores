@@ -32,7 +32,9 @@ namespace SailScores.Web.Mapping
                     s.BoatClasses.Select(c => c.Id)))
                 .ForMember(d => d.CompetitorOptions, o => o.Ignore())
                 .ForMember(d => d.CompetitorIds, o => o.MapFrom(s =>
-                    s.Competitors.Select(c => c.Id))); ;
+                    s.Competitors.Select(c => c.Id)))
+                .ForMember(d => d.Regatta, o => o.Ignore())
+                .ForMember(d => d.RegattaId, o => o.Ignore());
 
             CreateMap<Model.Series, SeriesWithOptionsViewModel>()
                 .ForMember(d => d.SeasonOptions, o => o.Ignore())
@@ -40,7 +42,9 @@ namespace SailScores.Web.Mapping
                     s.Season.Id))
                 .ForMember(d => d.ScoringSystemOptions, o => o.Ignore());
             CreateMap<Model.Competitor, CompetitorWithOptionsViewModel>()
-                .ForMember(d => d.BoatClassOptions, o => o.Ignore());
+                .ForMember(d => d.BoatClassOptions, o => o.Ignore())
+                .ForMember(d => d.FleetOptions, o => o.Ignore())
+                .ForMember(d => d.FleetIds, o => o.MapFrom(s => s.Fleets.Select(f => f.Id)));
 
             CreateMap<RaceViewModel, RaceWithOptionsViewModel>()
                 .ForMember(d => d.FleetOptions, o => o.Ignore())
@@ -48,6 +52,8 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())
                 .ForMember(d => d.CompetitorOptions, o => o.Ignore())
                 .ForMember(d => d.InitialOrder, o => o.Ignore())
+                .ForMember(d => d.Regatta, o => o.Ignore())
+                .ForMember(d => d.RegattaId, o => o.Ignore())
                 .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(sr => sr.Id)));
 
             CreateMap<Model.ScoringSystem, ScoringSystemWithOptionsViewModel>()
@@ -59,6 +65,14 @@ namespace SailScores.Web.Mapping
 
             CreateMap<Model.ScoreCode, ScoreCodeWithOptionsViewModel>()
                 .ForMember(d => d.FormulaOptions, o => o.Ignore());
+
+            CreateMap<Model.Regatta, RegattaWithOptionsViewModel>()
+                .ForMember(d => d.SeasonOptions, o => o.Ignore())
+                .ForMember(d => d.ScoringSystemOptions, o => o.Ignore())
+                .ForMember(d => d.FleetOptions, o => o.Ignore())
+                .ForMember(d => d.FleetIds, o => o.MapFrom(s =>
+                    s.Fleets.Select(c => c.Id)));
+
         }
     }
 }

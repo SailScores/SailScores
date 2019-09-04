@@ -41,7 +41,7 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ClubInitials"] = clubInitials;
 
-            var series = await _seriesService.GetAllSeriesSummaryAsync(clubInitials);
+            var series = await _seriesService.GetNonRegattaSeriesSummariesAsync(clubInitials);
 
             return View(new ClubCollectionViewModel<SeriesSummary>
             {
@@ -71,8 +71,10 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Create(string clubInitials)
         {
             var club = await _clubService.GetFullClub(clubInitials);
-            var vm = new SeriesWithOptionsViewModel();
-            vm.SeasonOptions = club.Seasons;
+            var vm = new SeriesWithOptionsViewModel
+            {
+                SeasonOptions = club.Seasons
+            };
             var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
             scoringSystemOptions.Add(new ScoringSystem
             {

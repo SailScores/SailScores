@@ -7,10 +7,12 @@
 }
 
 <div class="container p-0 justify-content-between">
-    <h4>Add a new race</h4>
+    <h4>Add a new race@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
     <hr />
-    <form id="raceform" asp-action="Create">
+    <form id="raceform" asp-action="Create"
+          asp-route-returnurl="@ViewData["ReturnUrl"]" >
         <input type="hidden" id="clubId" asp-for="ClubId" />
+        <input type="hidden" id="regattaId" asp-for="RegattaId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label asp-for="Date" class="control-label"></label>
@@ -43,6 +45,8 @@
             </select>
             <span asp-validation-for="FleetId" class="text-danger"></span>
         </div>
+        @if (!Model.RegattaId.HasValue && Model.Regatta == null)
+        {
         <div class="form-group">
             <label asp-for="SeriesIds" class="control-label">Series</label>
             <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
@@ -55,6 +59,7 @@
             </select>
             <span asp-validation-for="SeriesIds" class="text-danger"></span>
         </div>
+        }
 
         <div id="advancedFields" role="tablist">
             <div class="card">
@@ -111,7 +116,7 @@
                                 <span class="badge badge-secondary badge-pill race-place"></span>
                             </div>
                             <div>
-                                <span class="sail-number"></span>
+                                <span class="sail-number"></span><span class="alt-sail-number" style="display: none"></span>
                             </div>
                             <div>
                                 <span class="competitor-name h5"></span>
@@ -138,7 +143,7 @@
                         </div>
                     </li>
                 </ul>
- 
+
             </div>
         </div>
         <div class="row">
@@ -156,9 +161,9 @@
             </div>
             <div class="col-md-3">
                 <a asp-controller="Admin"
-                    asp-action="Index"
-                    asp-fragment="races"
-                    class="btn btn-outline-primary btn-block">Cancel</a>
+                   asp-action="Index"
+                   asp-fragment="races"
+                   class="btn btn-outline-primary btn-block">Cancel</a>
             </div>
         </div>
     </form>

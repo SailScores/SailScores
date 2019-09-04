@@ -30,10 +30,12 @@ namespace SailScores.Web.Services
             await _coreSeriesService.Delete(id);
         }
 
-        public async Task<IEnumerable<SeriesSummary>> GetAllSeriesSummaryAsync(string clubInitials)
+        public async Task<IEnumerable<SeriesSummary>> GetNonRegattaSeriesSummariesAsync(string clubInitials)
         {
-            var coreObject = await _coreClubService.GetFullClub(clubInitials);
-            var orderedSeries = coreObject.Series
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
+            var orderedSeries = 
+                coreObject
                 .OrderByDescending(s => s.Season.Start)
                 .ThenBy(s => s.Name);
             return _mapper.Map<IList<SeriesSummary>>(orderedSeries);

@@ -37,7 +37,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             DateTime? date
             )
         {
-            var series =  await _service.GetAllSeriesAsync(clubId, date);
+            var series =  await _service.GetAllSeriesAsync(clubId, date, true);
             return _mapper.Map<List<SeriesDto>>(series);
         }
 
@@ -59,7 +59,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             var seriesBizObj = _mapper.Map<Series>(series);
             await _service.SaveNewSeries(seriesBizObj);
             var savedSeries =
-                (await _service.GetAllSeriesAsync(series.ClubId,null))                
+                (await _service.GetAllSeriesAsync(series.ClubId,null,true))                
                 .Single(s => s.Name == series.Name
                     && s.Season.Id == series.SeasonId);
             return Ok(savedSeries.Id);

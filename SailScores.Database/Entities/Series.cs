@@ -34,5 +34,10 @@ namespace SailScores.Database.Entities
         public ScoringSystem ScoringSystem { get; set; }
 
         public TrendOption? TrendOption { get; set; }
+
+        // used for connecting series to correct fleet. Particularly for Regatta use.
+        public Guid? FleetId { get; set; }
+
+        public bool? PreferAlternativeSailNumbers { get; set; }
     }
 }

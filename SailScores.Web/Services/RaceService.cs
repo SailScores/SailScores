@@ -15,17 +15,20 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IRaceService _coreRaceService;
         private readonly IScoringService _coreScoringService;
+        private readonly Core.Services.IRegattaService _coreRegattaService;
         private readonly IMapper _mapper;
 
         public RaceService(
             Core.Services.IClubService clubService,
             Core.Services.IRaceService coreRaceService,
             Core.Services.IScoringService coreScoringService,
+            Core.Services.IRegattaService coreRegattaService,
             IMapper mapper)
         {
             _coreClubService = clubService;
             _coreRaceService = coreRaceService;
             _coreScoringService = coreScoringService;
+            _coreRegattaService = coreRegattaService;
             _mapper = mapper;
         }
 
@@ -62,22 +65,77 @@ namespace SailScores.Web.Services
             return scoreCodes.FirstOrDefault(sc => sc.Name == code);
         }
 
-        public async Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(string clubInitials)
+        public async Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(
+            string clubInitials,
+            Guid? regattaId)
         {
-            var club = await _coreClubService.GetFullClub(clubInitials);
-            var model = new RaceWithOptionsViewModel();
-            model.ClubId = club.Id;
-            model.FleetOptions = club.Fleets;
-            model.SeriesOptions = club.Series;
-            model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
-                .OrderBy(s => s.Name).ToList();
-            model.CompetitorOptions = club.Competitors;
-            model.Date = DateTime.Today;
-            model.Order = 1;
-            return model;
+            if (regattaId.HasValue)
+            {
+                return await CreateRegattaRaceAsync(clubInitials, regattaId);
+            }
+            else
+            {
+                return await CreateClubRaceAsync(clubInitials);
+            }
 
         }
-        
+
+        private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(string clubInitials)
+        {
+            var club = await _coreClubService.GetFullClub(clubInitials);
+            var model = new RaceWithOptionsViewModel
+            {
+                ClubId = club.Id,
+                FleetOptions = club.Fleets,
+                SeriesOptions = club.Series,
+                ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+                    .OrderBy(s => s.Name).ToList(),
+                CompetitorOptions = club.Competitors,
+                Date = DateTime.Today
+            };
+            return model;
+        }
+
+        private async Task<RaceWithOptionsViewModel> CreateRegattaRaceAsync(
+            string clubInitials,
+            Guid? regattaId)
+        {
+            var club = await _coreClubService.GetFullClub(clubInitials);
+            var regatta = club.Regattas.Single(r => r.Id == regattaId);
+            var model = new RaceWithOptionsViewModel();
+            model.ClubId = club.Id;
+            model.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
+            model.FleetOptions = regatta.Fleets;
+            model.SeriesOptions = club.Series;
+            if (regatta.ScoringSystemId.HasValue)
+            {
+                model.ScoreCodeOptions =
+                    (await _coreScoringService
+                        .GetScoringSystemAsync(regatta.ScoringSystemId.Value))
+                    .ScoreCodes;
+            }
+            else
+            {
+                model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+                    .OrderBy(s => s.Name).ToList();
+            }
+            model.CompetitorOptions = regatta.Fleets?.FirstOrDefault()?.Competitors;
+            if (regatta.StartDate.HasValue && regatta.EndDate.HasValue
+                && DateTime.Today >= regatta.StartDate && DateTime.Today <= regatta.EndDate)
+            {
+                model.Date = DateTime.Today;
+            }
+            else if (regatta.StartDate.HasValue)
+            {
+                model.Date = regatta.StartDate.Value;
+            }
+            else
+            {
+                model.Date = DateTime.Today;
+            }
+            return model;
+        }
+
         public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions)
         {
             var club = await _coreClubService.GetFullClub(raceWithOptions.ClubId);
@@ -121,6 +179,22 @@ namespace SailScores.Web.Services
             if(race.FleetId != default(Guid))
             {
                 race.Fleet = club.Fleets.Single(f => f.Id == race.FleetId);
+                // if a regatta race, give everyone in the fleet a result
+                if (race.RegattaId.HasValue)
+                {
+                    foreach (var competitor in race.Fleet.Competitors)
+                    {
+                        if (!race.Scores.Any(s => s.CompetitorId == competitor.Id))
+                        {
+                            race.Scores.Add(new Score
+                            {
+                                CompetitorId = competitor.Id,
+                                Code = "DNC",
+                                Race = race
+                            });
+                        }
+                    }
+                }
             }
             if(race.Order == 0)
             {
@@ -140,7 +214,13 @@ namespace SailScores.Web.Services
                 }
             }
             var raceDto = _mapper.Map<RaceDto>(race);
-            await _coreRaceService.SaveAsync(raceDto);
+            var raceId = await _coreRaceService.SaveAsync(raceDto);
+
+            race.Id = raceId;
+            if(race.RegattaId.HasValue)
+            {
+                await _coreRegattaService.AddRaceToRegattaAsync(race, race.RegattaId.Value);
+            }
         }
     }
 }

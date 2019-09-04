@@ -39,6 +39,12 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.Score, Model.Score>()
                 .ForMember(d => d.Competitor, o => o.Ignore());
 
+            CreateMap<Db.Regatta, Model.Regatta>()
+                .ForMember(d => d.Series, o => o.MapFrom(s => s.RegattaSeries.Select(rs => rs.Series).ToList()))
+                .ForMember(d => d.Fleets, o => o.MapFrom(s => s.RegattaFleet.Select(rs => rs.Fleet).ToList()))
+                .ForMember(d => d.PreferAlternateSailNumbers, o => o.MapFrom(s => s.PreferAlternateSailNumbers ?? false))
+                .ReverseMap();
+
         }
     }
 }

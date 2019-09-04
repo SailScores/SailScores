@@ -11,7 +11,8 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create"
+              asp-route-returnurl="@ViewData["ReturnUrl"]">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label">Name <em>Required</em></label>
@@ -24,24 +25,9 @@
                 <span asp-validation-for="SailNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="AlternativeSailNumber" class="control-label"></label>
-                <input asp-for="AlternativeSailNumber" class="form-control" />
-                <span asp-validation-for="AlternativeSailNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="BoatName" class="control-label"></label>
                 <input asp-for="BoatName" class="form-control" />
                 <span asp-validation-for="BoatName" class="text-danger"></span>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" name="IsActive" value="true" class="form-check-input" checked />
-                <label asp-for="IsActive" class="control-label"></label>
-                <span asp-validation-for="IsActive" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Notes" class="control-label"></label>
-                <input asp-for="Notes" class="form-control" />
-                <span asp-validation-for="Notes" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="BoatClassId" class="control-label">Class <em>Required</em></label>
@@ -56,6 +42,55 @@
                 </select>
                 <span asp-validation-for="BoatClassId" class="text-danger"></span>
             </div>
+
+            <div id="advancedFields" role="tablist">
+                <div class="card">
+                    <div class="card-header" role="tab" id="advancedHeading">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                Additional Settings
+                            </a> <span class="small"><em>&ensp;Optional</em></span>
+                        </h5>
+                    </div>
+                    <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="FleetIds" class="control-label">Fleets</label>
+                                <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
+                                    @foreach (var fleet in Model.FleetOptions)
+                                    {
+                                        <option value="@fleet.Id">
+                                            @fleet.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="FleetIds" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="HomeClubName" class="control-label"></label>
+                                <input asp-for="HomeClubName" class="form-control" />
+                                <span asp-validation-for="HomeClubName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="AlternativeSailNumber" class="control-label"></label>
+                                <input asp-for="AlternativeSailNumber" class="form-control" />
+                                <span asp-validation-for="AlternativeSailNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="IsActive" value="true" class="form-check-input" checked />
+                                <label asp-for="IsActive" class="control-label"></label>
+                                <span asp-validation-for="IsActive" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Notes" class="control-label"></label>
+                                <input asp-for="Notes" class="form-control" />
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary my-2" />
                 <a asp-controller="Admin"
@@ -69,4 +104,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 }

@@ -14,5 +14,9 @@ namespace SailScores.Web.Models.SailScores
 
         public IEnumerable<Competitor> CompetitorOptions { get; set; }
         public IEnumerable<Guid> CompetitorIds { get; set; }
+
+        public RegattaSummaryViewModel Regatta { get; set; }
+
+        public Guid? RegattaId { get; set; }
     }
 }

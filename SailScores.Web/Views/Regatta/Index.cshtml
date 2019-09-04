@@ -1,0 +1,72 @@
+﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Extensions;
+@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
+
+@inject IStringLocalizer<SharedResource> localizer
+
+@model ClubCollectionViewModel<RegattaSummaryViewModel>
+@{
+    ViewBag.Title = Model.ClubInitials + " " + localizer["Regattas"];
+    Layout = "_ClubLayout";
+}
+
+@section Sidebar {
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky sticky-top">
+            <ul class="nav flex-column">
+                @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#@item.Key">
+                            @item.Key
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        </div>
+    </nav>
+}
+
+@if (Model.List.Any())
+{
+
+<table class="table">
+    <tbody>
+        @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+        {
+            <tr id="@item.Key">
+                <td colspan="3">
+                    <h2>@item.Key</h2>
+                </td>
+            </tr>
+            foreach (var regatta in item)
+            {
+                <tr>
+                    <td>
+                        <a href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.UrlName">
+                            @Html.DisplayFor(modelItem => regatta.Name)
+                        </a>
+                        (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
+                    </td>
+                    <td>
+                        @regatta.StartDate?.ToString("d") -
+                        @regatta.EndDate?.ToString("d")
+                    </td>
+                    <td>
+                        @if (regatta.UpdatedDate.HasValue)
+                        {
+                            <span class="d-none d-md-table-cell"><i>Updated @(regatta.UpdatedDate.Value.ToString("d"))</i></span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+} else
+{
+    <br />
+    <h4>This club has not shared any regattas.</h4>
+}

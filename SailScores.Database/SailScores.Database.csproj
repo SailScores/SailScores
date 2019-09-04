@@ -1,8 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190808010919_CreateRegatta.cs" />
+    <Compile Remove="Migrations\20190808010919_CreateRegatta.Designer.cs" />
+    <Compile Remove="Migrations\20190808011642_CreateRegatta.cs" />
+    <Compile Remove="Migrations\20190808011642_CreateRegatta.Designer.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.8" />

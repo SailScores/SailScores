@@ -43,6 +43,11 @@ namespace SailScores.Core.Model
 
         public TrendOption? TrendOption { get; set; }
 
+        // used for connecting series to correct fleet. Particularly for Regatta use.
+        public Guid? FleetId { get; set; }
+
+        public bool? PreferAlternativeSailNumbers { get; set; }
+
         public Series ShallowCopy()
         {
             return (Series)this.MemberwiseClone();

@@ -86,13 +86,18 @@ function addNewCompetitor(competitor: competitorDto) {
     var compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
     compListItem.id = competitor.id.toString();
     compListItem.setAttribute("data-competitorId", competitor.id.toString());
-    var span = compListItem.getElementsByClassName("competitor-name")[0];
+    var span = compListItem.getElementsByClassName("competitor-name")[0] as HTMLElement;
     span.appendChild(document.createTextNode(competitor.name));
 
-    span = compListItem.getElementsByClassName("sail-number")[0];
+    span = compListItem.getElementsByClassName("sail-number")[0] as HTMLElement;
     span.appendChild(document.createTextNode(competitor.sailNumber));
+    if (competitor.alternativeSailNumber) {
+        span = compListItem.getElementsByClassName("alt-sail-number")[0] as HTMLElement;
+        span.appendChild(document.createTextNode(" ("+competitor.alternativeSailNumber+")"));
+        span.style.display = "";
+    }
 
-    span = compListItem.getElementsByClassName("race-place")[0];
+    span = compListItem.getElementsByClassName("race-place")[0] as HTMLElement;
     span.appendChild(document.createTextNode(c.toString()));
 
     var deleteButtons = compListItem.getElementsByClassName("delete-button");
@@ -181,11 +186,15 @@ function getSuggestions(): AutocompleteSuggestion[] {
     console.debug("checking for comps in results");
     allCompetitors.forEach(c => {
         if (!competitorIsInResults(c)) {
-            competitorSuggestions.push(
-                {
-                    value: c.sailNumber + " - " + c.name,
-                    data: c
-                });
+            let comp = {
+                value: c.sailNumber + " - " + c.name,
+                data: c
+            };
+            if (c.alternativeSailNumber) {
+                comp.value = c.sailNumber + " ( " +
+                    c.alternativeSailNumber + " ) - " + c.name;
+            }
+            competitorSuggestions.push(comp);
         }
     });
     return competitorSuggestions;

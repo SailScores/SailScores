@@ -7,14 +7,17 @@
 
 <h2>Create</h2>
 
-<h4>Fleet</h4>
+<h4>Fleet@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create"
+          asp-route-returnurl="@ViewData["ReturnUrl"]" >
+            <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ShortName" class="control-label"></label>
+                <small>Should be unique within this club; for URLs, e.g. 2019DieHardMCs</small>
                 <input asp-for="ShortName" class="form-control" />
                 <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
@@ -22,6 +25,12 @@
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NickName" class="control-label"></label>
+                <small>Does not need to be unique, used for display only, e.g. MC Scows</small>
+                <input asp-for="NickName" class="form-control" />
+                <span asp-validation-for="NickName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
@@ -51,11 +60,13 @@
             </div>
             <div id="boatSelectGroup" class="form-group">
                 <label asp-for="CompetitorIds" class="control-label">Competitors</label>
-                <select multiple asp-for="CompetitorIds" class="form-control">
-                    @foreach (var competitor in Model.CompetitorOptions)
+                <select multiple asp-for="CompetitorIds" class="form-control custom-select selectpicker">
+                    @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber)
+                   .ThenBy(c => c.AlternativeSailNumber)
+                   .ThenBy(c => c.Name))
                     {
                         <option value="@competitor.Id">
-                            @competitor.SailNumber - @competitor.Name
+                            @competitor.SailNumber - @competitor.Name (@competitor.BoatClass.Name)
                         </option>
                     }
                 </select>
@@ -71,25 +82,26 @@
         </form>
     </div>
 </div>
-<script type="text/javascript">
-    function checkVisibility() {
-        var f = document.getElementById('fleetType');
-        var fType = f.options[f.selectedIndex].text;
-        if (fType.indexOf('Class') > -1) {
-            document.getElementById('classSelectGroup').style.display = 'block';
-        } else {
-            document.getElementById('classSelectGroup').style.display = 'none';
-        }
-        if (fType.indexOf('Selected Boats') > -1) {
-            document.getElementById('boatSelectGroup').style.display = 'block';
-        } else {
-            document.getElementById('boatSelectGroup').style.display = 'none';
-        }
-    };
-    checkVisibility();
-</script>
-
 
 @section Scripts {
+    <script type="text/javascript">
+        function checkVisibility() {
+            var f = document.getElementById('fleetType');
+            var fType = f.options[f.selectedIndex].text;
+            if (fType.indexOf('Class') > -1) {
+                document.getElementById('classSelectGroup').style.display = 'block';
+            } else {
+                document.getElementById('classSelectGroup').style.display = 'none';
+            }
+            if (fType.indexOf('Selected Boats') > -1) {
+                document.getElementById('boatSelectGroup').style.display = 'block';
+            } else {
+                document.getElementById('boatSelectGroup').style.display = 'none';
+            }
+        };
+        checkVisibility();
+
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 }

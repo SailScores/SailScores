@@ -19,6 +19,7 @@ namespace SailScores.Database
         public DbSet<Series> Series { get; set; }
         public DbSet<Race> Races { get; set; }
         public DbSet<Score> Scores { get; set; }
+        public DbSet<Regatta> Regattas { get; set; }
 
         public DbSet<ScoreCode> ScoreCodes { get; set; }
 
@@ -45,7 +46,10 @@ namespace SailScores.Database
                 .HasKey(x => new {x.SeriesId, x.RaceId});
             modelBuilder.Entity<FleetBoatClass>()
                 .HasKey(x => new {x.FleetId, x.BoatClassId});
-
+            modelBuilder.Entity<RegattaFleet>()
+                .HasKey(x => new { x.RegattaId, x.FleetId });
+            modelBuilder.Entity<RegattaSeries>()
+                .HasKey(x => new { x.RegattaId, x.SeriesId });
 
             // Following lines resolve multiple deletion paths to entities.
             modelBuilder.Entity<Club>()
@@ -68,6 +72,13 @@ namespace SailScores.Database
                     DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) :
                     v);
 
+            modelBuilder.Entity<Regatta>()
+                .Property(e => e.UpdatedDate)
+                .HasConversion(v => v, v =>
+                    v.HasValue ?
+                    DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) :
+                    v);
+
             modelBuilder.Entity<Fleet>()
                 .HasMany(f => f.CompetitorFleets)
                 .WithOne(cf => cf.Fleet)
@@ -76,6 +87,21 @@ namespace SailScores.Database
             modelBuilder.Entity<Fleet>()
                 .HasMany(f => f.FleetBoatClasses)
                 .WithOne(c => c.Fleet)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Regatta>()
+                .HasMany(f => f.RegattaFleet)
+                .WithOne(c => c.Regatta)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Regatta>()
+                .HasMany(f => f.RegattaSeries)
+                .WithOne(c => c.Regatta)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Regatta>()
+                .HasOne(f => f.Season)
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Score>()
