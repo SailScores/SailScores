@@ -55,15 +55,20 @@ namespace SailScores.Web.Services
             return vm;
         }
 
+        public async Task<Regatta> GetRegattaAsync(Guid regattaId)
+        {
+            return await _coreRegattaService.GetRegattaAsync(regattaId);
+        }
+
         public async Task<Regatta> GetRegattaAsync(string clubInitials, string season, string regattaName)
         {
             return await _coreRegattaService.GetRegattaAsync(clubInitials, season, regattaName);
         }
 
-        public async Task SaveNewAsync(RegattaWithOptionsViewModel model)
+        public async Task<Guid> SaveNewAsync(RegattaWithOptionsViewModel model)
         {
             await PrepRegattaVmAsync(model);
-            await _coreRegattaService.SaveNewRegattaAsync(model);
+            return await _coreRegattaService.SaveNewRegattaAsync(model);
         }
 
         private async Task PrepRegattaVmAsync(RegattaWithOptionsViewModel model)
@@ -89,15 +94,20 @@ namespace SailScores.Web.Services
             }
         }
 
-        public async Task UpdateAsync(RegattaWithOptionsViewModel model)
+        public async Task<Guid> UpdateAsync(RegattaWithOptionsViewModel model)
         {
             await PrepRegattaVmAsync(model);
-            await _coreRegattaService.UpdateAsync(model);
+            return await _coreRegattaService.UpdateAsync(model);
         }
 
         public async Task DeleteAsync(Guid regattaId)
         {
             await _coreRegattaService.DeleteAsync(regattaId);
+        }
+
+        public async Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId)
+        {
+            await _coreRegattaService.AddFleetToRegattaAsync(fleetId, regattaId);
         }
 
     }

@@ -12,13 +12,15 @@ namespace SailScores.Core.Services
         Task<IList<Model.Regatta>> GetRegattasDuringSpanAsync(
             DateTime start,
             DateTime end);
+        Task<Regatta> GetRegattaAsync(Guid regattaId);
         Task<Core.Model.Regatta> GetRegattaAsync(
             string clubInitials,
             string seasonName,
             string regattaName);
-        Task SaveNewRegattaAsync(Regatta regatta);
-        Task UpdateAsync(Regatta model);
+        Task<Guid> SaveNewRegattaAsync(Regatta regatta);
+        Task<Guid> UpdateAsync(Regatta model);
         Task AddRaceToRegattaAsync(Race race, Guid regattaId);
         Task DeleteAsync(Guid regattaId);
+        Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId);
     }
 }

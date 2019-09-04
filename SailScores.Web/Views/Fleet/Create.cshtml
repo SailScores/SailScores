@@ -7,11 +7,13 @@
 
 <h2>Create</h2>
 
-<h4>Fleet</h4>
+<h4>Fleet@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create"
+          asp-route-returnurl="@ViewData["ReturnUrl"]" >
+            <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ShortName" class="control-label"></label>
@@ -60,8 +62,8 @@
                 <label asp-for="CompetitorIds" class="control-label">Competitors</label>
                 <select multiple asp-for="CompetitorIds" class="form-control custom-select selectpicker">
                     @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber)
-                    .ThenBy(c => c.AlternativeSailNumber)
-                    .ThenBy(c => c.Name))
+                   .ThenBy(c => c.AlternativeSailNumber)
+                   .ThenBy(c => c.Name))
                     {
                         <option value="@competitor.Id">
                             @competitor.SailNumber - @competitor.Name (@competitor.BoatClass.Name)

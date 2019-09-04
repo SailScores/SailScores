@@ -105,9 +105,14 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = clubId;
-                await _regattaService.SaveNewAsync(model);
-
-                return RedirectToAction("Index", "Admin");
+                var regattaId = await _regattaService.SaveNewAsync(model);
+                var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
+                return RedirectToAction("Details", new
+                {
+                    clubInitials = clubInitials,
+                    season = savedRegatta.Season.Name,
+                    regattaName = savedRegatta.UrlName
+                });
             }
             catch
             {
@@ -125,7 +130,9 @@ namespace SailScores.Web.Controllers
         }
 
         [Authorize]
-        public async Task<ActionResult> Edit(string clubInitials, Guid id)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            Guid id)
         {
             var club = await _clubService.GetFullClub(clubInitials);
             if (!await _authService.CanUserEdit(User, club.Id))
@@ -166,9 +173,15 @@ namespace SailScores.Web.Controllers
                 {
                     return Unauthorized();
                 }
-                await _regattaService.UpdateAsync(model);
+                var regattaId = await _regattaService.UpdateAsync(model);
 
-                return RedirectToAction("Index", "Admin");
+                var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
+                return RedirectToAction("Details", new
+                {
+                    clubInitials = clubInitials,
+                    season = savedRegatta.Season.Name,
+                    regattaName = savedRegatta.UrlName
+                });
             }
             catch
             {

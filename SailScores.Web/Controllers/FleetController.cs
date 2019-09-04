@@ -62,19 +62,28 @@ namespace SailScores.Web.Controllers
             });
         }
 
-        public async Task<ActionResult> Create(string clubInitials)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            Guid? regattaId,
+            string returnUrl = null)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            var vm = new FleetWithOptionsViewModel();
-            vm.BoatClassOptions = club.BoatClasses;
-            vm.CompetitorOptions = club.Competitors;
+
+            ViewData["ReturnUrl"] = returnUrl;
+            var vm = await _fleetService.GetBlankFleetWithOptionsAsync(
+                clubInitials,
+                regattaId);
+
             return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials, FleetCreateViewModel model)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            FleetWithOptionsViewModel model,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             try
             {
                 var clubId = await _clubService.GetClubId(clubInitials);
@@ -84,12 +93,15 @@ namespace SailScores.Web.Controllers
                 }
                 model.ClubId = clubId;
                 await _fleetService.SaveNew(model);
-
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
                 return RedirectToAction("Index", "Admin");
             }
             catch
             {
-                return View();
+                return View(model);
             }
         }
 

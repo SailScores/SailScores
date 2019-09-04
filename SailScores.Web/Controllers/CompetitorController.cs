@@ -46,8 +46,11 @@ namespace SailScores.Web.Controllers
         }
 
         // GET: Competitor/Create
-        public async Task<ActionResult> Create(string clubInitials)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             var comp = new CompetitorWithOptionsViewModel();
             //todo: remove getfullclub
             var club = await _clubService.GetFullClub(clubInitials);
@@ -64,8 +67,10 @@ namespace SailScores.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(
             string clubInitials,
-            CompetitorWithOptionsViewModel competitor)
+            CompetitorWithOptionsViewModel competitor,
+            string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             try
             {
                 var club = await _clubService.GetFullClub(clubInitials);
@@ -87,7 +92,10 @@ namespace SailScores.Web.Controllers
                     competitor.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
                 }
                 await _competitorService.SaveAsync(competitor);
-
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
                 return RedirectToAction("Index", "Admin");
             }
             catch

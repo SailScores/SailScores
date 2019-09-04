@@ -14,15 +14,18 @@ namespace SailScores.Web.Services
     {
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IFleetService _coreFleetService;
+        private readonly IRegattaService _regattaService;
         private readonly IMapper _mapper;
 
         public FleetService(
             Core.Services.IClubService clubService,
             Core.Services.IFleetService coreFleetService,
+            IRegattaService regattaService,
             IMapper mapper)
         {
             _coreClubService = clubService;
             _coreFleetService = coreFleetService;
+            _regattaService = regattaService;
             _mapper = mapper;
         }
 
@@ -53,7 +56,7 @@ namespace SailScores.Web.Services
             await _coreFleetService.Delete(fleetId);
         }
 
-        public async Task SaveNew(FleetCreateViewModel fleet)
+        public async Task SaveNew(FleetWithOptionsViewModel fleet)
         {
             var coreModel = _mapper.Map<Fleet>(fleet);
             var club = await _coreClubService.GetFullClub(fleet.ClubId);
@@ -64,8 +67,19 @@ namespace SailScores.Web.Services
                     club.BoatClasses
                     .Where(c => fleet.BoatClassIds.Contains(c.Id))
                     .ToList();
+            } else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats
+                  && fleet.CompetitorIds != null)
+            {
+                coreModel.Competitors =
+                    club.Competitors
+                    .Where(c => fleet.CompetitorIds.Contains(c.Id))
+                    .ToList();
             }
-            await _coreFleetService.SaveNew(coreModel);
+            var fleetId = await _coreFleetService.SaveNew(coreModel);
+            if (fleet.RegattaId.HasValue)
+            {
+                await _regattaService.AddFleetToRegattaAsync(fleetId, fleet.RegattaId.Value);
+            }
         }
 
         public async Task Update(FleetWithOptionsViewModel fleet)
@@ -91,5 +105,21 @@ namespace SailScores.Web.Services
             await _coreFleetService.Update(coreModel);
         }
 
+        public async Task<FleetWithOptionsViewModel> GetBlankFleetWithOptionsAsync(
+            string clubInitials,
+            Guid? regattaId)
+        {
+            var club = await _coreClubService.GetFullClub(clubInitials);
+            var vm = new FleetWithOptionsViewModel();
+            vm.BoatClassOptions = club.BoatClasses;
+            vm.CompetitorOptions = club.Competitors;
+            vm.RegattaId = regattaId;
+            if (regattaId.HasValue)
+            {
+                var regatta = club.Regattas.Single(r => r.Id == regattaId);
+                vm.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
+            }
+            return vm;
+        }
     }
 }

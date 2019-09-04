@@ -9,11 +9,14 @@ namespace SailScores.Web.Services
     public interface IRegattaService
     {
         Task<IEnumerable<RegattaSummaryViewModel>> GetAllRegattaSummaryAsync(string clubInitials);
+        Task<Regatta> GetRegattaAsync(Guid regattaId);
         Task<Regatta> GetRegattaAsync(string clubInitials, string season, string regattaName);
-        Task SaveNewAsync(RegattaWithOptionsViewModel model);
-        Task UpdateAsync(RegattaWithOptionsViewModel model);
+        Task<Guid> SaveNewAsync(RegattaWithOptionsViewModel model);
+        Task<Guid> UpdateAsync(RegattaWithOptionsViewModel model);
         Task DeleteAsync(Guid regattaId);
 
         Task<IEnumerable<RegattaSummaryViewModel>> GetCurrentRegattas();
+        Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId);
+
     }
 }

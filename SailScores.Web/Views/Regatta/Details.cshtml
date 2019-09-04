@@ -1,6 +1,7 @@
 @using Microsoft.Extensions.Localization;
 @using SailScores.Web.Resources;
 @using SailScores.Web.Extensions;
+@using Microsoft.AspNetCore.Http.Extensions;
 
 @using SailScores.Web.Models.SailScores
 @using SailScores.Core.FlatModel
@@ -17,8 +18,7 @@
     <nav class="col-md-2 d-none d-md-block bg-light sidebar">
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
-                @foreach (var fleet in
-               Model.Item?.Fleets)
+                @foreach (var fleet in Model.Item?.Fleets?.OrderBy(f => f.NickName))
                 {
                     <li class="nav-item">
                         <a class="nav-link active" href="#@fleet.ShortName">
@@ -38,11 +38,11 @@
             @Model.Item.Name
             @if (!String.IsNullOrWhiteSpace(Model.Item.Url))
             {
-            <span class="h5">
-                <a href="@Model.Item.Url" target="_blank">
-                    <span class="fas fa-external-link-alt"></span> @localizer["Regatta Web Site"]
-                </a>
-            </span>
+                <span class="h5">
+                    <a href="@Model.Item.Url" target="_blank">
+                        <span class="fas fa-external-link-alt"></span> @localizer["Regatta Web Site"]
+                    </a>
+                </span>
             }
         </h1>
         <h5 class="text-muted d-none d-md-inline">
@@ -62,41 +62,57 @@
         @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
         {
             @Html.Raw(Markdig.Markdown.ToHtml(Model.Item.Description))
+        } else
+        {
+            @:&nbsp;
         }
     </div>
 
-    @if (Model.CanEdit)
-    {
-        <br />
-        <hr />
-        <div class="row bg-light">
-            <div class="col-sm-3 my-2">
-                <a asp-controller="Regatta"
-                   asp-action="Edit"
-                   asp-route-Id="@Model.Item.Id"
-                   class="btn btn-outline-primary">Edit Regatta</a>
+    <div class="col-md-6">
+        @if (Model.CanEdit)
+        {
+            <br class="d-md-none" />
+            <hr class="d-md-none" />
+            <div class="row bg-light">
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Fleet"
+                        asp-action="Create"
+                        asp-route-regattaId="@Model.Item.Id"
+                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                        class="btn btn-outline-primary">New Fleet</a>
+                </div>
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Competitor"
+                        asp-action="Create"
+                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                        class="btn btn-outline-primary">New Competitor</a>
+                </div>
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Race"
+                        asp-action="Create"
+                        asp-route-regattaId="@Model.Item.Id"
+                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                        class="btn btn-outline-primary">New Race</a>
+                </div>
             </div>
-            <div class="col-sm-3 my-2">
-                <a asp-controller="Competitor"
-                   asp-action="Create"
-                   class="btn btn-outline-primary">New Competitor</a>
+            <div class="row bg-light">
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Regatta"
+                        asp-action="Edit"
+                        asp-route-Id="@Model.Item.Id"
+                        class="btn btn-outline-primary">Edit Regatta</a>
+                </div>
+                <div class="col-sm-4">&nbsp;</div>
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Admin"
+                        asp-action="Index"
+                        class="btn btn-outline-primary">Club Admin</a>
+                </div>
             </div>
-            <div class="col-sm-3 my-2">
-                <a asp-controller="Race"
-                   asp-action="Create"
-                   asp-route-regattaId="@Model.Item.Id"
-                   class="btn btn-outline-primary">New Regatta Race</a>
-            </div>
-            <div class="col-sm-3 my-2">
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   class="btn btn-outline-primary">Club Admin</a>
-            </div>
-        </div>
-    }
+        }
+    </div>
 </div>
-
-@foreach (var fleet in Model.Item.Fleets)
+@foreach (var fleet in Model.Item.Fleets.OrderBy(f => f.NickName))
 {
     var fleetHasResults = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id)?.FlatResults?.NumberOfSailedRaces > 0;
     <div id="@fleet.ShortName">
@@ -128,16 +144,16 @@
                             <th scope="col">@localizer["Boat"]</th>
                             <th scope="col">@localizer["Club"]</th>
                         </tr>
-                        </thead>
+                    </thead>
                     <tbody>
                         @foreach (var comp in fleet.Competitors)
                         {
-                        <tr>
-                            <td>@comp.SailNumber</td>
-                            <td>@comp.Name</td>
-                            <td>@comp.BoatName</td>
-                            <td>@(comp.HomeClubName??Model.ClubInitials)</td>
-                        </tr>
+                            <tr>
+                                <td>@comp.SailNumber</td>
+                                <td>@comp.Name</td>
+                                <td>@comp.BoatName</td>
+                                <td>@(comp.HomeClubName ?? Model.ClubInitials)</td>
+                            </tr>
                         }
                     </tbody>
                 </table>

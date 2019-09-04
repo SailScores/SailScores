@@ -14,7 +14,8 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit"
+          asp-route-returnurl="@ViewData["ReturnUrl"]" >
             <input type="hidden" id="clubId" asp-for="ClubId" />
             <input type="hidden" id="Id" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>

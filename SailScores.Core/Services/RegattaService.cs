@@ -56,28 +56,23 @@ namespace SailScores.Core.Services
             return returnObj;
         }
 
-        public async Task<Regatta> GetRegattaAsync(string clubInitials, string seasonName, string regattaName)
+        public async Task<Regatta> GetRegattaAsync(Guid regattaId)
         {
-            var clubId = await _dbContext.Clubs
-                .Where(c =>
-                   c.Initials == clubInitials
-                ).Select(c => c.Id).SingleAsync();
             var regattaDb = await _dbContext
                 .Regattas
                 .Where(r =>
-                    r.ClubId == clubId)
+                    r.Id == regattaId)
                 .Include(r => r.RegattaFleet)
                 .ThenInclude(rf => rf.Fleet)
                 .ThenInclude(f => f.CompetitorFleets)
                 .ThenInclude(cf => cf.Competitor)
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
-                .SingleAsync(r => r.UrlName == regattaName
-                                  && r.Season.Name == seasonName);
+                .SingleAsync();
 
             var fullRegatta = _mapper.Map<Regatta>(regattaDb);
 
-            foreach(var series in fullRegatta.Series)
+            foreach (var series in fullRegatta.Series)
             {
                 series.FlatResults = await _seriesService.GetHistoricalResults(series);
                 series.PreferAlternativeSailNumbers = fullRegatta.PreferAlternateSailNumbers;
@@ -85,7 +80,23 @@ namespace SailScores.Core.Services
             return fullRegatta;
         }
 
-        public async Task SaveNewRegattaAsync(Regatta regatta)
+        public async Task<Regatta> GetRegattaAsync(string clubInitials, string seasonName, string regattaName)
+        {
+            var clubId = await _dbContext.Clubs
+                .Where(c =>
+                   c.Initials == clubInitials
+                ).Select(c => c.Id).SingleAsync();
+
+            var regattaId = (await _dbContext
+                .Regattas
+                .Where(r =>
+                    r.ClubId == clubId &&
+                    r.UrlName == regattaName &&
+                    r.Season.Name == seasonName).SingleAsync()).Id;
+            return await GetRegattaAsync(regattaId);
+        }
+
+        public async Task<Guid> SaveNewRegattaAsync(Regatta regatta)
         {
             Database.Entities.Regatta dbRegatta = await _dbObjectBuilder.BuildDbRegattaAsync(regatta);
             dbRegatta.UrlName = UrlUtility.GetUrlName(dbRegatta.Name);
@@ -112,9 +123,10 @@ namespace SailScores.Core.Services
 
             _dbContext.Regattas.Add(dbRegatta);
             await _dbContext.SaveChangesAsync();
+            return dbRegatta.Id;
         }
 
-        public async Task UpdateAsync(Regatta model)
+        public async Task<Guid> UpdateAsync(Regatta model)
         {
             if (_dbContext.Regattas.Any(r =>
                 r.Id != model.Id
@@ -147,6 +159,8 @@ namespace SailScores.Core.Services
             CleanupFleets(model, existingRegatta);
 
             await _dbContext.SaveChangesAsync();
+
+            return existingRegatta.Id;
         }
 
         private static void CleanupFleets(Regatta model, dbObj.Regatta existingRegatta)
@@ -234,6 +248,23 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
             await _seriesService.UpdateSeriesResults(series.Id);
 
+        }
+
+        public async Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId)
+        {
+            var exists = await _dbContext.Regattas.SelectMany(r => r.RegattaFleet)
+                .AnyAsync(rf => rf.FleetId == fleetId && rf.RegattaId == regattaId);
+
+            if (!exists)
+            {
+                var regatta = await _dbContext.Regattas.SingleAsync(r => r.Id == regattaId);
+                regatta.RegattaFleet.Add(new dbObj.RegattaFleet
+                {
+                    RegattaId = regattaId,
+                    FleetId = fleetId
+                });
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
     }

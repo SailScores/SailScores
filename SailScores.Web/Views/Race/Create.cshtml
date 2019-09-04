@@ -9,7 +9,8 @@
 <div class="container p-0 justify-content-between">
     <h4>Add a new race@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
     <hr />
-    <form id="raceform" asp-action="Create">
+    <form id="raceform" asp-action="Create"
+          asp-route-returnurl="@ViewData["ReturnUrl"]" >
         <input type="hidden" id="clubId" asp-for="ClubId" />
         <input type="hidden" id="regattaId" asp-for="RegattaId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>

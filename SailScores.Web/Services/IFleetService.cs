@@ -11,8 +11,11 @@ namespace SailScores.Web.Services
         Task<IList<FleetSummary>> GetAllFleetSummary(string clubInitials);
         Task<FleetSummary> GetFleet(string clubInitials, string fleetName);
         Task<Fleet> GetFleet(Guid fleetId);
-        Task SaveNew(FleetCreateViewModel fleet);
+        Task SaveNew(FleetWithOptionsViewModel fleet);
         Task Delete(Guid fleetId);
         Task Update(FleetWithOptionsViewModel fleet);
+        Task<FleetWithOptionsViewModel> GetBlankFleetWithOptionsAsync(
+            string clubInitials,
+            Guid? regattaId);
     }
 }
