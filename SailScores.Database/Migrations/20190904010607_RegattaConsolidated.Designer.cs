@@ -10,8 +10,8 @@ using SailScores.Database;
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    [Migration("20190824153839_HomeClubForCompetitor")]
-    partial class HomeClubForCompetitor
+    [Migration("20190904010607_RegattaConsolidated")]
+    partial class RegattaConsolidated
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -254,6 +254,8 @@ namespace SailScores.Database.Migrations
                         .IsRequired()
                         .HasMaxLength(200);
 
+                    b.Property<bool?>("PreferAlternateSailNumbers");
+
                     b.Property<Guid?>("ScoringSystemId");
 
                     b.Property<Guid>("SeasonId");
@@ -262,6 +264,12 @@ namespace SailScores.Database.Migrations
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnName("UpdatedDateUtc");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(1000);
+
+                    b.Property<string>("UrlName")
+                        .HasMaxLength(200);
 
                     b.HasKey("Id");
 
@@ -417,11 +425,15 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(2000);
 
+                    b.Property<Guid?>("FleetId");
+
                     b.Property<bool?>("IsImportantSeries");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200);
+
+                    b.Property<bool?>("PreferAlternativeSailNumbers");
 
                     b.Property<bool?>("ResultsLocked");
 

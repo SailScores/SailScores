@@ -3,10 +3,32 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SailScores.Database.Migrations
 {
-    public partial class Regatta : Migration
+    public partial class RegattaConsolidated : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<Guid>(
+                name: "FleetId",
+                table: "Series",
+                nullable: true);
+
+            migrationBuilder.AddColumn<bool>(
+                name: "PreferAlternativeSailNumbers",
+                table: "Series",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "NickName",
+                table: "Fleets",
+                maxLength: 30,
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "HomeClubName",
+                table: "Competitors",
+                maxLength: 200,
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "Regattas",
                 columns: table => new
@@ -14,12 +36,15 @@ namespace SailScores.Database.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     ClubId = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(maxLength: 200, nullable: false),
+                    UrlName = table.Column<string>(maxLength: 200, nullable: true),
                     Description = table.Column<string>(nullable: true),
+                    Url = table.Column<string>(maxLength: 1000, nullable: true),
                     SeasonId = table.Column<Guid>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: true),
                     EndDate = table.Column<DateTime>(nullable: true),
                     UpdatedDateUtc = table.Column<DateTime>(nullable: true),
-                    ScoringSystemId = table.Column<Guid>(nullable: true)
+                    ScoringSystemId = table.Column<Guid>(nullable: true),
+                    PreferAlternateSailNumbers = table.Column<bool>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -128,6 +153,22 @@ namespace SailScores.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "Regattas");
+
+            migrationBuilder.DropColumn(
+                name: "FleetId",
+                table: "Series");
+
+            migrationBuilder.DropColumn(
+                name: "PreferAlternativeSailNumbers",
+                table: "Series");
+
+            migrationBuilder.DropColumn(
+                name: "NickName",
+                table: "Fleets");
+
+            migrationBuilder.DropColumn(
+                name: "HomeClubName",
+                table: "Competitors");
         }
     }
 }
