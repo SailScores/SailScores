@@ -143,7 +143,9 @@ namespace SailScores.Core.Services
             Db.Race dbRace;
             IEnumerable<Guid> seriesIdsToUpdate = new List<Guid>();
             if (race.Id != default) {
-                dbRace = await _dbContext.Races.Include(r => r.SeriesRaces).SingleOrDefaultAsync(r => r.Id == race.Id);
+                dbRace = await _dbContext.Races
+                    .Include(r => r.SeriesRaces)
+                    .SingleOrDefaultAsync(r => r.Id == race.Id);
                 var seriesFromRace = dbRace?.SeriesRaces?.Select(r => r.SeriesId)?.ToList();
                 if(seriesFromRace != null)
                 {

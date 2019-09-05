@@ -456,7 +456,7 @@ namespace SailScores.Core.Scoring
                 average = compResults.CalculatedScores.Values
                     .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                     .OrderBy(s => s.ScoreValue)
-                    .FirstOrDefault().ScoreValue ?? 0m;
+                    .FirstOrDefault()?.ScoreValue ?? 0m;
             } else
             {
                 average = compResults.CalculatedScores.Values
