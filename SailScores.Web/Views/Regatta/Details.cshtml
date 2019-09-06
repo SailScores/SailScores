@@ -146,14 +146,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var comp in fleet.Competitors)
+                        @foreach(var comp in fleet.Competitors.OrderBy(
+                            c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
+                            .ThenBy(c => c.Name))
                         {
-                            <tr>
-                                <td>@comp.SailNumber</td>
-                                <td>@comp.Name</td>
-                                <td>@comp.BoatName</td>
-                                <td>@(comp.HomeClubName ?? Model.ClubInitials)</td>
-                            </tr>
+                        <tr>
+                            <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
+                            <td>@comp.Name</td>
+                            <td>@comp.BoatName</td>
+                            <td>@(comp.HomeClubName ?? Model.ClubInitials)</td>
+                        </tr>
                         }
                     </tbody>
                 </table>
