@@ -34,6 +34,10 @@ namespace SailScores.Core.Services
             {
                 dbClass.FleetBoatClasses.Remove(link);
             }
+            foreach (var link in dbClass.CompetitorFleets.ToList())
+            {
+                dbClass.CompetitorFleets.Remove(link);
+            }
             _dbContext.Fleets.Remove(dbClass);
             
             await _dbContext.SaveChangesAsync();
