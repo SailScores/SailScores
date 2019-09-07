@@ -95,13 +95,14 @@ namespace SailScores.SeleniumTests
                 driver.FindElement(By.Id("classes")).Click();
 
                 var deleteButton = wait.Until(ExpectedConditions.ElementIsVisible(
-                    By.XPath($"//tr/td[contains(text(), '{className}')]/../../tr//a[contains(text(),'Delete')]")));
+                    By.XPath($"//tr/td[contains(text(), '{className}')]/..//a[contains(text(),'Delete')]")));
 
                 deleteButton.Click();
 
                 submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
                 submitButton.Click();
 
+                Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete boat class");
             }
         }
 
@@ -135,7 +136,7 @@ namespace SailScores.SeleniumTests
 
 
                 var editButton = wait.Until(ExpectedConditions.ElementIsVisible(
-                    By.XPath($"//tr/td[contains(text(), '{compName}')]/../../tr//a[contains(text(),'Edit')]")));
+                    By.XPath($"//tr/td[contains(text(), '{compName}')]/..//a[contains(text(),'Edit')]")));
                 editButton.Click();
 
                 submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -144,12 +145,13 @@ namespace SailScores.SeleniumTests
                 driver.FindElement(By.Id("competitors")).Click();
 
                 var deleteButton = wait.Until(ExpectedConditions.ElementIsVisible(
-                    By.XPath($"//tr/td[contains(text(), '{compName}')]/../../tr//a[contains(text(),'Delete')]")));
+                    By.XPath($"//tr/td[contains(text(), '{compName}')]/..//a[contains(text(),'Delete')]")));
                 deleteButton.Click();
 
                 submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
                 submitButton.Click();
 
+                Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete competitor");
             }
         }
 
@@ -186,7 +188,7 @@ namespace SailScores.SeleniumTests
 
 
                 var editButton = wait.Until(ExpectedConditions.ElementIsVisible(
-                    By.XPath($"//tr/td[contains(text(), '{fleetName}')]/../../tr//a[contains(text(),'Edit')]")));
+                    By.XPath($"//tr/td[contains(text(), '{fleetName}')]/..//a[contains(text(),'Edit')]")));
                 editButton.Click();
 
                 submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -195,16 +197,62 @@ namespace SailScores.SeleniumTests
                 driver.FindElement(By.Id("fleets")).Click();
 
                 var deleteButton = wait.Until(ExpectedConditions.ElementIsVisible(
-                    By.XPath($"//tr/td[contains(text(), '{fleetName}')]/../../tr//a[contains(text(),'Delete')]")));
+                    By.XPath($"//tr/td[contains(text(), '{fleetName}')]/..//a[contains(text(),'Delete')]")));
                 deleteButton.Click();
 
                 submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
                 submitButton.Click();
 
-                Assert.True(driver.Url.Contains("/TEST/Admin"));
+                Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete fleet");
             }
         }
 
+        [Fact]
+        public void AddEditDeleteSeason()
+        {
+            using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
+            {
+                LoginAndGoToHiddenTestClub(driver);
+                driver.FindElement(By.LinkText("Admin Page")).Click();
+                var sectionName = "seasons";
+                driver.FindElement(By.Id(sectionName)).Click();
+
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
+                var createLink = wait.Until(ExpectedConditions.ElementToBeClickable(By.LinkText("Create")));
+                createLink.Click();
+                var startDate = DateTime.Today.AddYears(-5);
+                var finishDate = DateTime.Today.AddDays(1).AddYears(-5);
+                var seasonName = $"Test {startDate.Year}";
+                driver.FindElement(By.Id("Name")).SendKeys(seasonName);
+                driver.FindElement(By.Id("Start")).SendKeys(startDate.ToShortDateString());
+                driver.FindElement(By.Id("End")).SendKeys(finishDate.ToShortDateString());
+
+
+                var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
+                submitButton.Click();
+
+                driver.FindElement(By.Id(sectionName)).Click();
+
+
+                var editButton = wait.Until(ExpectedConditions.ElementIsVisible(
+                    By.XPath($"//tr/td[contains(text(), '{seasonName}')]/..//a[contains(text(),'Edit')]")));
+                editButton.Click();
+
+                submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
+                submitButton.Click();
+
+                driver.FindElement(By.Id(sectionName)).Click();
+
+                var deleteButton = wait.Until(ExpectedConditions.ElementIsVisible(
+                    By.XPath($"//tr/td[contains(text(), '{seasonName}')]/..//a[contains(text(),'Delete')]")));
+                deleteButton.Click();
+
+                submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
+                submitButton.Click();
+
+                Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete season");
+            }
+        }
         [Fact]
         public void AddRaceAndSeeResults()
         {
@@ -225,7 +273,6 @@ namespace SailScores.SeleniumTests
             }
         }
 
-        // create fleet
         // create series
         // create regatta
         // delete regatta
