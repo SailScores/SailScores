@@ -84,7 +84,7 @@ namespace SailScores.Web.Controllers
             {
                 var club = await _clubService.GetFullClub(clubInitials);
                 if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.BoatClasses.Any(c => c.Id == model.Id))
+                    || !club.Seasons.Any(c => c.Id == model.Id))
                 {
                     return Unauthorized();
                 }
