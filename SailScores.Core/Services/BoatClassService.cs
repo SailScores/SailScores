@@ -28,6 +28,14 @@ namespace SailScores.Core.Services
         public async Task Delete(Guid boatClassId)
         {
             var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId);
+            var fleets = await _dbContext.Fleets
+                .Where(f =>
+                    f.FleetType == Api.Enumerations.FleetType.SelectedClasses
+                    && f.FleetBoatClasses.Any(fbc =>
+                        fbc.BoatClassId == dbClass.Id))
+                .ToListAsync();
+
+            _dbContext.Fleets.RemoveRange(fleets);
             _dbContext.BoatClasses.Remove(dbClass);
             await _dbContext.SaveChangesAsync();
         }
