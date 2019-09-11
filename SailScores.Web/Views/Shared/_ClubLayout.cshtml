@@ -110,6 +110,10 @@
         </div>
 
         <hr />
+        @if (IsSectionDefined("PreFooter"))
+        {
+            @RenderSection("PreFooter")
+        }
         <footer>
             <div class="row">
                 <div class="col-12 text-sm-right">

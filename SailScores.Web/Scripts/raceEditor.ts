@@ -79,8 +79,15 @@ export function confirmDelete() {
     modal.show();
 }
 
-var c: number = 0;
+export function hideScoreButtonFooter() {
+    $('#scoreButtonFooter').hide();
+}
+export function addNewCompetitorById(competitorId: Guid) {
+    let comp = allCompetitors.find(c => c.id === competitorId);
+    addNewCompetitor(comp);
+}
 function addNewCompetitor(competitor: competitorDto) {
+    var c: number = 0;
     var resultDiv = document.getElementById("results");
     var compTemplate = document.getElementById("competitorTemplate");
     var compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
@@ -110,8 +117,12 @@ function addNewCompetitor(competitor: competitorDto) {
     resultDiv.appendChild(compListItem);
     calculatePlaces();
     $('html, body').animate({
-        scrollTop: $(compListItem).offset().top - 100
+        scrollTop: $(compListItem).offset().top - 150
     }, 500);
+
+    $('#newCompetitor').val("");
+    initializeAutoComplete();
+    initializeButtonFooter();
 }
 
 function addScoresFieldsToForm(form: HTMLFormElement) {
@@ -212,6 +223,7 @@ function getCompetitors(clubId: string, fleetId: string) {
             function (data: competitorDto[]) {
                 allCompetitors = data;
                 initializeAutoComplete();
+                initializeButtonFooter();
             });
     }
 }
@@ -261,8 +273,6 @@ function initializeAutoComplete() {
         onSelect: function (suggestion: AutocompleteSuggestion) {
             addNewCompetitor(suggestion.data as competitorDto);
 
-            $('#newCompetitor').val("");
-            initializeAutoComplete();
         },
         autoSelectFirst: true,
         triggerSelectOnValidInput: false,
@@ -270,6 +280,34 @@ function initializeAutoComplete() {
     });
     autoCompleteSetup = true;
 }
+
+
+function initializeButtonFooter() {
+    $('#scoreButtonDiv').empty();
+    if (allCompetitors && allCompetitors.length && allCompetitors.length < 21) {
+        $('#scoreButtonFooter').show();
+    } else {
+        $('#scoreButtonFooter').hide();
+    }
+    allCompetitors.forEach(c => {
+        let style = 'btn ';
+        let script = '';
+        if (!competitorIsInResults(c)) {
+            style += 'btn-outline-primary';
+            script = 'window.SailScores.addNewCompetitorById(\'' +
+                c.id + '\')';
+        } else {
+            style += 'btn-primary';
+        }
+        // need to add if not there, remove if there.
+        // for now just adding.
+        $('#scoreButtonDiv').append('<button class="' + style +
+            ' data-id="' + c.id + '" onclick="' + script +
+            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+
+    });
+}
+
 
 function getCompetitorCode(compListItem: HTMLLIElement) {
     const codeText = (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement).value;

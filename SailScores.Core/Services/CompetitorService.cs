@@ -55,7 +55,10 @@ namespace SailScores.Core.Services
                 }
             }
 
-            var list = await dbObjects.ToListAsync();
+            var list = await dbObjects
+                .OrderBy(c => c.SailNumber)
+                .ThenBy(c => c.Name)
+                .ToListAsync();
             return _mapper.Map<List<Model.Competitor>>(list);
         }
 
