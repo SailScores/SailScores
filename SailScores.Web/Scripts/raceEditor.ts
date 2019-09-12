@@ -122,7 +122,7 @@ function addNewCompetitor(competitor: competitorDto) {
 
     $('#newCompetitor').val("");
     initializeAutoComplete();
-    initializeButtonFooter();
+    updateButtonFooter();
 }
 
 function addScoresFieldsToForm(form: HTMLFormElement) {
@@ -299,8 +299,6 @@ function initializeButtonFooter() {
         } else {
             style += 'btn-primary';
         }
-        // need to add if not there, remove if there.
-        // for now just adding.
         $('#scoreButtonDiv').append('<button class="' + style +
             ' data-id="' + c.id + '" onclick="' + script +
             '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
@@ -308,6 +306,24 @@ function initializeButtonFooter() {
     });
 }
 
+function updateButtonFooter() {
+    $('#scoreButtonDiv').empty();
+    allCompetitors.forEach(c => {
+        let style = 'btn ';
+        let script = '';
+        if (!competitorIsInResults(c)) {
+            style += 'btn-outline-primary';
+            script = 'window.SailScores.addNewCompetitorById(\'' +
+                c.id + '\')';
+        } else {
+            style += 'btn-primary';
+        }
+        $('#scoreButtonDiv').append('<button class="' + style +
+            ' data-id="' + c.id + '" onclick="' + script +
+            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+
+    });
+}
 
 function getCompetitorCode(compListItem: HTMLLIElement) {
     const codeText = (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement).value;
