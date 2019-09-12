@@ -5,6 +5,7 @@
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
 @using SailScores.Web.Services
+@using Microsoft.AspNetCore.Http.Extensions;
 
 @inject IStringLocalizer<SharedResource> localizer
 
@@ -15,22 +16,44 @@
     Layout = "_ClubLayout";
 }
 
-<h2>@Model.Item.Name</h2>
-@if (!String.IsNullOrWhiteSpace(Model.Item.Description))
-{
-    <h5>@Model.Item.Description</h5>
-}
-@Model.Item.FlatResults.NumberOfSailedRaces races sailed
-with @Model.Item.FlatResults.NumberOfDiscards discards,
-@Model.Item.FlatResults.Competitors.Count() competitors
-@if (!String.IsNullOrWhiteSpace(@Model.Item.FlatResults.ScoringSystemName))
-{
-    @:&ndash; @Model.Item.FlatResults.ScoringSystemName
-}
-@if (Model.Item.FlatResults.IsPercentSystem && Model.Item.FlatResults.PercentRequired.HasValue)
-{
-    @:&ndash; @Model.Item.FlatResults.PercentRequired.Value.ToString("G5")% participation required for ranking
-}
+<div class="row">
+    <div class="col-md-6">
+        <h2>@Model.Item.Name</h2>
+        @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
+        {
+            <h5>@Model.Item.Description</h5>
+        }
+        @Model.Item.FlatResults.NumberOfSailedRaces races sailed
+        with @Model.Item.FlatResults.NumberOfDiscards discards,
+        @Model.Item.FlatResults.Competitors.Count() competitors
+        @if (!String.IsNullOrWhiteSpace(@Model.Item.FlatResults.ScoringSystemName))
+        {
+            @:&ndash; @Model.Item.FlatResults.ScoringSystemName
+        }
+        @if (Model.Item.FlatResults.IsPercentSystem && Model.Item.FlatResults.PercentRequired.HasValue)
+        {
+            @:&ndash; @Model.Item.FlatResults.PercentRequired.Value.ToString("G5")% participation required for ranking
+        }
+    </div>
+
+    <div class="col-md-6">
+        @if (Model.CanEdit)
+        {
+            <br class="d-md-none" />
+            <hr class="d-md-none" />
+            <div class="row bg-light">
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Race"
+                        asp-action="Create"
+                        asp-route-seriesId="@Model.Item.Id"
+                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                        class="btn btn-outline-primary">New Race</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
 
 @await Html.PartialAsync("_ResultsTable", Model.Item)
 

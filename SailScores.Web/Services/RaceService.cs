@@ -67,11 +67,15 @@ namespace SailScores.Web.Services
 
         public async Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(
             string clubInitials,
-            Guid? regattaId)
+            Guid? regattaId,
+            Guid? seriesId)
         {
             if (regattaId.HasValue)
             {
                 return await CreateRegattaRaceAsync(clubInitials, regattaId);
+            } else if (seriesId.HasValue)
+            {
+                return await CreateSeriesRaceAsync(clubInitials, seriesId.Value);
             }
             else
             {
@@ -133,6 +137,39 @@ namespace SailScores.Web.Services
             {
                 model.Date = DateTime.Today;
             }
+            return model;
+        }
+
+
+        private async Task<RaceWithOptionsViewModel> CreateSeriesRaceAsync(
+            string clubInitials,
+            Guid seriesId)
+        {
+            var club = await _coreClubService.GetFullClub(clubInitials);
+            var series = club.Series.Single(r => r.Id == seriesId);
+            var model = new RaceWithOptionsViewModel();
+            model.ClubId = club.Id;
+            model.Date = DateTime.Today;
+            model.FleetOptions = club.Fleets;
+            model.SeriesOptions = club.Series;
+            model.SeriesIds = new List<Guid>
+            {
+                seriesId
+            };
+            if (series.ScoringSystemId.HasValue)
+            {
+                model.ScoreCodeOptions =
+                    (await _coreScoringService
+                        .GetScoringSystemAsync(series.ScoringSystemId.Value))
+                    .ScoreCodes;
+            }
+            else
+            {
+                model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+                    .OrderBy(s => s.Name).ToList();
+            }
+            model.CompetitorOptions = club.Competitors;
+            
             return model;
         }
 
