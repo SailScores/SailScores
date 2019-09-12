@@ -74,13 +74,15 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Create(
             string clubInitials,
             Guid? regattaId,
+            Guid? seriesId,
             string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             RaceWithOptionsViewModel race =
                 await _raceService.GetBlankRaceWithOptions(
                     clubInitials,
-                    regattaId);
+                    regattaId,
+                    seriesId);
 
             return View(race);
         }

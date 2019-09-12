@@ -10,7 +10,7 @@
     <h4>Add a new race@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
     <hr />
     <form id="raceform" asp-action="Create"
-          asp-route-returnurl="@ViewData["ReturnUrl"]" >
+          asp-route-returnurl="@ViewData["ReturnUrl"]">
         <input type="hidden" id="clubId" asp-for="ClubId" />
         <input type="hidden" id="regattaId" asp-for="RegattaId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -47,18 +47,18 @@
         </div>
         @if (!Model.RegattaId.HasValue && Model.Regatta == null)
         {
-        <div class="form-group">
-            <label asp-for="SeriesIds" class="control-label">Series</label>
-            <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
-                @foreach (var series in Model.SeriesOptions)
-                {
-                    <option value="@series.Id">
-                        @series.Name (@series.Season.Name)
-                    </option>
-                }
-            </select>
-            <span asp-validation-for="SeriesIds" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="SeriesIds" class="control-label">Series</label>
+                <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
+                    @foreach (var series in Model.SeriesOptions)
+                    {
+                        <option value="@series.Id">
+                            @series.Name (@series.Season.Name)
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="SeriesIds" class="text-danger"></span>
+            </div>
         }
 
         <div id="advancedFields" role="tablist">
@@ -195,6 +195,23 @@
     </div>
 </div>
 
+
+@section PreFooter {
+    <footer class="footer score-entry" id="scoreButtonFooter" style="display: none;">
+        <div class="container footer-header">
+            <div class="row float-right">
+                <button type="button" class="close" aria-label="Close"
+                         onclick="window.SailScores.hideScoreButtonFooter()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        <div class="container" id="scoreButtonDiv">
+            <!-- competitor buttons go here-->
+        </div>
+    </footer>
+}
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
@@ -202,8 +219,8 @@
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
 
     <script>
-        var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
-        window.SailScores.init()
+    var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
+    window.SailScores.init()
     </script>
 
 }

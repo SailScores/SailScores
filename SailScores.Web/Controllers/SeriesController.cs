@@ -58,11 +58,18 @@ namespace SailScores.Web.Controllers
             ViewData["ClubInitials"] = clubInitials;
 
             var series = await _seriesService.GetSeriesAsync(clubInitials, season, seriesName);
+            var canEdit = false;
+            if (User != null && (User.Identity?.IsAuthenticated ?? false))
+            {
+                var clubId = await _clubService.GetClubId(clubInitials);
+                canEdit = await _authService.CanUserEdit(User, clubId);
+            }
 
             return View(new ClubItemViewModel<Core.Model.Series>
             {
                 Item = series,
-                ClubInitials = clubInitials
+                ClubInitials = clubInitials,
+                CanEdit = canEdit
             });
         }
 

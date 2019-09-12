@@ -96,3 +96,32 @@ body {
 [data-toggle="collapse"].collapsed:after {
     transform: rotate(0deg);
 }
+
+
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 130px;
+}
+
+.score-entry {
+    position: fixed;
+    margin-left: -15px;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 170px;
+    line-height: 40px; /* Vertically center the text there */
+    background-color: #f5f5f5;
+    z-index: 1;
+}
+
+.footer-header {
+    height: 40px;
+}
+
+button.close {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+

@@ -134,7 +134,8 @@
                                 </div>
                                 <div>
                                     <span class="sail-number">@score.Competitor.SailNumber</span>
-                                    @if(!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber)) {
+                                    @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
+                                    {
                                         <span class="alt-sail-number"> (@score.Competitor.AlternativeSailNumber)</span>
                                     }
                                 </div>
@@ -212,7 +213,7 @@
                 <form>
                     <div class="form-group">
                         <p> Delete the result for <span id="competitorNameToDelete"></span>?</p>
-                        </div>
+                    </div>
                     <input id="compIdToDelete" type="hidden" />
                 </form>
             </div>
@@ -223,6 +224,23 @@
         </div>
     </div>
 </div>
+
+@section PreFooter {
+    <footer class="footer score-entry" id="scoreButtonFooter" style="display: none;">
+        <div class="container footer-header">
+            <div class="row float-right">
+                <button type="button" class="close" aria-label="Close"
+                        onclick="window.SailScores.hideScoreButtonFooter()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        <div class="container" id="scoreButtonDiv">
+            <!-- competitor buttons go here-->
+        </div>
+    </footer>
+}
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
