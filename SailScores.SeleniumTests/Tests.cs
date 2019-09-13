@@ -222,8 +222,9 @@ namespace SailScores.SeleniumTests
                 driver.FindElement(By.Id("End")).SendKeys(finishDate.ToShortDateString());
 
 
-                var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
+                var submitButton = driver.WaitUntilVisible(By.XPath("//input[@value='Create']"));
                 submitButton.Click();
+                // if submit button fails, check to see if already a season with this name exists.
 
                 driver.FindElement(By.Id(sectionName)).Click();
 
@@ -314,16 +315,14 @@ namespace SailScores.SeleniumTests
                 var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
                 submitButton.Click();
 
-                driver.FindElement(By.Id(sectionName)).Click();
-
-                var editButton = driver.WaitUntilVisible(
-                    By.XPath($"//tr/td[contains(text(), '{seriesName}')]/..//a[contains(text(),'Edit')]"));
-                editButton.Click();
+                driver.FindElement(By.LinkText("Edit Regatta")).Click();
 
                 submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
                 submitButton.Click();
 
-                driver.FindElement(By.Id(sectionName)).Click();
+                driver.FindElement(By.LinkText("Club Admin")).Click();
+
+                driver.WaitUntilVisible(By.Id(sectionName)).Click();
 
                 var deleteButton = driver.WaitUntilVisible(
                     By.XPath($"//tr/td[contains(text(), '{seriesName}')]/..//a[contains(text(),'Delete')]"));
