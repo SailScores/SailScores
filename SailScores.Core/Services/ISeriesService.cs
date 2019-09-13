@@ -10,7 +10,7 @@ namespace SailScores.Core.Services
         Task<Core.Model.Series> GetSeriesDetailsAsync(
             string clubInitials,
             string seasonName,
-            string seriesName);
+            string seriesUrlName);
         Task<IList<Model.Series>> GetAllSeriesAsync(
             Guid clubId,
             DateTime? date,
@@ -20,7 +20,6 @@ namespace SailScores.Core.Services
         Task SaveNewSeries(Series series);
         Task Update(Series model);
         Task Delete(Guid fleetId);
-        Task UpdateSeriesResults(string clubInitials, string seasonName, string seriesName);
         Task UpdateSeriesResults(Guid seriesId);
         Task<FlatModel.FlatResults> GetHistoricalResults(Series series);
     }

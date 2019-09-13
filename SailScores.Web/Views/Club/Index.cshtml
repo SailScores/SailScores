@@ -65,7 +65,7 @@
                 @foreach (var series in Model.ImportantSeries)
                 {
                     <li>
-                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
+                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">
                             @series.Season.Name  @series.Name
                         </a>
                         @if (series.UpdatedDate.HasValue && series.UpdatedDate > DateTime.Now.AddDays(-15))
@@ -85,7 +85,7 @@
                 @foreach (var series in Model.RecentSeries)
                 {
                     <li>
-                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.Name">
+                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">
                             @series.Name
                         </a>
                         @if (series.UpdatedDate.HasValue)
