@@ -216,4 +216,7 @@
   <data name="Log out" xml:space="preserve">
     <value>Kirjaudu ulos</value>
   </data>
+  <data name="Regattas" xml:space="preserve">
+    <value>Purjehdukset</value>
+  </data>
 </root>
