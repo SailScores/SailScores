@@ -213,4 +213,7 @@
   <data name="Scores" xml:space="preserve">
     <value>Scores</value>
   </data>
+  <data name="CapCompetitors" xml:space="preserve">
+    <value>Competitors</value>
+  </data>
 </root>

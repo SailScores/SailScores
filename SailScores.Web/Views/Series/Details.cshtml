@@ -15,6 +15,9 @@
     ViewBag.Title = Model.Item.Name;
     Layout = "_ClubLayout";
 }
+@{ 
+    var results = Model.Item.FlatResults;
+}
 
 <div class="row">
     <div class="col-md-6">
@@ -23,16 +26,16 @@
         {
             <h5>@Model.Item.Description</h5>
         }
-        @Model.Item.FlatResults.NumberOfSailedRaces races sailed
-        with @Model.Item.FlatResults.NumberOfDiscards discards,
-        @Model.Item.FlatResults.Competitors.Count() competitors
-        @if (!String.IsNullOrWhiteSpace(@Model.Item.FlatResults.ScoringSystemName))
+        @results.NumberOfSailedRaces @localizer["races sailed with"] @results.NumberOfDiscards 
+        @localizer["discards"],
+        @results.Competitors.Count() @localizer["competitors"]
+        @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
         {
-            @:&ndash; @Model.Item.FlatResults.ScoringSystemName
+            @:&ndash; @results.ScoringSystemName
         }
-        @if (Model.Item.FlatResults.IsPercentSystem && Model.Item.FlatResults.PercentRequired.HasValue)
+        @if (results.IsPercentSystem && results.PercentRequired.HasValue)
         {
-            @:&ndash; @Model.Item.FlatResults.PercentRequired.Value.ToString("G5")% participation required for ranking
+            @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
         }
     </div>
 
@@ -47,18 +50,17 @@
                         asp-action="Create"
                         asp-route-seriesId="@Model.Item.Id"
                         asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-                        class="btn btn-outline-primary">New Race</a>
+                        class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
             </div>
         }
     </div>
 </div>
 
-
 @await Html.PartialAsync("_ResultsTable", Model.Item)
 
 @if (Model.Item.UpdatedDate.HasValue)
 {
     <br />
-    <i>Last updated @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
+    <i>@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
 }

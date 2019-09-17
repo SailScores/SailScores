@@ -57,7 +57,7 @@
                     <td>
                         @if (regatta.UpdatedDate.HasValue)
                         {
-                            <span class="d-none d-md-table-cell"><i>Updated @(regatta.UpdatedDate.Value.ToString("d"))</i></span>
+                            <span class="d-none d-md-table-cell"><i>@localizer["Updated"] @(regatta.UpdatedDate.Value.ToString("d"))</i></span>
                         }
                     </td>
                 </tr>

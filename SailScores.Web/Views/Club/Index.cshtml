@@ -48,7 +48,7 @@
                 }
                 <h3>
                     <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.Name/@regatta.UrlName">
-                        @regatta.Season.Name  @regatta.Name
+                        @regatta.Season.Name @regatta.Name
                     </a>
                 </h3>
                 <br />
@@ -60,17 +60,17 @@
     @if (Model.ImportantSeries.Any())
     {
         <div class="col-md-6">
-            <h2>Top Series</h2>
+            <h2>@localizer["Top Series"]</h2>
             <ul class="list-unstyled">
                 @foreach (var series in Model.ImportantSeries)
                 {
                     <li>
                         <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">
-                            @series.Season.Name  @series.Name
+                            @series.Season.Name @series.Name
                         </a>
                         @if (series.UpdatedDate.HasValue && series.UpdatedDate > DateTime.Now.AddDays(-15))
                         {
-                            <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                            <i><small>@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
                         }
                     </li>
                 }
@@ -80,7 +80,7 @@
     @if (Model.RecentSeries.Any())
     {
         <div class="col-sm-6 col-md-3">
-            <h4>Recent Series</h4>
+            <h4>@localizer["Recent Series"]</h4>
             <ul class="list-unstyled">
                 @foreach (var series in Model.RecentSeries)
                 {
@@ -90,7 +90,7 @@
                         </a>
                         @if (series.UpdatedDate.HasValue)
                         {
-                            <i><small>Updated @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                            <i><small>@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
                         }
                     </li>
                 }
@@ -100,7 +100,7 @@
     else if (Model.RecentRaces.Count() > 0)
     {
         <div class="col-sm-6 col-md-3">
-            <h4>Recent races</h4>
+            <h4>@localizer["Recent races"]</h4>
             <ul class="list-unstyled">
                 @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
@@ -125,11 +125,11 @@
     else
     {
         <div class="col-sm-6 col-md-3">
-            <p><i>No recent series found.</i></p>
+            <p><i>@localizer["No recent series found."]</i></p>
             <p>
                 <a asp-controller="Series"
                    asp-route-clubInitials="@Model.Initials">
-                    All Series
+                    @localizer["All Series"]
                 </a>
             </p>
         </div>
@@ -137,7 +137,7 @@
     <div class="col-sm-6 col-md-3">
         @if (Model.UpcomingRaces.Count() > 0)
         {
-            <h4>Upcoming Races</h4>
+            <h4>@localizer["Upcoming Races"]</h4>
             <ul class="list-unstyled">
                 @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
@@ -167,19 +167,19 @@
     <div class="row bg-light">
         <div class="col-sm-3 my-2">
             <a asp-controller="Admin"
-               class="btn btn-outline-primary">Admin Page</a>
+               class="btn btn-outline-primary">@localizer["Admin Page"]</a>
         </div>
         <div class="col-sm-3 my-2">
             <a asp-controller="Competitor"
                asp-action="Create"
                asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-               class="btn btn-outline-primary">New Competitor</a>
+               class="btn btn-outline-primary">@localizer["New Competitor"]</a>
         </div>
         <div class="col-sm-3 my-2">
             <a asp-controller="Race"
                asp-action="Create"
                asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-               class="btn btn-outline-primary">New Race</a>
+               class="btn btn-outline-primary">@localizer["New Race"]</a>
         </div>
     </div>
 }

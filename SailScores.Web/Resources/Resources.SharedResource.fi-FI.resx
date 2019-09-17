@@ -219,4 +219,13 @@
   <data name="Regattas" xml:space="preserve">
     <value>Purjehdukset</value>
   </data>
+  <data name="CapCompetitors" xml:space="preserve">
+    <value>Kilpailijat</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Tulokset</value>
+  </data>
+  <data name="No results posted" xml:space="preserve">
+    <value>Ei tuoreita tuloksia</value>
+  </data>
 </root>
