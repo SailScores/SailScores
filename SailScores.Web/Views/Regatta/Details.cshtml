@@ -13,24 +13,6 @@
     Layout = "_ClubLayout";
 }
 
-@section Sidebar {
-    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-        <div class="sidebar-sticky sticky-top">
-            <ul class="nav flex-column">
-                @foreach (var fleet in Model.Item?.Fleets?.OrderBy(f => f.NickName))
-                {
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#@fleet.ShortName">
-                            @fleet.NickName
-                        </a>
-                    </li>
-                }
-
-            </ul>
-        </div>
-    </nav>
-}
-
 <div class="row">
     <div class="col-12">
         <h1 class="display-4">
