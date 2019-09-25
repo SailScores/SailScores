@@ -140,7 +140,7 @@ namespace SailScores.SeleniumTests
 
                 driver.FindElement(By.Id("competitors")).Click();
 
-                var deleteButton = driver.WaitUntilVisible(
+                var deleteButton = driver.WaitUntilClickable(
                     By.XPath($"//tr/td[contains(text(), '{compName}')]/..//a[contains(text(),'Delete')]"));
                 deleteButton.Click();
 
@@ -350,8 +350,10 @@ namespace SailScores.SeleniumTests
                     firstButton.Click();
                     serieslink = driver.FindElements(By.LinkText("Series"));
                 }
+                serieslink[0].Click();
 
-                driver.FindElement(By.LinkText("Test Series")).Click();
+                var testSeriesLink = driver.WaitUntilClickable(By.LinkText("Test Series"));
+                testSeriesLink.Click();
 
                 var headerlinks = driver.FindElements(By.CssSelector("th a"));
                 int raceCount = headerlinks.Count;
@@ -389,7 +391,7 @@ namespace SailScores.SeleniumTests
                 driver.FindElement(By.LinkText("Test Series")).Click();
 
                 // verify series includes race heading
-                var linkText = $"{DateTime.Today.ToString("M-d")} R{order}";
+                var linkText = $"{DateTime.Today.ToString("M/d")} R{order}";
                 var raceLink = driver.FindElement(By.LinkText(linkText));
 
                 Assert.NotNull(raceLink);
