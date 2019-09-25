@@ -24,7 +24,7 @@
     @foreach (var series in @Model.Item.Series)
     {
         <li>
-            <a href="~/@Model.ClubInitials/@Model.Item.Season.Name/@series.Name">
+            <a href="~/@Model.ClubInitials/@Model.Item.Season.Name/@series.UrlName">
                 @Html.DisplayFor(modelItem => series.Name)
             </a>
         </li>

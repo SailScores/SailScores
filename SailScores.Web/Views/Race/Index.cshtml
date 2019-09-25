@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Routing
 @using SailScores.Web.Models.SailScores;
 @using SailScores.Core.Model;
-@using SailScores.Web.Extensions;
+@using SailScores.Core.Extensions;
 @using SailScores.Web.Resources
 @using Microsoft.Extensions.Localization
 
@@ -77,9 +77,8 @@
                     }
                 </td>
                 <td>
-
                     @Html.DisplayFor(modelItem => race.CompetitorCount)
-                    @(race.CompetitorCount == 1 ? "boat" : "boats")
+                    @localizer["boats"]
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => race.Name)

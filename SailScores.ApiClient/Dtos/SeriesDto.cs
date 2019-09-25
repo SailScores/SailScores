@@ -15,6 +15,9 @@ namespace SailScores.Api.Dtos
         [StringLength(200)]
         public String Name { get; set; }
 
+        [StringLength(200)]
+        public String UrlName { get; set; }
+
         [StringLength(2000)]
         public String Description { get; set; }
 

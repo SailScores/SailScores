@@ -30,7 +30,9 @@ namespace SailScores.Web.Controllers
         {
             var clubSelector = new ClubSelectorModel
             {
-                Clubs = (await _clubservice.GetClubs(false)).ToList()
+                Clubs = (await _clubservice.GetClubs(false))
+                    .OrderBy(c => c.Name)
+                    .ToList()
             };
             var regattaSelector = new RegattaSelectorModel
             {

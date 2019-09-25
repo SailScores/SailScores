@@ -70,24 +70,6 @@ namespace SailScores.Core.Services
         }
 
         public async Task UpdateSeriesResults(
-            string clubInitials,
-            string seasonName,
-            string seriesName)
-        {
-            var clubId = (await _dbContext.Clubs
-                .SingleAsync(c =>
-                   c.Initials == clubInitials
-                )).Id;
-            var seriesDb = await _dbContext
-                .Series
-                .SingleAsync(s => s.ClubId == clubId
-                    && s.Name == seriesName
-                  && s.Season.Name == seasonName);
-
-            await UpdateSeriesResults(seriesDb.Id);
-        }
-
-        public async Task UpdateSeriesResults(
             Guid seriesId)
         {
             var dbSeries = await _dbContext
@@ -123,7 +105,7 @@ namespace SailScores.Core.Services
         public async Task<Series> GetSeriesDetailsAsync(
             string clubInitials,
             string seasonName,
-            string seriesName)
+            string seriesUrlName)
         {
             var clubId = await _dbContext.Clubs
                 .Where(c =>
@@ -133,7 +115,7 @@ namespace SailScores.Core.Services
                 .Series
                 .Where(s =>
                     s.ClubId == clubId)
-                .SingleAsync(s => s.Name == seriesName
+                .SingleAsync(s => s.UrlName == seriesUrlName
                                   && s.Season.Name == seasonName);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
@@ -300,7 +282,7 @@ namespace SailScores.Core.Services
         {
             Database.Entities.Series dbSeries = await 
                 _dbObjectBuilder.BuildDbSeriesAsync(series);
-            dbSeries.Name = UrlUtility.RemoveDisallowedCharacters(series.Name);
+            dbSeries.UrlName = UrlUtility.GetUrlName(series.Name);
             dbSeries.UpdatedDate = DateTime.UtcNow;
             if (dbSeries.Season == null && series.Season.Id != Guid.Empty && series.Season.Start != default)
             {
@@ -343,7 +325,8 @@ namespace SailScores.Core.Services
                 .Include(f => f.RaceSeries)
                 .SingleAsync(c => c.Id == model.Id);
 
-            existingSeries.Name = UrlUtility.RemoveDisallowedCharacters(model.Name);
+            existingSeries.Name = model.Name;
+            // Don't update UrlName here: keep links to this series unchanged.
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
             existingSeries.ResultsLocked = model.ResultsLocked;

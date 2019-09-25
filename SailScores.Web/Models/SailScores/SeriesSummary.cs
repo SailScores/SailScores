@@ -11,6 +11,7 @@ namespace SailScores.Web.Models.SailScores
 
         public Guid Id { get; set; }
         public String Name { get; set; }
+        public String UrlName { get; set; }
         public String Description { get; set; }
         public IList<Race> Races { get; set; }
         public Season Season { get; set; }

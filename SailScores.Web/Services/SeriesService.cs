@@ -41,9 +41,9 @@ namespace SailScores.Web.Services
             return _mapper.Map<IList<SeriesSummary>>(orderedSeries);
         }
 
-        public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesName)
+        public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesUrlName)
         {
-            var series = await _coreSeriesService.GetSeriesDetailsAsync(clubInitials, season, seriesName );
+            var series = await _coreSeriesService.GetSeriesDetailsAsync(clubInitials, season, seriesUrlName );
 
             return series;
         }

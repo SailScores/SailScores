@@ -32,15 +32,15 @@
                         {
                             <th class="text-center d-none d-sm-table-cell">
                                 @Html.ActionLink(
-        @race.Date?.ToString("M-d") + " R" + @race.Order
-        , "Details", "Race", new { id = race.Id })
+                                    @race.ShortName
+                                    , "Details", "Race", new { id = race.Id })
                             </th>
                         }
                         else
                         {
                             <th class="text-center">
                                 @Html.ActionLink(
-        @race.Date?.ToString("M-d") + " R" + @race.Order
+        @race.ShortName
         , "Details", "Race", new { id = race.Id })
                             </th>
                         }

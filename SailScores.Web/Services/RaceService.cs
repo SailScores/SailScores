@@ -113,10 +113,12 @@ namespace SailScores.Web.Services
             model.SeriesOptions = club.Series;
             if (regatta.ScoringSystemId.HasValue)
             {
+                var scoreSystem = await _coreScoringService
+                        .GetScoringSystemAsync(regatta.ScoringSystemId.Value);
                 model.ScoreCodeOptions =
-                    (await _coreScoringService
-                        .GetScoringSystemAsync(regatta.ScoringSystemId.Value))
-                    .ScoreCodes;
+                    scoreSystem.ScoreCodes
+                    .Union(scoreSystem.InheritedScoreCodes)
+                    .ToList();
             }
             else
             {
@@ -158,10 +160,12 @@ namespace SailScores.Web.Services
             };
             if (series.ScoringSystemId.HasValue)
             {
+                var scoreSystem = await _coreScoringService
+                    .GetScoringSystemAsync(series.ScoringSystemId.Value);
                 model.ScoreCodeOptions =
-                    (await _coreScoringService
-                        .GetScoringSystemAsync(series.ScoringSystemId.Value))
-                    .ScoreCodes;
+                    scoreSystem.ScoreCodes
+                    .Union(scoreSystem.InheritedScoreCodes)
+                    .ToList();
             }
             else
             {

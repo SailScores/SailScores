@@ -9,7 +9,7 @@ namespace SailScores.Web.Services
     public interface ISeriesService
     {
         Task<IEnumerable<SeriesSummary>> GetNonRegattaSeriesSummariesAsync(string clubInitials);
-        Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesName);
+        Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesUrlName);
         Task SaveNew(SeriesWithOptionsViewModel model);
         Task Update(SeriesWithOptionsViewModel model);
         Task DeleteAsync(Guid id);

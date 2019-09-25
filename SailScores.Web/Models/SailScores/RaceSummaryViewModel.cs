@@ -1,9 +1,11 @@
 ﻿using SailScores.Api.Enumerations;
+using SailScores.Core.Extensions;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SailScores.Web.Models.SailScores
@@ -41,10 +43,35 @@ namespace SailScores.Web.Models.SailScores
         {
             get
             {
-                return Date?.ToString("ddd") +", " +
-                    Date?.ToString("M") + " Race " + Order;
+                var raceWord = "Race";
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi" )
+                {
+                    raceWord = "Purjehdukset"; 
+                }
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
+                {
+                    raceWord = "Seglingar";
+                }
+                return $"{Date.ToShortString()} {raceWord} {Order}";
             }
         }
+        public string ShortName
+        {
+            get
+            {
+
+                var raceLetter = "R";
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
+                {
+                    raceLetter = "k";
+                }
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
+                {
+                    raceLetter = "S";
+                }
+                return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
+            }
+        } 
 
         public int CompetitorCount
         {

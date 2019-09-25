@@ -1,5 +1,7 @@
 ﻿using SailScores.Api.Enumerations;
 using System;
+using System.Threading;
+using SailScores.Core.Extensions;
 
 namespace SailScores.Core.FlatModel
 {
@@ -15,5 +17,40 @@ namespace SailScores.Core.FlatModel
         public RaceState? State { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+
+        public String CalculatedName
+        {
+            get
+            {
+                var raceWord = "Race";
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
+                {
+                    raceWord = "Purjehdukset";
+                }
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
+                {
+                    raceWord = "Seglingar";
+                }
+                return $"{Date.ToShortString()} {raceWord} {Order}";
+            }
+        }
+        public string ShortName
+        {
+            get
+            {
+
+                var raceLetter = "R";
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
+                {
+                    raceLetter = "k";
+                }
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
+                {
+                    raceLetter = "S";
+                }
+                return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
+            }
+        }
+
     }
 }

@@ -118,102 +118,126 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="All Races" xml:space="preserve">
-    <value>All Races</value>
+    <value />
   </data>
   <data name="All Series" xml:space="preserve">
-    <value>All Series</value>
+    <value>Alla serier</value>
   </data>
   <data name="Boat" xml:space="preserve">
-    <value>Boat</value>
+    <value>Båt</value>
   </data>
   <data name="Boat Name" xml:space="preserve">
-    <value>Boat Name</value>
+    <value>Båt namn</value>
   </data>
   <data name="Club Web Site" xml:space="preserve">
-    <value>Club Web Site</value>
+    <value>Klubbens hemsida</value>
   </data>
   <data name="Competitor" xml:space="preserve">
-    <value>Competitor</value>
+    <value>Tävlande</value>
   </data>
   <data name="competitors" xml:space="preserve">
-    <value>competitors</value>
+    <value>tävlande</value>
   </data>
   <data name="discards" xml:space="preserve">
-    <value>discards</value>
+    <value>borträknade</value>
   </data>
   <data name="Helm" xml:space="preserve">
-    <value>Helm</value>
+    <value>Skeppare</value>
   </data>
   <data name="Log in" xml:space="preserve">
-    <value>Log in</value>
+    <value>Logga in</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>Name</value>
+    <value>Namn</value>
   </data>
   <data name="No Competitors" xml:space="preserve">
-    <value>No Competitors</value>
+    <value>Inga deltagare</value>
   </data>
   <data name="No races" xml:space="preserve">
-    <value>No races</value>
+    <value>Inga starter</value>
   </data>
   <data name="No recent races found." xml:space="preserve">
-    <value>No recent races found</value>
+    <value>Inga färska resultat</value>
   </data>
   <data name="No recent series found." xml:space="preserve">
-    <value>No recent series found.</value>
+    <value>Inga färska resultat</value>
   </data>
   <data name="No scheduled races found." xml:space="preserve">
-    <value>No scheduled races found.</value>
+    <value />
   </data>
   <data name="Place" xml:space="preserve">
-    <value>Place</value>
+    <value>Placering</value>
   </data>
   <data name="Races" xml:space="preserve">
-    <value>Races</value>
+    <value>Seglingar</value>
   </data>
   <data name="races sailed with" xml:space="preserve">
-    <value>races sailed with</value>
+    <value>Starter seglade med</value>
   </data>
   <data name="Recent Races" xml:space="preserve">
-    <value>Recent Races</value>
+    <value>Senaste tävlingar</value>
   </data>
   <data name="Recent Series" xml:space="preserve">
-    <value>Recent Series</value>
+    <value>Senaste serier</value>
   </data>
   <data name="Sail" xml:space="preserve">
-    <value>Sail</value>
+    <value>Segel</value>
   </data>
   <data name="Sail Number" xml:space="preserve">
-    <value>Sail Number</value>
+    <value>Segelnummer</value>
   </data>
   <data name="Seasons" xml:space="preserve">
-    <value>Seasons</value>
+    <value />
   </data>
   <data name="Series" xml:space="preserve">
-    <value>Series</value>
+    <value>Serier</value>
   </data>
   <data name="Total" xml:space="preserve">
-    <value>Total</value>
+    <value>Totalt</value>
   </data>
   <data name="Upcoming Races" xml:space="preserve">
-    <value>Upcoming Races</value>
+    <value>Kommande tävlingar</value>
   </data>
   <data name="Admin Page" xml:space="preserve">
-    <value>Admin Page</value>
+    <value>Administratörs sida</value>
   </data>
   <data name="New Competitor" xml:space="preserve">
-    <value>New Competitor</value>
+    <value>Ny tävlande</value>
   </data>
   <data name="New Race" xml:space="preserve">
-    <value>New Race</value>
+    <value>Ny segling</value>
   </data>
   <data name="No seasons are set up." xml:space="preserve">
-    <value>No seasons are set up.</value>
+    <value />
   </data>
   <data name="Scores" xml:space="preserve">
-    <value>Scores</value>
+    <value>Resultat</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Logga ut</value>
+  </data>
+  <data name="Regattas" xml:space="preserve">
+    <value>Regattor</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>Uppdaterad</value>
+  </data>
+  <data name="boats" xml:space="preserve">
+    <value>båtar</value>
+  </data>
+  <data name="String" xml:space="preserve">
+    <value>Konkurrenter</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
   </data>
   <data name="CapCompetitors" xml:space="preserve">
-    <value>Competitors</value>
+    <value>Tävlande</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Resultat</value>
+  </data>
+  <data name="No results posted" xml:space="preserve">
+    <value>Inga färska resultat</value>
   </data>
 </root>

@@ -60,35 +60,35 @@
                         asp-action="Create"
                         asp-route-regattaId="@Model.Item.Id"
                         asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-                        class="btn btn-outline-primary">New Fleet</a>
+                        class="btn btn-outline-primary">@localizer["New Fleet"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Competitor"
-                        asp-action="Create"
-                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-                        class="btn btn-outline-primary">New Competitor</a>
-                </div>
+                       asp-action="Create"
+                       asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                       class="btn btn-outline-primary">@localizer["New Competitor"]</a>
+</div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Race"
-                        asp-action="Create"
-                        asp-route-regattaId="@Model.Item.Id"
-                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-                        class="btn btn-outline-primary">New Race</a>
-                </div>
+                       asp-action="Create"
+                       asp-route-regattaId="@Model.Item.Id"
+                       asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                       class="btn btn-outline-primary">@localizer["New Race"]</a>
+</div>
             </div>
             <div class="row bg-light">
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Regatta"
-                        asp-action="Edit"
-                        asp-route-Id="@Model.Item.Id"
-                        class="btn btn-outline-primary">Edit Regatta</a>
-                </div>
+                       asp-action="Edit"
+                       asp-route-Id="@Model.Item.Id"
+                       class="btn btn-outline-primary">@localizer["Edit Regatta"]</a>
+</div>
                 <div class="col-sm-4">&nbsp;</div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Admin"
-                        asp-action="Index"
-                        class="btn btn-outline-primary">Club Admin</a>
-                </div>
+                       asp-action="Index"
+                       class="btn btn-outline-primary">@localizer["Club Admin"]</a>
+</div>
             </div>
         }
     </div>
@@ -103,14 +103,14 @@
                 <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{fleet.ShortName}-tab")" data-toggle="tab"
                    href="@($"#Competitors{fleet.ShortName}")" role="tab"
                    aria-controls="@($"Competitors{fleet.ShortName}")" aria-selected="true">
-                    Competitors
+                    @localizer["CapCompetitors"]
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(fleetHasResults ? "active" : "")" id="@($"Results{fleet.ShortName}-tab")" data-toggle="tab"
                    href="@($"#Results{fleet.ShortName}")" role="tab"
                    aria-controls="@($"Results{fleet.ShortName}")" aria-selected="false">
-                    Results
+                    @localizer["Results"]
                 </a>
             </li>
         </ul>
@@ -149,7 +149,7 @@
                 }
                 else
                 {
-                    <span>No Results posted.</span>
+                    <span>@localizer["No Results posted"]</span>
                 }
             </div>
         </div>

@@ -23,7 +23,6 @@
                         </a>
                     </li>
                 }
-
             </ul>
         </div>
     </nav>
@@ -42,10 +41,10 @@
             {
                 <tr>
                     <td>
-                        <a href="~/@Model.ClubInitials/@series.Season.Name/@series.Name">
+                        <a href="~/@Model.ClubInitials/@series.Season.Name/@series.UrlName">
                             @Html.DisplayFor(modelItem => series.Name)
                         </a>
-                        (@(series.Races?.Count.ToString() ?? "No") Races)
+                        (@(series.Races?.Count.ToString() ?? "No") @localizer["Races"])
                     </td>
                     <td>
                         @series.DateString
@@ -54,7 +53,7 @@
                         @Html.DisplayFor(modelItem => series.Description)
                         @if (series.UpdatedDate.HasValue)
                         {
-                            <span class="d-none d-md-table-cell"><i>Updated @(series.UpdatedDate.Value.ToString("d"))</i></span>
+                            <span class="d-none d-md-table-cell"><i>@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</i></span>
                         }
                     </td>
                 </tr>
