@@ -46,13 +46,18 @@ namespace SailScores.Web.Services
                 .OrderBy(s => s.StartDate)
                 .ThenBy(s => s.Name);
             var vm = _mapper.Map<IList<RegattaSummaryViewModel>>(filteredRegattas);
+            var regattasToRemove = new List<RegattaSummaryViewModel>();
             foreach(var regatta in vm)
             {
                 var club = await _clubService.GetMinimalClub(regatta.ClubId);
+                if (club.IsHidden)
+                {
+                    regattasToRemove.Add(regatta);
+                }
                 regatta.ClubInitials = club.Initials;
                 regatta.ClubName = club.Name;
             }
-            return vm;
+            return vm.Except(regattasToRemove);
         }
 
         public async Task<Regatta> GetRegattaAsync(Guid regattaId)

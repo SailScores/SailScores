@@ -9,8 +9,8 @@ live in spring of 2019 and is regularly used for [large series][2] as well as on
 
 I've been keeping scores for our club for a few years and decided to fix the
 weaknesses with available options for scorekeeping. I'm not aware of any other scoring
-software that has a modern interface, supports mobile devices, is inexpensive or free, and
-supports club series scoring as much as regatta scoring. SailScores scratches those itches.
+software that: 1) has a modern interface, 2) supports mobile devices, 3) is inexpensive or free, and
+4) supports club series scoring as well as regatta scoring. SailScores scratches those itches.
 
 SailScores top priorities:
 - easy to navigate and bookmark.
