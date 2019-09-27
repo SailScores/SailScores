@@ -76,6 +76,7 @@ namespace SailScores.Core.Services
             {
                 series.FlatResults = await _seriesService.GetHistoricalResults(series);
                 series.PreferAlternativeSailNumbers = fullRegatta.PreferAlternateSailNumbers;
+                series.PartOfRegatta = true;
             }
             return fullRegatta;
         }
