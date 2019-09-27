@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="All Races" xml:space="preserve">
-    <value />
+    <value>Alla tävlingar</value>
   </data>
   <data name="All Series" xml:space="preserve">
     <value>Alla serier</value>
@@ -187,7 +187,7 @@
     <value>Segelnummer</value>
   </data>
   <data name="Seasons" xml:space="preserve">
-    <value />
+    <value>Seasons</value>
   </data>
   <data name="Series" xml:space="preserve">
     <value>Serier</value>
@@ -225,12 +225,6 @@
   <data name="boats" xml:space="preserve">
     <value>båtar</value>
   </data>
-  <data name="String" xml:space="preserve">
-    <value>Konkurrenter</value>
-  </data>
-  <data name="String1" xml:space="preserve">
-    <value />
-  </data>
   <data name="CapCompetitors" xml:space="preserve">
     <value>Tävlande</value>
   </data>
@@ -239,5 +233,20 @@
   </data>
   <data name="No results posted" xml:space="preserve">
     <value>Inga färska resultat</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Förändring</value>
+  </data>
+  <data name="Previous Day" xml:space="preserve">
+    <value>föregående dag</value>
+  </data>
+  <data name="Previous Race" xml:space="preserve">
+    <value>tidigare race</value>
+  </data>
+  <data name="Previous Week" xml:space="preserve">
+    <value>föregående vecka</value>
+  </data>
+  <data name="Rank change from" xml:space="preserve">
+    <value>Rank förändring från</value>
   </data>
 </root>

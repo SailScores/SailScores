@@ -1,4 +1,4 @@
-﻿@using SailScores.Web.Models.SailScores
+@using SailScores.Web.Models.SailScores
 @using SailScores.Core.Model
 @using SailScores.Core.FlatModel
 @using SailScores.Api.Enumerations
@@ -167,7 +167,7 @@
         @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None)
         {
             <span class="d-none d-sm-inline">
-                * Rank change from @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
+                * @localizer["Rank change from"] @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
             </span>
         }
     </div>

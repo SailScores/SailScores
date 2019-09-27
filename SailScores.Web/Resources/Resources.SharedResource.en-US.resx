@@ -216,4 +216,19 @@
   <data name="CapCompetitors" xml:space="preserve">
     <value>Competitors</value>
   </data>
+  <data name="Previous Day" xml:space="preserve">
+    <value>previous day</value>
+  </data>
+  <data name="Previous Race" xml:space="preserve">
+    <value>previous race</value>
+  </data>
+  <data name="Previous Week" xml:space="preserve">
+    <value>previous week</value>
+  </data>
+  <data name="Rank change from" xml:space="preserve">
+    <value>Rank change from</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>Updated</value>
+  </data>
 </root>

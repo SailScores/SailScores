@@ -100,7 +100,7 @@
     else if (Model.RecentRaces.Count() > 0)
     {
         <div class="col-sm-6 col-md-3">
-            <h4>@localizer["Recent races"]</h4>
+            <h4>@localizer["Recent Races"]</h4>
             <ul class="list-unstyled">
                 @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
