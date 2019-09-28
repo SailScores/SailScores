@@ -174,6 +174,8 @@ namespace SailScores.Core.Services
             {
                 throw new InvalidOperationException("Cannot update club. A club with these initials already exists.");
             }
+
+            // don't update initials or id!
             var dbClub = _dbContext.Clubs.Single(c => c.Id == club.Id);
             dbClub.Name = club.Name;
             dbClub.IsHidden = club.IsHidden;
