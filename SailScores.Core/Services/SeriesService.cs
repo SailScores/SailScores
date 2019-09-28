@@ -251,7 +251,8 @@ namespace SailScores.Core.Services
                         Name = c.Name,
                         SailNumber = c.SailNumber,
                         AlternativeSailNumber = c.AlternativeSailNumber,
-                        BoatName = c.BoatName
+                        BoatName = c.BoatName,
+                        HomeClubName = c.HomeClubName
                     });
         }
 

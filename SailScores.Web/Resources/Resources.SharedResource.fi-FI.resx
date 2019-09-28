@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="All Races" xml:space="preserve">
-    <value>All Races</value>
+    <value>Kaikki purjehdukset</value>
   </data>
   <data name="All Series" xml:space="preserve">
     <value>Kaikki sarjat</value>
@@ -217,7 +217,7 @@
     <value>Kirjaudu ulos</value>
   </data>
   <data name="Regattas" xml:space="preserve">
-    <value>Purjehdukset</value>
+    <value>Regattas</value>
   </data>
   <data name="CapCompetitors" xml:space="preserve">
     <value>Kilpailijat</value>
@@ -227,5 +227,23 @@
   </data>
   <data name="No results posted" xml:space="preserve">
     <value>Ei tuoreita tuloksia</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Muutos</value>
+  </data>
+  <data name="Previous Day" xml:space="preserve">
+    <value>edelliseen päivään</value>
+  </data>
+  <data name="Previous Race" xml:space="preserve">
+    <value>edelliseen kilpailuun</value>
+  </data>
+  <data name="Previous Week" xml:space="preserve">
+    <value>edelliseen viikkoon</value>
+  </data>
+  <data name="Rank change from" xml:space="preserve">
+    <value>Verrattuna</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>Päivitetty</value>
   </data>
 </root>

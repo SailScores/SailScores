@@ -21,8 +21,7 @@ namespace SailScores.Web.Services
         {
             _dbContext = httpContext.RequestServices.GetService<ISailScoresContext>();
             _cache = httpContext.RequestServices.GetService<IMemoryCache>();
-            var clubInitials = await GetClubInitials(httpContext);
-            var locale = await GetClubLocale(clubInitials);
+            var locale = await GetLocaleAsync(httpContext.Request.Path);
             if (String.IsNullOrWhiteSpace(locale))
             {
                 return null;
@@ -30,13 +29,8 @@ namespace SailScores.Web.Services
             return new ProviderCultureResult(locale);
         }
 
-        private async Task<string> GetClubInitials(HttpContext httpContext)
-        {
-            //TODO
-            return "LHYC";
-        }
 
-        public async Task<String> GetClubLocale(string clubInitials)
+        public async Task<String> GetLocaleAsync(PathString path)
         {
             // cache all initials from the db.
             Dictionary<string, string> clubInitialsToLocales;
@@ -45,9 +39,9 @@ namespace SailScores.Web.Services
             {
                 clubInitialsToLocales = _dbContext.Clubs
                 .ToDictionary(
-                    c => c.Initials,
+                    c => c.Initials.ToUpperInvariant(),
                     c => c.Locale);
-                //TODO: need to deal with reloading the cache from db occasionally,
+                //TODO: need to test reloading the cache from db occasionally,
                 //even if it is getting frequent use.
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromSeconds(60));
@@ -55,8 +49,16 @@ namespace SailScores.Web.Services
                 // Save data in cache.
                 _cache.Set(cacheKeyName, clubInitialsToLocales, cacheEntryOptions);
             }
+            PathString remaining;
+            foreach(var key in clubInitialsToLocales.Keys)
+            {
+                if (path.StartsWithSegments($"/{key}", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return clubInitialsToLocales[key];
+                }
+            }
 
-            return clubInitialsToLocales[clubInitials.ToUpperInvariant()];
+            return "en-US";
         }
     }
 }

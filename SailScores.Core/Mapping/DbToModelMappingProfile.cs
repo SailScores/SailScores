@@ -26,6 +26,7 @@ namespace SailScores.Core.Mapping
                         s.RaceSeries
                         .SelectMany(rs => rs.Race.Scores
                             .Select(r => r.Competitor)).Distinct().ToList()))
+                .ForMember(d => d.PartOfRegatta, o => o.Ignore())
                 .ReverseMap()
                 .ForMember(d => d.RaceSeries, o => o.Ignore());
             CreateMap<Db.Fleet, Model.Fleet>()

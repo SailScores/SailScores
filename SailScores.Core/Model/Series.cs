@@ -51,6 +51,8 @@ namespace SailScores.Core.Model
 
         public bool? PreferAlternativeSailNumbers { get; set; }
 
+        public bool? PartOfRegatta { get; set; }
+
         public Series ShallowCopy()
         {
             return (Series)this.MemberwiseClone();
