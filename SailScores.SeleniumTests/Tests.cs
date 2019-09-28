@@ -386,9 +386,9 @@ namespace SailScores.SeleniumTests
                 submitButton.Click();
 
                 // go to this series.
-                driver.FindElement(By.LinkText("TEST")).Click();
+                driver.WaitUntilVisible(By.LinkText("TEST")).Click();
 
-                driver.FindElement(By.LinkText("Test Series")).Click();
+                driver.WaitUntilVisible(By.LinkText("Test Series")).Click();
 
                 // verify series includes race heading
                 var linkText = $"{DateTime.Today.ToString("M/d")} R{order}";
