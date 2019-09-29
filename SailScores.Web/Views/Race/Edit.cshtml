@@ -1,5 +1,6 @@
 ﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 @using SailScores.Web.Extensions;
+@using System.Globalization;
 
 @{
     ViewBag.Title = "Edit Race";
@@ -112,6 +113,7 @@
                                             <option value="@code.Name">@code.Name: @code.Description.Left(40)</option>
                                         }
                                     </select>
+                                    <input class="code-points form-control form-control-sm" type="number" placeholder="place" />
                                 </div>
                                 <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
                                 <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
@@ -151,6 +153,8 @@
                                                 <option value="@code.Name" selected="@(score.Code == code.Name)">@code.Name: @code.Description.Left(40)</option>
                                             }
                                         </select>
+                                        <input class="code-points form-control form-control-sm" type="number" placeholder="place"
+                                               value="@score.CodePoints?.ToString("0.#", CultureInfo.InvariantCulture)"/>
                                     </div>
                                     <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
                                     <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>

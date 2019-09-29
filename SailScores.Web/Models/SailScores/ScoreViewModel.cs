@@ -25,5 +25,7 @@ namespace SailScores.Web.Models.SailScores
         // depending on the series for which the score is being
         // calculated. Only one of them would be here.
         public ScoreCode ScoreCode { get; set; }
+
+        public decimal? CodePoints { get; set; }
     }
 }

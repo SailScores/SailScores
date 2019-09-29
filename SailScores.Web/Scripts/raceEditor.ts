@@ -3,7 +3,6 @@
 import { competitorDto, scoreCodeDto, seriesDto } from "./interfaces/server";
 
 import { Guid } from "./guid";
-import * as dragula from "dragula";
 
 let competitors: competitorDto[];
 declare var scoreCodes: scoreCodeDto[];
@@ -152,6 +151,13 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
         input.value = getCompetitorCode(resultItems[i]);
         form.appendChild(input);
 
+
+        input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "Scores\[" + listIndex + "\].codePoints";
+        input.value = getCompetitorCodePoints(resultItems[i]);
+        form.appendChild(input);
+
     }
 }
 
@@ -176,6 +182,15 @@ export function calculatePlaces() {
                 span.textContent = getCompetitorCode(resultItems[i]);
                 resultItems[i].removeAttribute("data-place");
             }
+        }
+
+        // show manual entry if needed
+        var codepointsinput = resultItems[i].getElementsByClassName("code-points")[0] as HTMLInputElement;
+        if (shouldHaveManualEntry(resultItems[i])) {
+            codepointsinput.style.display = "";
+        } else {
+            codepointsinput.style.display = "none";
+            codepointsinput.value = "";
         }
     }
 }
@@ -332,6 +347,13 @@ function getCompetitorCode(compListItem: HTMLLIElement) {
     }
     return codeText;
 }
+function getCompetitorCodePoints(compListItem: HTMLLIElement) {
+    const codePoints = (compListItem.getElementsByClassName("code-points")[0] as HTMLInputElement).value;
+    if (codePoints === noCodeString) {
+        return null;
+    }
+    return codePoints;
+}
 
 function shouldCompKeepScore(compListItem: HTMLLIElement): boolean {
     const codeText =
@@ -342,5 +364,16 @@ function shouldCompKeepScore(compListItem: HTMLLIElement): boolean {
     }
     const fullCodeObj = scoreCodes.filter(s => s.name === codeText);
     return !!(fullCodeObj[0].preserveResult);
+}
+
+function shouldHaveManualEntry(compListItem: HTMLLIElement): boolean {
+    const codeText =
+        (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement)
+            .value;
+    if (codeText === noCodeString) {
+        return false;
+    }
+    const fullCodeObj = scoreCodes.filter(s => s.name === codeText);
+    return (fullCodeObj[0].formula == "MAN");
 }
 

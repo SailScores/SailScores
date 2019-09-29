@@ -11,5 +11,6 @@ namespace SailScores.Database.Entities
         public Guid RaceId { get; set; }
         public int? Place { get; set; }
         public string Code { get; set; }
+        public decimal? CodePoints { get; set; }
     }
 }
