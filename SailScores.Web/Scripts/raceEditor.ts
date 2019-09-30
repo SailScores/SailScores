@@ -154,7 +154,7 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
 
         input = document.createElement("input");
         input.type = "hidden";
-        input.name = "Scores\[" + listIndex + "\].codePoints";
+        input.name = "Scores\[" + listIndex + "\].codePointsString";
         input.value = getCompetitorCodePoints(resultItems[i]);
         form.appendChild(input);
 

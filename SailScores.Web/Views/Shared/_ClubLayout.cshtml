@@ -1,10 +1,11 @@
 ﻿@using Microsoft.Extensions.Localization
 @using Microsoft.AspNetCore.Routing
 @using SailScores.Web.Resources
+@using System.Globalization;
 
 @inject IStringLocalizer<SharedResource> localizer
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@CultureInfo.CurrentCulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="google" content="notranslate" />

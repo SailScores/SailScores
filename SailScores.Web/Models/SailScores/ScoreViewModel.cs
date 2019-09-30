@@ -27,5 +27,7 @@ namespace SailScores.Web.Models.SailScores
         public ScoreCode ScoreCode { get; set; }
 
         public decimal? CodePoints { get; set; }
+        // used for parsing CodePoints, can use period or comma as decimal separator
+        public string CodePointsString { get; set; }
     }
 }

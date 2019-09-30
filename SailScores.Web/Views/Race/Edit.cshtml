@@ -93,39 +93,7 @@
         <div class="row">
             <div class="col-12 col-lg-8 pb-3">
                 <ul class="list-group" id="results">
-                    <li class="list-group-item" id="competitorTemplate" style="display: none;">
-                        <div class="d-flex w-100 flex-wrap">
-                            <div>
-                                <span class="badge badge-secondary badge-pill race-place"></span>
-                            </div>
-                            <div>
-                                <span class="sail-number"></span><span class="alt-sail-number" style="display: none"></span>
-                            </div>
-                            <div>
-                                <span class="competitor-name h5"></span>
-                            </div>
-                            <div class="float-right ml-auto d-flex">
-                                <div>
-                                    <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
-                                        <option value="No Code">No Code</option>
-                                        @foreach (var code in Model.ScoreCodeOptions)
-                                        {
-                                            <option value="@code.Name">@code.Name: @code.Description.Left(40)</option>
-                                        }
-                                    </select>
-                                    <input class="code-points form-control form-control-sm" type="number" placeholder="place" />
-                                </div>
-                                <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
-                                <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
-                                &ensp;
-                                <button class="btn btn-light delete-button" type="button" data-toggle="modal"
-                                        data-target="#deleteConfirm"
-                                        onclick="window.SailScores.confirmDelete()">
-                                    <span class="far fa-trash-alt text-danger"></span>
-                                </button>
-                            </div>
-                        </div>
-                    </li>
+                    @await Html.PartialAsync("_scoreEntryPartial", Model)
                     @foreach (var score in Model.Scores)
                     {
                         <li id="@score.CompetitorId" class="list-group-item"
@@ -153,8 +121,11 @@
                                                 <option value="@code.Name" selected="@(score.Code == code.Name)">@code.Name: @code.Description.Left(40)</option>
                                             }
                                         </select>
-                                        <input class="code-points form-control form-control-sm" type="number" placeholder="place"
-                                               value="@score.CodePoints?.ToString("0.#", CultureInfo.InvariantCulture)"/>
+                                        <input class="code-points form-control form-control-sm"
+                                               style="display:none"
+                                               type="text" pattern="[0-9]+([\.,][0-9]+)?"
+                                               placeholder="place"
+                                               value="@score.CodePoints?.ToString("0.#")" />
                                     </div>
                                     <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
                                     <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>

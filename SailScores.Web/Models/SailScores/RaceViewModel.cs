@@ -33,6 +33,8 @@ namespace SailScores.Web.Models.SailScores
 
         public IList<Series> Series { get; set; }
 
+        public RegattaViewModel Regatta { get; set; }
+
         public Season Season { get; set; }
 
         public RaceState? State { get; set; }
