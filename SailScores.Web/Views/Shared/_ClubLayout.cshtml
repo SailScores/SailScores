@@ -1,8 +1,12 @@
 ﻿@using Microsoft.Extensions.Localization
 @using Microsoft.AspNetCore.Routing
 @using SailScores.Web.Resources
+@using System.Globalization
 
 @inject IStringLocalizer<SharedResource> localizer
+@{
+    string pageUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,6 +29,12 @@
     <link rel="icon" type="image/png" href="~/images/favicon/favicon-32x32.png" sizes="32x32">
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="msapplication-TileImage" content="~/images/favicon/mstile-144x144.png">
+    <meta property="og:url" content="@(pageUrl)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@ViewData["Title"]" />
+    <meta property="og:description" content="@ViewData["MetaDescription"]" />
+    <meta property="og:image" content="@Url.Content("~/images/favicon/mstile-144x144.png")" />
+    <meta property="og:locale" content="@CultureInfo.CurrentCulture" />
     <title>@ViewData["Title"]</title>
     @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaDescription"]))
     {
@@ -116,7 +126,18 @@
         }
         <footer>
             <div class="row">
-                <div class="col-12 text-sm-right">
+                <div class="col-5"></div>
+                <div class="col-2 text-center">
+                    <a href="http://twitter.com/intent/tweet?url=@(pageUrl)&text=@ViewData["Title"]+results:&via=SailScores&hashtags=sailing"
+                       class="text-muted" target="_blank">
+                        <span class="fab fa-2x fa-twitter"></span>
+                    </a>
+                    <a href="https://www.facebook.com/sharer.php?display=page&u=@(pageUrl)" target="_blank"
+                       class="text-muted">
+                        <span class="fab fa-2x fa-facebook-square"></span>
+                    </a>
+                </div>
+                <div class="col-5 text-sm-right">
                     @await Html.PartialAsync("_LoginPartial")
                 </div>
             </div>
