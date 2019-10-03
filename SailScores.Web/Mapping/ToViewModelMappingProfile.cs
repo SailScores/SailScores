@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using SailScores.Api.Dtos;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Db = SailScores.Database.Entities;
@@ -22,7 +24,10 @@ namespace SailScores.Web.Mapping
                 .ForMember(r => r.FleetShortName, o => o.MapFrom(s => s.Fleet.ShortName))
                 .ForMember(r => r.SeriesNames, o => o.MapFrom(s => s.Series.Select(sr => sr.Name)));
             CreateMap<Model.Score, ScoreViewModel>()
-                .ForMember(s => s.ScoreCode, o => o.Ignore());
+                .ForMember(d => d.ScoreCode, o => o.Ignore())
+                .ForMember(d => d.CodePointsString, o => o.MapFrom(s => s.CodePoints.HasValue ? s.CodePoints.Value.ToString("0.##") : String.Empty))
+                .ReverseMap()
+                .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)));
 
             CreateMap<Model.Fleet, FleetSummary>()
                 .ForMember(d => d.Series, o => o.Ignore());
@@ -73,6 +78,30 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.FleetIds, o => o.MapFrom(s =>
                     s.Fleets.Select(c => c.Id)));
 
+            CreateMap<RaceViewModel, RaceDto>()
+                .ForMember(d => d.ScoreIds, o => o.MapFrom(r => r.Scores.Select(s => s.Id)))
+                .ForMember(d => d.RegattaId, o => o.MapFrom(r => r.Regatta.Id))
+                .ForMember(d => d.SeriesIds, o => o.MapFrom(r => r.Series.Select(s => s.Id)))
+                .ReverseMap()
+                .ForMember(d => d.Regatta, o => o.Ignore());
+            CreateMap<Model.Race, RaceViewModel>()
+                .ForMember(r => r.Regatta, o => o.Ignore());
+            CreateMap<ScoreViewModel, ScoreDto>()
+                .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)));
+        }
+
+        private decimal? ParseDecimal(string decimalString)
+        {
+            decimal output;
+            if(Decimal.TryParse(decimalString, out output))
+            {
+                return output;
+            }
+            if(Decimal.TryParse(decimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out output))
+            {
+                return output;
+            }
+            return null;
         }
     }
 }

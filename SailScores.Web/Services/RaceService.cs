@@ -227,11 +227,11 @@ namespace SailScores.Web.Services
                     {
                         if (!race.Scores.Any(s => s.CompetitorId == competitor.Id))
                         {
-                            race.Scores.Add(new Score
+                            race.Scores.Add(new ScoreViewModel
                             {
                                 CompetitorId = competitor.Id,
                                 Code = "DNC",
-                                Race = race
+                                Race = _mapper.Map<Race>(race)
                             });
                         }
                     }
@@ -260,7 +260,8 @@ namespace SailScores.Web.Services
             race.Id = raceId;
             if(race.RegattaId.HasValue)
             {
-                await _coreRegattaService.AddRaceToRegattaAsync(race, race.RegattaId.Value);
+                await _coreRegattaService.AddRaceToRegattaAsync(
+                    _mapper.Map<Race>(race), race.RegattaId.Value);
             }
         }
     }

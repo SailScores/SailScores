@@ -203,7 +203,8 @@ namespace SailScores.Core.Services
                         CompetitorId = score.CompetitorId,
                         Race = dbRace,
                         Place = score.Place,
-                        Code = score.Code
+                        Code = score.Code,
+                        CodePoints = score.CodePoints
                     });
                 }
 

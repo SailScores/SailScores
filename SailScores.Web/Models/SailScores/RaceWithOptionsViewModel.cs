@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SailScores.Web.Models.SailScores
 {
-    public class RaceWithOptionsViewModel : Race
+    public class RaceWithOptionsViewModel : RaceViewModel
     {
         public IList<Fleet> FleetOptions { get; set; }
         public IList<Series> SeriesOptions { get; set; }

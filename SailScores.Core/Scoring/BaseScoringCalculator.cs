@@ -332,6 +332,10 @@ namespace SailScores.Core.Scoring
                 case FIXED_FORMULANAME:
                     return scoreCode.FormulaValue;
                 case MANUAL_FORMULANAME:
+                    if (score.RawScore.CodePoints.HasValue)
+                    {
+                        return score.RawScore.CodePoints;
+                    }
                     if (score.RawScore.Place.HasValue)
                     {
                         return Convert.ToDecimal(score.RawScore.Place);
