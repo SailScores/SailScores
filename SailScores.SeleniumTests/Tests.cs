@@ -309,13 +309,13 @@ namespace SailScores.SeleniumTests
                 var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
                 createLink.Click();
                 driver.FindElement(By.Id("Name")).SendKeys(seriesName);
-                driver.FindElement(By.Name("StartDate")).SendKeys(DateTime.Today.AddDays(-1).ToShortDateString());
-                driver.FindElement(By.Name("EndDate")).SendKeys(DateTime.Today.AddDays(1).ToShortDateString());
+                driver.FindElement(By.Name("StartDate")).SendKeys(DateTime.Today.AddDays(-1).ToString("MM/dd/yyyy"));
+                driver.FindElement(By.Name("EndDate")).SendKeys(DateTime.Today.AddDays(1).ToString("MM/dd/yyyy"));
 
                 var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
                 submitButton.Click();
 
-                driver.FindElement(By.LinkText("Edit Regatta")).Click();
+                driver.WaitUntilClickable(By.LinkText("Edit Regatta")).Click();
 
                 submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
                 submitButton.Click();
@@ -365,7 +365,7 @@ namespace SailScores.SeleniumTests
                 driver.FindElementByLinkText("New Race").Click();
 
                 // set race fields, saving order for later
-                var fleetSelector = new SelectElement(driver.FindElement(By.Id("fleetId")));
+                var fleetSelector = new SelectElement(driver.WaitUntilVisible(By.Id("fleetId")));
                 fleetSelector.SelectByText("Test Boat Class Fleet");
                 var seriesSelector = new SelectElement(driver.FindElement(By.Id("seriesIds")));
                 seriesSelector.SelectByText("Test Series");

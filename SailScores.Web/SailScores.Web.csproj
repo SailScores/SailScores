@@ -13,9 +13,6 @@
   <PropertyGroup>
     <ServerGarbageCollection>false</ServerGarbageCollection>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Views\Race\_scoreEntryPartial.cshtml" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Scripts\guid.ts" />
@@ -50,10 +47,6 @@
     <Folder Include="Areas\Api\Views\" />
     <Folder Include="Data\" />
     <Folder Include="wwwroot\lib\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\Race\_scoreEntryPartial.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
