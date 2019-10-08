@@ -80,26 +80,33 @@ namespace SailScores.Core.Services
                     .Include(s => s.Season)
                 .SingleAsync(s => s.Id == seriesId);
 
-            if(dbSeries.ResultsLocked ?? false)
+            if (dbSeries.ResultsLocked ?? false)
             {
                 return;
             }
 
             var fullSeries = _mapper.Map<Series>(dbSeries);
+            await CalculateScoresAsync(fullSeries);
+            dbSeries.UpdatedDate = DateTime.UtcNow;
+            await SaveHistoricalResults(fullSeries);
+
+            await SaveChartData(fullSeries);
+        }
+
+        private async Task CalculateScoresAsync(Series fullSeries)
+        {
             var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
                 fullSeries);
 
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
             var calculator = await _scoringCalculatorFactory
                 .CreateScoringCalculatorAsync(fullSeries.ScoringSystem);
-            
+
             fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
             await PopulateCompetitorsAsync(fullSeries);
 
             var results = calculator.CalculateResults(fullSeries);
             fullSeries.Results = results;
-            dbSeries.UpdatedDate = DateTime.UtcNow;
-            await SaveHistoricalResults(fullSeries);
         }
 
         public async Task<Series> GetSeriesDetailsAsync(
@@ -164,22 +171,13 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<FlatResults> GetHistoricalResults(Series series)
-        {
-            var dbRow = await _dbContext.HistoricalResults
-                .SingleOrDefaultAsync(r =>
-                    r.SeriesId == series.Id
-                    && r.IsCurrent);
-
-            if(String.IsNullOrWhiteSpace(dbRow?.Results))
-            {
-                return null;
-            }
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
-        }
-
         private FlatResults FlattenResults(Series series)
         {
+            series.Competitors =
+                series.Competitors.OrderBy(c => series.Results.Results.Keys.Contains(c) ?
+                    (series.Results.Results[c].Rank ?? int.MaxValue)
+                    : (int.MaxValue))
+                .ToList();
             var flatResults = new FlatResults
             {
                 SeriesId = series.Id,
@@ -243,7 +241,6 @@ namespace SailScores.Core.Services
         private IEnumerable<FlatCompetitor> FlattenCompetitors(Series series)
         {
             return series.Competitors
-                .OrderBy(c => series.Results.Results[c].Rank ?? int.MaxValue)
                 .Select(c =>
                     new FlatCompetitor
                     {
@@ -386,6 +383,109 @@ namespace SailScores.Core.Services
             _dbContext.Series.Remove(dbSeries);
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task SaveChartData(Series fullSeries)
+        {
+            FlatChartData chartData = await CalculateChartData(fullSeries);
+            var oldCharts = await _dbContext
+                .SeriesChartResults
+                .Where(r => r.SeriesId == fullSeries.Id).ToListAsync();
+            
+            foreach (var chart in oldCharts.ToList()) {
+                _dbContext.SeriesChartResults.Remove(chart);
+            }
+
+            var chartResults = new Database.Entities.SeriesChartResults
+            {
+                Id = Guid.NewGuid(),
+                SeriesId = fullSeries.Id,
+                IsCurrent = true,
+                Results = Newtonsoft.Json.JsonConvert.SerializeObject(chartData),
+                Created = DateTime.Now
+            };
+            _dbContext.SeriesChartResults.Add(chartResults);
+            await _dbContext.SaveChangesAsync();
+
+        }
+
+        private async Task<FlatChartData> CalculateChartData(Series fullSeries)
+        {
+            var entries = new List<FlatChartPoint>();
+            entries.AddRange(GetChartDataPoints(fullSeries));
+            fullSeries.Races = fullSeries.Races
+                .Where(r => r.State == null || r.State == Api.Enumerations.RaceState.Raced)
+                .ToList();
+            var copyOfRaces = fullSeries.Races.ToList();
+            var copyOfCompetitors = fullSeries.Competitors.ToList();
+
+            var racesToRemove = fullSeries.Races.OrderByDescending(r => r.Date).ThenByDescending(r => r.Order)
+                .ToList();
+            foreach (var race in racesToRemove)
+            {
+
+                fullSeries.Races.Remove(race);
+                if (fullSeries.Races.Count > 0)
+                {
+                    await CalculateScoresAsync(fullSeries);
+                    entries.AddRange(GetChartDataPoints(fullSeries));
+                }
+            }
+            fullSeries.Races = copyOfRaces;
+            fullSeries.Competitors = copyOfCompetitors;
+            return new FlatChartData
+            {
+                Races = FlattenRaces(fullSeries),
+                Competitors = FlattenCompetitors(fullSeries),
+                IsLowPoints = true, //todo: figure out if it's really low points
+                Entries = entries
+            };
+        }
+
+        private IEnumerable<FlatChartPoint> GetChartDataPoints(Series fullSeries)
+        {
+            var lastRaceId = fullSeries.Races.OrderByDescending(r => r.Date).ThenByDescending(r => r.Order).First().Id;
+            foreach (var comp in fullSeries.Competitors)
+            {
+                var calcScore = fullSeries.Results.Results.FirstOrDefault(r => r.Key == comp).Value;
+                var raceScore = calcScore.CalculatedScores.FirstOrDefault(s => s.Key.Id == lastRaceId).Value;
+                yield return new FlatChartPoint
+                {
+                    RaceId = lastRaceId,
+                    CompetitorId = comp.Id,
+                    RacePlace = raceScore?.ScoreValue,
+                    SeriesRank = calcScore?.Rank,
+                    SeriesPoints = calcScore?.TotalScore
+                };
+            }
+        }
+
+        public async Task<FlatResults> GetHistoricalResults(Series series)
+        {
+            var dbRow = await _dbContext.HistoricalResults
+                .SingleOrDefaultAsync(r =>
+                    r.SeriesId == series.Id
+                    && r.IsCurrent);
+
+            if (String.IsNullOrWhiteSpace(dbRow?.Results))
+            {
+                return null;
+            }
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
+        }
+
+        public async Task<FlatChartData> GetChartData(Guid seriesId)
+        {
+            var dbRow = await _dbContext.SeriesChartResults
+                .SingleOrDefaultAsync(r =>
+                    r.SeriesId == seriesId
+                    && r.IsCurrent);
+
+            if (String.IsNullOrWhiteSpace(dbRow?.Results))
+            {
+                return null;
+            }
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatChartData>(dbRow.Results);
         }
     }
 }

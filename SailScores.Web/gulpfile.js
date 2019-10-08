@@ -20,7 +20,7 @@ paths.minCss = paths.webroot + "css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "js/site.min.js";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.concatTsDest = paths.webroot + "scripts/**.*";
-paths.scripts = ['scripts/**/*.js', 'scripts/**/*.ts', 'scripts/**/*.map'];
+paths.scripts = ['scripts/**/*.js'];
 
 gulp.task("clean:js", function (cb) {
     rimraf(paths.concatJsDest, cb);
@@ -53,8 +53,8 @@ gulp.task("min:css", function () {
 gulp.task("min", gulp.parallel("min:js", "min:css"));
 
 
-gulp.task('typescript', function () {
-    return gulp.src(paths.scripts).pipe(gulp.dest('wwwroot/scripts'));
+gulp.task('copyJs', function () {
+    return gulp.src(paths.scripts).pipe(gulp.dest('wwwroot/js'));
 });
 
 gulp.task("sass", function () {

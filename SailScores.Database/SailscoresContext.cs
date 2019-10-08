@@ -30,6 +30,7 @@ namespace SailScores.Database
         public DbSet<File> Files { get; set; }
 
         public DbSet<HistoricalResults> HistoricalResults { get; set; }
+        public DbSet<SeriesChartResults> SeriesChartResults { get; set; }
 
         public SailScoresContext(
             DbContextOptions<SailScoresContext> options)
@@ -110,6 +111,10 @@ namespace SailScores.Database
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<HistoricalResults>()
+                .Property(b => b.Created)
+                .HasDefaultValueSql("getdate()");
+
+            modelBuilder.Entity<SeriesChartResults>()
                 .Property(b => b.Created)
                 .HasDefaultValueSql("getdate()");
 

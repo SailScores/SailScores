@@ -13,5 +13,6 @@ namespace SailScores.Web.Services
         Task SaveNew(SeriesWithOptionsViewModel model);
         Task Update(SeriesWithOptionsViewModel model);
         Task DeleteAsync(Guid id);
+        Task<Core.FlatModel.FlatChartData> GetChartData(Guid seriesId);
     }
 }
