@@ -15,6 +15,7 @@ using SailScores.Core.Mapping;
 using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Web.Data;
+using SailScores.Web.JobQueue;
 using SailScores.Web.Mapping;
 using SailScores.Web.Services;
 using Swashbuckle.AspNetCore.Swagger;
@@ -148,7 +149,15 @@ namespace SailScores.Web
 
             RegisterSailScoresServices(services);
 
+            RegisterBackgroundQueueServices(services);
 
+
+        }
+
+        private void RegisterBackgroundQueueServices(IServiceCollection services)
+        {
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         }
 
         private void RegisterSailScoresServices(IServiceCollection services)
@@ -158,6 +167,8 @@ namespace SailScores.Web
             
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }
+
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMapper mapper)
