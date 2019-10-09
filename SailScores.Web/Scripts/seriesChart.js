@@ -83,7 +83,8 @@ var seriesChart = (function () {
     function processChartData(data) {
         var dates = data.races.map(r => new Date(r.date));
         var earliestDate = Math.min.apply(null, dates);
-        var latestDate = Math.max.apply(null, dates);
+        var latestDate = new Date(Math.max.apply(null, dates));
+        latestDate.setDate(latestDate.getDate() + 1);
         var xScale = d3.scaleTime()
             .domain([earliestDate, latestDate])
             .range([margin, chartOverallWidth - margin - legendWidth]);
@@ -95,6 +96,11 @@ var seriesChart = (function () {
             .attr("width", chartOverallWidth)
             .attr("height", chartOverallHeight)
             .call(responsivefy);
+
+
+        function getRaceName(raceId) {
+            return data.races.find(r => r.id === raceId).shortName;
+        }
 
         function onMouseOver(d) {
             compId = d.competitorId || d.id;
@@ -132,12 +138,18 @@ var seriesChart = (function () {
             tooltipGroup
                 .select("text")
                 .append("tspan")
-                .text("Race place: " + d.racePlace);
+                .text(getRaceName(d.raceId));
             tooltipGroup
                 .select("text")
                 .append("tspan")
                 .attr("x", 5)
                 .attr("y", (legendLineHeight * 2) - 5)
+                .text("Place: " + d.racePlace);
+            tooltipGroup
+                .select("text")
+                .append("tspan")
+                .attr("x", 5)
+                .attr("y", (legendLineHeight * 3) - 5)
                 .text("Series points: " + d.seriesPoints);
             onMouseOver(d);
 
@@ -203,7 +215,7 @@ var seriesChart = (function () {
             .style("font-size", "11px")
             .text(function (d) { return d.name; });
 
-        var xAxis = d3.axisTop().scale(xScale);
+        var xAxis = d3.axisTop().scale(xScale).tickFormat("");
         d3.select("#chart").append("g").attr("id", "xAxisG")
             .attr("transform", "translate(0,20)").call(xAxis);
 
@@ -245,7 +257,7 @@ var seriesChart = (function () {
             .attr("opacity", 0);
         tooltipGroup.append("rect")
             .attr("width", 120)
-            .attr("height", legendLineHeight * 2)
+            .attr("height", legendLineHeight * 3)
             .attr("fill", "white")
             .attr("fill-opacity", ".7");
         tooltipGroup.append("text")
