@@ -11,6 +11,9 @@ using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
 using SailScores.Api.Dtos;
 using SailScores.Api.Enumerations;
+using Microsoft.Extensions.DependencyInjection;
+using SailScores.Core.JobQueue;
+using Microsoft.Extensions.Logging;
 
 namespace SailScores.Core.Services
 {
@@ -20,13 +23,26 @@ namespace SailScores.Core.Services
         private readonly ISeriesService _seriesService;
         private readonly IMapper _mapper;
 
+
+        private readonly ILogger _logger;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public IBackgroundTaskQueue Queue { get; }
+
         public RaceService(
             ISailScoresContext dbContext,
             ISeriesService seriesService,
+            IBackgroundTaskQueue queue,
+            ILogger<IRaceService> logger,
+            IServiceScopeFactory serviceScopeFactory,
             IMapper mapper)
         {
             _dbContext = dbContext;
             _seriesService = seriesService;
+            _logger = logger;
+            Queue = queue;
+
+            _serviceScopeFactory = serviceScopeFactory;
             _mapper = mapper;
         }
 
@@ -213,9 +229,43 @@ namespace SailScores.Core.Services
             seriesIdsToUpdate = seriesIdsToUpdate.Union(dbRace.SeriesRaces.Select(rs => rs.SeriesId).ToList());
             foreach (var seriesId in seriesIdsToUpdate)
             {
-                await _seriesService.UpdateSeriesResults(seriesId);
+                //await _seriesService.UpdateSeriesResults(seriesId);
+
+                AddUpdateSeriesJob(seriesId);
             }
+
             return dbRace.Id;
+        }
+
+        private void AddUpdateSeriesJob(Guid seriesId)
+        {
+            Queue.QueueBackgroundWorkItem(async token =>
+            {
+                var guid = Guid.NewGuid().ToString();
+
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var scopedServices = scope.ServiceProvider;
+                    var seriesService = scopedServices.GetRequiredService<ISeriesService>();
+                    // fake delay to test?
+
+                    //await Task.Delay(TimeSpan.FromSeconds(5), token);
+                    try
+                    {
+                        // Do background-y stuff here.
+                        await seriesService.UpdateSeriesResults(seriesId);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex,
+                            "An error occurred writing to the " +
+                            "database. Error: {Message}", ex.Message);
+                    }
+                }
+
+                _logger.LogInformation(
+                    "Queued Background Task {Guid} is complete. 3/3", guid);
+            });
         }
 
         public async Task Delete(Guid raceId)

@@ -1,22 +1,22 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SailScores.Web.JobQueue
+namespace SailScores.Core.JobQueue
 {
     public class QueuedHostedService : BackgroundService
     {
         private readonly ILogger _logger;
 
         public QueuedHostedService(IBackgroundTaskQueue taskQueue,
-            ILogger logger)
+            ILoggerFactory loggerFactory)
         {
             TaskQueue = taskQueue;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<QueuedHostedService>();
         }
 
         public IBackgroundTaskQueue TaskQueue { get; }
@@ -24,7 +24,7 @@ namespace SailScores.Web.JobQueue
         protected async override Task ExecuteAsync(
             CancellationToken cancellationToken)
         {
-            _logger.Information("Queued Hosted Service is starting.");
+            _logger.LogInformation("Queued Hosted Service is starting.");
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -36,12 +36,12 @@ namespace SailScores.Web.JobQueue
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex,
+                    _logger.LogError(ex,
                        "Error occurred executing {WorkItem}.", nameof(workItem));
                 }
             }
 
-            _logger.Information("Queued Hosted Service is stopping.");
+            _logger.LogInformation("Queued Hosted Service is stopping.");
         }
     }
 }

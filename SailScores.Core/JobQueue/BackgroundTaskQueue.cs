@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SailScores.Web.JobQueue
+namespace SailScores.Core.JobQueue
 {
     public interface IBackgroundTaskQueue
     {
