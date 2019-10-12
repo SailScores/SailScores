@@ -444,14 +444,18 @@ namespace SailScores.Core.Services
 
         private IEnumerable<FlatChartPoint> GetChartDataPoints(Series fullSeries)
         {
-            var lastRaceId = fullSeries.Races.OrderByDescending(r => r.Date).ThenByDescending(r => r.Order).First().Id;
+            var lastRaceId = fullSeries.Races.OrderByDescending(r => r.Date).ThenByDescending(r => r.Order).FirstOrDefault()?.Id;
+            if(lastRaceId == null)
+            {
+                yield break;
+            }
             foreach (var comp in fullSeries.Competitors)
             {
                 var calcScore = fullSeries.Results.Results.FirstOrDefault(r => r.Key == comp).Value;
                 var raceScore = calcScore.CalculatedScores.FirstOrDefault(s => s.Key.Id == lastRaceId).Value;
                 yield return new FlatChartPoint
                 {
-                    RaceId = lastRaceId,
+                    RaceId = lastRaceId.Value,
                     CompetitorId = comp.Id,
                     RacePlace = raceScore?.ScoreValue,
                     SeriesRank = calcScore?.Rank,

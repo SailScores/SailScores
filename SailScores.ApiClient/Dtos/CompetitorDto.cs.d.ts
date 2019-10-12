@@ -11,6 +11,5 @@ declare module server {
 		isActive: boolean;
 		boatClassId: any;
 		fleetIds: any[];
-		scoreIds: any[];
 	}
 }

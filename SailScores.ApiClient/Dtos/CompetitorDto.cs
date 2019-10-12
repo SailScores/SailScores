@@ -26,7 +26,6 @@ namespace SailScores.Api.Dtos
         public Guid BoatClassId { get; set; }
 
         public IList<Guid> FleetIds { get; set; }
-        public IList<Guid> ScoreIds { get; set; }
 
         public override string ToString()
         {
