@@ -10,6 +10,10 @@ var seriesChart = (function () {
     var legendLineHeight = 16;
     var legendMargin = 2;
 
+    var minDate;
+    var maxDate;
+
+
 
     function drawChart(seriesId, elementId) {
         chartSeriesId = seriesId;
@@ -21,19 +25,11 @@ var seriesChart = (function () {
     function getDate(result, allData) {
         var thisRace = allData.races.find(r => r.id === result.raceId);
         var racesThisDate = allData.races.filter(r => r.date === thisRace.date);
-        if (thisRace.length === 1) {
-            return new Date(thisRace.date);
-        }
 
-        var order = racesThisDate.findIndex(r => r.id === thisRace.id);
-        var oneDaySeries = 0;
-        var minDate = Math.min.apply(null, allData.races.map(r => new Date(r.date)));
-        var maxDate = Math.max.apply(null, allData.races.map(r => new Date(r.date)));
-        if (minDate === maxDate && racesThisDate.length > 1) {
-            oneDaySeries = 1;
-        }
+        var order = racesThisDate.findIndex(r => r.id === thisRace.id) + 1;
+        
         return new Date(new Date(thisRace.date).getTime()
-            + (order * 24 * 60 * 60 * 1000 / (racesThisDate.length - oneDaySeries)));
+            + (order * 24 * 60 * 60 * 1000 / (racesThisDate.length + 1 )));
     }
 
     function getY(result, allData) {
@@ -76,6 +72,9 @@ var seriesChart = (function () {
         // get width of container and resize svg to fit it
         function resize() {
             var targetWidth = parseInt(container.style("width"));
+            if (targetWidth <= 100) {// assume percent
+                targetWidth = width;
+            }
             svg.attr("width", targetWidth);
             svg.attr("height", Math.round(targetWidth / aspect));
         }
@@ -90,15 +89,12 @@ var seriesChart = (function () {
             return;
         }
         var dates = data.races.map(r => new Date(r.date));
-        var earliestDate = Math.min.apply(null, dates);
-        var latestDate = new Date(Math.max.apply(null, dates));
-        var minDate = Math.min.apply(null, data.races.map(r => new Date(r.date)));
-        var maxDate = Math.max.apply(null, data.races.map(r => new Date(r.date)));
-        if (minDate === maxDate && data.races.length > 1) {
-            latestDate.setDate(latestDate.getDate() + 1);
-        }
+        minDate = new Date(Math.min.apply(null, dates));
+        maxDate = new Date(Math.max.apply(null, dates));
+        maxDate.setDate(maxDate.getDate() + 1);
+
         var xScale = d3.scaleTime()
-            .domain([earliestDate, latestDate])
+            .domain([minDate, maxDate])
             .range([margin, chartOverallWidth - margin - legendWidth]);
         var color = d3.scaleOrdinal(d3.schemeDark2);
 
@@ -108,7 +104,6 @@ var seriesChart = (function () {
             .attr("width", chartOverallWidth)
             .attr("height", chartOverallHeight)
             .call(responsivefy);
-
 
         function getRaceName(raceId) {
             return data.races.find(r => r.id === raceId).shortName;
@@ -229,10 +224,10 @@ var seriesChart = (function () {
 
         var xAxis = d3.axisTop().scale(xScale);
         var language = d3.select("html").attr("lang").substring(0,2);
-        if (minDate === maxDate || language !== "en") {
+        if (((minDate - maxDate) < (10*24*60*60*1000)) || language !== "en") {
             xAxis = xAxis.tickFormat("");
         }
-        d3.select("#chart").append("g").attr("id", "xAxisG")
+        svgElement.append("g").attr("id", "xAxisG")
             .attr("transform", "translate(0,20)").call(xAxis);
 
         lineData = d3.line()

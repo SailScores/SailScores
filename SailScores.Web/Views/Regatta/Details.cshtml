@@ -43,7 +43,8 @@
         @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
         {
             @Html.Raw(Markdig.Markdown.ToHtml(Model.Item.Description))
-        } else
+        }
+        else
         {
             @:&nbsp;
         }
@@ -57,24 +58,24 @@
             <div class="row bg-light">
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Fleet"
-                        asp-action="Create"
-                        asp-route-regattaId="@Model.Item.Id"
-                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-                        class="btn btn-outline-primary">@localizer["New Fleet"]</a>
+                       asp-action="Create"
+                       asp-route-regattaId="@Model.Item.Id"
+                       asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                       class="btn btn-outline-primary">@localizer["New Fleet"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Competitor"
                        asp-action="Create"
                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
                        class="btn btn-outline-primary">@localizer["New Competitor"]</a>
-</div>
+                </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Race"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
                        class="btn btn-outline-primary">@localizer["New Race"]</a>
-</div>
+                </div>
             </div>
             <div class="row bg-light">
                 <div class="col-sm-4 my-2">
@@ -82,13 +83,13 @@
                        asp-action="Edit"
                        asp-route-Id="@Model.Item.Id"
                        class="btn btn-outline-primary">@localizer["Edit Regatta"]</a>
-</div>
+                </div>
                 <div class="col-sm-4">&nbsp;</div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Admin"
                        asp-action="Index"
                        class="btn btn-outline-primary">@localizer["Club Admin"]</a>
-</div>
+                </div>
             </div>
         }
     </div>
@@ -113,6 +114,13 @@
                     @localizer["Results"]
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="@($"Chart{fleet.ShortName}-tab")" data-toggle="tab"
+                   href="@($"#Chart{fleet.ShortName}")" role="tab"
+                   aria-controls="@($"Chart{fleet.ShortName}")" aria-selected="false">
+                    @localizer["Chart"]
+                </a>
+            </li>
         </ul>
         <div class="tab-content" id="@($"Tab{fleet.ShortName}Content")">
             <div class="tab-pane fade @(fleetHasResults ? "" : "show active")" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
@@ -127,16 +135,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(var comp in fleet.Competitors.OrderBy(
-                            c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
-                            .ThenBy(c => c.Name))
+                        @foreach (var comp in fleet.Competitors.OrderBy(
+                        c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
+                        .ThenBy(c => c.Name))
                         {
-                        <tr>
-                            <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
-                            <td>@comp.Name</td>
-                            <td>@comp.BoatName</td>
-                            <td>@(comp.HomeClubName ?? Model.ClubInitials)</td>
-                        </tr>
+                            <tr>
+                                <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
+                                <td>@comp.Name</td>
+                                <td>@comp.BoatName</td>
+                                <td>@(comp.HomeClubName ?? Model.ClubInitials)</td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -152,6 +160,19 @@
                     <span>@localizer["No Results posted"]</span>
                 }
             </div>
+            <div class="tab-pane fade" id="@($"Chart{fleet.ShortName}")" role="tabpanel"
+                 aria-labelledby="@($"Chart{fleet.ShortName}-tab")">
+                @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
+                {
+                    <div class="container d-none d-lg-flex">
+                         <svg id="@($"chart{fleet.ShortName}")"></svg>
+                    </div>
+                }
+                else
+                {
+                    <span>@localizer["No Results posted"]</span>
+                }
+            </div>
         </div>
     </div>
 }
@@ -159,5 +180,17 @@
 
 @section Scripts {
     <script src="~/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
+    <script src="~/js/seriesChart.js"></script>
+    <script>
 
+@foreach (var fleet in Model.Item.Fleets)
+{
+                    @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
+                {
+    @:var chart@(fleet.ShortName) = new seriesChart();
+    @:chart@(fleet.ShortName).drawChart("@Model.Item.Series.First(s => s.FleetId == fleet.Id).Id", "@($"#chart{fleet.ShortName}")");
+        }
+}
+    </script>
 }
