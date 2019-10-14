@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using System;
@@ -28,6 +29,11 @@ namespace SailScores.Web.Services
         public async Task DeleteAsync(Guid id)
         {
             await _coreSeriesService.Delete(id);
+        }
+
+        public async Task<FlatChartData> GetChartData(Guid seriesId)
+        {
+            return await _coreSeriesService.GetChartData(seriesId);
         }
 
         public async Task<IEnumerable<SeriesSummary>> GetNonRegattaSeriesSummariesAsync(string clubInitials)

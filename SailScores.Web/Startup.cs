@@ -11,6 +11,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SailScores.Core.JobQueue;
 using SailScores.Core.Mapping;
 using SailScores.Core.Services;
 using SailScores.Database;
@@ -148,7 +149,15 @@ namespace SailScores.Web
 
             RegisterSailScoresServices(services);
 
+            RegisterBackgroundQueueServices(services);
 
+
+        }
+
+        private void RegisterBackgroundQueueServices(IServiceCollection services)
+        {
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         }
 
         private void RegisterSailScoresServices(IServiceCollection services)
@@ -158,6 +167,8 @@ namespace SailScores.Web
             
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }
+
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMapper mapper)

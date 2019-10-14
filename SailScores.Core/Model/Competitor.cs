@@ -37,7 +37,6 @@ namespace SailScores.Core.Model
         public Guid BoatClassId { get; set; }
         public BoatClass BoatClass { get; set; }
         public IList<Fleet> Fleets { get; set; }
-        public IList<Score> Scores { get; set; }
 
         public override string ToString()
         {

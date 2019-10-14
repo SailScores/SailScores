@@ -4,7 +4,6 @@
   "private": true,
   "devDependencies": {
     "@types/bootstrap-select": "1.11.1",
-    "@types/dragula": "2.1.34",
     "@types/jquery": "3.3.29",
     "gulp": "4.0.0",
     "gulp-concat": "2.6.1",
@@ -25,7 +24,8 @@
     "jquery-validate": "2.0.0",
     "popper.js": "1.14.7",
     "dragula": "3.7.2",
-    "devbridge-autocomplete": "1.4.10"
+    "devbridge-autocomplete": "1.4.10",
+    "d3": "5.12.0"
   },
   "scripts": {
     "build": "webpack"

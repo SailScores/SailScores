@@ -8,14 +8,15 @@ namespace SailScores.SeleniumTests
 {
     public static class WebDriverExtensions
     {
+        private static int _basicTimeout = 20;
 
         // use: element = driver.WaitUntilVisible(By.XPath("//input[@value='Save']"));
         public static IWebElement WaitUntilVisible(
             this IWebDriver driver,
             By itemSpecifier,
-            int secondsTimeout = 10)
+            int? secondsTimeout = null)
         {
-            var wait = new WebDriverWait(driver, new TimeSpan(0, 0, secondsTimeout));
+            var wait = new WebDriverWait(driver, new TimeSpan(0, 0, secondsTimeout ?? _basicTimeout));
             var element = wait.Until<IWebElement>(driver =>
             {
                 try
@@ -43,9 +44,9 @@ namespace SailScores.SeleniumTests
         public static IWebElement WaitUntilClickable(
             this IWebDriver driver,
             By itemSpecifier,
-            int secondsTimeout = 10)
+            int? secondsTimeout = null)
         {
-            var wait = new WebDriverWait(driver, new TimeSpan(0, 0, secondsTimeout));
+            var wait = new WebDriverWait(driver, new TimeSpan(0, 0, secondsTimeout ?? _basicTimeout));
             var element = wait.Until<IWebElement>(driver =>
             {
                 try

@@ -49,17 +49,15 @@
                             </a> <span class="small"><em>&ensp;Optional</em></span>
                         </h5>
                     </div>
-
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <label>
-                                <input asp-for="IsImportantSeries" /> List as Top Series
-                            </label>
-                        </div>
-                    </div>
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
-
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input asp-for="IsImportantSeries" /> List as Top Series
+                                    </label>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label asp-for="TrendOption">Calculate Rank Trend</label>
                                 <select id="ScoringSystemId" asp-for="TrendOption" class="form-control">

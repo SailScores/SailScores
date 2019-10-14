@@ -19,7 +19,7 @@ write-host "File: "  $ZipFile.FullName
 expand-archive $ZipFile.FullName -DestinationPath $TempPath
 
 $BakFile = Get-ChildItem $TempPath *.bak | Sort-Object -Descending -Property LastWriteTimeUtc  | select -first 1
-Move-Item  $BakFile.Fullname "$UnzipPath/sailscores.bak"
+Move-Item  $BakFile.Fullname "$UnzipPath/sailscores.bak" 
 
 
 docker cp c:\Temp\sailscores.bak sssql1:/var/opt/mssql/backup/
@@ -41,3 +41,5 @@ $connection.Open()
 $command.ExecuteNonQuery()
 
 $connection.Close()
+
+Remove-Item –path "$UnzipPath/sailscores.bak"

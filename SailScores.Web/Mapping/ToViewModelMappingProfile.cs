@@ -28,7 +28,6 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.CodePointsString, o => o.MapFrom(s => s.CodePoints.HasValue ? s.CodePoints.Value.ToString("0.##") : String.Empty))
                 .ReverseMap()
                 .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)));
-
             CreateMap<Model.Fleet, FleetSummary>()
                 .ForMember(d => d.Series, o => o.Ignore());
             CreateMap<Model.Fleet, FleetWithOptionsViewModel>()
@@ -78,6 +77,11 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.FleetIds, o => o.MapFrom(s =>
                     s.Fleets.Select(c => c.Id)));
 
+            CreateMap<Model.Regatta, RegattaViewModel>();
+            CreateMap<Model.Regatta, RegattaSummaryViewModel>()
+                .ForMember(d => d.ClubInitials, o => o.Ignore())
+                .ForMember(d => d.ClubName, o => o.Ignore());
+
             CreateMap<RaceViewModel, RaceDto>()
                 .ForMember(d => d.ScoreIds, o => o.MapFrom(r => r.Scores.Select(s => s.Id)))
                 .ForMember(d => d.RegattaId, o => o.MapFrom(r => r.Regatta.Id))
@@ -87,7 +91,10 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Race, RaceViewModel>()
                 .ForMember(r => r.Regatta, o => o.Ignore());
             CreateMap<ScoreViewModel, ScoreDto>()
-                .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)));
+                .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)))
+                .ReverseMap();
+
+            CreateMap<Model.Series, SeriesSummary>();
         }
 
         private decimal? ParseDecimal(string decimalString)

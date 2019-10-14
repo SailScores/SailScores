@@ -226,16 +226,18 @@ namespace SailScores.Core.Services
             if(series == null)
             {
                 // create a new series for this fleet.
+                var seriesName = $"{dbRegatta.Season.Name} {dbRegatta.Name} {dbFleet.NickName}";
                 series = new Database.Entities.Series
                 {
                     ClubId = race.ClubId,
-                    Name = $"{dbRegatta.Season.Name} {dbRegatta.Name} {dbFleet.NickName}",
+                    Name = seriesName,
                     Season = dbRegatta.Season,
                     UpdatedDate = DateTime.UtcNow,
                     ScoringSystem = dbRegatta.ScoringSystem,
                     TrendOption = Api.Enumerations.TrendOption.PreviousRace,
                     FleetId = dbFleet.Id,
-                    RaceSeries = new List<Database.Entities.SeriesRace>()
+                    RaceSeries = new List<Database.Entities.SeriesRace>(),
+                    UrlName = UrlUtility.GetUrlName(seriesName)
                 };
                 dbRegatta.RegattaSeries.Add(new dbObj.RegattaSeries
                 {

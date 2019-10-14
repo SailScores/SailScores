@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -71,6 +71,14 @@ namespace SailScores.Web.Controllers
                 ClubInitials = clubInitials,
                 CanEdit = canEdit
             });
+        }
+
+        public async Task<JsonResult> Chart(
+            Guid seriesId)
+        {
+            var chartData = await _seriesService.GetChartData(seriesId);
+            
+            return Json(chartData);
         }
 
 

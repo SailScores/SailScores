@@ -13,7 +13,8 @@ namespace SailScores.SeleniumTests
 {
     public class Tests
     {
-
+        // private const string baseUrl = "https://localhost:44334";
+        private const string baseUrl = "https://sailscores.com";
         private SailScoresTestConfig configuration;
 
         public Tests()
@@ -28,7 +29,7 @@ namespace SailScores.SeleniumTests
             using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
 
-                driver.Navigate().GoToUrl("https://sailscores.com");
+                driver.Navigate().GoToUrl(baseUrl);
 
                 //if logged in, log out.
                 var logout = driver.FindElementsByLinkText("Log out");
@@ -40,7 +41,7 @@ namespace SailScores.SeleniumTests
                 clubSelector.SelectByText("Lake Harriet Yacht Club");
                 var currentElement = driver.WaitUntilClickable(By.PartialLinkText("LHYC"));
 
-                Assert.Equal("https://sailscores.com/LHYC", driver.Url);
+                Assert.Equal(baseUrl+"/LHYC", driver.Url);
 
                 currentElement = driver.FindElement(By.LinkText("Series"));
                 currentElement.Click();
@@ -60,7 +61,7 @@ namespace SailScores.SeleniumTests
         private void LoginAndGoToHiddenTestClub(IWebDriver driver)
         {
             //navigate to home page.
-            driver.Navigate().GoToUrl("https://sailscores.com");
+            driver.Navigate().GoToUrl(baseUrl);
 
             //log in
             driver.FindElement(By.LinkText("Log in")).Click();
@@ -69,7 +70,27 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.CssSelector("form")).Submit();
 
             // go to (hidden) test club
-            driver.Url = $"{driver.Url}/{configuration.TestClubInitials}";
+            driver.Url = UrlCombine(driver.Url, configuration.TestClubInitials);
+        }
+
+        //thank you stack overflow:
+        //https://stackoverflow.com/a/2806717/400375
+        private string UrlCombine(string url1, string url2)
+        {
+            if (url1.Length == 0)
+            {
+                return url2;
+            }
+
+            if (url2.Length == 0)
+            {
+                return url1;
+            }
+
+            url1 = url1.TrimEnd('/', '\\');
+            url2 = url2.TrimStart('/', '\\');
+
+            return string.Format("{0}/{1}", url1, url2);
         }
 
         [Fact]
@@ -78,8 +99,8 @@ namespace SailScores.SeleniumTests
             using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
                 LoginAndGoToHiddenTestClub(driver);
-                driver.FindElement(By.LinkText("Admin Page")).Click();
-                driver.FindElement(By.Id("classes")).Click();
+                driver.WaitUntilClickable(By.LinkText("Admin Page")).Click();
+                driver.WaitUntilClickable(By.Id("classes")).Click();
 
                 var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
                 createLink.Click();

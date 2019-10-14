@@ -25,10 +25,14 @@ namespace SailScores.Core.FlatModel
 
         public FlatCalculatedScore GetScore(FlatCompetitor comp, FlatRace race)
         {
+            return GetScore(comp.Id, race.Id);
+        }
+        public FlatCalculatedScore GetScore(Guid compId, Guid raceId)
+        {
             return CalculatedScores
-                .FirstOrDefault(s => s.CompetitorId == comp.Id)
+                .FirstOrDefault(s => s.CompetitorId == compId)
                 ?.Scores
-                ?.FirstOrDefault(s => s.RaceId == race.Id);
+                ?.FirstOrDefault(s => s.RaceId == raceId);
         }
     }
 }
