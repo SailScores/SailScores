@@ -114,7 +114,7 @@
                     @localizer["Results"]
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item d-none d-sm-inline-flex">
                 <a class="nav-link" id="@($"Chart{fleet.ShortName}-tab")" data-toggle="tab"
                    href="@($"#Chart{fleet.ShortName}")" role="tab"
                    aria-controls="@($"Chart{fleet.ShortName}")" aria-selected="false">
@@ -164,7 +164,7 @@
                  aria-labelledby="@($"Chart{fleet.ShortName}-tab")">
                 @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
                 {
-                    <div class="container d-none d-lg-flex">
+                    <div class="container d-none d-sm-flex">
                          <svg id="@($"chart{fleet.ShortName}")"></svg>
                     </div>
                 }
