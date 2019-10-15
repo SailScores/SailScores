@@ -122,19 +122,20 @@ namespace SailScores.Core.Services
                 .Series
                 .Where(s =>
                     s.ClubId == clubId)
-                .SingleAsync(s => s.UrlName == seriesUrlName
+                .SingleOrDefaultAsync(s => s.UrlName == seriesUrlName
                                   && s.Season.Name == seasonName);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
-            
-            var flatResults = await GetHistoricalResults(fullSeries);
-            if(flatResults == null)
+            if (fullSeries != null)
             {
-                await UpdateSeriesResults(seriesDb.Id);
-                flatResults = await GetHistoricalResults(fullSeries);
+                var flatResults = await GetHistoricalResults(fullSeries);
+                if (flatResults == null)
+                {
+                    await UpdateSeriesResults(seriesDb.Id);
+                    flatResults = await GetHistoricalResults(fullSeries);
+                }
+                fullSeries.FlatResults = flatResults;
             }
-            fullSeries.FlatResults = flatResults;
-
             return fullSeries;
         }
 

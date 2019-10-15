@@ -93,8 +93,12 @@ namespace SailScores.Core.Services
                 .Where(r =>
                     r.ClubId == clubId &&
                     r.UrlName == regattaName &&
-                    r.Season.Name == seasonName).SingleAsync()).Id;
-            return await GetRegattaAsync(regattaId);
+                    r.Season.Name == seasonName).SingleOrDefaultAsync())?.Id;
+            if(!regattaId.HasValue)
+            {
+                return null;
+            }
+            return await GetRegattaAsync(regattaId.Value);
         }
 
         public async Task<Guid> SaveNewRegattaAsync(Regatta regatta)
