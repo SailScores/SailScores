@@ -34,27 +34,38 @@ namespace SailScores.Web.Services
         {
             // cache all initials from the db.
             Dictionary<string, string> clubInitialsToLocales;
-            
+
             if (!_cache.TryGetValue(cacheKeyName, out clubInitialsToLocales))
             {
-                clubInitialsToLocales = _dbContext.Clubs
-                .ToDictionary(
-                    c => c.Initials.ToUpperInvariant(),
-                    c => c.Locale);
-                //TODO: need to test reloading the cache from db occasionally,
-                //even if it is getting frequent use.
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromSeconds(60));
-
-                // Save data in cache.
-                _cache.Set(cacheKeyName, clubInitialsToLocales, cacheEntryOptions);
-            }
-            PathString remaining;
-            foreach(var key in clubInitialsToLocales.Keys)
-            {
-                if (path.StartsWithSegments($"/{key}", StringComparison.InvariantCultureIgnoreCase))
+                try
                 {
-                    return clubInitialsToLocales[key];
+                    clubInitialsToLocales = _dbContext.Clubs
+                    .ToDictionary(
+                        c => c.Initials.ToUpperInvariant(),
+                        c => c.Locale);
+                    //TODO: need to test reloading the cache from db occasionally,
+                    //even if it is getting frequent use.
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60)
+                    };
+
+                    // Save data in cache.
+                    _cache.Set(cacheKeyName, clubInitialsToLocales, cacheEntryOptions);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // swallowing: this is a likely error on initial load.
+                }
+            }
+            if (clubInitialsToLocales != null)
+            {
+                foreach (var key in clubInitialsToLocales.Keys)
+                {
+                    if (path.StartsWithSegments($"/{key}", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return clubInitialsToLocales[key];
+                    }
                 }
             }
 

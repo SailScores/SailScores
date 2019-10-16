@@ -58,6 +58,10 @@ namespace SailScores.Web.Controllers
             ViewData["ClubInitials"] = clubInitials;
 
             var series = await _seriesService.GetSeriesAsync(clubInitials, season, seriesName);
+            if(series == null)
+            {
+                return new NotFoundResult();
+            }
             var canEdit = false;
             if (User != null && (User.Identity?.IsAuthenticated ?? false))
             {

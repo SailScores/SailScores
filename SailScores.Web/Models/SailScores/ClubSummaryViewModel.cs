@@ -65,7 +65,7 @@ namespace SailScores.Web.Models.SailScores
         public IEnumerable<RegattaSummaryViewModel> CurrentRegattas => Regattas
         ?.Where(r =>
             (r.EndDate.HasValue && r.EndDate.Value > DateTime.Today.AddDays(-14))
-            ||
+            &&
             (r.StartDate.HasValue && r.StartDate.Value < DateTime.Today.AddDays(14)))
         .OrderBy(r => r.Name);
     }

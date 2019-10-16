@@ -180,7 +180,7 @@ namespace SailScores.Web
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseStatusCodePagesWithReExecute("/error/{0}");
                 app.UseHsts();
             }
 

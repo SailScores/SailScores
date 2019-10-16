@@ -57,6 +57,10 @@ namespace SailScores.Web.Controllers
             ViewData["ClubInitials"] = clubInitials;
 
             var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
+            if(regatta == null)
+            {
+                return new NotFoundResult();
+            }
 
             var canEdit = false;
             if (User != null && (User.Identity?.IsAuthenticated ?? false))
