@@ -48,6 +48,18 @@ namespace SailScores.Web.Controllers
             var vm = _mapper.Map<AdminViewModel>(club);
             vm.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
 
+            //todo: fill in dynamically
+            vm.Tips = new List<AdminTipViewModel>
+            {
+                new AdminTipViewModel
+                {
+                    Title = "Create Season",
+                    Details = "Before creating a series, a season needs to be created.",
+                    Url = "Season/Create"
+
+                }
+            };
+
             return View(vm);
         }
 

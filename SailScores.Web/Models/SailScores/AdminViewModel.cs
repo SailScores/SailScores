@@ -36,13 +36,6 @@ namespace SailScores.Web.Models.SailScores
 
         public IList<ScoringSystem> ScoringSystemOptions { get; set; }
 
-        private DateTime recentCutoff = DateTime.Now.AddDays(-8);
-        public IEnumerable<Race> RecentRaces => Races?.Where(r => r.Date > recentCutoff);
-
-        public IEnumerable<Series> RecentSeries => Series
-                ?.Where(s =>
-                    s.Races
-                    ?.Any(r => r.Date > recentCutoff) ?? false);
-
+        public IList<AdminTipViewModel> Tips { get; set; }
     }
 }
