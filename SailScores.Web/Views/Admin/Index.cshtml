@@ -49,7 +49,21 @@
 <h2>@Model.Name</h2>
 <h3>Admin</h3>
 <hr />
-
+@if(Model.Tips != null && Model.Tips.Count > 0)
+{
+    <div class="row bg-light">
+        <div class="col-12">
+            <h4>Finish setting up this club</h4>
+            <dl class="row">
+                @foreach (var tip in Model.Tips) {
+                <dt class="col-sm-3"><span><span class="far @(tip.Completed ? "fa-check-square" : "fa-square")"></span> @tip.Title</span></dt>
+                <dd class="col-sm-9">@tip.Details</dd>
+                }
+            </dl>
+        </div>
+    </div>
+    <hr />
+}
 <div class="row">
     <div class="col-sm-4">
         <a asp-controller="Race"
