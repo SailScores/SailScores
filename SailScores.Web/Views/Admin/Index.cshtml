@@ -49,7 +49,10 @@
 <h2>@Model.Name</h2>
 <h3>Admin</h3>
 <hr />
-
+@if (Model.Tips != null)
+{
+    @await Html.PartialAsync("_AdminToDoList", Model.Tips)
+}
 <div class="row">
     <div class="col-sm-4">
         <a asp-controller="Race"
@@ -79,13 +82,15 @@
                 @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.IsHidden)
+                <label asp-for="IsHidden" class="control-label">Hidden</label>
+                <span class="small">Hide this club from the front page club list?</span>
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.IsHidden)
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.Url)
+                <label asp-for="Url" class="control-label"></label>
+                <span class="small">Link to an external website for the club</span>
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Url)

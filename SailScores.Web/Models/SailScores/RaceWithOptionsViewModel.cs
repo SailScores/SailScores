@@ -20,5 +20,7 @@ namespace SailScores.Web.Models.SailScores
         public RegattaSummaryViewModel Regatta { get; set; }
 
         public Guid? RegattaId { get; set; }
+
+        public IList<AdminToDoViewModel> Tips { get; set; }
     }
 }

@@ -1,0 +1,16 @@
+﻿@model IList<SailScores.Web.Models.SailScores.AdminToDoViewModel>
+
+@{
+    ViewBag.Title = "Create Series Error";
+    Layout = "_ClubLayout";
+}
+
+    <div class="container p-0 justify-content-between">
+        <h4>
+            Follow the steps on the
+            <a asp-controller="Admin" asp-action="Index">Admin page.</a>
+        </h4>
+        <hr />
+
+        @await Html.PartialAsync("_AdminToDoList", Model)
+    </div>

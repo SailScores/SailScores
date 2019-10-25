@@ -28,6 +28,9 @@
                                 <em>@Html.DisplayFor(modelItem => item.BoatName)</em>
                             </td>
                             <td>
+                                @(item.IsActive ? "" : "Inactive")
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Notes)
                             </td>
                             <td>

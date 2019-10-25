@@ -1,0 +1,46 @@
+﻿@using SailScores.Web.Models.SailScores
+@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
+
+@inject IStringLocalizer<SharedResource> localizer
+
+@model IList<AdminToDoViewModel>
+
+@if (Model != null && Model.Count != 0)
+{
+    <div class="row bg-light alert alert-primary">
+        <div class="col-12">
+            <h4>Finish setting up this club</h4>
+            <dl class="row">
+                @foreach (var tip in Model)
+                {
+                    <dt class="col-sm-3">
+                        <span>
+                            @if (tip.Completed)
+                            {
+                                if (@tip.Link != null)
+                                {
+                                    <span class="far fa-check-square"></span> <s><a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">@tip.Title</a></s>
+                                }
+                                else
+                                {
+                                    <span class="far fa-check-square"></span> <s>@tip.Title</s>
+                                }
+                            }
+                            else if (@tip.Link != null)
+                            {
+                                <span class="far fa-square"></span> <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">@tip.Title</a>
+                            }
+                            else
+                            {
+                                <span class="far fa-square"></span> <a href="@tip">@tip.Title</a>
+                            }
+                        </span>
+                    </dt>
+                    <dd class="col-sm-9">@tip.Details</dd>
+                }
+            </dl>
+        </div>
+    </div>
+    <hr />
+}

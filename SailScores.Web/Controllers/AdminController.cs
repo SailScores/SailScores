@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
+using CoreServices = SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
-using Services = SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
@@ -18,20 +15,23 @@ namespace SailScores.Web.Controllers
     public class AdminController : Controller
     {
 
-        private readonly IClubService _clubService;
-        private readonly IScoringService _scoringService;
+        private readonly CoreServices.IClubService _clubService;
+        private readonly CoreServices.IScoringService _scoringService;
         private readonly Services.IAuthorizationService _authService;
+        private readonly Services.IAdminTipService _tipService;
         private readonly IMapper _mapper;
 
         public AdminController(
-            IClubService clubService,
-            IScoringService scoringService,
+            CoreServices.IClubService clubService,
+            CoreServices.IScoringService scoringService,
             Services.IAuthorizationService authService,
+            Services.IAdminTipService tipService,
             IMapper mapper)
         {
             _clubService = clubService;
             _scoringService = scoringService;
             _authService = authService;
+            _tipService = tipService;
             _mapper = mapper;
         }
 
@@ -48,6 +48,7 @@ namespace SailScores.Web.Controllers
             var vm = _mapper.Map<AdminViewModel>(club);
             vm.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
 
+            _tipService.AddTips(ref vm);
             return View(vm);
         }
 

@@ -118,7 +118,7 @@ namespace SailScores.Core.Services
 
             var dbSeason = _dbContext.Clubs
                 .Include(c => c.Seasons)
-                .First(c => c.Id == race.ClubId)
+                .Single(c => c.Id == race.ClubId)
                 .Seasons
                 .SingleOrDefault(s => race.Date.HasValue
                        && s.Start <= race.Date

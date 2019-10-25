@@ -20,6 +20,7 @@ namespace SailScores.Web.Controllers
         private readonly Core.Services.IClubService _clubService;
         private readonly Services.IAuthorizationService _authService;
         private readonly IScoringService _scoringService;
+        private readonly Services.IAdminTipService _adminTipService;
         private readonly IMapper _mapper;
 
         public SeriesController(
@@ -27,12 +28,14 @@ namespace SailScores.Web.Controllers
             Core.Services.IClubService clubService,
             Services.IAuthorizationService authService,
             IScoringService scoringService,
+            Services.IAdminTipService adminTipService,
             IMapper mapper)
         {
             _seriesService = seriesService;
             _clubService = clubService;
             _authService = authService;
             _scoringService = scoringService;
+            _adminTipService = adminTipService;
             _mapper = mapper;
         }
 
@@ -101,6 +104,13 @@ namespace SailScores.Web.Controllers
                 Name = "<Use Club Default>"
             });
             vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+
+            var errors = _adminTipService.GetSeriesCreateErrors(vm);
+            if (errors != null && errors.Count > 0)
+            {
+                return View("CreateErrors", errors);
+            }
+
             return View(vm);
         }
 
