@@ -18,17 +18,20 @@ namespace SailScores.Web.Controllers
         private readonly Core.Services.IClubService _clubService;
         private readonly Web.Services.IRaceService _raceService;
         private readonly Services.IAuthorizationService _authService;
+        private readonly Services.IAdminTipService _adminTipService;
         private readonly IMapper _mapper;
 
         public RaceController(
             Core.Services.IClubService clubService,
             Web.Services.IRaceService raceService,
             Services.IAuthorizationService authService,
+            Services.IAdminTipService adminTipService,
             IMapper mapper)
         {
             _clubService = clubService;
             _raceService = raceService;
             _authService = authService;
+            _adminTipService = adminTipService;
             _mapper = mapper;
         }
 
@@ -83,8 +86,14 @@ namespace SailScores.Web.Controllers
                     clubInitials,
                     regattaId,
                     seriesId);
-
+            var errors = _adminTipService.GetRaceCreateErrors(race);
+            if(errors != null && errors.Count > 0)
+            {
+                return View("CreateErrors", errors);
+            }
+            _adminTipService.AddTips(ref race);
             return View(race);
+            
         }
 
         [HttpPost]

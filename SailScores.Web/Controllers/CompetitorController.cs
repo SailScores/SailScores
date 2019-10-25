@@ -20,16 +20,19 @@ namespace SailScores.Web.Controllers
         private readonly ICompetitorService _competitorService;
         private readonly IMapper _mapper;
         private readonly Services.IAuthorizationService _authService;
+        private readonly Services.IAdminTipService _adminTipService;
 
         public CompetitorController(
             IClubService clubService,
             ICompetitorService competitorService,
             Services.IAuthorizationService authService,
+            Services.IAdminTipService adminTipService,
             IMapper mapper)
         {
             _clubService = clubService;
             _competitorService = competitorService;
             _authService = authService;
+            _adminTipService = adminTipService;
             _mapper = mapper;
         }
 
@@ -58,6 +61,12 @@ namespace SailScores.Web.Controllers
             var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 .OrderBy(f => f.Name);
             comp.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+
+            var errors = _adminTipService.GetCompetitorCreateErrors(comp);
+            if (errors != null && errors.Count > 0)
+            {
+                return View("CreateErrors", errors);
+            }
 
             return View(comp);
         }

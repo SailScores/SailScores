@@ -36,6 +36,6 @@ namespace SailScores.Web.Models.SailScores
 
         public IList<ScoringSystem> ScoringSystemOptions { get; set; }
 
-        public IList<AdminTipViewModel> Tips { get; set; }
+        public IList<AdminToDoViewModel> Tips { get; set; }
     }
 }

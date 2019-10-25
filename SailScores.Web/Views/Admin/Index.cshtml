@@ -49,20 +49,9 @@
 <h2>@Model.Name</h2>
 <h3>Admin</h3>
 <hr />
-@if(Model.Tips != null && Model.Tips.Count > 0)
+@if (Model.Tips != null)
 {
-    <div class="row bg-light">
-        <div class="col-12">
-            <h4>Finish setting up this club</h4>
-            <dl class="row">
-                @foreach (var tip in Model.Tips) {
-                <dt class="col-sm-3"><span><span class="far @(tip.Completed ? "fa-check-square" : "fa-square")"></span> @tip.Title</span></dt>
-                <dd class="col-sm-9">@tip.Details</dd>
-                }
-            </dl>
-        </div>
-    </div>
-    <hr />
+    @await Html.PartialAsync("_AdminToDoList", Model.Tips)
 }
 <div class="row">
     <div class="col-sm-4">
@@ -93,13 +82,15 @@
                 @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.IsHidden)
+                <label asp-for="IsHidden" class="control-label">Hidden</label>
+                <span class="small">Hide this club from the front page club list?</span>
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.IsHidden)
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.Url)
+                <label asp-for="Url" class="control-label"></label>
+                <span class="small">Link to an external website for the club</span>
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Url)

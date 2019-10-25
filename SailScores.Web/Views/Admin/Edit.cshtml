@@ -63,12 +63,14 @@
             <div class="form-group">
                 <div class="checkbox">
                     <label>
-                        <input asp-for="IsHidden" /> @Html.DisplayNameFor(model => model.IsHidden)
+                        <input asp-for="IsHidden" /> Hidden
                     </label>
+                    <span class="small">Hide this club from the front page club list?</span>
                 </div>
             </div>
             <div class="form-group">
                 <label asp-for="Url" class="control-label"></label>
+                <span class="small">Link to an external website for the club</span>
                 <input asp-for="Url" class="form-control" />
                 <span asp-validation-for="Url" class="text-danger"></span>
             </div>

@@ -17,18 +17,22 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ShortName" class="control-label"></label>
-                <small>Should be unique within this club; for URLs, e.g. 2019DieHardMCs</small>
+                <small>
+                    Should not be the same as any other fleet name for this club, e.g. <i>2019DieHardMCs</i><br />
+                    Used to create URLs for regattas.
+                </small>
                 <input asp-for="ShortName" class="form-control" />
                 <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
+                <small>The full name of the fleet, with spaces, such as <i>2019 Die Hard MC Scows</i></small>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="NickName" class="control-label"></label>
-                <small>Does not need to be unique, used for display only, e.g. MC Scows</small>
+                <small>Does not need to be unique, used as a display nickname only, e.g. <i>MC Scows</i></small>
                 <input asp-for="NickName" class="form-control" />
                 <span asp-validation-for="NickName" class="text-danger"></span>
             </div>
