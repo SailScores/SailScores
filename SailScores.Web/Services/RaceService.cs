@@ -95,6 +95,7 @@ namespace SailScores.Web.Services
                 ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
                     .OrderBy(s => s.Name).ToList(),
                 CompetitorOptions = club.Competitors,
+                CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name),
                 Date = DateTime.Today
             };
             return model;
@@ -111,6 +112,7 @@ namespace SailScores.Web.Services
             model.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
             model.FleetOptions = regatta.Fleets;
             model.SeriesOptions = club.Series;
+            model.CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
             if (regatta.ScoringSystemId.HasValue)
             {
                 var scoreSystem = await _coreScoringService
@@ -154,6 +156,7 @@ namespace SailScores.Web.Services
             model.Date = DateTime.Today;
             model.FleetOptions = club.Fleets;
             model.SeriesOptions = club.Series;
+            model.CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
             model.SeriesIds = new List<Guid>
             {
                 seriesId
@@ -185,6 +188,7 @@ namespace SailScores.Web.Services
             raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
                 .OrderBy(s => s.Name).ToList();
             raceWithOptions.CompetitorOptions = club.Competitors;
+            raceWithOptions.CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
         }
 
         public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)

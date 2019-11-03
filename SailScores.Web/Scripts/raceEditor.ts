@@ -39,7 +39,31 @@ export function loadSeriesOptions() {
 export function loadFleet() {
     let clubId = ($("#clubId").val() as string);
     let fleetId = ($("#fleetId").val() as string);
+    let sel = document.getElementById('fleetId') as HTMLSelectElement;
+    let option = sel.options[sel.selectedIndex];
+    let boatClassId = option.getAttribute('data-boat-class-id');
+    if (boatClassId) {
+        $("#createCompBoatClassSelect").val(boatClassId);
+    }
+
+    $("#createCompFleetId").val(fleetId);
     getCompetitors(clubId, fleetId);
+}
+
+export function completeCompCreate() {
+    let clubId = ($("#clubId").val() as string);
+    let fleetId = ($("#fleetId").val() as string);
+    getCompetitors(clubId, fleetId);
+
+    var modal = $("#createCompetitor");
+    (<any>modal).modal("hide");
+}
+export function completeCompCreateFailed() {
+    $("#compCreateAlert").show();
+}
+
+export function hideAlert() {
+    $("#compCreateAlert").hide();
 }
 
 export function moveUp() {
