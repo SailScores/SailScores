@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
+@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 @using SailScores.Web.Extensions;
 @using System.Globalization;
 
@@ -183,6 +183,7 @@
             </div>
         </div>
     </form>
+    <hr />
 </div>
 
 <div class="modal fade" id="deleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
@@ -194,14 +195,14 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-                <form>
-                    <div class="form-group">
-                        <div class="modal-body">
-                            <p> Delete the result for <span id="competitorNameToDelete"></span>?</p>
-                        </div>
-                        <input id="compIdToDelete" type="hidden" />
-</form>
-            </div>
+            <form>
+                <div class="form-group">
+                    <div class="modal-body">
+                        <p> Delete the result for <span id="competitorNameToDelete"></span>?</p>
+                    </div>
+                    <input id="compIdToDelete" type="hidden" />
+                </div>
+            </form>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="window.SailScores.deleteResult()">Delete</button>
@@ -210,90 +211,33 @@
     </div>
 </div>
 
-<div class="modal fade" id="createCompetitor" tabindex="-1" role="dialog" aria-labelledby="createCompetitorLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createCompetitorLabel">Create competitor?</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div id="compCreateAlert" class="alert alert-danger alert-dismissible collapse" role="alert">
-                <strong>Oops.</strong> Creating the competitor failed. Are the fields all filled in?
-                <button type="button" class="close" onclick="window.SailScores.hideAlert()" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="compform"
-                  method="post" class="col-12" data-ajax="true" data-ajax-method="post"
-                  data-ajax-url="@Url.Action("Create", "Competitor")"
-                  data-ajax-loading="#compLoading"
-                  data-ajax-failure="window.SailScores.completeCompCreateFailed"
-                  data-ajax-success="window.SailScores.completeCompCreate">
-                <div class="modal-body">
+@await Html.PartialAsync("_competitorCreate", Model)
 
-                    <input type="text" name="IsActive" value="true" hidden />
-                    <input type="text" id="createCompFleetId" name="fleetIds[0]" hidden />
-                    <div class="form-group">
-                        <label class="control-label">Name <em>Required</em></label>
-                        <input name="name" type="text" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label name="sailNumber" class="control-label">Sail Number <em>Required</em></label>
-                        <input name="SailNumber" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label name="BoatClassId" class="control-label">Class <em>Required</em></label>
-                        <select id="createCompBoatClassSelect" name="BoatClassId" class="form-control">
-                            <option selected="selected">Select a class...</option>
-                            @foreach (var boatclass in Model.CompetitorBoatClassOptions)
-                            {
-                                <option value="@boatclass.Id">
-                                    @boatclass.Name
-                                </option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <span class="spinner-border spinner-border-sm" id="compLoading" role="status" aria-hidden="true" style="display:none;">
-                            <span class="sr-only">Loading...</span>
-                        </span>
-                        Add
+    @section PreFooter {
+        <footer class="footer score-entry" id="scoreButtonFooter" style="display: none;">
+            <div class="container footer-header">
+                <div class="row float-right">
+                    <button type="button" class="close" aria-label="Close"
+                            onclick="window.SailScores.hideScoreButtonFooter()">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
-@section PreFooter {
-    <footer class="footer score-entry" id="scoreButtonFooter" style="display: none;">
-        <div class="container footer-header">
-            <div class="row float-right">
-                <button type="button" class="close" aria-label="Close"
-                        onclick="window.SailScores.hideScoreButtonFooter()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
-        </div>
-        <div class="container" id="scoreButtonDiv">
-            <!-- competitor buttons go here-->
-        </div>
-    </footer>
-}
+            <div class="container" id="scoreButtonDiv">
+                <!-- competitor buttons go here-->
+            </div>
+        </footer>
+    }
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
-    <script src="~/js/raceEditor.build.js"></script>
-    <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
+        <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+        <script src="~/js/raceEditor.build.js"></script>
+        <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
 
-    <script>
+        <script>
         var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
         window.SailScores.init()
-    </script>
-}
+        </script>
+    }

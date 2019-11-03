@@ -128,7 +128,7 @@ namespace SailScores.Core.Services
                                 && f.ClubId == comp.ClubId
                                 && f.FleetType != Api.Enumerations.FleetType.AllBoatsInClub
                                 && f.FleetType != Api.Enumerations.FleetType.SelectedClasses);
-                        if (fleet != null)
+                        if (dbFleet != null)
                         {
                             dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
                             {
