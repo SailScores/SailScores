@@ -2,6 +2,7 @@ using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SailScores.Web.Models.SailScores
 {
@@ -11,6 +12,7 @@ namespace SailScores.Web.Models.SailScores
         public IList<Series> SeriesOptions { get; set; }
         public IList<ScoreCode> ScoreCodeOptions { get; set; }
         public IList<Competitor> CompetitorOptions { get; set; }
+        public IOrderedEnumerable<BoatClass> CompetitorBoatClassOptions { get; set; }
 
         public Guid FleetId { get; set; }
         public IList<Guid> SeriesIds { get; set; }

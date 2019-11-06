@@ -1,168 +1,178 @@
-﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
+@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 
 @{
     ViewBag.Title = "Create Race";
     Layout = "_ClubLayout";
 }
 
-    <div class="container p-0 justify-content-between">
-        <h4>Add a new race@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
-        <hr />
-        @if (Model.Tips != null && Model.Tips.Count != 0)
-        {
-            <div class="row bg-light alert alert-primary">
-                <div class="col-12">
-                    <dl class="row">
-                        @foreach (var tip in Model.Tips)
-                        {
-                            <dt class="col-sm-3">
-                                <span>
-                                    @if (@tip.Link != null)
-                                    {
-                                        <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">@tip.Title</a>
-                                    }
-                                    else
-                                    {
-                                        @tip.Title
-                                    }
-                                </span>
-                            </dt>
-                            <dd class="col-sm-9">@tip.Details</dd>
-                        }
-                    </dl>
-                </div>
-            </div>
-            <hr />
-        }
-        <form id="raceform" asp-action="Create"
-              asp-route-returnurl="@ViewData["ReturnUrl"]">
-            <input type="hidden" id="clubId" asp-for="ClubId" />
-            <input type="hidden" id="regattaId" asp-for="RegattaId" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input id="date" asp-for="Date" class="form-control"
-                       onchange="window.SailScores.loadSeriesOptions()" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
-                <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
-                    @if (Model.FleetOptions.Count > 1)
+<div class="container p-0 justify-content-between">
+    <h4>Add a new race@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
+    <hr />
+    @if (Model.Tips != null && Model.Tips.Count != 0)
+    {
+        <div class="row bg-light alert alert-primary">
+            <div class="col-12">
+                <dl class="row">
+                    @foreach (var tip in Model.Tips)
                     {
-                        <option selected="selected">Select a fleet...</option>
+                        <dt class="col-sm-3">
+                            <span>
+                                @if (@tip.Link != null)
+                                {
+                                    <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">@tip.Title</a>
+                                }
+                                else
+                                {
+                                    @tip.Title
+                                }
+                            </span>
+                        </dt>
+                        <dd class="col-sm-9">@tip.Details</dd>
                     }
-                    @foreach (var fleet in Model.FleetOptions)
+                </dl>
+            </div>
+        </div>
+        <hr />
+    }
+    <form id="raceform" asp-action="Create"
+          asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <input type="hidden" id="clubId" asp-for="ClubId" />
+        <input type="hidden" id="regattaId" asp-for="RegattaId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Date" class="control-label"></label>
+            <input id="date" asp-for="Date" class="form-control"
+                   onchange="window.SailScores.loadSeriesOptions()" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
+            <select id="fleetId" asp-for="FleetId" class="form-control" onchange="window.SailScores.loadFleet()">
+                @if (Model.FleetOptions.Count > 1)
+                {
+                    <option selected="selected">Select a fleet...</option>
+                }
+                @foreach (var fleet in Model.FleetOptions)
+                {
+                    @if (Model.FleetOptions.Count == 1)
                     {
-                        @if (Model.FleetOptions.Count == 1)
-                        {
-                            <option selected="selected" value="@fleet.Id">
-                                @fleet.Name
-                            </option>
-                        }
-                        else
-                        {
-                            <option value="@fleet.Id">
-                                @fleet.Name
-                            </option>
-                        }
+                        <option selected="selected" value="@fleet.Id">
+                            @fleet.Name
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@fleet.Id">
+                            @fleet.Name
+                        </option>
+                    }
+                }
+            </select>
+            <span asp-validation-for="FleetId" class="text-danger"></span>
+        </div>
+        @if (!Model.RegattaId.HasValue && Model.Regatta == null)
+        {
+            <div class="form-group">
+                <label asp-for="SeriesIds" class="control-label">Series</label>
+                <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
+                    @foreach (var series in Model.SeriesOptions)
+                    {
+                        <option value="@series.Id">
+                            @series.Name (@series.Season.Name)
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="FleetId" class="text-danger"></span>
+                <span asp-validation-for="SeriesIds" class="text-danger"></span>
             </div>
-            @if (!Model.RegattaId.HasValue && Model.Regatta == null)
-            {
-                <div class="form-group">
-                    <label asp-for="SeriesIds" class="control-label">Series</label>
-                    <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
-                        @foreach (var series in Model.SeriesOptions)
-                        {
-                            <option value="@series.Id">
-                                @series.Name (@series.Season.Name)
-                            </option>
-                        }
-                    </select>
-                    <span asp-validation-for="SeriesIds" class="text-danger"></span>
+        }
+
+        <div id="advancedFields" role="tablist">
+            <div class="card">
+                <div class="card-header" role="tab" id="advancedHeading">
+                    <h5 class="mb-0">
+                        <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                            Additional Fields
+                        </a> <span class="small"><em>&ensp;Optional</em></span>
+                    </h5>
                 </div>
-            }
 
-            <div id="advancedFields" role="tablist">
-                <div class="card">
-                    <div class="card-header" role="tab" id="advancedHeading">
-                        <h5 class="mb-0">
-                            <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
-                                Additional Fields
-                            </a> <span class="small"><em>&ensp;Optional</em></span>
-                        </h5>
+                <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
+                            <input asp-for="InitialOrder" class="form-control" />
+                            <span asp-validation-for="InitialOrder" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label">Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="State" class="control-label"></label>
+                            <select id="fleetType" asp-for="State" class="form-control"
+                                    asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
+                            <span asp-validation-for="State" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Description" class="control-label">Description</label>
+                            <input asp-for="Description" class="form-control" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="TrackingUrl" class="control-label">Tracking Url</label>
+                            <input asp-for="TrackingUrl" class="form-control" />
+                            <span asp-validation-for="TrackingUrl" class="text-danger"></span>
+                        </div>
+
                     </div>
+                </div>
+            </div>
+        </div>
+        <br />
 
-                    <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label asp-for="Order" class="control-label">Order<em>&ensp;Used for sorting after the date</em></label>
-                                <input asp-for="InitialOrder" class="form-control" />
-                                <span asp-validation-for="InitialOrder" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="Name" class="control-label">Name</label>
-                                <input asp-for="Name" class="form-control" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="State" class="control-label"></label>
-                                <select id="fleetType" asp-for="State" class="form-control"
-                                        asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
-                                <span asp-validation-for="State" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="Description" class="control-label">Description</label>
-                                <input asp-for="Description" class="form-control" />
-                                <span asp-validation-for="Description" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="TrackingUrl" class="control-label">Tracking Url</label>
-                                <input asp-for="TrackingUrl" class="form-control" />
-                                <span asp-validation-for="TrackingUrl" class="text-danger"></span>
-                            </div>
+        <div class="row">
+            <div class="col-12 col-lg-8 pb-3">
 
+                <ul class="list-group" id="results">
+                    @await Html.PartialAsync("_scoreEntryPartial", Model)
+                </ul>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-4 mb-3">
+                <div class="form-group">
+                    <label class="contorl-label h4">Add result:</label>
+                    <input id="newCompetitor" type="text" class="form-control" />
+                </div>
+            </div>
+            <div class="col-lg-2"></div>
+            <div class="col-lg-3">
+                <div class="form-group bottom-column">
+                    <div class="form-group bottom-column">
+                        <div class="">
+                            <input id="createCompButton" type="button" value="Create New Competitor" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#createCompetitor" />
                         </div>
                     </div>
                 </div>
             </div>
-            <br />
-
-            <div class="row">
-                <div class="col-12 col-lg-8 pb-3">
-
-                    <ul class="list-group" id="results">
-                        @await Html.PartialAsync("_scoreEntryPartial", Model)
-                    </ul>
-
-                </div>
+        </div>
+        <div class="row">
+            <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
+            <div class="col-md-3">
+                <input id="submitButton" type="submit" value="Create" class="btn btn-primary btn-block" disabled="disabled" />
             </div>
-            <div class="row">
-                <div class="col-12 col-lg-4 mb-3">
-                    <div class="form-group">
-                        <label class="contorl-label h4">Add result:</label>
-                        <input id="newCompetitor" type="text" class="form-control" />
-                    </div>
-                </div>
+            <div class="col-md-3">
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="races"
+                   class="btn btn-outline-primary btn-block">Cancel</a>
             </div>
-            <div class="row">
-                <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
-                <div class="col-md-3">
-                    <input id="submitButton" type="submit" value="Create" class="btn btn-primary btn-block" disabled="disabled" />
-                </div>
-                <div class="col-md-3">
-                    <a asp-controller="Admin"
-                       asp-action="Index"
-                       asp-fragment="races"
-                       class="btn btn-outline-primary btn-block">Cancel</a>
-                </div>
-            </div>
-        </form>
-        <hr />
-    </div>
+        </div>
+    </form>
+    <hr />
+</div>
 
 <div class="modal fade" id="deleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -189,6 +199,7 @@
     </div>
 </div>
 
+@await Html.PartialAsync("_competitorCreate", Model)
 
 @section PreFooter {
     <footer class="footer score-entry" id="scoreButtonFooter" style="display: none;">
