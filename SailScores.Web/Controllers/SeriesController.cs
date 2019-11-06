@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +23,7 @@ namespace SailScores.Web.Controllers
         private readonly Services.IAuthorizationService _authService;
         private readonly IScoringService _scoringService;
         private readonly Services.IAdminTipService _adminTipService;
+        private readonly ICsvService _csvService;
         private readonly IMapper _mapper;
 
         public SeriesController(
@@ -29,6 +32,7 @@ namespace SailScores.Web.Controllers
             Services.IAuthorizationService authService,
             IScoringService scoringService,
             Services.IAdminTipService adminTipService,
+            Services.ICsvService csvService,
             IMapper mapper)
         {
             _seriesService = seriesService;
@@ -36,6 +40,7 @@ namespace SailScores.Web.Controllers
             _authService = authService;
             _scoringService = scoringService;
             _adminTipService = adminTipService;
+            _csvService = csvService;
             _mapper = mapper;
         }
 
@@ -78,6 +83,40 @@ namespace SailScores.Web.Controllers
                 ClubInitials = clubInitials,
                 CanEdit = canEdit
             });
+        }
+
+        public async Task<ActionResult> ExportCsv(
+            string id)
+        {
+
+            var series = await _seriesService.GetSeriesAsync(new Guid(id));
+            if (series == null)
+            {
+                return new NotFoundResult();
+            }
+
+            var filename = series.Name.Contains(series.Season.Name) ? $"{series.Name}.csv" : $"{series.Season.Name} {series.Name}.csv";
+            var csv = _csvService.GetCsv(series);
+
+            return File(csv, "text/csv", filename);
+        }
+
+        public async Task<ActionResult> ExportHtml(
+            string id)
+        {
+            var series = await _seriesService.GetSeriesAsync(new Guid(id));
+            if (series == null)
+            {
+                return new NotFoundResult();
+            }
+            var filename = series.Name.Contains(series.Season.Name) ? series.Name : $"{series.Season.Name} {series.Name}";
+            // urlencode helps with unicode values, but replaces (valid) spaces.
+            filename = HttpUtility.UrlEncode(filename + ".html", Encoding.UTF8);
+            filename = filename.Replace("+", " ");
+            var disposition = $"attachment; filename=\"{filename}\"; filename*=UTF-8''{filename}";
+            Response.Headers.Add("content-disposition", disposition);
+
+            return View(series);
         }
 
         public async Task<JsonResult> Chart(

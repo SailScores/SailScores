@@ -54,6 +54,13 @@ namespace SailScores.Web.Services
             return series;
         }
 
+        public async Task<Series> GetSeriesAsync(Guid seriesId)
+        {
+            var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
+
+            return series;
+        }
+
         public async Task SaveNew(SeriesWithOptionsViewModel model)
         {
             var club = await _coreClubService.GetFullClub(model.ClubId);

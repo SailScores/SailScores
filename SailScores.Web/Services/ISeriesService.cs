@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ namespace SailScores.Web.Services
     {
         Task<IEnumerable<SeriesSummary>> GetNonRegattaSeriesSummariesAsync(string clubInitials);
         Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesUrlName);
+        Task<Core.Model.Series> GetSeriesAsync(Guid guid);
         Task SaveNew(SeriesWithOptionsViewModel model);
         Task Update(SeriesWithOptionsViewModel model);
         Task DeleteAsync(Guid id);
