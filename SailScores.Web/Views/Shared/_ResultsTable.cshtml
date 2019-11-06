@@ -17,7 +17,8 @@
             <thead>
                 <tr>
                     <th scope="col">@localizer["Place"]</th>
-                    @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None)
+                    @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
+                        && !((bool?)ViewData["IsExport"] ?? false))
                     {
                         <th scope="col" class="d-none d-sm-table-cell">@localizer["Change"]*</th>
                     }
@@ -44,8 +45,8 @@
                         {
                             <th class="text-center">
                                 @Html.ActionLink(
-        @race.ShortName
-        , "Details", "Race", new { id = race.Id })
+                                    @race.ShortName
+                                    , "Details", "Race", new { id = race.Id })
                             </th>
                         }
                         if (++colCount % 25 == 0 && (Model.FlatResults.NumberOfSailedRaces - colCount) > 10)
@@ -80,7 +81,8 @@
                     colCount = 0;
                 <tr>
                     <th scope="row">@Model.FlatResults.GetScore(comp)?.Rank</th>
-                    @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None)
+                    @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
+                        && !((bool?)ViewData["IsExport"] ?? false))
                     {
                         <th scope="row" class="d-none d-sm-table-cell">
                             @if (Model.FlatResults.GetScore(comp)?.Trend > 0)
@@ -102,7 +104,7 @@
                     }
                     <th scope="row">
                         @if ((Model.PreferAlternativeSailNumbers ?? false)
-                          && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber))
+                         && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber))
                         {
                             @comp.AlternativeSailNumber
                         }
@@ -113,7 +115,8 @@
                     </th>
                     <th scope="row">@comp.Name</th>
                     <td class="d-none d-sm-table-cell">@comp.BoatName</td>
-                    @if (Model.PartOfRegatta ?? false) {
+                    @if (Model.PartOfRegatta ?? false)
+                    {
                         <td class="d-none d-sm-table-cell">@comp.HomeClubName</td>
                     }
                     <td scope="row" class="text-center">
@@ -121,7 +124,7 @@
                             @String.Format("{0:0.##}", Model.FlatResults.GetScore(comp)?.TotalScore)
 
                             @if (Model.FlatResults.IsPercentSystem &&
-                   Model.FlatResults.GetScore(comp)?.TotalScore != null)
+                  Model.FlatResults.GetScore(comp)?.TotalScore != null)
                             {
                                 <br />
                                 <span class="small">
@@ -173,12 +176,36 @@
                 }
             </tbody>
         </table>
-        @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None)
-        {
-            <span class="d-none d-sm-inline">
-                * @localizer["Rank change from"] @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
-            </span>
-        }
+        <div class="row">
+            <div class="col-md-9">
+                @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
+                    && !((bool?)ViewData["IsExport"] ?? false))
+                {
+                    <span class="d-none d-sm-inline">
+                        * @localizer["Rank change from"] @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
+                    </span>
+                }
+            </div>
+            <div class="col-md-3 text-right">
+                @if(!((bool?)ViewData["IsExport"] ?? false))
+                { 
+                    <a class="btn btn-outline-secondary btn-sm"
+                       asp-action="ExportHtml"
+                       asp-controller="Series"
+                       asp-route-id="@Model.Id"
+                       title="Export as HTML">
+                        <span class="fas fa-2x fa-file-code"></span>
+                    </a>
+                    <a class="btn btn-outline-secondary btn-sm"
+                       asp-action="ExportCsv"
+                       asp-controller="Series"
+                       asp-route-id="@Model.Id"
+                       title="Export as CSV">
+                        <span class="fas fa-2x fa-file-csv"></span>
+                    </a>
+                }
+            </div>
+        </div>
     </div>
 }
 else

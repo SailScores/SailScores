@@ -15,7 +15,7 @@ namespace SailScores.Core.Services
             Guid clubId,
             DateTime? date,
             bool includeRegattaSeries);
-        Task<Model.Series> GetOneSeriesAsync(Guid guid);
+        Task<Model.Series> GetOneSeriesAsync(Guid seriesId);
         Task SaveNewSeries(Series series, Club club);
         Task SaveNewSeries(Series series);
         Task Update(Series model);

@@ -64,9 +64,21 @@ namespace SailScores.Core.Services
         {
             var seriesDb = await _dbContext
                 .Series
+                .Include(s => s.Season)
                 .FirstAsync(c => c.Id == guid);
 
-            return _mapper.Map<Series>(seriesDb);
+            var fullSeries = _mapper.Map<Series>(seriesDb);
+            if (fullSeries != null)
+            {
+                var flatResults = await GetHistoricalResults(fullSeries);
+                if (flatResults == null)
+                {
+                    await UpdateSeriesResults(seriesDb.Id);
+                    flatResults = await GetHistoricalResults(fullSeries);
+                }
+                fullSeries.FlatResults = flatResults;
+            }
+            return fullSeries;
         }
 
         public async Task UpdateSeriesResults(
