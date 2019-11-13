@@ -209,6 +209,31 @@ namespace SailScores.Web.Services
 
             return returnList;
         }
+        public IList<AdminToDoViewModel> GetMultipleCompetitorsCreateErrors(
+            MultipleCompetitorsWithOptionsViewModel vm)
+        {
+            if (vm == null)
+            {
+                return null;
+            }
+            var returnList = new List<AdminToDoViewModel>();
+            if (vm.BoatClassOptions == null
+                || vm.BoatClassOptions.Count() == 0)
+            {
+                returnList.Add(new AdminToDoViewModel
+                {
+                    Title = "Add a class",
+                    Details = "Before creating a competitor, add the types of boats that are sailed by your club.",
+                    Link = new ToDoLinkViewModel
+                    {
+                        Action = "Create",
+                        Controller = "BoatClass"
+                    },
+                    Completed = false
+                });
+            }
 
+            return returnList;
+        }
     }
 }

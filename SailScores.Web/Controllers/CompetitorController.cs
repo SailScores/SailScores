@@ -113,6 +113,76 @@ namespace SailScores.Web.Controllers
             }
         }
 
+        // GET: Competitor/CreateMultiple
+        public async Task<ActionResult> CreateMultiple(
+            string clubInitials,
+            string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            var vm = new MultipleCompetitorsWithOptionsViewModel();
+            //todo: remove getfullclub
+            var club = await _clubService.GetFullClub(clubInitials);
+            vm.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                .OrderBy(f => f.Name);
+            vm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+
+            var errors = _adminTipService.GetMultipleCompetitorsCreateErrors(vm);
+            if (errors != null && errors.Count > 0)
+            {
+                return View("CreateErrors", errors);
+            }
+
+            return View(vm);
+        }
+
+        // POST: Competitor/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateMultiple(
+            string clubInitials,
+            MultipleCompetitorsWithOptionsViewModel competitorsVm,
+            string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            try
+            {
+                var club = await _clubService.GetFullClub(clubInitials);
+                if (!await _authService.CanUserEdit(User, club.Id))
+                {
+                    return Unauthorized();
+                }
+                var coreCompetitors = new List<Core.Model.Competitor>();
+                foreach (var comp in competitorsVm.Competitors)
+                {
+                    var currentComp = _mapper.Map<Core.Model.Competitor>(comp);
+                    currentComp.ClubId = club.Id;
+                    currentComp.Fleets = new List<Fleet>();
+
+                    foreach (var fleetId in competitorsVm.FleetIds)
+                    {
+                        currentComp.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
+                    }
+                    coreCompetitors.Add(currentComp);
+                }
+
+                foreach(var comp in coreCompetitors)
+                {
+                    await _competitorService.SaveAsync(comp);
+                }
+
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+                return RedirectToAction("Index", "Admin");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
         // GET: Competitor/Edit/5
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
