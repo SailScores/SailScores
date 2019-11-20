@@ -381,8 +381,8 @@ namespace SailScores.Web.Controllers
                 // visit https://go.microsoft.com/fwlink/?LinkID=532713
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
-                await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+                await _emailSender.SendEmailAsync(model.Email, "Reset SailScores Password",
+                   $"<br/>Please reset your SailScores password by clicking here:<br/> <a href='{callbackUrl}'>{callbackUrl}</a><br/>");
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 

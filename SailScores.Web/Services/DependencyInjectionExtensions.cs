@@ -16,6 +16,7 @@ namespace SailScores.Web.Services
             services.AddScoped<IRegattaService, RegattaService>();
             services.AddScoped<IAdminTipService, AdminTipService>();
             services.AddScoped<ICsvService, CsvService>();
+            services.AddScoped<IMergeService, MergeService>();
 
         }
     }

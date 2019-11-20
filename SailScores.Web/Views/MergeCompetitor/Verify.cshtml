@@ -1,0 +1,88 @@
+﻿@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
+
+@inject IStringLocalizer<SharedResource> localizer
+
+@model SailScores.Web.Models.SailScores.MergeCompetitorViewModel
+
+@{
+    ViewData["Title"] = "Merge Competitors (3/4)";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<div class="container">
+    <h2>Merge</h2>
+    <h4>Are you sure?</h4>
+    <hr />
+    <div class="row">
+        <div class="col-12">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Step 3 of 4</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <br />
+            Verify the competitors to be merged.
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Target</h3>
+            <p>
+                This competitor will keep their results and also have the results of the Source
+                competitor. The sail number, class and other characteristics will not be changed.
+            </p>
+            <dl>
+                <dt>@localizer["Sail"]</dt>
+                <dd>@Model.TargetCompetitor.SailNumber</dd>
+                <dt>@localizer["Helm"]</dt>
+                <dd>@Model.TargetCompetitor.Name</dd>
+                <dt>Number of races (before merge)</dt>
+                <dd>@Model.TargetNumberOfRaces</dd>
+                <dt>Active Seasons</dt>
+                <dd>@string.Join(", ", Model.TargetSeasons.Select(s => s.Name))</dd>
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <h3>Source</h3>
+            <p>
+                This competitor will be removed after their results are moved to the target
+                competitor.
+            </p>
+            <dl>
+                <dt>@localizer["Sail"]</dt>
+                <dd>@Model.SourceCompetitor.SailNumber</dd>
+                <dt>@localizer["Helm"]</dt>
+                <dd>@Model.SourceCompetitor.Name</dd>
+                <dt>Number of races (before merge)</dt>
+                <dd>@Model.SourceNumberOfRaces</dd>
+                <dt>Active Seasons</dt>
+                <dd>@string.Join(", ", Model.SourceSeasons.Select(s => s.Name))</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Merge">
+                <input type="hidden" asp-for="TargetCompetitorId" />
+                <input type="hidden" asp-for="SourceCompetitorId" />
+                <div class="form-group">
+
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Merge" class="btn btn-primary my-2" />
+                    <a asp-controller="Admin"
+                       asp-action="Index"
+                       class="btn btn-outline-primary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+}
