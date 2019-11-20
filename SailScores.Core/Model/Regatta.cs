@@ -32,10 +32,12 @@ namespace SailScores.Core.Model
         
         public DateTime? UpdatedDate { get; set; }
 
+        [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
         public DateTime? StartDate { get; set; }
 
+        [Display(Name = "End Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
         public DateTime? EndDate { get; set; }
