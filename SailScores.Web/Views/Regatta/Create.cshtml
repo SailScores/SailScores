@@ -14,6 +14,14 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
+        <p>Regattas are sailing events held over a few days, unlike 
+            <a asp-controller="Series" asp-action="Create">series</a> which have recurring races. They will be shared on the front page of SailScores for a week before and
+        after their scheduled dates.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -88,9 +96,9 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
                 <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="series"
-                   class="btn btn-outline-primary">Cancel</a>
+                    asp-action="Index"
+                    asp-fragment="series"
+                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
     </div>
