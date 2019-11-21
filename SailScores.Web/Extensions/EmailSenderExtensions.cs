@@ -8,8 +8,8 @@ namespace SailScores.Web.Extensions
     {
         public static Task SendEmailConfirmationAsync(this IEmailSender emailSender, string email, string link)
         {
-            return emailSender.SendEmailAsync(email, "Confirm your email",
-                $"Please confirm your account by clicking this link: <a href='{HtmlEncoder.Default.Encode(link)}'>link</a>");
+            return emailSender.SendEmailAsync(email, "Confirm your SailScores account",
+                $"<br/>Please confirm your SailScores account by clicking this link: <br/> <a href='{HtmlEncoder.Default.Encode(link)}'>{link}</a><br/>");
         }
     }
 }

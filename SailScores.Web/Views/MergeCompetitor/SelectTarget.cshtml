@@ -1,0 +1,55 @@
+﻿@model SailScores.Web.Models.SailScores.MergeCompetitorViewModel
+
+@{
+    ViewData["Title"] = "Merge Competitors (1/4)";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Merge</h2>
+
+<h4>Choose Target</h4>
+<hr />
+<div class="row">
+    <div class="col-12">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Step 1 of 4</div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <br />
+        Choose the target competitor for the merge. The result of the merge will have all of the characteristics of this competitor: name, sail number, and class.
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Options">
+            <div class="form-group">
+                <label asp-for="TargetCompetitorId" class="control-label">Competitor <em>Required</em></label>
+                <select asp-for="TargetCompetitorId" class="form-control">
+                    <option selected="selected">Select a racer...</option>
+                    @foreach (var comp in Model.TargetCompetitorOptions)
+                    {
+                <option value="@comp.Id">
+                    @comp.Name - @comp.SailNumber @(comp.BoatClass != null ? $"( {comp.BoatClass.Name} )" : "")
+                </option>
+                    }
+                </select>
+                <span asp-validation-for="TargetCompetitorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Choose Other Competitor" class="btn btn-primary my-2" />
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+}

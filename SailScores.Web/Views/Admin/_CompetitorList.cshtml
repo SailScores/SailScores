@@ -10,9 +10,18 @@
     </div>
     <div id="collapseCompetitors" class="collapse" aria-labelledby="competitorsHeading" data-parent="#accordion">
         <div class="card-body">
-            <p>
-                @Html.ActionLink("Create", "Create", "Competitor", new { /* id=item.PrimaryKey */ })
-            </p>
+            <div class="row">
+                <div class="col-sm-6">
+                    <a class="btn btn-primary" asp-action="Create" asp-controller="Competitor">
+                        Create
+                    </a>
+                </div>
+                <div class="col-sm-6">
+                    <a class="btn btn-warning" asp-action="Options" asp-controller="MergeCompetitor">
+                        Merge Competitors
+                    </a>
+                </div>
+            </div>
             <table class="table table-not-wide">
                 <tbody>
                     @foreach (var item in Model.OrderBy(c => c.Name))

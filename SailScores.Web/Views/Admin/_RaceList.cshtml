@@ -10,7 +10,9 @@
     <div id="collapseRaces" class="collapse" aria-labelledby="racesHeading" data-parent="#accordion">
         <div class="card-body p-1 p-md-20">
             <p>
-                @Html.ActionLink("Create", "Create", "Race", new { /* id=item.PrimaryKey */ })
+                <a class="btn btn-primary" asp-action="Create" asp-controller="Race">
+                    Create
+                </a>
             </p>
             <div id="raceAccordion">
                 @foreach (var yearRaces in Model.OrderByDescending(r => r.Date)

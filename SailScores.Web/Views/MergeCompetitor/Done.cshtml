@@ -1,0 +1,38 @@
+﻿@model SailScores.Web.Models.SailScores.MergeCompetitorViewModel
+
+@{
+    ViewData["Title"] = "Merge Competitors (4/4)";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Merge</h2>
+<h4>Done</h4>
+<hr />
+<div class="row">
+    <div class="col-12">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Step 4 of 4</div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <br />
+        Merge completed.<hr />
+        @Model.TargetCompetitor.Name now has @Model.TargetNumberOfRaces races.
+        <br />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">Back To Admin</a>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+}
