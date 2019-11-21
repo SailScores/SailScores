@@ -11,7 +11,9 @@
     <div id="collapseSeries" class="collapse" aria-labelledby="seriesHeading" data-parent="#accordion">
             <div class="card-body">
                 <p>
-                    @Html.ActionLink("Create", "Create", "Series", new { /* id=item.PrimaryKey */ })
+                    <a class="btn btn-primary" asp-action="Create" asp-controller="Series">
+                        Create
+                    </a>
                 </p>
                 <table class="table table-not-wide">
                     <tbody>

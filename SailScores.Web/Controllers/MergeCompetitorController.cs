@@ -98,10 +98,10 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            var SourceCompetitor = await _competitorService.GetCompetitorAsync(vm.SourceCompetitorId.Value);
-            var TargetCompetitor = await _competitorService.GetCompetitorAsync(vm.TargetCompetitorId.Value);
-            if (SourceCompetitor.ClubId != club.Id ||
-                TargetCompetitor.ClubId != club.Id)
+            vm.SourceCompetitor = await _competitorService.GetCompetitorAsync(vm.SourceCompetitorId.Value);
+            vm.TargetCompetitor = await _competitorService.GetCompetitorAsync(vm.TargetCompetitorId.Value);
+            if (vm.SourceCompetitor.ClubId != club.Id ||
+                vm.TargetCompetitor.ClubId != club.Id)
             {
                 return Unauthorized();
             }

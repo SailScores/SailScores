@@ -19,7 +19,7 @@
 <div class="row">
     <div class="col-12">
         <br />
-        Choose the target competitor for the merge. The result of the merge will have all of the charcateristics of this competitor: name, sail number, and class.
+        Choose the target competitor for the merge. The result of the merge will have all of the characteristics of this competitor: name, sail number, and class.
     </div>
 </div>
 <div class="row">
@@ -31,16 +31,16 @@
                     <option selected="selected">Select a racer...</option>
                     @foreach (var comp in Model.TargetCompetitorOptions)
                     {
-                        <option value="@comp.Id">
-                            @comp.Name - @comp.SailNumber
-                        </option>
+                <option value="@comp.Id">
+                    @comp.Name - @comp.SailNumber @(comp.BoatClass != null ? $"( {comp.BoatClass.Name} )" : "")
+                </option>
                     }
                 </select>
                 <span asp-validation-for="TargetCompetitorId" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Merge" class="btn btn-primary my-2" />
+                <input type="submit" value="Choose Other Competitor" class="btn btn-primary my-2" />
                 <a asp-controller="Admin"
                    asp-action="Index"
                    class="btn btn-outline-primary">Cancel</a>

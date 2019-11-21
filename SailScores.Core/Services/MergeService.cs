@@ -10,6 +10,7 @@ using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
 using SailScores.Api.Dtos;
+using Microsoft.Extensions.Logging;
 
 namespace SailScores.Core.Services
 {
@@ -18,17 +19,22 @@ namespace SailScores.Core.Services
         private readonly ISailScoresContext _dbContext;
         private readonly ICompetitorService _competitorService;
         private readonly ISeriesService _seriesService;
+
+
+        private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
         public MergeService(
             ISailScoresContext dbContext,
             ICompetitorService competitorService,
             ISeriesService seriesService,
+            ILogger<IMergeService> logger,
             IMapper mapper)
         {
             _dbContext = dbContext;
             _competitorService = competitorService;
             _seriesService = seriesService;
+            _logger = logger;
             _mapper = mapper;
         }
 
@@ -73,12 +79,13 @@ namespace SailScores.Core.Services
 
         public async Task Merge(Guid targetCompetitorId, Guid sourceCompetitorId)
         {
+            _logger.LogInformation("Merging competitors {0} and {1}", targetCompetitorId, sourceCompetitorId);
             var scoresToMove = _dbContext.Scores
                 .Where(s => s.CompetitorId == sourceCompetitorId);
             var seriesIds = await scoresToMove
                 .Select(s => s.Race)
                 .SelectMany(s => s.SeriesRaces)
-                .Select(s => s.RaceId)
+                .Select(s => s.SeriesId)
                 .Distinct()
                 .ToListAsync();
 
@@ -89,7 +96,7 @@ namespace SailScores.Core.Services
 
             foreach(var seriesId in seriesIds)
             {
-                _seriesService.UpdateSeriesResults(seriesId);
+                await _seriesService.UpdateSeriesResults(seriesId);
             }
         }
 
