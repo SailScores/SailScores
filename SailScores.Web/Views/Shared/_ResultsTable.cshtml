@@ -35,19 +35,33 @@
                     {
                         if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                         {
-                            <th class="text-center d-none d-sm-table-cell">
-                                @Html.ActionLink(
-                                    @race.ShortName
-                                    , "Details", "Race", new { id = race.Id })
-                            </th>
+                <th class="text-center d-none d-sm-table-cell">
+                    @if (((bool?)ViewData["IsExport"] ?? false))
+                    {
+                        @race.ShortName
+                    }
+                    else
+                    {
+                    @Html.ActionLink(
+                                 @race.ShortName
+                                 , "Details", "Race", new { id = race.Id })
+                    }
+                </th>
                         }
                         else
                         {
-                            <th class="text-center">
-                                @Html.ActionLink(
-                                    @race.ShortName
-                                    , "Details", "Race", new { id = race.Id })
-                            </th>
+                <th class="text-center">
+                    @if (((bool?)ViewData["IsExport"] ?? false))
+                    {
+                        @race.ShortName
+                    }
+                    else
+                    {
+                        @Html.ActionLink(
+                                     @race.ShortName
+                                     , "Details", "Race", new { id = race.Id })
+                    }
+                </th>
                         }
                         if (++colCount % 25 == 0 && (Model.FlatResults.NumberOfSailedRaces - colCount) > 10)
                         {
