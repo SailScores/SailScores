@@ -1,4 +1,4 @@
-﻿
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -49,6 +49,7 @@ namespace SailScores.SeleniumTests
                 currentElement = driver.FindElement(By.CssSelector("a[href*='/2019/MC Season Champ']"));
                 currentElement.Click();
 
+                driver.WaitUntilVisible(By.CssSelector("table.table"));
                 var rows = driver.FindElements(By.CssSelector("tr"));
                 Assert.True(rows.Count > 25, "At least 25 rows expected in 2019 season champ results");
                 var headers = driver.FindElements(By.CssSelector("thead th"));
@@ -65,7 +66,7 @@ namespace SailScores.SeleniumTests
 
             //log in
             driver.FindElement(By.LinkText("Log in")).Click();
-            driver.FindElement(By.Id("Email")).SendKeys(configuration.TestEmail);
+            driver.WaitUntilClickable(By.Id("Email")).SendKeys(configuration.TestEmail);
             driver.FindElement(By.Id("Password")).SendKeys(configuration.TestPassword);
             driver.FindElement(By.CssSelector("form")).Submit();
 
