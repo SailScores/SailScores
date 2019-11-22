@@ -148,6 +148,14 @@ namespace SailScores.Web.Controllers
             try
             {
                 var club = await _clubService.GetFullClub(clubInitials);
+                if (!ModelState.IsValid)
+                {
+                    competitorsVm.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+                    var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                        .OrderBy(f => f.Name);
+                    competitorsVm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+                    return View(competitorsVm);
+                }
                 if (!await _authService.CanUserEdit(User, club.Id))
                 {
                     return Unauthorized();
