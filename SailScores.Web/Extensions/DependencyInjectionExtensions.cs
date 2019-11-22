@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SailScores.Web.Services;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Extensions
 {
     public static class DependencyInjectionExtensions
     {
@@ -17,7 +17,7 @@ namespace SailScores.Web.Services
             services.AddScoped<IAdminTipService, AdminTipService>();
             services.AddScoped<ICsvService, CsvService>();
             services.AddScoped<IMergeService, MergeService>();
-
+            services.AddScoped<IClubRequestService, ClubRequestService>();
         }
     }
 }

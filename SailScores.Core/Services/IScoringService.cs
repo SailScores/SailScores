@@ -17,5 +17,6 @@ namespace SailScores.Core.Services
         Task SaveScoringSystemAsync(ScoringSystem scorinSystem);
         Task<bool> IsScoringSystemInUseAsync(Guid id);
         Task DeleteScoringSystemAsync(Guid id);
+        Task<ScoringSystem> GetSiteDefaultSystemAsync();
     }
 }

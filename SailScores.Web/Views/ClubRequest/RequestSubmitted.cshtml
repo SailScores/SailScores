@@ -1,0 +1,28 @@
+﻿@model SailScores.Web.Models.SailScores.ClubRequestViewModel
+
+@{
+    ViewData["Title"] = "Request Submitted";
+}
+
+<h1>Request Submitted</h1>
+
+<h4>We'll send an email soon</h4>
+<hr />
+<div class="row">
+    <div class="col-12">
+        <p>If everything looks good, we'll send an email to @Model.ContactEmail once your club is set up or if we have any questions. </p>
+        <p>
+            If you don't hear from us within 48 hours, please reach out via
+            Twitter (@@SailScores) or email (<a href="mailto:info@sailscores.com">info@sailscores.com</a>
+            or <a href="mailto:jamie@widernets.com">jamie@widernets.com</a>).
+        </p>
+        <p>
+            If you haven't already, you can <a asp-controller="Account" asp-action="Register">
+                register your login information.</a> Make sure to use the contact email you provided.
+        </p>
+        <br />
+</div>
+</div>
+<div>
+    <a asp-controller="Home" asp-action="Index">Back to the home page</a>
+</div>

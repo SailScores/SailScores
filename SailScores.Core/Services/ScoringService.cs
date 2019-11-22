@@ -51,6 +51,18 @@ namespace SailScores.Core.Services
             return _mapper.Map<List<Model.ScoringSystem>>(dbObjects);
         }
 
+
+        public async Task<Model.ScoringSystem> GetSiteDefaultSystemAsync()
+        {
+            var dbObject = await _dbContext
+                .ScoringSystems
+                .Where(s => s.ClubId == null
+                && s.Name == "Appendix A Low Point For Series")
+                .Include(s => s.ScoreCodes)
+                .FirstOrDefaultAsync();
+            return _mapper.Map<Model.ScoringSystem>(dbObject);
+        }
+
         // This is a big one: returns a scoring system, including inherited ScoreCodes.
         // So all score codes that will work in this scoring system will be returned.
         public async Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId)

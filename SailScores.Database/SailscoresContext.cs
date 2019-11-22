@@ -33,6 +33,8 @@ namespace SailScores.Database
         public DbSet<HistoricalResults> HistoricalResults { get; set; }
         public DbSet<SeriesChartResults> SeriesChartResults { get; set; }
 
+        public DbSet<ClubRequest> ClubRequests { get; set; }
+
         public SailScoresContext(
             DbContextOptions<SailScoresContext> options)
             : base(options)

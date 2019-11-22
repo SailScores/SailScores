@@ -12,7 +12,8 @@ namespace SailScores.Core.Mapping
     {
         public DbToModelMappingProfile()
         {
-            CreateMap<Db.Club, Model.Club>();
+            CreateMap<Db.Club, Model.Club>()
+                .ReverseMap();
             CreateMap<Db.Competitor, Model.Competitor>()
                 .ForMember(d => d.Fleets, o => o.MapFrom(s => s.CompetitorFleets.Select(f => f.Fleet).ToList()))
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive ?? true))
@@ -59,6 +60,8 @@ namespace SailScores.Core.Mapping
                 .ReverseMap();
             CreateMap<Db.ScoreCode, Model.ScoreCode>()
                 .ForMember(d => d.ClubId, o => o.Ignore())
+                .ReverseMap();
+            CreateMap<Db.ClubRequest, Model.ClubRequest>()
                 .ReverseMap();
         }
     }

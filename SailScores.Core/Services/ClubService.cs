@@ -17,6 +17,9 @@ namespace SailScores.Core.Services
     {
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
+        
+        //used for copying club
+        private Dictionary<Guid, Guid> guidMapper;
 
         public ClubService(
             ISailScoresContext dbContext,
@@ -129,7 +132,7 @@ namespace SailScores.Core.Services
 
         }
 
-        public async Task SaveNewClub(Club club)
+        public async Task<Guid> SaveNewClub(Club club)
         {
             if(_dbContext.Clubs.Any(c => c.Initials == club.Initials))
             {
@@ -150,6 +153,7 @@ namespace SailScores.Core.Services
             };
             _dbContext.Fleets.Add(dbFleet);
             await _dbContext.SaveChangesAsync();
+            return club.Id;
         }
 
         public async Task SaveNewFleet(Fleet fleet)
@@ -183,6 +187,148 @@ namespace SailScores.Core.Services
             dbClub.Description = club.Description;
             dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Guid> CopyClubAsync(Guid copyFromClubId, Club targetClub)
+        {
+
+            var dbClub = await _dbContext.Clubs.Where(c => c.Id == copyFromClubId)
+                .AsNoTracking()
+                .Include(c => c.ScoringSystems)
+                .ThenInclude(s => s.ScoreCodes)
+                .Include(c => c.Competitors)
+                .ThenInclude(c => c.CompetitorFleets)
+                .Include(c => c.Fleets)
+                .ThenInclude(f => f.FleetBoatClasses)
+                .Include(c => c.BoatClasses)
+                .Include(c => c.Seasons)
+                .FirstAsync();
+
+            dbClub.Id = GetNewGuid(dbClub.Id);
+
+            dbClub.DefaultScoringSystem = null;
+
+            foreach (var scoringSystem in dbClub.ScoringSystems)
+            {
+                scoringSystem.Id = GetNewGuid(scoringSystem.Id);
+                scoringSystem.ClubId = dbClub.Id;
+                foreach (var scoreCode in scoringSystem.ScoreCodes)
+                {
+                    scoreCode.Id = GetNewGuid(scoreCode.Id);
+                    scoreCode.ScoringSystemId = GetNewGuid(scoreCode.ScoringSystemId);
+                }
+            }
+            // cycle through again, now that we've set all new Ids.
+            foreach (var scoringSystem in dbClub.ScoringSystems)
+            {
+                scoringSystem.ParentSystem = null;
+                // This allows that some parent systems might not be owned by this club.
+                scoringSystem.ParentSystemId = GetNewGuidIfSet(scoringSystem.ParentSystemId);
+            }
+
+            foreach (var boatClass in dbClub.BoatClasses)
+            {
+                boatClass.Id = GetNewGuid(boatClass.Id);
+                boatClass.ClubId = dbClub.Id;
+            }
+
+            foreach (var comp in dbClub.Competitors)
+            {
+                comp.Id = GetNewGuid(comp.Id);
+                comp.ClubId = dbClub.Id;
+                comp.BoatClass = null;
+                comp.BoatClassId = GetNewGuid(comp.BoatClassId);
+            }
+
+            foreach (var fleet in dbClub.Fleets)
+            {
+                fleet.Id = GetNewGuid(fleet.Id);
+                fleet.ClubId = dbClub.Id;
+                foreach(var fleetBoatClass in fleet.FleetBoatClasses)
+                {
+                    fleetBoatClass.FleetId = fleet.Id;
+                    fleetBoatClass.Fleet = null;
+                    fleetBoatClass.BoatClassId = GetNewGuid(fleetBoatClass.BoatClassId);
+                    fleetBoatClass.BoatClass = null;
+                }
+            }
+
+            // cycle through competitors a second time.
+            foreach (var comp in dbClub.Competitors)
+            {
+                foreach (var compFleet in comp.CompetitorFleets)
+                {
+                    compFleet.CompetitorId = comp.Id;
+                    compFleet.Competitor = null;
+                    compFleet.FleetId = GetNewGuid(compFleet.FleetId);
+                    compFleet.Fleet = null;
+                }
+            }
+            foreach(var season in dbClub.Seasons)
+            {
+                season.ClubId = dbClub.Id;
+                season.Id = GetNewGuid(season.Id);
+            }
+
+            dbClub.Initials = targetClub.Initials;
+            dbClub.Name = targetClub.Name;
+            dbClub.Url = targetClub.Url;
+            dbClub.IsHidden = targetClub.IsHidden;
+
+            Guid? oldDefaultScoringSystemId = null;
+            if(!(GetNewGuidIfSet(dbClub.DefaultScoringSystemId) == oldDefaultScoringSystemId))
+            {
+                oldDefaultScoringSystemId = dbClub.DefaultScoringSystemId;
+                dbClub.DefaultScoringSystemId = null;
+            }
+
+            _dbContext.Clubs.Add(dbClub);
+            await _dbContext.SaveChangesAsync();
+            if (oldDefaultScoringSystemId != null)
+            {
+                dbClub.DefaultScoringSystemId = GetNewGuidIfSet(oldDefaultScoringSystemId);
+            }
+            await _dbContext.SaveChangesAsync();
+            return dbClub.Id;
+        }
+
+        private Guid? GetNewGuid(Guid? oldGuid)
+        {
+            if (!oldGuid.HasValue)
+            {
+                return null;
+            }
+            return GetNewGuid(oldGuid.Value);
+        }
+
+        private Guid GetNewGuid(Guid oldGuid)
+        {
+            if(guidMapper == null)
+            {
+                guidMapper = new Dictionary<Guid, Guid>();
+            }
+            if (!guidMapper.ContainsKey(oldGuid))
+            {
+                guidMapper.Add(oldGuid, Guid.NewGuid());
+            }
+            return guidMapper[oldGuid];
+        }
+
+        private Guid? GetNewGuidIfSet(Guid? oldGuid)
+        {
+            if (!oldGuid.HasValue)
+            {
+                return null;
+            }
+            if (guidMapper == null)
+            {
+                guidMapper = new Dictionary<Guid, Guid>();
+            }
+            if (guidMapper.ContainsKey(oldGuid.Value))
+            {
+                return guidMapper[oldGuid.Value];
+            }
+            return oldGuid;
         }
     }
 }

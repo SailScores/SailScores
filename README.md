@@ -21,18 +21,22 @@ SailScores top priorities:
 [Appendix A][3] are currently supported, with options for custom calculations and score codes.
 - Open REST API: I have plans for rich client software which will use the existing public,
 straightforward API.
-- Free for the foreseeable future. (At some point I might ask for help covering expenses.)
+- Free for the foreseeable future.
 - On the roadmap: analytics for race and competitor data.
 
-This code supports multiple tenants, including visible and hidden clubs. There is currently
-no automatic creation of clubs, so you'll need to contact me for the initial setup.
-Enhancements and fixes are coming weekly. Some bigger features will get worked on over the 2019-2020 winter.
+This code supports multiple tenants, including visible and hidden clubs. This winter includes
+work on some bigger features and a client app.
+
+## License
 
 Licensed with Mozilla Public License Version 2.0 : You may use this software, but
 share the source for modifications that you distribute.
 
-Contributions welcome. Feedback requested: I'm trying to keep the github issues list current with features I'm working
-on; but it's nice to have help prioritizing.
+## Contributing
+
+Contributions welcome. Feedback requested: I'm trying to keep the github issues list
+current with features I'm working on; but it's nice to have help prioritizing. Even
+thumbs-ups for features you would like to see are tremendously useful.
 
 
 Sail fast...
