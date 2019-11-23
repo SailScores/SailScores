@@ -1,191 +1,235 @@
-﻿@model SailScores.Web.Models.SailScores.MultipleCompetitorsWithOptionsViewModel
+﻿@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
+@inject IStringLocalizer<SharedResource> localizer
+
+@model SailScores.Web.Models.SailScores.MultipleCompetitorsWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Create</h2>
+<div class="container">
+    <h2>Create</h2>
 
-<h4>Multiple Competitors</h4>
-<hr />
+    <h4>Multiple Competitors</h4>
+    <hr />
 
-<form asp-action="CreateMultiple"
-      asp-route-returnurl="@ViewData["ReturnUrl"]">
-    <div class="row">
-        <div class="col-md-4">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form asp-action="CreateMultiple"
+          asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <div class="row">
+            <div class="col-md-4">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="form-group">
-                <label asp-for="BoatClassId" class="control-label">Class <em>Required</em></label>
-                <select asp-for="BoatClassId" class="form-control">
-                    <option selected="selected">Select a class...</option>
-                    @foreach (var boatclass in Model.BoatClassOptions)
-                    {
-                        <option value="@boatclass.Id">
-                            @boatclass.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="BoatClassId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FleetIds" class="control-label">Fleets <span class="small muted"><i>Optional</i> If in doubt, leave empty.</span></label>
-                <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
-                    @foreach (var fleet in Model.FleetOptions)
-                    {
-                        <option value="@fleet.Id">
-                            @fleet.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="FleetIds" class="text-danger"></span>
+                <div class="form-group">
+                    <label asp-for="BoatClassId" class="control-label">Class <em>Required</em></label>
+                    <select asp-for="BoatClassId" class="form-control">
+                        <option selected="selected">Select a class...</option>
+                        @foreach (var boatclass in Model.BoatClassOptions)
+                        {
+                            <option value="@boatclass.Id">
+                                @boatclass.Name
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="BoatClassId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FleetIds" class="control-label">Fleets <span class="small muted"><i>Optional</i> If in doubt, leave empty.</span></label>
+                    <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
+                        @foreach (var fleet in Model.FleetOptions)
+                        {
+                            <option value="@fleet.Id">
+                                @fleet.Name
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="FleetIds" class="text-danger"></span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-
-            <div id="allCompetitors">
-
-                <div class="row">
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            Sail Number
+        <div class="row">
+            <div class="col-12">
+                <div id="allCompetitors">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @localizer["Sail"]
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @localizer["Helm"]
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @localizer["Boat"]
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                Home Club <span class="small muted"><i>Optional - for regattas</i></span>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            Name
+                    <div class="row" id="compRowTemplate" style="display: none">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.SailNumber" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.Name" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.BoatName" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.HomeClubName" class="form-control" />
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            Boat Name
+                    <div class="row competitor-row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].SailNumber" class="form-control"
+                                       data-column="0" data-row="0" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            Home Club <span class="small muted"><i>Optional - for regattas</i></span>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].Name" class="form-control" 
+                                       data-column="1" data-row="0" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-1">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].BoatName" class="form-control" 
+                                       data-column="2" data-row="0" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].HomeClubName" class="form-control" 
+                                       data-column="3" data-row="0" />
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="row" id="compRowTemplate" style="display: none">
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <input type="text" name="template.SailNumber" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="template.Name" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="template.BoatName" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="template.HomeClubName" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-1">
-                        <button class="btn btn-light" type="button"
-                                onclick="addNewRow()">
-                            <span class="fas fa-plus"></span>
-                        </button>
-                    </div>
+                <button class="btn btn-light" type="button"
+                        onclick="addNewRow()">
+                    <span class="fas fa-plus"></span>
+                </button>
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary my-2" />
+                    <a asp-controller="Admin"
+                       asp-action="Index"
+                       asp-fragment="competitors"
+                       class="btn btn-outline-primary">Cancel</a>
                 </div>
-                <div class="row competitor-row">
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].SailNumber" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].Name" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].BoatName" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].HomeClubName" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="col-1">
-                        <button class="btn btn-light" type="button"
-                                onclick="addNewRow()">
-                            <span class="fas fa-plus"></span>
-                        </button>
-                    </div>
-                </div>
-
-
-
 
             </div>
-
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary my-2" />
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="competitors"
-                   class="btn btn-outline-primary">Cancel</a>
-            </div>
-
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 @section Scripts {
     <script type="text/javascript">
         (function () {
-            var textbox = document.getElementById("Competitor[0].Name");
+            var allCompDiv = document.getElementsByName("competitors[0].Name")[0];
+            allCompDiv = document.getElementById('allCompetitors');
+            allCompDiv.onpaste = function (event) {
 
-            textbox.onpaste = function (event) {
-                console.error(event.clipboardData.getData('text/plain'));
-                console.error(event.clipboardData.getData('text/html'));
-                var bar = document.getElementById("bar")
-                var h = (bar.contentDocument || bar.contentWindow);
-                h = h.document || h;
-                h.body.innerHTML = event.clipboardData.getData('text/html');
+                var clipText = event.clipboardData.getData('text/plain')
+                var clipRows = clipText.split(String.fromCharCode(13));
+                for (var i=0; i<clipRows.length; i++) {
+                    clipRows[i] = clipRows[i].split(String.fromCharCode(9));
+                }
+                if (clipRows[0].length === 1) {
+                    return;
+                }
+                               
+                event.preventDefault();
+                //get starting position:
+                var startColumn = Number(event.target.dataset.column) || 0;
+                var startRow = Number(event.target.dataset.row) || 0;
+
+                // paste the array:
+                for (var i = 0; i < clipRows.length; i++) {
+                    for (var j = 0; j < clipRows[i].length; j++) {
+                        if (startColumn + j < 4) {
+                            getInputAtRowColumn(startRow + i, startColumn + j).value = clipRows[i][j];
+                        }
+                    }
+                }
+
+                event.stopPropagation();
+                event.preventDefault();
             };
         })();
-        function addNewRow() {
-            var rowCount = 0;
+
+        function getInputAtRowColumn(row, column) {
             var allCompDiv = document.getElementById("allCompetitors");
-            var compTemplate = document.getElementById("competitorTemplate");
+            var rowSelector = "[data-row=\"" + row + "\"]";
+            var rowArray = document.querySelectorAll(rowSelector);
+            if (!rowArray || rowArray.length === 0 ) {
+                if (allCompDiv.querySelectorAll(".row").length > 102) {
+                    alert("Only 100 competitors can be added at a time.");
+                    throw ("Too many rows added.");
+                }
+                addNewRow();
+                return getInputAtRowColumn(row, column);
+            }
+            var elementSelector = rowSelector + "[data-column=\"" + column + "\"]";
+            var elementArray = document.querySelectorAll(elementSelector);
+            if (!elementArray || elementArray.length < 1) {
+                    throw ("Problem finding input.");
+            }
+            return elementArray[0];
+        }
+        function addNewRow() {
+            var rowIndex = 0;
+            var allCompDiv = document.getElementById("allCompetitors");
+            var compTemplate = document.getElementById("compRowTemplate");
 
             var compListItem = (compTemplate.cloneNode(true));
-            compListItem.id = competitor.id.toString();
-            compListItem.setAttribute("data-competitorId", competitor.id.toString());
-            var span = compListItem.getElementsByClassName("competitor-name")[0];
-            span.appendChild(document.createTextNode(competitor.name));
 
-            span = compListItem.getElementsByClassName("sail-number")[0];
-            span.appendChild(document.createTextNode(competitor.sailNumber));
+            //subtract two, don't count template or header row
+            rowIndex = allCompDiv.querySelectorAll(".row").length - 2;
+            if (rowIndex < 0) rowIndex = 0;
+            var namePrefix = "competitors[" + rowIndex + "].";
 
-            span = compListItem.getElementsByClassName("race-place")[0];
-            span.appendChild(document.createTextNode(c.toString()));
+            var sail = compListItem.querySelectorAll('input[name="template.SailNumber"]')[0];
+            sail.name = namePrefix + "SailNumber";
+            sail.dataset.column = 0;
+            sail.dataset.row = rowIndex;
+
+            var name = compListItem.querySelectorAll('input[name="template.Name"]')[0];
+            name.name = namePrefix + "Name";
+            name.dataset.column = 1;
+            name.dataset.row = rowIndex;
+
+            var boat = compListItem.querySelectorAll('input[name="template.BoatName"]')[0];
+            boat.name = namePrefix + "BoatName";
+            boat.dataset.column = 2;
+            boat.dataset.row = rowIndex;
+
+            var club = compListItem.querySelectorAll('input[name="template.HomeClubName"]')[0];
+            club.name = namePrefix + "HomeClubName";
+            club.dataset.column = 3;
+            club.dataset.row = rowIndex;
 
             compListItem.style.display = "";
-            resultDiv.appendChild(compListItem);
-            calculatePlaces();
-            $('html, body').animate({
-                scrollTop: $(compListItem).offset().top - 150
-            }, 200);
+            allCompDiv.appendChild(compListItem);
 
-
-            // set focus to new row.
+            sail.focus();
         }
 
     </script>

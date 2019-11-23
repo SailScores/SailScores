@@ -163,6 +163,13 @@ namespace SailScores.Web.Controllers
                 var coreCompetitors = new List<Core.Model.Competitor>();
                 foreach (var comp in competitorsVm.Competitors)
                 {
+                    // if they didn't give a name or sail, skip this row.
+                    if(String.IsNullOrWhiteSpace(comp.Name)
+                        && String.IsNullOrWhiteSpace(comp.SailNumber)
+                        )
+                    {
+                        break;
+                    }
                     var currentComp = _mapper.Map<Core.Model.Competitor>(comp);
                     currentComp.ClubId = club.Id;
                     currentComp.Fleets = new List<Fleet>();

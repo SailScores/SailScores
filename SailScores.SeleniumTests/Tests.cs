@@ -1,4 +1,4 @@
-
+﻿
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -43,10 +43,10 @@ namespace SailScores.SeleniumTests
 
                 Assert.Equal(baseUrl+"/LHYC", driver.Url);
 
-                currentElement = driver.FindElement(By.LinkText("Series"));
+                currentElement = driver.WaitUntilClickable(By.CssSelector("a[href*='/LHYC/Series']"));
                 currentElement.Click();
 
-                currentElement = driver.FindElement(By.CssSelector("a[href*='/2019/MC Season Champ']"));
+                currentElement = driver.WaitUntilClickable(By.CssSelector("a[href*='/LHYC/2019/MC Season Champ']"));
                 currentElement.Click();
 
                 driver.WaitUntilVisible(By.CssSelector("table.table"));
