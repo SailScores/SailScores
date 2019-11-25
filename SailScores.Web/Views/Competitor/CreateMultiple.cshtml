@@ -152,7 +152,7 @@
                 for (var i=0; i<clipRows.length; i++) {
                     clipRows[i] = clipRows[i].split(String.fromCharCode(9));
                 }
-                if (clipRows[0].length === 1) {
+                if (clipRows.length === 1 && clipRows[0].length === 1) {
                     return;
                 }
                                
