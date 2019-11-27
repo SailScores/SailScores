@@ -98,6 +98,10 @@ namespace SailScores.Web.Mapping
                 .ReverseMap();
 
             CreateMap<Model.Series, SeriesSummary>();
+            CreateMap<Model.ClubRequest, ClubRequestViewModel>()
+                .ReverseMap();
+            CreateMap<Model.ClubRequest, ClubRequestWithOptionsViewModel>()
+                .ForMember(d => d.ClubOptions, o => o.Ignore());
         }
 
         private decimal? ParseDecimal(string decimalString)

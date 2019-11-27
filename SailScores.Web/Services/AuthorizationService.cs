@@ -44,5 +44,16 @@ namespace SailScores.Web.Services
                 email,
                 clubId);
         }
+
+        public async Task<bool> IsUserFullAdmin(ClaimsPrincipal user)
+        {
+            var email = user.FindFirst("sub")?.Value;
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                email = user.Identity.Name;
+            }
+            return await _userService.IsUserFullAdmin(
+                email);
+        }
     }
 }

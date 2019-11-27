@@ -23,8 +23,8 @@ namespace SailScores.Web.Services
             {
                 new AdminToDoViewModel
                 {
-                    Title = "Add a class of boat",
-                    Details = "Even if the club only sails one type of boat, you need to set up a class to use SailScores. A fleet for each class will be automatically set up.",
+                    Title = "Add classes of boats",
+                    Details = "Even if the club sails a single type of boat, set up a class to use SailScores. A fleet for each class will be automatically set up.",
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",
@@ -69,7 +69,7 @@ namespace SailScores.Web.Services
                 new AdminToDoViewModel
                 {
                     Title = "Add races",
-                    Details = "Now enter some results in a new race.",
+                    Details = "Enter some results in a new race.",
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",
