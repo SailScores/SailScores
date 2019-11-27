@@ -60,7 +60,7 @@ namespace SailScores.Web.Services
                     Details = "Before adding a race, set up the competitors.",
                     Link = new ToDoLinkViewModel
                     {
-                        Action = "Create",
+                        Action = "CreateMultiple",
                         Controller = "Competitor"
                     },
                     Completed = viewModel.Competitors.Any()
@@ -133,7 +133,7 @@ namespace SailScores.Web.Services
                     Details = "Before adding a race, set up the competitors.",
                     Link = new ToDoLinkViewModel
                     {
-                        Action = "Create",
+                        Action = "CreateMultiple",
                         Controller = "Competitor"
                     },
                     Completed = false
