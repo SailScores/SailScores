@@ -11,5 +11,6 @@ namespace SailScores.Web.Services
         IList<AdminToDoViewModel> GetSeriesCreateErrors(SeriesWithOptionsViewModel series);
         IList<AdminToDoViewModel> GetCompetitorCreateErrors(
             CompetitorWithOptionsViewModel competitor);
+        IList<AdminToDoViewModel> GetMultipleCompetitorsCreateErrors(MultipleCompetitorsWithOptionsViewModel vm);
     }
 }
