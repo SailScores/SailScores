@@ -44,7 +44,7 @@ namespace SailScores.Web.Models.SailScores
         public String Classes { get; set; }
 
         [Display(Name = "Usual discard rules", Description =
-            "Optional. What is the typical pattern of discards used by your club?")]
+            "What is the typical pattern of discards used by your club?")]
         public String TypicalDiscardRules { get; set; }
         [Display(Name = "Other Comments")]
         public String Comments { get; set; }

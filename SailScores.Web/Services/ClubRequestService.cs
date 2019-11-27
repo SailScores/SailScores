@@ -46,9 +46,16 @@ namespace SailScores.Web.Services
             coreRequest.RequestSubmitted = DateTime.Now;
             await _coreClubRequestService.Submit(coreRequest);
             var notificationEmail = _configuration["NotificationEmail"];
-            await _emailSender.SendEmailAsync(notificationEmail, "SailScores - Club Request submitted.",
-                   $"A club has been requested for {request.ClubName} by {request.ContactEmail}.");
+            try {
+                await _emailSender.SendEmailAsync(notificationEmail, "SailScores - Club Request submitted.",
+                       $"A club has been requested for {request.ClubName} by {request.ContactEmail}.");
 
+            }
+            catch (Exception)
+            {
+                // if email is not sent , should add some alert for site admins, that there are 
+                // requests to approve.
+            }
         }
 
         public async Task UpdateRequest(ClubRequestViewModel vm)
@@ -109,7 +116,8 @@ namespace SailScores.Web.Services
                     Initials = initialsToUse,
                     IsHidden = test,
                     Url = request.ClubWebsite,
-                    DefaultScoringSystem = newScoringSystem
+                    DefaultScoringSystem = newScoringSystem,
+                    Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_"+request.ClubLocation+"_")
                 };
 
                 newClubId = await _coreClubService.SaveNewClub(club);

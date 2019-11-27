@@ -24,7 +24,7 @@ namespace SailScores.Web.Services
                 new AdminToDoViewModel
                 {
                     Title = "Add classes of boats",
-                    Details = "Even if the club sails a single type of boat, set up a class to use SailScores. A fleet for each class will be automatically set up.",
+                    Details = "Even if the club sails a single type of boat, set up a class to use SailScores.",
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",

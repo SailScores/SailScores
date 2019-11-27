@@ -24,7 +24,7 @@ namespace SailScores.Web.TagHelpers
         {
             await base.ProcessAsync(context, output);
 
-            if (For.Metadata.IsRequired)
+            if (For.Metadata.IsRequired && For.Metadata.ModelType != typeof(bool))
             {
                 output.Attributes.AddCssClass(RequiredCssClass);
             }
