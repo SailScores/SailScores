@@ -141,7 +141,7 @@ function addNewCompetitor(competitor: competitorDto) {
     calculatePlaces();
     $('html, body').animate({
         scrollTop: $(compListItem).offset().top - 150
-    }, 500);
+    }, 300);
 
     $('#newCompetitor').val("");
     initializeAutoComplete();

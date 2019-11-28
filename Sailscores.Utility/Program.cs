@@ -15,6 +15,7 @@ using AutoMapper;
 using System.Threading.Tasks;
 using System.Linq;
 using SailScores.Api.Services;
+using SailScores.Core.Extensions;
 
 namespace SailScores.Utility
 {

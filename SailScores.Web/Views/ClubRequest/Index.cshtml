@@ -1,0 +1,127 @@
+﻿@model SailScores.Web.Models.SailScores.ClubRequestViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Give it a try. It's free.</h1>
+
+<h4>Interested in seeing how SailScores works?</h4>
+<hr />
+<div class="row">
+    <div class="col-12">
+        <p>
+            Fill out the form and we'll create a test club
+            for you. If you like how things are working, we can copy the competitors
+            and settings to a club visible on the front page, or you can start
+            with a clean slate.
+        </p>
+        <p>
+            Inactive clubs will be archived and removed from the site
+            periodically.  (A club is considered inactive if it hasn't had
+            any activity in a year, or if the initial setup isn't completed
+            within 2 months.)
+        </p>
+        <br />
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <form asp-action="Index">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ClubName" class="control-label"></label>
+                        <input asp-for="ClubName" class="form-control" />
+                        <span asp-validation-for="ClubName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label asp-for="ClubInitials" class="control-label"></label>
+                        <input asp-for="ClubInitials" class="form-control" />
+                        <span asp-validation-for="ClubInitials" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ClubLocation" class="control-label"></label>
+                        <input asp-for="ClubLocation" class="form-control" />
+                        <span asp-validation-for="ClubLocation" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ClubWebsite" class="control-label"></label>
+                        <input asp-for="ClubWebsite" class="form-control" />
+                        <span asp-validation-for="ClubWebsite" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ContactName" class="control-label"></label>
+                        <input asp-for="ContactName" class="form-control" />
+                        <span asp-validation-for="ContactName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ContactEmail" class="control-label"></label>
+                        <input asp-for="ContactEmail" class="form-control" />
+                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label asp-for="Classes" class="control-label mb-0"></label>
+                        <span asp-description-for="Classes" class="mt-0 form-text text-muted small" />
+                        <input asp-for="Classes" class="form-control" />
+                        <span asp-validation-for="Classes" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label asp-for="TypicalDiscardRules" class="control-label mb-0"></label>
+                        <span asp-description-for="TypicalDiscardRules" class="mt-0 form-text text-muted small" />
+                        <input asp-for="TypicalDiscardRules" class="form-control input-large" aria-describedby="TypicalDiscardRules-description" />
+                        <span asp-validation-for="TypicalDiscardRules" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label asp-for="Comments" class="control-label"></label>
+                        <textarea asp-for="Comments" class="form-control" cols="60" rows="6"></textarea>
+                        <span asp-validation-for="Comments" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <input type="submit" value="Submit" class="btn btn-primary" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Back to the main page</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

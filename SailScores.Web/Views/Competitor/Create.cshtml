@@ -1,4 +1,8 @@
-﻿@model SailScores.Web.Models.SailScores.CompetitorWithOptionsViewModel
+﻿@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
+@inject IStringLocalizer<SharedResource> localizer
+
+@model SailScores.Web.Models.SailScores.CompetitorWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -15,17 +19,17 @@
               asp-route-returnurl="@ViewData["ReturnUrl"]">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label">Name <em>Required</em></label>
+                <label asp-for="Name" class="control-label">@localizer["Helm"] <em>Required</em></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SailNumber" class="control-label">Sail Number <em>Required</em></label>
+                <label asp-for="SailNumber" class="control-label">@localizer["Sail"] <em>Required</em></label>
                 <input asp-for="SailNumber" class="form-control" />
                 <span asp-validation-for="SailNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="BoatName" class="control-label"></label>
+                <label asp-for="BoatName" class="control-label">@localizer["Boat"]</label>
                 <input asp-for="BoatName" class="form-control" />
                 <span asp-validation-for="BoatName" class="text-danger"></span>
             </div>

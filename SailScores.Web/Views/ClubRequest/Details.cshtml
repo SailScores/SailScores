@@ -1,0 +1,144 @@
+﻿@model SailScores.Web.Models.SailScores.ClubRequestWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Club Request</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            <span class="small">
+                @Html.DisplayFor(model => model.Id)
+            </span>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClubName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClubName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClubInitials)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClubInitials)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClubLocation)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClubLocation)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClubWebsite)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClubWebsite)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ContactName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ContactName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ContactEmail)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ContactEmail)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hide)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hide)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ForTesting)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ForTesting)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Classes)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Classes)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TypicalDiscardRules)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TypicalDiscardRules)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Comments)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Comments)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RequestSubmitted)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RequestSubmitted)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RequestApproved)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RequestApproved)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AdminNotes)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AdminNotes)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TestClubId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TestClubId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VisibleClubId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VisibleClubId)
+        </dd>
+    </dl>
+
+    
+    <form asp-action="CreateClub">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label class="control-label">Test / hidden ?</label>
+            <input type="checkbox" class="form-control" name="test" value="true" checked />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Copy from Club</label>
+            <select name="copyFromClubId" class="form-control">
+                <option value="@Guid.Empty">Blank</option>
+                @foreach (var club in Model.ClubOptions.OrderBy(c => c.Name))
+                {
+                    <option value="@club.Id">@club.Initials - @club.Name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+            <input type="submit" value="Create Club" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+<div>
+    <a asp-action="List">Back to List</a>
+</div>

@@ -23,8 +23,8 @@ namespace SailScores.Web.Services
             {
                 new AdminToDoViewModel
                 {
-                    Title = "Add a class of boat",
-                    Details = "Even if the club only sails one type of boat, you need to set up a class to use SailScores. A fleet for each class will be automatically set up.",
+                    Title = "Add classes of boats",
+                    Details = "Even if the club sails a single type of boat, set up a class to use SailScores.",
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",
@@ -60,7 +60,7 @@ namespace SailScores.Web.Services
                     Details = "Before adding a race, set up the competitors.",
                     Link = new ToDoLinkViewModel
                     {
-                        Action = "Create",
+                        Action = "CreateMultiple",
                         Controller = "Competitor"
                     },
                     Completed = viewModel.Competitors.Any()
@@ -69,7 +69,7 @@ namespace SailScores.Web.Services
                 new AdminToDoViewModel
                 {
                     Title = "Add races",
-                    Details = "Now enter some results in a new race.",
+                    Details = "Enter some results in a new race.",
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",
@@ -133,7 +133,7 @@ namespace SailScores.Web.Services
                     Details = "Before adding a race, set up the competitors.",
                     Link = new ToDoLinkViewModel
                     {
-                        Action = "Create",
+                        Action = "CreateMultiple",
                         Controller = "Competitor"
                     },
                     Completed = false
@@ -209,6 +209,31 @@ namespace SailScores.Web.Services
 
             return returnList;
         }
+        public IList<AdminToDoViewModel> GetMultipleCompetitorsCreateErrors(
+            MultipleCompetitorsWithOptionsViewModel vm)
+        {
+            if (vm == null)
+            {
+                return null;
+            }
+            var returnList = new List<AdminToDoViewModel>();
+            if (vm.BoatClassOptions == null
+                || vm.BoatClassOptions.Count() == 0)
+            {
+                returnList.Add(new AdminToDoViewModel
+                {
+                    Title = "Add a class",
+                    Details = "Before creating a competitor, add the types of boats that are sailed by your club.",
+                    Link = new ToDoLinkViewModel
+                    {
+                        Action = "Create",
+                        Controller = "BoatClass"
+                    },
+                    Completed = false
+                });
+            }
 
+            return returnList;
+        }
     }
 }

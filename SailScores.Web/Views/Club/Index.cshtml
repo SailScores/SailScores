@@ -39,10 +39,10 @@
 {
     <div class="row bg-light">
         <div class="col-12">
-            <h4>
+            <p>
                 Follow the steps on the
                 <a asp-controller="Admin" asp-action="Index">Admin page</a> to set up this club.
-            </h4>
+            </p>
         </div>
     </div>
 }
@@ -182,7 +182,7 @@
         </div>
         <div class="col-sm-3 my-2">
             <a asp-controller="Competitor"
-               asp-action="Create"
+               asp-action="CreateMultiple"
                asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
                class="btn btn-outline-primary">@localizer["New Competitor"]</a>
         </div>

@@ -86,7 +86,7 @@
                 <span class="small">Hide this club from the front page club list?</span>
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.IsHidden)
+                @(Model.IsHidden ? "Yes" : "No")
             </dd>
             <dt>
                 <label asp-for="Url" class="control-label"></label>

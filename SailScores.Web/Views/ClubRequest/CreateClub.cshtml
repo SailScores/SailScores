@@ -1,0 +1,56 @@
+﻿@model SailScores.Web.Models.SailScores.ClubRequestWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Club Created";
+}
+
+<h1>Club Created</h1>
+@{
+    var clubUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~")}/{Model.ClubInitials + ((Model.ForTesting ?? false) ? "TEST" : "")}";
+}
+
+<a href="@clubUrl">
+    @Model.ClubInitials - @Model.ClubName
+</a>
+
+<h3>Thanks for your interest in SailScores!</h3>
+<p>
+    A club has been set up for @Model.ClubName at: <br />
+    <a href="@clubUrl">@clubUrl</a>
+    <br />
+</p>
+@if (Model.ForTesting ?? false)
+{
+    <p>
+        This was set up as a "hidden" club. That means the club won't show up on the
+        home page of SailScores, but it is still accessible to any users that have
+        the url above.
+    </p>
+}
+
+<p>
+    If you provided a list of boat types you sail or your usual discard pattern,
+    we've set those up for you.
+</p>
+<p>
+    You can complete the club set up tasks at your admin page:
+    <a href="@clubUrl/admin/">@clubUrl/admin/</a>
+</p>
+@if (Model.ForTesting ?? false)
+{
+    <p>
+        After exploring and setting up this test club, we can copy the settings and
+        competitor list to a new visible club. Then you'll have both this test club
+        to experiment with and a club listed on the front page.
+    </p>
+}
+<p>
+    Please let us know about your experience: if there are areas of SailScores that are
+    causing you trouble, or even if you just see an opportunity for improvement, please
+    let us know. A public list of issues, bugs and feature requests is at
+    <a href="https://github.com/jbfraser1/SailScores/issues">https://github.com/jbfraser1/SailScores/issues</a> . Or feel free to email me at
+    <a href="mailto:jamie@widernets.com">jamie@widernets.com</a>
+</p>
+
+
+

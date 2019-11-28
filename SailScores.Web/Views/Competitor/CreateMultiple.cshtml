@@ -1,0 +1,183 @@
+﻿@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
+@inject IStringLocalizer<SharedResource> localizer
+
+@model SailScores.Web.Models.SailScores.MultipleCompetitorsWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<div class="container">
+    <h2>Create</h2>
+
+    <h4>Multiple Competitors</h4>
+    <hr />
+
+    <form asp-action="CreateMultiple"
+          asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <div class="row">
+            <div class="col-md-4">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="BoatClassId" class="control-label">Class <em>Required</em></label>
+                    <select asp-for="BoatClassId" class="form-control">
+                        <option selected="selected">Select a class...</option>
+                        @foreach (var boatclass in Model.BoatClassOptions)
+                        {
+                            <option value="@boatclass.Id">
+                                @boatclass.Name
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="BoatClassId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FleetIds" class="control-label">Fleets <span class="small muted"><i>Optional</i> If in doubt, leave empty.</span></label>
+                    <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
+                        @foreach (var fleet in Model.FleetOptions)
+                        {
+                            <option value="@fleet.Id">
+                                @fleet.Name
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="FleetIds" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="allCompetitors">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @localizer["Sail"]
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @localizer["Helm"]
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @localizer["Boat"]
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                Home Club <span class="small muted"><i>Optional - for regattas</i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="compRowTemplate" style="display: none">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.SailNumber" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.Name" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.BoatName" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="template.HomeClubName" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.Competitors != null && Model.Competitors.Count > 0)
+                    {
+                        for (int i = 0; i < Model.Competitors.Count; i++)
+                        {
+                            <div class="row competitor-row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[0].SailNumber" class="form-control"
+                                               data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[0].Name" class="form-control"
+                                               data-column="1" data-row="@i" value="@Model.Competitors[i].Name"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[0].BoatName" class="form-control"
+                                               data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[0].HomeClubName" class="form-control"
+                                               data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName"/>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                    <div class="row competitor-row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].SailNumber" class="form-control"
+                                       data-column="0" data-row="0" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].Name" class="form-control"
+                                       data-column="1" data-row="0" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].BoatName" class="form-control"
+                                       data-column="2" data-row="0" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" name="competitors[0].HomeClubName" class="form-control"
+                                       data-column="3" data-row="0" />
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+                <button class="btn btn-light" type="button"
+                        onclick="addNewRow()">
+                    <span class="fas fa-plus"></span>
+                </button>
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary my-2" />
+                    <a asp-controller="Admin"
+                       asp-action="Index"
+                       asp-fragment="competitors"
+                       class="btn btn-outline-primary">Cancel</a>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/createMultipleComp.js">
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+}

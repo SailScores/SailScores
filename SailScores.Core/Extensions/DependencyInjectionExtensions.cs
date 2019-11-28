@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SailScores.Core.Scoring;
 using SailScores.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SailScores.Core.Services
+namespace SailScores.Core.Extensions
 {
     public static class DependencyInjectionExtensions
     {
@@ -25,6 +22,7 @@ namespace SailScores.Core.Services
             services.AddScoped<IRegattaService, RegattaService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IScoringCalculatorFactory, ScoringCalculatorFactory>();
+            services.AddScoped<IClubRequestService, ClubRequestService>();
             services.AddScoped<IMergeService, MergeService>();
         }
     }

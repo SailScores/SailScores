@@ -11,11 +11,13 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SailScores.Core.Extensions;
 using SailScores.Core.JobQueue;
 using SailScores.Core.Mapping;
 using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Web.Data;
+using SailScores.Web.Extensions;
 using SailScores.Web.Mapping;
 using SailScores.Web.Services;
 using Swashbuckle.AspNetCore.Swagger;
@@ -198,7 +200,6 @@ namespace SailScores.Web
 
 
             app.UseRequestLocalization();
-
 
             app.UseHttpsRedirection();
             app.UseMiddleware<Datalust.SerilogMiddlewareExample.Diagnostics.SerilogMiddleware>();
