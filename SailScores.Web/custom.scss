@@ -107,17 +107,18 @@ body {
 .score-entry {
     position: fixed;
     margin-left: -15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     bottom: 0;
     width: 100%;
-    /* Set the fixed height of the footer here */
-    height: 170px;
+    height: auto;
     line-height: 40px; /* Vertically center the text there */
     background-color: #f5f5f5;
     z-index: 1;
 }
 
 .footer-header {
-    height: 40px;
+    height: 20px;
 }
 
 button.close {
@@ -130,7 +131,6 @@ svg text {
 }
 
 .bottom-column {
-    width: 90%;
     position: absolute;
     left: 5%;
     bottom: 0;
