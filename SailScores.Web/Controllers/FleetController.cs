@@ -92,6 +92,17 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = clubId;
+                if (!ModelState.IsValid)
+                {
+
+                    var vmOptions = await _fleetService.GetBlankFleetWithOptionsAsync(
+                        clubInitials,
+                        model.RegattaId);
+                    model.BoatClassOptions = vmOptions.BoatClassOptions;
+                    model.CompetitorOptions = vmOptions.CompetitorOptions;
+
+                    return View(model);
+                }
                 await _fleetService.SaveNew(model);
                 if (!string.IsNullOrWhiteSpace(returnUrl))
                 {
@@ -139,6 +150,17 @@ namespace SailScores.Web.Controllers
                     || !club.Fleets.Any(c => c.Id == model.Id))
                 {
                     return Unauthorized();
+                }
+                if (!ModelState.IsValid)
+                {
+
+                    var vmOptions = await _fleetService.GetBlankFleetWithOptionsAsync(
+                        clubInitials,
+                        model.RegattaId);
+                    model.BoatClassOptions = vmOptions.BoatClassOptions;
+                    model.CompetitorOptions = vmOptions.CompetitorOptions;
+
+                    return View(model);
                 }
                 await _fleetService.Update(model);
 

@@ -17,9 +17,13 @@ namespace SailScores.Web.Mapping
         {
             CreateMap<Model.Club, ClubSummaryViewModel>()
                 .ForMember(d => d.CanEdit, o => o.Ignore());
+
             CreateMap<Model.Club, AdminViewModel>()
                 .ForMember(d => d.ScoringSystemOptions, o => o.Ignore())
-                .ForMember(d => d.Tips, o => o.Ignore());
+                .ForMember(d => d.Tips, o => o.Ignore())
+                .ForMember(d => d.DefaultScoringSystemName, o => o.MapFrom(s => s.DefaultScoringSystem.Name))
+                .ReverseMap()
+                .ForMember(d => d.DefaultScoringSystem, o => o.Ignore());
             CreateMap<Model.Race, RaceSummaryViewModel>()
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
                 .ForMember(r => r.FleetShortName, o => o.MapFrom(s => s.Fleet.ShortName))
@@ -50,6 +54,16 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.BoatClassOptions, o => o.Ignore())
                 .ForMember(d => d.FleetOptions, o => o.Ignore())
                 .ForMember(d => d.FleetIds, o => o.MapFrom(s => s.Fleets.Select(f => f.Id)));
+
+            CreateMap<CompetitorViewModel, Model.Competitor>()
+                .ForMember(d => d.ClubId, o => o.Ignore())
+                .ForMember(d => d.AlternativeSailNumber, o => o.Ignore())
+                .ForMember(d => d.IsActive, o => o.MapFrom(s => true))
+                .ForMember(d => d.Notes, o => o.Ignore())
+                .ForMember(d => d.BoatClassId, o => o.Ignore())
+                .ForMember(d => d.BoatClass, o => o.Ignore())
+                .ForMember(d => d.Fleets, o => o.Ignore());
+
 
             CreateMap<RaceViewModel, RaceWithOptionsViewModel>()
                 .ForMember(d => d.FleetOptions, o => o.Ignore())

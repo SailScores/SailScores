@@ -37,15 +37,11 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
-                <a href="@ViewData["returnUrl"]"
+                <a  asp-action="Index" asp-controller="Admin"
                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index" asp-controller="Admin">Back to Admin</a>
 </div>
 
 @section Scripts {

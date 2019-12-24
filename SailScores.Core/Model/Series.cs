@@ -24,7 +24,6 @@ namespace SailScores.Core.Model
 
         public IList<Race> Races { get; set; }
 
-        [Required]
         public Season Season { get; set; }
 
         [NotMapped]

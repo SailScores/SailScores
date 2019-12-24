@@ -15,6 +15,7 @@ namespace SailScores.Web.Models.SailScores
         [Required]
         [StringLength(200)]
         public String Name { get; set; }
+
         [StringLength(10)]
         public String Initials { get; set; }
         public String Description { get; set; }
@@ -29,7 +30,7 @@ namespace SailScores.Web.Models.SailScores
         public IList<Race> Races { get; set; }
         public IList<Regatta> Regattas { get; set; }
 
-        public ScoringSystem DefaultScoringSystem { get; set; }
+        public string DefaultScoringSystemName { get; set; }
         public Guid? DefaultScoringSystemId { get; set; }
 
         public IList<ScoringSystem> ScoringSystems { get; set; }

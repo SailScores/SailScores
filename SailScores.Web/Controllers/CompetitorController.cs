@@ -88,7 +88,14 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 competitor.ClubId = club.Id;
-                if(competitor.Fleets == null)
+                if (!ModelState.IsValid)
+                {
+                    var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                        .OrderBy(f => f.Name);
+                    competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+                    return View(competitor);
+                }
+                if (competitor.Fleets == null)
                 {
                     competitor.Fleets = new List<Fleet>();
                 }
@@ -173,10 +180,14 @@ namespace SailScores.Web.Controllers
                     var currentComp = _mapper.Map<Core.Model.Competitor>(comp);
                     currentComp.ClubId = club.Id;
                     currentComp.Fleets = new List<Fleet>();
-
-                    foreach (var fleetId in competitorsVm.FleetIds)
+                    currentComp.BoatClassId = competitorsVm.BoatClassId;
+                    
+                    if (competitorsVm.FleetIds != null)
                     {
-                        currentComp.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
+                        foreach (var fleetId in competitorsVm.FleetIds)
+                        {
+                            currentComp.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
+                        }
                     }
                     coreCompetitors.Add(currentComp);
                 }
@@ -194,7 +205,13 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+
+                var club = await _clubService.GetFullClub(clubInitials);
+                competitorsVm.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+                var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                    .OrderBy(f => f.Name);
+                competitorsVm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+                return View(competitorsVm);
             }
         }
 
@@ -240,6 +257,14 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 var club = await _clubService.GetFullClub(competitor.ClubId);
+                if (!ModelState.IsValid)
+                {
+                    competitor.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+                    var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                        .OrderBy(f => f.Name);
+                    competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+                    return View(competitor);
+                }
                 if (competitor.Fleets == null)
                 {
                     competitor.Fleets = new List<Fleet>();

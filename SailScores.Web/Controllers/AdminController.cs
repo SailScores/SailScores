@@ -82,9 +82,17 @@ namespace SailScores.Web.Controllers
                 {
                     return Unauthorized();
                 }
+                if (!ModelState.IsValid)
+                {
+                    var club = await _clubService.GetFullClub(clubInitials);
+                    clubAdmin.Seasons = club.Seasons;
+                    clubAdmin.Races = club.Races;
+                    clubAdmin.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(clubAdmin.Id, true);
+                    return View(clubAdmin);
+                }
                 var clubObject = _mapper.Map<Club>(clubAdmin);
                 clubObject.DefaultScoringSystemId =
-                    clubAdmin.DefaultScoringSystemId ?? clubAdmin?.DefaultScoringSystem?.Id;
+                    clubAdmin.DefaultScoringSystemId;
 
                 await _clubService.UpdateClub(clubObject);
 
@@ -92,7 +100,11 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                var club = await _clubService.GetFullClub(clubInitials);
+                clubAdmin.Seasons = club.Seasons;
+                clubAdmin.Races = club.Races;
+                clubAdmin.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(clubAdmin.Id, true);
+                return View(clubAdmin);
             }
         }
 

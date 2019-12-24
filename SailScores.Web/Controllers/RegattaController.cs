@@ -99,7 +99,9 @@ namespace SailScores.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> Create(string clubInitials, RegattaWithOptionsViewModel model)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            RegattaWithOptionsViewModel model)
         {
             try
             {
@@ -109,6 +111,21 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = clubId;
+                if (!ModelState.IsValid)
+                {
+                    var club = await _clubService.GetFullClub(clubInitials);
+                    model.SeasonOptions = club.Seasons;
+                    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+                    scoringSystemOptions.Add(new ScoringSystem
+                    {
+                        Id = Guid.Empty,
+                        Name = "<Use Club Default>"
+                    });
+                    model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                    model.FleetOptions = club.Fleets;
+                    return View(model);
+                }
+                
                 var regattaId = await _regattaService.SaveNewAsync(model);
                 var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
                 return RedirectToAction("Details", new
@@ -177,8 +194,22 @@ namespace SailScores.Web.Controllers
                 {
                     return Unauthorized();
                 }
-                var regattaId = await _regattaService.UpdateAsync(model);
 
+                if (!ModelState.IsValid)
+                {
+                    model.SeasonOptions = club.Seasons;
+                    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+                    scoringSystemOptions.Add(new ScoringSystem
+                    {
+                        Id = Guid.Empty,
+                        Name = "<Use Club Default>"
+                    });
+                    model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                    model.FleetOptions = club.Fleets;
+                    return View(model);
+                }
+
+                var regattaId = await _regattaService.UpdateAsync(model);
                 var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
                 return RedirectToAction("Details", new
                 {

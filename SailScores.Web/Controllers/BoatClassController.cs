@@ -50,6 +50,10 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = club.Id;
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
                 await _classService.SaveNew(model);
 
                 return RedirectToAction("Index", "Admin");
@@ -84,6 +88,10 @@ namespace SailScores.Web.Controllers
                     || !club.BoatClasses.Any(c => c.Id == model.Id))
                 {
                     return Unauthorized();
+                }
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
                 }
                 await _classService.Update(model);
 
