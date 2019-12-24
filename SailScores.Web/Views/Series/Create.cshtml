@@ -19,11 +19,12 @@
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
-                <span class="small">
-                Consider adding the boat class to the series name if other classes might have similar series, e.g. <i>MC Holiday</i><br />
-                Don't include the season in the series name; it will be added automatically.<br />
-                Some special characters are not allowed: : / ? # [ ] @@ ! $ & ' ( ) * + , ; =</span>
                 <span asp-validation-for="Name" class="text-danger"></span>
+                <span class="small">
+                    Consider adding the boat class to the series name if other classes might have similar series, e.g. <i>MC Holiday</i><br />
+                    Don't include the season in the series name; it will be added automatically.
+                </span>
+
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>

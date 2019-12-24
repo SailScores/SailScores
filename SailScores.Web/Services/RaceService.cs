@@ -252,7 +252,7 @@ namespace SailScores.Web.Services
                     var maxOrder = club.Races
                         .Where(r =>
                             r.Date == race.Date
-                            && r.Fleet.Id == race.FleetId)
+                            && (r.Fleet != null && r.Fleet.Id == race.FleetId))
                         .DefaultIfEmpty()
                         .Max(r => r?.Order ?? 0);
                     race.Order = maxOrder + 1;

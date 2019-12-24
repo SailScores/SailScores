@@ -49,6 +49,10 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = club.Id;
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
                 await _seasonService.SaveNew(model);
 
                 return RedirectToAction("Index", "Admin");
@@ -87,6 +91,10 @@ namespace SailScores.Web.Controllers
                     || !club.Seasons.Any(c => c.Id == model.Id))
                 {
                     return Unauthorized();
+                }
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
                 }
                 await _seasonService.Update(model);
 

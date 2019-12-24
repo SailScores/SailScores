@@ -122,7 +122,15 @@ namespace SailScores.Web.Services
 
                 newClubId = await _coreClubService.SaveNewClub(club);
 
-                request.VisibleClubId = newClubId;
+                if(test)
+                {
+                    request.TestClubId = newClubId;
+
+                }
+                else
+                {
+                    request.VisibleClubId = newClubId;
+                }
                 request.RequestApproved = request.RequestApproved ?? DateTime.UtcNow;
                 await _coreClubRequestService.UpdateRequest(request);
             }

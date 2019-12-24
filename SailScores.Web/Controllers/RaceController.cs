@@ -107,6 +107,20 @@ namespace SailScores.Web.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    RaceWithOptionsViewModel raceOptions =
+                        await _raceService.GetBlankRaceWithOptions(
+                            clubInitials,
+                            race.RegattaId,
+                            race.SeriesIds?.FirstOrDefault());
+                    race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
+                    race.FleetOptions = raceOptions.FleetOptions;
+                    race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
+                    race.CompetitorOptions = raceOptions.CompetitorOptions;
+                    race.SeriesOptions = raceOptions.SeriesOptions;
+                    return View(race);
+                }
                 var clubId = await _clubService.GetClubId(clubInitials);
                 if (!await _authService.CanUserEdit(User, clubId))
                 {
@@ -148,6 +162,7 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
+
             var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
             await _raceService.AddOptionsToRace(raceWithOptions);
@@ -159,16 +174,36 @@ namespace SailScores.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
+            string clubInitials,
             Guid id,
             RaceWithOptionsViewModel race,
             string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            ViewData["ClubInitials"] = clubInitials;
             try
             {
                 if (!await _authService.CanUserEdit(User, race.ClubId))
                 {
                     return Unauthorized();
+                }
+                if (!ModelState.IsValid)
+                {
+                    RaceWithOptionsViewModel raceOptions =
+                        await _raceService.GetBlankRaceWithOptions(
+                            clubInitials,
+                            race.RegattaId,
+                            race.SeriesIds?.FirstOrDefault());
+                    race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
+                    race.FleetOptions = raceOptions.FleetOptions;
+                    race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
+                    race.CompetitorOptions = raceOptions.CompetitorOptions;
+                    race.SeriesOptions = raceOptions.SeriesOptions;
+                    foreach(var score in race.Scores)
+                    {
+                        score.Competitor = raceOptions.CompetitorOptions.First(c => c.Id == score.CompetitorId);
+                    }
+                    return View(race);
                 }
                 await _raceService.SaveAsync(race);
 

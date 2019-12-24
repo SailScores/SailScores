@@ -166,6 +166,20 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = clubId;
+
+                if (!ModelState.IsValid)
+                {
+                    var club = await _clubService.GetFullClub(clubInitials);
+                    model.SeasonOptions = club.Seasons;
+                    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+                    scoringSystemOptions.Add(new ScoringSystem
+                    {
+                        Id = Guid.Empty,
+                        Name = "<Use Club Default>"
+                    });
+                    model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                    return View(model);
+                }
                 await _seriesService.SaveNew(model);
 
                 return RedirectToAction("Index", "Admin");
@@ -225,6 +239,19 @@ namespace SailScores.Web.Controllers
                     || !club.Series.Any(c => c.Id == model.Id))
                 {
                     return Unauthorized();
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    model.SeasonOptions = club.Seasons;
+                    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+                    scoringSystemOptions.Add(new ScoringSystem
+                    {
+                        Id = Guid.Empty,
+                        Name = "<Use Club Default>"
+                    });
+                    model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                    return View(model);
                 }
                 await _seriesService.Update(model);
 

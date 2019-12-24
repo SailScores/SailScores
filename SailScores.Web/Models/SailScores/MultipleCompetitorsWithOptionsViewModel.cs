@@ -14,7 +14,7 @@ namespace SailScores.Web.Models.SailScores
 
         [Required]
         [Display(Name="Boat Class")]
-        public Guid? BoatClassId { get; set; }
+        public Guid BoatClassId { get; set; }
         public IList<FleetSummary> FleetOptions { get; set; }
 
         public IList<Guid> FleetIds { get; set; }

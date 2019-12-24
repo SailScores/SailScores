@@ -63,9 +63,15 @@ namespace SailScores.Web.Controllers
             }
             model.ClubId = clubId;
             model.Id = Guid.NewGuid();
+            if (!ModelState.IsValid)
+            {
+                var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
+                model.ParentSystemOptions = potentialParents.ToList();
+                return View(model);
+            }
 
             await _scoringService.SaveScoringSystemAsync(
-                _mapper.Map<ScoringSystem>(model));
+            _mapper.Map<ScoringSystem>(model));
 
            return RedirectToAction("Edit", "ScoringSystem", new { id = model.Id });
         }
@@ -103,7 +109,16 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
+            if (!ModelState.IsValid)
+            {
+                var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
+                model.ParentSystemOptions = potentialParents.ToList();
 
+                var scoringSystem = await _scoringService.GetScoringSystemAsync(model.Id);
+                model.ScoreCodes = scoringSystem.ScoreCodes;
+                model.InheritedScoreCodes = scoringSystem.InheritedScoreCodes;
+                return View(model);
+            }
             var system = _mapper.Map<ScoringSystem>(model);
             await _scoringService.SaveScoringSystemAsync(system);
             
