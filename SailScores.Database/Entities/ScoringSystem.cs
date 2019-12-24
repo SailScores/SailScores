@@ -8,7 +8,9 @@ namespace SailScores.Database.Entities
     public class ScoringSystem
     {
         public Guid Id { get; set; }
-        public Guid? ClubId { get; set; }
+        public Guid? OwningClubId { get; set; }
+
+        public IList<Club> DefaultForClubs { get; set; }
 
         public Guid? ParentSystemId { get; set; }
 

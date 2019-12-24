@@ -211,7 +211,7 @@ namespace SailScores.Core.Services
             foreach (var scoringSystem in dbClub.ScoringSystems)
             {
                 scoringSystem.Id = GetNewGuid(scoringSystem.Id);
-                scoringSystem.ClubId = dbClub.Id;
+                scoringSystem.OwningClubId = dbClub.Id;
                 foreach (var scoreCode in scoringSystem.ScoreCodes)
                 {
                     scoreCode.Id = GetNewGuid(scoreCode.Id);
