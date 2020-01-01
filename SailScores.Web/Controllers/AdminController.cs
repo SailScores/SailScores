@@ -99,7 +99,7 @@ namespace SailScores.Web.Controllers
                 }
                 var clubObject = _mapper.Map<Club>(clubAdmin);
                 clubObject.DefaultScoringSystemId =
-                    clubAdmin.DefaultScoringSystemId ?? clubAdmin?.DefaultScoringSystem?.Id;
+                    clubAdmin.DefaultScoringSystemId;
                 clubObject.WeatherSettings = new WeatherSettings
                 {
                     Latitude = clubAdmin.Latitude,
