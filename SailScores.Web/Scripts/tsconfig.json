@@ -14,11 +14,12 @@
       "dom"
     ]
   },
-    "files": [
-      "./guid.ts",
-      "./raceEditor.ts",
-      "./interfaces/CompetitorDto.cs.d.ts",
-      "./jquery.autocomplete.d.ts",
-      "./bootstrap-select.d.ts"
-    ]
+  "files": [
+    "./guid.ts",
+    "./raceEditor.ts",
+    "./interfaces/CompetitorDto.cs.d.ts",
+    "./jquery.autocomplete.d.ts",
+    "./bootstrap-select.d.ts"
+  ],
+  "compileOnSave": true
   }

@@ -67,42 +67,39 @@
 </div>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <dl class="dl-horizontal">
-            <dt>
-                @Html.DisplayNameFor(model => model.Initials)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Initials)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-            <dd>
+    <div class="col-lg-6">
+        <div class="row">
+            <div class="col-4 col-md-2">
+                <i>@Html.DisplayNameFor(model => model.Initials)</i>
+            </div>
+            <div class="col-8 col-md-10">
+                <strong>@Html.DisplayFor(model => model.Initials)</strong>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <i>@Html.DisplayNameFor(model => model.Description)</i>
+            </div>
+            <div class="col-md-10">
                 @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
-            </dd>
-            <dt>
-                <label asp-for="IsHidden" class="control-label">Hidden</label>
-                <span class="small">Hide this club from the front page club list?</span>
-            </dt>
-            <dd>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4 col-md-2">
+                <label asp-for="IsHidden" class="control-label"><i>Hidden</i></label>
+            </div>
+            <div class="col-8 col-md-10">
                 @(Model.IsHidden ? "Yes" : "No")
-            </dd>
-            <dt>
-                <label asp-for="Url" class="control-label"></label>
-                <span class="small">Link to an external website for the club</span>
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Url)
-            </dd>
-            <dt>
-                <label asp-for="DefaultScoringSystemName">Default Scoring System</label>
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.DefaultScoringSystemName)
-            </dd>
-        </dl>
-
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label asp-for="DefaultScoringSystem"><i>Default Scoring System:</i></label>
+                @Html.DisplayFor(model => model.DefaultScoringSystem.Name)
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
     </div>
 </div>
 <div id="accordion">
@@ -114,7 +111,6 @@
     @await Html.PartialAsync("_RaceList", Model.Races)
     @await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
     @await Html.PartialAsync("_RegattaList", Model.Regattas)
-
 </div>
 
 @section Scripts {

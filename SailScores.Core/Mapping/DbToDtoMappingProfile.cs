@@ -20,6 +20,11 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.CompetitorFleets, o => o.Ignore())
                 .ForMember(d => d.Scores, o => o.Ignore());
 
+
+            CreateMap<Dto.WeatherDto, Db.Weather>()
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.CreatedDate, o => o.Ignore());
+
         }
     }
 }

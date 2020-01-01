@@ -17,6 +17,7 @@ namespace SailScores.Core.Services
     {
         private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
         private readonly IScoringService _scoringService;
+        private readonly IConversionService _converter;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
@@ -24,12 +25,14 @@ namespace SailScores.Core.Services
         public SeriesService(
             IScoringCalculatorFactory scoringCalculatorFactory,
             IScoringService scoringService,
+            IConversionService converter,
             IDbObjectBuilder dbObjBuilder,
             ISailScoresContext dbContext,
             IMapper mapper)
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
             _scoringService = scoringService;
+            _converter = converter;
             _dbObjectBuilder = dbObjBuilder;
             _dbContext = dbContext;
             _mapper = mapper;
@@ -86,6 +89,9 @@ namespace SailScores.Core.Services
         {
             var dbSeries = await _dbContext
                 .Series
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Weather)
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
                         .ThenInclude(r => r.Scores)
@@ -151,6 +157,31 @@ namespace SailScores.Core.Services
             return fullSeries;
         }
 
+        private async Task LocalizeFlatResults(FlatResults flatResults, Guid clubId)
+        {
+            var settings = await _dbContext.Clubs
+                .Where(c =>
+                   c.Id == clubId
+                ).Select(c => c.WeatherSettings).SingleOrDefaultAsync();
+            if(settings == null)
+            {
+                return;
+            }
+            foreach(var race in flatResults.Races)
+            {
+                race.WindSpeed = 
+                    _converter.Convert(
+                     race.WindSpeedMeterPerSecond,
+                     _converter.MeterPerSecond,
+                     settings?.WindSpeedUnits)?.ToString("N0");
+                race.WindGust =
+                     _converter.Convert(
+                         race.WindSpeedMeterPerSecond,
+                         _converter.MeterPerSecond,
+                         settings?.WindSpeedUnits)?.ToString("N0");
+            }
+        }
+
         private async Task SaveHistoricalResults(Series series)
         {
             DateTime currentDate = DateTime.Today;
@@ -191,11 +222,12 @@ namespace SailScores.Core.Services
                     (series.Results.Results[c].Rank ?? int.MaxValue)
                     : (int.MaxValue))
                 .ToList();
+            var races = FlattenRaces(series);
             var flatResults = new FlatResults
             {
                 SeriesId = series.Id,
                 Competitors = FlattenCompetitors(series),
-                Races = FlattenRaces(series),
+                Races = races,
                 CalculatedScores = FlattenSeriesScores(series),
                 NumberOfDiscards = series.Results.NumberOfDiscards,
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),
@@ -236,7 +268,7 @@ namespace SailScores.Core.Services
 
         private IEnumerable<FlatRace> FlattenRaces(Series series)
         {
-            return series.Races
+            var flatRaces = series.Races
                 .OrderBy(r => r.Date)
                 .ThenBy(r => r.Order)
                 .Select(r =>
@@ -247,8 +279,14 @@ namespace SailScores.Core.Services
                         Date = r.Date,
                         Order = r.Order,
                         Description = r.Description,
-                        State = r.State
+                        State = r.State,
+                        WeatherIcon = (r.Weather != null ? r.Weather.Icon : null),
+                        WindSpeedMeterPerSecond = (r.Weather != null ? r.Weather.WindSpeedMeterPerSecond : null),
+                        WindDirectionDegrees = (r.Weather != null ? r.Weather.WindDirectionDegrees : null),
+                        WindGustMeterPerSecond = (r.Weather != null ? r.Weather.WindGustMeterPerSecond : null)
                     });
+
+            return flatRaces;
         }
 
         private IEnumerable<FlatCompetitor> FlattenCompetitors(Series series)
@@ -488,7 +526,10 @@ namespace SailScores.Core.Services
             {
                 return null;
             }
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
+
+            var flatResults = Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
+            await LocalizeFlatResults(flatResults, series.ClubId);
+            return flatResults;
         }
 
         public async Task<FlatChartData> GetChartData(Guid seriesId)

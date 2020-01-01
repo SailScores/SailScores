@@ -18,6 +18,15 @@ namespace SailScores.Core.FlatModel
 
         public DateTime? UpdatedDate { get; set; }
 
+        public Decimal? WindSpeedMeterPerSecond { get; set; }
+        public Decimal? WindGustMeterPerSecond { get; set; }
+        public Decimal? WindDirectionDegrees { get; set; }
+        public String WeatherIcon { get; set; }
+
+
+        public string WindSpeed { get; internal set; }
+        public string WindGust { get; internal set; }
+
         public String CalculatedName
         {
             get

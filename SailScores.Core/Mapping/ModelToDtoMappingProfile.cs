@@ -49,6 +49,35 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.RaceIds, o => o.MapFrom(s => s.Races.Select(c => c.Id)))
                 .ReverseMap();
 
+            CreateMap<Model.OpenWeatherMap.CurrentWeatherResponse, Model.Weather>()
+                .ForMember(d => d.Description,
+                    o => o.MapFrom(
+                        s => String.Join(", ", s.Weather.Select(w => w.Main)) + "; " +
+                       String.Join(", ", s.Weather.Select(w => w.Description))))
+                .ForMember(d => d.Icon, o => o.MapFrom(s => s.Weather.First().Icon))
+                .ForMember(d => d.TemperatureDegreesKelvin,
+                    o => o.MapFrom(s => s.Main.TemperatureDegreesKelvin))
+                .ForMember(d => d.WindSpeedMeterPerSecond,
+                    o => o.MapFrom(s => s.Wind.Speed))
+                .ForMember(d => d.WindDirectionDegrees,
+                    o => o.MapFrom(s => s.Wind.Degrees))
+                .ForMember(d => d.WindGustMeterPerSecond,
+                    o => o.MapFrom(s => s.Wind.Gust))
+                .ForMember(d => d.Humidity,
+                    o => o.MapFrom(s => s.Main.HumidityPercent))
+                .ForMember(d => d.CloudCoverPercent,
+                    o => o.MapFrom(s => s.Clouds.CoverPercent))
+                .ForMember(d => d.CreatedDate, o => o.MapFrom(s => DateTime.Now))
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.TemperatureString, o => o.Ignore())
+                .ForMember(d => d.WindSpeedString, o => o.Ignore())
+                .ForMember(d => d.WindDirectionString, o => o.Ignore())
+                .ForMember(d => d.WindGustString, o => o.Ignore());
+
+
+            CreateMap<Model.Weather, Dto.WeatherDto>();
+
+
         }
     }
 }

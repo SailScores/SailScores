@@ -8,7 +8,6 @@ using SailScores.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using SailScores.Core.Mapping;
 using System.Reflection;
 using AutoMapper;
