@@ -7,6 +7,7 @@
 @using SailScores.Web.Services
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject IWeatherService weatherService
 
 @model Series
 
@@ -61,7 +62,20 @@
                                      @race.ShortName
                                      , "Details", "Race", new { id = race.Id })
                     }
-                </th>
+                    <br />
+                    <div class="weather">
+                        @if (race.WindDirectionDegrees.HasValue)
+                        {
+                            <i class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></i>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
+                        {<span data-toggle="tooltip" title="mph">@race.WindSpeed</span>}
+                        @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
+                        {
+                            <i class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></i>
+                        }
+                    </div>
+                    </th>
                         }
                         if (++colCount % 25 == 0 && (Model.FlatResults.NumberOfSailedRaces - colCount) > 10)
                         {

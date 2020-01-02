@@ -46,7 +46,7 @@
 <h3>Administrator View</h3>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8 col-lg-6">
         <form asp-action="Edit">
             <input hidden asp-for="Id" class="form-control" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -65,12 +65,12 @@
                     <label>
                         <input asp-for="IsHidden" /> Hidden
                     </label>
-                    <span class="small">Hide this club from the front page club list?</span>
+                    <span class="small">Hide this club on the front page list?</span>
                 </div>
             </div>
             <div class="form-group">
                 <label asp-for="Url" class="control-label"></label>
-                <span class="small">Link to an external website for the club</span>
+                <span class="small">External website for the club</span>
                 <input asp-for="Url" class="form-control" />
                 <span asp-validation-for="Url" class="text-danger"></span>
             </div>
@@ -85,6 +85,48 @@
                     }
                 </select>
                 <span asp-validation-for="DefaultScoringSystemId" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-6">
+                    <div class="form-row">
+                        <label class="col-6 col-form-label"
+                               asp-for="Latitude"></label>
+                        <input asp-for="Latitude"
+                               class="form-control col-6"
+                               type="number" step="any"/>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6">
+                    <div class="form-row">
+                        <label class="col-6 col-form-label"
+                               asp-for="Longitude"></label>
+                        <input asp-for="Longitude"
+                               class="form-control col-6"
+                               type="number" step="any" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-6">
+                    <div class="form-row">
+                        <label class="col-6 col-form-label control-label"
+                               asp-for="SpeedUnits">Speed Units</label>
+                        <select id="speedUnits" asp-for="SpeedUnits"
+                                class="form-control col-6"
+                                asp-items="new SelectList(Model.SpeedUnitOptions)"></select>
+                        <span asp-validation-for="SpeedUnits" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6">
+                    <div class="form-row">
+                        <label class="col-6 col-form-label control-label"
+                               asp-for="TemperatureUnits">Temp Units</label>
+                        <select id="temperatureUnits" asp-for="TemperatureUnits"
+                                class="form-control col-6"
+                                asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
+                        <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

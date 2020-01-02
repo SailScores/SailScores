@@ -147,7 +147,8 @@ namespace SailScores.Web
                     typeof(DbToModelMappingProfile).GetTypeInfo().Assembly,
                     typeof(ToViewModelMappingProfile).GetTypeInfo().Assembly
                 });
-            
+
+            services.AddHttpClient();
 
             RegisterSailScoresServices(services);
 

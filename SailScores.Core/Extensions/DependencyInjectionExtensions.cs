@@ -24,6 +24,9 @@ namespace SailScores.Core.Extensions
             services.AddScoped<IScoringCalculatorFactory, ScoringCalculatorFactory>();
             services.AddScoped<IClubRequestService, ClubRequestService>();
             services.AddScoped<IMergeService, MergeService>();
+            services.AddScoped<IWeatherService, WeatherService>();
+            services.AddScoped<IConversionService, ConversionService>();
+
         }
     }
 }

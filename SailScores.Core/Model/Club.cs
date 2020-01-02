@@ -17,6 +17,8 @@ namespace SailScores.Core.Model
         public bool IsHidden { get; set; }
         public String Url { get; set; }
 
+        public WeatherSettings WeatherSettings { get; set; }
+
         public IList<Fleet> Fleets { get; set; }
         public IList<Competitor> Competitors { get; set; }
         public IList<BoatClass> BoatClasses { get; set; }

@@ -107,6 +107,7 @@ namespace SailScores.Core.Services
                 .Races
                 .Include(r => r.Fleet)
                 .Include(r => r.Scores)
+                .Include(r => r.Weather)
                 .FirstOrDefaultAsync(c => c.Id == raceId);
             if (race == null)
             {
@@ -161,6 +162,7 @@ namespace SailScores.Core.Services
             if (race.Id != default) {
                 dbRace = await _dbContext.Races
                     .Include(r => r.SeriesRaces)
+                    .Include(r => r.Weather)
                     .SingleOrDefaultAsync(r => r.Id == race.Id);
                 var seriesFromRace = dbRace?.SeriesRaces?.Select(r => r.SeriesId)?.ToList();
                 if(seriesFromRace != null)
@@ -184,7 +186,21 @@ namespace SailScores.Core.Services
             dbRace.TrackingUrl = race.TrackingUrl;
             dbRace.UpdatedDate = DateTime.UtcNow;
 
-            if(race.FleetId != null)
+            if (dbRace.Weather == null)
+            {
+                var dbObj = _mapper.Map<Database.Entities.Weather>(race.Weather);
+                dbRace.Weather = dbObj;
+            }
+            else
+            {
+                var id = dbRace.Weather.Id;
+                var createdDate = dbRace.Weather.CreatedDate;
+                _mapper.Map<WeatherDto, Database.Entities.Weather>(race.Weather, dbRace.Weather);
+                dbRace.Weather.CreatedDate = createdDate;
+                dbRace.Weather.Id = id;
+            }
+
+            if (race.FleetId != null)
             {
                 dbRace.Fleet = _dbContext.Fleets.SingleOrDefault(f => f.Id == race.FleetId);
             }

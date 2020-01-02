@@ -19,6 +19,7 @@ namespace SailScores.Web.Controllers
         private readonly CoreServices.IScoringService _scoringService;
         private readonly Services.IAuthorizationService _authService;
         private readonly Services.IAdminTipService _tipService;
+        private readonly Services.IWeatherService _weatherService;
         private readonly IMapper _mapper;
 
         public AdminController(
@@ -26,12 +27,14 @@ namespace SailScores.Web.Controllers
             CoreServices.IScoringService scoringService,
             Services.IAuthorizationService authService,
             Services.IAdminTipService tipService,
+            Services.IWeatherService weatherService,
             IMapper mapper)
         {
             _clubService = clubService;
             _scoringService = scoringService;
             _authService = authService;
             _tipService = tipService;
+            _weatherService = weatherService;
             _mapper = mapper;
         }
 
@@ -66,6 +69,8 @@ namespace SailScores.Web.Controllers
 
             var vm = _mapper.Map<AdminViewModel>(club);
             vm.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+            vm.SpeedUnitOptions = _weatherService.GetSpeedUnitOptions();
+            vm.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
 
             return View(vm);
         }
@@ -73,7 +78,9 @@ namespace SailScores.Web.Controllers
         // POST: Admin/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(string clubInitials, AdminViewModel clubAdmin)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            AdminViewModel clubAdmin)
         {
             ViewData["ClubInitials"] = clubInitials;
             try
@@ -93,6 +100,13 @@ namespace SailScores.Web.Controllers
                 var clubObject = _mapper.Map<Club>(clubAdmin);
                 clubObject.DefaultScoringSystemId =
                     clubAdmin.DefaultScoringSystemId;
+                clubObject.WeatherSettings = new WeatherSettings
+                {
+                    Latitude = clubAdmin.Latitude,
+                    Longitude = clubAdmin.Longitude,
+                    TemperatureUnits = clubAdmin.TemperatureUnits,
+                    WindSpeedUnits = clubAdmin.SpeedUnits
+                };
 
                 await _clubService.UpdateClub(clubObject);
 

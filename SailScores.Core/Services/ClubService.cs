@@ -109,6 +109,7 @@ namespace SailScores.Core.Services
                     .ThenInclude(r => r.RegattaSeries)
                 .Include(c => c.Regattas)
                     .ThenInclude(r => r.RegattaFleet)
+                .Include(c => c.WeatherSettings)
                 .FirstOrDefaultAsync();
 
             var retClub = _mapper.Map<Model.Club>(club);
@@ -124,7 +125,9 @@ namespace SailScores.Core.Services
         public async Task<Model.Club> GetMinimalClub(Guid id)
         {
 
-            var dbClub = await _dbContext.Clubs.FirstAsync(c => c.Id == id);
+            var dbClub = await _dbContext.Clubs
+                .Include(c => c.WeatherSettings)
+                .FirstAsync(c => c.Id == id);
 
             var retClub = _mapper.Map<Model.Club>(dbClub);
 
@@ -180,12 +183,24 @@ namespace SailScores.Core.Services
             }
 
             // don't update initials or id!
-            var dbClub = _dbContext.Clubs.Single(c => c.Id == club.Id);
+            var dbClub = _dbContext.Clubs
+                .Include(c => c.WeatherSettings)
+                .Single(c => c.Id == club.Id);
             dbClub.Name = club.Name;
             dbClub.IsHidden = club.IsHidden;
             dbClub.Url = club.Url;
             dbClub.Description = club.Description;
             dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
+
+            if (dbClub.WeatherSettings == null)
+            {
+                dbClub.WeatherSettings = new Database.Entities.WeatherSettings();
+            }
+            dbClub.WeatherSettings.Latitude = club.WeatherSettings.Latitude;
+            dbClub.WeatherSettings.Longitude = club.WeatherSettings.Longitude;
+            dbClub.WeatherSettings.TemperatureUnits = club.WeatherSettings.TemperatureUnits;
+            dbClub.WeatherSettings.WindSpeedUnits = club.WeatherSettings.WindSpeedUnits;
+
             await _dbContext.SaveChangesAsync();
         }
 

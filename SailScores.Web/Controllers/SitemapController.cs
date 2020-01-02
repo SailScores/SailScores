@@ -12,6 +12,7 @@ using SailScores.Web.Models.Sitemap;
 
 namespace SailScores.Web.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class SitemapController : Controller
     {
 

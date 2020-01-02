@@ -2,27 +2,52 @@
 @using SailScores.Web.Models.SailScores;
 @using SailScores.Core.Model;
 @model ClubItemViewModel<RaceViewModel>
+@inject SailScores.Web.Services.IWeatherService  weatherService
 
 @{
     ViewBag.Title = Model.ClubInitials + " " + Model.Item.DisplayName;
     Layout = "_ClubLayout";
 }
-
-<h2>
-    @Model.Item.DisplayName
-</h2>
-@if (Model.CanEdit)
-{
-    @Html.ActionLink("Edit", "Edit", "Race",
-    new { id = Model.Item.Id, returnUrl = Context.Request.Path },
-        new { @class = "btn btn-outline-primary btn-sm" })
-}
-<h4>
-    @Model.Item.Fleet.Name
-</h4>
+<div class="row">
+    <div class="col-sm-6">
+        <h2>
+            @Model.Item.DisplayName
+        </h2>
+        @if (Model.CanEdit)
+        {
+            @Html.ActionLink("Edit", "Edit", "Race",
+new { id = Model.Item.Id, returnUrl = Context.Request.Path },
+new { @class = "btn btn-outline-primary btn-sm" })
+        }
+        <h4>
+            @Model.Item.Fleet.Name
+        </h4>
+    </div>
+    <div class="col-sm-6 text-sm-right weather">
+        @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindDirection))
+        {
+            <i class="wi wi-wind from-@Model.Item.Weather.WindDirection-deg ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather.WindDirection°"></i>
+        }
+        <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.WindSpeedUnits">
+            @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindSpeed))
+            {
+                //This is hideous, but the easiest way to avoid a space between the two elements.
+                @(Model.Item.Weather.WindSpeed)}@if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindGust)){@($"(g{Model.Item.Weather.WindGust})")
+            }
+        </span>
+        @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Icon))
+        {
+            <i class="wi @weatherService.GetIconCharacter(Model.Item.Weather?.Icon) ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather?.Description"></i>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Temperature))
+        {
+            <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.TemperatureUnits">@Model.Item.Weather.Temperature°</span>
+        }
+    </div>
+</div>
 <ul>
     @foreach (var series in @Model.Item.Series)
-    {
+            {
         <li>
             <a href="~/@Model.ClubInitials/@Model.Item.Season.Name/@series.UrlName">
                 @Html.DisplayFor(modelItem => series.Name)
@@ -32,7 +57,7 @@
 </ul>
 <p>@Model.Item.Description</p>
 @if (!String.IsNullOrWhiteSpace(Model.Item.TrackingUrl))
-{
+            {
     <div class="row">
         <div class="col-12">
             <p><a href="@Model.Item.TrackingUrl" target="_blank"><span class="fas fa-external-link-alt"></span> Race Tracking</a></p>
@@ -72,3 +97,11 @@
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+    </script>
+}

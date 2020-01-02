@@ -50,6 +50,16 @@ export function loadFleet() {
     getCompetitors(clubId, fleetId);
 }
 
+export function raceStateChanged() {
+    let state = $("#raceState").val();
+    if (state === "2"){
+        clearWeatherFields()
+    }
+    if (state === "1") {
+        populateEmptyWeatherFields();
+    }
+}
+
 export function completeCompCreate() {
     let clubId = ($("#clubId").val() as string);
     let fleetId = ($("#fleetId").val() as string);
@@ -297,7 +307,6 @@ function setSeries() {
     seriesSelect.selectpicker();
     seriesSelect.val(selectedSeriesValues);
     seriesSelect.selectpicker('refresh');
-
 }
 
 var autoCompleteSetup: boolean = false;
@@ -341,7 +350,6 @@ function initializeButtonFooter() {
         $('#scoreButtonDiv').append('<button class="' + style +
             ' data-id="' + c.id + '" onclick="' + script +
             '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
-
     });
 }
 
@@ -401,3 +409,49 @@ function shouldHaveManualEntry(compListItem: HTMLLIElement): boolean {
     return (fullCodeObj[0].formula == "MAN");
 }
 
+function clearWeatherFields() {
+    $("#weatherIcon").val("Select...");
+    $("#weatherIcon").selectpicker("refresh");
+    $("#weatherDescription").val(null);
+    $("#windSpeed").val(null);
+    $("#windGust").val(null);
+    $("#windDirection").val(null);
+    $("#temperature").val(null);
+    $("#humidity").val(null);
+    $("#cloudcover").val(null);
+}
+
+function populateEmptyWeatherFields() {
+    var initials = $("#clubInitials").val();
+    $.getJSON("/" + initials +"/weather/current/",
+        {},
+        function (data: any) {
+            console.log(data);
+            if (data.icon && $("#weatherIcon").val(null)) {
+                $("#weatherIcon").val(data.icon);
+
+                $("#weatherIcon").selectpicker("refresh");
+            }
+            if (data.description && $("#weatherDescription").val(null)) {
+                $("#weatherDescription").val(data.description);
+            }
+            if (data.windSpeed && $("#windSpeed").val(null)) {
+                $("#windSpeed").val(data.windSpeed);
+            }
+            if (data.windGust && $("#windGust").val(null)) {
+                $("#windGust").val(data.windGust);
+            }
+            if (data.windDirection && $("#windDirection").val(null)) {
+                $("#windDirection").val(data.windDirection);
+            }
+            if (data.temperature && $("#temperature").val(null)) {
+                $("#temperature").val(data.temperature);
+            }
+            if (data.humidity && $("#humidity").val(null)) {
+                $("#humidity").val(data.humidity);
+            }
+            if (data.cloudCoverPercent && $("#cloudCover").val(null)) {
+                $("#cloudCover").val(data.cloudCoverPercent);
+            }
+        });
+}
