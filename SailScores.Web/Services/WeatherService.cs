@@ -238,6 +238,10 @@ namespace SailScores.Web.Services
 
         private decimal? GetWindDirectionFromLetters(string windDirection)
         {
+            if(String.IsNullOrWhiteSpace(windDirection))
+            {
+                return null;
+            }
             var allCaps = windDirection.ToUpperInvariant();
             switch (allCaps)
             {
