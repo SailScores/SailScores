@@ -9,6 +9,7 @@
 @{
     ViewBag.Title = Model.Name + " " + localizer["Scores"];
     Layout = "_ClubLayout";
+    ViewData["MetaDescription"] = $"Sailing results and scores for racing at {Model.Name} ({Model.Initials})";
 }
 <div class="row">
     <div class="col-12">

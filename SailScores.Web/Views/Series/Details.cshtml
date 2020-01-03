@@ -14,6 +14,7 @@
 @{
     ViewBag.Title = Model.Item.Name;
     Layout = "_ClubLayout";
+    ViewData["MetaDescription"] = $"Results for {Model.Item.Name} series racing at {Model.ClubInitials}";
 }
 @{
     var results = Model.Item.FlatResults;
@@ -21,7 +22,7 @@
 
     <div class="row">
         <div class="col-md-6">
-            <h2>@Model.Item.Name</h2>
+            <h1 class="h2">@Model.Item.Name</h1>
             @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
             {
                 <h5>@Model.Item.Description</h5>
