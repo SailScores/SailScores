@@ -95,6 +95,8 @@ namespace SailScores.Web.Controllers
                     clubAdmin.Seasons = club.Seasons;
                     clubAdmin.Races = club.Races;
                     clubAdmin.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(clubAdmin.Id, true);
+                    clubAdmin.SpeedUnitOptions = _weatherService.GetSpeedUnitOptions();
+                    clubAdmin.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
                     return View(clubAdmin);
                 }
                 var clubObject = _mapper.Map<Club>(clubAdmin);
