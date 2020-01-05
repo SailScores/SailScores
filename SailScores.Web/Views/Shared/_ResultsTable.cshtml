@@ -26,7 +26,7 @@
                     <th scope="col">@localizer["Sail"]</th>
                     <th scope="col">@localizer["Helm"]</th>
                     <th scope="col" class="d-none d-sm-table-cell">@localizer["Boat"]</th>
-                    @if (Model.PartOfRegatta ?? false)
+                    @if (Model.ShowCompetitorClub ?? false)
                     {
                         <th scope="col" class="d-none d-sm-table-cell">@localizer["Club"]</th>
                     }
@@ -43,10 +43,22 @@
                     }
                     else
                     {
-                    @Html.ActionLink(
-                                 @race.ShortName
-                                 , "Details", "Race", new { id = race.Id })
+                        @Html.ActionLink(
+                                     @race.ShortName
+                                     , "Details", "Race", new { id = race.Id })
                     }
+                    <div class="weather">
+                        @if (race.WindDirectionDegrees.HasValue)
+                        {
+                            <i class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></i>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
+                        {<span data-toggle="tooltip" title="mph">@race.WindSpeed</span>}
+                        @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
+                        {
+                            <i class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></i>
+                        }
+                    </div>
                 </th>
                         }
                         else
@@ -59,8 +71,8 @@
                     else
                     {
                         @Html.ActionLink(
-                                     @race.ShortName
-                                     , "Details", "Race", new { id = race.Id })
+                            @race.ShortName
+                            , "Details", "Race", new { id = race.Id })
                     }
                     <br />
                     <div class="weather">
@@ -143,7 +155,7 @@
                     </th>
                     <th scope="row">@comp.Name</th>
                     <td class="d-none d-sm-table-cell">@comp.BoatName</td>
-                    @if (Model.PartOfRegatta ?? false)
+                    @if (Model.ShowCompetitorClub ?? false)
                     {
                         <td class="d-none d-sm-table-cell">@comp.HomeClubName</td>
                     }

@@ -30,8 +30,10 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.TemperatureUnitOptions, o => o.Ignore())
                 .ForMember(d => d.Tips, o => o.Ignore())
                 .ForMember(d => d.DefaultScoringSystemName, o => o.MapFrom(s => s.DefaultScoringSystem.Name))
+                .ForMember(d => d.ShowClubInResults, o => o.MapFrom(s => s.ShowClubInResults ?? false))
                 .ReverseMap()
                 .ForMember(d => d.DefaultScoringSystem, o => o.Ignore());
+
             CreateMap<Model.Race, RaceSummaryViewModel>()
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
                 .ForMember(r => r.FleetShortName, o => o.MapFrom(s => s.Fleet.ShortName))
