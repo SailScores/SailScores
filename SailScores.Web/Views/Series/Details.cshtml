@@ -14,74 +14,75 @@
 @{
     ViewBag.Title = Model.Item.Name;
     Layout = "_ClubLayout";
+    ViewData["MetaDescription"] = $"Results for {Model.Item.Name} series racing at {Model.ClubInitials}";
 }
 @{
     var results = Model.Item.FlatResults;
 }
 
-    <div class="row">
-        <div class="col-md-6">
-            <h2>@Model.Item.Name</h2>
-            @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
-            {
-                <h5>@Model.Item.Description</h5>
-            }
-            @results.NumberOfSailedRaces @localizer["races sailed with"] @results.NumberOfDiscards
-            @localizer["discards"],
-            @results.Competitors.Count() @localizer["competitors"]
-            @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
-            {
-                @:&ndash; @results.ScoringSystemName
-            }
-            @if (results.IsPercentSystem && results.PercentRequired.HasValue)
-            {
-                @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
-            }
-        </div>
-
-        <div class="col-md-3">
-            @if (Model.CanEdit)
-            {
-                <br class="d-md-none" />
-                <hr class="d-md-none" />
-                <div class="row bg-light">
-                    <div class="col-sm-4 my-2">
-                        <a asp-controller="Race"
-                           asp-action="Create"
-                           asp-route-seriesId="@Model.Item.Id"
-                           asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-                           class="btn btn-outline-primary">@localizer["New Race"]</a>
-                    </div>
-                </div>
-            }
-        </div>
+<div class="row">
+    <div class="col-md-6">
+        <h1 class="h2">@Model.Item.Name</h1>
+        @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
+        {
+            <h5>@Model.Item.Description</h5>
+        }
+        @results.NumberOfSailedRaces @localizer["races sailed with"] @results.NumberOfDiscards
+        @localizer["discards"],
+        @results.Competitors.Count() @localizer["competitors"]
+        @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
+        {
+            @:&ndash; @results.ScoringSystemName
+        }
+        @if (results.IsPercentSystem && results.PercentRequired.HasValue)
+        {
+            @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
+        }
     </div>
 
-    @await Html.PartialAsync("_ResultsTable", Model.Item)
-
-        @if (results.NumberOfSailedRaces > 2)
+    <div class="col-md-3">
+        @if (Model.CanEdit)
         {
-            <br />
-            <div class="container d-none d-lg-block">
-                <div class="row">
-                    <div class="col-12">
-                        <svg id="chart"></svg>
-                    </div>
+            <br class="d-md-none" />
+            <hr class="d-md-none" />
+            <div class="row bg-light">
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Race"
+                        asp-action="Create"
+                        asp-route-seriesId="@Model.Item.Id"
+                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                        class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
             </div>
         }
+    </div>
+</div>
 
-    @if (Model.Item.UpdatedDate.HasValue)
-    {
-        <br />
-        <i>@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
-    }
+@await Html.PartialAsync("_ResultsTable", Model.Item)
 
-    @section Scripts {
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
-        <script src="~/js/seriesChart.js"></script>
-        <script>
+@if (results.NumberOfSailedRaces > 2)
+{
+    <br />
+    <div class="container d-none d-lg-block">
+        <div class="row">
+            <div class="col-12">
+                <svg id="chart"></svg>
+            </div>
+        </div>
+    </div>
+}
+
+@if (Model.Item.UpdatedDate.HasValue)
+{
+    <br />
+    <i>@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
+    <script src="~/js/seriesChart.js"></script>
+    <script>
 var chart1 = new seriesChart();
 chart1.drawChart("@Model.Item.Id", "#chart");
-        </script>
-    }
+    </script>
+}
