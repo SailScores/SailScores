@@ -43,6 +43,7 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.1.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
+    <PackageReference Include="WebMarkupMin.AspNetCore2" Version="2.7.0" />
   </ItemGroup>
 
   <ItemGroup>

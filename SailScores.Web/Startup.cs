@@ -28,6 +28,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using WebMarkupMin.AspNetCore2;
 
 namespace SailScores.Web
 {
@@ -150,6 +151,18 @@ namespace SailScores.Web
 
             services.AddHttpClient();
 
+            services.AddWebMarkupMin(
+                options =>
+                {
+                    options.AllowMinificationInDevelopmentEnvironment = true;
+                    options.AllowCompressionInDevelopmentEnvironment = true;
+                })
+                .AddHtmlMinification(
+                    options =>
+                    {
+                    })
+                .AddHttpCompression();
+
             RegisterSailScoresServices(services);
 
             RegisterBackgroundQueueServices(services);
@@ -206,6 +219,8 @@ namespace SailScores.Web
             app.UseMiddleware<Datalust.SerilogMiddlewareExample.Diagnostics.SerilogMiddleware>();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseWebMarkupMin();
 
             app.UseAuthentication();
 
