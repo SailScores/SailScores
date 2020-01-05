@@ -191,6 +191,7 @@ namespace SailScores.Core.Services
             dbClub.Url = club.Url;
             dbClub.Description = club.Description;
             dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
+            dbClub.ShowClubInResults = club.ShowClubInResults;
 
             if (dbClub.WeatherSettings == null)
             {

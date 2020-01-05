@@ -46,21 +46,21 @@
 <h3>Administrator View</h3>
 <hr />
 <div class="row">
-    <div class="col-md-8 col-lg-6">
-        <form asp-action="Edit">
-            <input hidden asp-for="Id" class="form-control" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" cols="60" rows="6"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+    <form asp-action="Edit">
+        <input hidden asp-for="Id" class="form-control" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description" class="control-label"></label>
+            <textarea asp-for="Description" class="form-control" cols="60" rows="6"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
                 <div class="checkbox">
                     <label>
                         <input asp-for="IsHidden" /> Hidden
@@ -68,73 +68,81 @@
                     <span class="small">Hide this club on the front page list?</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Url" class="control-label"></label>
-                <span class="small">External website for the club</span>
-                <input asp-for="Url" class="form-control" />
-                <span asp-validation-for="Url" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DefaultScoringSystemId">Default Scoring System</label>
-                <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-control">
-                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
-                    {
-                        <option value="@scoringSystem.Id">
-                            @scoringSystem.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="DefaultScoringSystemId" class="text-danger"></span>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-6">
-                    <div class="form-row">
-                        <label class="col-6 col-form-label"
-                               asp-for="Latitude"></label>
-                        <input asp-for="Latitude"
-                               class="form-control col-6"
-                               type="text" pattern="[0-9]+([\.,][0-9]+)?" />
-                        <span asp-validation-for="Latitude" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group col-sm-6">
-                    <div class="form-row">
-                        <label class="col-6 col-form-label"
-                               asp-for="Longitude"></label>
-                        <input asp-for="Longitude"
-                               class="form-control col-6"
-                               type="text" pattern="[0-9]+([\.,][0-9]+)?" />
-                        <span asp-validation-for="Longitude" class="text-danger"></span>
-                    </div>
+            <div class="form-group col-md-6">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="ShowClubInResults" /> Show Clubs
+                    </label>
+                    <span class="small">List clubs in series results?</span>
                 </div>
             </div>
-            <div class="row">
-                <div class="form-group col-sm-6">
-                    <div class="form-row">
-                        <label class="col-6 col-form-label control-label"
-                               asp-for="SpeedUnits">Speed Units</label>
-                        <select id="speedUnits" asp-for="SpeedUnits"
-                                class="form-control col-6"
-                                asp-items="new SelectList(Model.SpeedUnitOptions)"></select>
-                        <span asp-validation-for="SpeedUnits" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group col-sm-6">
-                    <div class="form-row">
-                        <label class="col-6 col-form-label control-label"
-                               asp-for="TemperatureUnits">Temp Units</label>
-                        <select id="temperatureUnits" asp-for="TemperatureUnits"
-                                class="form-control col-6"
-                                asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
-                        <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
-                    </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Url" class="control-label"></label>
+            <span class="small">External website for the club</span>
+            <input asp-for="Url" class="form-control" />
+            <span asp-validation-for="Url" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="DefaultScoringSystemId">Default Scoring System</label>
+            <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-control">
+                @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                {
+                    <option value="@scoringSystem.Id">
+                        @scoringSystem.Name
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="DefaultScoringSystemId" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <div class="form-row">
+                    <label class="col-6 col-form-label"
+                            asp-for="Latitude"></label>
+                    <input asp-for="Latitude"
+                            class="form-control col-6"
+                            type="text" pattern="[0-9]+([\.,][0-9]+)?" />
+                    <span asp-validation-for="Latitude" class="text-danger"></span>
                 </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="form-group col-sm-6">
+                <div class="form-row">
+                    <label class="col-6 col-form-label"
+                            asp-for="Longitude"></label>
+                    <input asp-for="Longitude"
+                            class="form-control col-6"
+                            type="text" pattern="[0-9]+([\.,][0-9]+)?" />
+                    <span asp-validation-for="Longitude" class="text-danger"></span>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <div class="form-row">
+                    <label class="col-6 col-form-label control-label"
+                            asp-for="SpeedUnits">Speed Units</label>
+                    <select id="speedUnits" asp-for="SpeedUnits"
+                            class="form-control col-6"
+                            asp-items="new SelectList(Model.SpeedUnitOptions)"></select>
+                    <span asp-validation-for="SpeedUnits" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-6">
+                <div class="form-row">
+                    <label class="col-6 col-form-label control-label"
+                            asp-for="TemperatureUnits">Temp Units</label>
+                    <select id="temperatureUnits" asp-for="TemperatureUnits"
+                            class="form-control col-6"
+                            asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
+                    <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
 </div>
 
 @section Scripts {

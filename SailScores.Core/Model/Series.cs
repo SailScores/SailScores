@@ -50,7 +50,7 @@ namespace SailScores.Core.Model
 
         public bool? PreferAlternativeSailNumbers { get; set; }
 
-        public bool? PartOfRegatta { get; set; }
+        public bool? ShowCompetitorClub { get; internal set; }
 
         public Series ShallowCopy()
         {

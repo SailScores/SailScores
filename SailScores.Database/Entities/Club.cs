@@ -15,6 +15,7 @@ namespace SailScores.Database.Entities
         public String Initials { get; set; }
         public String Description { get; set; }
         public bool IsHidden { get; set; }
+        public bool? ShowClubInResults { get; set; }
         public String Url { get; set; }
 
         public String Locale { get; set; }

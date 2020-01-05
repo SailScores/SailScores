@@ -132,10 +132,11 @@ namespace SailScores.Core.Services
             string seasonName,
             string seriesUrlName)
         {
-            var clubId = await _dbContext.Clubs
+            var club = await _dbContext.Clubs
                 .Where(c =>
                    c.Initials == clubInitials
-                ).Select(c => c.Id).SingleAsync();
+                ).SingleAsync();
+            var clubId = club.Id;
             var seriesDb = await _dbContext
                 .Series
                 .Where(s =>
@@ -144,6 +145,7 @@ namespace SailScores.Core.Services
                                   && s.Season.Name == seasonName);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
+            fullSeries.ShowCompetitorClub = club.ShowClubInResults;
             if (fullSeries != null)
             {
                 var flatResults = await GetHistoricalResults(fullSeries);
