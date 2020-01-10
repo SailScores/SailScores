@@ -1,5 +1,11 @@
 /// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
+/// <reference types="jquery" />
 ///
+
+import $ from "jquery";
+import "bootstrap";
+import "bootstrap-select";
+
 import { competitorDto, scoreCodeDto, seriesDto } from "./interfaces/server";
 
 import { Guid } from "./guid";

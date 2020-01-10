@@ -28,7 +28,7 @@
     <ProjectReference Include="..\SailScores.ApiClient\SailScores.Api.csproj" />
     <ProjectReference Include="..\SailScores.Core\SailScores.Core.csproj" />
     <ProjectReference Include="..\SailScores.Database\SailScores.Database.csproj" />
-    <ProjectReference Include="..\Sailscores.ImportExport\SailScores.ImportExport.csproj" />
+    <ProjectReference Include="..\SailScores.ImportExport\SailScores.ImportExport.csproj" />
   </ItemGroup>
 
 </Project>

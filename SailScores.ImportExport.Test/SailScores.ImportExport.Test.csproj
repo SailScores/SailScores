@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sailscores.ImportExport\SailScores.ImportExport.csproj" />
+    <ProjectReference Include="..\SailScores.ImportExport\SailScores.ImportExport.csproj" />
   </ItemGroup>
 
 </Project>

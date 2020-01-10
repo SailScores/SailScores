@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "@types/bootstrap-select": "1.11.1",
-    "@types/jquery": "3.3.29",
+    "@types/jquery": "^3.3.31",
     "gulp": "4.0.0",
     "gulp-clean-css": "4.2.0",
     "gulp-concat": "2.6.1",
@@ -14,12 +14,11 @@
     "merge-stream": "1.0.1",
     "rimraf": "2.6.3",
     "ts-loader": "5.3.3",
-    "typescript": "3.3.1",
-    "webpack": "^4.2.0",
-    "webpack-cli": "^3.3.5"
+    "typescript": "3.3.1"
   },
   "dependencies": {
     "bootstrap": "4.4.1",
+    "bootstrap-select": "1.13.12",
     "jquery": "3.4.1",
     "jquery-validate": "2.0.0",
     "jquery-ajax-unobtrusive": "3.2.6",
@@ -27,13 +26,5 @@
     "dragula": "3.7.2",
     "devbridge-autocomplete": "1.4.10",
     "d3": "5.12.0"
-  },
-  "scripts": {
-    "build": "webpack"
-  },
-  "-vs-binding": {
-    "BeforeBuild": [
-      "build"
-    ]
   }
 }
