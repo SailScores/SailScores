@@ -62,3 +62,6 @@ gulp.task("sass", function () {
         .pipe(sass())
         .pipe(gulp.dest('wwwroot/css'));
 });
+
+
+gulp.task('default', gulp.series('min'));

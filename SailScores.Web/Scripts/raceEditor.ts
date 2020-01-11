@@ -10,7 +10,6 @@ import { competitorDto, scoreCodeDto, seriesDto } from "./interfaces/server";
 
 import { Guid } from "./guid";
 
-let competitors: competitorDto[];
 declare var scoreCodes: scoreCodeDto[];
 const noCodeString = "No Code";
 
@@ -181,7 +180,6 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
         input.name = "Scores\[" + listIndex + "\].place";
         if (shouldCompKeepScore(resultItems[i])) {
             input.value = resultItems[i].getAttribute("data-place");
-        } else {
         }
         form.appendChild(input);
 
@@ -212,7 +210,7 @@ export function calculatePlaces() {
         var span = resultItems[i].getElementsByClassName("race-place")[0];
         resultItems[i].setAttribute("data-place", i.toString());
         var origScore = resultItems[i].getAttribute("data-originalScore");
-        if (span.id != "competitorTemplate") {
+        if (span.id !== "competitorTemplate") {
             if (shouldCompKeepScore(resultItems[i]) &&
                 origScore !== "0") {
                 span.textContent = (scoreCount).toString();
@@ -412,7 +410,7 @@ function shouldHaveManualEntry(compListItem: HTMLLIElement): boolean {
         return false;
     }
     const fullCodeObj = scoreCodes.filter(s => s.name === codeText);
-    return (fullCodeObj[0].formula == "MAN");
+    return (fullCodeObj[0].formula === "MAN");
 }
 
 function clearWeatherFields() {
