@@ -1,4 +1,4 @@
-/// <binding BeforeBuild='copyJs' Clean='clean' />
+/// <binding BeforeBuild='prebuild' Clean='clean' />
 "use strict";
 
 var gulp = require("gulp"),
@@ -53,15 +53,25 @@ gulp.task("min:css", function () {
 gulp.task("min", gulp.parallel("min:js", "min:css"));
 
 
-gulp.task('copyJs', function () {
-    return gulp.src(paths.scripts).pipe(gulp.dest('wwwroot/js'));
+gulp.task("copyJs", function () {
+    return gulp.src(paths.scripts).pipe(gulp.dest("wwwroot/js"));
 });
 
-gulp.task("sass", function () {
-    return gulp.src('custom.scss')
+gulp.task("sass", function (done) {
+    gulp.src('custom.scss')
         .pipe(sass())
         .pipe(gulp.dest('wwwroot/css'));
+    done();
 });
 
+gulp.task('prebuild', function (done) {
+    gulp.series(
+        gulp.parallel("copyJs", "sass"),
+        "min");
+    done();
+});
 
-gulp.task('default', gulp.series('min'));
+gulp.task('default', function (done) {
+    gulp.series('prebuild');
+    done();
+});
