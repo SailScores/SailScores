@@ -36,25 +36,28 @@ gulp.task("clean:ts", function (cb) {
 
 gulp.task("clean", gulp.parallel("clean:js", "clean:css", "clean:ts"));
 
-gulp.task("min:js", function () {
-    return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
+gulp.task("min:js", function (done) {
+    gulp.src([paths.js, "!" + paths.minJs], { base: "." })
         .pipe(concat(paths.concatJsDest))
         .pipe(uglify())
         .pipe(gulp.dest("."));
+    done();
 });
 
-gulp.task("min:css", function () {
-    return gulp.src([paths.css, "!" + paths.minCss])
+gulp.task("min:css", function (done) {
+    gulp.src([paths.css, "!" + paths.minCss])
         .pipe(concat(paths.concatCssDest))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(gulp.dest("."));
+    done();
 });
 
 gulp.task("min", gulp.parallel("min:js", "min:css"));
 
 
-gulp.task("copyJs", function () {
-    return gulp.src(paths.scripts).pipe(gulp.dest("wwwroot/js"));
+gulp.task("copyJs", function (done) {
+    gulp.src(paths.scripts).pipe(gulp.dest("wwwroot/js"));
+    done();
 });
 
 gulp.task("sass", function (done) {
@@ -64,14 +67,16 @@ gulp.task("sass", function (done) {
     done();
 });
 
-gulp.task('prebuild', function (done) {
+gulp.task('prebuild',
     gulp.series(
         gulp.parallel("copyJs", "sass"),
-        "min");
-    done();
+        "min"),
+    function (done) {
+        done();
 });
 
-gulp.task('default', function (done) {
+gulp.task('default',
     gulp.series('prebuild');
-    done();
+    function (done) {
+        done();
 });
