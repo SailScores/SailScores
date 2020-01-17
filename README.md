@@ -1,10 +1,10 @@
 # SailScores
 
 
-The code for the site hosted at [sailscores.com][1], a free site hosting club sailing scores.
-The site is written on ASP.NET Core with a REST API.
+The code for the site hosted at [sailscores.com][1], a free service for hosting club sailing scores.
+Written on ASP.NET Core MVC with a REST API.
 
-It is optimized for a range of screen sizes and fast entry of results. The site went
+It's optimized for a range of screen sizes and fast entry of results. The site went
 live in spring of 2019 and is regularly used for [large series][2] as well as one evening events.
 
 I've been keeping scores for our club for a few years and decided to fix the
@@ -17,11 +17,12 @@ SailScores top priorities:
 - fast to use, particularly for entering new results.
 - web and mobile friendly.
 - Accurate Appendix A results, including proper rounding and tie-breaking.
+- Free for the foreseeable future.
+- Various niceties for scoring, like automatically including weather, but not at the expense of ease-of-use.
 - Additional scoring system options. Systems based on [High Point Percentage][4] and
 [Appendix A][3] are currently supported, with options for custom calculations and score codes.
 - Open REST API: I have plans for rich client software which will use the existing public,
 straightforward API.
-- Free for the foreseeable future.
 - On the roadmap: analytics for race and competitor data.
 
 This code supports multiple tenants, including visible and hidden clubs. This winter includes
