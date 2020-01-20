@@ -20,6 +20,8 @@ namespace SailScores.Web.Models.SailScores
         public String Initials { get; set; }
         public String Description { get; set; }
         public bool IsHidden { get; set; }
+        public bool ShowClubInResults { get; set; }
+
         public String Url { get; set; }
 
         public IList<Fleet> Fleets { get; set; }
@@ -38,5 +40,11 @@ namespace SailScores.Web.Models.SailScores
         public IList<ScoringSystem> ScoringSystemOptions { get; set; }
 
         public IList<AdminToDoViewModel> Tips { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public string TemperatureUnits { get; set; }
+        public string SpeedUnits { get; set; }
+        public IList<string> SpeedUnitOptions { get; set; }
+        public IList<string> TemperatureUnitOptions { get; set; }
     }
 }

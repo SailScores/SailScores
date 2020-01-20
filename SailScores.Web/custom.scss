@@ -16,10 +16,6 @@ body {
     width: auto;
 }
 
-.btn {
-    margin: 2px;
-}
-
 #results {
     padding: 0;
 
@@ -139,7 +135,24 @@ form label.required:not(.custom-control-label)::after {
     content: "*";
     position: relative;
     font-size: 150%;
+    line-height: 65%;
     top: .1em;
     padding-left: .4rem;
     color: theme-color('danger');
+}
+
+.dropdown-item .wi {
+    font-size: 1.4rem;
+}
+
+.weather .wi {
+    vertical-align: bottom;
+}
+
+.ss-wi-large {
+    font-size: 2em;
+}
+
+.ss-wi {
+    font-size: 1.4em;
 }

@@ -20,14 +20,26 @@ namespace SailScores.Web.Mapping
 
             CreateMap<Model.Club, AdminViewModel>()
                 .ForMember(d => d.ScoringSystemOptions, o => o.Ignore())
+                .ForMember(d => d.Latitude, o => o.MapFrom(s => s.WeatherSettings != null ? s.WeatherSettings.Latitude: null))
+                .ForMember(d => d.Longitude, o => o.MapFrom(s => s.WeatherSettings != null ? s.WeatherSettings.Longitude: null))
+                .ForMember(d => d.TemperatureUnits, o => o.MapFrom(s =>
+                    s.WeatherSettings != null ? s.WeatherSettings.TemperatureUnits: null))
+                .ForMember(d => d.SpeedUnits, o => o.MapFrom(s =>
+                    s.WeatherSettings != null ? s.WeatherSettings.WindSpeedUnits: null))
+                .ForMember(d => d.SpeedUnitOptions, o => o.Ignore())
+                .ForMember(d => d.TemperatureUnitOptions, o => o.Ignore())
                 .ForMember(d => d.Tips, o => o.Ignore())
                 .ForMember(d => d.DefaultScoringSystemName, o => o.MapFrom(s => s.DefaultScoringSystem.Name))
+                .ForMember(d => d.ShowClubInResults, o => o.MapFrom(s => s.ShowClubInResults ?? false))
                 .ReverseMap()
                 .ForMember(d => d.DefaultScoringSystem, o => o.Ignore());
+
             CreateMap<Model.Race, RaceSummaryViewModel>()
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))
                 .ForMember(r => r.FleetShortName, o => o.MapFrom(s => s.Fleet.ShortName))
-                .ForMember(r => r.SeriesNames, o => o.MapFrom(s => s.Series.Select(sr => sr.Name)));
+                .ForMember(r => r.SeriesNames, o => o.MapFrom(s => s.Series.Select(sr => sr.Name)))
+                .ForMember(r => r.Weather, o => o.Ignore());
+
             CreateMap<Model.Score, ScoreViewModel>()
                 .ForMember(d => d.ScoreCode, o => o.Ignore())
                 .ForMember(d => d.CodePointsString, o => o.MapFrom(s => s.CodePoints.HasValue ? s.CodePoints.Value.ToString("0.##") : String.Empty))
@@ -70,12 +82,15 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.SeriesOptions, o => o.Ignore())
                 .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())
                 .ForMember(d => d.CompetitorOptions, o => o.Ignore())
+                .ForMember(d => d.WeatherIconOptions, o => o.Ignore())
                 .ForMember(d => d.InitialOrder, o => o.Ignore())
                 .ForMember(d => d.Regatta, o => o.Ignore())
                 .ForMember(d => d.RegattaId, o => o.Ignore())
                 .ForMember(d => d.Tips, o => o.Ignore())
                 .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(sr => sr.Id)))
-                .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore());
+                .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore())
+                .ForMember(d => d.ClubInitials, o => o.Ignore());
+
 
             CreateMap<Model.ScoringSystem, ScoringSystemWithOptionsViewModel>()
                 .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())
@@ -103,10 +118,13 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.ScoreIds, o => o.MapFrom(r => r.Scores.Select(s => s.Id)))
                 .ForMember(d => d.RegattaId, o => o.MapFrom(r => r.Regatta.Id))
                 .ForMember(d => d.SeriesIds, o => o.MapFrom(r => r.Series.Select(s => s.Id)))
+                .ForMember(d => d.Weather, o => o.Ignore())
                 .ReverseMap()
-                .ForMember(d => d.Regatta, o => o.Ignore());
+                .ForMember(d => d.Regatta, o => o.Ignore())
+                .ForMember(d => d.Weather, o => o.Ignore());
             CreateMap<Model.Race, RaceViewModel>()
-                .ForMember(r => r.Regatta, o => o.Ignore());
+                .ForMember(r => r.Regatta, o => o.Ignore())
+                .ForMember(r => r.Weather, o => o.Ignore());
             CreateMap<ScoreViewModel, ScoreDto>()
                 .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)))
                 .ReverseMap();
@@ -116,6 +134,7 @@ namespace SailScores.Web.Mapping
                 .ReverseMap();
             CreateMap<Model.ClubRequest, ClubRequestWithOptionsViewModel>()
                 .ForMember(d => d.ClubOptions, o => o.Ignore());
+            
         }
 
         private decimal? ParseDecimal(string decimalString)

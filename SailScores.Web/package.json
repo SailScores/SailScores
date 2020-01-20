@@ -6,8 +6,8 @@
     "@types/bootstrap-select": "1.11.1",
     "@types/jquery": "3.3.29",
     "gulp": "4.0.0",
-    "gulp-concat": "2.6.1",
     "gulp-clean-css": "4.2.0",
+    "gulp-concat": "2.6.1",
     "gulp-sass": "4.0.2",
     "gulp-uglify": "3.0.1",
     "gulp-uglify-es": "1.0.4",
@@ -15,11 +15,11 @@
     "rimraf": "2.6.3",
     "ts-loader": "5.3.3",
     "typescript": "3.3.1",
-    "webpack": "4.2.0",
+    "webpack": "^4.2.0",
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "bootstrap": "4.3.1",
+    "bootstrap": "4.4.1",
     "jquery": "3.4.1",
     "jquery-validate": "2.0.0",
     "jquery-ajax-unobtrusive": "3.2.6",

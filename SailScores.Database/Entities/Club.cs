@@ -15,9 +15,12 @@ namespace SailScores.Database.Entities
         public String Initials { get; set; }
         public String Description { get; set; }
         public bool IsHidden { get; set; }
+        public bool? ShowClubInResults { get; set; }
         public String Url { get; set; }
 
         public String Locale { get; set; }
+
+        public WeatherSettings WeatherSettings { get; set; }
 
         public IList<Fleet> Fleets { get; set; }
         public IList<Competitor> Competitors { get; set; }
@@ -30,6 +33,7 @@ namespace SailScores.Database.Entities
         public ScoringSystem DefaultScoringSystem { get; set; }
         public Guid? DefaultScoringSystemId { get; set; }
         public IList<ScoringSystem> ScoringSystems { get; set;}
+
         
     }
 }

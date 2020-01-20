@@ -9,6 +9,8 @@
     <Compile Remove="Migrations\20190808010919_CreateRegatta.Designer.cs" />
     <Compile Remove="Migrations\20190808011642_CreateRegatta.cs" />
     <Compile Remove="Migrations\20190808011642_CreateRegatta.Designer.cs" />
+    <Compile Remove="Migrations\20191219184130_weather.cs" />
+    <Compile Remove="Migrations\20191219184130_weather.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

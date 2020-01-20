@@ -14,6 +14,10 @@ namespace SailScores.Core.Mapping
         {
             CreateMap<Db.Club, Model.Club>()
                 .ReverseMap();
+            CreateMap<Db.WeatherSettings, Model.WeatherSettings>()
+                .ReverseMap()
+                .ForMember(d => d.Id, o => o.Ignore());
+
             CreateMap<Db.Competitor, Model.Competitor>()
                 .ForMember(d => d.Fleets, o => o.MapFrom(s => s.CompetitorFleets.Select(f => f.Fleet).ToList()))
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive ?? true))
@@ -30,7 +34,7 @@ namespace SailScores.Core.Mapping
                         s.RaceSeries
                         .SelectMany(rs => rs.Race.Scores
                             .Select(r => r.Competitor)).Distinct().ToList()))
-                .ForMember(d => d.PartOfRegatta, o => o.Ignore())
+                .ForMember(d => d.ShowCompetitorClub, o => o.Ignore())
                 .ReverseMap()
                 .ForMember(d => d.RaceSeries, o => o.Ignore());
             CreateMap<Db.Fleet, Model.Fleet>()
@@ -62,6 +66,8 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.ClubId, o => o.Ignore())
                 .ReverseMap();
             CreateMap<Db.ClubRequest, Model.ClubRequest>()
+                .ReverseMap();
+            CreateMap<Db.Weather, Model.Weather>()
                 .ReverseMap();
         }
     }

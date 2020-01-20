@@ -11,6 +11,7 @@ using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : Controller
     {
         

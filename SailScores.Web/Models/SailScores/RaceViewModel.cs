@@ -39,6 +39,8 @@ namespace SailScores.Web.Models.SailScores
 
         public RaceState? State { get; set; }
 
+        public WeatherViewModel Weather { get; set; }
+
         public DateTime? UpdatedDate { get; set; }
 
         public string DisplayName { get

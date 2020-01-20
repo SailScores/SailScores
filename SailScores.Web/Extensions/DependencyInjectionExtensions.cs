@@ -18,6 +18,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<ICsvService, CsvService>();
             services.AddScoped<IMergeService, MergeService>();
             services.AddScoped<IClubRequestService, ClubRequestService>();
+            services.AddScoped<IWeatherService, WeatherService>();
         }
     }
 }

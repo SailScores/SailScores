@@ -35,5 +35,7 @@ namespace SailScores.Database.Entities
 
         [Column("UpdatedDateUtc")]
         public DateTime? UpdatedDate { get; set; }
+
+        public Weather Weather { get; set; }
     }
 }

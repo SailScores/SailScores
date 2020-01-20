@@ -24,11 +24,13 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
         private readonly Mock<IScoringService> _mockScoringService;
+        private readonly Mock<IConversionService> _mockConversionService;
 
         public SeriesServiceTests()
         {
             _mockScoringCalculatorFactory = new Mock<IScoringCalculatorFactory>();
             _mockScoringService = new Mock<IScoringService>();
+            _mockConversionService = new Mock<IConversionService>();
 
             var options = new DbContextOptionsBuilder<SailScoresContext>()
                 .UseInMemoryDatabase(databaseName: "Series_Test_database")
@@ -83,6 +85,7 @@ namespace SailScores.Test.Unit.Core.Services
             _service = new SailScores.Core.Services.SeriesService(
                 _mockScoringCalculatorFactory.Object,
                 _mockScoringService.Object,
+                _mockConversionService.Object,
                 _dbObjectBuilder,
                 _context,
                 _mapper
