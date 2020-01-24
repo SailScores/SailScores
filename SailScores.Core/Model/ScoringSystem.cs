@@ -9,7 +9,7 @@ namespace SailScores.Core.Model
     public class ScoringSystem
     {
         public Guid Id { get; set; }
-        public Guid? ClubId { get; set; }
+        public Guid? OwningClubId { get; set; }
 
         [Required]
         [StringLength(100)]

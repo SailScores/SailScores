@@ -76,7 +76,7 @@ gulp.task('prebuild',
 });
 
 gulp.task('default',
-    gulp.series('prebuild');
+    gulp.series('prebuild'),
     function (done) {
         done();
 });
