@@ -1,9 +1,10 @@
-﻿@{
+﻿@model SailScores.Web.Models.SailScores.AboutViewModel
+@{
     ViewData["Title"] = "About SailScores";
 }
 
 
-<h2>Sailing scoring kept simple.</h2>
+<h1 class="h2">Sailing scoring kept simple.</h1>
 <p>
     SailScores makes publishing sail race results simple and
     fast: simple enough that the scores can be entered and shared
@@ -70,3 +71,5 @@ Sailscores is maintained by Jamie Fraser, <a href="mailto:jamie@widernets.com">j
 <address>
     <a href="mailto:info@sailscores.com">info@sailscores.com</a><br />
 </address>
+
+<p><code>v@Model.Version</code></p>
