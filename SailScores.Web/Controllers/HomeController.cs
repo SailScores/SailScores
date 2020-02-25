@@ -55,7 +55,7 @@ namespace SailScores.Web.Controllers
             {
             Version = _versionService.Version
             };
-            return View();
+            return View(vm);
         }
 
         public IActionResult News()
