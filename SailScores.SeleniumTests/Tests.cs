@@ -13,8 +13,8 @@ namespace SailScores.SeleniumTests
 {
     public class Tests
     {
-        // private const string baseUrl = "https://localhost:44334";
-        private const string baseUrl = "https://sailscores.com";
+         private const string baseUrl = "https://localhost:44334";
+        //private const string baseUrl = "https://sailscores.com";
         private SailScoresTestConfig configuration;
 
         public Tests()
@@ -137,12 +137,12 @@ namespace SailScores.SeleniumTests
                 var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
                 createLink.Click();
                 var compName = $"AutoTest Comp {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
-                driver.FindElement(By.Id("Name")).SendKeys(compName);
+                driver.FindElement(By.Name("competitors[0].Name")).SendKeys(compName);
 
                 var rnd = new Random();
                 var sailNumber = $"AT{rnd.Next(9999)}";
-                driver.FindElement(By.Id("SailNumber")).SendKeys(sailNumber);
-                driver.FindElement(By.Id("BoatName")).SendKeys("Test Boat");
+                driver.FindElement(By.Name("competitors[0].SailNumber")).SendKeys(sailNumber);
+                driver.FindElement(By.Name("competitors[0].BoatName")).SendKeys("Test Boat");
 
                 var classSelector = new SelectElement(driver.FindElement(By.Id("BoatClassId")));
                 classSelector.SelectByText("Test Boat Class");
