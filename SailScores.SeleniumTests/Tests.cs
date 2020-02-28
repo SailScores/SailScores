@@ -392,7 +392,7 @@ namespace SailScores.SeleniumTests
                 var seriesSelector = new SelectElement(driver.FindElement(By.Id("seriesIds")));
                 seriesSelector.SelectByText("Test Series");
 
-                driver.FindElementByLinkText("Additional Fields").Click();
+                driver.FindElementByLinkText("Optional Fields").Click();
                 int order = ++raceCount;
                 var orderField = driver.WaitUntilVisible(By.Id("InitialOrder"));
                 orderField.SendKeys(order.ToString());
