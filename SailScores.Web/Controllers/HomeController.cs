@@ -53,8 +53,12 @@ namespace SailScores.Web.Controllers
         {
             var vm = new AboutViewModel
             {
-            Version = _versionService.Version
+                Version = _versionService.Version
             };
+
+#if DEBUG
+            vm.Version = _versionService.InformationalVersion;
+#endif
             return View(vm);
         }
 
