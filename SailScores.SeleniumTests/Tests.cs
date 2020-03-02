@@ -13,8 +13,9 @@ namespace SailScores.SeleniumTests
 {
     public class Tests
     {
-         private const string baseUrl = "https://localhost:44334";
+        //private const string baseUrl = "https://localhost:44334";
         //private const string baseUrl = "https://sailscores.com";
+        private const string baseUrl = "https://sailscorestest.azurewebsites.net/";
         private SailScoresTestConfig configuration;
 
         public Tests()

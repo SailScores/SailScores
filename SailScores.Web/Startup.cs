@@ -50,10 +50,14 @@ namespace SailScores.Web
             {
                 //options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("fi-FI");
                 ////By default the below will be set to whatever the server culture is. 
-                options.SupportedCultures = new List<CultureInfo> {  new CultureInfo("en-US"), new CultureInfo("fi-FI"),
-              new CultureInfo("sv-FI")};
-                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-US"), new CultureInfo("fi-FI"),
-              new CultureInfo("sv-FI")};
+                options.SupportedCultures = new List<CultureInfo> {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("fi-FI"),
+                    new CultureInfo("sv-FI")};
+                options.SupportedUICultures = new List<CultureInfo> {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("fi-FI"),
+                    new CultureInfo("sv-FI")};
 
                 options.RequestCultureProviders = new List<IRequestCultureProvider>
                 { new ClubCultureProvider()
