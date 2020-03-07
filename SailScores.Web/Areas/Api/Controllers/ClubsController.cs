@@ -47,7 +47,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             var filteredClubs = new List<Club>();
             foreach (var club in clubs) {
-                if(await _authService.CanUserEdit(User, c.Id))
+                if(await _authService.CanUserEdit(User, club.Id))
                 {
                     filteredClubs.Add(club);
                 }
