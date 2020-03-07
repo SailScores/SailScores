@@ -40,5 +40,5 @@ steps:
     ConnectionType: 'AzureRM'
     azureSubscription: 'Pay-As-You-Go(f7df2a10-9d9b-4209-a82e-72626aa77ee8)'
     appType: 'webAppLinux'
-    WebAppName: 'SailScoresTest2'
+    WebAppName: 'SailScores'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
