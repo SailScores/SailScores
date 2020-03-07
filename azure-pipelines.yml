@@ -42,3 +42,4 @@ steps:
     appType: 'webAppLinux'
     WebAppName: 'SailScores'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    RuntimeStack: 'DOTNETCORE|3.1'
