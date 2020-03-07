@@ -46,9 +46,9 @@ namespace SailScores.Core.Services
                        && f.ClubId == clubId);
                 if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses)
                 {
+                    var classIds = fleet.FleetBoatClasses.Select(f => f.BoatClassId);
                     dbObjects = dbObjects
-                        .Where(d => fleet.FleetBoatClasses
-                            .Any(fbc => fbc.BoatClassId == d.BoatClassId));
+                        .Where(c => classIds.Contains(c.BoatClassId));
                 } else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats) {
                     dbObjects = dbObjects
                         .Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleetId));

@@ -87,19 +87,25 @@ namespace SailScores.Core.Services
         public async Task<Model.Club> GetFullClub(Guid id)
         {
             IQueryable<Db.Club> clubQuery =
-                            _dbContext.Clubs.Where(c => c.Id == id);
+                            _dbContext.Clubs.Where(c => c.Id == id)
+                            .Include(c => c.Seasons);
+            var club = await clubQuery.FirstAsync();
 
-            var club = await clubQuery
+            await clubQuery
                 .Include(c => c.Races)
                     .ThenInclude(r => r.Scores)
                 .Include(c => c.Races)
                     .ThenInclude(r => r.Fleet)
+                    .LoadAsync();
+            await clubQuery
                 .Include(c => c.Seasons)
                 .Include(c => c.Series)
-                    .ThenInclude(s => s.RaceSeries)
+                    .ThenInclude(s => s.RaceSeries).LoadAsync();
+            await clubQuery
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
-                .Include(c => c.DefaultScoringSystem)
+                .LoadAsync();
+            await clubQuery.Include(c => c.DefaultScoringSystem)
                 .Include(c => c.ScoringSystems)
                 .Include(c => c.Fleets)
                     .ThenInclude(f => f.CompetitorFleets)
@@ -227,7 +233,7 @@ namespace SailScores.Core.Services
             foreach (var scoringSystem in dbClub.ScoringSystems)
             {
                 scoringSystem.Id = GetNewGuid(scoringSystem.Id);
-                scoringSystem.ClubId = dbClub.Id;
+                scoringSystem.OwningClubId = dbClub.Id;
                 foreach (var scoreCode in scoringSystem.ScoreCodes)
                 {
                     scoreCode.Id = GetNewGuid(scoreCode.Id);

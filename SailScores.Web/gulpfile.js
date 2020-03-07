@@ -1,4 +1,4 @@
-/// <binding BeforeBuild='copyJs' Clean='clean' />
+/// <binding BeforeBuild='prebuild' Clean='clean' />
 "use strict";
 
 var gulp = require("gulp"),
@@ -36,29 +36,47 @@ gulp.task("clean:ts", function (cb) {
 
 gulp.task("clean", gulp.parallel("clean:js", "clean:css", "clean:ts"));
 
-gulp.task("min:js", function () {
-    return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
+gulp.task("min:js", function (done) {
+    gulp.src([paths.js, "!" + paths.minJs], { base: "." })
         .pipe(concat(paths.concatJsDest))
         .pipe(uglify())
         .pipe(gulp.dest("."));
+    done();
 });
 
-gulp.task("min:css", function () {
-    return gulp.src([paths.css, "!" + paths.minCss])
+gulp.task("min:css", function (done) {
+    gulp.src([paths.css, "!" + paths.minCss])
         .pipe(concat(paths.concatCssDest))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(gulp.dest("."));
+    done();
 });
 
 gulp.task("min", gulp.parallel("min:js", "min:css"));
 
 
-gulp.task('copyJs', function () {
-    return gulp.src(paths.scripts).pipe(gulp.dest('wwwroot/js'));
+gulp.task("copyJs", function (done) {
+    gulp.src(paths.scripts).pipe(gulp.dest("wwwroot/js"));
+    done();
 });
 
-gulp.task("sass", function () {
-    return gulp.src('custom.scss')
+gulp.task("sass", function (done) {
+    gulp.src('custom.scss')
         .pipe(sass())
         .pipe(gulp.dest('wwwroot/css'));
+    done();
+});
+
+gulp.task('prebuild',
+    gulp.series(
+        gulp.parallel("copyJs", "sass"),
+        "min"),
+    function (done) {
+        done();
+});
+
+gulp.task('default',
+    gulp.series('prebuild'),
+    function (done) {
+        done();
 });

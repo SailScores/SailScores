@@ -97,9 +97,7 @@
                 @foreach (var series in Model.RecentSeries)
                 {
                     <li>
-                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">
-                            @series.Name
-                        </a>
+                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">@series.Name</a>
                         @if (series.UpdatedDate.HasValue)
                         {
                             <i><small>@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</small></i>

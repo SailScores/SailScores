@@ -3,19 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20191224210424_EFCore3")]
+    partial class EFCore3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.2")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -70,20 +72,12 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<bool?>("ShowClubInResults")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("WeatherSettingsId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DefaultScoringSystemId");
-
-                    b.HasIndex("WeatherSettingsId");
 
                     b.ToTable("Clubs");
                 });
@@ -351,16 +345,11 @@ namespace SailScores.Database.Migrations
                         .HasColumnName("UpdatedDateUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("WeatherId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClubId");
 
                     b.HasIndex("FleetId");
-
-                    b.HasIndex("WeatherId");
 
                     b.ToTable("Races");
                 });
@@ -713,86 +702,6 @@ namespace SailScores.Database.Migrations
                     b.ToTable("UserPermissions");
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.Weather", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("CloudCoverPercent")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnName("CreatedDateUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(1000)")
-                        .HasMaxLength(1000);
-
-                    b.Property<decimal?>("Humidity")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
-
-                    b.Property<decimal?>("TemperatureDegreesKelvin")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("TemperatureString")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
-
-                    b.Property<decimal?>("WindDirectionDegrees")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("WindDirectionString")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
-
-                    b.Property<decimal?>("WindGustMeterPerSecond")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("WindGustString")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
-
-                    b.Property<decimal?>("WindSpeedMeterPerSecond")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("WindSpeedString")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Weather");
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.WeatherSettings", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("Latitude")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<decimal?>("Longitude")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("TemperatureUnits")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WindSpeedUnits")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WeatherSettings");
-                });
-
             modelBuilder.Entity("SailScores.Database.Entities.BoatClass", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Club", null)
@@ -807,10 +716,6 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.ScoringSystem", "DefaultScoringSystem")
                         .WithMany("DefaultForClubs")
                         .HasForeignKey("DefaultScoringSystemId");
-
-                    b.HasOne("SailScores.Database.Entities.WeatherSettings", "WeatherSettings")
-                        .WithMany()
-                        .HasForeignKey("WeatherSettingsId");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Competitor", b =>
@@ -863,7 +768,7 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
                         .WithMany("FleetBoatClasses")
                         .HasForeignKey("FleetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -887,10 +792,6 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
                         .WithMany()
                         .HasForeignKey("FleetId");
-
-                    b.HasOne("SailScores.Database.Entities.Weather", "Weather")
-                        .WithMany()
-                        .HasForeignKey("WeatherId");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Regatta", b =>
