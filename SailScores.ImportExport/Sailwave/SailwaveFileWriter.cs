@@ -20,7 +20,7 @@ namespace SailScores.ImportExport.Sailwave
                 var csv = new CsvWriter(writer);
                 csv.Configuration.RegisterClassMap<ColumnMapToCsv>();
                 csv.Configuration.HasHeaderRecord = false;
-                csv.Configuration.QuoteAllFields = true;
+                csv.Configuration.ShouldQuote = (s, c) => true;
                 csv.WriteRecords(await Writers.SeriesWriter.WriteSeries(series));
             }
         }

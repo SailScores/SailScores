@@ -159,6 +159,7 @@ namespace SailScores.Core.Services
         {
             Db.Race dbRace;
             IEnumerable<Guid> seriesIdsToUpdate = new List<Guid>();
+            bool addToContext = false;
             if (race.Id != default) {
                 dbRace = await _dbContext.Races
                     .Include(r => r.SeriesRaces)
@@ -176,7 +177,7 @@ namespace SailScores.Core.Services
                     Id = Guid.NewGuid(),
                     ClubId = race.ClubId
                 };
-                _dbContext.Races.Add(dbRace);
+                addToContext = true;
             }
             dbRace.Name = race.Name;
             dbRace.Order = race.Order;
@@ -239,8 +240,12 @@ namespace SailScores.Core.Services
                         CodePoints = score.CodePoints
                     });
                 }
-
             }
+            if (addToContext)
+            {
+                _dbContext.Races.Add(dbRace);
+            }
+
             await _dbContext.SaveChangesAsync();
             seriesIdsToUpdate = seriesIdsToUpdate.Union(dbRace.SeriesRaces.Select(rs => rs.SeriesId).ToList());
             foreach (var seriesId in seriesIdsToUpdate)

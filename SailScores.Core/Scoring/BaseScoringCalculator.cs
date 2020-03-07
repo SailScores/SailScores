@@ -582,7 +582,13 @@ namespace SailScores.Core.Scoring
             {
                 return 0;
             }
-            var discardStrings = _scoringSystem.DiscardPattern.Split(',');
+            string[] discardStrings;
+            if (String.IsNullOrWhiteSpace(_scoringSystem?.DiscardPattern)){
+                discardStrings = new string[]{ "0" };
+            } else
+            {
+                discardStrings = _scoringSystem.DiscardPattern.Split(',');
+            }
             string selectedString;
             if(numberOfRaces > discardStrings.Length)
             {

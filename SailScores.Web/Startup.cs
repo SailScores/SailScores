@@ -11,6 +11,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SailScores.Core.Extensions;
 using SailScores.Core.JobQueue;
 using SailScores.Core.Mapping;
@@ -20,7 +21,6 @@ using SailScores.Web.Data;
 using SailScores.Web.Extensions;
 using SailScores.Web.Mapping;
 using SailScores.Web.Services;
-using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,7 +28,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using WebMarkupMin.AspNetCore2;
+using WebMarkupMin.AspNetCore3;
 
 namespace SailScores.Web
 {
@@ -50,10 +50,14 @@ namespace SailScores.Web
             {
                 //options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("fi-FI");
                 ////By default the below will be set to whatever the server culture is. 
-                options.SupportedCultures = new List<CultureInfo> {  new CultureInfo("en-US"), new CultureInfo("fi-FI"),
-              new CultureInfo("sv-FI")};
-                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-US"), new CultureInfo("fi-FI"),
-              new CultureInfo("sv-FI")};
+                options.SupportedCultures = new List<CultureInfo> {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("fi-FI"),
+                    new CultureInfo("sv-FI")};
+                options.SupportedUICultures = new List<CultureInfo> {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("fi-FI"),
+                    new CultureInfo("sv-FI")};
 
                 options.RequestCultureProviders = new List<IRequestCultureProvider>
                 { new ClubCultureProvider()
@@ -63,19 +67,29 @@ namespace SailScores.Web
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "SailScores API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SailScores API", Version = "v1" });
                 c.IncludeXmlComments(string.Format(@"{0}/SailScores.Web.xml",
                      System.AppDomain.CurrentDomain.BaseDirectory));
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Description = "JWT Authorization header using the Bearer scheme.",
                     Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
                 });
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    { "Bearer", new string[] { } }
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
                 });
             });
 
@@ -139,7 +153,7 @@ namespace SailScores.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services
-                .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
             services.AddTransient<IEmailSender, EmailSender>();

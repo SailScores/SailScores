@@ -49,10 +49,10 @@ namespace SailScores.Database
                 .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
             {
                 // EF Core 1 & 2
-                property.Relational().ColumnType = "decimal(18, 2)";
+                //property.Relational().ColumnType = "decimal(18, 2)";
 
                 // EF Core 3
-                //property.SetColumnType("decimal(18, 6)");
+                property.SetColumnType("decimal(18, 2)");
             }
 
 
@@ -66,6 +66,11 @@ namespace SailScores.Database
                 .HasKey(x => new { x.RegattaId, x.FleetId });
             modelBuilder.Entity<RegattaSeries>()
                 .HasKey(x => new { x.RegattaId, x.SeriesId });
+
+            modelBuilder.Entity<Club>()
+                .HasOne(c => c.DefaultScoringSystem)
+                .WithMany(s => s.DefaultForClubs)
+                .HasForeignKey(c => c.DefaultScoringSystemId);
 
             // Following lines resolve multiple deletion paths to entities.
             modelBuilder.Entity<Club>()
@@ -103,7 +108,7 @@ namespace SailScores.Database
             modelBuilder.Entity<Fleet>()
                 .HasMany(f => f.FleetBoatClasses)
                 .WithOne(c => c.Fleet)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Regatta>()
                 .HasMany(f => f.RegattaFleet)
@@ -155,7 +160,7 @@ namespace SailScores.Database
         {
             return base.SaveChanges();
         }
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return base.SaveChangesAsync(cancellationToken);
         }

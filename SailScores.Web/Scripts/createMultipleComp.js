@@ -3,7 +3,7 @@
     allCompDiv = document.getElementById('allCompetitors');
     allCompDiv.onpaste = function (event) {
 
-        var clipText = event.clipboardData.getData('text/plain')
+        var clipText = event.clipboardData.getData('text/plain');
         var clipRows = clipText.split(String.fromCharCode(13));
         for (var i = 0; i < clipRows.length; i++) {
             clipRows[i] = clipRows[i].split(String.fromCharCode(9));
@@ -18,7 +18,7 @@
         var startRow = Number(event.target.dataset.row) || 0;
 
         // paste the array:
-        for (var i = 0; i < clipRows.length; i++) {
+        for (i = 0; i < clipRows.length; i++) {
             for (var j = 0; j < clipRows[i].length; j++) {
                 if (startColumn + j < 4) {
                     getInputAtRowColumn(startRow + i, startColumn + j).value = clipRows[i][j];
@@ -38,7 +38,7 @@ function getInputAtRowColumn(row, column) {
     if (!rowArray || rowArray.length === 0) {
         if (allCompDiv.querySelectorAll(".row").length > 102) {
             alert("Only 100 competitors can be added at a time.");
-            throw ("Too many rows added.");
+            throw "Too many rows added.";
         }
         addNewRow();
         return getInputAtRowColumn(row, column);
@@ -46,7 +46,7 @@ function getInputAtRowColumn(row, column) {
     var elementSelector = rowSelector + "[data-column=\"" + column + "\"]";
     var elementArray = document.querySelectorAll(elementSelector);
     if (!elementArray || elementArray.length < 1) {
-        throw ("Problem finding input.");
+        throw "Problem finding input.";
     }
     return elementArray[0];
 }
@@ -55,7 +55,7 @@ function addNewRow() {
     var allCompDiv = document.getElementById("allCompetitors");
     var compTemplate = document.getElementById("compRowTemplate");
 
-    var compListItem = (compTemplate.cloneNode(true));
+    var compListItem = compTemplate.cloneNode(true);
 
     //subtract two, don't count template or header row
     rowIndex = allCompDiv.querySelectorAll(".row").length - 2;

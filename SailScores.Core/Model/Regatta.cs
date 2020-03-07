@@ -25,7 +25,6 @@ namespace SailScores.Core.Model
 
         public IList<Series> Series { get; set; }
 
-        [Required]
         public Season Season { get; set; }
 
         public IList<Fleet> Fleets { get; set; }

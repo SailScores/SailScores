@@ -43,7 +43,7 @@ namespace SailScores.Web.Controllers
             }
             var vm = new ScoringSystemWithOptionsViewModel
             {
-                ClubId = clubId
+                OwningClubId = clubId
             };
             var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
             vm.ParentSystemOptions = potentialParents.ToList();
@@ -61,7 +61,7 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            model.ClubId = clubId;
+            model.OwningClubId = clubId;
             model.Id = Guid.NewGuid();
             if (!ModelState.IsValid)
             {
@@ -85,7 +85,7 @@ namespace SailScores.Web.Controllers
             }
 
             var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
-            if (scoringSystem.ClubId != clubId)
+            if (scoringSystem.OwningClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -105,7 +105,7 @@ namespace SailScores.Web.Controllers
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             if (!await _authService.CanUserEdit(User, clubId)
-                || model.ClubId != clubId)
+                || model.OwningClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -135,7 +135,7 @@ namespace SailScores.Web.Controllers
             }
 
             var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
-            if (scoringSystem.ClubId != clubId)
+            if (scoringSystem.OwningClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -158,7 +158,7 @@ namespace SailScores.Web.Controllers
             }
 
             var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
-            if (scoringSystem.ClubId != clubId)
+            if (scoringSystem.OwningClubId != clubId)
             {
                 return Unauthorized();
             }

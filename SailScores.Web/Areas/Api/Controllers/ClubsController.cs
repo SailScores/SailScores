@@ -44,7 +44,15 @@ namespace SailScores.Web.Areas.Api.Controllers
         public async Task<IEnumerable<ClubDto>> Get()
         {
             var clubs =  await _clubService.GetClubs(true);
-            return _mapper.Map<List<ClubDto>>(clubs);
+
+            var filteredClubs = new List<Club>();
+            foreach (var club in clubs) {
+                if(await _authService.CanUserEdit(User, club.Id))
+                {
+                    filteredClubs.Add(club);
+                }
+            }
+            return _mapper.Map<List<ClubDto>>(filteredClubs);
         }
 
         /// <summary>
