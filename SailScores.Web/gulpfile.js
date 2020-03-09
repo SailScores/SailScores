@@ -7,6 +7,7 @@ var gulp = require("gulp"),
     cleanCSS = require('gulp-clean-css'),
     merge = require('merge-stream'),
     sass = require("gulp-sass"),
+    named = require('vinyl-named'),
     webpack = require('webpack-stream');
 
 var paths = {
@@ -39,10 +40,8 @@ gulp.task("clean", gulp.parallel("clean:js", "clean:css", "clean:ts"));
 
 gulp.task("min:js", function (done) {
     gulp.src([paths.js, "!" + paths.minJs], { base: "." })
+        .pipe(named())
         .pipe(webpack({
-            output: {
-                filename: 'site.min.js',
-            },
             module: {
                 rules: [
                     {
@@ -53,7 +52,7 @@ gulp.task("min:js", function (done) {
             externals: {
                 "jquery": "jQuery",
                 "bootstrap": "bootstrap",
-                "bootstrapselect": "bootstrap-select",
+                "bootstrap-select": 'window["bootstrap-select"]',
                 "d3": "d3"
             }
         }))
