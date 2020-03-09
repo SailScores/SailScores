@@ -5,9 +5,9 @@ var gulp = require("gulp"),
     rimraf = require("rimraf"),
     concat = require("gulp-concat"),
     cleanCSS = require('gulp-clean-css'),
-    uglify = require('gulp-uglify-es').default,
     merge = require('merge-stream'),
-    sass = require("gulp-sass");
+    sass = require("gulp-sass"),
+    webpack = require('webpack-stream');
 
 var paths = {
     webroot: "./wwwroot/"
@@ -20,6 +20,7 @@ paths.minCss = paths.webroot + "css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "js/site.min.js";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.concatTsDest = paths.webroot + "scripts/**.*";
+paths.jsDir = paths.webroot + "js/";
 paths.scripts = ['scripts/**/*.js'];
 
 gulp.task("clean:js", function (cb) {
@@ -38,9 +39,25 @@ gulp.task("clean", gulp.parallel("clean:js", "clean:css", "clean:ts"));
 
 gulp.task("min:js", function (done) {
     gulp.src([paths.js, "!" + paths.minJs], { base: "." })
-        .pipe(concat(paths.concatJsDest))
-        .pipe(uglify())
-        .pipe(gulp.dest("."));
+        .pipe(webpack({
+            output: {
+                filename: 'site.min.js',
+            },
+            module: {
+                rules: [
+                    {
+                        exclude: /(node_modules)/,
+                    }
+                ]
+            },
+            externals: {
+                "jquery": "jQuery",
+                "bootstrap": "bootstrap",
+                "bootstrapselect": "bootstrap-select",
+                "d3": "d3"
+            }
+        }))
+        .pipe(gulp.dest(paths.jsDir));
     done();
 });
 

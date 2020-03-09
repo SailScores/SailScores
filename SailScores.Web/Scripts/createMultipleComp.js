@@ -1,33 +1,35 @@
 ﻿(function () {
     var allCompDiv = document.getElementsByName("competitors[0].Name")[0];
     allCompDiv = document.getElementById('allCompetitors');
-    allCompDiv.onpaste = function (event) {
+    if (allCompDiv) {
+        allCompDiv.onpaste = function (event) {
 
-        var clipText = event.clipboardData.getData('text/plain');
-        var clipRows = clipText.split(String.fromCharCode(13));
-        for (var i = 0; i < clipRows.length; i++) {
-            clipRows[i] = clipRows[i].split(String.fromCharCode(9));
-        }
-        if (clipRows.length === 1 && clipRows[0].length === 1) {
-            return;
-        }
+            var clipText = event.clipboardData.getData('text/plain');
+            var clipRows = clipText.split(String.fromCharCode(13));
+            for (var i = 0; i < clipRows.length; i++) {
+                clipRows[i] = clipRows[i].split(String.fromCharCode(9));
+            }
+            if (clipRows.length === 1 && clipRows[0].length === 1) {
+                return;
+            }
 
-        event.preventDefault();
-        //get starting position:
-        var startColumn = Number(event.target.dataset.column) || 0;
-        var startRow = Number(event.target.dataset.row) || 0;
+            event.preventDefault();
+            //get starting position:
+            var startColumn = Number(event.target.dataset.column) || 0;
+            var startRow = Number(event.target.dataset.row) || 0;
 
-        // paste the array:
-        for (i = 0; i < clipRows.length; i++) {
-            for (var j = 0; j < clipRows[i].length; j++) {
-                if (startColumn + j < 4) {
-                    getInputAtRowColumn(startRow + i, startColumn + j).value = clipRows[i][j];
+            // paste the array:
+            for (i = 0; i < clipRows.length; i++) {
+                for (var j = 0; j < clipRows[i].length; j++) {
+                    if (startColumn + j < 4) {
+                        getInputAtRowColumn(startRow + i, startColumn + j).value = clipRows[i][j];
+                    }
                 }
             }
-        }
 
-        event.stopPropagation();
-        event.preventDefault();
+            event.stopPropagation();
+            event.preventDefault();
+        };
     };
 })();
 
