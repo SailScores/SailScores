@@ -76,6 +76,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\js\build\guid.js" />
+    <None Include="wwwroot\js\build\interfaces\server.js" />
+    <None Include="wwwroot\js\build\raceEditor.js" />
+    <None Include="wwwroot\js\build\seriesChart.js" />
+    <None Include="wwwroot\js\createMultipleComp.js" />
+    <None Include="wwwroot\js\jquery.unobtrusive-ajax.min.js" />
+    <None Include="wwwroot\js\raceEditor.build.js" />
+    <None Include="wwwroot\js\raceEditor.js.map" />
+    <None Include="wwwroot\js\seriesChart.build.js" />
+    <None Include="wwwroot\js\seriesChart.js" />
+    <None Include="wwwroot\js\site.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SailScores.Core\SailScores.Core.csproj" />
     <ProjectReference Include="..\SailScores.Database\SailScores.Database.csproj" />
     <ProjectReference Include="..\SailScores.Identity\SailScores.Identity.csproj" />

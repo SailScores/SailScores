@@ -6,6 +6,7 @@ var gulp = require("gulp"),
     concat = require("gulp-concat"),
     cleanCSS = require('gulp-clean-css'),
     uglify = require('gulp-uglify-es').default,
+    babel = require('gulp-babel'),
     merge = require('merge-stream'),
     sass = require("gulp-sass");
 
@@ -54,10 +55,13 @@ gulp.task("min:css", function (done) {
 
 gulp.task("min", gulp.parallel("min:js", "min:css"));
 
-
-gulp.task("copyJs", function (done) {
-    gulp.src(paths.scripts).pipe(gulp.dest("wwwroot/js"));
-    done();
+gulp.task('es6-commonjs', () => {
+    return gulp.src(paths.scripts)
+        .pipe(babel({
+            presets: ['@babel/env']
+        }))
+        .pipe(uglify())
+        .pipe(gulp.dest("wwwroot/js"))
 });
 
 gulp.task("sass", function (done) {
@@ -69,7 +73,7 @@ gulp.task("sass", function (done) {
 
 gulp.task('prebuild',
     gulp.series(
-        gulp.parallel("copyJs", "sass"),
+        gulp.parallel("es6-commonjs", "sass"),
         "min"),
     function (done) {
         done();

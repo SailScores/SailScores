@@ -3,9 +3,12 @@
   "name": "asp.net",
   "private": true,
   "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "@types/bootstrap-select": "1.11.1",
     "@types/jquery": "^3.3.31",
     "gulp": "4.0.2",
+    "gulp-babel": "^8.0.0",
     "gulp-clean-css": "4.2.0",
     "gulp-concat": "2.6.1",
     "gulp-sass": "4.0.2",
