@@ -1,5 +1,6 @@
 ﻿
-var seriesChart = (function () {
+(function () {
+
 
     var chartSeriesId;
     var chartElementId;
@@ -13,6 +14,10 @@ var seriesChart = (function () {
     var minDate;
     var maxDate;
 
+    var charts = document.getElementsByClassName("results-chart");
+    for (var i = 0; i < charts.length; i++) {
+        drawChart(charts[i].dataset.seriesId, "#"+charts[i].id)
+    }
 
 
     function drawChart(seriesId, elementId) {
@@ -283,4 +288,4 @@ var seriesChart = (function () {
         drawChart: drawChart
     };
 
-});
+})();
