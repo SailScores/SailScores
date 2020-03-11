@@ -7,6 +7,7 @@ var gulp = require("gulp"),
     cleanCSS = require('gulp-clean-css'),
     sass = require("gulp-sass"),
     named = require('vinyl-named'),
+    rename = require('gulp-rename'),
     webpack = require('webpack-stream');
 
 var paths = {
@@ -56,6 +57,7 @@ gulp.task("min:js", function () {
                 "d3": "d3"
             }
         }))
+        .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest(paths.jsDir));
 });
 

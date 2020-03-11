@@ -19,8 +19,9 @@ function checkEnter(e: KeyboardEvent) {
     return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
 }
 
-export function init() {
+export function initialize() {
     document.querySelector('form').onkeypress = checkEnter;
+    $('#fleetId').change(loadFleet);
     $("#raceform").submit(function (e) {
         e.preventDefault();
         var form = this as HTMLFormElement;
@@ -267,7 +268,7 @@ function getSuggestions(): AutocompleteSuggestion[] {
 var allCompetitors: competitorDto[];
 var competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
-    if (clubId && fleetId) {
+    if ($ && clubId && fleetId) {
         $.getJSON("/api/Competitors",
             {
                 clubId: clubId,
@@ -459,3 +460,5 @@ function populateEmptyWeatherFields() {
             }
         });
 }
+
+initialize();
