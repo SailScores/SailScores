@@ -4,16 +4,16 @@
   "private": true,
   "devDependencies": {
     "@types/bootstrap-select": "1.11.1",
-    "@types/jquery": "^3.3.31",
+    "@types/jquery": "^3.3.33",
+    "del": "5.1.0",
     "gulp": "4.0.2",
     "gulp-clean-css": "4.2.0",
     "gulp-concat": "2.6.1",
     "gulp-sass": "4.0.2",
-    "del": "5.1.0",
-    "vinyl-named": "1.1.0",
     "merge-stream": "2.0.0",
     "ts-loader": "6.2.1",
     "typescript": "3.7.4",
+    "vinyl-named": "1.1.0",
     "webpack-stream": "5.2.1"
   },
   "dependencies": {

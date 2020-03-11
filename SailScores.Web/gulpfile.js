@@ -41,6 +41,7 @@ gulp.task("min:js", function () {
     return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
         .pipe(named())
         .pipe(webpack({
+            mode: "production",
             module: {
                 rules: [
                     {
@@ -76,14 +77,10 @@ gulp.task("sass", function () {
         .pipe(gulp.dest('wwwroot/css'));
 });
 
-gulp.task('prebuild', function () {
-    gulp.series(
+gulp.task('prebuild',  gulp.series(
         "copyJs",
         "sass",
         "min:js",
-        "min:css");
-});
+        "min:css"));
 
-gulp.task('default', function () {
-    return gulp.series('prebuild');
-});
+gulp.task('default', gulp.series('prebuild'));
