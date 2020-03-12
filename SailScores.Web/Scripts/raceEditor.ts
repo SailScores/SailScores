@@ -268,7 +268,7 @@ function getSuggestions(): AutocompleteSuggestion[] {
 var allCompetitors: competitorDto[];
 var competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
-    if ($ && clubId && fleetId) {
+    if ($ && clubId && fleetId && fleetId.length > 31) {
         $.getJSON("/api/Competitors",
             {
                 clubId: clubId,
