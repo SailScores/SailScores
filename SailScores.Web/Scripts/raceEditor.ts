@@ -28,6 +28,7 @@ export function initialize() {
     $('#results').on('click', '.move-up', moveUp);
     $('#results').on('click', '.move-down', moveDown);
     $('#results').on('click', '.delete-button', confirmDelete);
+    $('#scoreButtonDiv').on('click', '.add-comp-enabled', addNewCompetitorFromButton);
     $('#deleteConfirmed').click(deleteResult);
     $('#closefooter').click(hideScoreButtonFooter);
     $("#raceform").submit(function (e) {
@@ -129,10 +130,17 @@ export function confirmDelete() {
 export function hideScoreButtonFooter() {
     $('#scoreButtonFooter').hide();
 }
-export function addNewCompetitorById(competitorId: Guid) {
+
+export function addNewCompetitorFromButton() {
+    if (!(event.target instanceof HTMLButtonElement)) {
+        return;
+    }
+    var competitorId =new Guid(event.target.dataset['competitorid']);
+    //var competitorId = $(btn).data('id');
     let comp = allCompetitors.find(c => c.id === competitorId);
     addNewCompetitor(comp);
 }
+
 function addNewCompetitor(competitor: competitorDto) {
     var c: number = 0;
     var resultDiv = document.getElementById("results");
@@ -352,17 +360,14 @@ function initializeButtonFooter() {
     }
     allCompetitors.forEach(c => {
         let style = 'btn ';
-        let script = '';
         if (!competitorIsInResults(c)) {
-            style += 'btn-outline-primary';
-            script = 'window.SailScores.addNewCompetitorById(\'' +
-                c.id + '\')';
+            style += 'btn-outline-primary add-comp-enabled';
         } else {
-            style += 'btn-primary';
+            style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-id="' + c.id + '" onclick="' + script +
-            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            ' data-competitorid="' + c.id + '" > ' +
+            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
     });
 }
 
@@ -370,17 +375,14 @@ function updateButtonFooter() {
     $('#scoreButtonDiv').empty();
     allCompetitors.forEach(c => {
         let style = 'btn ';
-        let script = '';
         if (!competitorIsInResults(c)) {
-            style += 'btn-outline-primary';
-            script = 'window.SailScores.addNewCompetitorById(\'' +
-                c.id + '\')';
+            style += 'btn-outline-primary add-comp-enabled';
         } else {
-            style += 'btn-primary';
+            style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-id="' + c.id + '" onclick="' + script +
-            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            ' data-competitorid="' + c.id + '" > ' +
+            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
 
     });
 }
