@@ -48,8 +48,7 @@
         <div class="form-group form-row">
             <label asp-for="Date" class="col-2 col-form-label"></label>
             <div class="col-md-4 col-10">
-                <input id="date" asp-for="Date" class="form-control"
-                       onchange="window.SailScores.loadSeriesOptions()" />
+                <input id="date" asp-for="Date" class="form-control"/>
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
         </div>
@@ -125,7 +124,6 @@
                                 <div class="form-row">
                                     <label asp-for="State" class="control-label col-form-label col-4"></label>
                                     <select id="raceState" asp-for="State" class="form-control col-8"
-                                            onchange="window.SailScores.raceStateChanged()"
                                             asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
                                     <span asp-validation-for="State" class="text-danger"></span>
                                 </div>
@@ -234,7 +232,7 @@
                                 </div>
                                 <div class="float-right ml-auto d-flex">
                                     <div>
-                                        <select class="select-code form-control form-control-sm" onchange="window.SailScores.calculatePlaces()">
+                                        <select class="select-code form-control form-control-sm">
                                             <option value="No Code">No Code</option>
                                             @foreach (var code in Model.ScoreCodeOptions)
                                             {
@@ -247,12 +245,11 @@
                                                placeholder="place"
                                                value="@score.CodePoints?.ToString("0.#")" />
                                     </div>
-                                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveUp()"><span class="fa fa-angle-up"></span></button>
-                                    <button class="btn btn-light" type="button" onclick="window.SailScores.moveDown()"><span class="fa fa-angle-down"></span></button>
+                                    <button class="btn btn-light move-up" type="button"><span class="fa fa-angle-up"></span></button>
+                                    <button class="btn btn-light move-down" type="button"><span class="fa fa-angle-down"></span></button>
                                     &ensp;
                                     <button class="btn btn-light delete-button" type="button" data-toggle="modal"
-                                            data-target="#deleteConfirm" data-competitorid="@score.CompetitorId"
-                                            onclick="window.SailScores.confirmDelete()">
+                                            data-target="#deleteConfirm" data-competitorid="@score.CompetitorId">
                                         <span class="far fa-trash-alt text-danger"></span>
                                     </button>
                                 </div>
@@ -314,7 +311,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="window.SailScores.deleteResult()">Delete</button>
+                <button id="deleteConfirmed" type="button" class="btn btn-primary">Delete</button>
             </div>
         </div>
     </div>
@@ -326,8 +323,7 @@
     <footer class="footer score-entry" id="scoreButtonFooter" style="display: none;">
         <div class="container footer-header">
             <div class="row float-right">
-                <button type="button" class="close" aria-label="Close"
-                        onclick="window.SailScores.hideScoreButtonFooter()">
+                <button id="closefooter" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -342,7 +338,6 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
-
     <script>
     var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
     </script>
