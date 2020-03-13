@@ -19,8 +19,17 @@ function checkEnter(e: KeyboardEvent) {
     return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
 }
 
-export function init() {
+export function initialize() {
     document.querySelector('form').onkeypress = checkEnter;
+    $('#fleetId').change(loadFleet);
+    $('#date').change(loadSeriesOptions);
+    $('#raceState').change(raceStateChanged);
+    $('#results').on('click', '.select-code', calculatePlaces);
+    $('#results').on('click', '.move-up', moveUp);
+    $('#results').on('click', '.move-down', moveDown);
+    $('#results').on('click', '.delete-button', confirmDelete);
+    $('#deleteConfirmed').click(deleteResult);
+    $('#closefooter').click(hideScoreButtonFooter);
     $("#raceform").submit(function (e) {
         e.preventDefault();
         var form = this as HTMLFormElement;
@@ -267,7 +276,7 @@ function getSuggestions(): AutocompleteSuggestion[] {
 var allCompetitors: competitorDto[];
 var competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
-    if (clubId && fleetId) {
+    if ($ && clubId && fleetId && fleetId.length > 31) {
         $.getJSON("/api/Competitors",
             {
                 clubId: clubId,
@@ -459,3 +468,5 @@ function populateEmptyWeatherFields() {
             }
         });
 }
+
+initialize();

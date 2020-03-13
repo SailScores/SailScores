@@ -2,13 +2,13 @@
 "use strict";
 
 var gulp = require("gulp"),
-    rimraf = require("rimraf"),
+    del = require("del"),
     concat = require("gulp-concat"),
     cleanCSS = require('gulp-clean-css'),
-    uglify = require('gulp-uglify-es').default,
-    babel = require('gulp-babel'),
-    merge = require('merge-stream'),
-    sass = require("gulp-sass");
+    sass = require("gulp-sass"),
+    named = require('vinyl-named'),
+    rename = require('gulp-rename'),
+    webpack = require('webpack-stream');
 
 var paths = {
     webroot: "./wwwroot/"
@@ -18,69 +18,71 @@ paths.js = paths.webroot + "js/**/*.js";
 paths.minJs = paths.webroot + "js/**/*.min.js";
 paths.css = paths.webroot + "css/**/*.css";
 paths.minCss = paths.webroot + "css/**/*.min.css";
-paths.concatJsDest = paths.webroot + "js/site.min.js";
+paths.concatJsDest = paths.webroot + "js/**/*";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.concatTsDest = paths.webroot + "scripts/**.*";
+paths.jsDir = paths.webroot + "js/";
 paths.scripts = ['scripts/**/*.js'];
 
-gulp.task("clean:js", function (cb) {
-    rimraf(paths.concatJsDest, cb);
+gulp.task("clean:js", function () {
+    return del(paths.concatJsDest);
 });
 
-gulp.task("clean:css", function (cb) {
-    rimraf(paths.concatCssDest, cb);
+gulp.task("clean:css", function () {
+    return del(paths.concatCssDest);
 });
 
-gulp.task("clean:ts", function (cb) {
-    rimraf(paths.concatTsDest, cb);
+gulp.task("clean:ts", function () {
+    return del(paths.concatTsDest);
 });
 
 gulp.task("clean", gulp.parallel("clean:js", "clean:css", "clean:ts"));
 
-gulp.task("min:js", function (done) {
-    gulp.src([paths.js, "!" + paths.minJs], { base: "." })
-        .pipe(concat(paths.concatJsDest))
-        .pipe(uglify())
-        .pipe(gulp.dest("."));
-    done();
+gulp.task("min:js", function () {
+    return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
+        .pipe(named())
+        .pipe(webpack({
+            mode: "production",
+            module: {
+                rules: [
+                    {
+                        exclude: /(node_modules)/,
+                    }
+                ]
+            },
+            externals: {
+                "jquery": "jQuery",
+                "bootstrap": "bootstrap",
+                "bootstrap-select": 'window["bootstrap-select"]',
+                "d3": "d3"
+            }
+        }))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest(paths.jsDir));
 });
 
-gulp.task("min:css", function (done) {
-    gulp.src([paths.css, "!" + paths.minCss])
+gulp.task("min:css", function () {
+    return gulp.src([paths.css, "!" + paths.minCss])
         .pipe(concat(paths.concatCssDest))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(gulp.dest("."));
-    done();
 });
 
-gulp.task("min", gulp.parallel("min:js", "min:css"));
-
-gulp.task('es6-commonjs', () => {
+gulp.task("copyJs", function () {
     return gulp.src(paths.scripts)
-        .pipe(babel({
-            presets: ['@babel/env']
-        }))
-        .pipe(uglify())
-        .pipe(gulp.dest("wwwroot/js"))
+        .pipe(gulp.dest("wwwroot/js"));
 });
 
-gulp.task("sass", function (done) {
-    gulp.src('custom.scss')
+gulp.task("sass", function () {
+    return gulp.src('custom.scss')
         .pipe(sass())
         .pipe(gulp.dest('wwwroot/css'));
-    done();
 });
 
-gulp.task('prebuild',
-    gulp.series(
-        gulp.parallel("es6-commonjs", "sass"),
-        "min"),
-    function (done) {
-        done();
-});
+gulp.task('prebuild',  gulp.series(
+        "copyJs",
+        "sass",
+        "min:js",
+        "min:css"));
 
-gulp.task('default',
-    gulp.series('prebuild'),
-    function (done) {
-        done();
-});
+gulp.task('default', gulp.series('prebuild'));
