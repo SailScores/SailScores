@@ -135,9 +135,11 @@ export function addNewCompetitorFromButton() {
     if (!(event.target instanceof HTMLButtonElement)) {
         return;
     }
-    var competitorId =new Guid(event.target.dataset['competitorid']);
+    var competitorId = event.target.dataset['competitorid'];
     //var competitorId = $(btn).data('id');
-    let comp = allCompetitors.find(c => c.id === competitorId);
+    let comp = allCompetitors.find(c => c.id.toString() === competitorId);
+    console.log(competitorId);
+    console.log(allCompetitors);
     addNewCompetitor(comp);
 }
 
@@ -366,7 +368,7 @@ function initializeButtonFooter() {
             style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-competitorid="' + c.id + '" > ' +
+            '" data-competitorid="' + c.id + '" > ' +
             (c.sailNumber || c.alternativeSailNumber) + ' </button>');
     });
 }
@@ -381,7 +383,7 @@ function updateButtonFooter() {
             style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-competitorid="' + c.id + '" > ' +
+            '" data-competitorid="' + c.id + '" > ' +
             (c.sailNumber || c.alternativeSailNumber) + ' </button>');
 
     });
