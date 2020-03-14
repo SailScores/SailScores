@@ -31,6 +31,7 @@ export function initialize() {
     $('#scoreButtonDiv').on('click', '.add-comp-enabled', addNewCompetitorFromButton);
     $('#deleteConfirmed').click(deleteResult);
     $('#closefooter').click(hideScoreButtonFooter);
+    $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
         e.preventDefault();
         var form = this as HTMLFormElement;
@@ -60,6 +61,11 @@ export function loadFleet() {
     if (boatClassId) {
         $("#createCompBoatClassSelect").val(boatClassId);
     }
+    if (fleetId.length < 30) {
+        $("#createCompButton").prop('disabled', true);
+    } else {
+        $("#createCompButton").prop('disabled', false);
+    }
 
     $("#createCompFleetId").val(fleetId);
     getCompetitors(clubId, fleetId);
@@ -73,6 +79,35 @@ export function raceStateChanged() {
     if (state === "1") {
         populateEmptyWeatherFields();
     }
+}
+
+export function compCreateSubmit(e: any) {
+
+    e.preventDefault();
+    $("#compLoading").show();
+    var form = $(this as HTMLFormElement);
+    console.log(form);
+    var url = form.attr("data-submit-url");
+
+    console.log(url);
+    var prep = function (xhr: any) {
+        $('#compLoading').show();
+        xhr.setRequestHeader("RequestVerificationToken",
+            $('input:hidden[name="__RequestVerificationToken"]').val());
+    };
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        beforeSend: prep,
+        data: form.serialize(), // serializes the form's elements.
+        success: completeCompCreate,
+        error: completeCompCreateFailed
+    });
+
+    $("#compLoading").hide();
+
+    return false;
 }
 
 export function completeCompCreate() {
