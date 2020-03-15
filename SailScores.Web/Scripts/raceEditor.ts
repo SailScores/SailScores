@@ -86,10 +86,8 @@ export function compCreateSubmit(e: any) {
     e.preventDefault();
     $("#compLoading").show();
     var form = $(this as HTMLFormElement);
-    console.log(form);
     var url = form.attr("data-submit-url");
 
-    console.log(url);
     var prep = function (xhr: any) {
         $('#compLoading').show();
         xhr.setRequestHeader("RequestVerificationToken",
@@ -173,8 +171,6 @@ export function addNewCompetitorFromButton() {
     var competitorId = event.target.dataset['competitorid'];
     //var competitorId = $(btn).data('id');
     let comp = allCompetitors.find(c => c.id.toString() === competitorId);
-    console.log(competitorId);
-    console.log(allCompetitors);
     addNewCompetitor(comp);
 }
 
@@ -301,7 +297,6 @@ function competitorIsInResults(comp: competitorDto) {
 
 function getSuggestions(): AutocompleteSuggestion[] {
     const competitorSuggestions: AutocompleteSuggestion[] = [];
-    console.debug("checking for comps in results");
     allCompetitors.forEach(c => {
         if (!competitorIsInResults(c)) {
             let comp = {
@@ -478,7 +473,6 @@ function populateEmptyWeatherFields() {
     $.getJSON("/" + initials +"/weather/current/",
         {},
         function (data: any) {
-            console.log(data);
             if (data.icon && $("#weatherIcon").val(null)) {
                 $("#weatherIcon").val(data.icon);
 

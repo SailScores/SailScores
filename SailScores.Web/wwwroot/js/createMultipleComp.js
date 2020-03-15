@@ -31,6 +31,11 @@
             event.preventDefault();
         };
     };
+    var closeBox = docuemnt.getElementById("closebutton");
+    closeBox.onclick = function (event) {
+            $("#compCreateAlert").hide();
+    }
+
 })();
 
 function getInputAtRowColumn(row, column) {

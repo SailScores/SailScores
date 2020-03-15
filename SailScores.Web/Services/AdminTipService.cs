@@ -92,7 +92,7 @@ namespace SailScores.Web.Services
                 race.Tips = new List<AdminToDoViewModel> { new AdminToDoViewModel
                 {
                     Title = "Add a series",
-                    Details = "If you want to score races together, add a series first.",
+                    Details = "If you want to score races together, add a series.",
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",
@@ -125,7 +125,7 @@ namespace SailScores.Web.Services
                     Completed = false,
                 });
             }
-            if (race.CompetitorOptions == null || race.CompetitorOptions.Count == 0)
+            if (!race.ClubHasCompetitors && ( race.CompetitorOptions == null || race.CompetitorOptions.Count == 0))
             {
                 returnList.Add(new AdminToDoViewModel
                 {

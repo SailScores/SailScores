@@ -13,14 +13,14 @@ namespace SailScores.Web.Controllers
     public class MergeCompetitorController : Controller
     {
         private readonly Core.Services.IClubService _clubService;
-        private readonly ICompetitorService _competitorService;
+        private readonly Web.Services.ICompetitorService _competitorService;
         private readonly IMapper _mapper;
         private readonly Services.IAuthorizationService _authService;
         private readonly Services.IMergeService _mergeService;
 
         public MergeCompetitorController(
             Core.Services.IClubService clubService,
-            ICompetitorService competitorService,
+            Web.Services.ICompetitorService competitorService,
             Services.IAuthorizationService authService,
             Services.IMergeService mergeService,
             IMapper mapper)

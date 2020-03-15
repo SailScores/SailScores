@@ -57,6 +57,33 @@ namespace SailScores.Core.Services
             return bizObj;
         }
 
+
+        public async Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId)
+        {
+            var dbFleets = await _dbContext
+                .Fleets
+                .Where(f => f.ClubId == clubId
+                    && !f.IsHidden
+                    && f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                .ToListAsync();
+
+            var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
+            return bizObj;
+        }
+
+
+        public async Task<IEnumerable<BoatClass>> GetAllBoatClasses(Guid clubId)
+        {
+            var dbClasses = await _dbContext
+                .BoatClasses
+                .Where(bc => bc.ClubId == clubId)
+                .ToListAsync();
+
+            var bizObj = _mapper.Map<IList<BoatClass>>(dbClasses);
+
+            return bizObj;
+        }
+
         public async Task<IList<Model.Club>> GetClubs(bool includeHidden)
         {
             var dbObjects = await _dbContext
@@ -134,6 +161,18 @@ namespace SailScores.Core.Services
             var dbClub = await _dbContext.Clubs
                 .Include(c => c.WeatherSettings)
                 .FirstAsync(c => c.Id == id);
+
+            var retClub = _mapper.Map<Model.Club>(dbClub);
+
+            return retClub;
+
+        }
+        public async Task<Model.Club> GetMinimalClub(string clubInitials)
+        {
+
+            var dbClub = await _dbContext.Clubs
+                .Include(c => c.WeatherSettings)
+                .FirstAsync(c => c.Initials == clubInitials);
 
             var retClub = _mapper.Map<Model.Club>(dbClub);
 
@@ -352,5 +391,11 @@ namespace SailScores.Core.Services
             }
             return oldGuid;
         }
+
+        public async Task<bool> DoesClubHaveCompetitors(Guid clubId)
+        {
+            return await _dbContext.Competitors.AnyAsync(c => c.ClubId == clubId);
+        }
+
     }
 }

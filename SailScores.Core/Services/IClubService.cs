@@ -17,7 +17,11 @@ namespace SailScores.Core.Services
         Task<IList<Fleet>> GetAllFleets(Guid clubId);
         Task UpdateClub(Club clubObject);
         Task<Club> GetMinimalClub(Guid id);
+        Task<Club> GetMinimalClub(string clubInitials);
         Task<Guid> GetClubId(string initials);
         Task<Guid> CopyClubAsync(Guid copyFromClubId, Club targetClub);
+        Task<IEnumerable<BoatClass>> GetAllBoatClasses(Guid clubId);
+        Task<bool> DoesClubHaveCompetitors(Guid clubId);
+        Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId);
     }
 }

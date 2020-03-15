@@ -230,9 +230,7 @@
                 <input id="submitButton" type="submit" value="Save" class="btn btn-primary btn-block" disabled="disabled" />
             </div>
             <div class="col-md-3">
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="races"
+                <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
                    class="btn btn-outline-primary btn-block">Cancel</a>
             </div>
             <div class="col-md-3">

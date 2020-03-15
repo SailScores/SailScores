@@ -61,8 +61,7 @@ namespace SailScores.Web.Controllers
             var canEdit = false;
             if(User != null && (User.Identity?.IsAuthenticated ?? false))
             {
-                var clubId = await _clubService.GetClubId(clubInitials);
-                canEdit = await _authService.CanUserEdit(User, clubId);
+                canEdit = await _authService.CanUserEdit(User, clubInitials);
             }
 
             return View(new ClubItemViewModel<RaceViewModel>
@@ -258,6 +257,7 @@ namespace SailScores.Web.Controllers
         {
             try
             {
+                // todo: remove this call to GetFullClub (which is really slow.)
                 var club = await _clubService.GetFullClub(clubInitials);
                 if (!await _authService.CanUserEdit(User, club.Id)
                     || !club.Races.Any(c => c.Id == id))

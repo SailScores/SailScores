@@ -161,15 +161,15 @@
                         onclick="addNewRow()">
                     <span class="fas fa-plus"></span>
                 </button>
-
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary my-2" />
-                    <a asp-controller="Admin"
-                       asp-action="Index"
-                       asp-fragment="competitors"
-                       class="btn btn-outline-primary">Cancel</a>
-                </div>
-
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <input type="submit" value="Create" class="btn btn-primary btn-block my-2" />
+            </div>
+            <div class="col-md-3">
+                <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
+                    class="btn btn-outline-primary btn-block my-2">Cancel</a>
             </div>
         </div>
     </form>

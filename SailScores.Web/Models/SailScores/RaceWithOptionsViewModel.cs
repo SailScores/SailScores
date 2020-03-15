@@ -9,6 +9,8 @@ namespace SailScores.Web.Models.SailScores
 {
     public class RaceWithOptionsViewModel : RaceViewModel
     {
+        internal bool ClubHasCompetitors;
+
         public string ClubInitials { get; set; }
         public IList<Fleet> FleetOptions { get; set; }
         public IList<Series> SeriesOptions { get; set; }
