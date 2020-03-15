@@ -15,21 +15,25 @@ namespace SailScores.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "3.1.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("SailScores.Database.Entities.BoatClass", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClubId");
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(2000)")
                         .HasMaxLength(2000);
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -42,28 +46,38 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Club", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DefaultScoringSystemId");
+                    b.Property<Guid?>("DefaultScoringSystemId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Initials")
+                        .HasColumnType("nvarchar(10)")
                         .HasMaxLength(10);
 
-                    b.Property<bool>("IsHidden");
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Locale");
+                    b.Property<string>("Locale")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<bool?>("ShowClubInResults");
+                    b.Property<bool?>("ShowClubInResults")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Url");
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("WeatherSettingsId");
+                    b.Property<Guid?>("WeatherSettingsId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -77,42 +91,59 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.ClubRequest", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AdminNotes");
+                    b.Property<string>("AdminNotes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Classes");
+                    b.Property<string>("Classes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClubInitials")
+                        .HasColumnType("nvarchar(10)")
                         .HasMaxLength(10);
 
-                    b.Property<string>("ClubLocation");
+                    b.Property<string>("ClubLocation")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClubName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<string>("ClubWebsite");
+                    b.Property<string>("ClubWebsite")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Comments");
+                    b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactEmail");
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactName");
+                    b.Property<string>("ContactName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("ForTesting");
+                    b.Property<bool?>("ForTesting")
+                        .HasColumnType("bit");
 
-                    b.Property<bool?>("Hide");
+                    b.Property<bool?>("Hide")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime?>("RequestApproved");
+                    b.Property<DateTime?>("RequestApproved")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RequestSubmitted");
+                    b.Property<DateTime?>("RequestSubmitted")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("TestClubId");
+                    b.Property<Guid?>("TestClubId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("TypicalDiscardRules");
+                    b.Property<string>("TypicalDiscardRules")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("VisibleClubId");
+                    b.Property<Guid?>("VisibleClubId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -122,30 +153,40 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Competitor", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AlternativeSailNumber")
+                        .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
 
-                    b.Property<Guid>("BoatClassId");
+                    b.Property<Guid>("BoatClassId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BoatName")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<Guid>("ClubId");
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("HomeClubName")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<bool?>("IsActive");
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
                     b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(2000)")
                         .HasMaxLength(2000);
 
                     b.Property<string>("SailNumber")
+                        .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
 
                     b.HasKey("Id");
@@ -159,9 +200,11 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.CompetitorFleet", b =>
                 {
-                    b.Property<Guid>("CompetitorId");
+                    b.Property<Guid>("CompetitorId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("FleetId");
+                    b.Property<Guid>("FleetId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CompetitorId", "FleetId");
 
@@ -173,13 +216,17 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.File", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Created");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("FileContents");
+                    b.Property<byte[]>("FileContents")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<DateTime?>("ImportedTime");
+                    b.Property<DateTime?>("ImportedTime")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -189,24 +236,32 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Fleet", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClubId");
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(2000)")
                         .HasMaxLength(2000);
 
-                    b.Property<int>("FleetType");
+                    b.Property<int>("FleetType")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsHidden");
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
                     b.Property<string>("NickName")
+                        .HasColumnType("nvarchar(30)")
                         .HasMaxLength(30);
 
                     b.Property<string>("ShortName")
+                        .HasColumnType("nvarchar(30)")
                         .HasMaxLength(30);
 
                     b.HasKey("Id");
@@ -218,9 +273,11 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.FleetBoatClass", b =>
                 {
-                    b.Property<Guid>("FleetId");
+                    b.Property<Guid>("FleetId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BoatClassId");
+                    b.Property<Guid>("BoatClassId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("FleetId", "BoatClassId");
 
@@ -232,17 +289,22 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.HistoricalResults", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
                         .HasDefaultValueSql("getdate()");
 
-                    b.Property<bool>("IsCurrent");
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Results");
+                    b.Property<string>("Results")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SeriesId");
+                    b.Property<Guid>("SeriesId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -254,32 +316,43 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Race", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClubId");
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("Date");
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(1000)")
                         .HasMaxLength(1000);
 
-                    b.Property<Guid?>("FleetId");
+                    b.Property<Guid?>("FleetId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<int>("Order");
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
                     b.Property<string>("State")
+                        .HasColumnType("nvarchar(30)")
                         .HasMaxLength(30);
 
                     b.Property<string>("TrackingUrl")
+                        .HasColumnType("nvarchar(500)")
                         .HasMaxLength(500);
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnName("UpdatedDateUtc");
+                        .HasColumnName("UpdatedDateUtc")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("WeatherId");
+                    b.Property<Guid?>("WeatherId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -295,33 +368,45 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Regatta", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClubId");
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EndDate");
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<bool?>("PreferAlternateSailNumbers");
+                    b.Property<bool?>("PreferAlternateSailNumbers")
+                        .HasColumnType("bit");
 
-                    b.Property<Guid?>("ScoringSystemId");
+                    b.Property<Guid?>("ScoringSystemId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SeasonId");
+                    b.Property<Guid>("SeasonId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("StartDate");
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnName("UpdatedDateUtc");
+                        .HasColumnName("UpdatedDateUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
+                        .HasColumnType("nvarchar(1000)")
                         .HasMaxLength(1000);
 
                     b.Property<string>("UrlName")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -337,9 +422,11 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.RegattaFleet", b =>
                 {
-                    b.Property<Guid>("RegattaId");
+                    b.Property<Guid>("RegattaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("FleetId");
+                    b.Property<Guid>("FleetId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("RegattaId", "FleetId");
 
@@ -350,9 +437,11 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.RegattaSeries", b =>
                 {
-                    b.Property<Guid>("RegattaId");
+                    b.Property<Guid>("RegattaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SeriesId");
+                    b.Property<Guid>("SeriesId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("RegattaId", "SeriesId");
 
@@ -364,18 +453,23 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Score", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code");
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("CodePoints")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.Property<Guid>("CompetitorId");
+                    b.Property<Guid>("CompetitorId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Place");
+                    b.Property<int?>("Place")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("RaceId");
+                    b.Property<Guid>("RaceId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -389,34 +483,47 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.ScoreCode", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("AdjustOtherScores");
+                    b.Property<bool?>("AdjustOtherScores")
+                        .HasColumnType("bit");
 
-                    b.Property<bool?>("CameToStart");
+                    b.Property<bool?>("CameToStart")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(1000)")
                         .HasMaxLength(1000);
 
-                    b.Property<bool?>("Discardable");
+                    b.Property<bool?>("Discardable")
+                        .HasColumnType("bit");
 
-                    b.Property<bool?>("Finished");
+                    b.Property<bool?>("Finished")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Formula")
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<int?>("FormulaValue");
+                    b.Property<int?>("FormulaValue")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
 
-                    b.Property<bool?>("PreserveResult");
+                    b.Property<bool?>("PreserveResult")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ScoreLike");
+                    b.Property<string>("ScoreLike")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ScoringSystemId");
+                    b.Property<Guid>("ScoringSystemId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("Started");
+                    b.Property<bool?>("Started")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -428,16 +535,24 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.ScoringSystem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ClubId");
+                    b.Property<Guid?>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("DiscardPattern");
+                    b.Property<string>("DiscardPattern")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<Guid?>("ParentSystemId");
+                    b.Property<Guid?>("OwningClubId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ParentSystemId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("ParticipationPercent")
                         .HasColumnType("decimal(18, 2)");
@@ -454,16 +569,21 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Season", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClubId");
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("End");
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<DateTime>("Start");
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -475,35 +595,48 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Series", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClubId");
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(2000)")
                         .HasMaxLength(2000);
 
-                    b.Property<Guid?>("FleetId");
+                    b.Property<Guid?>("FleetId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsImportantSeries");
+                    b.Property<bool?>("IsImportantSeries")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<bool?>("PreferAlternativeSailNumbers");
+                    b.Property<bool?>("PreferAlternativeSailNumbers")
+                        .HasColumnType("bit");
 
-                    b.Property<bool?>("ResultsLocked");
+                    b.Property<bool?>("ResultsLocked")
+                        .HasColumnType("bit");
 
-                    b.Property<Guid?>("ScoringSystemId");
+                    b.Property<Guid?>("ScoringSystemId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SeasonId");
+                    b.Property<Guid>("SeasonId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("TrendOption");
+                    b.Property<string>("TrendOption")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnName("UpdatedDateUtc");
+                        .HasColumnName("UpdatedDateUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UrlName")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -520,17 +653,22 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.SeriesChartResults", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
                         .HasDefaultValueSql("getdate()");
 
-                    b.Property<bool>("IsCurrent");
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Results");
+                    b.Property<string>("Results")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SeriesId");
+                    b.Property<Guid>("SeriesId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -541,9 +679,11 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.SeriesRace", b =>
                 {
-                    b.Property<Guid>("SeriesId");
+                    b.Property<Guid>("SeriesId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("RaceId");
+                    b.Property<Guid>("RaceId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("SeriesId", "RaceId");
 
@@ -555,13 +695,17 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.UserClubPermission", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("CanEditAllClubs");
+                    b.Property<bool>("CanEditAllClubs")
+                        .HasColumnType("bit");
 
-                    b.Property<Guid?>("ClubId");
+                    b.Property<Guid?>("ClubId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserEmail")
+                        .HasColumnType("nvarchar(254)")
                         .HasMaxLength(254);
 
                     b.HasKey("Id");
@@ -572,45 +716,53 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.Weather", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("CloudCoverPercent")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnName("CreatedDateUtc");
+                        .HasColumnName("CreatedDateUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(1000)")
                         .HasMaxLength(1000);
 
                     b.Property<decimal?>("Humidity")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(32)")
                         .HasMaxLength(32);
 
                     b.Property<decimal?>("TemperatureDegreesKelvin")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("TemperatureString")
+                        .HasColumnType("nvarchar(32)")
                         .HasMaxLength(32);
 
                     b.Property<decimal?>("WindDirectionDegrees")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("WindDirectionString")
+                        .HasColumnType("nvarchar(32)")
                         .HasMaxLength(32);
 
                     b.Property<decimal?>("WindGustMeterPerSecond")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("WindGustString")
+                        .HasColumnType("nvarchar(32)")
                         .HasMaxLength(32);
 
                     b.Property<decimal?>("WindSpeedMeterPerSecond")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("WindSpeedString")
+                        .HasColumnType("nvarchar(32)")
                         .HasMaxLength(32);
 
                     b.HasKey("Id");
@@ -621,7 +773,8 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.WeatherSettings", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("Latitude")
                         .HasColumnType("decimal(18, 2)");
@@ -629,9 +782,11 @@ namespace SailScores.Database.Migrations
                     b.Property<decimal?>("Longitude")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.Property<string>("TemperatureUnits");
+                    b.Property<string>("TemperatureUnits")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("WindSpeedUnits");
+                    b.Property<string>("WindSpeedUnits")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -640,16 +795,17 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.BoatClass", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("BoatClasses")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Club", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.ScoringSystem", "DefaultScoringSystem")
-                        .WithMany()
+                        .WithMany("DefaultForClubs")
                         .HasForeignKey("DefaultScoringSystemId");
 
                     b.HasOne("SailScores.Database.Entities.WeatherSettings", "WeatherSettings")
@@ -662,12 +818,14 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.BoatClass", "BoatClass")
                         .WithMany()
                         .HasForeignKey("BoatClassId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("Competitors")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.CompetitorFleet", b =>
@@ -675,20 +833,23 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Competitor", "Competitor")
                         .WithMany("CompetitorFleets")
                         .HasForeignKey("CompetitorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
                         .WithMany("CompetitorFleets")
                         .HasForeignKey("FleetId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Fleet", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("Fleets")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.FleetBoatClass", b =>
@@ -696,12 +857,14 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.BoatClass", "BoatClass")
                         .WithMany()
                         .HasForeignKey("BoatClassId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
                         .WithMany("FleetBoatClasses")
                         .HasForeignKey("FleetId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.HistoricalResults", b =>
@@ -709,15 +872,17 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Series", "Series")
                         .WithMany()
                         .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Race", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("Races")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
                         .WithMany()
@@ -730,10 +895,11 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.Regatta", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("Regattas")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.ScoringSystem", "ScoringSystem")
                         .WithMany()
@@ -742,7 +908,8 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Season", "Season")
                         .WithMany()
                         .HasForeignKey("SeasonId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.RegattaFleet", b =>
@@ -750,12 +917,14 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
                         .WithMany()
                         .HasForeignKey("FleetId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.Regatta", "Regatta")
                         .WithMany("RegattaFleet")
                         .HasForeignKey("RegattaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.RegattaSeries", b =>
@@ -763,12 +932,14 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Regatta", "Regatta")
                         .WithMany("RegattaSeries")
                         .HasForeignKey("RegattaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.Series", "Series")
                         .WithMany()
                         .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Score", b =>
@@ -776,25 +947,28 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Competitor", "Competitor")
                         .WithMany("Scores")
                         .HasForeignKey("CompetitorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.Race", "Race")
                         .WithMany("Scores")
                         .HasForeignKey("RaceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.ScoreCode", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.ScoringSystem")
+                    b.HasOne("SailScores.Database.Entities.ScoringSystem", null)
                         .WithMany("ScoreCodes")
                         .HasForeignKey("ScoringSystemId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.ScoringSystem", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("ScoringSystems")
                         .HasForeignKey("ClubId");
 
@@ -805,18 +979,20 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.Season", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("Seasons")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Series", b =>
                 {
-                    b.HasOne("SailScores.Database.Entities.Club")
+                    b.HasOne("SailScores.Database.Entities.Club", null)
                         .WithMany("Series")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.ScoringSystem", "ScoringSystem")
                         .WithMany()
@@ -825,7 +1001,8 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Season", "Season")
                         .WithMany("Series")
                         .HasForeignKey("SeasonId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.SeriesChartResults", b =>
@@ -833,7 +1010,8 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Series", "Series")
                         .WithMany()
                         .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.SeriesRace", b =>
@@ -841,12 +1019,14 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.Race", "Race")
                         .WithMany("SeriesRaces")
                         .HasForeignKey("RaceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SailScores.Database.Entities.Series", "Series")
                         .WithMany("RaceSeries")
                         .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -14,6 +14,7 @@ namespace SailScores.Web.Services
     {
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IRaceService _coreRaceService;
+        private readonly Core.Services.ISeriesService _coreSeriesService;
         private readonly IScoringService _coreScoringService;
         private readonly Core.Services.IRegattaService _coreRegattaService;
         private readonly IWeatherService _weatherService;
@@ -22,6 +23,7 @@ namespace SailScores.Web.Services
         public RaceService(
             Core.Services.IClubService clubService,
             Core.Services.IRaceService coreRaceService,
+            Core.Services.ISeriesService coreSeriesService,
             Core.Services.IScoringService coreScoringService,
             Core.Services.IRegattaService coreRegattaService,
             IWeatherService weatherService,
@@ -29,6 +31,7 @@ namespace SailScores.Web.Services
         {
             _coreClubService = clubService;
             _coreRaceService = coreRaceService;
+            _coreSeriesService = coreSeriesService;
             _coreScoringService = coreScoringService;
             _coreRegattaService = coreRegattaService;
             _weatherService = weatherService;
@@ -90,25 +93,6 @@ namespace SailScores.Web.Services
 
         }
 
-        private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(string clubInitials)
-        {
-            var club = await _coreClubService.GetFullClub(clubInitials);
-            var model = new RaceWithOptionsViewModel
-            {
-                ClubId = club.Id,
-                FleetOptions = club.Fleets,
-                SeriesOptions = club.Series,
-                ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
-                    .OrderBy(s => s.Name).ToList(),
-                CompetitorOptions = club.Competitors,
-                CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name),
-                Date = DateTime.Today,
-                Weather = (await GetCurrentWeatherAsync(club.Id)),
-                WeatherIconOptions = GetWeatherIconOptions()
-            };
-            return model;
-        }
-
         private IList<KeyValuePair<string, string>> GetWeatherIconOptions()
         {
             return _weatherService.GetWeatherIconOptions();
@@ -118,21 +102,40 @@ namespace SailScores.Web.Services
         {
             return await _weatherService.GetCurrentWeatherForClubAsync(clubId);
         }
+        private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(string clubInitials)
+        {
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            var model = new RaceWithOptionsViewModel
+            {
+                ClubId = clubId,
+                FleetOptions = await _coreClubService.GetAllFleets(clubId),
+                SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(clubId, DateTime.Today, false),
+                ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(clubId))
+                    .OrderBy(s => s.Name).ToList(),
+                CompetitorOptions = new List<Competitor>(),
+                CompetitorBoatClassOptions = (await _coreClubService.GetAllBoatClasses(clubId)).OrderBy(c => c.Name),
+                Date = DateTime.Today,
+                Weather = (await GetCurrentWeatherAsync(clubId)),
+                WeatherIconOptions = GetWeatherIconOptions(),
+                ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(clubId)
+            };
+            return model;
+        }
 
         private async Task<RaceWithOptionsViewModel> CreateRegattaRaceAsync(
             string clubInitials,
             Guid? regattaId)
         {
-            var club = await _coreClubService.GetFullClub(clubInitials);
-            var regatta = club.Regattas.Single(r => r.Id == regattaId);
-            var model = new RaceWithOptionsViewModel();
-            model.ClubId = club.Id;
+            var model = await CreateClubRaceAsync(clubInitials);
+            if(!regattaId.HasValue)
+            {
+                return model;
+            }
+            //var club = await _coreClubService.GetFullClub(clubInitials);
+            var regatta = await _coreRegattaService.GetRegattaAsync(regattaId.Value);
+            
             model.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
             model.FleetOptions = regatta.Fleets;
-            model.SeriesOptions = club.Series;
-            model.CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
-            model.Weather = await GetCurrentWeatherAsync(club.Id);
-            model.WeatherIconOptions = GetWeatherIconOptions();
             if (regatta.ScoringSystemId.HasValue)
             {
                 var scoreSystem = await _coreScoringService
@@ -144,7 +147,7 @@ namespace SailScores.Web.Services
             }
             else
             {
-                model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+                model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(model.ClubId))
                     .OrderBy(s => s.Name).ToList();
             }
             model.CompetitorOptions = regatta.Fleets?.FirstOrDefault()?.Competitors;
@@ -169,20 +172,15 @@ namespace SailScores.Web.Services
             string clubInitials,
             Guid seriesId)
         {
-            var club = await _coreClubService.GetFullClub(clubInitials);
-            var series = club.Series.Single(r => r.Id == seriesId);
-            var model = new RaceWithOptionsViewModel();
-            model.ClubId = club.Id;
-            model.Date = DateTime.Today;
-            model.FleetOptions = club.Fleets;
-            model.SeriesOptions = club.Series;
-            model.CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            var model = await CreateClubRaceAsync(clubInitials);
+
+            //var club = await _coreClubService.GetFullClub(clubInitials);
+            var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
+            
             model.SeriesIds = new List<Guid>
             {
                 seriesId
             };
-            model.Weather = await GetCurrentWeatherAsync(club.Id);
-            model.WeatherIconOptions = GetWeatherIconOptions();
             if (series.ScoringSystemId.HasValue)
             {
                 var scoreSystem = await _coreScoringService
@@ -194,10 +192,9 @@ namespace SailScores.Web.Services
             }
             else
             {
-                model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+                model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(model.ClubId))
                     .OrderBy(s => s.Name).ToList();
             }
-            model.CompetitorOptions = club.Competitors;
             
             return model;
         }

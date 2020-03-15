@@ -11,16 +11,12 @@
             </div>
             <div id="compCreateAlert" class="alert alert-danger alert-dismissible collapse" role="alert">
                 <strong>Oops.</strong> Creating the competitor failed. Are the fields all filled in?
-                <button type="button" class="close" onclick="window.SailScores.hideAlert()" aria-label="Close">
+                <button type="button" id="closebutton" class="close" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="compform"
-                  method="post" class="col-12" data-ajax="true" data-ajax-method="post"
-                  data-ajax-url="@Url.Action("Create", "Competitor")"
-                  data-ajax-loading="#compLoading"
-                  data-ajax-failure="window.SailScores.completeCompCreateFailed"
-                  data-ajax-success="window.SailScores.completeCompCreate">
+            <form id="compform" class="col-12"
+                  data-submit-url="@Url.Action("Create", "Competitor")">
                 <div class="modal-body">
 
                     <input type="text" name="IsActive" value="true" hidden />
@@ -48,7 +44,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button id="submitNewComp" type="submit" class="btn btn-primary">
                         <span class="spinner-border spinner-border-sm" id="compLoading" role="status" aria-hidden="true" style="display:none;">
                             <span class="sr-only">Loading...</span>
                         </span>

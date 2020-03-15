@@ -1,5 +1,6 @@
 ﻿
-var seriesChart = (function () {
+(function () {
+
 
     var chartSeriesId;
     var chartElementId;
@@ -13,13 +14,19 @@ var seriesChart = (function () {
     var minDate;
     var maxDate;
 
+    var charts = document.getElementsByClassName("results-chart");
+    for (var i = 0; i < charts.length; i++) {
+        drawChart(charts[i].dataset.seriesId, "#"+charts[i].id)
+    }
 
 
     function drawChart(seriesId, elementId) {
         chartSeriesId = seriesId;
         chartElementId = elementId;
         var dataPath = "/series/chart?seriesId=" + seriesId;
-        d3.json(dataPath).then(processChartData);
+        if (typeof(d3) != "undefined" && d3 != null) {
+            d3.json(dataPath).then(processChartData);
+        }
     }
 
     function getDate(result, allData) {
@@ -281,4 +288,4 @@ var seriesChart = (function () {
         drawChart: drawChart
     };
 
-});
+})();

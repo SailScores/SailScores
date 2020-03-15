@@ -1,9 +1,10 @@
-﻿@{
+﻿@model SailScores.Web.Models.SailScores.AboutViewModel
+@{
     ViewData["Title"] = "About SailScores";
 }
 
 
-<h2>Sailing scoring kept simple.</h2>
+<h1 class="h2">Sailing scoring kept simple.</h1>
 <p>
     SailScores makes publishing sail race results simple and
     fast: simple enough that the scores can be entered and shared
@@ -54,7 +55,7 @@ We're working on new features, including:
     <li>Integration with social media, such as automatic posting of results to Twitter.</li>
     <li>Fields to track race conditions, with analysis for competitors in different conditions.</li>
     <li>More import and export options to integrate with existing scoring software.</li>
-    <li>Deeper trend reporting for clubs: Are your races growing year orver year?</li>
+    <li>Deeper trend reporting for clubs: Are your races growing year over year?</li>
     <li>More options for result entry: let's keep making result entry simpler and faster. We've got even more ideas for this...</li>
 </ul>
 <p>View a full list of issues and feature requests at <a href="https://github.com/jbfraser1/SailScores/issues">GitHub</a></p>
@@ -70,3 +71,5 @@ Sailscores is maintained by Jamie Fraser, <a href="mailto:jamie@widernets.com">j
 <address>
     <a href="mailto:info@sailscores.com">info@sailscores.com</a><br />
 </address>
+<br/>
+<p><small><code>v@(Model.Version)</code></small></p>

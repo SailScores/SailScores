@@ -57,6 +57,33 @@ namespace SailScores.Core.Services
             return bizObj;
         }
 
+
+        public async Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId)
+        {
+            var dbFleets = await _dbContext
+                .Fleets
+                .Where(f => f.ClubId == clubId
+                    && !f.IsHidden
+                    && f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                .ToListAsync();
+
+            var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
+            return bizObj;
+        }
+
+
+        public async Task<IEnumerable<BoatClass>> GetAllBoatClasses(Guid clubId)
+        {
+            var dbClasses = await _dbContext
+                .BoatClasses
+                .Where(bc => bc.ClubId == clubId)
+                .ToListAsync();
+
+            var bizObj = _mapper.Map<IList<BoatClass>>(dbClasses);
+
+            return bizObj;
+        }
+
         public async Task<IList<Model.Club>> GetClubs(bool includeHidden)
         {
             var dbObjects = await _dbContext
@@ -87,19 +114,25 @@ namespace SailScores.Core.Services
         public async Task<Model.Club> GetFullClub(Guid id)
         {
             IQueryable<Db.Club> clubQuery =
-                            _dbContext.Clubs.Where(c => c.Id == id);
+                            _dbContext.Clubs.Where(c => c.Id == id)
+                            .Include(c => c.Seasons);
+            var club = await clubQuery.FirstAsync();
 
-            var club = await clubQuery
+            await clubQuery
                 .Include(c => c.Races)
                     .ThenInclude(r => r.Scores)
                 .Include(c => c.Races)
                     .ThenInclude(r => r.Fleet)
+                    .LoadAsync();
+            await clubQuery
                 .Include(c => c.Seasons)
                 .Include(c => c.Series)
-                    .ThenInclude(s => s.RaceSeries)
+                    .ThenInclude(s => s.RaceSeries).LoadAsync();
+            await clubQuery
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
-                .Include(c => c.DefaultScoringSystem)
+                .LoadAsync();
+            await clubQuery.Include(c => c.DefaultScoringSystem)
                 .Include(c => c.ScoringSystems)
                 .Include(c => c.Fleets)
                     .ThenInclude(f => f.CompetitorFleets)
@@ -128,6 +161,18 @@ namespace SailScores.Core.Services
             var dbClub = await _dbContext.Clubs
                 .Include(c => c.WeatherSettings)
                 .FirstAsync(c => c.Id == id);
+
+            var retClub = _mapper.Map<Model.Club>(dbClub);
+
+            return retClub;
+
+        }
+        public async Task<Model.Club> GetMinimalClub(string clubInitials)
+        {
+
+            var dbClub = await _dbContext.Clubs
+                .Include(c => c.WeatherSettings)
+                .FirstAsync(c => c.Initials == clubInitials);
 
             var retClub = _mapper.Map<Model.Club>(dbClub);
 
@@ -227,7 +272,7 @@ namespace SailScores.Core.Services
             foreach (var scoringSystem in dbClub.ScoringSystems)
             {
                 scoringSystem.Id = GetNewGuid(scoringSystem.Id);
-                scoringSystem.ClubId = dbClub.Id;
+                scoringSystem.OwningClubId = dbClub.Id;
                 foreach (var scoreCode in scoringSystem.ScoreCodes)
                 {
                     scoreCode.Id = GetNewGuid(scoreCode.Id);
@@ -346,5 +391,11 @@ namespace SailScores.Core.Services
             }
             return oldGuid;
         }
+
+        public async Task<bool> DoesClubHaveCompetitors(Guid clubId)
+        {
+            return await _dbContext.Competitors.AnyAsync(c => c.ClubId == clubId);
+        }
+
     }
 }

@@ -16,14 +16,17 @@ namespace SailScores.Web.Controllers
 
         private readonly CoreServices.IClubService _clubservice;
         private readonly IRegattaService _regattaService;
+        private readonly IAppVersionService _versionService;
 
         public HomeController(
             CoreServices.IClubService clubService,
-            IRegattaService regattaService)
+            IRegattaService regattaService,
+            IAppVersionService versionService)
 
         {
             _clubservice = clubService;
             _regattaService = regattaService;
+            _versionService = versionService;
         }
 
         public async Task<IActionResult> Index()
@@ -48,7 +51,15 @@ namespace SailScores.Web.Controllers
 
         public IActionResult About()
         {
-            return View();
+            var vm = new AboutViewModel
+            {
+                Version = _versionService.Version
+            };
+
+#if DEBUG
+            vm.Version = _versionService.InformationalVersion;
+#endif
+            return View(vm);
         }
 
         public IActionResult News()

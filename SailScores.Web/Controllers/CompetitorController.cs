@@ -17,14 +17,14 @@ namespace SailScores.Web.Controllers
     public class CompetitorController : Controller
     {
         private readonly IClubService _clubService;
-        private readonly ICompetitorService _competitorService;
+        private readonly Web.Services.ICompetitorService _competitorService;
         private readonly IMapper _mapper;
         private readonly Services.IAuthorizationService _authService;
         private readonly Services.IAdminTipService _adminTipService;
 
         public CompetitorController(
             IClubService clubService,
-            ICompetitorService competitorService,
+            Web.Services.ICompetitorService competitorService,
             Services.IAuthorizationService authService,
             Services.IAdminTipService adminTipService,
             IMapper mapper)
@@ -82,30 +82,25 @@ namespace SailScores.Web.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             try
             {
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
                 }
-                competitor.ClubId = club.Id;
+                competitor.ClubId = clubId;
+
+                var fleets = (await _clubService.GetAllFleets(clubId))
+                    .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                    .OrderBy(f => f.Name);
                 if (!ModelState.IsValid)
                 {
-                    var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
-                        .OrderBy(f => f.Name);
                     competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
                     return View(competitor);
                 }
-                if (competitor.Fleets == null)
-                {
-                    competitor.Fleets = new List<Fleet>();
-                }
-                if (competitor.FleetIds == null)
-                {
-                    competitor.FleetIds = new List<Guid>();
-                }
+
                 foreach (var fleetId in competitor.FleetIds)
                 {
-                    competitor.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
+                    competitor.Fleets.Add(fleets.Single(f => f.Id == fleetId));
                 }
                 await _competitorService.SaveAsync(competitor);
                 if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -127,10 +122,11 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             var vm = new MultipleCompetitorsWithOptionsViewModel();
-            //todo: remove getfullclub
-            var club = await _clubService.GetFullClub(clubInitials);
-            vm.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
-            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+            var clubId = await _clubService.GetClubId(clubInitials);
+            vm.BoatClassOptions = (await _clubService.GetAllBoatClasses(clubId))
+                .OrderBy(c => c.Name);
+            var fleets = (await _clubService.GetAllFleets(clubId))
+                .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 .OrderBy(f => f.Name);
             vm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
 
@@ -154,48 +150,25 @@ namespace SailScores.Web.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             try
             {
-                var club = await _clubService.GetFullClub(clubInitials);
+                var clubId = await _clubService.GetClubId(clubInitials);
+
                 if (!ModelState.IsValid)
                 {
-                    competitorsVm.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
-                    var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                    var fleets = (await _clubService.GetAllFleets(clubId))
+                        .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                         .OrderBy(f => f.Name);
+
+                    competitorsVm.BoatClassOptions = (await _clubService.GetAllBoatClasses(clubId))
+                        .OrderBy(c => c.Name);
                     competitorsVm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
                     return View(competitorsVm);
                 }
-                if (!await _authService.CanUserEdit(User, club.Id))
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
                 }
-                var coreCompetitors = new List<Core.Model.Competitor>();
-                foreach (var comp in competitorsVm.Competitors)
-                {
-                    // if they didn't give a name or sail, skip this row.
-                    if(String.IsNullOrWhiteSpace(comp.Name)
-                        && String.IsNullOrWhiteSpace(comp.SailNumber)
-                        )
-                    {
-                        break;
-                    }
-                    var currentComp = _mapper.Map<Core.Model.Competitor>(comp);
-                    currentComp.ClubId = club.Id;
-                    currentComp.Fleets = new List<Fleet>();
-                    currentComp.BoatClassId = competitorsVm.BoatClassId;
-                    
-                    if (competitorsVm.FleetIds != null)
-                    {
-                        foreach (var fleetId in competitorsVm.FleetIds)
-                        {
-                            currentComp.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
-                        }
-                    }
-                    coreCompetitors.Add(currentComp);
-                }
 
-                foreach(var comp in coreCompetitors)
-                {
-                    await _competitorService.SaveAsync(comp);
-                }
+                await _competitorService.SaveAsync(competitorsVm, clubId);
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))
                 {
@@ -264,18 +237,6 @@ namespace SailScores.Web.Controllers
                         .OrderBy(f => f.Name);
                     competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
                     return View(competitor);
-                }
-                if (competitor.Fleets == null)
-                {
-                    competitor.Fleets = new List<Fleet>();
-                }
-                if (competitor.FleetIds == null)
-                {
-                    competitor.FleetIds = new List<Guid>();
-                }
-                foreach (var fleetId in competitor.FleetIds)
-                {
-                    competitor.Fleets.Add(club.Fleets.Single(f => f.Id == fleetId));
                 }
                 await _competitorService.SaveAsync(competitor);
 

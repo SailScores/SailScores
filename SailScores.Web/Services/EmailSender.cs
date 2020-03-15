@@ -1,6 +1,5 @@
-﻿using MailKit.Net.Smtp;
-using MimeKit;
-using MimeKit.Text;
+﻿using SendGrid;
+using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
 
 namespace SailScores.Web.Services
@@ -18,29 +17,13 @@ namespace SailScores.Web.Services
 
         public async Task SendEmailAsync(string email, string subject, string message)
         {
-            var mimeMessage = new MimeMessage();
-            mimeMessage.To.Add(new MailboxAddress(email));
-            mimeMessage.From.Add(new MailboxAddress(_emailConfiguration.SmtpFromAddress));
 
-            mimeMessage.Subject = subject; 
-            mimeMessage.Body = new TextPart(TextFormat.Html)
-            {
-                Text = message
-            };
-
-            // MailKit's SmtpClient not System.Net...!
-            using (var emailClient = new SmtpClient())
-            {
-                emailClient.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort, MailKit.Security.SecureSocketOptions.Auto);
-
-                emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
-
-                emailClient.Authenticate(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
-
-                emailClient.Send(mimeMessage);
-
-                emailClient.Disconnect(true);
-            }
+            var apiKey = _emailConfiguration.SendGridApiKey;
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress(_emailConfiguration.FromAddress);            
+            var to = new EmailAddress(email);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, message, message);
+            var response = await client.SendEmailAsync(msg);
         }
     }
 }

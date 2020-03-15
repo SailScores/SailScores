@@ -1,8 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model SailScores.Web.Models.SailScores.ClubSelectorModel
 <select id="clubSelect" hidden asp-for="SelectedClubInitials" class="form-control"
-        onchange="window.location.href =
-        '@string.Format("{0}://{1}{2}/", Context.Request.Scheme, Context.Request.Host, Url.Content("~"))' + this.value;"
+        onchange="window.location.href = '/' + this.value;"
         autocomplete="off"
         asp-items="@(new SelectList(Model.Clubs, "Initials", "Name"))">
     <option>  ----Select a club----  </option>
@@ -14,7 +13,7 @@
 <noscript>
     @foreach (var club in Model.Clubs)
     {
-        <a href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~")}/{club.Initials}")">
+        <a href="@($"/{club.Initials}")">
         @club.Initials - @club.Name
         </a><br />
     }

@@ -1,10 +1,15 @@
 /// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
+/// <reference types="jquery" />
 ///
+
+import $ from "jquery";
+import "bootstrap";
+import "bootstrap-select";
+
 import { competitorDto, scoreCodeDto, seriesDto } from "./interfaces/server";
 
 import { Guid } from "./guid";
 
-let competitors: competitorDto[];
 declare var scoreCodes: scoreCodeDto[];
 const noCodeString = "No Code";
 
@@ -14,8 +19,19 @@ function checkEnter(e: KeyboardEvent) {
     return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
 }
 
-export function init() {
+export function initialize() {
     document.querySelector('form').onkeypress = checkEnter;
+    $('#fleetId').change(loadFleet);
+    $('#date').change(loadSeriesOptions);
+    $('#raceState').change(raceStateChanged);
+    $('#results').on('click', '.select-code', calculatePlaces);
+    $('#results').on('click', '.move-up', moveUp);
+    $('#results').on('click', '.move-down', moveDown);
+    $('#results').on('click', '.delete-button', confirmDelete);
+    $('#scoreButtonDiv').on('click', '.add-comp-enabled', addNewCompetitorFromButton);
+    $('#deleteConfirmed').click(deleteResult);
+    $('#closefooter').click(hideScoreButtonFooter);
+    $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
         e.preventDefault();
         var form = this as HTMLFormElement;
@@ -45,6 +61,11 @@ export function loadFleet() {
     if (boatClassId) {
         $("#createCompBoatClassSelect").val(boatClassId);
     }
+    if (fleetId.length < 30) {
+        $("#createCompButton").prop('disabled', true);
+    } else {
+        $("#createCompButton").prop('disabled', false);
+    }
 
     $("#createCompFleetId").val(fleetId);
     getCompetitors(clubId, fleetId);
@@ -58,6 +79,33 @@ export function raceStateChanged() {
     if (state === "1") {
         populateEmptyWeatherFields();
     }
+}
+
+export function compCreateSubmit(e: any) {
+
+    e.preventDefault();
+    $("#compLoading").show();
+    var form = $(this as HTMLFormElement);
+    var url = form.attr("data-submit-url");
+
+    var prep = function (xhr: any) {
+        $('#compLoading').show();
+        xhr.setRequestHeader("RequestVerificationToken",
+            $('input:hidden[name="__RequestVerificationToken"]').val());
+    };
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        beforeSend: prep,
+        data: form.serialize(), // serializes the form's elements.
+        success: completeCompCreate,
+        error: completeCompCreateFailed
+    });
+
+    $("#compLoading").hide();
+
+    return false;
 }
 
 export function completeCompCreate() {
@@ -115,10 +163,17 @@ export function confirmDelete() {
 export function hideScoreButtonFooter() {
     $('#scoreButtonFooter').hide();
 }
-export function addNewCompetitorById(competitorId: Guid) {
-    let comp = allCompetitors.find(c => c.id === competitorId);
+
+export function addNewCompetitorFromButton() {
+    if (!(event.target instanceof HTMLButtonElement)) {
+        return;
+    }
+    var competitorId = event.target.dataset['competitorid'];
+    //var competitorId = $(btn).data('id');
+    let comp = allCompetitors.find(c => c.id.toString() === competitorId);
     addNewCompetitor(comp);
 }
+
 function addNewCompetitor(competitor: competitorDto) {
     var c: number = 0;
     var resultDiv = document.getElementById("results");
@@ -175,7 +230,6 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
         input.name = "Scores\[" + listIndex + "\].place";
         if (shouldCompKeepScore(resultItems[i])) {
             input.value = resultItems[i].getAttribute("data-place");
-        } else {
         }
         form.appendChild(input);
 
@@ -206,7 +260,7 @@ export function calculatePlaces() {
         var span = resultItems[i].getElementsByClassName("race-place")[0];
         resultItems[i].setAttribute("data-place", i.toString());
         var origScore = resultItems[i].getAttribute("data-originalScore");
-        if (span.id != "competitorTemplate") {
+        if (span.id !== "competitorTemplate") {
             if (shouldCompKeepScore(resultItems[i]) &&
                 origScore !== "0") {
                 span.textContent = (scoreCount).toString();
@@ -243,7 +297,6 @@ function competitorIsInResults(comp: competitorDto) {
 
 function getSuggestions(): AutocompleteSuggestion[] {
     const competitorSuggestions: AutocompleteSuggestion[] = [];
-    console.debug("checking for comps in results");
     allCompetitors.forEach(c => {
         if (!competitorIsInResults(c)) {
             let comp = {
@@ -263,7 +316,7 @@ function getSuggestions(): AutocompleteSuggestion[] {
 var allCompetitors: competitorDto[];
 var competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
-    if (clubId && fleetId) {
+    if ($ && clubId && fleetId && fleetId.length > 31) {
         $.getJSON("/api/Competitors",
             {
                 clubId: clubId,
@@ -339,17 +392,14 @@ function initializeButtonFooter() {
     }
     allCompetitors.forEach(c => {
         let style = 'btn ';
-        let script = '';
         if (!competitorIsInResults(c)) {
-            style += 'btn-outline-primary';
-            script = 'window.SailScores.addNewCompetitorById(\'' +
-                c.id + '\')';
+            style += 'btn-outline-primary add-comp-enabled';
         } else {
-            style += 'btn-primary';
+            style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-id="' + c.id + '" onclick="' + script +
-            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            '" data-competitorid="' + c.id + '" > ' +
+            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
     });
 }
 
@@ -357,17 +407,14 @@ function updateButtonFooter() {
     $('#scoreButtonDiv').empty();
     allCompetitors.forEach(c => {
         let style = 'btn ';
-        let script = '';
         if (!competitorIsInResults(c)) {
-            style += 'btn-outline-primary';
-            script = 'window.SailScores.addNewCompetitorById(\'' +
-                c.id + '\')';
+            style += 'btn-outline-primary add-comp-enabled';
         } else {
-            style += 'btn-primary';
+            style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-id="' + c.id + '" onclick="' + script +
-            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            '" data-competitorid="' + c.id + '" > ' +
+            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
 
     });
 }
@@ -406,7 +453,7 @@ function shouldHaveManualEntry(compListItem: HTMLLIElement): boolean {
         return false;
     }
     const fullCodeObj = scoreCodes.filter(s => s.name === codeText);
-    return (fullCodeObj[0].formula == "MAN");
+    return (fullCodeObj[0].formula === "MAN");
 }
 
 function clearWeatherFields() {
@@ -426,7 +473,6 @@ function populateEmptyWeatherFields() {
     $.getJSON("/" + initials +"/weather/current/",
         {},
         function (data: any) {
-            console.log(data);
             if (data.icon && $("#weatherIcon").val(null)) {
                 $("#weatherIcon").val(data.icon);
 
@@ -455,3 +501,5 @@ function populateEmptyWeatherFields() {
             }
         });
 }
+
+initialize();

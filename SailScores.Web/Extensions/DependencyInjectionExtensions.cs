@@ -11,6 +11,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<ISeriesService, SeriesService>();
             services.AddScoped<IFleetService, FleetService>();
             services.AddScoped<IRaceService, RaceService>();
+            services.AddScoped<ICompetitorService, CompetitorService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IRegattaService, RegattaService>();
@@ -19,6 +20,8 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IMergeService, MergeService>();
             services.AddScoped<IClubRequestService, ClubRequestService>();
             services.AddScoped<IWeatherService, WeatherService>();
+            services.AddTransient<IAppVersionService, AppVersionService>();
+
         }
     }
 }

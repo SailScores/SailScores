@@ -1,34 +1,41 @@
 ﻿(function () {
     var allCompDiv = document.getElementsByName("competitors[0].Name")[0];
     allCompDiv = document.getElementById('allCompetitors');
-    allCompDiv.onpaste = function (event) {
+    if (allCompDiv) {
+        allCompDiv.onpaste = function (event) {
 
-        var clipText = event.clipboardData.getData('text/plain')
-        var clipRows = clipText.split(String.fromCharCode(13));
-        for (var i = 0; i < clipRows.length; i++) {
-            clipRows[i] = clipRows[i].split(String.fromCharCode(9));
-        }
-        if (clipRows.length === 1 && clipRows[0].length === 1) {
-            return;
-        }
+            var clipText = event.clipboardData.getData('text/plain');
+            var clipRows = clipText.split(String.fromCharCode(13));
+            for (var i = 0; i < clipRows.length; i++) {
+                clipRows[i] = clipRows[i].split(String.fromCharCode(9));
+            }
+            if (clipRows.length === 1 && clipRows[0].length === 1) {
+                return;
+            }
 
-        event.preventDefault();
-        //get starting position:
-        var startColumn = Number(event.target.dataset.column) || 0;
-        var startRow = Number(event.target.dataset.row) || 0;
+            event.preventDefault();
+            //get starting position:
+            var startColumn = Number(event.target.dataset.column) || 0;
+            var startRow = Number(event.target.dataset.row) || 0;
 
-        // paste the array:
-        for (var i = 0; i < clipRows.length; i++) {
-            for (var j = 0; j < clipRows[i].length; j++) {
-                if (startColumn + j < 4) {
-                    getInputAtRowColumn(startRow + i, startColumn + j).value = clipRows[i][j];
+            // paste the array:
+            for (i = 0; i < clipRows.length; i++) {
+                for (var j = 0; j < clipRows[i].length; j++) {
+                    if (startColumn + j < 4) {
+                        getInputAtRowColumn(startRow + i, startColumn + j).value = clipRows[i][j];
+                    }
                 }
             }
-        }
 
-        event.stopPropagation();
-        event.preventDefault();
+            event.stopPropagation();
+            event.preventDefault();
+        };
     };
+    var closeBox = docuemnt.getElementById("closebutton");
+    closeBox.onclick = function (event) {
+            $("#compCreateAlert").hide();
+    }
+
 })();
 
 function getInputAtRowColumn(row, column) {
@@ -38,7 +45,7 @@ function getInputAtRowColumn(row, column) {
     if (!rowArray || rowArray.length === 0) {
         if (allCompDiv.querySelectorAll(".row").length > 102) {
             alert("Only 100 competitors can be added at a time.");
-            throw ("Too many rows added.");
+            throw "Too many rows added.";
         }
         addNewRow();
         return getInputAtRowColumn(row, column);
@@ -46,7 +53,7 @@ function getInputAtRowColumn(row, column) {
     var elementSelector = rowSelector + "[data-column=\"" + column + "\"]";
     var elementArray = document.querySelectorAll(elementSelector);
     if (!elementArray || elementArray.length < 1) {
-        throw ("Problem finding input.");
+        throw "Problem finding input.";
     }
     return elementArray[0];
 }
@@ -55,7 +62,7 @@ function addNewRow() {
     var allCompDiv = document.getElementById("allCompetitors");
     var compTemplate = document.getElementById("compRowTemplate");
 
-    var compListItem = (compTemplate.cloneNode(true));
+    var compListItem = compTemplate.cloneNode(true);
 
     //subtract two, don't count template or header row
     rowIndex = allCompDiv.querySelectorAll(".row").length - 2;
