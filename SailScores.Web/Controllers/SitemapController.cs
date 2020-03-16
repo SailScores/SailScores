@@ -18,6 +18,8 @@ namespace SailScores.Web.Controllers
 
         private readonly Core.Services.IClubService _clubservice;
 
+        private readonly string preferredBaseUrl = "https://www.sailscores.com";
+
         public SitemapController(
             Core.Services.IClubService clubService)
         {
@@ -27,7 +29,8 @@ namespace SailScores.Web.Controllers
         [Route("sitemap.xml")]
         public async Task<ActionResult> SitemapAsync()
         {
-            string baseUrl = $"{Request.Scheme}://{Request.Host}{Url.Content("~")}";
+            // CDN rewrites headers, so needed to make thisless dynamic.
+            string baseUrl = preferredBaseUrl;
 
             // get a list of public clubs
             var clubs = await _clubservice.GetClubs(false);
