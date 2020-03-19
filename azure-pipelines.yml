@@ -29,8 +29,13 @@ steps:
   inputs:
     command: 'install'
     workingDir: 'SailScores.Web'
+
 - script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+  displayName: 'dotnet build $(buildConfiguration) /p:SourceRevisionId=$(Build.SourceVersion)'
+- script: 'echo -e "$(Build.BuildNumber)\n$(Build.BuildId)" > .buildinfo.json'
+  displayName: "Emit build number"
+  workingDirectory: '$(Build.SourcesDirectory)/SailScores.Web'
+  failOnStderr: true
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
