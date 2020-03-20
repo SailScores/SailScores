@@ -22,6 +22,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IWeatherService, WeatherService>();
 
             services.AddSingleton<AppVersionInfo>();
+            services.AddSingleton<AppSettingsService>();
 
         }
     }
