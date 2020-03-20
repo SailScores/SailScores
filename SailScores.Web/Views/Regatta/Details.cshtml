@@ -2,10 +2,12 @@
 @using SailScores.Web.Resources;
 @using SailScores.Web.Extensions;
 @using Microsoft.AspNetCore.Http.Extensions;
+@using SailScores.Web.Services;
 
 @using SailScores.Web.Models.SailScores
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
 
 @model ClubItemViewModel<RegattaViewModel>
 @{
@@ -60,20 +62,20 @@
                     <a asp-controller="Fleet"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
-                       asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Fleet"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Competitor"
                        asp-action="Create"
-                       asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Competitor"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Race"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
-                       asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
             </div>
@@ -136,8 +138,8 @@
                     </thead>
                     <tbody>
                         @foreach (var comp in fleet.Competitors.OrderBy(
-                       c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
-                       .ThenBy(c => c.Name))
+                     c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
+                     .ThenBy(c => c.Name))
                         {
                             <tr>
                                 <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>

@@ -23,15 +23,21 @@ namespace SailScores.Web.Services
 
         public string GetPreferredUri(HttpRequest request)
         {
-            //var preferredBase = _config["baseUrl"];
-            //if (String.IsNullOrWhiteSpace(preferredBase))
-            //{
-            //    return request.GetEncodedUrl();
-            //}
-            request.Host = new HostString("www.sailscores.com");
-            //var newUri = (new Uri(preferredBase, request.Path.ToUriComponent())).ToString() + "?" + request.QueryString.ToUriComponent();
-            //return request.GetEncodedUrl();
-            return "~" + request.GetEncodedPathAndQuery();
+            var preferredhost = _config["basehost"];
+            if (!String.IsNullOrWhiteSpace(preferredhost))
+            {
+                request.Host = new HostString(preferredhost);
+            }
+
+            var absoluteUri = string.Concat(
+                        request.Scheme,
+                        "://",
+                        request.Host.ToUriComponent(),
+                        request.PathBase.ToUriComponent(),
+                        request.Path.ToUriComponent(),
+                        request.QueryString.ToUriComponent());
+
+            return absoluteUri;
         }
 
         public string Version =>

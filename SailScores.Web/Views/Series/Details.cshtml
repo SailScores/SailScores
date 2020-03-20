@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.Http.Extensions;
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
 
 @model ClubItemViewModel<Series>
 
@@ -48,10 +49,10 @@
             <div class="row bg-light">
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Race"
-                        asp-action="Create"
-                        asp-route-seriesId="@Model.Item.Id"
-                        asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
-                        class="btn btn-outline-primary">@localizer["New Race"]</a>
+                       asp-action="Create"
+                       asp-route-seriesId="@Model.Item.Id"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                       class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
             </div>
         }
