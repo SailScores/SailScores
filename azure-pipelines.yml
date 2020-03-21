@@ -34,12 +34,14 @@ steps:
   workingDirectory: '$(Build.SourcesDirectory)/SailScores.Web'
   failOnStderr: true
 - task: DotNetCoreCLI@2
+  displayName: "Publish"
   inputs:
     command: 'publish'
     publishWebProjects: true
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --no-build'
+    arguments: '--configuration $(BuildConfiguration) --no-build'
     zipAfterPublish: True
 - task: AzureRmWebAppDeployment@4
+  displayName: "Deploy to Prod"
   inputs:
     ConnectionType: 'AzureRM'
     azureSubscription: 'Pay-As-You-Go(f7df2a10-9d9b-4209-a82e-72626aa77ee8)'
