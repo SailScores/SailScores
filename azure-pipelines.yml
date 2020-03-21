@@ -45,7 +45,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: true
-    arguments: '-r $(rid) --configuration $(BuildConfiguration) --no-build'
+    arguments: '-r $(rid) --configuration $(BuildConfiguration) -p:Version=$(VERSION_TAG) -p:SourceRevisionId=$(Build.SourceVersion)'
     zipAfterPublish: True
 
 - task: AzureRmWebAppDeployment@4
