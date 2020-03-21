@@ -109,8 +109,8 @@ namespace SailScores.Web.Services
         }
 
         public string Version =>
-    Assembly.GetEntryAssembly()
-    .GetName().Version.ToString();
+            Assembly.GetEntryAssembly()
+            .GetName().Version.ToString();
 
         public string InformationalVersion =>
             Assembly.GetEntryAssembly()

@@ -39,15 +39,5 @@ namespace SailScores.Web.Services
 
             return absoluteUri;
         }
-
-        public string Version =>
-    Assembly.GetEntryAssembly()
-    .GetName().Version.ToString();
-
-        public string InformationalVersion =>
-            Assembly.GetEntryAssembly()
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            .InformationalVersion;
-
     }
 }
