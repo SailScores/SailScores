@@ -28,7 +28,7 @@ steps:
   displayName: Set the tag name as an environment variable
 
 - script: dotnet build --configuration $(buildConfiguration) -p:Version=$(VERSION_TAG) /p:SourceRevisionId=$(Build.SourceVersion)
-  displayName: 'dotnet build $(buildConfiguration) /p:SourceRevisionId=$(Build.SourceVersion)'
+  displayName: 'dotnet build $(buildConfiguration)'
 - script: 'echo -e "$(Build.BuildNumber)\n$(Build.BuildId)" > .buildinfo.json'
   displayName: "Emit build number"
   workingDirectory: '$(Build.SourcesDirectory)/SailScores.Web'
@@ -37,6 +37,8 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: true
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --no-build'
+    zipAfterPublish: True
 - task: AzureRmWebAppDeployment@4
   inputs:
     ConnectionType: 'AzureRM'
