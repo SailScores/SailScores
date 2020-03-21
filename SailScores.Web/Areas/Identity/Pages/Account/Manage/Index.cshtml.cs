@@ -137,7 +137,7 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 email,
-                "Confirm your SailScores.com account",
+                "Confirm your SailScores account",
                 $"Please confirm your SailScores account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
             StatusMessage = "Verification email sent. Please check your email.";
