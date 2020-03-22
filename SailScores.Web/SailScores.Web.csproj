@@ -13,11 +13,20 @@
   <PropertyGroup>
     <ServerGarbageCollection>false</ServerGarbageCollection>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>SailScores.Web.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Scripts\guid.ts" />
     <None Remove="Scripts\interfaces\server.ts" />
     <None Remove="Scripts\raceEditor.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include=".well-known\placeholder.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -66,7 +75,6 @@
     <Folder Include="Areas\Api\Models\" />
     <Folder Include="Areas\Api\Views\" />
     <Folder Include="Data\" />
-    <Folder Include=".well-known\" />
     <Folder Include="Views\Error\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>

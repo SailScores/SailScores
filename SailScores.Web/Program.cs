@@ -61,13 +61,17 @@ namespace SailScores.Web
             {
 
                 return WebHost.CreateDefaultBuilder(args)
+                    .ConfigureLogging(c =>
+                        c.AddConsole())
                     .UseSetting("https_port", _sslPort.ToString())
-                    .UseStartup<Startup>()
-                    .UseSerilog();
+                    .UseStartup<Startup>();
+                    //.UseSerilog();
             }
             return WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseSerilog();
+                                    .ConfigureLogging(c =>
+                        c.AddConsole())
+                .UseStartup<Startup>();
+                //.UseSerilog();
         }
     }
 }
