@@ -2,9 +2,11 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources;
+@using SailScores.Web.Services;
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject AppSettingsService settingsService
 
 @inject IStringLocalizer<SharedResource> localizer
 
@@ -18,5 +20,5 @@
 else
 {
     <a class="nav-link pt-0" asp-area="" asp-controller="Account" asp-action="Login"
-       asp-route-returnUrl="@Context.Request.GetEncodedUrl()">@localizer["Log in"]</a>
+       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">@localizer["Log in"]</a>
 }

@@ -9,6 +9,7 @@ using SailScores.Core.Services;
 using SailScores.Web.Models;
 using SailScores.Web.Services;
 using SailScores.Web.Models.Sitemap;
+using Microsoft.Extensions.Configuration;
 
 namespace SailScores.Web.Controllers
 {
@@ -17,17 +18,23 @@ namespace SailScores.Web.Controllers
     {
 
         private readonly Core.Services.IClubService _clubservice;
+        private readonly IConfiguration _config;
 
         public SitemapController(
-            Core.Services.IClubService clubService)
+            Core.Services.IClubService clubService,
+            IConfiguration config)
         {
             _clubservice = clubService;
+            _config = config;
         }
 
         [Route("sitemap.xml")]
         public async Task<ActionResult> SitemapAsync()
         {
-            string baseUrl = $"{Request.Scheme}://{Request.Host}{Url.Content("~")}";
+
+            var preferredhost = _config["PreferredHost"];
+            // CDN rewrites headers, so needed to make this less dynamic.
+            string baseUrl = $"https://{preferredhost}";
 
             // get a list of public clubs
             var clubs = await _clubservice.GetClubs(false);

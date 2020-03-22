@@ -16,12 +16,12 @@ namespace SailScores.Web.Controllers
 
         private readonly CoreServices.IClubService _clubservice;
         private readonly IRegattaService _regattaService;
-        private readonly IAppVersionService _versionService;
+        private readonly AppVersionInfo _versionService;
 
         public HomeController(
             CoreServices.IClubService clubService,
             IRegattaService regattaService,
-            IAppVersionService versionService)
+            AppVersionInfo versionService)
 
         {
             _clubservice = clubService;
@@ -53,7 +53,12 @@ namespace SailScores.Web.Controllers
         {
             var vm = new AboutViewModel
             {
-                Version = _versionService.Version
+                Version = _versionService.Version,
+                Framework = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+                ShortGitHash = _versionService.ShortGitHash,
+                GitHash = _versionService.GitHash,
+                BuildId = _versionService.BuildId,
+                BuildNumber = _versionService.BuildNumber
             };
 
 #if DEBUG

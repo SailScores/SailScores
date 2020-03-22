@@ -2,8 +2,10 @@
 @using SailScores.Web.Resources;
 @using SailScores.Web.Extensions;
 @using Microsoft.AspNetCore.Http.Extensions;
+@using SailScores.Web.Services;
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
 
 @model SailScores.Web.Models.SailScores.ClubSummaryViewModel
 @{
@@ -182,13 +184,13 @@
         <div class="col-sm-3 my-2">
             <a asp-controller="Competitor"
                asp-action="CreateMultiple"
-               asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                class="btn btn-outline-primary">@localizer["New Competitor"]</a>
         </div>
         <div class="col-sm-3 my-2">
             <a asp-controller="Race"
                asp-action="Create"
-               asp-route-returnUrl="@Context.Request.GetEncodedUrl()"
+               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                class="btn btn-outline-primary">@localizer["New Race"]</a>
         </div>
     </div>

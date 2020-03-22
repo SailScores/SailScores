@@ -71,5 +71,13 @@ Sailscores is maintained by Jamie Fraser, <a href="mailto:jamie@widernets.com">j
 <address>
     <a href="mailto:info@sailscores.com">info@sailscores.com</a><br />
 </address>
-<br/>
-<p><small><code>v@(Model.Version)</code></small></p>
+<br />
+
+<p>
+    <small>
+        <code>
+            src <a href="https://github.com/jbfraser1/sailscores/commit/@Model.GitHash">@Model.ShortGitHash</a>
+            build <a href="https://dev.azure.com/SailScores/SailScoresWebApp/_build/results?buildId=@Model.BuildId&view=results">@Model.BuildNumber</a>
+        </code>
+    </small>
+</p>
