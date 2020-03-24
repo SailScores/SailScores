@@ -11,6 +11,7 @@ using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public class HomeController : Controller
     {
 

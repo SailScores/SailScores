@@ -156,7 +156,11 @@ namespace SailScores.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services
-                .AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .AddMvc(option => {
+                    option.Filters.Add(new ResponseCacheAttribute() { NoStore = true, Location = ResponseCacheLocation.None });
+                    option.EnableEndpointRouting = false;
+                    })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
             services.AddTransient<IEmailSender, EmailSender>();
