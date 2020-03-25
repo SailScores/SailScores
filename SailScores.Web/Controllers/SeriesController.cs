@@ -21,7 +21,6 @@ namespace SailScores.Web.Controllers
         private readonly Web.Services.ISeriesService _seriesService;
         private readonly Core.Services.IClubService _clubService;
         private readonly Services.IAuthorizationService _authService;
-        private readonly IScoringService _scoringService;
         private readonly Services.IAdminTipService _adminTipService;
         private readonly ICsvService _csvService;
         private readonly IMapper _mapper;
@@ -30,7 +29,6 @@ namespace SailScores.Web.Controllers
             Web.Services.ISeriesService seriesService,
             Core.Services.IClubService clubService,
             Services.IAuthorizationService authService,
-            IScoringService scoringService,
             Services.IAdminTipService adminTipService,
             Services.ICsvService csvService,
             IMapper mapper)
@@ -38,7 +36,6 @@ namespace SailScores.Web.Controllers
             _seriesService = seriesService;
             _clubService = clubService;
             _authService = authService;
-            _scoringService = scoringService;
             _adminTipService = adminTipService;
             _csvService = csvService;
             _mapper = mapper;
@@ -131,19 +128,7 @@ namespace SailScores.Web.Controllers
         [Authorize]
         public async Task<ActionResult> Create(string clubInitials)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            var vm = new SeriesWithOptionsViewModel
-            {
-                SeasonOptions = club.Seasons
-            };
-            var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-            scoringSystemOptions.Add(new ScoringSystem
-            {
-                Id = Guid.Empty,
-                Name = "<Use Club Default>"
-            });
-            vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
-
+            var vm = await _seriesService.GetBlankVmForCreate(clubInitials);
             var errors = _adminTipService.GetSeriesCreateErrors(vm);
             if (errors != null && errors.Count > 0)
             {
@@ -169,15 +154,9 @@ namespace SailScores.Web.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    var club = await _clubService.GetFullClub(clubInitials);
-                    model.SeasonOptions = club.Seasons;
-                    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-                    scoringSystemOptions.Add(new ScoringSystem
-                    {
-                        Id = Guid.Empty,
-                        Name = "<Use Club Default>"
-                    });
-                    model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                    var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
+                    model.SeasonOptions = blankVm.SeasonOptions;
+                    model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                     return View(model);
                 }
                 await _seriesService.SaveNew(model);
@@ -186,15 +165,9 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                var club = await _clubService.GetFullClub(clubInitials);
-                model.SeasonOptions = club.Seasons;
-                var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-                scoringSystemOptions.Add(new ScoringSystem
-                {
-                    Id = Guid.Empty,
-                    Name = "<Use Club Default>"
-                });
-                model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
+                model.SeasonOptions = blankVm.SeasonOptions;
+                model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 return View(model);
             }
         }
@@ -202,28 +175,21 @@ namespace SailScores.Web.Controllers
         [Authorize]
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
-            var series =
-                club.Series
-                .SingleOrDefault(c => c.Id == id);
+            var series = await _seriesService.GetSeriesAsync(id);
             if (series == null)
             {
                 return NotFound();
             }
-            var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
-            seriesWithOptions.SeasonOptions = club.Seasons;
 
-            var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-            scoringSystemOptions.Add(new ScoringSystem
-            {
-                Id = Guid.Empty,
-                Name = "<Use Club Default>"
-            });
-            seriesWithOptions.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+            var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
+            var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
+            seriesWithOptions.SeasonOptions = blankVm.SeasonOptions;
+            seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             return View(seriesWithOptions);
         }
 
@@ -234,23 +200,18 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.Series.Any(c => c.Id == model.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
                 }
+                model.ClubId = clubId;
 
                 if (!ModelState.IsValid)
                 {
-                    model.SeasonOptions = club.Seasons;
-                    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-                    scoringSystemOptions.Add(new ScoringSystem
-                    {
-                        Id = Guid.Empty,
-                        Name = "<Use Club Default>"
-                    });
-                    model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+                    var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
+                    model.SeasonOptions = blankVm.SeasonOptions;
+                    model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                     return View(model);
                 }
                 await _seriesService.Update(model);
