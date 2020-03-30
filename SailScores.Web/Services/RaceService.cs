@@ -237,14 +237,17 @@ namespace SailScores.Web.Services
 
         public async Task SaveAsync(RaceWithOptionsViewModel race)
         {
-            var club = await _coreClubService.GetFullClub(race.ClubId);
+            //var club = await _coreClubService.GetFullClub(race.ClubId);
+            var fleets = await _coreClubService.GetAllFleets(race.ClubId);
+            var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, DateTime.Today, false);
+
             // fill in series and fleets
             if (race.SeriesIds != null) {
-                race.Series = club.Series.Where(s => race.SeriesIds.Contains(s.Id)).ToList();
+                race.Series = series.Where(s => race.SeriesIds.Contains(s.Id)).ToList();
             }
             if(race.FleetId != default(Guid))
             {
-                race.Fleet = club.Fleets.Single(f => f.Id == race.FleetId);
+                race.Fleet = fleets.Single(f => f.Id == race.FleetId);
                 // if a regatta race, give everyone in the fleet a result
                 if (race.RegattaId.HasValue)
                 {
@@ -270,7 +273,8 @@ namespace SailScores.Web.Services
                 }
                 else
                 {
-                    var maxOrder = club.Races
+                    var races = await _coreRaceService.GetRacesAsync(race.ClubId);
+                    var maxOrder = races
                         .Where(r =>
                             r.Date == race.Date
                             && r.Fleet != null
@@ -283,13 +287,14 @@ namespace SailScores.Web.Services
             var raceDto = _mapper.Map<RaceDto>(race);
             if (race.Weather != null)
             {
+                var weatherSettings = (await _coreClubService.GetMinimalClub(race.ClubId)).WeatherSettings;
                 if (String.IsNullOrWhiteSpace(race.Weather.WindSpeedUnits))
                 {
-                    race.Weather.WindSpeedUnits = club?.WeatherSettings?.WindSpeedUnits;
+                    race.Weather.WindSpeedUnits = weatherSettings?.WindSpeedUnits;
                 }
                 if (String.IsNullOrWhiteSpace(race.Weather.TemperatureUnits))
                 {
-                    race.Weather.TemperatureUnits = club?.WeatherSettings?.TemperatureUnits;
+                    race.Weather.TemperatureUnits = weatherSettings?.TemperatureUnits;
                 }
             }
             var weather = _weatherService.GetStandardWeather(race.Weather);
