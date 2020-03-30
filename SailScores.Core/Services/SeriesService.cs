@@ -374,7 +374,7 @@ namespace SailScores.Core.Services
             }
             var existingSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
-                .SingleAsync(c => c.Id == model.Id);
+                .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId);
 
             existingSeries.Name = model.Name;
             // Don't update UrlName here: keep links to this series unchanged.

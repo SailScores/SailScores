@@ -118,6 +118,7 @@ namespace SailScores.Web.Controllers
                     race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
                     race.CompetitorOptions = raceOptions.CompetitorOptions;
                     race.SeriesOptions = raceOptions.SeriesOptions;
+                    race.WeatherIconOptions = raceOptions.WeatherIconOptions;
                     return View(race);
                 }
                 var clubId = await _clubService.GetClubId(clubInitials);
@@ -126,20 +127,6 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 race.ClubId = clubId;
-                if (!ModelState.IsValid)
-                {
-                    var options = await _raceService.GetBlankRaceWithOptions(
-                        clubInitials,
-                        race.RegattaId,
-                        null);
-                    race.CompetitorBoatClassOptions = options.CompetitorBoatClassOptions;
-                    race.CompetitorOptions = options.CompetitorOptions;
-                    race.FleetOptions = options.FleetOptions;
-                    race.ScoreCodeOptions = options.ScoreCodeOptions;
-                    race.SeriesOptions = options.SeriesOptions;
-                    race.WeatherIconOptions = options.WeatherIconOptions;
-                    return View(race);
-                }
                 await _raceService.SaveAsync(race);
                 if (!string.IsNullOrWhiteSpace(returnUrl))
                 {
