@@ -19,8 +19,10 @@ export function initialize() {
     $('#results').on('click', '.move-up', moveUp);
     $('#results').on('click', '.move-down', moveDown);
     $('#results').on('click', '.delete-button', confirmDelete);
+    $('#scoreButtonDiv').on('click', '.add-comp-enabled', addNewCompetitorFromButton);
     $('#deleteConfirmed').click(deleteResult);
     $('#closefooter').click(hideScoreButtonFooter);
+    $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
         e.preventDefault();
         var form = this;
@@ -48,6 +50,12 @@ export function loadFleet() {
     if (boatClassId) {
         $("#createCompBoatClassSelect").val(boatClassId);
     }
+    if (fleetId.length < 30) {
+        $("#createCompButton").prop('disabled', true);
+    }
+    else {
+        $("#createCompButton").prop('disabled', false);
+    }
     $("#createCompFleetId").val(fleetId);
     getCompetitors(clubId, fleetId);
 }
@@ -59,6 +67,26 @@ export function raceStateChanged() {
     if (state === "1") {
         populateEmptyWeatherFields();
     }
+}
+export function compCreateSubmit(e) {
+    e.preventDefault();
+    $("#compLoading").show();
+    var form = $(this);
+    var url = form.attr("data-submit-url");
+    var prep = function (xhr) {
+        $('#compLoading').show();
+        xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
+    };
+    $.ajax({
+        type: "POST",
+        url: url,
+        beforeSend: prep,
+        data: form.serialize(),
+        success: completeCompCreate,
+        error: completeCompCreateFailed
+    });
+    $("#compLoading").hide();
+    return false;
 }
 export function completeCompCreate() {
     let clubId = $("#clubId").val();
@@ -93,6 +121,7 @@ export function deleteResult() {
     var resultItem = resultList.find(`[data-competitorid='${compId}']`);
     resultItem.remove();
     calculatePlaces();
+    updateButtonFooter();
     modal.modal("hide");
 }
 export function confirmDelete() {
@@ -108,8 +137,13 @@ export function confirmDelete() {
 export function hideScoreButtonFooter() {
     $('#scoreButtonFooter').hide();
 }
-export function addNewCompetitorById(competitorId) {
-    let comp = allCompetitors.find(c => c.id === competitorId);
+export function addNewCompetitorFromButton() {
+    if (!(event.target instanceof HTMLButtonElement)) {
+        return;
+    }
+    var competitorId = event.target.dataset['competitorid'];
+    //var competitorId = $(btn).data('id');
+    let comp = allCompetitors.find(c => c.id.toString() === competitorId);
     addNewCompetitor(comp);
 }
 function addNewCompetitor(competitor) {
@@ -220,7 +254,6 @@ function competitorIsInResults(comp) {
 }
 function getSuggestions() {
     const competitorSuggestions = [];
-    console.debug("checking for comps in results");
     allCompetitors.forEach(c => {
         if (!competitorIsInResults(c)) {
             let comp = {
@@ -303,36 +336,30 @@ function initializeButtonFooter() {
     }
     allCompetitors.forEach(c => {
         let style = 'btn ';
-        let script = '';
         if (!competitorIsInResults(c)) {
-            style += 'btn-outline-primary';
-            script = 'window.SailScores.addNewCompetitorById(\'' +
-                c.id + '\')';
+            style += 'btn-outline-primary add-comp-enabled';
         }
         else {
-            style += 'btn-primary';
+            style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-id="' + c.id + '" onclick="' + script +
-            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            '" data-competitorid="' + c.id + '" > ' +
+            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
     });
 }
 function updateButtonFooter() {
     $('#scoreButtonDiv').empty();
     allCompetitors.forEach(c => {
         let style = 'btn ';
-        let script = '';
         if (!competitorIsInResults(c)) {
-            style += 'btn-outline-primary';
-            script = 'window.SailScores.addNewCompetitorById(\'' +
-                c.id + '\')';
+            style += 'btn-outline-primary add-comp-enabled';
         }
         else {
-            style += 'btn-primary';
+            style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            ' data-id="' + c.id + '" onclick="' + script +
-            '" > ' + (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            '" data-competitorid="' + c.id + '" > ' +
+            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
     });
 }
 function getCompetitorCode(compListItem) {
@@ -381,7 +408,6 @@ function clearWeatherFields() {
 function populateEmptyWeatherFields() {
     var initials = $("#clubInitials").val();
     $.getJSON("/" + initials + "/weather/current/", {}, function (data) {
-        console.log(data);
         if (data.icon && $("#weatherIcon").val(null)) {
             $("#weatherIcon").val(data.icon);
             $("#weatherIcon").selectpicker("refresh");

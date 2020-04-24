@@ -237,7 +237,6 @@ namespace SailScores.Web.Services
 
         public async Task SaveAsync(RaceWithOptionsViewModel race)
         {
-            //var club = await _coreClubService.GetFullClub(race.ClubId);
             var fleets = await _coreClubService.GetAllFleets(race.ClubId);
             var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, DateTime.Today, false);
 
@@ -285,6 +284,10 @@ namespace SailScores.Web.Services
                 }
             }
             var raceDto = _mapper.Map<RaceDto>(race);
+            if ((raceDto.SeriesIds?.Count ?? 0) != (race?.SeriesIds?.Count ?? 0))
+            {
+                raceDto.SeriesIds = race.SeriesIds;
+            }
             if (race.Weather != null)
             {
                 var weatherSettings = (await _coreClubService.GetMinimalClub(race.ClubId)).WeatherSettings;

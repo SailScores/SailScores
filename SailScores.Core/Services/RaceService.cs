@@ -162,6 +162,7 @@ namespace SailScores.Core.Services
             bool addToContext = false;
             if (race.Id != default) {
                 dbRace = await _dbContext.Races
+                    .Include(r => r.Scores)
                     .Include(r => r.SeriesRaces)
                     .Include(r => r.Weather)
                     .SingleOrDefaultAsync(r => r.Id == race.Id);
@@ -230,7 +231,7 @@ namespace SailScores.Core.Services
                 dbRace.Scores.Clear();
                 foreach (var score in race.Scores)
                 {
-                    dbRace.Scores.Add(new Db.Score
+                    var newScore = new Db.Score
                     {
                         Id = Guid.NewGuid(),
                         CompetitorId = score.CompetitorId,
@@ -238,7 +239,10 @@ namespace SailScores.Core.Services
                         Place = score.Place,
                         Code = score.Code,
                         CodePoints = score.CodePoints
-                    });
+                    };
+                    _dbContext.Scores.Add(newScore);
+
+                    dbRace.Scores.Add(newScore);
                 }
             }
             if (addToContext)

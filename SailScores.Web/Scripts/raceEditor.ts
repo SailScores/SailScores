@@ -146,6 +146,7 @@ export function deleteResult() {
     var resultItem = resultList.find(`[data-competitorid='${compId}']`);
     resultItem.remove();
     calculatePlaces();
+    updateButtonFooter();
     (<any>modal).modal("hide");
 }
 
