@@ -237,7 +237,6 @@ namespace SailScores.Web.Services
 
         public async Task SaveAsync(RaceWithOptionsViewModel race)
         {
-            //var club = await _coreClubService.GetFullClub(race.ClubId);
             var fleets = await _coreClubService.GetAllFleets(race.ClubId);
             var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, DateTime.Today, false);
 

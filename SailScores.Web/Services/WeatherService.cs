@@ -145,10 +145,16 @@ namespace SailScores.Web.Services
 
         public Weather GetStandardWeather(WeatherViewModel weather)
         {
+            var icon = weather.Icon;
+            // todo: check for valid icons.
+            if (icon.Contains("Select..."))
+            {
+                icon = string.Empty;
+            }
             var returnObj = new Weather
             {
                 Description = weather.Description,
-                Icon = weather.Icon,
+                Icon = icon,
                 TemperatureString = GetTemperatureString(weather),
                 TemperatureDegreesKelvin = GetTemperatureDecimal(weather),
                 WindSpeedString = GetWindString(weather),
