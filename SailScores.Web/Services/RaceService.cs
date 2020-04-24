@@ -285,7 +285,7 @@ namespace SailScores.Web.Services
                 }
             }
             var raceDto = _mapper.Map<RaceDto>(race);
-            if ((raceDto.SeriesIds?.Count ?? 0) != (race?.SeriesIds.Count ?? 0))
+            if ((raceDto.SeriesIds?.Count ?? 0) != (race?.SeriesIds?.Count ?? 0))
             {
                 raceDto.SeriesIds = race.SeriesIds;
             }
