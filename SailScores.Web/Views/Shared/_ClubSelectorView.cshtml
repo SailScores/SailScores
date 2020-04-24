@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model SailScores.Web.Models.SailScores.ClubSelectorModel
 <select id="clubSelect" hidden asp-for="SelectedClubInitials" class="form-control"
+        aria-label="Select Club"
         onchange="window.location.href = '/' + this.value;"
         autocomplete="off"
         asp-items="@(new SelectList(Model.Clubs, "Initials", "Name"))">
