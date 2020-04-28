@@ -383,6 +383,7 @@ namespace SailScores.Core.Services
             existingSeries.ResultsLocked = model.ResultsLocked;
             existingSeries.ScoringSystemId = model.ScoringSystemId;
             existingSeries.TrendOption = model.TrendOption;
+            existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty

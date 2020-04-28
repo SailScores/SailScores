@@ -55,7 +55,7 @@ namespace SailScores.Web.Controllers
             {
                 return new NotFoundResult();
             }
-            var vm = new ClubItemViewModel<CompetitorViewModel>
+            var vm = new ClubItemViewModel<CompetitorStatsViewModel>
             {
                 ClubInitials = clubInitials.ToUpperInvariant(),
                 Item = competitorStats

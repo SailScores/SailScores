@@ -91,7 +91,7 @@ ISNULL(s.Code, '') = ''
     AND
     c.Id = @CompetitorId
     -- and ( Place is null or Place = 0 )
-    AND seasons.ID IN (SELECT TOP 3
+    AND seasons.ID IN (SELECT TOP 2
         Seasons.ID
     FROM Seasons
     WHERE Seasons.[Start] < GETDATE()
