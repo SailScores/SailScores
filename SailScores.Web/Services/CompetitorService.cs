@@ -56,6 +56,7 @@ namespace SailScores.Web.Services
             var vm = _mapper.Map<CompetitorStatsViewModel>(comp);
 
             // get more Stats here.
+            var statSummary = await _coreCompetitorService.GetCompetitorStatSummaryAsync(clubInitials, sailNumber);
 
             return vm;
         }

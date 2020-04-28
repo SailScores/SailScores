@@ -1,65 +1,52 @@
-DECLARE @SailNumber NVARCHAR(30)
+--DECLARE @SailNumber NVARCHAR(30)
+--SET @SailNumber = '2144'
+--DECLARE @ClubInitials NVARCHAR(30)
+--SET @ClubInitials = 'lhyc'
 
-SET @SailNumber = '2144'
-DECLARE @ClubInitials NVARCHAR(30)
-SET @ClubInitials = 'lhyc'
 
 DECLARE @ClubId UNIQUEIDENTIFIER
 SET @ClubId = (
-SELECT Id
-FROM Clubs
-WHERE Initials = @ClubInitials
+    SELECT Id
+    FROM Clubs
+    WHERE Initials = @ClubInitials
 )
 DECLARE @CompetitorId UNIQUEIDENTIFIER
-SET @CompetitorId = (SELECT
-    Id
-FROM Competitors
-WHERE SailNumber LIKE @SailNumber
-    AND ClubId = @ClubId)
-
---SET @CompetitorId = '1e2fd196-f825-42d8-bcd2-db9d1e2a5462'
-
+SET @CompetitorId = (
+    SELECT
+        Id
+    FROM Competitors
+    WHERE SailNumber LIKE @SailNumber
+        AND ClubId = @ClubId)
 
 SELECT
-    c.Name AS competitor,
-    c.SailNumber,
-    c.BoatName,
-    Seasons.Name AS Season,
-    Seasons.[Start] AS [Start],
-    Seasons.[End] AS [End],
+    c.Id AS CompetitorId,
+    Seasons.Name AS SeasonName,
+    Seasons.[Start] AS [SeasonStart],
+    Seasons.[End] AS [SeasonEnd],
     count(r.Id) AS RaceCount,
-    AVG(CAST(s.Place AS FLOAT)) as AveragePlace,
+    AVG(CAST(s.Place AS FLOAT)) AS AverageFinishRank,
     count(DISTINCT r.Date) AS DaysRaced,
-    -- CASE WHEN Code IS NULL OR Code = '' THEN CONVERT(NVARCHAR(5), s.Place) ELSE CODE END AS Result,
-    -- RaceResults.Place,
-    -- RaceResults.FinisherCount,
-    -- RaceResults.FinisherCount - RaceResults.Place as PeopleBeat
     -- CASE WHEN RaceResults.FinisherCount = 1 THEN Null ELSE
     --    CONVERT(Decimal(7,4),RaceResults.FinisherCount - RaceResults.Place) /
     --    CONVERT(Decimal(7,4), RaceResults.FinisherCount - 1)
     --    END as percentile
 
-    SUM(RaceResults.FinisherCount) AS Finishers,
-    SUM(RaceResults.FinisherCount - 1) AS OtherFinishers,
+    SUM(RaceResults.FinisherCount) AS RaceFinishers,
+    SUM(RaceResults.FinisherCount - 1) AS BoatsRacedAgainst,
     SUM(RaceResults.FinisherCount - RaceResults.Place ) AS BoatsBeat
--- CASE WHEN SUM(RaceResults.FinisherCount) = 1 THEN Null ELSE
---    CONVERT(Decimal(7,4),RaceResults.FinisherCount - RaceResults.Place) /
---    CONVERT(Decimal(7,4), RaceResults.FinisherCount - 1)
---    END as percentile
---, count(*) as Count
 FROM
     Seasons
-    LEFT OUTER JOIN
+    INNER JOIN
     Competitors c
-    ON c.ClubId = Seasons.ClubId
-    INNER JOIN Clubs
-    ON c.ClubId = Clubs.Id
+    on c.Id = @CompetitorId -- unconventional, but awesome
+    AND Seasons.ClubId = @ClubId
+    LEFT OUTER JOIN Races r
+    ON r.[Date] >= Seasons.[Start] AND r.[Date] <= Seasons.[End]
+    AND r.ClubId = @ClubId
     LEFT OUTER JOIN
     Scores s
     ON c.Id = s.CompetitorId
-    LEFT OUTER JOIN Races r
-    ON r.Id = s.RaceId
-        AND r.[Date] >= Seasons.[Start] AND r.[Date] <= Seasons.[End]
+    and r.Id = s.RaceId
     LEFT OUTER JOIN
     (
 SELECT
@@ -86,7 +73,6 @@ racerScore.Place
 ) AS RaceResults
     ON RaceResults.Id = r.Id
 WHERE
-
 ISNULL(s.Code, '') = ''
     AND
     c.Id = @CompetitorId
@@ -95,7 +81,7 @@ ISNULL(s.Code, '') = ''
         Seasons.ID
     FROM Seasons
     WHERE Seasons.[Start] < GETDATE()
-        AND Seasons.ClubId = '23cc00a0-ba27-4fe2-8c1c-e448b1f68eba'
+        AND Seasons.ClubId = @ClubId
     ORDER BY [Start] DESC)
     --Not in a series that Shouldn't be counted toward season stats
     AND (r.ID IS NULL OR r.Id NOT IN ( SELECT r2.Id
@@ -108,16 +94,9 @@ ISNULL(s.Code, '') = ''
     WHERE s2.ExcludeFromCompetitorStats = 1
 
 ))
+
 GROUP BY
-   C.Name,
-   c.SailNumber,
-   c.BoatName,
+   c.Id,
    Seasons.Name,
    Seasons.[Start],
    Seasons.[End]
-
-
-
-
--- Alter TABLE Series ADD  ExcludeFromCompetitorStats bit null
-

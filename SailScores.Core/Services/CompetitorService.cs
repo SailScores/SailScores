@@ -262,5 +262,10 @@ namespace SailScores.Core.Services
             _dbContext.Competitors.Remove(dbComp);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<IList<Db.CompetitorStatsSummary>> GetCompetitorStatSummaryAsync(string clubInitials, string sailNumber)
+        {
+            return await _dbContext.GetCompetitorStatsSummaryAsync(clubInitials, sailNumber);
+        }
     }
 }
