@@ -55,11 +55,10 @@ namespace SailScores.Web.Controllers
             {
                 return new NotFoundResult();
             }
-            var compVm = _mapper.Map<CompetitorViewModel>(competitorStats);
             var vm = new ClubItemViewModel<CompetitorViewModel>
             {
                 ClubInitials = clubInitials.ToUpperInvariant(),
-                Item = compVm
+                Item = competitorStats
             };
             return View(vm);
         }

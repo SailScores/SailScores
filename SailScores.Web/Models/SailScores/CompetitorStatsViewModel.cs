@@ -32,6 +32,5 @@ namespace SailScores.Web.Models.SailScores
         {
             return BoatName + " : " + Name + " : " + SailNumber + " : " + Id;
         }
-
     }
 }

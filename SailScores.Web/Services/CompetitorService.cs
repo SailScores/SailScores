@@ -46,14 +46,18 @@ namespace SailScores.Web.Services
             return comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task<ClubItemViewModel<CompetitorStatsViewModel>> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
+        public async Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
         {
 
             var club = await _coreClubService.GetMinimalClub(clubInitials);
             var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
 
             var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
-            throw new NotImplementedException();
+            var vm = _mapper.Map<CompetitorStatsViewModel>(comp);
+
+            // get more Stats here.
+
+            return vm;
         }
 
         public async Task SaveAsync(
