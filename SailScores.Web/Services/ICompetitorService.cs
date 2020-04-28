@@ -14,5 +14,7 @@ namespace SailScores.Web.Services
         Task SaveAsync(
             MultipleCompetitorsWithOptionsViewModel vm,
             Guid clubId);
+        Task<Competitor> GetCompetitorAsync(string clubInitials, string sailNumber);
+        Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(string clubInitials, string sailNumber);
     }
 }

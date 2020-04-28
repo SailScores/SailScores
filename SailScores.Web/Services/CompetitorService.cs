@@ -5,6 +5,7 @@ using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,8 +35,27 @@ namespace SailScores.Web.Services
 
         public Task<Competitor> GetCompetitorAsync(Guid competitorId)
         {
+            var comp = _coreCompetitorService.GetCompetitorAsync(competitorId);
+            return comp;
+        }
+
+        public async Task<Competitor> GetCompetitorAsync(string clubInitials, string sailNumber)
+        {
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
+            return comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public async Task<ClubItemViewModel<CompetitorStatsViewModel>> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
+        {
+
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
+
+            var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
             throw new NotImplementedException();
         }
+
         public async Task SaveAsync(
             MultipleCompetitorsWithOptionsViewModel vm,
             Guid clubId)

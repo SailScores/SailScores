@@ -74,7 +74,8 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Notes, o => o.Ignore())
                 .ForMember(d => d.BoatClassId, o => o.Ignore())
                 .ForMember(d => d.BoatClass, o => o.Ignore())
-                .ForMember(d => d.Fleets, o => o.Ignore());
+                .ForMember(d => d.Fleets, o => o.Ignore())
+                .ReverseMap();
 
 
             CreateMap<RaceViewModel, RaceWithOptionsViewModel>()

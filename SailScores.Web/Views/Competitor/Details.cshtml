@@ -1,0 +1,77 @@
+﻿@using Microsoft.Extensions.Localization
+@using SailScores.Web.Resources
+@using SailScores.Web.Models.SailScores
+
+@inject IStringLocalizer<SharedResource> localizer
+
+@model ClubItemViewModel<CompetitorViewModel>
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "_ClubLayout";
+}
+
+<h2>@Model.Item.SailNumber</h2>
+<h3>@Model.Item.Name</h3>
+<h4><i>@Model.Item.BoatName</i></h4>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <em>0</em> finishes in current season (2020)<br />
+        <em>43</em> finishes in 2019 season
+        <p>Places at 34 percentile.</p>
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    <th>Finishes</th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                    <th>9</th>
+                    <th>10</th>
+                    <th>11</th>
+                    <th>12</th>
+                    <th>13</th>
+                    <th>14</th>
+                    <th>15</th>
+                    <th>16</th>
+                    <th>17</th>
+                    <th>18</th>
+                    <th>19</th>
+                    <th>20</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="24">2019</td>
+                <tr />
+                <tr>
+                    <td>Wednesday Night</td>
+                    <td>27</td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td>6</td>
+                    <td>4</td>
+                    <td>15</td>
+                    <td>11</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+}

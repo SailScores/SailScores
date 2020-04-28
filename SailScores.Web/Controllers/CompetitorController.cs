@@ -39,13 +39,29 @@ namespace SailScores.Web.Controllers
         // GET: Competitor
         public ActionResult Index(string clubInitials)
         {
-            return View();
+            var vm = new ClubCollectionViewModel<Competitor>
+            {
+                ClubInitials = clubInitials,
+                List = new List<Competitor>()
+            };
+            return View(vm);
         }
 
-        // GET: Competitor/Details/5
-        public ActionResult Details(string clubInitials, Guid id)
+        // GET: {clubInitials}/Competitor/{sailNumber}
+        public async Task<ActionResult> Details(string clubInitials, string sailNumber)
         {
-            return View();
+            var competitorStats = await _competitorService.GetCompetitorStatsAsync(clubInitials, sailNumber);
+            if(competitorStats == null)
+            {
+                return new NotFoundResult();
+            }
+            var compVm = _mapper.Map<CompetitorViewModel>(competitorStats);
+            var vm = new ClubItemViewModel<CompetitorViewModel>
+            {
+                ClubInitials = clubInitials.ToUpperInvariant(),
+                Item = compVm
+            };
+            return View(vm);
         }
 
         // GET: Competitor/Create

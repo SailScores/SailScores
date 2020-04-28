@@ -279,6 +279,17 @@ namespace SailScores.Web
                     });
 
                 routes.MapRoute(
+                    name: "Competitor",
+                    template: "{clubInitials}/Competitor/{sailNumber}/",
+                    defaults: new { controller = "Competitor", action = "Details" },
+                    constraints: new
+                    {
+                        clubInitials = new ClubRouteConstraint(() =>
+                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
+                        )
+                    });
+                routes.MapRoute(
                     name: "Series",
                     template: "{clubInitials}/{season}/{seriesName}",
                     defaults: new { controller = "Series", action = "Details" },
