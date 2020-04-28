@@ -21,12 +21,14 @@ WHERE SailNumber LIKE @SailNumber
 
 
 SELECT
-    c.Id as CompetitorId,
+    c.Name AS competitor,
+    c.SailNumber,
+    c.BoatName,
     Seasons.Name AS Season,
     Seasons.[Start] AS [Start],
     Seasons.[End] AS [End],
     count(r.Id) AS RaceCount,
-    AVG(CAST(s.Place AS FLOAT)) as AverageFinishRank,
+    AVG(CAST(s.Place AS FLOAT)) as AveragePlace,
     count(DISTINCT r.Date) AS DaysRaced,
     -- CASE WHEN Code IS NULL OR Code = '' THEN CONVERT(NVARCHAR(5), s.Place) ELSE CODE END AS Result,
     -- RaceResults.Place,
@@ -37,8 +39,8 @@ SELECT
     --    CONVERT(Decimal(7,4), RaceResults.FinisherCount - 1)
     --    END as percentile
 
-    SUM(RaceResults.FinisherCount) AS RaceFinishers,
-    SUM(RaceResults.FinisherCount - 1) AS BoatsRacedAgainst,
+    SUM(RaceResults.FinisherCount) AS Finishers,
+    SUM(RaceResults.FinisherCount - 1) AS OtherFinishers,
     SUM(RaceResults.FinisherCount - RaceResults.Place ) AS BoatsBeat
 -- CASE WHEN SUM(RaceResults.FinisherCount) = 1 THEN Null ELSE
 --    CONVERT(Decimal(7,4),RaceResults.FinisherCount - RaceResults.Place) /

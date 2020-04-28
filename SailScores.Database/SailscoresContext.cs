@@ -35,6 +35,8 @@ namespace SailScores.Database
 
         public DbSet<ClubRequest> ClubRequests { get; set; }
 
+        public DbQuery<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
+
         public SailScoresContext(
             DbContextOptions<SailScoresContext> options)
             : base(options)
@@ -152,8 +154,11 @@ namespace SailScores.Database
                     v => v.ToString(),
                     v => (TrendOption)Enum.Parse(typeof(TrendOption), v));
 
-
-
+            modelBuilder.Entity<CompetitorStatsSummary>(
+                cs =>
+                {
+                    cs.HasNoKey();
+                });
         }
 
         public override int SaveChanges()
