@@ -70,6 +70,8 @@ namespace SailScores.Core.Mapping
                 .ReverseMap();
             CreateMap<Db.Weather, Model.Weather>()
                 .ReverseMap();
+
+            CreateMap<Db.CompetitorRankStats, Model.PlaceCount>();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using SailScores.Core.Model;
+using SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -27,6 +28,7 @@ namespace SailScores.Web.Models.SailScores
         [StringLength(200)]
         public String HomeClubName { get; set; }
 
+        public IList<CompetitorSeasonStats> SeasonStats { get; internal set; }
 
         public override string ToString()
         {

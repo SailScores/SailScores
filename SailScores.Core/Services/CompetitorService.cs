@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -72,7 +72,7 @@ namespace SailScores.Core.Services
             return _mapper.Map<Model.Competitor>(competitor);
         }
 
-        public async Task SaveAsync(Competitor comp)
+        public async Task SaveAsync(Model.Competitor comp)
         {
             var dbObject = await _dbContext
                 .Competitors
@@ -263,9 +263,31 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IList<Db.CompetitorStatsSummary>> GetCompetitorStatSummaryAsync(string clubInitials, string sailNumber)
+        public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
         {
-            return await _dbContext.GetCompetitorStatsSummaryAsync(clubInitials, sailNumber);
+            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubInitials, sailNumber);
+            var ranks = await _dbContext.GetCompetitorRankCountsAsync(clubInitials, sailNumber);
+
+            var returnList = new List<CompetitorSeasonStats>();
+            foreach(var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
+            {
+                var seasonStats = new CompetitorSeasonStats
+                {
+                    SeasonName = season.SeasonName,
+                    SeasonStart = season.SeasonStart,
+                    SeasonEnd = season.SeasonEnd,
+                    RaceCount = season.RaceCount,
+                    AverageFinishPlace = season.AverageFinishRank,
+                    DaysRaced = season.DaysRaced,
+                    BoatsRacedAgainst = season.BoatsRacedAgainst,
+                    BoatsBeat = season.BoatsBeat,
+                    PlaceCounts = _mapper.Map<List<PlaceCount>>(ranks
+                        .Where(r => r.SeasonName == season.SeasonName)
+                        .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code))
+                };
+                returnList.Add(seasonStats);
+            }
+            return returnList;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿@using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
 @using SailScores.Web.Models.SailScores
+@using Humanizer
 
 @inject IStringLocalizer<SharedResource> localizer
 
@@ -17,58 +18,49 @@
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <em>0</em> finishes in current season (2020)<br />
-        <em>43</em> finishes in 2019 season
-        <p>Places at 34 percentile.</p>
-        <table class="table table-bordered table-sm">
-            <thead class="thead-light">
-                <tr>
-                    <th></th>
-                    <th>Finishes</th>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>6</th>
-                    <th>7</th>
-                    <th>8</th>
-                    <th>9</th>
-                    <th>10</th>
-                    <th>11</th>
-                    <th>12</th>
-                    <th>13</th>
-                    <th>14</th>
-                    <th>15</th>
-                    <th>16</th>
-                    <th>17</th>
-                    <th>18</th>
-                    <th>19</th>
-                    <th>20</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="24">2019</td>
-                <tr />
-                <tr>
-                    <td>Wednesday Night</td>
-                    <td>27</td>
-                    <td>1</td>
-                    <td></td>
-                    <td></td>
-                    <td>6</td>
-                    <td>4</td>
-                    <td>15</td>
-                    <td>11</td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+    @foreach (var SeasonStats in Model.Item.SeasonStats)
+    {
+        <div class="col-12">
+            <h4>@SeasonStats.SeasonName</h4>
+            <strong>@SeasonStats.RaceCount</strong> races
+            @if (SeasonStats.DaysRaced.HasValue)
+            {
+                @:on <strong>@SeasonStats.DaysRaced</strong> days<br />
+                @if (SeasonStats.DaysRaced > 2)
+                {
 
-
-    </div>
+                    @(SeasonStats.AverageFinishPlace.HasValue ? String.Format("{0:0.0}", SeasonStats.AverageFinishPlace) : "No") @:average place<br />
+                    @:Raced against @SeasonStats.BoatsRacedAgainst boats
+                    @if (SeasonStats.BoatsBeat.HasValue && ((SeasonStats.BoatsBeat * 100m) / SeasonStats.BoatsRacedAgainst) > 25)
+                    {
+                        @:and beat @SeasonStats.BoatsBeat boats
+                        @:( @(((SeasonStats.BoatsBeat.Value * 100m) / SeasonStats.BoatsRacedAgainst.Value).ToString("0.0")) %)<br />
+                    }
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th></th>
+                                @foreach (var rankGroup in SeasonStats.PlaceCounts)
+                                {
+                                    @:<th>@(rankGroup.Place.HasValue ? rankGroup.Place.Value.Ordinalize() : rankGroup.Code)</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td># Finishes</td>
+                                @foreach (var rankGroup in SeasonStats.PlaceCounts)
+                                {
+                                    @:<td>@(rankGroup.Count.HasValue ? rankGroup.Count.Value.ToString() : "-")</td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            }
+            <br />
+        </div>
+    }
 </div>
 
 @section Scripts {

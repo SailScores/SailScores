@@ -42,7 +42,8 @@ namespace SailScores.Database
 
         public DbSet<ClubRequest> ClubRequests { get; set; }
 
-        public virtual DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
+        private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
+        private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
 
         public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber)
         {
@@ -50,6 +51,17 @@ namespace SailScores.Database
             var clubParam = new SqlParameter("ClubInitials", clubInitials);
             var sailParam = new SqlParameter("SailNumber", sailNumber);
             var result = await this.CompetitorStatsSummary
+                .FromSqlRaw(query, clubParam, sailParam)
+                .ToListAsync();
+            return result;
+        }
+
+        public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber)
+        {
+            var query = await GetSqlQuery("RankCounts");
+            var clubParam = new SqlParameter("ClubInitials", clubInitials);
+            var sailParam = new SqlParameter("SailNumber", sailNumber);
+            var result = await this.CompetitorRankStats
                 .FromSqlRaw(query, clubParam, sailParam)
                 .ToListAsync();
             return result;
@@ -188,6 +200,11 @@ namespace SailScores.Database
                 {
                     cs.HasNoKey();
                 });
+            modelBuilder.Entity<CompetitorRankStats>(
+                cs =>
+                {
+                    cs.HasNoKey();
+                });
         }
 
         public override int SaveChanges()
@@ -198,5 +215,6 @@ namespace SailScores.Database
         {
             return base.SaveChangesAsync(cancellationToken);
         }
+
     }
 }

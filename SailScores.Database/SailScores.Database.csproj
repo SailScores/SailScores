@@ -14,12 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Sql\race results.sql" />
+    <None Remove="Sql\RankCounts.sql" />
     <None Remove="Sql\SeasonSummary.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Sql\race results.sql" />
+    <EmbeddedResource Include="Sql\RankCounts.sql" />
     <EmbeddedResource Include="Sql\SeasonSummary.sql" />
   </ItemGroup>
 

@@ -55,8 +55,7 @@ namespace SailScores.Web.Services
             var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
             var vm = _mapper.Map<CompetitorStatsViewModel>(comp);
 
-            // get more Stats here.
-            var statSummary = await _coreCompetitorService.GetCompetitorStatSummaryAsync(clubInitials, sailNumber);
+            vm.SeasonStats = await _coreCompetitorService.GetCompetitorStatsAsync(clubInitials, sailNumber);
 
             return vm;
         }

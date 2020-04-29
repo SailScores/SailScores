@@ -34,8 +34,10 @@ namespace SailScores.Database
         DbSet<ClubRequest> ClubRequests { get; set; }
 
         Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber);
+
+        Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber);
+        
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
-
     }
 }

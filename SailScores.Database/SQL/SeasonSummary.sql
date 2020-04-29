@@ -1,7 +1,7 @@
---DECLARE @SailNumber NVARCHAR(30)
---SET @SailNumber = '2144'
---DECLARE @ClubInitials NVARCHAR(30)
---SET @ClubInitials = 'lhyc'
+-- DECLARE @SailNumber NVARCHAR(30)
+-- SET @SailNumber = '2144'
+-- DECLARE @ClubInitials NVARCHAR(30)
+-- SET @ClubInitials = 'lhyc'
 
 
 DECLARE @ClubId UNIQUEIDENTIFIER
@@ -23,9 +23,9 @@ SELECT
     Seasons.Name AS SeasonName,
     Seasons.[Start] AS [SeasonStart],
     Seasons.[End] AS [SeasonEnd],
-    count(r.Id) AS RaceCount,
+    count(distinct s.RaceId) AS RaceCount,
     AVG(CAST(s.Place AS FLOAT)) AS AverageFinishRank,
-    count(DISTINCT r.Date) AS DaysRaced,
+    count(DISTINCT RacedDate) AS DaysRaced,
     -- CASE WHEN RaceResults.FinisherCount = 1 THEN Null ELSE
     --    CONVERT(Decimal(7,4),RaceResults.FinisherCount - RaceResults.Place) /
     --    CONVERT(Decimal(7,4), RaceResults.FinisherCount - 1)
@@ -51,6 +51,7 @@ FROM
     (
 SELECT
         r.Id,
+        r.Date as RacedDate,
         COUNT(*) FinisherCount,
         racerScore.Place
     FROM
@@ -69,6 +70,7 @@ SELECT
 ISNULL(s.Code, '') = ''
         AND ISNULL(racerScore.Place,0) <> 0
     GROUP BY r.Id,
+    r.Date,
 racerScore.Place
 ) AS RaceResults
     ON RaceResults.Id = r.Id
