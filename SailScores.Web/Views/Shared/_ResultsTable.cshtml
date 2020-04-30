@@ -165,9 +165,7 @@
                         }
                         else
                         {
-                        @Html.ActionLink(
-                            @comp.Name
-                            , "Details", "Competitor", new { sailNumber = @comp.CurrentSailNumber })
+                            <a asp-route="Competitor" asp-route-sailNumber="@comp.CurrentSailNumber">@comp.Name</a>
                         }
                     </th>
                     <td class="d-none d-sm-table-cell">@comp.BoatName</td>
