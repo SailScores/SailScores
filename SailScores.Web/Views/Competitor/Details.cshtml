@@ -12,58 +12,75 @@
     Layout = "_ClubLayout";
 }
 
-<h2>@Model.Item.SailNumber</h2>
-<h3>@Model.Item.Name</h3>
-<h4><i>@Model.Item.BoatName</i></h4>
 
-<hr />
+<div class="row">
+    <div class="col-12">
+        <span class="h2 avoidwrap">@Model.Item.SailNumber</span>&emsp;
+        <span class="avoidwrap">
+            <span class="h3 avoidwrap">@Model.Item.Name</span>&emsp;
+            <span class="h3 avoidwrap"><i>@Model.Item.BoatName</i></span>
+        </span>
+    </div>
+</div>
 <div class="row">
     @foreach (var SeasonStats in Model.Item.SeasonStats)
     {
-        <div class="col-12">
-            <h4>@SeasonStats.SeasonName</h4>
-            <strong>@SeasonStats.RaceCount</strong> races
-            @if (SeasonStats.DaysRaced.HasValue)
+    <div class="col-12">
+        <h4>@SeasonStats.SeasonName</h4>
+        <strong>@SeasonStats.RaceCount</strong> races
+        @if (SeasonStats.DaysRaced.HasValue)
+        {
+            @:on <strong>@SeasonStats.DaysRaced</strong> days&emsp;
+            @if (SeasonStats.DaysRaced > 2)
             {
-                @:on <strong>@SeasonStats.DaysRaced</strong> days<br />
-                @if (SeasonStats.DaysRaced > 2)
+                @:Average place: @(SeasonStats.AverageFinishPlace.HasValue ? String.Format("{0:0.0}", SeasonStats.AverageFinishPlace) : "No")&emsp;
+                @:Raced against @SeasonStats.BoatsRacedAgainst boats
+                @if (SeasonStats.BoatsBeat.HasValue && ((SeasonStats.BoatsBeat * 100m) / SeasonStats.BoatsRacedAgainst) > 25)
                 {
-
-                    @(SeasonStats.AverageFinishPlace.HasValue ? String.Format("{0:0.0}", SeasonStats.AverageFinishPlace) : "No") @:average place<br />
-                    @:Raced against @SeasonStats.BoatsRacedAgainst boats
-                    @if (SeasonStats.BoatsBeat.HasValue && ((SeasonStats.BoatsBeat * 100m) / SeasonStats.BoatsRacedAgainst) > 25)
-                    {
-                        @:and beat @SeasonStats.BoatsBeat boats
-                        @:( @(((SeasonStats.BoatsBeat.Value * 100m) / SeasonStats.BoatsRacedAgainst.Value).ToString("0.0")) %)<br />
-                    }
-                    <table class="table table-bordered table-sm">
-                        <thead class="thead-light">
-                            <tr>
-                                <th></th>
-                                @foreach (var rankGroup in SeasonStats.PlaceCounts)
-                                {
-                                    @:<th>@(rankGroup.Place.HasValue ? rankGroup.Place.Value.Ordinalize() : rankGroup.Code)</th>
-                                }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td># Finishes</td>
-                                @foreach (var rankGroup in SeasonStats.PlaceCounts)
-                                {
-                                    @:<td>@(rankGroup.Count.HasValue ? rankGroup.Count.Value.ToString() : "-")</td>
-                                }
-                            </tr>
-                        </tbody>
-                    </table>
+                    @:and beat @SeasonStats.BoatsBeat boats
+                    @:(@(((SeasonStats.BoatsBeat.Value * 100m) / SeasonStats.BoatsRacedAgainst.Value).ToString("0.0"))%)<br />
                 }
+            @*<table class="table table-bordered table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th></th>
+                        @foreach (var rankGroup in SeasonStats.PlaceCounts)
+                        {
+                            @:<th>@(rankGroup.Place.HasValue ? rankGroup.Place.Value.Ordinalize() : rankGroup.Code)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td># Finishes</td>
+                        @foreach (var rankGroup in SeasonStats.PlaceCounts)
+                        {
+                            @:<td>@(rankGroup.Count.HasValue ? rankGroup.Count.Value.ToString() : "-")</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>*@
             }
-            <br />
+        }
+        <br />
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <svg id="chart-@(SeasonStats.SeasonName)" class="season-chart"
+                    data-competitor-id="@Model.Item.Id"
+                    data-season-name="@SeasonStats.SeasonName"></svg>
         </div>
+    </div>
     }
 </div>
+<div class="row">
+    <div class="col-12">
+        Statistics compiled from multiple, but not necessarily all, series.
+    </div>
+</div>
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
+    <script src="~/js/competitorStatsChart.js"></script>
 }

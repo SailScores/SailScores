@@ -1,9 +1,12 @@
 ﻿
 
 $my-dark-color: #001156;
+$my-link-color: #0063CC;
+$my-hover-color: #265180;
 $theme-colors: (
-    'dark' : $my-dark-color
-);
+    'dark' : $my-dark-color,
+    'primary' : $my-link-color
+    );
 
 $font-family-base: "Open Sans", "Segoe UI", sans-serif;
 
@@ -12,6 +15,12 @@ $font-family-base: "Open Sans", "Segoe UI", sans-serif;
 body {
 }
 
+a {
+    color: $my-link-color;
+}
+a:hover {
+    color: $my-hover-color;
+}
 .table-not-wide {
     width: auto;
 }
@@ -31,6 +40,10 @@ body {
     div {
         padding: 0px 5px 0px 5px;
     }
+}
+
+span.avoidwrap {
+    display: inline-block;
 }
 
 .autocomplete-suggestion {

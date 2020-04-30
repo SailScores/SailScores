@@ -266,8 +266,7 @@ namespace SailScores.Core.Services
         public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
         {
             var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubInitials, sailNumber);
-            var ranks = await _dbContext.GetCompetitorRankCountsAsync(clubInitials, sailNumber);
-
+            
             var returnList = new List<CompetitorSeasonStats>();
             foreach(var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
             {
@@ -281,13 +280,22 @@ namespace SailScores.Core.Services
                     DaysRaced = season.DaysRaced,
                     BoatsRacedAgainst = season.BoatsRacedAgainst,
                     BoatsBeat = season.BoatsBeat,
-                    PlaceCounts = _mapper.Map<List<PlaceCount>>(ranks
-                        .Where(r => r.SeasonName == season.SeasonName)
-                        .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code))
                 };
                 returnList.Add(seasonStats);
             }
             return returnList;
+        }
+
+        public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
+            Guid competitorId,
+            string seasonName)
+        {
+            var ranks = await _dbContext.GetCompetitorRankCountsAsync(
+                competitorId,
+                seasonName);
+            return _mapper.Map<List<PlaceCount>>(ranks
+                .Where(r => r.SeasonName == seasonName)
+                .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }
     }
 }

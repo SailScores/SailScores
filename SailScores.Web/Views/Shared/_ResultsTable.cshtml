@@ -10,6 +10,9 @@
 @inject IWeatherService weatherService
 
 @model Series
+@{
+    bool NoCompetitors = false;
+}
 
 @if (Model != null)
 {
@@ -112,6 +115,7 @@
                         new FlatCompetitor {
                             Name= localizer["No competitors"]}
                         };
+                        NoCompetitors = true;
                     }
                 }
                 @{ var cellViewData = new ViewDataDictionary(ViewData)
@@ -154,7 +158,18 @@
                             @comp.SailNumber
                         }
                     </th>
-                    <th scope="row">@comp.Name</th>
+                    <th scope="row">
+                        @if (((bool?)ViewData["IsExport"] ?? false) || ((bool?)ViewData["IsRegatta"] ?? false) || NoCompetitors)
+                        {
+                            @comp.Name
+                        }
+                        else
+                        {
+                        @Html.ActionLink(
+                            @comp.Name
+                            , "Details", "Competitor", new { sailNumber = @comp.CurrentSailNumber })
+                        }
+                    </th>
                     <td class="d-none d-sm-table-cell">@comp.BoatName</td>
                     @if (Model.ShowCompetitorClub ?? false)
                     {

@@ -16,5 +16,6 @@ namespace SailScores.Web.Services
             Guid clubId);
         Task<Competitor> GetCompetitorAsync(string clubInitials, string sailNumber);
         Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(string clubInitials, string sailNumber);
+        Task<List<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonName);
     }
 }

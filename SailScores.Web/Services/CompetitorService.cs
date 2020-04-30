@@ -46,17 +46,37 @@ namespace SailScores.Web.Services
             return comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
+        public async Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(
+            string clubInitials,
+            string sailNumber)
         {
 
             var club = await _coreClubService.GetMinimalClub(clubInitials);
             var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
 
             var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
+            if(comp == null)
+            {
+                return null;
+            }
             var vm = _mapper.Map<CompetitorStatsViewModel>(comp);
 
             vm.SeasonStats = await _coreCompetitorService.GetCompetitorStatsAsync(clubInitials, sailNumber);
 
+            return vm;
+        }
+
+        public async Task<List<PlaceCount>> GetCompetitorSeasonRanksAsync(
+            Guid competitorId,
+            string seasonName)
+        {
+
+            var seasonStats = await _coreCompetitorService.GetCompetitorSeasonRanksAsync(
+                competitorId,
+                seasonName);
+
+            var vm = _mapper.Map<List<PlaceCount>>(seasonStats);
+            
             return vm;
         }
 

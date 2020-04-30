@@ -39,5 +39,8 @@ namespace SailScores.Database
         
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
+            Guid competitorId,
+            string seasonName);
     }
 }

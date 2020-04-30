@@ -67,6 +67,19 @@ namespace SailScores.Database
             return result;
         }
 
+        public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
+            Guid competitorId,
+            string seasonName)
+        {
+            var query = await GetSqlQuery("RankCountsById");
+            var competitorParam = new SqlParameter("CompetitorId", competitorId);
+            var seasonParam = new SqlParameter("SeasonName", seasonName);
+            var result = await this.CompetitorRankStats
+                .FromSqlRaw(query, competitorParam, seasonParam)
+                .ToListAsync();
+            return result;
+        }
+
         private async Task<string> GetSqlQuery(string name)
         {
             string resourceName = $"SailScores.Database.Sql.{name}.sql";

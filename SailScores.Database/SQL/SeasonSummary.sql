@@ -1,7 +1,7 @@
--- DECLARE @SailNumber NVARCHAR(30)
--- SET @SailNumber = '2144'
--- DECLARE @ClubInitials NVARCHAR(30)
--- SET @ClubInitials = 'lhyc'
+--  DECLARE @SailNumber NVARCHAR(30)
+--  SET @SailNumber = '2091'
+--  DECLARE @ClubInitials NVARCHAR(30)
+--  SET @ClubInitials = 'lhyc'
 
 
 DECLARE @ClubId UNIQUEIDENTIFIER
@@ -12,11 +12,13 @@ SET @ClubId = (
 )
 DECLARE @CompetitorId UNIQUEIDENTIFIER
 SET @CompetitorId = (
-    SELECT
+    SELECT top 1
         Id
     FROM Competitors
-    WHERE SailNumber LIKE @SailNumber
-        AND ClubId = @ClubId)
+    WHERE SailNumber = @SailNumber
+        AND ClubId = @ClubId
+        order by IsActive desc
+        )
 
 SELECT
     c.Id AS CompetitorId,

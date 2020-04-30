@@ -47,10 +47,13 @@ namespace SailScores.Web.Controllers
             return View(vm);
         }
 
+        [AllowAnonymous]
         // GET: {clubInitials}/Competitor/{sailNumber}
         public async Task<ActionResult> Details(string clubInitials, string sailNumber)
         {
-            var competitorStats = await _competitorService.GetCompetitorStatsAsync(clubInitials, sailNumber);
+            var competitorStats = await _competitorService.GetCompetitorStatsAsync(
+                clubInitials,
+                sailNumber);
             if(competitorStats == null)
             {
                 return new NotFoundResult();
@@ -62,6 +65,23 @@ namespace SailScores.Web.Controllers
             };
             return View(vm);
         }
+
+        [AllowAnonymous]
+        public async Task<JsonResult> Chart(
+            Guid competitorId,
+            string seasonName)
+        {
+            var ranks = await _competitorService.GetCompetitorSeasonRanksAsync(
+                competitorId,
+                seasonName);
+            if (ranks == null)
+            {
+                return Json(String.Empty);
+                //return new NotFoundResult();
+            }
+            return Json(ranks);
+        }
+
 
         // GET: Competitor/Create
         public async Task<ActionResult> Create(

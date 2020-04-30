@@ -156,6 +156,11 @@ namespace SailScores.Core.Services
                 }
                 fullSeries.FlatResults = flatResults;
             }
+            // get the current version of the competitors, so we can get current sail number.
+            foreach(var comp in fullSeries.FlatResults.Competitors)
+            {
+                comp.CurrentSailNumber = (await _dbContext.Competitors.FirstOrDefaultAsync(c => c.Id == comp.Id)).SailNumber;
+            }
             return fullSeries;
         }
 

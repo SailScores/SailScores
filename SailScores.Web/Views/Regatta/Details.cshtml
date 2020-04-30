@@ -155,7 +155,8 @@
                  aria-labelledby="@($"Results{fleet.ShortName}-tab")">
                 @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
                 {
-                    @await Html.PartialAsync("_ResultsTable", Model.Item.Series.First(s => s.FleetId == fleet.Id))
+                    @await Html.PartialAsync("_ResultsTable", Model.Item.Series.First(s => s.FleetId == fleet.Id),
+                        new ViewDataDictionary(this.ViewData) { { "IsRegatta", true } })
                 }
                 else
                 {

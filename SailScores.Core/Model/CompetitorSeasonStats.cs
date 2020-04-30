@@ -25,8 +25,5 @@ namespace SailScores.Core.Model
         public int? BoatsRacedAgainst { get; internal set; }
         [Display(Name = "Boats Beat")]
         public int? BoatsBeat { get; internal set; }
-        [Display(Name = "Results")]
-        public List<PlaceCount> PlaceCounts { get; internal set; }
-
     }
 }
