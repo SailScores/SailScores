@@ -52,6 +52,10 @@ namespace SailScores.Core.Model
 
         public bool? ShowCompetitorClub { get; internal set; }
 
+        // If set, any races assigned to this series will not be
+        // used in the competitor summary statistics.
+        public bool ExcludeFromCompetitorStats { get; set; }
+
         public Series ShallowCopy()
         {
             return (Series)this.MemberwiseClone();

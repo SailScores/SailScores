@@ -1,5 +1,6 @@
 ﻿@using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
+@using Microsoft.AspNetCore.Mvc.ModelBinding
 @inject IStringLocalizer<SharedResource> localizer
 
 @model SailScores.Web.Models.SailScores.MultipleCompetitorsWithOptionsViewModel
@@ -102,26 +103,28 @@
                             <div class="row competitor-row">
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <input type="text" name="competitors[@i].SailNumber" class="form-control"
-                                               data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber"/>
+                                        <input type="text" name="competitors[@i].SailNumber" class="form-control
+                                               @(ViewData.ModelState[$"competitors[{i}].SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
+                                               data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber" />
+                                        <span asp-validation-for="Competitors[i].SailNumber" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <input type="text" name="competitors[@i].Name" class="form-control"
-                                               data-column="1" data-row="@i" value="@Model.Competitors[i].Name"/>
+                                               data-column="1" data-row="@i" value="@Model.Competitors[i].Name" />
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <input type="text" name="competitors[@i].BoatName" class="form-control"
-                                               data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName"/>
+                                               data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName" />
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <input type="text" name="competitors[@i].HomeClubName" class="form-control"
-                                               data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName"/>
+                                               data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName" />
                                     </div>
                                 </div>
                             </div>
@@ -129,32 +132,32 @@
                     }
                     else
                     {
-                    <div class="row competitor-row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <input type="text" name="competitors[0].SailNumber" class="form-control"
-                                       data-column="0" data-row="0" />
+                        <div class="row competitor-row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].SailNumber" class="form-control"
+                                           data-column="0" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].Name" class="form-control"
+                                           data-column="1" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].BoatName" class="form-control"
+                                           data-column="2" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].HomeClubName" class="form-control"
+                                           data-column="3" data-row="0" />
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <input type="text" name="competitors[0].Name" class="form-control"
-                                       data-column="1" data-row="0" />
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <input type="text" name="competitors[0].BoatName" class="form-control"
-                                       data-column="2" data-row="0" />
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <input type="text" name="competitors[0].HomeClubName" class="form-control"
-                                       data-column="3" data-row="0" />
-                            </div>
-                        </div>
-                    </div>
                     }
                 </div>
                 <button class="btn btn-light" type="button"
@@ -169,7 +172,7 @@
             </div>
             <div class="col-md-3">
                 <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
-                    class="btn btn-outline-primary btn-block my-2">Cancel</a>
+                   class="btn btn-outline-primary btn-block my-2">Cancel</a>
             </div>
         </div>
     </form>

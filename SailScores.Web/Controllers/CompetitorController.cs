@@ -39,14 +39,49 @@ namespace SailScores.Web.Controllers
         // GET: Competitor
         public ActionResult Index(string clubInitials)
         {
-            return View();
+            var vm = new ClubCollectionViewModel<Competitor>
+            {
+                ClubInitials = clubInitials,
+                List = new List<Competitor>()
+            };
+            return View(vm);
         }
 
-        // GET: Competitor/Details/5
-        public ActionResult Details(string clubInitials, Guid id)
+        [AllowAnonymous]
+        // GET: {clubInitials}/Competitor/{sailNumber}
+        public async Task<ActionResult> Details(string clubInitials, string sailNumber)
         {
-            return View();
+            var competitorStats = await _competitorService.GetCompetitorStatsAsync(
+                clubInitials,
+                sailNumber);
+            if(competitorStats == null)
+            {
+                return new NotFoundResult();
+            }
+            var vm = new ClubItemViewModel<CompetitorStatsViewModel>
+            {
+                ClubInitials = clubInitials.ToUpperInvariant(),
+                Item = competitorStats
+            };
+            return View(vm);
         }
+
+        [AllowAnonymous]
+        public async Task<JsonResult> Chart(
+            Guid competitorId,
+            string seasonName)
+        {
+            var ranks = await _competitorService.GetCompetitorSeasonRanksAsync(
+                competitorId,
+                seasonName);
+            if (ranks == null)
+            {
+                return Json(String.Empty);
+                //return new NotFoundResult();
+            }
+            return Json(ranks);
+        }
+
 
         // GET: Competitor/Create
         public async Task<ActionResult> Create(
@@ -151,6 +186,15 @@ namespace SailScores.Web.Controllers
             try
             {
                 var clubId = await _clubService.GetClubId(clubInitials);
+                int i = 0;
+                foreach (var comp in competitorsVm.Competitors) {
+                    Guid? id = await _competitorService.GetCompetitorIdForSailnumberAsync(clubId, comp.SailNumber);
+                    if(id.HasValue)
+                    {
+                        ModelState.AddModelError($"Competitors[{i}].SailNumber", "Sail number is already assigned to an active competitor.");
+                    }
+                    i++;
+                }
 
                 if (!ModelState.IsValid)
                 {
@@ -230,6 +274,13 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 var club = await _clubService.GetFullClub(competitor.ClubId);
+
+                Guid? existingCompId = await _competitorService.GetCompetitorIdForSailnumberAsync(club.Id, competitor.SailNumber);
+                if (existingCompId.HasValue && existingCompId.Value != competitor.Id)
+                {
+                    ModelState.AddModelError($"SailNumber", "Sail number is already assigned to an active competitor.");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     competitor.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);

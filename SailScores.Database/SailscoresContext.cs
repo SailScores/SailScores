@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SailScores.Api.Enumerations;
 using SailScores.Database.Entities;
+using File = SailScores.Database.Entities.File;
 
 namespace SailScores.Database
 {
     public class SailScoresContext : DbContext, ISailScoresContext
     {
+        private readonly Assembly _executingAssembly;
+
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Fleet> Fleets { get; set; }
         public DbSet<BoatClass> BoatClasses { get; set; }
@@ -35,10 +42,59 @@ namespace SailScores.Database
 
         public DbSet<ClubRequest> ClubRequests { get; set; }
 
+        private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
+        private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
+
+        public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber)
+        {
+            var query = await GetSqlQuery("SeasonSummary");
+            var clubParam = new SqlParameter("ClubInitials", clubInitials);
+            var sailParam = new SqlParameter("SailNumber", sailNumber);
+            var result = await this.CompetitorStatsSummary
+                .FromSqlRaw(query, clubParam, sailParam)
+                .ToListAsync();
+            return result;
+        }
+
+        public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber)
+        {
+            var query = await GetSqlQuery("RankCounts");
+            var clubParam = new SqlParameter("ClubInitials", clubInitials);
+            var sailParam = new SqlParameter("SailNumber", sailNumber);
+            var result = await this.CompetitorRankStats
+                .FromSqlRaw(query, clubParam, sailParam)
+                .ToListAsync();
+            return result;
+        }
+
+        public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
+            Guid competitorId,
+            string seasonName)
+        {
+            var query = await GetSqlQuery("RankCountsById");
+            var competitorParam = new SqlParameter("CompetitorId", competitorId);
+            var seasonParam = new SqlParameter("SeasonName", seasonName);
+            var result = await this.CompetitorRankStats
+                .FromSqlRaw(query, competitorParam, seasonParam)
+                .ToListAsync();
+            return result;
+        }
+
+        private async Task<string> GetSqlQuery(string name)
+        {
+            string resourceName = $"SailScores.Database.Sql.{name}.sql";
+            using (Stream stream = _executingAssembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
         public SailScoresContext(
             DbContextOptions<SailScoresContext> options)
             : base(options)
         {
+            _executingAssembly = typeof(SailScoresContext).Assembly;
         }
 
         protected override void
@@ -152,8 +208,16 @@ namespace SailScores.Database
                     v => v.ToString(),
                     v => (TrendOption)Enum.Parse(typeof(TrendOption), v));
 
-
-
+            modelBuilder.Entity<CompetitorStatsSummary>(
+                cs =>
+                {
+                    cs.HasNoKey();
+                });
+            modelBuilder.Entity<CompetitorRankStats>(
+                cs =>
+                {
+                    cs.HasNoKey();
+                });
         }
 
         public override int SaveChanges()
@@ -164,5 +228,6 @@ namespace SailScores.Database
         {
             return base.SaveChangesAsync(cancellationToken);
         }
+
     }
 }

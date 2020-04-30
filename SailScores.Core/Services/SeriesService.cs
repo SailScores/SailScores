@@ -156,6 +156,11 @@ namespace SailScores.Core.Services
                 }
                 fullSeries.FlatResults = flatResults;
             }
+            // get the current version of the competitors, so we can get current sail number.
+            foreach(var comp in fullSeries.FlatResults.Competitors)
+            {
+                comp.CurrentSailNumber = (await _dbContext.Competitors.FirstOrDefaultAsync(c => c.Id == comp.Id)).SailNumber;
+            }
             return fullSeries;
         }
 
@@ -383,6 +388,7 @@ namespace SailScores.Core.Services
             existingSeries.ResultsLocked = model.ResultsLocked;
             existingSeries.ScoringSystemId = model.ScoringSystemId;
             existingSeries.TrendOption = model.TrendOption;
+            existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty
@@ -465,9 +471,11 @@ namespace SailScores.Core.Services
         private async Task<FlatChartData> CalculateChartData(Series fullSeries)
         {
             var entries = new List<FlatChartPoint>();
+            var lastRaceId = fullSeries.Races.OrderByDescending(r => r.Date).ThenByDescending(r => r.Order).FirstOrDefault()?.Id;
             entries.AddRange(GetChartDataPoints(fullSeries));
             fullSeries.Races = fullSeries.Races
-                .Where(r => r.State == null || r.State == Api.Enumerations.RaceState.Raced)
+                .Where(r => r.State == null || r.State == Api.Enumerations.RaceState.Raced
+                || r.Id == lastRaceId)
                 .ToList();
             var copyOfRaces = fullSeries.Races.ToList();
             var copyOfCompetitors = fullSeries.Competitors.ToList();

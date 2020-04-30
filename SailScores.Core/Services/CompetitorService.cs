@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -72,7 +72,21 @@ namespace SailScores.Core.Services
             return _mapper.Map<Model.Competitor>(competitor);
         }
 
-        public async Task SaveAsync(Competitor comp)
+
+        public async Task<Competitor> GetCompetitorBySailNumberAsync(Guid clubId, string sailNumber)
+        {
+            var competitor = await
+                _dbContext
+                .Competitors
+                .FirstOrDefaultAsync(c =>
+                    c.ClubId == clubId &&
+                    c.SailNumber == sailNumber &&
+                    (c.IsActive ?? true));
+
+            return _mapper.Map<Model.Competitor>(competitor);
+        }
+
+        public async Task SaveAsync(Model.Competitor comp)
         {
             var dbObject = await _dbContext
                 .Competitors
@@ -262,5 +276,41 @@ namespace SailScores.Core.Services
             _dbContext.Competitors.Remove(dbComp);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
+        {
+            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubInitials, sailNumber);
+            
+            var returnList = new List<CompetitorSeasonStats>();
+            foreach(var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
+            {
+                var seasonStats = new CompetitorSeasonStats
+                {
+                    SeasonName = season.SeasonName,
+                    SeasonStart = season.SeasonStart,
+                    SeasonEnd = season.SeasonEnd,
+                    RaceCount = season.RaceCount,
+                    AverageFinishPlace = season.AverageFinishRank,
+                    DaysRaced = season.DaysRaced,
+                    BoatsRacedAgainst = season.BoatsRacedAgainst,
+                    BoatsBeat = season.BoatsBeat,
+                };
+                returnList.Add(seasonStats);
+            }
+            return returnList;
+        }
+
+        public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
+            Guid competitorId,
+            string seasonName)
+        {
+            var ranks = await _dbContext.GetCompetitorRankCountsAsync(
+                competitorId,
+                seasonName);
+            return _mapper.Map<List<PlaceCount>>(ranks
+                .Where(r => r.SeasonName == seasonName)
+                .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
+        }
+
     }
 }

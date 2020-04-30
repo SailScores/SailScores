@@ -67,7 +67,7 @@
         // add viewBox and preserveAspectRatio properties,
         // and call resize so that svg resizes on inital page load
         svg.attr("viewBox", "0 0 " + width + " " + height)
-            .attr("perserveAspectRatio", "xMinYMid")
+            .attr("preserveAspectRatio", "xMinYMid")
             .call(resize);
 
         // to register multiple listeners for same event type, 

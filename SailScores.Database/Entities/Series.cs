@@ -42,5 +42,7 @@ namespace SailScores.Database.Entities
         public Guid? FleetId { get; set; }
 
         public bool? PreferAlternativeSailNumbers { get; set; }
+
+        public bool? ExcludeFromCompetitorStats { get; set; }
     }
 }
