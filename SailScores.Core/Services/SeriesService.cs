@@ -471,9 +471,11 @@ namespace SailScores.Core.Services
         private async Task<FlatChartData> CalculateChartData(Series fullSeries)
         {
             var entries = new List<FlatChartPoint>();
+            var lastRaceId = fullSeries.Races.OrderByDescending(r => r.Date).ThenByDescending(r => r.Order).FirstOrDefault()?.Id;
             entries.AddRange(GetChartDataPoints(fullSeries));
             fullSeries.Races = fullSeries.Races
-                .Where(r => r.State == null || r.State == Api.Enumerations.RaceState.Raced)
+                .Where(r => r.State == null || r.State == Api.Enumerations.RaceState.Raced
+                || r.Id == lastRaceId)
                 .ToList();
             var copyOfRaces = fullSeries.Races.ToList();
             var copyOfCompetitors = fullSeries.Competitors.ToList();
