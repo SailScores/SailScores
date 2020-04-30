@@ -23,7 +23,7 @@ SailScores top priorities:
 [Appendix A][3] are currently supported, with options for custom calculations and score codes.
 - Open REST API: I have plans for rich client software which will use the existing public,
 straightforward API.
-- On the roadmap: analytics for race and competitor data.
+- Competitor Stats.
 
 This code supports multiple tenants, including visible and hidden clubs. This winter includes
 work on some bigger features and a client app.
