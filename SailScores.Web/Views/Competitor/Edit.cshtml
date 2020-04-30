@@ -1,4 +1,6 @@
-﻿@model SailScores.Web.Models.SailScores.CompetitorWithOptionsViewModel
+﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+
+@model SailScores.Web.Models.SailScores.CompetitorWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -16,7 +18,9 @@
             <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label
+                       @(ViewData.ModelState["SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
+                       ></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
@@ -36,9 +40,9 @@
                     <option selected="selected">Select a class...</option>
                     @foreach (var boatclass in Model.BoatClassOptions)
                     {
-                        <option value="@boatclass.Id">
-                            @boatclass.Name
-                        </option>
+                    <option value="@boatclass.Id">
+                        @boatclass.Name
+                    </option>
                     }
                 </select>
                 <span asp-validation-for="BoatClassId" class="text-danger"></span>
@@ -59,9 +63,9 @@
                                 <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
                                     @foreach (var fleet in Model.FleetOptions)
                                     {
-                                        <option value="@fleet.Id">
-                                            @fleet.Name
-                                        </option>
+                                    <option value="@fleet.Id">
+                                        @fleet.Name
+                                    </option>
                                     }
                                 </select>
                                 <span asp-validation-for="FleetIds" class="text-danger"></span>
@@ -104,5 +108,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+<script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
 }

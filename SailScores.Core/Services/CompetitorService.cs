@@ -72,6 +72,20 @@ namespace SailScores.Core.Services
             return _mapper.Map<Model.Competitor>(competitor);
         }
 
+
+        public async Task<Competitor> GetCompetitorBySailNumberAsync(Guid clubId, string sailNumber)
+        {
+            var competitor = await
+                _dbContext
+                .Competitors
+                .FirstOrDefaultAsync(c =>
+                    c.ClubId == clubId &&
+                    c.SailNumber == sailNumber &&
+                    (c.IsActive ?? true));
+
+            return _mapper.Map<Model.Competitor>(competitor);
+        }
+
         public async Task SaveAsync(Model.Competitor comp)
         {
             var dbObject = await _dbContext
@@ -297,5 +311,6 @@ namespace SailScores.Core.Services
                 .Where(r => r.SeasonName == seasonName)
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }
+
     }
 }
