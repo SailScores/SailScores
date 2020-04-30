@@ -13,5 +13,7 @@ namespace SailScores.Core.Services
         Task SaveAsync(Competitor comp);
         Task SaveAsync(CompetitorDto comp);
         Task DeleteCompetitorAsync(Guid competitorId);
+        Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(string clubInitials, string sailNumber);
+        Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonName);
     }
 }

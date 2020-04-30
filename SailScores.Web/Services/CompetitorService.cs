@@ -5,6 +5,7 @@ using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,8 +35,51 @@ namespace SailScores.Web.Services
 
         public Task<Competitor> GetCompetitorAsync(Guid competitorId)
         {
-            throw new NotImplementedException();
+            var comp = _coreCompetitorService.GetCompetitorAsync(competitorId);
+            return comp;
         }
+
+        public async Task<Competitor> GetCompetitorAsync(string clubInitials, string sailNumber)
+        {
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
+            return comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public async Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(
+            string clubInitials,
+            string sailNumber)
+        {
+
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
+
+            var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
+            if(comp == null)
+            {
+                return null;
+            }
+            var vm = _mapper.Map<CompetitorStatsViewModel>(comp);
+
+            vm.SeasonStats = await _coreCompetitorService.GetCompetitorStatsAsync(clubInitials, sailNumber);
+
+            return vm;
+        }
+
+        public async Task<List<PlaceCount>> GetCompetitorSeasonRanksAsync(
+            Guid competitorId,
+            string seasonName)
+        {
+
+            var seasonStats = await _coreCompetitorService.GetCompetitorSeasonRanksAsync(
+                competitorId,
+                seasonName);
+
+            var vm = _mapper.Map<List<PlaceCount>>(seasonStats);
+            
+            return vm;
+        }
+
         public async Task SaveAsync(
             MultipleCompetitorsWithOptionsViewModel vm,
             Guid clubId)

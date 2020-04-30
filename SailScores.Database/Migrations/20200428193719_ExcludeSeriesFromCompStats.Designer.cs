@@ -10,8 +10,8 @@ using SailScores.Database;
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    [Migration("20200227022502_BoatClassDeleteFix")]
-    partial class BoatClassDeleteFix
+    [Migration("20200428193719_ExcludeSeriesFromCompStats")]
+    partial class ExcludeSeriesFromCompStats
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -606,6 +606,9 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(2000)")
                         .HasMaxLength(2000);
+
+                    b.Property<bool?>("ExcludeFromCompetitorStats")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("FleetId")
                         .HasColumnType("uniqueidentifier");

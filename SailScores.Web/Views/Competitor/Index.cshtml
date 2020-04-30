@@ -1,0 +1,30 @@
+﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Extensions;
+@using Microsoft.Extensions.Localization
+@using SailScores.Web.Services
+@using SailScores.Web.Resources
+
+@inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
+
+@model ClubCollectionViewModel<CompetitorViewModel>
+
+
+
+
+@{
+    ViewBag.Title = Model.ClubInitials + " " + localizer["Series"];
+    Layout = "_ClubLayout";
+}
+
+<table class="table">
+    <tbody>
+        @foreach(var competitor in Model.List) { 
+            <tr id="@competitor.Id">
+                <td colspan="3">
+                    <h2>@competitor.Name</h2>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
