@@ -18,6 +18,12 @@ steps:
     packageType: 'sdk'
     version: '3.1.x'
 
+- task: UseDotNet@2
+  displayName: Install .NET Core 2.0 SDK
+  inputs:
+    packageType: 'sdk'
+    version: '2.0.0'
+
 - task: Npm@1
   inputs:
     command: 'install'
