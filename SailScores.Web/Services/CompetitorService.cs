@@ -139,5 +139,11 @@ namespace SailScores.Web.Services
             }
             await _coreCompetitorService.SaveAsync(competitor);
         }
+
+        public async Task<Guid?> GetCompetitorIdForSailnumberAsync(Guid clubId, string sailNumber)
+        {
+            var competitor = await _coreCompetitorService.GetCompetitorBySailNumberAsync(clubId, sailNumber);
+            return competitor?.Id;
+        }
     }
 }
