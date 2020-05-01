@@ -170,9 +170,15 @@ form label.required:not(.custom-control-label)::after {
     font-size: 1.4em;
 }
 
+.updated-date {
+    font-size: 80%;
+    font-style: italic;
+}
+
 .small-on-small {
     font-size: 80%;
 }
+
 
 @include media-breakpoint-up(md) {
     .small-on-small {
