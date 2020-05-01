@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Database.Entities
 {
@@ -10,6 +11,8 @@ namespace SailScores.Database.Entities
         public Race Race { get; set; }
         public Guid RaceId { get; set; }
         public int? Place { get; set; }
+
+        [StringLength(20)]
         public string Code { get; set; }
         public decimal? CodePoints { get; set; }
     }
