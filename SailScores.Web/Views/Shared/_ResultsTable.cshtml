@@ -159,7 +159,8 @@
                         }
                     </th>
                     <th scope="row">
-                        @if (((bool?)ViewData["IsExport"] ?? false) || ((bool?)ViewData["IsRegatta"] ?? false) || NoCompetitors)
+                        @if (((bool?)ViewData["IsExport"] ?? false)
+                            || ((bool?)ViewData["ExcludeCompetitorLinks"] ?? false) || NoCompetitors)
                         {
                             @comp.Name
                         }

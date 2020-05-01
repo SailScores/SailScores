@@ -169,3 +169,13 @@ form label.required:not(.custom-control-label)::after {
 .ss-wi {
     font-size: 1.4em;
 }
+
+.small-on-small {
+    font-size: 80%;
+}
+
+@include media-breakpoint-up(md) {
+    .small-on-small {
+        font-size: 100%;
+    }
+}

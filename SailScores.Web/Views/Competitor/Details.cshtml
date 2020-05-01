@@ -8,7 +8,7 @@
 @model ClubItemViewModel<CompetitorStatsViewModel>
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = Model.Item.SailNumber + " " + (!String.IsNullOrWhiteSpace(Model.Item.Name) ? Model.Item.Name : "") + " Stats";
     Layout = "_ClubLayout";
 }
 
@@ -40,26 +40,6 @@
                     @:and beat @SeasonStats.BoatsBeat boats
                     @:(@(((SeasonStats.BoatsBeat.Value * 100m) / SeasonStats.BoatsRacedAgainst.Value).ToString("0.0"))%)<br />
                 }
-            @*<table class="table table-bordered table-sm">
-                <thead class="thead-light">
-                    <tr>
-                        <th></th>
-                        @foreach (var rankGroup in SeasonStats.PlaceCounts)
-                        {
-                            @:<th>@(rankGroup.Place.HasValue ? rankGroup.Place.Value.Ordinalize() : rankGroup.Code)</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td># Finishes</td>
-                        @foreach (var rankGroup in SeasonStats.PlaceCounts)
-                        {
-                            @:<td>@(rankGroup.Count.HasValue ? rankGroup.Count.Value.ToString() : "-")</td>
-                        }
-                    </tr>
-                </tbody>
-            </table>*@
             }
         }
         <br />
