@@ -9,7 +9,7 @@ namespace SailScores.Web.Models.SailScores
     public class ScoreCodeWithOptionsViewModel : ScoreCodeViewModel
     {
 
-        public List<SelectListItem> FormulaOptions = new List<SelectListItem>
+        public readonly List<SelectListItem> FormulaOptions = new List<SelectListItem>
         {
             new SelectListItem("COD - Use value of Score Like to find another code to use", "COD"),
             new SelectListItem("FIN+ - Competitors who finished this race + Formula Value", "FIN+"),
