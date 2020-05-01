@@ -39,6 +39,10 @@
         {
             @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
         }
+        @if (Model.Item.ExcludeFromCompetitorStats)
+        {
+            <br />@:<small>This series is excluded from competitor stats.</small>
+        }
     </div>
 
     <div class="col-md-3">
@@ -59,7 +63,8 @@
     </div>
 </div>
 
-@await Html.PartialAsync("_ResultsTable", Model.Item)
+@await Html.PartialAsync("_ResultsTable", Model.Item,
+                        new ViewDataDictionary(this.ViewData) { { "ExcludeCompetitorLinks", Model.Item.ExcludeFromCompetitorStats } })
 
 @if (results.NumberOfSailedRaces > 2)
 {
