@@ -16,13 +16,11 @@
   <ItemGroup>
     <None Remove="Sql\RankCounts.sql" />
     <None Remove="Sql\RankCountsById.sql" />
-    <None Remove="Sql\SeasonSummary.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Sql\RankCountsById.sql" />
     <EmbeddedResource Include="Sql\RankCounts.sql" />
-    <EmbeddedResource Include="Sql\SeasonSummary.sql" />
   </ItemGroup>
 
   <ItemGroup>

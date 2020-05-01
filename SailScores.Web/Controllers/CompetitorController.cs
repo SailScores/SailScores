@@ -48,7 +48,7 @@ namespace SailScores.Web.Controllers
         }
 
         [AllowAnonymous]
-        [ResponseCache(Duration = 1800, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "*" })]
+        [ResponseCache(Duration = 1800, Location = ResponseCacheLocation.Any)]
         // GET: {clubInitials}/Competitor/{sailNumber}
         public async Task<ActionResult> Details(string clubInitials, string sailNumber)
         {
