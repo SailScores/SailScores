@@ -47,7 +47,6 @@ namespace SailScores.Database
 
         public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber)
         {
-            //var query = await GetSqlQuery("SeasonSummary");
             var query = "EXECUTE dbo.SS_SP_GetSeasonSummary @SailNumber = @sailNumber, @ClubInitials = @clubInitials";
 
             var clubParam = new SqlParameter("clubInitials", clubInitials);
@@ -106,9 +105,6 @@ namespace SailScores.Database
                 .SelectMany(t => t.GetProperties())
                 .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
             {
-                // EF Core 1 & 2
-                //property.Relational().ColumnType = "decimal(18, 2)";
-
                 // EF Core 3
                 property.SetColumnType("decimal(18, 2)");
             }
