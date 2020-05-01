@@ -47,11 +47,13 @@ namespace SailScores.Database
 
         public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber)
         {
-            var query = await GetSqlQuery("SeasonSummary");
-            var clubParam = new SqlParameter("ClubInitials", clubInitials);
-            var sailParam = new SqlParameter("SailNumber", sailNumber);
+            //var query = await GetSqlQuery("SeasonSummary");
+            var query = "EXECUTE dbo.SS_SP_GetSeasonSummary @SailNumber = @sailNumber, @ClubInitials = @clubInitials";
+
+            var clubParam = new SqlParameter("clubInitials", clubInitials);
+            var sailParam = new SqlParameter("sailNumber", sailNumber);
             var result = await this.CompetitorStatsSummary
-                .FromSqlRaw(query, clubParam, sailParam)
+                .FromSqlRaw(query, sailParam, clubParam)
                 .ToListAsync();
             return result;
         }

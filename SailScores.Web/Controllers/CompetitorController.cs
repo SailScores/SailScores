@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,6 +48,7 @@ namespace SailScores.Web.Controllers
         }
 
         [AllowAnonymous]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
         // GET: {clubInitials}/Competitor/{sailNumber}
         public async Task<ActionResult> Details(string clubInitials, string sailNumber)
         {
@@ -67,6 +68,7 @@ namespace SailScores.Web.Controllers
         }
 
         [AllowAnonymous]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
         public async Task<JsonResult> Chart(
             Guid competitorId,
             string seasonName)

@@ -156,7 +156,7 @@
                 @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
                 {
                     @await Html.PartialAsync("_ResultsTable", Model.Item.Series.First(s => s.FleetId == fleet.Id),
-                        new ViewDataDictionary(this.ViewData) { { "IsRegatta", true } })
+                        new ViewDataDictionary(this.ViewData) { { "ExcludeCompetitorLinks", true } })
                 }
                 else
                 {
