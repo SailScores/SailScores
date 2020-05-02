@@ -9,8 +9,8 @@ namespace SailScores.ImportExport.Sailwave.Tests.Integration
 {
     public class ReadFileTests
     {
-        private string _simpleFilePath = @"..\..\..\SailwaveFiles\SimpleSeries.blw";
-        private string _lhycFilePath = @"..\..\..\SailwaveFiles\LHYCSeries.blw";
+        private string _simpleFilePath = @"../../../SailwaveFiles/SimpleSeries.blw";
+        private string _lhycFilePath = @"../../../SailwaveFiles/LHYCSeries.blw";
 
         [Fact]
         public void BasicReadFile()
