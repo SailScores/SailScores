@@ -53,7 +53,7 @@ namespace SailScores.Web.Services
                     // Save data in cache.
                     _cache.Set(cacheKeyName, clubInitialsToLocales, cacheEntryOptions);
                 }
-                catch (InvalidOperationException ex)
+                catch (InvalidOperationException)
                 {
                     // swallowing: this is a likely error on initial load.
                 }

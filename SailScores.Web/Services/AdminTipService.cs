@@ -164,7 +164,7 @@ namespace SailScores.Web.Services
                 return null;
             }
             var returnList = new List<AdminToDoViewModel>();
-            if (series.SeasonOptions == null || series.SeasonOptions.Count() == 0)
+            if (series.SeasonOptions == null || !series.SeasonOptions.Any())
             {
                 returnList.Add(new AdminToDoViewModel
                 {
@@ -192,7 +192,7 @@ namespace SailScores.Web.Services
             }
             var returnList = new List<AdminToDoViewModel>();
             if (competitor.BoatClassOptions == null
-                || competitor.BoatClassOptions.Count() == 0)
+                || !competitor.BoatClassOptions.Any())
             {
                 returnList.Add(new AdminToDoViewModel
                 {
@@ -218,7 +218,7 @@ namespace SailScores.Web.Services
             }
             var returnList = new List<AdminToDoViewModel>();
             if (vm.BoatClassOptions == null
-                || vm.BoatClassOptions.Count() == 0)
+                || !vm.BoatClassOptions.Any())
             {
                 returnList.Add(new AdminToDoViewModel
                 {

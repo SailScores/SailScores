@@ -247,6 +247,10 @@ namespace SailScores.Core.Services
 
         private IEnumerable<FlatSeriesScore> FlattenSeriesScores(Series series)
         {
+            if (series?.Results?.Results == null)
+            {
+                return new List<FlatSeriesScore>();
+            }
             return series.Results.Results.Select(
                 kvp => new FlatSeriesScore
                 {

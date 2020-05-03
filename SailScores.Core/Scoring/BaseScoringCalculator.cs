@@ -77,7 +77,7 @@ namespace SailScores.Core.Scoring
                     newSeries.Races = RemoveLastWeeksRaces(series.Races);
                     break;
             }
-            if(newSeries.Races.Count() == 0)
+            if(!newSeries.Races.Any())
             {
                 return;
             }

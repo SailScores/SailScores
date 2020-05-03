@@ -91,7 +91,7 @@ namespace SailScores.Web
                                 Id = "Bearer"
                             }
                         },
-                        new string[] {}
+                        Array.Empty<string>()
                     }
                 });
             });
