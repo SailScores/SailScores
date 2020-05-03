@@ -27,6 +27,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AE2F13E0-64D0-43D5-8D31-B6BDEAFA5B73}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipeline-prod-deploy.yml = azure-pipeline-prod-deploy.yml
+		azure-pipeline-SQAnalysis.yml = azure-pipeline-SQAnalysis.yml
 		azure-pipeline-test-deploy.yml = azure-pipeline-test-deploy.yml
 	EndProjectSection
 EndProject
