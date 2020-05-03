@@ -42,19 +42,23 @@ steps:
     scannerMode: 'MSBuild'
     projectKey: 'jbfraser1_SailScores'
     projectName: 'SailScores'
+    extraProperties: |
+      sonar.exclusions=**/obj/**,**/*.dll
+      sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/**/coverage.opencover.xml
+      sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/*.trx
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build $(buildConfiguration)'
   inputs:
     command: 'build'
-    arguments: '-r $(rid) --configuration $(buildConfiguration) -p:SourceRevisionId=$(Build.SourceVersion) -p:Version=$(VERSION_TAG)'
+    arguments: '-r $(rid) --configuration $(buildConfiguration) -p:SourceRevisionId=$(Build.SourceVersion) -p:Version=$(VERSION_TAG) -p:CollectCoverage=true -p:CoverletOutputFormat=opencover'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
   inputs:
     command: 'test'
     projects: '**/*Test.Unit/*.csproj'
-    arguments: '--no-restore --collect:"Code Coverage"'
+    arguments: '--no-restore --collect:"XPlat Code Coverage"'
 
 - task: SonarCloudAnalyze@1
   displayName: 'Run SonarCloud analysis'
