@@ -103,7 +103,7 @@ namespace SailScores.Core.Services
         
         public async Task SaveScoringSystemAsync(ScoringSystem scoringSystem)
         {
-            if (scoringSystem.Id == null && scoringSystem.Id == Guid.Empty)
+            if (scoringSystem.Id == Guid.Empty)
             {
                 scoringSystem.Id = Guid.NewGuid();
             }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-
-namespace SailScores.Api.Services
+﻿namespace SailScores.Api.Services
 {
     public interface ISettings
     {

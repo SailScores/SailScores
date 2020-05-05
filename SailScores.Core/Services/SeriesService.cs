@@ -63,12 +63,12 @@ namespace SailScores.Core.Services
             return returnObj;
         }
 
-        public async Task<Series> GetOneSeriesAsync(Guid guid)
+        public async Task<Series> GetOneSeriesAsync(Guid seriesId)
         {
             var seriesDb = await _dbContext
                 .Series
                 .Include(s => s.Season)
-                .FirstAsync(c => c.Id == guid);
+                .FirstAsync(c => c.Id == seriesId);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
             if (fullSeries != null)

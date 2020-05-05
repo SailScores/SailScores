@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 //This namespace is likely to get moved to Api project
 namespace SailScores.Core.FlatModel

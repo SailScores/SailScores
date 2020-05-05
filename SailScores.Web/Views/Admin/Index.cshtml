@@ -70,7 +70,7 @@
     <div class="col-lg-6">
         <div class="row">
             <div class="col-4 col-md-2">
-                <i>@Html.DisplayNameFor(model => model.Initials)</i>
+                <span class="font-italic">@Html.DisplayNameFor(model => model.Initials)</span>
             </div>
             <div class="col-8 col-md-10">
                 <strong>@Html.DisplayFor(model => model.Initials)</strong>
@@ -78,26 +78,24 @@
         </div>
         <div class="row">
             <div class="col-md-2">
-                <i>@Html.DisplayNameFor(model => model.Description)</i>
+                <span class="font-italic">@Html.DisplayNameFor(model => model.Description)</span>
             </div>
             <div class="col-md-10">
                 @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
             </div>
         </div>
         <div class="row">
-            <div class="col-4 col-md-2">
-                <label asp-for="IsHidden" class="control-label"><i>Hidden</i></label>
-            </div>
+            <div class="col-4 col-md-2"></div>
             <div class="col-8 col-md-10">
-                @(Model.IsHidden ? "Yes" : "No")
+                @if (Model.IsHidden) {
+                    @:This club does not appear on the front page club list.
+                }
             </div>
         </div>
         <div class="row">
             <div class="col-12">
-                <label asp-for="DefaultScoringSystemId"><i>Default Scoring System:</i></label>
+                <label asp-for="DefaultScoringSystemId"><span class="font-italic">Default Scoring System:</span></label>
                 @Html.DisplayFor(model => model.DefaultScoringSystemName)
-            </div>
-            <div class="col-md-6">
             </div>
         </div>
     </div>

@@ -314,7 +314,7 @@ namespace SailScores.Core.Scoring
 
         protected int GetNumberOfCompetitors(SeriesResults seriesResults)
         {
-            return seriesResults.Competitors.Count();
+            return seriesResults.Competitors.Count;
         }
 
 

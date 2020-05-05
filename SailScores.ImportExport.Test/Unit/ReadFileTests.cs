@@ -26,7 +26,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
             var series = SeriesParser.GetSeries(Utilities.SimpleFile.GetStream());
 
             Assert.Equal(2, series.Competitors.Count);
-            Assert.Equal(1, series.Competitors.Where( c => c.Id == 3).Count());
+            Assert.Equal(1, series.Competitors.Count(c => c.Id == 3));
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
             var series = SeriesParser.GetSeries(Utilities.SimpleFile.GetStream());
 
             Assert.Equal(2, series.Races.Count);
-            Assert.Equal(1, series.Races.Where(r => r.Id == 1).Count());
+            Assert.Equal(1, series.Races.Count(r => r.Id == 1));
         }
 
 

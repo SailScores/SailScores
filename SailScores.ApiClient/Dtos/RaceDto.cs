@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Api.Dtos
 {
-    public class RaceDto : IEquatable<RaceDto>
+    public sealed class RaceDto : IEquatable<RaceDto>
     {
         public Guid Id { get; set; }
         

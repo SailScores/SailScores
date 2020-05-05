@@ -165,8 +165,8 @@ namespace SailScores.Core.Services
                     .Include(r => r.Scores)
                     .Include(r => r.SeriesRaces)
                     .Include(r => r.Weather)
-                    .SingleOrDefaultAsync(r => r.Id == race.Id);
-                var seriesFromRace = dbRace?.SeriesRaces?.Select(r => r.SeriesId)?.ToList();
+                    .SingleAsync(r => r.Id == race.Id);
+                var seriesFromRace = dbRace.SeriesRaces?.Select(r => r.SeriesId)?.ToList();
                 if(seriesFromRace != null)
                 {
                     seriesIdsToUpdate = seriesFromRace;

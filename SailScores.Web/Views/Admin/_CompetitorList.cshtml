@@ -22,37 +22,25 @@
                     </a>
                 </div>
             </div>
-            <table class="table table-not-wide">
-                <tbody>
-                    @foreach (var item in Model.OrderBy(c => c.Name))
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.SailNumber)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                <em>@Html.DisplayFor(modelItem => item.BoatName)</em>
-                            </td>
-                            <td>
-                                @(item.IsActive ? "" : "Inactive")
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Notes)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.BoatClass.Name)
-                            </td>
-                            <td>
-                                @Html.ActionLink("Edit", "Edit", "Competitor", new { id = item.Id }) |
-                                @Html.ActionLink("Delete", "Delete", "Competitor", new { id = item.Id })
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            @foreach (var item in Model.OrderBy(c => c.Name))
+            {
+        <div class="row border-bottom mb-1 pb-1">
+            <div class="col-3 col-sm-2"><strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong></div>
+            <div class="col-9 col-sm-4 col-md-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
+            <div class="col-4 col-sm-3 col-md-3 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
+            <div class="col-4 col-md-2 small">
+                <em>@(item.IsActive ? "" : "Inactive")</em>
+                @Html.DisplayFor(modelItem => item.BoatClass.Name)
+            </div>
+            <div class="col-12 col-md-6 col-lg-3 col-xl-3">
+                @Html.ActionLink("Edit", "Edit", "Competitor", new { id = item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", "Competitor", new { id = item.Id })
+                    </div>
+            <div class="col-12">
+                @Html.DisplayFor(modelItem => item.Notes)
+            </div>
+        </div>
+            }
         </div>
     </div>
 </div>

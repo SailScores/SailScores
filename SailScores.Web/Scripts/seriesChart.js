@@ -117,7 +117,7 @@
         }
 
         function onMouseOver(d) {
-            compId = d.competitorId || d.id;
+            var compId = d.competitorId || d.id;
             svgElement
                 .selectAll("path.compLine")
                 .attr("opacity", .4);
@@ -237,7 +237,7 @@
         svgElement.append("g").attr("id", "xAxisG")
             .attr("transform", "translate(0,20)").call(xAxis);
 
-        lineData = d3.line()
+        var lineData = d3.line()
             .x(d => xScale(getDate(d, data)))
             .y(d => getY(d, data));
 
@@ -270,7 +270,7 @@
             .on("mouseover", onMouseOverRace)
             .on("mouseout", onMouseOut);
 
-        tooltipGroup = svgElement
+        var tooltipGroup = svgElement
             .append("g")
             .attr("opacity", 0);
         tooltipGroup.append("rect")

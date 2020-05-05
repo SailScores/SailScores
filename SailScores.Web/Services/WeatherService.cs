@@ -16,7 +16,6 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IWeatherService _coreWeatherService;
         private readonly Core.Services.IConversionService _converter;
-        private readonly IMapper _mapper;
 
         private static List<KeyValuePair<string, string>> IconList = new List<KeyValuePair<string, string>>
             {
@@ -47,13 +46,11 @@ namespace SailScores.Web.Services
     public WeatherService(
             Core.Services.IClubService clubService,
             Core.Services.IWeatherService weatherService,
-            Core.Services.IConversionService converter,
-            IMapper mapper)
+            Core.Services.IConversionService converter)
         {
             _coreClubService = clubService;
             _coreWeatherService = weatherService;
             _converter = converter;
-            _mapper = mapper;
         }
 
 

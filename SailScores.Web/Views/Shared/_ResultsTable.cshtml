@@ -39,7 +39,7 @@
                     {
                         if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                         {
-                <th class="text-center d-none d-sm-table-cell">
+                <th class="text-center d-none d-sm-table-cell" scope="col">
                     @if (((bool?)ViewData["IsExport"] ?? false))
                     {
                         @race.ShortName
@@ -52,13 +52,13 @@
                         <div class="weather">
                             @if (race.WindDirectionDegrees.HasValue)
                             {
-                                <i class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></i>
+                                <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
                             }
                             @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
                             {<span data-toggle="tooltip" title="mph">@race.WindSpeed</span>}
                             @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
                             {
-                                <i class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></i>
+                                <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
                             }
                         </div>
                     }
@@ -67,7 +67,7 @@
                         }
                         else
                         {
-                <th class="text-center">
+                <th class="text-center" scope="col">
                     @if (((bool?)ViewData["IsExport"] ?? false))
                     {
                         @race.ShortName
@@ -223,7 +223,8 @@
                     }
                     @if ((Model.FlatResults.NumberOfSailedRaces) > 4)
                     {
-                        <th class="d-table-cell @(( Model.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")">@comp.Name</th>
+                        <th class="d-table-cell @(( Model.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")"
+                            scope="row">@comp.Name</th>
                     }
                     @{firstRow = false;
                     }

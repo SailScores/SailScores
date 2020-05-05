@@ -5,9 +5,7 @@ using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Core = SailScores.Core;
 
 namespace SailScores.Web.Services
 {
@@ -93,7 +91,7 @@ namespace SailScores.Web.Services
             {
                 newClubId = await CopyClub(copyFromClubId.Value, request, test);
                 request.TestClubId = newClubId;
-                request.RequestApproved = request.RequestApproved ?? DateTime.UtcNow;
+                request.RequestApproved ??= DateTime.UtcNow;
                 await _coreClubRequestService.UpdateRequest(request);
             }
             else
@@ -111,7 +109,7 @@ namespace SailScores.Web.Services
                 var initialsToUse = request.ClubInitials + (test ? "TEST" : "");
                 var club = new Core.Model.Club
                 {
-                    Id = new Guid(),
+                    Id = Guid.Empty,
                     Name = request.ClubName,
                     Initials = initialsToUse,
                     IsHidden = test,
@@ -131,11 +129,14 @@ namespace SailScores.Web.Services
                 {
                     request.VisibleClubId = newClubId;
                 }
-                request.RequestApproved = request.RequestApproved ?? DateTime.UtcNow;
+                request.RequestApproved ??= DateTime.UtcNow;
                 await _coreClubRequestService.UpdateRequest(request);
             }
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+    // we are storing email in lowercase, and not round-tripping back to upper case.
             await _coreUserService.AddPermision(newClubId, request.ContactEmail.ToLowerInvariant());
+#pragma warning restore CA1308 // Normalize strings to uppercase
         }
 
         private async Task<Guid> CopyClub(Guid copyFromClubId,

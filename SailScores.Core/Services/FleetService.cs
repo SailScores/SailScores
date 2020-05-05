@@ -56,7 +56,7 @@ namespace SailScores.Core.Services
             var dbFleet =_mapper.Map<Db.Fleet>(fleet);
             dbFleet.Id = Guid.NewGuid();
             dbFleet.FleetBoatClasses = new List<Db.FleetBoatClass>();
-            if((fleet.BoatClasses?.Count() ?? 0) != 0)
+            if((fleet.BoatClasses?.Count ?? 0) != 0)
             {
                 foreach(var newClass in fleet.BoatClasses)
                 {
@@ -69,7 +69,7 @@ namespace SailScores.Core.Services
                 }
             }
             dbFleet.CompetitorFleets = new List<Db.CompetitorFleet>();
-            if ((fleet.Competitors?.Count() ?? 0) != 0)
+            if ((fleet.Competitors?.Count ?? 0) != 0)
             {
                 foreach (var newComp in fleet.Competitors)
                 {

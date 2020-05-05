@@ -9,22 +9,22 @@
 
 @model ClubCollectionViewModel<CompetitorViewModel>
 
-
-
-
 @{
-    ViewBag.Title = Model.ClubInitials + " " + localizer["Series"];
+    ViewBag.Title = Model.ClubInitials + " " + localizer["Competitors"];
     Layout = "_ClubLayout";
 }
-
-<table class="table">
-    <tbody>
-        @foreach(var competitor in Model.List) { 
-            <tr id="@competitor.Id">
-                <td colspan="3">
-                    <h2>@competitor.Name</h2>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>@Model.ClubInitials @localizer["Competitors"]</h1>
+        </div>
+    </div>
+    @foreach (var competitor in Model.List)
+    {
+        <div class="row">
+            <div class="col-12">
+                <h2><a asp-route="Competitor" asp-route-sailNumber="@competitor.SailNumber">@competitor.Name</a></h2>
+            </div>
+        </div>
+    }
+</div>

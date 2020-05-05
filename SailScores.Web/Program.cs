@@ -12,7 +12,7 @@ using Serilog.Events;
 
 namespace SailScores.Web
 {
-    public class Program
+    public static class Program
     {
 
         private static int? _sslPort = null;

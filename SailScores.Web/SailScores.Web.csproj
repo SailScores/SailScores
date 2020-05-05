@@ -9,12 +9,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>SailScores.Web.xml</DocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
+    <CodeAnalysisRuleSet>SailScores.Web.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <ServerGarbageCollection>false</ServerGarbageCollection>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>SailScores.Web.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>SailScores.Web.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>

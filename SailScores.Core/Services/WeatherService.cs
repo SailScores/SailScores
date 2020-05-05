@@ -18,8 +18,6 @@ namespace SailScores.Core.Services
 {
     public class WeatherService : IWeatherService
     {
-        private readonly ISailScoresContext _dbContext;
-        private readonly ILogger _logger;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
@@ -27,16 +25,12 @@ namespace SailScores.Core.Services
         private readonly string _openWeatherApiRoot = "https://api.openweathermap.org/data/2.5/weather";
 
         public WeatherService(
-            ISailScoresContext dbContext,
             IHttpClientFactory clientFactory,
             IConfiguration configuration,
-            ILogger<IRaceService> logger,
             IMapper mapper)
         {
-            _dbContext = dbContext;
             _clientFactory = clientFactory;
             _configuration = configuration;
-            _logger = logger;
             _mapper = mapper;
         }
 
@@ -55,28 +49,31 @@ namespace SailScores.Core.Services
             string url = builder.ToString();
 
 
-            var request = new HttpRequestMessage(
+            using (var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                url);
+                url)) {;
             //request.Headers.Add("Accept", "application/vnd.github.v3+json");
             //request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
 
-            var client = _clientFactory.CreateClient();
+                using (var client = _clientFactory.CreateClient())
+                {
 
-            var response = await client.SendAsync(request);
+                    var response = await client.SendAsync(request);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var responseString = await response.Content
-                   .ReadAsStringAsync();
-                var responseObj = JsonConvert.DeserializeObject<CurrentWeatherResponse>(responseString);
-                var domainObj = _mapper.Map<Weather>(responseObj);
-                domainObj.Icon = GetIconName(responseObj.Weather?.First()?.Id);
-                return domainObj;
-            }
-            else
-            {
-                return null;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content
+                            .ReadAsStringAsync();
+                        var responseObj = JsonConvert.DeserializeObject<CurrentWeatherResponse>(responseString);
+                        var domainObj = _mapper.Map<Weather>(responseObj);
+                        domainObj.Icon = GetIconName(responseObj.Weather?.First()?.Id);
+                        return domainObj;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
             }
         }
 

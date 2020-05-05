@@ -1,11 +1,9 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
-using SailScores.Web.Services;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SailScores.Web.Controllers
 {
@@ -14,7 +12,6 @@ namespace SailScores.Web.Controllers
     {
         private readonly Core.Services.IClubService _clubService;
         private readonly Web.Services.ICompetitorService _competitorService;
-        private readonly IMapper _mapper;
         private readonly Services.IAuthorizationService _authService;
         private readonly Services.IMergeService _mergeService;
 
@@ -22,14 +19,12 @@ namespace SailScores.Web.Controllers
             Core.Services.IClubService clubService,
             Web.Services.ICompetitorService competitorService,
             Services.IAuthorizationService authService,
-            Services.IMergeService mergeService,
-            IMapper mapper)
+            Services.IMergeService mergeService)
         {
             _clubService = clubService;
             _competitorService = competitorService;
             _authService = authService;
             _mergeService = mergeService;
-            _mapper = mapper;
         }
 
         public async Task<ActionResult> Options(string clubInitials)

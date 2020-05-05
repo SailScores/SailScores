@@ -96,7 +96,7 @@ namespace SailScores.Web.Services
             sb.Append(GetEscapedValue(comp.BoatName));
             sb.Append(_separator);
 
-            var totalString = String.Format("{0:0.##}", score.TotalScore);
+            var totalString = String.Format("{0:0.##}", score?.TotalScore ?? 0);
             sb.Append(GetEscapedValue(totalString.ToString()));
             sb.Append(_separator);
             foreach (var race in series.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())

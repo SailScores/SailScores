@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SailScores.Api.Dtos;
@@ -12,7 +11,7 @@ namespace SailScores.Api.Services
 {
     public class SailScoresApiClient : ISailScoresApiClient
     {
-        private ISettings _settings;
+        private readonly ISettings _settings;
         private string _token;
 
         public SailScoresApiClient(ISettings settings)
@@ -36,27 +35,23 @@ namespace SailScores.Api.Services
                 Uri requestUri = new Uri(new Uri(_settings.ServerUrl), urlExtension);
 
                 //Send the GET request asynchronously and retrieve the response as a string.
-                var httpResponse = new HttpResponseMessage();
-                string httpResponseBody = "";
-
                 try
                 {
                     //Send the GET request
-                    httpResponse = await httpClient.GetAsync(requestUri);
+                    var httpResponse = await httpClient.GetAsync(requestUri);
                     if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         await AuthenticateAsync();
                         return await GetAsync<T>(urlExtension);
                     }
                     httpResponse.EnsureSuccessStatusCode();
-                    httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+                    var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
                     var returnObj = JsonConvert.DeserializeObject<T>(httpResponseBody);
                     return returnObj;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    httpResponseBody = "Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message;
                     throw;
                 }
             }
@@ -73,15 +68,12 @@ namespace SailScores.Api.Services
 
                 Uri requestUri = new Uri(new Uri(_settings.ServerUrl), urlExtension);
 
-                var httpResponse = new HttpResponseMessage();
-                string httpResponseBody = "";
-
                 try
                 {
                     var json = JsonConvert.SerializeObject(item);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
                     //Send the request
-                    httpResponse = await httpClient.PostAsync(requestUri, content);
+                    var httpResponse = await httpClient.PostAsync(requestUri, content);
                     if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         if (retryCount < 2)
@@ -94,14 +86,13 @@ namespace SailScores.Api.Services
                         }
                     }
                     httpResponse.EnsureSuccessStatusCode();
-                    httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+                    var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
                     var returnId = JsonConvert.DeserializeObject<Guid>(httpResponseBody);
                     return returnId;
                 }
                 catch (Exception ex)
                 {
-                    httpResponseBody = "Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message;
                     throw;
                 }
             }
@@ -118,10 +109,6 @@ namespace SailScores.Api.Services
             {
                 Uri requestUri = new Uri(new Uri(_settings.ServerUrl), "/account/jwttoken");
 
-                //Send the GET request asynchronously and retrieve the response as a string.
-                var httpResponse = new HttpResponseMessage();
-                string httpResponseBody = "";
-
                 var content = JsonConvert.SerializeObject(new
                 {
                     email = _settings.UserName,
@@ -130,19 +117,18 @@ namespace SailScores.Api.Services
 
                 try
                 {
-                    httpResponse = await httpClient.PostAsync(requestUri,
+                    var httpResponse = await httpClient.PostAsync(requestUri,
                         new StringContent(
                             content,
                             UnicodeEncoding.UTF8,
                             "application/json"));
                     httpResponse.EnsureSuccessStatusCode();
-                    httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+                    var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
                     _token = httpResponseBody;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    httpResponseBody = "Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message;
                     throw;
                 }
             }
