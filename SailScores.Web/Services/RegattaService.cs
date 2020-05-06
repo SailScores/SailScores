@@ -28,8 +28,9 @@ namespace SailScores.Web.Services
 
         public async Task<IEnumerable<RegattaSummaryViewModel>> GetAllRegattaSummaryAsync(string clubInitials)
         {
-            var coreObject = await _clubService.GetFullClub(clubInitials);
-            var orderedRegattas = coreObject.Regattas
+            var clubId = await _clubService.GetClubId(clubInitials);
+            var regattas = await _coreRegattaService.GetAllRegattasAsync(clubId);
+            var orderedRegattas = regattas
                 .OrderByDescending(s => s.Season.Start)
                 .ThenBy(s => s.StartDate)
                 .ThenBy(s => s.Name);

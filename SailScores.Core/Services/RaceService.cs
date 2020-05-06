@@ -57,6 +57,7 @@ namespace SailScores.Core.Services
                 .ToListAsync();
             return _mapper.Map<List<Model.Race>>(dbObjects);
         }
+
         public async Task<IList<Model.Race>> GetFullRacesAsync(
             Guid clubId,
             bool includeScheduled = true,
@@ -72,17 +73,13 @@ namespace SailScores.Core.Services
                         (includeScheduled && (r.State == RaceState.Scheduled)) ||
                         (includeAbandoned && (r.State == RaceState.Abandoned)));
             var modelRaces = _mapper.Map<List<Model.Race>>(dbRaces);
-            var dbSeries = (await _dbContext.Clubs
-                .Include(c => c.Series)
-                .FirstAsync(c => c.Id == clubId))
-                .Series;
+            
+            var dbSeries = await _dbContext.Series
+                .Where(s => s.ClubId == clubId).ToListAsync();
             var modelSeries = _mapper.Map<List<Model.Series>>(dbSeries);
 
-
-            var dbSeasons = (await _dbContext.Clubs
-                .Include(c => c.Seasons)
-                .FirstAsync(c => c.Id == clubId))
-                .Seasons;
+            var dbSeasons = await _dbContext.Seasons
+                .Where(s => s.ClubId == clubId).ToListAsync();
             var modelSeasons = _mapper.Map<List<Model.Season>>(dbSeasons);
 
             foreach (var race in modelRaces)

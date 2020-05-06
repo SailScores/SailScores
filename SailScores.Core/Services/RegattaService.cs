@@ -37,6 +37,8 @@ namespace SailScores.Core.Services
                 .Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Regattas)
+                .Include(c => c.Season)
+                .Include(c => c.RegattaFleet)
                 .OrderBy(r => r.StartDate)
                 .ToListAsync();
 

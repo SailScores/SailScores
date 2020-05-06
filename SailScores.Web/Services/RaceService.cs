@@ -48,17 +48,18 @@ namespace SailScores.Web.Services
             bool includeScheduled,
             bool includeAbandoned)
         {
-            var club = (await _coreClubService.GetClubs(true)).First(c => c.Initials == clubInitials);
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
             var races = (await _coreRaceService.GetFullRacesAsync(club.Id, includeScheduled, includeAbandoned))
                 .OrderByDescending(r => r.Date)
                 .ThenBy(r => r.Fleet?.Name)
                 .ThenBy(r => r.Order);
 
+            // need to get score codes so viewmodel can determine starting boat count.
             var scoreCodes = await _coreScoringService.GetScoreCodesAsync(club.Id);
             var vm = _mapper.Map<List<RaceSummaryViewModel>>(races);
-            foreach(var race in vm)
+            foreach (var race in vm)
             {
-                foreach(var score in race.Scores)
+                foreach (var score in race.Scores)
                 {
                     score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
                 }
@@ -244,7 +245,7 @@ namespace SailScores.Web.Services
             if (race.SeriesIds != null) {
                 race.Series = series.Where(s => race.SeriesIds.Contains(s.Id)).ToList();
             }
-            if(race.FleetId != default(Guid))
+            if(race.FleetId != default)
             {
                 race.Fleet = fleets.Single(f => f.Id == race.FleetId);
                 // if a regatta race, give everyone in the fleet a result
