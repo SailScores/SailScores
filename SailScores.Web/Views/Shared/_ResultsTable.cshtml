@@ -166,7 +166,9 @@
                         }
                         else
                         {
-                            <a asp-route="Competitor" asp-route-sailNumber="@comp.CurrentSailNumber">@comp.Name</a>
+                            <a asp-route="Competitor"
+                               asp-route-sailNumber="@comp.CurrentSailNumber"
+                               asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]">@comp.Name</a>
                         }
                     </th>
                     <td class="d-none d-sm-table-cell">@comp.BoatName</td>

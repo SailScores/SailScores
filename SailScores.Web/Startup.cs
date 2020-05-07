@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +16,6 @@ using Microsoft.OpenApi.Models;
 using SailScores.Core.Extensions;
 using SailScores.Core.JobQueue;
 using SailScores.Core.Mapping;
-using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Web.Data;
 using SailScores.Web.Extensions;
@@ -51,8 +49,6 @@ namespace SailScores.Web
 
             services.Configure<RequestLocalizationOptions>(options =>
             {
-                //options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("fi-FI");
-                ////By default the below will be set to whatever the server culture is. 
                 options.SupportedCultures = new List<CultureInfo> {
                     new CultureInfo("en-US"),
                     new CultureInfo("fi-FI"),
@@ -156,11 +152,10 @@ namespace SailScores.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services
-                .AddMvc(option => {
+                .AddMvc(option =>
+                {
                     option.Filters.Add(new ResponseCacheAttribute() { NoStore = true, Location = ResponseCacheLocation.None });
-                    option.EnableEndpointRouting = false;
-                    })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                });
 
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
             services.AddTransient<IEmailSender, EmailSender>();
@@ -258,16 +253,20 @@ namespace SailScores.Web
 
             app.UseWebMarkupMin();
 
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "areas",
-                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-                routes.MapRoute(
+                endpoints.MapControllers();
+                endpoints.MapAreaControllerRoute(
+                    "areas",
+                    "api",
+                    "api/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
                     name: "ClubRoute",
-                    template: "{clubInitials}/{controller}/{action}/{id?}",
+                    pattern: "{clubInitials}/{controller}/{action}/{id?}",
                     defaults: new { controller = "Club", action = "Index" },
                     constraints: new
                     {
@@ -277,20 +276,20 @@ namespace SailScores.Web
                         )
                     });
 
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "Competitor",
-                    template: "{clubInitials}/Competitor/{sailNumber}/",
+                    pattern: "{clubInitials}/Competitor/{sailNumber}/",
                     defaults: new { controller = "Competitor", action = "Details" },
                     constraints: new
                     {
                         clubInitials = new ClubRouteConstraint(() =>
-                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "Series",
-                    template: "{clubInitials}/{season}/{seriesName}",
+                    pattern: "{clubInitials}/{season}/{seriesName}",
                     defaults: new { controller = "Series", action = "Details" },
                     constraints: new
                     {
@@ -299,9 +298,9 @@ namespace SailScores.Web
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "Regatta",
-                    template: "{clubInitials}/Regatta/{season}/{regattaName}",
+                    pattern: "{clubInitials}/Regatta/{season}/{regattaName}",
                     defaults: new { controller = "Regatta", action = "Details" },
                     constraints: new
                     {
@@ -310,9 +309,9 @@ namespace SailScores.Web
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    "default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
