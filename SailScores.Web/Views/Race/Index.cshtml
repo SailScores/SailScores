@@ -54,7 +54,8 @@
 <div class="row border-bottom mb-1 pb-1">
     <div class="col-6 col-md-4">
         <span class="d-md-none">
-            <a asp-action="Details"
+            <a  id="smallracelink_@race.Id"
+               asp-action="Details"
                asp-controller="Race"
                asp-route-id=@race.Id>
                 @race.FleetShortName:
@@ -62,9 +63,12 @@
             </a>
         </span>
         <span class="d-none d-md-inline">
-            @Html.ActionLink(
-                race.CalculatedName
-                , "Details", new { id = race.Id })
+            <a id="racelink_@race.Id"
+               asp-action="Details"
+               asp-controller="Race"
+               asp-route-id=@race.Id>
+                @race.CalculatedName
+            </a>
         </span>
     </div>
     <div class="col-3 small">
