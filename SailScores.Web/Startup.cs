@@ -237,7 +237,6 @@ namespace SailScores.Web
             app.UseRequestLocalization();
 
             app.UseHttpsRedirection();
-            app.UseMiddleware<Datalust.SerilogMiddlewareExample.Diagnostics.SerilogMiddleware>();
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = ctx =>
