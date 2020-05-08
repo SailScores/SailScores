@@ -22,7 +22,7 @@ paths.concatJsDest = paths.webroot + "js/**/*";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.concatTsDest = paths.webroot + "scripts/**.*";
 paths.jsDir = paths.webroot + "js/";
-paths.scripts = ['scripts/**/*.js'];
+paths.scripts = ['scripts/*.js', 'scripts/build/*.js'];
 
 gulp.task("clean:js", function () {
     return del(paths.concatJsDest);
@@ -43,6 +43,7 @@ gulp.task("min:js", function () {
         .pipe(named())
         .pipe(webpack({
             mode: "production",
+            devtool: 'source-map',
             module: {
                 rules: [
                     {

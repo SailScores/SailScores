@@ -251,7 +251,7 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
 }
 
 function removeScoresFieldsFromForm(form: HTMLFormElement) {
-    form.find("[name^=Scores]").remove();
+    $(form).find("[name^=Scores]").remove();
 }
 export function calculatePlaces() {
     var resultList = document.getElementById("results");

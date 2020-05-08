@@ -208,7 +208,7 @@ function addScoresFieldsToForm(form) {
     }
 }
 function removeScoresFieldsFromForm(form) {
-    form.find("[name^=Scores]").remove();
+    $(form).find("[name^=Scores]").remove();
 }
 export function calculatePlaces() {
     var resultList = document.getElementById("results");
