@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
@@ -16,7 +17,7 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IWeatherService _coreWeatherService;
         private readonly Core.Services.IConversionService _converter;
-
+        private readonly ILogger<WeatherService> _logger;
         private static List<KeyValuePair<string, string>> IconList = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>(IconNames.Sunny.ToString(), "wi-day-sunny" ),
@@ -46,11 +47,14 @@ namespace SailScores.Web.Services
     public WeatherService(
             Core.Services.IClubService clubService,
             Core.Services.IWeatherService weatherService,
-            Core.Services.IConversionService converter)
+            Core.Services.IConversionService converter,
+            ILogger<WeatherService> logger
+        )
         {
             _coreClubService = clubService;
             _coreWeatherService = weatherService;
             _converter = converter;
+            _logger = logger;
         }
 
 
@@ -144,22 +148,43 @@ namespace SailScores.Web.Services
         {
             var icon = weather.Icon;
             // todo: check for valid icons.
-            if (icon.Contains("Select..."))
+            if (icon.Contains("Select...", StringComparison.InvariantCultureIgnoreCase))
             {
                 icon = string.Empty;
             }
+            _logger.LogInformation("About to get tempString");
+
+            var tempString = GetTemperatureString(weather);
+
+            _logger.LogInformation("About to get tempDegKelvin");
+            var tempDegKelvin = GetTemperatureDecimal(weather);
+            _logger.LogInformation("About to get windSpeedString");
+            var windSpeedString = GetWindString(weather);
+            _logger.LogInformation("About to get windSpeedMeterPerSecond");
+            var windSpeedMeterPerSecond = GetWindMeterPerSecond(weather);
+            _logger.LogInformation("About to get windDirectionString");
+            var windDirectionString = weather.WindDirection;
+            _logger.LogInformation("About to get windDirectionDegrees");
+            var windDirectionDegrees = GetWindDirectionDecimal(weather);
+            _logger.LogInformation("About to get windGustString");
+            var windGustString = GetWindGustString(weather);
+            _logger.LogInformation("About to get windGustMeterPerSecond");
+            var windGustMeterPerSecond = GetGustMeterPerSecond(weather);
+
+            _logger.LogInformation("About to return standardized weather");
+
             var returnObj = new Weather
             {
                 Description = weather.Description,
                 Icon = icon,
-                TemperatureString = GetTemperatureString(weather),
-                TemperatureDegreesKelvin = GetTemperatureDecimal(weather),
-                WindSpeedString = GetWindString(weather),
-                WindSpeedMeterPerSecond = GetWindMeterPerSecond(weather),
-                WindDirectionString = weather.WindDirection,
-                WindDirectionDegrees = GetWindDirectionDecimal(weather),
-                WindGustString = GetWindGustString(weather),
-                WindGustMeterPerSecond = GetGustMeterPerSecond(weather),
+                TemperatureString = tempString,
+                TemperatureDegreesKelvin = tempDegKelvin,
+                WindSpeedString = windSpeedString,
+                WindSpeedMeterPerSecond = windSpeedMeterPerSecond,
+                WindDirectionString = windDirectionString,
+                WindDirectionDegrees = windDirectionDegrees,
+                WindGustString = windGustString,
+                WindGustMeterPerSecond = windGustMeterPerSecond,
                 Humidity = weather.Humidity,
                 CloudCoverPercent = weather.CloudCoverPercent,
                 CreatedDate = DateTime.UtcNow
