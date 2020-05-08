@@ -15,5 +15,9 @@ namespace SailScores.Core.Services
         Task<Race> GetRaceAsync(Guid raceId);
         Task<Guid> SaveAsync(RaceDto race);
         Task Delete(Guid raceId);
+        Task<int> GetRaceCountAsync(
+            Guid clubId,
+            DateTime? date,
+            Guid fleetId);
     }
 }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
@@ -19,6 +20,7 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IRegattaService _coreRegattaService;
         private readonly IWeatherService _weatherService;
         private readonly IMapper _mapper;
+        private readonly ILogger<RaceService> _logger;
 
         public RaceService(
             Core.Services.IClubService clubService,
@@ -27,7 +29,8 @@ namespace SailScores.Web.Services
             Core.Services.IScoringService coreScoringService,
             Core.Services.IRegattaService coreRegattaService,
             IWeatherService weatherService,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<RaceService> logger)
         {
             _coreClubService = clubService;
             _coreRaceService = coreRaceService;
@@ -36,6 +39,7 @@ namespace SailScores.Web.Services
             _coreRegattaService = coreRegattaService;
             _weatherService = weatherService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task Delete(Guid id)
@@ -273,15 +277,12 @@ namespace SailScores.Web.Services
                 }
                 else
                 {
-                    var races = await _coreRaceService.GetRacesAsync(race.ClubId);
-                    var maxOrder = races
-                        .Where(r =>
-                            r.Date == race.Date
-                            && r.Fleet != null
-                            && r.Fleet.Id == race.FleetId)
-                        .DefaultIfEmpty()
-                        .Max(r => r?.Order ?? 0);
-                    race.Order = maxOrder + 1;
+                    int existingRaceCount = await _coreRaceService.GetRaceCountAsync(
+                        race.ClubId,
+                        race.Date,
+                        race.FleetId);
+
+                    race.Order = existingRaceCount + 1;
                 }
             }
             var raceDto = _mapper.Map<RaceDto>(race);
@@ -301,9 +302,14 @@ namespace SailScores.Web.Services
                     race.Weather.TemperatureUnits = weatherSettings?.TemperatureUnits;
                 }
             }
+            _logger.LogInformation("About to standardize weather for race create");
             var weather = _weatherService.GetStandardWeather(race.Weather);
+
+            _logger.LogInformation("About to automapper weather for race create");
             raceDto.Weather = _mapper.Map<WeatherDto>(weather);
-            
+
+
+            _logger.LogInformation("About to save race for race create");
             var raceId = await _coreRaceService.SaveAsync(raceDto);
 
 

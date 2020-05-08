@@ -303,5 +303,16 @@ namespace SailScores.Core.Services
                 await _seriesService.UpdateSeriesResults(seriesId);
             }
         }
+
+        public async Task<int> GetRaceCountAsync(
+            Guid clubId,
+            DateTime? raceDate,
+            Guid fleetId)
+        {
+            return await _dbContext
+                .Races
+                .Where(r => r.ClubId == clubId && r.Fleet.Id == fleetId)
+                .CountAsync(r => r.Date == raceDate);
+        }
     }
 }
