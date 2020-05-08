@@ -35,17 +35,21 @@ namespace SailScores.Web.Controllers
             _mapper = mapper;
         }
 
-        public async Task<ActionResult> Index(string clubInitials,
+        public async Task<ActionResult> Index(
+            string clubInitials,
+            string seasonName,
             bool showScheduled = false,
             bool showAbandoned = true)
         {
-            var races = await _raceService.GetAllRaceSummariesAsync(clubInitials,
+            var races = await _raceService.GetAllRaceSummariesAsync(
+                clubInitials,
+                seasonName,
                 showScheduled,
                 showAbandoned);
 
-            return View(new ClubCollectionViewModel<RaceSummaryViewModel>
+            return View(new ClubItemViewModel<RaceSummaryListViewModel>
             {
-                List = races,
+                Item = races,
                 ClubInitials = clubInitials
             });
         }

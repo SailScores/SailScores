@@ -288,6 +288,17 @@ namespace SailScores.Web
                         )
                     });
                 endpoints.MapControllerRoute(
+                    name: "Race",
+                    pattern: "{clubInitials}/Race/{seasonName}",
+                    defaults: new { controller = "Race", action = "Index" },
+                    constraints: new
+                    {
+                        clubInitials = new ClubRouteConstraint(() =>
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
+                        )
+                    });
+                endpoints.MapControllerRoute(
                     name: "Series",
                     pattern: "{clubInitials}/{season}/{seriesName}",
                     defaults: new { controller = "Series", action = "Details" },
@@ -309,6 +320,7 @@ namespace SailScores.Web
                             app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                         )
                     });
+
 
                 endpoints.MapControllerRoute(
                     "default", "{controller=Home}/{action=Index}/{id?}");

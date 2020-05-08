@@ -60,11 +60,18 @@ namespace SailScores.Core.Services
 
         public async Task<IList<Model.Race>> GetFullRacesAsync(
             Guid clubId,
+            string seasonName,
             bool includeScheduled = true,
             bool includeAbandoned = true)
         {
+            var seasonToUse = await GetSeasonAsync(clubId, seasonName);
+            var startDate = seasonToUse?.Start ?? DateTime.Today.AddYears(-5);
+            var endDate = seasonToUse?.End ?? DateTime.Today.AddYears(1);
+
             var dbRaces = (await _dbContext.Races
-                .Where(r => r.ClubId == clubId)
+                .Where(r => r.ClubId == clubId
+                    && r.Date >= startDate
+                    && r.Date <= endDate)
                 .Include(r => r.Fleet)
                 .Include( r => r.Scores)
                 .Include( r => r.SeriesRaces)
@@ -78,23 +85,46 @@ namespace SailScores.Core.Services
                 .Where(s => s.ClubId == clubId).ToListAsync();
             var modelSeries = _mapper.Map<List<Model.Series>>(dbSeries);
 
-            var dbSeasons = await _dbContext.Seasons
-                .Where(s => s.ClubId == clubId).ToListAsync();
-            var modelSeasons = _mapper.Map<List<Model.Season>>(dbSeasons);
-
             foreach (var race in modelRaces)
             {
                 race.Series = modelSeries.Where(s => dbRaces
                         .First(r => r.Id == race.Id)
                         .SeriesRaces.Any(sr => sr.SeriesId == s.Id))
                     .ToList();
-                race.Season = modelSeasons
-                    .SingleOrDefault(s =>
-                        race.Date.HasValue
-                        && s.Start <= race.Date
-                        && s.End > race.Date);
+                race.Season = _mapper.Map<Season>(seasonToUse);
             }
             return modelRaces;
+        }
+
+        private async Task<Db.Season> GetSeasonAsync(Guid clubId, string seasonName)
+        {
+            if (String.IsNullOrWhiteSpace(seasonName))
+            {
+                return await GetMostRecentRaceSeasonAsync(clubId);
+            }
+            return await _dbContext.Seasons.FirstOrDefaultAsync(s =>
+                s.ClubId == clubId && s.Name == seasonName);
+        }
+
+        private async Task<Db.Season> GetMostRecentRaceSeasonAsync(Guid clubId)
+        {
+            var race = await _dbContext.Races
+                .Where(r => r.ClubId == clubId)
+                .OrderByDescending(r => r.Date)
+                .FirstOrDefaultAsync();
+            if(race == null)
+            {
+                return await _dbContext.Seasons
+                    .Where(s => s.ClubId == clubId)
+                    .OrderByDescending(s => s.Start)
+                    .FirstOrDefaultAsync();
+            }
+
+            return await _dbContext.Seasons
+                .Where(s => s.ClubId == clubId)
+                .OrderByDescending(s => s.Start)
+                .FirstOrDefaultAsync(s => s.Start <= race.Date);
+
         }
 
         public async Task<Model.Race> GetRaceAsync(Guid raceId)
