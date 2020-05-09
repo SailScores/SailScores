@@ -115,7 +115,7 @@ namespace SailScores.Web.Services
             {
                 Description = weather?.Description,
                 Icon = weather?.Icon,
-                TemperatureUnits = GetTempUnitString(settings?.TemperatureUnits),
+                TemperatureUnits = settings?.TemperatureUnits,
                 WindSpeedUnits = settings?.WindSpeedUnits,
                 Humidity = weather?.Humidity,
                 CloudCoverPercent = weather?.CloudCoverPercent
@@ -349,20 +349,5 @@ namespace SailScores.Web.Services
                 return null;
             }
         }
-
-        private string GetTempUnitString(string temperatureUnits)
-        {
-            if (string.IsNullOrWhiteSpace(temperatureUnits))
-            {
-                return null;
-            }
-            if(temperatureUnits.ToUpperInvariant().StartsWith("F")
-                || temperatureUnits.ToUpperInvariant().Contains("FAHR"))
-            {
-                return "°F";
-            }
-            return "°C";
-        }
-
     }
 }

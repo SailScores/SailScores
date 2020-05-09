@@ -173,7 +173,7 @@
                                 <div class="form-row">
                                     <label asp-for="Weather.Temperature" class="control-label col-4 col-form-label ">Temp</label>
                                     <input id="temperature" asp-for="Weather.Temperature" class="form-control col-3 text-center" type="number" />
-                                    <div class="col-3 col-form-label">@Model.Weather?.TemperatureUnits</div>
+                                    <div class="col-3 col-form-label">@Model.Weather?.TemperatureLabel</div>
                                     <span asp-validation-for="Weather.Temperature" class="text-danger"></span>
                                 </div>
                             </div>
