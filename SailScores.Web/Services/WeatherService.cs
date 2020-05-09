@@ -6,6 +6,7 @@ using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Core = SailScores.Core;
@@ -195,11 +196,18 @@ namespace SailScores.Web.Services
 
         private string GetTemperatureString(WeatherViewModel weather)
         {
+
+            _logger.LogInformation("About to getTemperatureDecimal");
             var tempDecimal = GetTemperatureDecimal(weather);
+
+            _logger.LogInformation("About to test tempDecimal for null");
             if (tempDecimal != null) {
-                return tempDecimal?.ToString("N2");
+
+                _logger.LogInformation("About to return tempDecimal");
+                return tempDecimal?.ToString("N2", CultureInfo.InvariantCulture);
             }
 
+            _logger.LogInformation("About to return weather.Temperature");
             return weather.Temperature;
         }
 
@@ -207,15 +215,19 @@ namespace SailScores.Web.Services
         {
             if (String.IsNullOrWhiteSpace(weather.TemperatureUnits))
             {
+                _logger.LogInformation("About to getTemperatureDecimal => return null");
                 return null;
             }
             decimal tempDecimal;
-            if(Decimal.TryParse(weather.Temperature, out tempDecimal)){
+            _logger.LogInformation("About to getTemperatureDecimal => tryParse");
+            if (Decimal.TryParse(weather.Temperature, out tempDecimal)){
+                _logger.LogInformation("About to getTemperatureDecimal => call converter");
                 var tempKelvin = 
                     _converter.Convert(
                         tempDecimal,
                         weather.TemperatureUnits,
                         _converter.Kelvin);
+                _logger.LogInformation("About to return from GetTemperatureDecimal");
                 return tempKelvin;
             } else
             {
