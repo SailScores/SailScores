@@ -156,6 +156,9 @@ namespace SailScores.Core.Services
 
         private Units GetUnit(string units)
         {
+            _logger.LogInformation("In GetUnit");
+            _logger.LogInformation($"{units}");
+
             if (units.ToUpperInvariant() == "MPH")
             {
                 return Units.MilesPerHour;
@@ -172,21 +175,28 @@ namespace SailScores.Core.Services
             {
                 return Units.MeterPerSecond;
             }
-            if (units.ToUpperInvariant().StartsWith("F")
-                || units.ToUpperInvariant().StartsWith("°F"))
+            _logger.LogInformation("About to check the temperature types");
+
+            if (units.StartsWith("F", StringComparison.InvariantCultureIgnoreCase)
+                || units.StartsWith("°F", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Fahrenheit;
             }
+            _logger.LogInformation("About to check for Celsius");
+
             if (units.ToUpperInvariant().StartsWith("CE")
                 || units.ToUpperInvariant().StartsWith("°C"))
             {
                 return Units.Celsius;
             }
+            _logger.LogInformation("About to check for Kelvin");
             if (units.ToUpperInvariant().StartsWith("KE")
                 || units.ToUpperInvariant().StartsWith("°K"))
             {
                 return Units.Kelvin;
             }
+            _logger.LogInformation("About to throw from could not convert");
+
             throw new InvalidOperationException("Could not convert. Unknown units");
         }
 
