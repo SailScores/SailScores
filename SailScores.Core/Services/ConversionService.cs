@@ -184,14 +184,14 @@ namespace SailScores.Core.Services
             }
             _logger.LogInformation("About to check for Celsius");
 
-            if (units.ToUpperInvariant().StartsWith("CE")
-                || units.ToUpperInvariant().StartsWith("°C"))
+            if (units.StartsWith("CE", StringComparison.InvariantCultureIgnoreCase)
+                || units.StartsWith("°C", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Celsius;
             }
             _logger.LogInformation("About to check for Kelvin");
-            if (units.ToUpperInvariant().StartsWith("KE")
-                || units.ToUpperInvariant().StartsWith("°K"))
+            if (units.StartsWith("KE", StringComparison.InvariantCultureIgnoreCase)
+                || units.StartsWith("°K", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Kelvin;
             }
