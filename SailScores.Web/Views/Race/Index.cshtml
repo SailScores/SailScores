@@ -20,12 +20,13 @@
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
                 @foreach (var item in
-                   Model.Item.Seasons)
+                 Model.Item.Seasons)
                 {
                     <li class="nav-item">
-                        <a class="nav-link active" href="#@item.Name">
-                            @item.Name
-                        </a>
+                        <a asp-route="Race"
+                           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                           asp-route-seasonName="@item.Name"
+                           class="nav-link active">@item.Name</a>
                     </li>
                 }
 
@@ -42,7 +43,7 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <h2>SeasonNameNeeded</h2>
+            <h2>@Model.Item.CurrentSeason?.Name</h2>
         </div>
     </div>
     @foreach (var race in Model.Item.Races)

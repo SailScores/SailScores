@@ -78,10 +78,12 @@ namespace SailScores.Web.Services
                     score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
                 }
             }
+
             return new RaceSummaryListViewModel
             {
                 Races = racesVm,
-                Seasons = seasons
+                Seasons = seasons,
+                CurrentSeason = seasons.FirstOrDefault(s => s.Name == seasonName)
             };
         }
 

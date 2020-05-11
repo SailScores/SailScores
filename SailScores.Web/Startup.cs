@@ -148,7 +148,7 @@ namespace SailScores.Web
                 };
             });
 
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddDbContext<SailScoresContext>(options =>
                 options.UseSqlServer(
