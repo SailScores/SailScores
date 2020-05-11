@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -147,6 +148,8 @@ namespace SailScores.Web
                 };
             });
 
+            services.AddApplicationInsightsTelemetry();
+
             services.AddDbContext<SailScoresContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -213,7 +216,14 @@ namespace SailScores.Web
             else
             {
                 app.UseStatusCodePagesWithReExecute("/error/{0}");
+                app.UseExceptionHandler("/error");
                 app.UseHsts();
+
+                app.Use((context, next) =>
+                {
+                    context.SetEndpoint(null);
+                    return next();
+                });
             }
 
             mapper.ConfigurationProvider.AssertConfigurationIsValid();
@@ -227,7 +237,6 @@ namespace SailScores.Web
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "SailScores API V1");
             });
-
 
             app.UseRequestLocalization();
 
@@ -321,6 +330,10 @@ namespace SailScores.Web
                         )
                     });
 
+                endpoints.MapControllerRoute(
+                    name: "Error",
+                    pattern: "error/{code}",
+                    defaults: new { controller = "Error", action = "Error", code=500 });
 
                 endpoints.MapControllerRoute(
                     "default", "{controller=Home}/{action=Index}/{id?}");
