@@ -96,35 +96,40 @@ namespace SailScores.Core.Services
             return modelRaces;
         }
 
-        private async Task<Db.Season> GetSeasonAsync(Guid clubId, string seasonName)
+        private async Task<Season> GetSeasonAsync(Guid clubId, string seasonName)
         {
             if (String.IsNullOrWhiteSpace(seasonName))
             {
                 return await GetMostRecentRaceSeasonAsync(clubId);
             }
-            return await _dbContext.Seasons.FirstOrDefaultAsync(s =>
+            var dbSeason = await _dbContext.Seasons.FirstOrDefaultAsync(s =>
                 s.ClubId == clubId && s.Name == seasonName);
+
+            return _mapper.Map<Season>(dbSeason);
         }
 
-        private async Task<Db.Season> GetMostRecentRaceSeasonAsync(Guid clubId)
+        public async Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId)
         {
             var race = await _dbContext.Races
                 .Where(r => r.ClubId == clubId)
                 .OrderByDescending(r => r.Date)
                 .FirstOrDefaultAsync();
-            if(race == null)
+
+            Db.Season dbSeason;
+            if (race == null)
             {
-                return await _dbContext.Seasons
+                dbSeason = await _dbContext.Seasons
                     .Where(s => s.ClubId == clubId)
                     .OrderByDescending(s => s.Start)
                     .FirstOrDefaultAsync();
             }
 
-            return await _dbContext.Seasons
+            dbSeason = await _dbContext.Seasons
                 .Where(s => s.ClubId == clubId)
                 .OrderByDescending(s => s.Start)
                 .FirstOrDefaultAsync(s => s.Start <= race.Date);
 
+            return _mapper.Map<Season>(dbSeason);
         }
 
         public async Task<Model.Race> GetRaceAsync(Guid raceId)

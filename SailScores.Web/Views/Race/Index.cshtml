@@ -89,4 +89,20 @@
             </div>
         </div>
     }
+    <br />
+<div class="row">
+    <div class="d-md-none col-12">
+        <h3>Other Seasons</h3>
+        </div>
+        <div class="d-md-none col-12">
+            @foreach (var item in
+               Model.Item.Seasons)
+            {
+                <a asp-route="Race"
+                   asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                   asp-route-seasonName="@item.Name"
+                   class="nav-link active">@item.Name</a>
+            }
+        </div>
+    </div>
 </div>

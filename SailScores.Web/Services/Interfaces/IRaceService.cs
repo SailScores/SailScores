@@ -21,5 +21,6 @@ namespace SailScores.Web.Services
         Task SaveAsync(RaceWithOptionsViewModel race);
         Task Delete(Guid id);
         Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions);
+        Task<Season> GetCurrentSeasonAsync(string clubInitials);
     }
 }

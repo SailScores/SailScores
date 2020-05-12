@@ -41,6 +41,15 @@ namespace SailScores.Web.Controllers
             bool showScheduled = false,
             bool showAbandoned = true)
         {
+            if (String.IsNullOrWhiteSpace(seasonName))
+            {
+                var currentSeason = await _raceService.GetCurrentSeasonAsync(clubInitials);
+                return RedirectToRoute("Race", new
+                {
+                    clubInitials,
+                    seasonName = currentSeason.Name
+                });
+            }
             var races = await _raceService.GetAllRaceSummariesAsync(
                 clubInitials,
                 seasonName,

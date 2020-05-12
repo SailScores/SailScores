@@ -336,5 +336,11 @@ namespace SailScores.Web.Services
                     _mapper.Map<Race>(race), race.RegattaId.Value);
             }
         }
+
+        public async Task<Season> GetCurrentSeasonAsync(string clubInitials)
+        {
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            return await _coreRaceService.GetMostRecentRaceSeasonAsync(clubId);
+        }
     }
 }
