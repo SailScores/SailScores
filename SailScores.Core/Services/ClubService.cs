@@ -188,6 +188,13 @@ namespace SailScores.Core.Services
                     " A club with those initials already exists.");
             }
             club.Id = Guid.NewGuid();
+            if((club.ScoringSystems?.Count ?? 0) > 0)
+            {
+                foreach(var system in club.ScoringSystems)
+                {
+                    system.ClubId = club.Id;
+                }
+            }
             var dbClub = _mapper.Map<Db.Club>(club);
             _dbContext.Clubs.Add(dbClub);
             var dbFleet = new Db.Fleet
@@ -272,7 +279,7 @@ namespace SailScores.Core.Services
             foreach (var scoringSystem in dbClub.ScoringSystems)
             {
                 scoringSystem.Id = GetNewGuid(scoringSystem.Id);
-                scoringSystem.OwningClubId = dbClub.Id;
+                scoringSystem.ClubId = dbClub.Id;
                 foreach (var scoreCode in scoringSystem.ScoreCodes)
                 {
                     scoreCode.Id = GetNewGuid(scoreCode.Id);
