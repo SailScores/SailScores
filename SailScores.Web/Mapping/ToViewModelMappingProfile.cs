@@ -92,6 +92,7 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Tips, o => o.Ignore())
                 .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(sr => sr.Id)))
                 .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore())
+                .ForMember(d => d.NeedsLocalDate, o => o.Ignore())
                 .ForMember(d => d.ClubInitials, o => o.Ignore());
 
 

@@ -31,5 +31,7 @@ namespace SailScores.Web.Models.SailScores
         public Guid? RegattaId { get; set; }
 
         public IList<AdminToDoViewModel> Tips { get; set; }
+        // help the client keep track of whether they might need to change the date.
+        public bool NeedsLocalDate { get; set; }
     }
 }

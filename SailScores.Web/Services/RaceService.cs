@@ -138,7 +138,8 @@ namespace SailScores.Web.Services
                 Date = DateTime.Today,
                 Weather = (await GetCurrentWeatherAsync(clubId)),
                 WeatherIconOptions = GetWeatherIconOptions(),
-                ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(clubId)
+                ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(clubId),
+                NeedsLocalDate = true
             };
             return model;
         }
@@ -152,7 +153,7 @@ namespace SailScores.Web.Services
             {
                 return model;
             }
-            //var club = await _coreClubService.GetFullClub(clubInitials);
+
             var regatta = await _coreRegattaService.GetRegattaAsync(regattaId.Value);
             
             model.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
