@@ -69,11 +69,11 @@
                 </span>
             </div>
             <div class="col-3 small">
-                @{ var lastSeries = race.SeriesNames.LastOrDefault(); }
-                @foreach (var seriesName in race.SeriesNames)
+                @{ var lastSeries = race.SeriesUrlAndNames.LastOrDefault(); }
+                @foreach (var seriesUrlAndName in race.SeriesUrlAndNames)
                 {
-                    var separator = seriesName != lastSeries ? $", " : "";
-                    <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesName">@seriesName</a>@separator
+                    var separator = seriesUrlAndName.Key != lastSeries.Key ? $", " : "";
+                    <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesUrlAndName.Key">@seriesUrlAndName.Value</a>@separator
                 }
             </div>
             <div class="col-2">

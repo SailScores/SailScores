@@ -195,8 +195,6 @@ namespace SailScores.Web.Services
             Guid seriesId)
         {
             var model = await CreateClubRaceAsync(clubInitials);
-
-            //var club = await _coreClubService.GetFullClub(clubInitials);
             var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
             
             model.SeriesIds = new List<Guid>
