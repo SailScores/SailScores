@@ -35,17 +35,30 @@ namespace SailScores.Web.Controllers
             _mapper = mapper;
         }
 
-        public async Task<ActionResult> Index(string clubInitials,
+        public async Task<ActionResult> Index(
+            string clubInitials,
+            string seasonName,
             bool showScheduled = false,
             bool showAbandoned = true)
         {
-            var races = await _raceService.GetAllRaceSummariesAsync(clubInitials,
+            if (String.IsNullOrWhiteSpace(seasonName))
+            {
+                var currentSeason = await _raceService.GetCurrentSeasonAsync(clubInitials);
+                return RedirectToRoute("Race", new
+                {
+                    clubInitials,
+                    seasonName = currentSeason.Name
+                });
+            }
+            var races = await _raceService.GetAllRaceSummariesAsync(
+                clubInitials,
+                seasonName,
                 showScheduled,
                 showAbandoned);
 
-            return View(new ClubCollectionViewModel<RaceSummaryViewModel>
+            return View(new ClubItemViewModel<RaceSummaryListViewModel>
             {
-                List = races,
+                Item = races,
                 ClubInitials = clubInitials
             });
         }
@@ -104,40 +117,35 @@ namespace SailScores.Web.Controllers
             string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            try
+
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    RaceWithOptionsViewModel raceOptions =
-                        await _raceService.GetBlankRaceWithOptions(
-                            clubInitials,
-                            race.RegattaId,
-                            race.SeriesIds?.FirstOrDefault());
-                    race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
-                    race.FleetOptions = raceOptions.FleetOptions;
-                    race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
-                    race.CompetitorOptions = raceOptions.CompetitorOptions;
-                    race.SeriesOptions = raceOptions.SeriesOptions;
-                    race.WeatherIconOptions = raceOptions.WeatherIconOptions;
-                    return View(race);
-                }
-                var clubId = await _clubService.GetClubId(clubInitials);
-                if (!await _authService.CanUserEdit(User, clubId))
-                {
-                    return Unauthorized();
-                }
-                race.ClubId = clubId;
-                await _raceService.SaveAsync(race);
-                if (!string.IsNullOrWhiteSpace(returnUrl))
-                {
-                    return Redirect(returnUrl);
-                }
-                return RedirectToAction("Index", "Admin");
-            }
-            catch
-            {
+                RaceWithOptionsViewModel raceOptions =
+                    await _raceService.GetBlankRaceWithOptions(
+                        clubInitials,
+                        race.RegattaId,
+                        race.SeriesIds?.FirstOrDefault());
+                race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
+                race.FleetOptions = raceOptions.FleetOptions;
+                race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
+                race.CompetitorOptions = raceOptions.CompetitorOptions;
+                race.SeriesOptions = raceOptions.SeriesOptions;
+                race.WeatherIconOptions = raceOptions.WeatherIconOptions;
                 return View(race);
             }
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+            race.ClubId = clubId;
+            await _raceService.SaveAsync(race);
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Index", "Admin");
+
         }
 
         [Authorize]
@@ -181,38 +189,32 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             ViewData["ClubInitials"] = clubInitials;
-            try
-            {
-                if (!await _authService.CanUserEdit(User, race.ClubId))
-                {
-                    return Unauthorized();
-                }
-                if (!ModelState.IsValid)
-                {
-                    RaceWithOptionsViewModel raceOptions =
-                        await _raceService.GetBlankRaceWithOptions(
-                            clubInitials,
-                            race.RegattaId,
-                            race.SeriesIds?.FirstOrDefault());
-                    race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
-                    race.FleetOptions = raceOptions.FleetOptions;
-                    race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
-                    race.CompetitorOptions = raceOptions.CompetitorOptions;
-                    race.SeriesOptions = raceOptions.SeriesOptions;
-                    foreach(var score in race.Scores)
-                    {
-                        score.Competitor = raceOptions.CompetitorOptions.First(c => c.Id == score.CompetitorId);
-                    }
-                    return View(race);
-                }
-                await _raceService.SaveAsync(race);
 
-                return RedirectToLocal(returnUrl);
-            }
-            catch
+            if (!await _authService.CanUserEdit(User, race.ClubId))
             {
-                throw;
+                return Unauthorized();
             }
+            if (!ModelState.IsValid)
+            {
+                RaceWithOptionsViewModel raceOptions =
+                    await _raceService.GetBlankRaceWithOptions(
+                        clubInitials,
+                        race.RegattaId,
+                        race.SeriesIds?.FirstOrDefault());
+                race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
+                race.FleetOptions = raceOptions.FleetOptions;
+                race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
+                race.CompetitorOptions = raceOptions.CompetitorOptions;
+                race.SeriesOptions = raceOptions.SeriesOptions;
+                foreach(var score in race.Scores)
+                {
+                    score.Competitor = raceOptions.CompetitorOptions.First(c => c.Id == score.CompetitorId);
+                }
+                return View(race);
+            }
+            await _raceService.SaveAsync(race);
+
+            return RedirectToLocal(returnUrl);
         }
 
         [Authorize]

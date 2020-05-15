@@ -29,7 +29,7 @@ namespace SailScores.Web.Models.SailScores
         public String FleetName { get; set; }
         public String FleetShortName { get; set; }
 
-        public IList<string> SeriesNames { get; set; }
+        public IList<KeyValuePair<String, String>> SeriesUrlAndNames { get; set; }
 
         public Season Season { get; set; }
 

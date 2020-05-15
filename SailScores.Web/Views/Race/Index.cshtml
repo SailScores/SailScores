@@ -7,7 +7,7 @@
 
 @inject IStringLocalizer<SharedResource> localizer
 
-@model ClubCollectionViewModel<RaceSummaryViewModel>
+@model ClubItemViewModel<RaceSummaryListViewModel>
 
 
 @{
@@ -20,13 +20,13 @@
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
                 @foreach (var item in
-                   Model.List.GroupBy(s =>
-                       s.Season?.Name ?? String.Empty, s => s))
+                 Model.Item.Seasons)
                 {
                     <li class="nav-item">
-                        <a class="nav-link active" href="#@item.Key">
-                            @item.Key
-                        </a>
+                        <a asp-route="Race"
+                           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                           asp-route-seasonName="@item.Name"
+                           class="nav-link active">@item.Name</a>
                     </li>
                 }
 
@@ -41,52 +41,68 @@
 </h2>
 
 <div class="container">
-    @foreach (var item in
-      Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+    <div class="row">
+        <div class="col-12">
+            <h2>@Model.Item.CurrentSeason?.Name</h2>
+        </div>
+    </div>
+    @foreach (var race in Model.Item.Races)
     {
-        <div class="row">
-            <div class="col-12">
-                <h2>@item.Key</h2>
+        <div class="row border-bottom mb-1 pb-1">
+            <div class="col-6 col-md-4">
+                <span class="d-md-none">
+                    <a id="smallracelink_@race.Id"
+                        asp-action="Details"
+                        asp-controller="Race"
+                        asp-route-id=@race.Id>
+                        @race.FleetShortName:
+                        R@(race.Order) @race.Date.ToShortString()
+                    </a>
+                </span>
+                <span class="d-none d-md-inline">
+                    <a id="racelink_@race.Id"
+                        asp-action="Details"
+                        asp-controller="Race"
+                        asp-route-id=@race.Id>
+                        @race.CalculatedName
+                    </a>
+                </span>
+            </div>
+            <div class="col-3 small">
+                @{ var lastSeries = race.SeriesUrlAndNames.LastOrDefault(); }
+                @foreach (var seriesUrlAndName in race.SeriesUrlAndNames)
+                {
+                    var separator = seriesUrlAndName.Key != lastSeries.Key ? $", " : "";
+                    <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesUrlAndName.Key">@seriesUrlAndName.Value</a>@separator
+                }
+            </div>
+            <div class="col-2">
+                @Html.DisplayFor(modelItem => race.CompetitorCount)
+                @localizer["boats"]
+            </div>
+            <div class="col-1 d-none d-md-inline">
+                @race.State
+            </div>
+            <div class="col-12 d-none d-md-inline">
+                @Html.DisplayFor(modelItem => race.Name)
+                @Html.DisplayFor(modelItem => race.Description)
             </div>
         </div>
-        @foreach (var race in item)
-        {
-<div class="row border-bottom mb-1 pb-1">
-    <div class="col-6 col-md-4">
-        <span class="d-md-none">
-            <a asp-action="Details"
-               asp-controller="Race"
-               asp-route-id=@race.Id>
-                @race.FleetShortName:
-                R@(race.Order) @race.Date.ToShortString()
-            </a>
-        </span>
-        <span class="d-none d-md-inline">
-            @Html.ActionLink(
-                race.CalculatedName
-                , "Details", new { id = race.Id })
-        </span>
-    </div>
-    <div class="col-3 small">
-        @{ var lastSeries = race.SeriesNames.LastOrDefault(); }
-        @foreach (var seriesName in race.SeriesNames)
-        {
-            var separator = seriesName != lastSeries ? $", " : "";
-            <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesName">@seriesName</a>@separator
-        }
-    </div>
-    <div class="col-2">
-        @Html.DisplayFor(modelItem => race.CompetitorCount)
-        @localizer["boats"]
-    </div>
-    <div class="col-1 d-none d-md-inline">
-        @race.State
-    </div>
-    <div class="col-12 d-none d-md-inline">
-        @Html.DisplayFor(modelItem => race.Name)
-        @Html.DisplayFor(modelItem => race.Description)
-    </div>
-</div>
-        }
     }
+    <br />
+<div class="row">
+    <div class="d-md-none col-12">
+        <h3>Other Seasons</h3>
+        </div>
+        <div class="d-md-none col-12">
+            @foreach (var item in
+               Model.Item.Seasons)
+            {
+                <a asp-route="Race"
+                   asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                   asp-route-seasonName="@item.Name"
+                   class="nav-link active">@item.Name</a>
+            }
+        </div>
+    </div>
 </div>

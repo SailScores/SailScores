@@ -9,7 +9,7 @@ namespace SailScores.Database.Entities
     {
         public Guid Id { get; set; }
 
-        public Guid? OwningClubId { get; set; }
+        public Guid? ClubId { get; set; }
 
         public IList<Club> DefaultForClubs { get; set; }
 

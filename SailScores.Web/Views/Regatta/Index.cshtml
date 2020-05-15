@@ -42,7 +42,8 @@
         {
 <div class="row">
     <div class="col-sm-4 col-lg-3">
-        <a href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.UrlName"
+        <a id="regattalink_@regatta.Id"
+           href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.UrlName"
            >@Html.DisplayFor(modelItem => regatta.Name)</a>
         (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
     </div>
@@ -53,7 +54,9 @@
     <div class="col-sm-4 col-lg-3">
         @if (regatta.UpdatedDate.HasValue)
         {
-            <span class="d-none d-md-table-cell"><i>@localizer["Updated"] @(regatta.UpdatedDate.Value.ToString("d"))</i></span>
+            <span class="d-none d-md-table-cell">
+            <i>@localizer["Updated"] @(regatta.UpdatedDate.Value.ToString("d"))</i>
+            </span>
         }
     </div>
 </div>

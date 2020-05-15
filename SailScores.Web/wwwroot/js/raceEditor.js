@@ -13,6 +13,12 @@ function checkEnter(e) {
 export function initialize() {
     document.querySelector('form').onkeypress = checkEnter;
     $('#fleetId').change(loadFleet);
+    if ($('#needsLocalDate').val() === "true") {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        $('#date').val(now.toISOString().substring(0, 10));
+        $('#needsLocalDate').val('false');
+    }
     $('#date').change(loadSeriesOptions);
     $('#raceState').change(raceStateChanged);
     $('#results').on('click', '.select-code', calculatePlaces);
