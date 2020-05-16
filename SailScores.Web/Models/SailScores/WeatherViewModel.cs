@@ -41,9 +41,14 @@ namespace SailScores.Web.Models.SailScores
         {
             get
             {
-                return
-                    TemperatureUnits.StartsWith("F", StringComparison.InvariantCultureIgnoreCase)
-                        ? "°F" : "°C";
+                if (String.IsNullOrWhiteSpace(TemperatureUnits)) {
+                    return String.Empty;
+                                        }
+                else if (TemperatureUnits.StartsWith("F", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return "°F";
+                }
+                return "°C";
             }
         }
 
