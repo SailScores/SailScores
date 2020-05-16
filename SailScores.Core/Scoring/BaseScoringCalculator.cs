@@ -704,6 +704,16 @@ namespace SailScores.Core.Scoring
             if (returnScoreCode == null)
             {
                 returnScoreCode = GetScoreCode(DEFAULT_CODE);
+                if(returnScoreCode == null)
+                {
+                    returnScoreCode = new ScoreCode
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Default",
+                        Formula = "FIN+",
+                        FormulaValue = 2
+                    };
+                }
             }
             return returnScoreCode;
         }
