@@ -10,7 +10,7 @@
 }
 <div class="row">
     <div class="col-sm-6">
-        <h2>
+        <h2 id="racetitle">
             @Model.Item.DisplayName
         </h2>
         @if (Model.CanEdit)
@@ -64,7 +64,7 @@ new { @class = "btn btn-outline-primary btn-sm" })
         </div>
     </div>
 }
-<table class="table">
+<table class="table" aria-describedby="racetitle" >
     <thead>
         <tr>
             <th scope="col">Place</th>

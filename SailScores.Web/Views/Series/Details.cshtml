@@ -81,7 +81,7 @@
 @if (Model.Item.UpdatedDate.HasValue)
 {
     <br />
-    <i>@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</i>
+    <span class="font-italic">@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</span>
 }
 
 @section Scripts {

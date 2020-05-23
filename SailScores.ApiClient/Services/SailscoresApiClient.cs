@@ -35,25 +35,17 @@ namespace SailScores.Api.Services
                 Uri requestUri = new Uri(new Uri(_settings.ServerUrl), urlExtension);
 
                 //Send the GET request asynchronously and retrieve the response as a string.
-                try
+                var httpResponse = await httpClient.GetAsync(requestUri);
+                if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    //Send the GET request
-                    var httpResponse = await httpClient.GetAsync(requestUri);
-                    if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        await AuthenticateAsync();
-                        return await GetAsync<T>(urlExtension);
-                    }
-                    httpResponse.EnsureSuccessStatusCode();
-                    var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+                    await AuthenticateAsync();
+                    return await GetAsync<T>(urlExtension);
+                }
+                httpResponse.EnsureSuccessStatusCode();
+                var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
-                    var returnObj = JsonConvert.DeserializeObject<T>(httpResponseBody);
-                    return returnObj;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                var returnObj = JsonConvert.DeserializeObject<T>(httpResponseBody);
+                return returnObj;
             }
         }
 
@@ -68,33 +60,27 @@ namespace SailScores.Api.Services
 
                 Uri requestUri = new Uri(new Uri(_settings.ServerUrl), urlExtension);
 
-                try
+                var json = JsonConvert.SerializeObject(item);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                //Send the request
+                var httpResponse = await httpClient.PostAsync(requestUri, content);
+                if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    var json = JsonConvert.SerializeObject(item);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-                    //Send the request
-                    var httpResponse = await httpClient.PostAsync(requestUri, content);
-                    if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+                    if (retryCount < 2)
                     {
-                        if (retryCount < 2)
-                        {
-                            await AuthenticateAsync();
-                            return await PostAsync<T>(urlExtension, item, ++retryCount);
-                        } else
-                        {
-                            throw new UnauthorizedAccessException("Unauthorized for Web API. Check Credentials.");
-                        }
+                        await AuthenticateAsync();
+                        return await PostAsync<T>(urlExtension, item, ++retryCount);
+                    } else
+                    {
+                        throw new UnauthorizedAccessException("Unauthorized for Web API. Check Credentials.");
                     }
-                    httpResponse.EnsureSuccessStatusCode();
-                    var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+                }
+                httpResponse.EnsureSuccessStatusCode();
+                var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
-                    var returnId = JsonConvert.DeserializeObject<Guid>(httpResponseBody);
-                    return returnId;
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+                var returnId = JsonConvert.DeserializeObject<Guid>(httpResponseBody);
+                return returnId;
+                
             }
         }
 
@@ -115,22 +101,16 @@ namespace SailScores.Api.Services
                     password = _settings.Password
                 });
 
-                try
-                {
-                    var httpResponse = await httpClient.PostAsync(requestUri,
-                        new StringContent(
-                            content,
-                            UnicodeEncoding.UTF8,
-                            "application/json"));
-                    httpResponse.EnsureSuccessStatusCode();
-                    var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
+                var httpResponse = await httpClient.PostAsync(requestUri,
+                    new StringContent(
+                        content,
+                        UnicodeEncoding.UTF8,
+                        "application/json"));
+                httpResponse.EnsureSuccessStatusCode();
+                var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
-                    _token = httpResponseBody;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                _token = httpResponseBody;
+                
             }
         }
 
