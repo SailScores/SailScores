@@ -40,11 +40,8 @@ export function initialize() {
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
-        e.preventDefault();
-        var form = this as HTMLFormElement;
+        var form = document.getElementById("raceform") as HTMLFormElement;
         addScoresFieldsToForm(form);
-        form.submit();
-        removeScoresFieldsFromForm(form);
     });
     loadFleet();
     loadSeriesOptions();
@@ -222,6 +219,8 @@ function addNewCompetitor(competitor: competitorDto) {
 }
 
 function addScoresFieldsToForm(form: HTMLFormElement) {
+    //clear out old fields first:
+    removeScoresFieldsFromForm(form);
     var resultList = document.getElementById("results");
     var resultItems = resultList.getElementsByTagName("li");
 

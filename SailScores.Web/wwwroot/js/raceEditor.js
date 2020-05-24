@@ -30,11 +30,8 @@ export function initialize() {
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
-        e.preventDefault();
-        var form = this;
+        var form = document.getElementById("raceform");
         addScoresFieldsToForm(form);
-        form.submit();
-        removeScoresFieldsFromForm(form);
     });
     loadFleet();
     loadSeriesOptions();
@@ -185,6 +182,8 @@ function addNewCompetitor(competitor) {
     updateButtonFooter();
 }
 function addScoresFieldsToForm(form) {
+    //clear out old fields first:
+    removeScoresFieldsFromForm(form);
     var resultList = document.getElementById("results");
     var resultItems = resultList.getElementsByTagName("li");
     for (var i = 1; i < resultItems.length; i++) {
