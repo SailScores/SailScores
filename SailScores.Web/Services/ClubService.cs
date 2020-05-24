@@ -1,12 +1,5 @@
-﻿using AutoMapper;
-using SailScores.Core.Model;
-using SailScores.Core.Services;
-using SailScores.Web.Models.SailScores;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SailScores.Core.Model;
 using System.Threading.Tasks;
-using Core = SailScores.Core;
 
 namespace SailScores.Web.Services
 {
@@ -18,22 +11,19 @@ namespace SailScores.Web.Services
         private readonly Core.Services.ISeriesService _coreSeriesService;
         private readonly Core.Services.IRegattaService _coreRegattaService;
 
-        private readonly IMapper _mapper;
 
         public ClubService(
             Core.Services.IClubService clubService,
             Core.Services.ISeasonService seasonService,
             Core.Services.IRaceService raceService,
             Core.Services.ISeriesService seriesService,
-            Core.Services.IRegattaService regattaService,
-            IMapper mapper)
+            Core.Services.IRegattaService regattaService)
         {
             _coreClubService = clubService;
             _coreSeasonService = seasonService;
             _coreRaceService = raceService;
             _coreSeriesService = seriesService;
             _coreRegattaService = regattaService;
-            _mapper = mapper;
         }
 
         public async Task<Club> GetFullClub(string clubInitials)

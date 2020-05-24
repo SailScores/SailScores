@@ -22,17 +22,17 @@ namespace SailScores.Core.JobQueue
         public IBackgroundTaskQueue TaskQueue { get; }
 
         protected async override Task ExecuteAsync(
-            CancellationToken cancellationToken)
+            CancellationToken stoppingToken)
         {
             _logger.LogInformation("Queued Hosted Service is starting.");
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                var workItem = await TaskQueue.DequeueAsync(cancellationToken);
+                var workItem = await TaskQueue.DequeueAsync(stoppingToken);
 
                 try
                 {
-                    await workItem(cancellationToken);
+                    await workItem(stoppingToken);
                 }
                 catch (Exception ex)
                 {

@@ -37,5 +37,20 @@ namespace SailScores.Web.Models.SailScores
         public decimal? Humidity { get; set; }
         public decimal? CloudCoverPercent { get; set; }
 
+        public string TemperatureLabel
+        {
+            get
+            {
+                if (String.IsNullOrWhiteSpace(TemperatureUnits)) {
+                    return String.Empty;
+                                        }
+                else if (TemperatureUnits.StartsWith("F", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return "°F";
+                }
+                return "°C";
+            }
+        }
+
     }
 }

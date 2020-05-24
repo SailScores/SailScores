@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SailScores.Web.Controllers
 {
@@ -17,19 +15,16 @@ namespace SailScores.Web.Controllers
 
         private readonly IClubService _clubService;
         private readonly ISeasonService _seasonService;
-        private readonly IMapper _mapper;
         private readonly Services.IAuthorizationService _authService;
 
         public SeasonController(
             IClubService clubService,
             ISeasonService seasonService,
-            Services.IAuthorizationService authService,
-            IMapper mapper)
+            Services.IAuthorizationService authService)
         {
             _clubService = clubService;
             _seasonService = seasonService;
             _authService = authService;
-            _mapper = mapper;
         }
 
         public ActionResult Create()

@@ -35,258 +35,259 @@
         </div>
         <hr />
     }
-    <form id="raceform" asp-action="Create"
-          asp-route-returnurl="@ViewData["ReturnUrl"]">
-        <input type="hidden" id="clubInitials" asp-for="ClubInitials" />
-        <input type="hidden" id="clubId" asp-for="ClubId" />
-        <input type="hidden" id="regattaId" asp-for="RegattaId" />
-        <input type="hidden" asp-for="Weather.TemperatureUnits" />
-        <input type="hidden" asp-for="Weather.WindSpeedUnits" />
-        <input type="hidden" id="cloudCover" asp-for="Weather.CloudCoverPercent" />
-        <input type="hidden" id="humidity" asp-for="Weather.Humidity" />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group form-row">
-            <label asp-for="Date" class="col-2 col-form-label"></label>
-            <div class="col-md-4 col-10">
-                <input id="date" asp-for="Date" class="form-control"/>
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
+<form id="raceform" asp-action="Create"
+      asp-route-returnurl="@ViewData["ReturnUrl"]">
+    <input type="hidden" id="clubInitials" asp-for="ClubInitials" />
+    <input type="hidden" id="clubId" asp-for="ClubId" />
+    <input type="hidden" id="regattaId" asp-for="RegattaId" />
+    <input type="hidden" asp-for="Weather.TemperatureUnits" />
+    <input type="hidden" asp-for="Weather.WindSpeedUnits" />
+    <input type="hidden" id="cloudCover" asp-for="Weather.CloudCoverPercent" />
+    <input type="hidden" id="humidity" asp-for="Weather.Humidity" />
+    <input type="hidden" id="needsLocalDate" asp-for="NeedsLocalDate" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group form-row">
+        <label asp-for="Date" class="col-2 col-form-label"></label>
+        <div class="col-md-4 col-10">
+            <input id="date" asp-for="Date" class="form-control" />
+            <span asp-validation-for="Date" class="text-danger"></span>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label asp-for="FleetId" class="control-label">Fleet</label>
-                <small class="text-muted">Controls the list of available competitors</small>
-                <select id="fleetId" asp-for="FleetId" class="form-control">
-                    @if (Model.FleetOptions.Count > 1)
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label asp-for="FleetId" class="control-label">Fleet</label>
+            <small class="text-muted">Controls the list of available competitors</small>
+            <select id="fleetId" asp-for="FleetId" class="form-control">
+                @if (Model.FleetOptions.Count > 1)
+                {
+                    <option selected="selected">Select a fleet...</option>
+                }
+                @foreach (var fleet in Model.FleetOptions.OrderBy(f => f.Name))
+                {
+                    @if (Model.FleetOptions.Count == 1)
                     {
-                        <option selected="selected">Select a fleet...</option>
+                        <option selected="selected" value="@fleet.Id">
+                            @fleet.Name
+                        </option>
                     }
-                    @foreach (var fleet in Model.FleetOptions.OrderBy(f => f.Name))
+                    else
                     {
-                        @if (Model.FleetOptions.Count == 1)
-                        {
-                            <option selected="selected" value="@fleet.Id">
-                                @fleet.Name
-                            </option>
-                        }
-                        else
-                        {
-                            <option value="@fleet.Id">
-                                @fleet.Name
-                            </option>
-                        }
+                        <option value="@fleet.Id">
+                            @fleet.Name
+                        </option>
+                    }
+                }
+            </select>
+
+            <span asp-validation-for="FleetId" class="text-danger"></span>
+        </div>
+        @if (!Model.RegattaId.HasValue && Model.Regatta == null)
+        {
+            <div class="form-group col-md-6">
+                <label asp-for="SeriesIds" class="control-label">Series</label>
+                <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
+                    @foreach (var series in Model.SeriesOptions)
+                    {
+                        <option value="@series.Id">
+                            @series.Name (@series.Season.Name)
+                        </option>
                     }
                 </select>
-
-                <span asp-validation-for="FleetId" class="text-danger"></span>
+                <span asp-validation-for="SeriesIds" class="text-danger"></span>
             </div>
-            @if (!Model.RegattaId.HasValue && Model.Regatta == null)
-            {
-                <div class="form-group col-md-6">
-                    <label asp-for="SeriesIds" class="control-label">Series</label>
-                    <select id="seriesIds" asp-for="SeriesIds" class="form-control" multiple>
-                        @foreach (var series in Model.SeriesOptions)
-                        {
-                            <option value="@series.Id">
-                                @series.Name (@series.Season.Name)
-                            </option>
-                        }
-                    </select>
-                    <span asp-validation-for="SeriesIds" class="text-danger"></span>
-                </div>
-            }
-        </div>
+        }
+    </div>
 
-        <div id="advancedFields" role="tablist">
-            <div class="card">
-                <div class="card-header" role="tab" id="advancedHeading">
-                    <h5 class="mb-0">
-                        <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
-                            Optional Fields
-                        </a>
-                    </h5>
-                </div>
+    <div id="advancedFields" role="tablist">
+        <div class="card">
+            <div class="card-header" role="tab" id="advancedHeading">
+                <h5 class="mb-0">
+                    <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                        Optional Fields
+                    </a>
+                </h5>
+            </div>
 
-                <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="form-group col-6">
-                                <div class="form-row">
-                                    <label asp-for="InitialOrder" class="control-label col-6 col-md-4 col-form-label">
-                                        Order
-                                        <small class="text-muted d-none d-sm-inline">Within date</small>
-                                    </label>
-                                    <input asp-for="InitialOrder" class="form-control col-6 col-md-8" />
-                                    <span asp-validation-for="InitialOrder" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group col-6">
-                                <div class="form-row">
-                                    <label asp-for="State" class="control-label col-form-label col-4"></label>
-                                    <select id="raceState" asp-for="State" class="form-control col-8"
-                                            asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
-                                    <span asp-validation-for="State" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
+            <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group col-6">
                             <div class="form-row">
-                                <label asp-for="Weather.Description" class="control-label col-3 col-md-2 col-form-label">Weather</label>
-                                <select id="weatherIcon" asp-for="Weather.Icon" data-show-content="true" class="form-control selectpicker col-3 col-md-2 pr-1">
-                                    <option>Select...</option>
-                                    @foreach (var icon in Model.WeatherIconOptions)
-                                    {
-                                        <option data-content="<i class='wi @icon.Value'></i>" value="@icon.Key"></option>
-                                    }
-                                </select>
-                                <input id="weatherDescription" asp-for="Weather.Description" class="form-control col-6 col-md-8" />
-                                <span asp-validation-for="Weather.Description" class="text-danger"></span>
+                                <label asp-for="InitialOrder" class="control-label col-6 col-md-4 col-form-label">
+                                    Order
+                                    <small class="text-muted d-none d-sm-inline">Within date</small>
+                                </label>
+                                <input asp-for="InitialOrder" class="form-control col-6 col-md-8" />
+                                <span asp-validation-for="InitialOrder" class="text-danger"></span>
                             </div>
                         </div>
+                        <div class="form-group col-6">
+                            <div class="form-row">
+                                <label asp-for="State" class="control-label col-form-label col-4"></label>
+                                <select id="raceState" asp-for="State" class="form-control col-8"
+                                        asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
+                                <span asp-validation-for="State" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="form-row">
-                            <div class="form-group col-6">
-                                <div class="form-row">
-                                    <label asp-for="Weather.WindSpeed" class="control-label col-6 col-md-4 col-form-label ">Wind</label>
-                                    <input id="windSpeed" asp-for="Weather.WindSpeed" class="form-control col-3 text-center" type="number" />
-                                    <div class="col-3 col-form-label">@Model.Weather?.WindSpeedUnits</div>
-                                    <span asp-validation-for="Weather.WindSpeed" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group col-6">
-                                <div class="form-row">
-                                    <label asp-for="Weather.WindDirection" class="control-label col-4 col-form-label ">Dir</label>
-                                    <input id="windDirection" asp-for="Weather.WindDirection" class="form-control col-3 text-center" />
-                                    <span asp-validation-for="Weather.WindDirection" class="text-danger"></span>
-                                </div>
+                            <label asp-for="Weather.Description" class="control-label col-3 col-md-2 col-form-label">Weather</label>
+                            <select id="weatherIcon" asp-for="Weather.Icon" data-show-content="true" class="form-control selectpicker col-3 col-md-2 pr-1">
+                                <option>Select...</option>
+                                @foreach (var icon in Model.WeatherIconOptions)
+                                {
+                                    <option data-content="<span class='wi @icon.Value'></span>" value="@icon.Key">@icon.Key</option>
+                                }
+                            </select>
+                            <input id="weatherDescription" asp-for="Weather.Description" class="form-control col-6 col-md-8" />
+                            <span asp-validation-for="Weather.Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <div class="form-row">
+                                <label asp-for="Weather.WindSpeed" class="control-label col-6 col-md-4 col-form-label ">Wind</label>
+                                <input id="windSpeed" asp-for="Weather.WindSpeed" class="form-control col-3 text-center" type="number" />
+                                <div class="col-3 col-form-label">@Model.Weather?.WindSpeedUnits</div>
+                                <span asp-validation-for="Weather.WindSpeed" class="text-danger"></span>
                             </div>
                         </div>
+                        <div class="form-group col-6">
+                            <div class="form-row">
+                                <label asp-for="Weather.WindDirection" class="control-label col-4 col-form-label ">Dir</label>
+                                <input id="windDirection" asp-for="Weather.WindDirection" class="form-control col-3 text-center" />
+                                <span asp-validation-for="Weather.WindDirection" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <div class="form-row">
+                                <label asp-for="Weather.WindGust" class="control-label col-6 col-md-4 col-form-label ">Gust</label>
+                                <input id="windGust" asp-for="Weather.WindGust" class="form-control col-3 text-center" type="number" />
+                                <div class="col-3 col-form-label">@Model.Weather?.WindSpeedUnits</div>
+                                <span asp-validation-for="Weather.WindGust" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group col-6">
+                            <div class="form-row">
+                                <label asp-for="Weather.Temperature" class="control-label col-4 col-form-label ">Temp</label>
+                                <input id="temperature" asp-for="Weather.Temperature" class="form-control col-3 text-center" type="number" />
+                                <div class="col-3 col-form-label">@Model.Weather?.TemperatureLabel</div>
+                                <span asp-validation-for="Weather.Temperature" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="form-row">
-                            <div class="form-group col-6">
-                                <div class="form-row">
-                                    <label asp-for="Weather.WindGust" class="control-label col-6 col-md-4 col-form-label ">Gust</label>
-                                    <input id="windGust" asp-for="Weather.WindGust" class="form-control col-3 text-center" type="number" />
-                                    <div class="col-3 col-form-label">@Model.Weather?.WindSpeedUnits</div>
-                                    <span asp-validation-for="Weather.WindGust" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group col-6">
-                                <div class="form-row">
-                                    <label asp-for="Weather.Temperature" class="control-label col-4 col-form-label ">Temp</label>
-                                    <input id="temperature" asp-for="Weather.Temperature" class="form-control col-3 text-center" type="number" />
-                                    <div class="col-3 col-form-label">@Model.Weather?.TemperatureUnits</div>
-                                    <span asp-validation-for="Weather.Temperature" class="text-danger"></span>
-                                </div>
-                            </div>
+                            <label asp-for="Name" class="control-label col-3 col-md-2 col-form-label">Name</label>
+                            <input asp-for="Name" class="form-control col-9 col-md-10" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <div class="form-row">
-                                <label asp-for="Name" class="control-label col-3 col-md-2 col-form-label">Name</label>
-                                <input asp-for="Name" class="form-control col-9 col-md-10" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-                        </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="form-row">
-                                <label asp-for="Description" class="control-label col-6 col-md-2 col-form-label">Comments</label>
-                                <input asp-for="Description" class="form-control col-12 col-md-10" />
-                                <span asp-validation-for="Description" class="text-danger"></span>
-                            </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label asp-for="Description" class="control-label col-6 col-md-2 col-form-label">Comments</label>
+                            <input asp-for="Description" class="form-control col-12 col-md-10" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <div class="form-row">
-                                <label asp-for="TrackingUrl" class="control-label col-3 col-md-2 col-form-label">Tracking Url</label>
-                                <input asp-for="TrackingUrl" class="form-control col-9 col-md-10" />
-                                <span asp-validation-for="TrackingUrl" class="text-danger"></span>
-                            </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label asp-for="TrackingUrl" class="control-label col-3 col-md-2 col-form-label">Tracking Url</label>
+                            <input asp-for="TrackingUrl" class="form-control col-9 col-md-10" />
+                            <span asp-validation-for="TrackingUrl" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <br />
+    </div>
+    <br />
 
-        <div class="row">
-            <div class="col-12 col-lg-8 pb-3">
+    <div class="row">
+        <div class="col-12 col-lg-8 pb-3">
 
-                <ul class="list-group" id="results">
-                    @await Html.PartialAsync("_scoreEntryPartial", Model)
-                    @foreach (var score in (Model.Scores ??
-                     new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
-                    {
-                        <li id="@score.CompetitorId" class="list-group-item"
-                            data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
-                            <div class="d-flex w-100 flex-wrap">
-                                <div>
-                                    <span class="badge badge-secondary badge-pill race-place"></span>
-                                </div>
-                                <div>
-                                    <span class="sail-number">@score.Competitor.SailNumber</span>
-                                    @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
-                                    {
-                                        <span class="alt-sail-number"> (@score.Competitor.AlternativeSailNumber)</span>
-                                    }
-                                </div>
-                                <div>
-                                    <span class="competitor-name h5">@score.Competitor.Name</span>
-                                </div>
-                                <div class="float-right ml-auto d-flex">
-                                    <div>
-                                        <select class="select-code form-control form-control-sm">
-                                            <option value="No Code">No Code</option>
-                                            @foreach (var code in Model.ScoreCodeOptions)
-                                            {
-                                                <option value="@code.Name" selected="@(score.Code == code.Name)">@code.Name: @code.Description.Left(40)</option>
-                                            }
-                                        </select>
-                                        <input class="code-points form-control form-control-sm"
-                                               style="display:none"
-                                               type="text" pattern="[0-9]+([\.,][0-9]+)?"
-                                               placeholder="place"
-                                               value="@score.CodePoints?.ToString("0.#")" />
-                                    </div>
-                                    <button class="btn btn-light move-up" type="button"><span class="fa fa-angle-up"></span></button>
-                                    <button class="btn btn-light move-down" type="button"><span class="fa fa-angle-down"></span></button>
-                                    &ensp;
-                                    <button class="btn btn-light delete-button" type="button" data-toggle="modal"
-                                            data-target="#deleteConfirm" data-competitorid="@score.CompetitorId">
-                                        <span class="far fa-trash-alt text-danger"></span>
-                                    </button>
-                                </div>
+            <ul class="list-group" id="results">
+                @await Html.PartialAsync("_scoreEntryPartial", Model)
+                @foreach (var score in (Model.Scores ??
+               new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
+                {
+                    <li id="@score.CompetitorId" class="list-group-item"
+                        data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
+                        <div class="d-flex w-100 flex-wrap">
+                            <div>
+                                <span class="badge badge-secondary badge-pill race-place"></span>
                             </div>
-                        </li>
-                    }
-                </ul>
+                            <div>
+                                <span class="sail-number">@score.Competitor.SailNumber</span>
+                                @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
+                                {
+                                    <span class="alt-sail-number"> (@score.Competitor.AlternativeSailNumber)</span>
+                                }
+                            </div>
+                            <div>
+                                <span class="competitor-name h5">@score.Competitor.Name</span>
+                            </div>
+                            <div class="float-right ml-auto d-flex">
+                                <div>
+                                    <select class="select-code form-control form-control-sm">
+                                        <option value="No Code">No Code</option>
+                                        @foreach (var code in Model.ScoreCodeOptions)
+                                        {
+                                            <option value="@code.Name" selected="@(score.Code == code.Name)">@code.Name: @code.Description.Left(40)</option>
+                                        }
+                                    </select>
+                                    <input class="code-points form-control form-control-sm"
+                                           style="display:none"
+                                           type="text" pattern="[0-9]+([\.,][0-9]+)?"
+                                           placeholder="place"
+                                           value="@score.CodePoints?.ToString("0.#")" />
+                                </div>
+                                <button class="btn btn-light move-up" type="button"><span class="fa fa-angle-up"></span></button>
+                                <button class="btn btn-light move-down" type="button"><span class="fa fa-angle-down"></span></button>
+                                &ensp;
+                                <button class="btn btn-light delete-button" type="button" data-toggle="modal"
+                                        data-target="#deleteConfirm" data-competitorid="@score.CompetitorId">
+                                    <span class="far fa-trash-alt text-danger"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
 
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-4 mb-3">
+            <div class="form-group">
+                <label class="contorl-label h4">Add result:</label>
+                <input id="newCompetitor" type="text" class="form-control" />
             </div>
         </div>
-        <div class="row">
-            <div class="col-12 col-lg-4 mb-3">
-                <div class="form-group">
-                    <label class="contorl-label h4">Add result:</label>
-                    <input id="newCompetitor" type="text" class="form-control" />
-                </div>
-            </div>
-            <div class="d-none d-lg-inline-block col-lg-2"></div>
-            <div class="col-12 col-lg-3">
-                <div class="form-group">
-                    <label class="d-none d-lg-inline h4">&nbsp;</label>
-                    <input id="createCompButton" type="button" value="Create New Competitor" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#createCompetitor" />
-                </div>
+        <div class="d-none d-lg-inline-block col-lg-2"></div>
+        <div class="col-12 col-lg-3">
+            <div class="form-group">
+                <label class="d-none d-lg-inline h4">&nbsp;</label>
+                <input id="createCompButton" type="button" value="Create New Competitor" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#createCompetitor" />
             </div>
         </div>
-        <hr />
-        <div class="row">
-            <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
-            <div class="col-md-3">
-                <input id="submitButton" type="submit" value="Create" class="btn btn-primary btn-block" disabled="disabled" />
-            </div>
-            <div class="col-md-3">
-                <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
-                   class="btn btn-outline-primary btn-block">Cancel</a>
-            </div>
+    </div>
+    <hr />
+    <div class="row">
+        <span id="submitDisabledMessage" visble>The Save function is still loading...</span>
+        <div class="col-md-3">
+            <input id="submitButton" type="submit" value="Create" class="btn btn-primary btn-block" disabled="disabled" />
         </div>
-    </form>
+        <div class="col-md-3">
+            <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
+               class="btn btn-outline-primary btn-block">Cancel</a>
+        </div>
+    </div>
+</form>
     <hr />
 </div>
 
@@ -339,5 +340,5 @@
     <script>
     var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
     </script>
-    <script src="~/js/raceEditor.min.js"></script>
+    <script src="~/js/raceEditor.min.js"  asp-append-version="true"></script>
 }

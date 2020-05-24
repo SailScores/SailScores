@@ -30,7 +30,7 @@ namespace SailScores.Core.Services
         {
             var allScoreCodes = await _dbContext
                 .ScoringSystems
-                .Where(s => s.OwningClubId == clubId || s.OwningClubId == null)
+                .Where(s => s.ClubId == clubId || s.ClubId == null)
                 .SelectMany(s => s.ScoreCodes).ToListAsync();
             var distinctScoreCodes = allScoreCodes
                 .GroupBy(s => s.Name, (key, g) => g.OrderBy(e => e.Name).First());
@@ -44,8 +44,8 @@ namespace SailScores.Core.Services
         {
             var dbObjects = await _dbContext
                 .ScoringSystems
-                .Where(s => s.OwningClubId == clubId ||
-                (includeBaseSystems && s.OwningClubId == null))
+                .Where(s => s.ClubId == clubId ||
+                (includeBaseSystems && s.ClubId == null))
                 .Include(s => s.ScoreCodes)
                 .ToListAsync();
             return _mapper.Map<List<Model.ScoringSystem>>(dbObjects);
@@ -56,7 +56,7 @@ namespace SailScores.Core.Services
         {
             var dbObject = await _dbContext
                 .ScoringSystems
-                .Where(s => s.OwningClubId == null
+                .Where(s => s.ClubId == null
                 && s.Name == "Appendix A Low Point For Series")
                 .Include(s => s.ScoreCodes)
                 .FirstOrDefaultAsync();
@@ -103,7 +103,7 @@ namespace SailScores.Core.Services
         
         public async Task SaveScoringSystemAsync(ScoringSystem scoringSystem)
         {
-            if (scoringSystem.Id == null && scoringSystem.Id == Guid.Empty)
+            if (scoringSystem.Id == Guid.Empty)
             {
                 scoringSystem.Id = Guid.NewGuid();
             }

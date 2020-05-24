@@ -9,34 +9,30 @@
         </h5>
     </div>
     <div id="collapseRegatta" class="collapse" aria-labelledby="regattaHeading" data-parent="#accordion">
-            <div class="card-body">
-                <p>
-                    <a class="btn btn-primary" asp-action="Create" asp-controller="Regatta">
-                        Create
-                    </a>
-                </p>
-                <table class="table table-not-wide">
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                @item.Series.Sum(s => s.Races.Count()) Races
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </td>
-                            <td>
-                                @Html.ActionLink("Edit", "Edit", "Regatta", new { id = item.Id }) |
-                                @Html.ActionLink("Delete", "Delete", "Regatta", new { id = item.Id })
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
+        <div class="card-body">
+            <p>
+                <a class="btn btn-primary" asp-action="Create" asp-controller="Regatta">
+                    Create
+                </a>
+            </p>
+            @foreach (var item in Model)
+            {
+        <div class="row border-bottom mb-1 pb-1">
+            <div class="col-6 col-sm-4 col-md-4">
+                @Html.DisplayFor(modelItem => item.Name)
+            </div>
+            <div class="col-6 col-sm-4 col-md-3">
+                @item.Series.Sum(s => s.Races.Count()) Races
+            </div>
+            <div class="col-6 col-sm-4 col-md-3">
+                @Html.DisplayFor(modelItem => item.Description)
+            </div>
+            <div class="col-6 col-sm-4 col-md-2">
+                @Html.ActionLink("Edit", "Edit", "Regatta", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "Delete", "Regatta", new { id = item.Id })
             </div>
         </div>
+            }
+        </div>
     </div>
+</div>

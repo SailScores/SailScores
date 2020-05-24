@@ -7,12 +7,12 @@ namespace SailScores.Database.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
+            // Nothing to do here
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            // Nothing to do here
         }
     }
 }

@@ -31,41 +31,39 @@
 
 @if (Model.List.Any())
 {
-
-<table class="table">
-    <tbody>
-        @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+    @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+    {
+        <div id="@item.Key" class="row">
+            <div class="col-12">
+                <h2>@item.Key</h2>
+            </div>
+        </div>
+        foreach (var regatta in item)
         {
-            <tr id="@item.Key">
-                <td colspan="3">
-                    <h2>@item.Key</h2>
-                </td>
-            </tr>
-            foreach (var regatta in item)
-            {
-                <tr>
-                    <td>
-                        <a href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.UrlName">
-                            @Html.DisplayFor(modelItem => regatta.Name)
-                        </a>
-                        (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
-                    </td>
-                    <td>
-                        @regatta.StartDate?.ToString("d") -
-                        @regatta.EndDate?.ToString("d")
-                    </td>
-                    <td>
-                        @if (regatta.UpdatedDate.HasValue)
-                        {
-                            <span class="d-none d-md-table-cell"><i>@localizer["Updated"] @(regatta.UpdatedDate.Value.ToString("d"))</i></span>
-                        }
-                    </td>
-                </tr>
-            }
+<div class="row">
+    <div class="col-sm-4 col-lg-3">
+        <a id="regattalink_@regatta.Id"
+           href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.UrlName"
+           >@Html.DisplayFor(modelItem => regatta.Name)</a>
+        (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        @regatta.StartDate?.ToString("d") -
+        @regatta.EndDate?.ToString("d")
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        @if (regatta.UpdatedDate.HasValue)
+        {
+            <span class="d-none d-md-table-cell">
+            <i>@localizer["Updated"] @(regatta.UpdatedDate.Value.ToString("d"))</i>
+            </span>
         }
-    </tbody>
-</table>
-} else
+    </div>
+</div>
+        }
+    }
+}
+else
 {
     <br />
     <h4>This club has not shared any regattas.</h4>

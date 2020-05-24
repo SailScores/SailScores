@@ -3,6 +3,7 @@ using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 
 namespace SailScores.Core.Scoring
 {
@@ -77,7 +78,7 @@ namespace SailScores.Core.Scoring
                     newSeries.Races = RemoveLastWeeksRaces(series.Races);
                     break;
             }
-            if(newSeries.Races.Count() == 0)
+            if(!newSeries.Races.Any())
             {
                 return;
             }
@@ -314,7 +315,7 @@ namespace SailScores.Core.Scoring
 
         protected int GetNumberOfCompetitors(SeriesResults seriesResults)
         {
-            return seriesResults.Competitors.Count();
+            return seriesResults.Competitors.Count;
         }
 
 
@@ -598,7 +599,18 @@ namespace SailScores.Core.Scoring
                 selectedString = discardStrings[numberOfRaces - 1];
             }
 
-            return int.Parse(selectedString);
+            int returnValue = 0;
+            if(int.TryParse(selectedString, out returnValue))
+            {
+                return returnValue;
+            }
+
+            if(numberOfRaces == 1)
+            {
+                return 0;
+            }
+            return GetNumberOfDiscards(numberOfRaces - 1);
+            
         }
 
 
@@ -704,6 +716,19 @@ namespace SailScores.Core.Scoring
             if (returnScoreCode == null)
             {
                 returnScoreCode = GetScoreCode(DEFAULT_CODE);
+                if(returnScoreCode == null)
+                {
+                    returnScoreCode = new ScoreCode
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Default",
+                        Formula = "FIN+",
+                        FormulaValue = 2,
+                        CameToStart = false,
+                        Finished = false,
+                        Discardable = true
+                    };
+                }
             }
             return returnScoreCode;
         }

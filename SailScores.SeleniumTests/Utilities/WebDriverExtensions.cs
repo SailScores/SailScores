@@ -8,7 +8,7 @@ namespace SailScores.SeleniumTests
 {
     public static class WebDriverExtensions
     {
-        private static int _basicTimeout = 20;
+        private static readonly int _basicTimeout = 20;
 
         // use: element = driver.WaitUntilVisible(By.XPath("//input[@value='Save']"));
         public static IWebElement WaitUntilVisible(

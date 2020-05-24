@@ -84,7 +84,7 @@
                         </a>
                         @if (series.UpdatedDate.HasValue && series.UpdatedDate > DateTime.Now.AddDays(-15))
                         {
-                            <i><small>@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
+                            <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
                         }
                     </li>
                 }
@@ -98,13 +98,13 @@
             <ul class="list-unstyled">
                 @foreach (var series in Model.RecentSeries)
                 {
-                    <li>
-                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">@series.Name</a>
-                        @if (series.UpdatedDate.HasValue)
-                        {
-                            <i><small>@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</small></i>
-                        }
-                    </li>
+                <li>
+                    <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">@series.Name</a>
+                    @if (series.UpdatedDate.HasValue)
+                    {
+                        <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
+                    }
+                </li>
                 }
             </ul>
         </div>
@@ -137,7 +137,7 @@
     else
     {
         <div class="col-sm-6 col-md-3">
-            <p><i>@localizer["No recent series found."]</i></p>
+            <p><em>@localizer["No recent series found."]</em></p>
             <p>
                 <a asp-controller="Series"
                    asp-route-clubInitials="@Model.Initials">
@@ -154,7 +154,7 @@
                 @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
                     <li>
-                        <b>@item.Key</b>
+                        <strong>@item.Key</strong>
                         <ul class="list-unstyled">
                             @foreach (var race in item)
                             {

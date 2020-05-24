@@ -1,36 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Web.Models.SailScores;
-using CoreServices = SailScores.Core.Services;
-using SailScores.Web.Models;
-using SailScores.Web.Services;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace SailScores.Web.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : Controller
     {
-        
-        public ErrorController()
+        private readonly ILogger<ErrorController> _logger;
+        private readonly TelemetryClient _telemetryClient;
+
+        public ErrorController(
+            ILogger<ErrorController> logger,
+            TelemetryClient telemetryClient)
         {
+            _logger = logger;
+            _telemetryClient = telemetryClient;
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        [Route("error/404")]
-        public IActionResult Error404()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        [Route("error/{code:int}")]
         public IActionResult Error(int code)
         {
             // handle different codes or just return the default error view
+            if (code == 404)
+            {
+                return View("Error404");
+            }
+
+            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            _telemetryClient.TrackException(exceptionHandlerPathFeature.Error);
+            _telemetryClient.TrackEvent("Error.ServerError", new Dictionary<string, string>
+            {
+                ["originalPath"] = exceptionHandlerPathFeature.Path,
+                ["error"] = exceptionHandlerPathFeature.Error.Message
+            });
+
             return View();
         }
     }

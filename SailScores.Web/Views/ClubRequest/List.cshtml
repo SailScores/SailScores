@@ -4,39 +4,39 @@
     ViewData["Title"] = "List";
 }
 
-<h1>List</h1>
+<h1 id="clubRequestTitle">Requests for Club Creation</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table" aria-describedby="clubRequestTitle">
     <thead>
         <tr>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.ClubName)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.ClubInitials)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.ClubLocation)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.ClubWebsite)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.ContactName)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.Comments)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.RequestSubmitted)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.AdminNotes)
             </th>
-            <th></th>
+            <th scope="col"></th>
         </tr>
     </thead>
     <tbody>

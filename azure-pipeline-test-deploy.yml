@@ -20,27 +20,12 @@ steps:
     packageType: 'sdk'
     version: '3.1.x'
 
-- task: UseDotNet@2
-  displayName: Install .NET Core 2.0 SDK
-  inputs:
-    packageType: 'sdk'
-    version: '2.0.0'
-
 - task: Npm@1
   inputs:
     command: 'install'
     workingDir: 'SailScores.Web'
 - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=VERSION_TAG]$VERSION_TAG"
   displayName: Set the tag name as an environment variable
-
-- task: SonarCloudPrepare@1
-  displayName: 'Prepare analysis configuration'
-  inputs:
-    SonarCloud: 'SonarCloud'
-    organization: 'jbfraser1-github'
-    scannerMode: 'MSBuild'
-    projectKey: 'jbfraser1_SailScores'
-    projectName: 'SailScores'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build $(buildConfiguration)'
@@ -52,15 +37,6 @@ steps:
   displayName: "Emit build number"
   workingDirectory: '$(Build.SourcesDirectory)/SailScores.Web'
   failOnStderr: true
-
-
-- task: SonarCloudAnalyze@1
-  displayName: 'Run SonarCloud analysis'
-
-- task: SonarCloudPublish@1
-  displayName: 'Publish results on build summary'
-  inputs:
-    pollingTimeoutSec: '300'
 
 - task: DotNetCoreCLI@2
   inputs:

@@ -63,12 +63,12 @@ namespace SailScores.Core.Services
             return returnObj;
         }
 
-        public async Task<Series> GetOneSeriesAsync(Guid guid)
+        public async Task<Series> GetOneSeriesAsync(Guid seriesId)
         {
             var seriesDb = await _dbContext
                 .Series
                 .Include(s => s.Season)
-                .FirstAsync(c => c.Id == guid);
+                .FirstAsync(c => c.Id == seriesId);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
             if (fullSeries != null)
@@ -247,6 +247,10 @@ namespace SailScores.Core.Services
 
         private IEnumerable<FlatSeriesScore> FlattenSeriesScores(Series series)
         {
+            if (series?.Results?.Results == null)
+            {
+                return new List<FlatSeriesScore>();
+            }
             return series.Results.Results.Select(
                 kvp => new FlatSeriesScore
                 {

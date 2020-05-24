@@ -17,20 +17,13 @@ namespace SailScores.Web.Controllers
 
         private readonly Core.Services.IClubService _clubService;
         private readonly Web.Services.IWeatherService  _weatherService;
-        private readonly Services.IAuthorizationService _authService;
-        private readonly Services.IAdminTipService _adminTipService;
-        private readonly IMapper _mapper;
 
         public WeatherController(
             Core.Services.IClubService clubService,
-            Web.Services.IWeatherService weatherService,
-            Services.IAuthorizationService authService,
-            IMapper mapper)
+            Web.Services.IWeatherService weatherService)
         {
             _clubService = clubService;
             _weatherService = weatherService;
-            _authService = authService;
-            _mapper = mapper;
         }
 
 

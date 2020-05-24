@@ -15,31 +15,27 @@
                         Create
                     </a>
                 </p>
-                <table class="table table-not-wide">
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Season.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Races.Count) Races
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </td>
-                            <td>
-                                @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
-                                @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
+                @foreach (var item in Model)
+                {
+                    <div class="row border-bottom mb-1 pb-1">
+                        <div class="col-6 col-sm-4 col-md-4">
+                            @Html.DisplayFor(modelItem => item.Season.Name)
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            @Html.DisplayFor(modelItem => item.Races.Count) Races
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-2">
+                            @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
+                            @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>

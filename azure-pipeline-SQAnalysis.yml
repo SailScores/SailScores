@@ -1,0 +1,70 @@
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  rid: 'linux-x64'
+  project: '$(Build.SourcesDirectory)/Solution.sln'
+  testOutputDirectory: '$(Agent.TempDirectory)/testresults'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '3.1.x'
+
+- task: UseDotNet@2
+  displayName: 'Install .NET Core 2.0 runtime for SonarCloud plugin'
+  inputs:
+    packageType: 'runtime'
+    version: '2.0.0'
+    
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'SailScores.Web'
+- script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=VERSION_TAG]$VERSION_TAG"
+  displayName: Set the tag name as an environment variable
+
+- task: SonarCloudPrepare@1
+  displayName: 'Prepare analysis configuration'
+  inputs:
+    SonarCloud: 'SonarCloud'
+    organization: 'jbfraser1-github'
+    scannerMode: 'MSBuild'
+    projectKey: 'jbfraser1_SailScores'
+    projectName: 'SailScores'
+    extraProperties: |
+        sonar.exclusions=**/obj/**,**/*.dll
+        sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
+        sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/*.trx
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build $(buildConfiguration)'
+  inputs:
+    command: 'build'
+    arguments: '-r $(rid) --configuration $(buildConfiguration) -p:SourceRevisionId=$(Build.SourceVersion)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: 'test'
+    projects: '**/*Test.Unit/*.csproj'
+    arguments: '--no-restore --collect:"XPlat Code Coverage" --settings:$(Build.SourcesDirectory)/SailScores.Test.Unit/runsettings.xml'
+
+- task: SonarCloudAnalyze@1
+  displayName: 'Run SonarCloud analysis'
+
+- task: SonarCloudPublish@1
+  displayName: 'Publish results on build summary'
+  inputs:
+    pollingTimeoutSec: '300'
+

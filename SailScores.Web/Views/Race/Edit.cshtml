@@ -88,7 +88,7 @@
                                     <option>Select...</option>
                                     @foreach (var icon in Model.WeatherIconOptions)
                                     {
-                                        <option data-content="<i class='wi @icon.Value'></i>" value="@icon.Key"></option>
+                                <option data-content="<span class='wi @icon.Value'></span>" value="@icon.Key">@icon.Key</option>
                                     }
                                 </select>
                                 <input id="weatherDescription" asp-for="Weather.Description" class="form-control col-6 col-md-8" />
@@ -125,7 +125,7 @@
                                 <div class="form-row">
                                     <label asp-for="Weather.Temperature" class="control-label col-4 col-form-label ">Temp</label>
                                     <input id="temperature" asp-for="Weather.Temperature" class="form-control col-3 text-center" type="number" />
-                                    <div class="col-3 col-form-label">@Model.Weather?.TemperatureUnits</div>
+                                    <div class="col-3 col-form-label">@Model.Weather?.TemperatureLabel</div>
                                     <span asp-validation-for="Weather.Temperature" class="text-danger"></span>
                                 </div>
                             </div>
@@ -297,5 +297,6 @@
     <script>
     var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
     </script>
-    <script src="~/js/raceEditor.min.js"></script>
+    <script src="~/js/raceEditor.min.js" asp-append-version="true"></script>
+
 }

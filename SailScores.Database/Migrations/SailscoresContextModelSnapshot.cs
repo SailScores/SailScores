@@ -598,9 +598,6 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<Guid?>("OwningClubId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("ParentSystemId")
                         .HasColumnType("uniqueidentifier");
 

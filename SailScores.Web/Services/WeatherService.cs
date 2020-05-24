@@ -1,13 +1,12 @@
-﻿using AutoMapper;
+﻿using Microsoft.Extensions.Logging;
 using SailScores.Api.Enumerations;
-using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Core = SailScores.Core;
 
 namespace SailScores.Web.Services
 {
@@ -16,8 +15,7 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IWeatherService _coreWeatherService;
         private readonly Core.Services.IConversionService _converter;
-        private readonly IMapper _mapper;
-
+        private readonly ILogger<WeatherService> _logger;
         private static List<KeyValuePair<string, string>> IconList = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>(IconNames.Sunny.ToString(), "wi-day-sunny" ),
@@ -48,12 +46,13 @@ namespace SailScores.Web.Services
             Core.Services.IClubService clubService,
             Core.Services.IWeatherService weatherService,
             Core.Services.IConversionService converter,
-            IMapper mapper)
+            ILogger<WeatherService> logger
+        )
         {
             _coreClubService = clubService;
             _coreWeatherService = weatherService;
             _converter = converter;
-            _mapper = mapper;
+            _logger = logger;
         }
 
 
@@ -113,7 +112,7 @@ namespace SailScores.Web.Services
             {
                 Description = weather?.Description,
                 Icon = weather?.Icon,
-                TemperatureUnits = GetTempUnitString(settings?.TemperatureUnits),
+                TemperatureUnits = settings?.TemperatureUnits,
                 WindSpeedUnits = settings?.WindSpeedUnits,
                 Humidity = weather?.Humidity,
                 CloudCoverPercent = weather?.CloudCoverPercent
@@ -147,22 +146,33 @@ namespace SailScores.Web.Services
         {
             var icon = weather.Icon;
             // todo: check for valid icons.
-            if (icon.Contains("Select..."))
+            if (icon.Contains("Select...", StringComparison.InvariantCultureIgnoreCase))
             {
                 icon = string.Empty;
             }
+
+            var tempString = GetTemperatureString(weather);
+
+            var tempDegKelvin = GetTemperatureDecimal(weather);
+            var windSpeedString = GetWindString(weather);
+            var windSpeedMeterPerSecond = GetWindMeterPerSecond(weather);
+            var windDirectionString = weather.WindDirection;
+            var windDirectionDegrees = GetWindDirectionDecimal(weather);
+            var windGustString = GetWindGustString(weather);
+            var windGustMeterPerSecond = GetGustMeterPerSecond(weather);
+
             var returnObj = new Weather
             {
                 Description = weather.Description,
                 Icon = icon,
-                TemperatureString = GetTemperatureString(weather),
-                TemperatureDegreesKelvin = GetTemperatureDecimal(weather),
-                WindSpeedString = GetWindString(weather),
-                WindSpeedMeterPerSecond = GetWindMeterPerSecond(weather),
-                WindDirectionString = weather.WindDirection,
-                WindDirectionDegrees = GetWindDirectionDecimal(weather),
-                WindGustString = GetWindGustString(weather),
-                WindGustMeterPerSecond = GetGustMeterPerSecond(weather),
+                TemperatureString = tempString,
+                TemperatureDegreesKelvin = tempDegKelvin,
+                WindSpeedString = windSpeedString,
+                WindSpeedMeterPerSecond = windSpeedMeterPerSecond,
+                WindDirectionString = windDirectionString,
+                WindDirectionDegrees = windDirectionDegrees,
+                WindGustString = windGustString,
+                WindGustMeterPerSecond = windGustMeterPerSecond,
                 Humidity = weather.Humidity,
                 CloudCoverPercent = weather.CloudCoverPercent,
                 CreatedDate = DateTime.UtcNow
@@ -174,10 +184,11 @@ namespace SailScores.Web.Services
         private string GetTemperatureString(WeatherViewModel weather)
         {
             var tempDecimal = GetTemperatureDecimal(weather);
-            if (tempDecimal != null) {
-                return tempDecimal?.ToString("N2");
-            }
 
+            if (tempDecimal != null) {
+
+                return tempDecimal?.ToString("N2", CultureInfo.InvariantCulture);
+            }
             return weather.Temperature;
         }
 
@@ -188,7 +199,7 @@ namespace SailScores.Web.Services
                 return null;
             }
             decimal tempDecimal;
-            if(Decimal.TryParse(weather.Temperature, out tempDecimal)){
+            if (Decimal.TryParse(weather.Temperature, out tempDecimal)){
                 var tempKelvin = 
                     _converter.Convert(
                         tempDecimal,
@@ -315,20 +326,5 @@ namespace SailScores.Web.Services
                 return null;
             }
         }
-
-        private string GetTempUnitString(string temperatureUnits)
-        {
-            if (string.IsNullOrWhiteSpace(temperatureUnits))
-            {
-                return null;
-            }
-            if(temperatureUnits.ToUpperInvariant().StartsWith("F")
-                || temperatureUnits.ToUpperInvariant().Contains("FAHR"))
-            {
-                return "°F";
-            }
-            return "°C";
-        }
-
     }
 }

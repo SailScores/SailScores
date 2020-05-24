@@ -1,25 +1,20 @@
 using AutoMapper;
-using System;
-using System.Threading.Tasks;
-using SailScores.Core.Model;
-using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Web;
 using Microsoft.Extensions.Configuration;
-using System.Globalization;
-using SailScores.Core.Model.OpenWeatherMap;
-using System.Linq;
+using Newtonsoft.Json;
 using SailScores.Api.Enumerations;
-using SailScores.Database;
-using Microsoft.EntityFrameworkCore;
+using SailScores.Core.Model;
+using SailScores.Core.Model.OpenWeatherMap;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace SailScores.Core.Services
 {
     public class WeatherService : IWeatherService
     {
-        private readonly ISailScoresContext _dbContext;
-        private readonly ILogger _logger;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
@@ -27,16 +22,12 @@ namespace SailScores.Core.Services
         private readonly string _openWeatherApiRoot = "https://api.openweathermap.org/data/2.5/weather";
 
         public WeatherService(
-            ISailScoresContext dbContext,
             IHttpClientFactory clientFactory,
             IConfiguration configuration,
-            ILogger<IRaceService> logger,
             IMapper mapper)
         {
-            _dbContext = dbContext;
             _clientFactory = clientFactory;
             _configuration = configuration;
-            _logger = logger;
             _mapper = mapper;
         }
 
@@ -55,28 +46,27 @@ namespace SailScores.Core.Services
             string url = builder.ToString();
 
 
-            var request = new HttpRequestMessage(
+            using (var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                url);
-            //request.Headers.Add("Accept", "application/vnd.github.v3+json");
-            //request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
-
-            var client = _clientFactory.CreateClient();
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
+                url)) 
+            using (var client = _clientFactory.CreateClient())
             {
-                var responseString = await response.Content
-                   .ReadAsStringAsync();
-                var responseObj = JsonConvert.DeserializeObject<CurrentWeatherResponse>(responseString);
-                var domainObj = _mapper.Map<Weather>(responseObj);
-                domainObj.Icon = GetIconName(responseObj.Weather?.First()?.Id);
-                return domainObj;
-            }
-            else
-            {
-                return null;
+
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content
+                        .ReadAsStringAsync();
+                    var responseObj = JsonConvert.DeserializeObject<CurrentWeatherResponse>(responseString);
+                    var domainObj = _mapper.Map<Weather>(responseObj);
+                    domainObj.Icon = GetIconName(responseObj.Weather?.First()?.Id);
+                    return domainObj;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 

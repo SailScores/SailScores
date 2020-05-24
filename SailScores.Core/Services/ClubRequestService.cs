@@ -1,15 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SailScores.Core.Model;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
 using System.Linq;
-using SailScores.Core.Model;
+using System.Threading.Tasks;
 using Db = SailScores.Database.Entities;
-using SailScores.Api.Dtos;
 
 namespace SailScores.Core.Services
 {
@@ -47,30 +44,35 @@ namespace SailScores.Core.Services
             return _mapper.Map<ClubRequest>(dbObj);
         }
 
-        public async Task Submit(ClubRequest request)
+        public async Task Submit(ClubRequest clubRequest)
         {
-            var dbObj = _mapper.Map<Db.ClubRequest>(request);
+            var dbObj = _mapper.Map<Db.ClubRequest>(clubRequest);
             _dbContext.ClubRequests.Add(dbObj);
 
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateRequest(ClubRequest request)
+        public async Task UpdateRequest(ClubRequest clubRequest)
         {
-            var existingEntry = await _dbContext.ClubRequests.SingleAsync(r => r.Id == request.Id);
+            if(clubRequest == null)
+            {
+                throw new ArgumentNullException(nameof(clubRequest));
+            }
+            var existingEntry = await _dbContext.ClubRequests
+                .SingleAsync(r => r.Id == clubRequest.Id);
 
-            existingEntry.ClubName = request.ClubName;
-            existingEntry.ClubInitials = request.ClubInitials;
-            existingEntry.ClubLocation = request.ClubLocation;
-            existingEntry.ClubWebsite = request.ClubWebsite;
-            existingEntry.ContactName = request.ContactName;
-            existingEntry.ContactEmail = request.ContactEmail;
-            existingEntry.Classes = request.Classes;
-            existingEntry.TypicalDiscardRules = request.TypicalDiscardRules;
-            existingEntry.Comments = request.Comments;
-            existingEntry.AdminNotes = request.AdminNotes;
-            existingEntry.TestClubId = request.TestClubId;
-            existingEntry.VisibleClubId = request.VisibleClubId;
+            existingEntry.ClubName = clubRequest.ClubName;
+            existingEntry.ClubInitials = clubRequest.ClubInitials;
+            existingEntry.ClubLocation = clubRequest.ClubLocation;
+            existingEntry.ClubWebsite = clubRequest.ClubWebsite;
+            existingEntry.ContactName = clubRequest.ContactName;
+            existingEntry.ContactEmail = clubRequest.ContactEmail;
+            existingEntry.Classes = clubRequest.Classes;
+            existingEntry.TypicalDiscardRules = clubRequest.TypicalDiscardRules;
+            existingEntry.Comments = clubRequest.Comments;
+            existingEntry.AdminNotes = clubRequest.AdminNotes;
+            existingEntry.TestClubId = clubRequest.TestClubId;
+            existingEntry.VisibleClubId = clubRequest.VisibleClubId;
         }
     }
 }

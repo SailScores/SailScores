@@ -10,7 +10,7 @@
 }
 <div class="row">
     <div class="col-sm-6">
-        <h2>
+        <h2 id="racetitle">
             @Model.Item.DisplayName
         </h2>
         @if (Model.CanEdit)
@@ -26,7 +26,7 @@ new { @class = "btn btn-outline-primary btn-sm" })
     <div class="col-sm-6 text-sm-right weather">
         @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindDirection))
         {
-            <i class="wi wi-wind from-@Model.Item.Weather.WindDirection-deg ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather.WindDirection°"></i>
+            <span class="wi wi-wind from-@Model.Item.Weather.WindDirection-deg ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather.WindDirection°"></span>
         }
         <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.WindSpeedUnits">
             @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindSpeed))
@@ -37,7 +37,7 @@ new { @class = "btn btn-outline-primary btn-sm" })
         </span>
         @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Icon))
         {
-            <i class="wi @weatherService.GetIconCharacter(Model.Item.Weather?.Icon) ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather?.Description"></i>
+            <span class="wi @weatherService.GetIconCharacter(Model.Item.Weather?.Icon) ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather?.Description"></span>
         }
         @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Temperature))
         {
@@ -64,13 +64,13 @@ new { @class = "btn btn-outline-primary btn-sm" })
         </div>
     </div>
 }
-<table class="table">
+<table class="table" aria-describedby="racetitle" >
     <thead>
         <tr>
-            <th>Place</th>
-            <th>Sail</th>
-            <th>Sailor</th>
-            <th>Boat</th>
+            <th scope="col">Place</th>
+            <th scope="col">Sail</th>
+            <th scope="col">Sailor</th>
+            <th scope="col">Boat</th>
         </tr>
     </thead>
     <tbody>

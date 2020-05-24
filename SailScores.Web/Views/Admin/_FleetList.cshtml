@@ -19,28 +19,24 @@
                         Create
                     </a>
                 </p>
-                <table class="table table-not-wide">
-                    <tbody>
-                        @foreach (var item in Model.OrderBy(f => f.Name))
-                        {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Description)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.FleetType)
-                                </td>
-                                <td>
-                                    @Html.ActionLink("Edit", "Edit", "Fleet", new { id = item.Id }) |
-                                    @Html.ActionLink("Delete", "Delete", "Fleet", new { id = item.Id })
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                @foreach (var item in Model.OrderBy(f => f.Name))
+                {
+            <div class="row border-bottom mb-1 pb-1">
+                <div class="col-6 col-sm-4 col-md-4">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    @Html.DisplayFor(modelItem => item.FleetType)
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    @Html.ActionLink("Edit", "Edit", "BoatClass", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", "BoatClass", new { id = item.Id })
+                </div>
+            </div>
+                }
             </div>
         </div>            
     </div>

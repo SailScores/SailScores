@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
@@ -8,8 +9,7 @@ namespace SailScores.Web.Models.SailScores
 {
     public class ScoreCodeWithOptionsViewModel : ScoreCodeViewModel
     {
-
-        public readonly List<SelectListItem> FormulaOptions = new List<SelectListItem>
+        public List<SelectListItem> FormulaOptions { get; } = new List<SelectListItem>
         {
             new SelectListItem("COD - Use value of Score Like to find another code to use", "COD"),
             new SelectListItem("FIN+ - Competitors who finished this race + Formula Value", "FIN+"),

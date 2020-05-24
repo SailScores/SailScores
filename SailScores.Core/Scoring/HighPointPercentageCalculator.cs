@@ -60,7 +60,7 @@ namespace SailScores.Core.Scoring
         /// accordingly.
         protected override void CalculateTotals(
             SeriesResults results,
-            IEnumerable<Score> allScores)
+            IEnumerable<Score> scores)
         {
             results.IsPercentSystem = true;
             results.PercentRequired = _scoringSystem.ParticipationPercent;
@@ -80,7 +80,7 @@ namespace SailScores.Core.Scoring
                         .CalculatedScores
                         .Where(s => s.Value.Discard)
                         .Select(s => s.Key.Id);
-                    var perfectScore = allScores.Where(s => !racesToExclude.Contains(s.RaceId))
+                    var perfectScore = scores.Where(s => !racesToExclude.Contains(s.RaceId))
                         .Count(s => CameToStart(s));
                     var compTotal = currentCompResults
                         .CalculatedScores.Values

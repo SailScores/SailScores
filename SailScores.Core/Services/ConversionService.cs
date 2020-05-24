@@ -1,21 +1,18 @@
-using AutoMapper;
 using System;
-using System.Threading.Tasks;
-using SailScores.Core.Model;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Web;
-using Microsoft.Extensions.Configuration;
-using System.Globalization;
-using SailScores.Core.Model.OpenWeatherMap;
-using System.Linq;
-using SailScores.Api.Enumerations;
 
 namespace SailScores.Core.Services
 {
     public class ConversionService : IConversionService
     {
+        private readonly ILogger<ConversionService> _logger;
+
+        public ConversionService(
+            ILogger<ConversionService> logger)
+        {
+            _logger = logger;
+        }
+
         public string Fahrenheit => "Fahrenheit";
 
         public string Celsius => "Celsius";
@@ -47,21 +44,35 @@ namespace SailScores.Core.Services
         }
         public decimal Convert(decimal measure, string sourceUnits, string destinationUnits)
         {
+            _logger.LogInformation("In Convert!");
             var sourceUnitEnum = GetUnit(sourceUnits);
+            _logger.LogInformation("About to GetDestinationUnit");
+
             var destinationUnitEnum = GetUnit(destinationUnits);
-            if(GetUnitType(sourceUnitEnum) != GetUnitType(destinationUnitEnum))
+            _logger.LogInformation("About to Compare unit types!");
+            if (GetUnitType(sourceUnitEnum) != GetUnitType(destinationUnitEnum))
             {
+                _logger.LogInformation("About to throw since types don't match");
+
                 throw new InvalidOperationException(
                     $"Could not convert between {sourceUnits} and {destinationUnits}");
             }
 
-            if(GetUnitType(sourceUnitEnum) == UnitType.Temperature)
+            _logger.LogInformation("About to test temp conversion");
+
+            if (GetUnitType(sourceUnitEnum) == UnitType.Temperature)
             {
+                _logger.LogInformation("About to convert Temp");
+
                 return ConvertTemperature(measure, sourceUnitEnum, destinationUnitEnum);
             } else if (GetUnitType(sourceUnitEnum) == UnitType.Speed)
             {
+                _logger.LogInformation("About to convert speed");
+
                 return ConvertSpeed(measure, sourceUnitEnum, destinationUnitEnum);
             }
+            _logger.LogInformation("Couldn't complete conversion, so throwing");
+
             throw new InvalidOperationException("Could not complete conversion for the unit types.");
         }
 
@@ -70,7 +81,9 @@ namespace SailScores.Core.Services
             Units sourceUnits,
             Units destinationUnits)
         {
+            _logger.LogInformation("About to convertToKelvin");
             var tempInKelvin = ConvertToKelvin(temp, sourceUnits);
+            _logger.LogInformation("Now convert from kelvin");
             return ConvertFromKelvin(tempInKelvin, destinationUnits);
         }
 
@@ -89,6 +102,8 @@ namespace SailScores.Core.Services
 
         private decimal ConvertToKelvin(decimal temp, Units sourceUnits)
         {
+            _logger.LogInformation($"Converting to Kelvin from : unit type {sourceUnits}");
+
             switch (sourceUnits)
             {
                 case Units.Fahrenheit:
@@ -141,6 +156,9 @@ namespace SailScores.Core.Services
 
         private Units GetUnit(string units)
         {
+            _logger.LogInformation("In GetUnit");
+            _logger.LogInformation($"{units}");
+
             if (units.ToUpperInvariant() == "MPH")
             {
                 return Units.MilesPerHour;
@@ -157,21 +175,28 @@ namespace SailScores.Core.Services
             {
                 return Units.MeterPerSecond;
             }
-            if (units.ToUpperInvariant().StartsWith("F")
-                || units.ToUpperInvariant().StartsWith("°F"))
+            _logger.LogInformation("About to check the temperature types");
+
+            if (units.StartsWith("F", StringComparison.InvariantCultureIgnoreCase)
+                || units.StartsWith("°F", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Fahrenheit;
             }
-            if (units.ToUpperInvariant().StartsWith("CE")
-                || units.ToUpperInvariant().StartsWith("°C"))
+            _logger.LogInformation("About to check for Celsius");
+
+            if (units.StartsWith("CE", StringComparison.InvariantCultureIgnoreCase)
+                || units.StartsWith("°C", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Celsius;
             }
-            if (units.ToUpperInvariant().StartsWith("KE")
-                || units.ToUpperInvariant().StartsWith("°K"))
+            _logger.LogInformation("About to check for Kelvin");
+            if (units.StartsWith("KE", StringComparison.InvariantCultureIgnoreCase)
+                || units.StartsWith("°K", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Kelvin;
             }
+            _logger.LogInformation("About to throw from could not convert");
+
             throw new InvalidOperationException("Could not convert. Unknown units");
         }
 

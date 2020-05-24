@@ -13,7 +13,7 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="OwningClubId" />
+            <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ParentSystemId">Parent Scoring System</label>
@@ -59,15 +59,15 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th></th>
-                    <th></th>
-                    <th>Formula</th>
-                    <th>Can be Discarded?</th>
-                    <th>Came To Start?</th>
-                    <th>Started?</th>
-                    <th>Finished?</th>
-                    <th>Keep Result?</th>
-                    <th>Adjust other scores?</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col">Formula</th>
+                    <th scope="col">Can be Discarded?</th>
+                    <th scope="col">Came To Start?</th>
+                    <th scope="col">Started?</th>
+                    <th scope="col">Finished?</th>
+                    <th scope="col">Keep Result?</th>
+                    <th scope="col">Adjust other scores?</th>
                 </tr>
             </thead>
             <tbody>

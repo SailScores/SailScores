@@ -67,7 +67,7 @@
                 @if (Model.UpdatedDate.HasValue)
                 {
                     <div class="col-md-6">
-                        <i>@localizer["Updated"] @(Model.UpdatedDate.Value.ToString("f")) UTC</i>
+                        <span class="font-italic">@localizer["Updated"] @(Model.UpdatedDate.Value.ToString("f")) UTC</span>
                     </div>
                 }
                 <div class="col-md-6">

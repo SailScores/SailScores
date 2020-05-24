@@ -13,6 +13,12 @@ function checkEnter(e) {
 export function initialize() {
     document.querySelector('form').onkeypress = checkEnter;
     $('#fleetId').change(loadFleet);
+    if ($('#needsLocalDate').val() === "true") {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        $('#date').val(now.toISOString().substring(0, 10));
+        $('#needsLocalDate').val('false');
+    }
     $('#date').change(loadSeriesOptions);
     $('#raceState').change(raceStateChanged);
     $('#results').on('click', '.select-code', calculatePlaces);
@@ -24,11 +30,8 @@ export function initialize() {
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
-        e.preventDefault();
-        var form = this;
+        var form = document.getElementById("raceform");
         addScoresFieldsToForm(form);
-        form.submit();
-        removeScoresFieldsFromForm(form);
     });
     loadFleet();
     loadSeriesOptions();
@@ -179,6 +182,8 @@ function addNewCompetitor(competitor) {
     updateButtonFooter();
 }
 function addScoresFieldsToForm(form) {
+    //clear out old fields first:
+    removeScoresFieldsFromForm(form);
     var resultList = document.getElementById("results");
     var resultItems = resultList.getElementsByTagName("li");
     for (var i = 1; i < resultItems.length; i++) {
@@ -208,7 +213,7 @@ function addScoresFieldsToForm(form) {
     }
 }
 function removeScoresFieldsFromForm(form) {
-    form.find("[name^=Scores]").remove();
+    $(form).find("[name^=Scores]").remove();
 }
 export function calculatePlaces() {
     var resultList = document.getElementById("results");

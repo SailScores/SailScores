@@ -15,16 +15,13 @@ namespace SailScores.Web.Controllers
     {
         private readonly IClubRequestService _clubRequestService;
         private readonly Services.IAuthorizationService _authService;
-        private readonly IMapper _mapper;
 
         public ClubRequestController(
             IClubRequestService clubRequestService,
-            Services.IAuthorizationService authService,
-            IMapper mapper)
+            Services.IAuthorizationService authService)
         {
             _clubRequestService = clubRequestService;
             _authService = authService;
-            _mapper = mapper;
         }
         
         public async Task<ActionResult> Index()

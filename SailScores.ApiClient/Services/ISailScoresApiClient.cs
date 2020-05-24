@@ -10,7 +10,7 @@ namespace SailScores.Api.Services
         Task<List<ClubDto>> GetClubsAsync();
         Task<List<BoatClassDto>> GetBoatClassesAsync(Guid clubId);
         Task<List<FleetDto>> GetFleetsAsync(Guid clubId);
-        Task<List<SeasonDto>> GetSeasonsAsync(Guid id);
+        Task<List<SeasonDto>> GetSeasonsAsync(Guid clubId);
         Task<List<CompetitorDto>> GetCompetitors(Guid clubId, Guid? fleetId);
 
         Task<Guid> SaveClub(ClubDto club);
@@ -18,7 +18,7 @@ namespace SailScores.Api.Services
         Task<Guid> SaveFleet(FleetDto fleet);
         Task<Guid> SaveSeries(SeriesDto series);
         Task<Guid> SaveSeason(SeasonDto season);
-        Task<Guid> SaveCompetitor(CompetitorDto comp);
+        Task<Guid> SaveCompetitor(CompetitorDto competitor);
         Task<Guid> SaveRace(RaceDto race);
     }
 }

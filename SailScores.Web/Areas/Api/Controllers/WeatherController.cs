@@ -23,17 +23,11 @@ namespace SailScores.Web.Areas.Api.Controllers
             JwtBearerDefaults.AuthenticationScheme;
 
         private readonly Services.IWeatherService _service;
-        private readonly Services.IAuthorizationService _authService;
-        private readonly IMapper _mapper;
 
         public WeatherController(
-            Services.IWeatherService service,
-            Services.IAuthorizationService authService,
-            IMapper mapper)
+            Services.IWeatherService service)
         {
             _service = service;
-            _authService = authService;
-            _mapper = mapper;
         }
 
         [HttpGet]

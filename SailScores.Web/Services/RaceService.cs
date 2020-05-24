@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
@@ -17,8 +18,10 @@ namespace SailScores.Web.Services
         private readonly Core.Services.ISeriesService _coreSeriesService;
         private readonly IScoringService _coreScoringService;
         private readonly Core.Services.IRegattaService _coreRegattaService;
+        private readonly ISeasonService _coreSeasonService;
         private readonly IWeatherService _weatherService;
         private readonly IMapper _mapper;
+        private readonly ILogger<RaceService> _logger;
 
         public RaceService(
             Core.Services.IClubService clubService,
@@ -26,16 +29,21 @@ namespace SailScores.Web.Services
             Core.Services.ISeriesService coreSeriesService,
             Core.Services.IScoringService coreScoringService,
             Core.Services.IRegattaService coreRegattaService,
+            Core.Services.ISeasonService coreSeasonService,
+
             IWeatherService weatherService,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<RaceService> logger)
         {
             _coreClubService = clubService;
             _coreRaceService = coreRaceService;
             _coreSeriesService = coreSeriesService;
             _coreScoringService = coreScoringService;
             _coreRegattaService = coreRegattaService;
+            _coreSeasonService = coreSeasonService;
             _weatherService = weatherService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task Delete(Guid id)
@@ -43,27 +51,40 @@ namespace SailScores.Web.Services
             await _coreRaceService.Delete(id);
         }
 
-        public async Task<IEnumerable<RaceSummaryViewModel>> GetAllRaceSummariesAsync(
+        public async Task<RaceSummaryListViewModel> GetAllRaceSummariesAsync(
             string clubInitials,
+            string seasonName,
             bool includeScheduled,
             bool includeAbandoned)
         {
-            var club = (await _coreClubService.GetClubs(true)).First(c => c.Initials == clubInitials);
-            var races = (await _coreRaceService.GetFullRacesAsync(club.Id, includeScheduled, includeAbandoned))
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
+            var seasons = await _coreSeasonService.GetSeasons(club.Id);
+            var races = (await _coreRaceService.GetFullRacesAsync(
+                    club.Id,
+                    seasonName,
+                    includeScheduled,
+                    includeAbandoned))
                 .OrderByDescending(r => r.Date)
                 .ThenBy(r => r.Fleet?.Name)
                 .ThenBy(r => r.Order);
 
+            // need to get score codes so viewmodel can determine starting boat count.
             var scoreCodes = await _coreScoringService.GetScoreCodesAsync(club.Id);
-            var vm = _mapper.Map<List<RaceSummaryViewModel>>(races);
-            foreach(var race in vm)
+            var racesVm = _mapper.Map<List<RaceSummaryViewModel>>(races);
+            foreach (var race in racesVm)
             {
-                foreach(var score in race.Scores)
+                foreach (var score in race.Scores)
                 {
                     score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
                 }
             }
-            return vm;
+
+            return new RaceSummaryListViewModel
+            {
+                Races = racesVm,
+                Seasons = seasons,
+                CurrentSeason = seasons.FirstOrDefault(s => s.Name == seasonName)
+            };
         }
 
         private static ScoreCode GetScoreCode(string code, IEnumerable<ScoreCode> scoreCodes)
@@ -117,7 +138,8 @@ namespace SailScores.Web.Services
                 Date = DateTime.Today,
                 Weather = (await GetCurrentWeatherAsync(clubId)),
                 WeatherIconOptions = GetWeatherIconOptions(),
-                ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(clubId)
+                ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(clubId),
+                NeedsLocalDate = true
             };
             return model;
         }
@@ -131,7 +153,7 @@ namespace SailScores.Web.Services
             {
                 return model;
             }
-            //var club = await _coreClubService.GetFullClub(clubInitials);
+
             var regatta = await _coreRegattaService.GetRegattaAsync(regattaId.Value);
             
             model.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
@@ -173,8 +195,6 @@ namespace SailScores.Web.Services
             Guid seriesId)
         {
             var model = await CreateClubRaceAsync(clubInitials);
-
-            //var club = await _coreClubService.GetFullClub(clubInitials);
             var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
             
             model.SeriesIds = new List<Guid>
@@ -244,7 +264,7 @@ namespace SailScores.Web.Services
             if (race.SeriesIds != null) {
                 race.Series = series.Where(s => race.SeriesIds.Contains(s.Id)).ToList();
             }
-            if(race.FleetId != default(Guid))
+            if(race.FleetId != default)
             {
                 race.Fleet = fleets.Single(f => f.Id == race.FleetId);
                 // if a regatta race, give everyone in the fleet a result
@@ -272,15 +292,12 @@ namespace SailScores.Web.Services
                 }
                 else
                 {
-                    var races = await _coreRaceService.GetRacesAsync(race.ClubId);
-                    var maxOrder = races
-                        .Where(r =>
-                            r.Date == race.Date
-                            && r.Fleet != null
-                            && r.Fleet.Id == race.FleetId)
-                        .DefaultIfEmpty()
-                        .Max(r => r?.Order ?? 0);
-                    race.Order = maxOrder + 1;
+                    int existingRaceCount = await _coreRaceService.GetRaceCountAsync(
+                        race.ClubId,
+                        race.Date,
+                        race.FleetId);
+
+                    race.Order = existingRaceCount + 1;
                 }
             }
             var raceDto = _mapper.Map<RaceDto>(race);
@@ -300,9 +317,14 @@ namespace SailScores.Web.Services
                     race.Weather.TemperatureUnits = weatherSettings?.TemperatureUnits;
                 }
             }
+            _logger.LogInformation("About to standardize weather for race create");
             var weather = _weatherService.GetStandardWeather(race.Weather);
+
+            _logger.LogInformation("About to automapper weather for race create");
             raceDto.Weather = _mapper.Map<WeatherDto>(weather);
-            
+
+
+            _logger.LogInformation("About to save race for race create");
             var raceId = await _coreRaceService.SaveAsync(raceDto);
 
 
@@ -312,6 +334,12 @@ namespace SailScores.Web.Services
                 await _coreRegattaService.AddRaceToRegattaAsync(
                     _mapper.Map<Race>(race), race.RegattaId.Value);
             }
+        }
+
+        public async Task<Season> GetCurrentSeasonAsync(string clubInitials)
+        {
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            return await _coreRaceService.GetMostRecentRaceSeasonAsync(clubId);
         }
     }
 }
