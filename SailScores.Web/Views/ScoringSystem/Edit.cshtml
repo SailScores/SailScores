@@ -56,7 +56,7 @@
         <a asp-action="Create" asp-controller="ScoreCode"           
             asp-route-scoringsystemid="@Model.Id"
             asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Create</a>
-        <table class="table">
+        <table class="table" summary="Score Codes in system">
             <thead>
                 <tr>
                     <th scope="col"></th>
