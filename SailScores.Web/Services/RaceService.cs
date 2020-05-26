@@ -129,7 +129,7 @@ namespace SailScores.Web.Services
             var model = new RaceWithOptionsViewModel
             {
                 ClubId = clubId,
-                FleetOptions = await _coreClubService.GetAllFleets(clubId),
+                FleetOptions = await _coreClubService.GetActiveFleets(clubId),
                 SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(clubId, DateTime.Today, false),
                 ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(clubId))
                     .OrderBy(s => s.Name).ToList(),
@@ -221,13 +221,25 @@ namespace SailScores.Web.Services
 
         public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions)
         {
-            var club = await _coreClubService.GetFullClub(raceWithOptions.ClubId);
-            raceWithOptions.FleetOptions = club.Fleets;
-            raceWithOptions.SeriesOptions = club.Series;
-            raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
+            if (raceWithOptions.RegattaId.HasValue)
+            {
+                raceWithOptions.FleetOptions = await _coreClubService.GetAllFleets(raceWithOptions.ClubId);
+            } else
+            {
+                raceWithOptions.FleetOptions = await _coreClubService.GetActiveFleets(raceWithOptions.ClubId);
+            }
+            raceWithOptions.FleetOptions = raceWithOptions.FleetOptions.OrderBy(f => f.ShortName).ToList();
+
+            raceWithOptions.SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(
+                raceWithOptions.ClubId,
+                raceWithOptions.Date.HasValue ? raceWithOptions.Date.Value : DateTime.Today,
+                true);
+            
+            raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(raceWithOptions.ClubId))
                 .OrderBy(s => s.Name).ToList();
-            raceWithOptions.CompetitorOptions = club.Competitors;
-            raceWithOptions.CompetitorBoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
+            // CompetitorOptions should be set by the JS on the page at edit time.
+            raceWithOptions.CompetitorBoatClassOptions =
+                (await _coreClubService.GetAllBoatClasses(raceWithOptions.ClubId)).OrderBy(c => c.Name);
             raceWithOptions.WeatherIconOptions = _weatherService.GetWeatherIconOptions();
         }
 
@@ -251,8 +263,16 @@ namespace SailScores.Web.Services
                 score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
             }
             retRace.Weather = await _weatherService.ConvertToLocalizedWeather(coreRace.Weather, coreRace.ClubId );
+            retRace.Regatta = await GetRegatta(retRace);
 
             return retRace;
+        }
+
+        private async Task<RegattaViewModel> GetRegatta(RaceViewModel retRace)
+        {
+            var regatta = await _coreRegattaService.GetRegattaForRace(retRace.Id);
+
+            return _mapper.Map<RegattaViewModel>(regatta);
         }
 
         public async Task SaveAsync(RaceWithOptionsViewModel race)

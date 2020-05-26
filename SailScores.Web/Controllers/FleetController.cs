@@ -120,16 +120,18 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
             try {
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id))
+                if (!await _authService.CanUserEdit(User, clubInitials))
                 {
                     return Unauthorized();
                 }
                 var fleet =
                     await _fleetService.GetFleet(id);
+                var vmOptions = await _fleetService.GetBlankFleetWithOptionsAsync(
+                    clubInitials,
+                    null);
                 var vm = _mapper.Map<FleetWithOptionsViewModel>(fleet);
-                vm.BoatClassOptions = club.BoatClasses;
-                vm.CompetitorOptions = club.Competitors;
+                vm.BoatClassOptions = vmOptions.BoatClassOptions;
+                vm.CompetitorOptions = vmOptions.CompetitorOptions;
                 return View(vm);
             }
             catch
@@ -145,9 +147,7 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.Fleets.Any(c => c.Id == model.Id))
+                if (!await _authService.CanUserEdit(User, clubInitials))
                 {
                     return Unauthorized();
                 }
@@ -175,14 +175,12 @@ namespace SailScores.Web.Controllers
         [Authorize]
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.Fleets.Any(c => c.Id == id))
+            if (!await _authService.CanUserEdit(User, clubInitials))
             {
                 return Unauthorized();
             }
-            var boatClass = club.Fleets.Single(c => c.Id == id);
-            return View(boatClass);
+            var fleet = await _fleetService.GetFleet(id);
+            return View(fleet);
         }
         
         [Authorize]
@@ -191,9 +189,7 @@ namespace SailScores.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.Fleets.Any(c => c.Id == id))
+            if (!await _authService.CanUserEdit(User, clubInitials))
             {
                 return Unauthorized();
             }
@@ -205,7 +201,8 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                var fleet = await _fleetService.GetFleet(id);
+                return View(fleet);
             }
         }
     }

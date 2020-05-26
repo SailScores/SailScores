@@ -17,7 +17,7 @@ namespace SailScores.Core.Services
     {
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
-        
+
         //used for copying club
         private Dictionary<Guid, Guid> guidMapper;
 
@@ -43,7 +43,7 @@ namespace SailScores.Core.Services
             var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
 
             // ignored in mapper to avoid loops.
-            foreach(var fleet in dbFleets)
+            foreach (var fleet in dbFleets)
             {
                 var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
                 bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
@@ -54,6 +54,33 @@ namespace SailScores.Core.Services
                     = _mapper.Map<IList<Competitor>>(competitors);
             }
 
+            return bizObj;
+        }
+
+        public async Task<IList<Fleet>> GetActiveFleets(Guid clubId)
+        {
+            var dbFleets = await _dbContext
+                .Fleets
+                .Include(f => f.FleetBoatClasses)
+                    .ThenInclude(fbc => fbc.BoatClass)
+                .Include(f => f.CompetitorFleets)
+                    .ThenInclude(cf => cf.Competitor)
+                .Where(f => f.ClubId == clubId && (f.IsActive ?? true))
+                .ToListAsync();
+
+            var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
+
+            // ignored in mapper to avoid loops.
+            foreach (var fleet in dbFleets)
+            {
+                var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
+                bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
+                    = _mapper.Map<IList<BoatClass>>(boatClasses);
+
+                var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
+                bizObj.First(bo => bo.Id == fleet.Id).Competitors
+                    = _mapper.Map<IList<Competitor>>(competitors);
+            }
             return bizObj;
         }
 
@@ -403,6 +430,5 @@ namespace SailScores.Core.Services
         {
             return await _dbContext.Competitors.AnyAsync(c => c.ClubId == clubId);
         }
-
     }
 }

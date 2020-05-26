@@ -10,7 +10,7 @@
 <h4>Fleet</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-lg-4 col-md-8">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
@@ -31,6 +31,12 @@
                 <small>Does not need to be unique, used for display only, e.g. MC Scows</small>
                 <input asp-for="NickName" class="form-control" />
                 <span asp-validation-for="NickName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="IsActive" />
+                    <label class="form-check-label"> Is an Active Fleet</label>
+                </div>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
