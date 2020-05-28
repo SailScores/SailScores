@@ -11,6 +11,10 @@ namespace SailScores.Core.Services
         Task<IList<Model.Club>> GetClubs(bool includeHidden);
         Task<Club> GetFullClub(string id);
         Task<Club> GetFullClub(Guid id);
+        Task<Club> GetFullClubExceptScores(Guid id);
+        Task<Club> GetFullClubExceptScores(string clubInitials);
+        Task<Club> GetMinimalClub(Guid id);
+        Task<Club> GetMinimalClub(string clubInitials);
         Task<Guid> SaveNewClub(Club club);
         Task SaveNewFleet(Fleet fleet);
         Task SaveNewSeason(Season season);
@@ -18,12 +22,11 @@ namespace SailScores.Core.Services
         Task<IList<Fleet>> GetActiveFleets(Guid clubId);
 
         Task UpdateClub(Club club);
-        Task<Club> GetMinimalClub(Guid id);
-        Task<Club> GetMinimalClub(string clubInitials);
         Task<Guid> GetClubId(string initials);
         Task<Guid> CopyClubAsync(Guid copyFromClubId, Club targetClub);
         Task<IEnumerable<BoatClass>> GetAllBoatClasses(Guid clubId);
         Task<bool> DoesClubHaveCompetitors(Guid clubId);
         Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId);
+
     }
 }

@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
-using CoreServices = SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
@@ -15,26 +15,20 @@ namespace SailScores.Web.Controllers
     public class AdminController : Controller
     {
 
-        private readonly CoreServices.IClubService _clubService;
-        private readonly CoreServices.IScoringService _scoringService;
+        private readonly IAdminService _adminService;
         private readonly Services.IAuthorizationService _authService;
-        private readonly Services.IAdminTipService _tipService;
-        private readonly Services.IWeatherService _weatherService;
+        private readonly IAdminTipService _tipService;
         private readonly IMapper _mapper;
 
         public AdminController(
-            CoreServices.IClubService clubService,
-            CoreServices.IScoringService scoringService,
+            IAdminService adminService,
             Services.IAuthorizationService authService,
-            Services.IAdminTipService tipService,
-            Services.IWeatherService weatherService,
+            IAdminTipService tipService,
             IMapper mapper)
         {
-            _clubService = clubService;
-            _scoringService = scoringService;
+            _adminService = adminService;
             _authService = authService;
             _tipService = tipService;
-            _weatherService = weatherService;
             _mapper = mapper;
         }
 
@@ -46,10 +40,7 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            var club = await _clubService.GetFullClub(clubInitials);
-
-            var vm = _mapper.Map<AdminViewModel>(club);
-            vm.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
+            var vm = await _adminService.GetClub(clubInitials);
 
             _tipService.AddTips(ref vm);
             return View(vm);
@@ -64,14 +55,7 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-
-            var club = await _clubService.GetFullClub(clubInitials);
-
-            var vm = _mapper.Map<AdminViewModel>(club);
-            vm.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-            vm.SpeedUnitOptions = _weatherService.GetSpeedUnitOptions();
-            vm.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
-
+            var vm = _adminService.GetClubForEdit(clubInitials);
             return View(vm);
         }
 
@@ -91,14 +75,15 @@ namespace SailScores.Web.Controllers
                 }
                 if (!ModelState.IsValid)
                 {
-                    var club = await _clubService.GetFullClub(clubInitials);
+                    var club = await _adminService.GetClubForEdit(clubInitials);
                     clubAdmin.Seasons = club.Seasons;
                     clubAdmin.Races = club.Races;
-                    clubAdmin.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(clubAdmin.Id, true);
-                    clubAdmin.SpeedUnitOptions = _weatherService.GetSpeedUnitOptions();
-                    clubAdmin.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
+                    clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
+                    clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
+                    clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
                     return View(clubAdmin);
                 }
+
                 var clubObject = _mapper.Map<Club>(clubAdmin);
                 clubObject.DefaultScoringSystemId =
                     clubAdmin.DefaultScoringSystemId;
@@ -110,16 +95,18 @@ namespace SailScores.Web.Controllers
                     WindSpeedUnits = clubAdmin.SpeedUnits
                 };
 
-                await _clubService.UpdateClub(clubObject);
+                await _adminService.UpdateClub(clubObject);
 
-                return RedirectToAction(nameof(Index), "Admin", new { clubInitials = clubInitials });
+                return RedirectToAction(nameof(Index), "Admin", new { clubInitials });
             }
             catch
             {
-                var club = await _clubService.GetFullClub(clubInitials);
+                var club = await _adminService.GetClubForEdit(clubInitials);
                 clubAdmin.Seasons = club.Seasons;
                 clubAdmin.Races = club.Races;
-                clubAdmin.ScoringSystemOptions = await _scoringService.GetScoringSystemsAsync(clubAdmin.Id, true);
+                clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
+                clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
+                clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
                 return View(clubAdmin);
             }
         }
