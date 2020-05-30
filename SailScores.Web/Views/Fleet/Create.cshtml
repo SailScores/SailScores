@@ -10,9 +10,9 @@
 <h4>Fleet@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-lg-4 col-md-8">
         <form asp-action="Create"
-          asp-route-returnurl="@ViewData["ReturnUrl"]" >
+              asp-route-returnurl="@ViewData["ReturnUrl"]">
             <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -37,6 +37,12 @@
                 <span asp-validation-for="NickName" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="IsActive" />
+                    <label class="form-check-label"> Is an Active Fleet</label>
+                </div>
+            </div>
+            <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
@@ -52,7 +58,7 @@
             </div>
             <div id="classSelectGroup" class="form-group">
                 <label asp-for="BoatClassIds" class="control-label">Class</label>
-                <select multiple asp-for="BoatClassIds" class="form-control">
+                <select multiple asp-for="BoatClassIds" class="form-control selectpicker">
                     @foreach (var boatclass in Model.BoatClassOptions)
                     {
                         <option value="@boatclass.Id">
@@ -66,8 +72,8 @@
                 <label asp-for="CompetitorIds" class="control-label">Competitors</label>
                 <select multiple asp-for="CompetitorIds" class="form-control custom-select selectpicker">
                     @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber)
-                   .ThenBy(c => c.AlternativeSailNumber)
-                   .ThenBy(c => c.Name))
+                .ThenBy(c => c.AlternativeSailNumber)
+                .ThenBy(c => c.Name))
                     {
                         <option value="@competitor.Id">
                             @competitor.SailNumber - @competitor.Name (@competitor.BoatClass.Name)

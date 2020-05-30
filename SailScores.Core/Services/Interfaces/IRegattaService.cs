@@ -22,5 +22,6 @@ namespace SailScores.Core.Services
         Task AddRaceToRegattaAsync(Race race, Guid regattaId);
         Task DeleteAsync(Guid regattaId);
         Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId);
+        Task<Regatta> GetRegattaForRace(Guid raceId);
     }
 }

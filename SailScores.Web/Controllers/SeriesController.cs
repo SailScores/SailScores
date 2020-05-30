@@ -228,13 +228,12 @@ namespace SailScores.Web.Controllers
         [Authorize]
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.Series.Any(c => c.Id == id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
-            var series = club.Series.SingleOrDefault(c => c.Id == id);
+            var series = await _seriesService.GetSeriesAsync(id);
             if (series == null)
             {
                 return NotFound();
@@ -248,9 +247,8 @@ namespace SailScores.Web.Controllers
         [Authorize]
         public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.Series.Any(c => c.Id == id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
@@ -262,7 +260,8 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                var series = await _seriesService.GetSeriesAsync(id);
+                return View(series);
             }
         }
     }

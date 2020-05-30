@@ -115,7 +115,8 @@ namespace SailScores.Web.Services
                     IsHidden = test,
                     Url = request.ClubWebsite,
                     DefaultScoringSystem = newScoringSystem,
-                    Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_"+request.ClubLocation+"_")
+                    Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_"+request.ClubLocation+"_"),
+                    ScoringSystems = new List<ScoringSystem> { newScoringSystem }
                 };
 
                 newClubId = await _coreClubService.SaveNewClub(club);

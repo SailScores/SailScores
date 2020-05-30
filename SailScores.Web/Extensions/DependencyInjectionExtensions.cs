@@ -20,6 +20,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IMergeService, MergeService>();
             services.AddScoped<IClubRequestService, ClubRequestService>();
             services.AddScoped<IWeatherService, WeatherService>();
+            services.AddScoped<IAdminService, AdminService>();
 
             services.AddSingleton<AppVersionInfo>();
             services.AddSingleton<AppSettingsService>();

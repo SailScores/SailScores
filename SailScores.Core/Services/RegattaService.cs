@@ -280,5 +280,16 @@ namespace SailScores.Core.Services
             }
         }
 
+        public async Task<Regatta> GetRegattaForRace(Guid raceId)
+        {
+            var seriesIds = _dbContext.Series
+                .Where(s => s.RaceSeries.Any(rs => rs.RaceId == raceId))
+                .Select(s => s.Id);
+
+            var r = await _dbContext.Regattas
+                .Where(r => r.RegattaSeries.Any(rs => seriesIds.Contains(rs.SeriesId)))
+                .FirstOrDefaultAsync();
+            return _mapper.Map<Regatta>(r);
+        }
     }
 }

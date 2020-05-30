@@ -59,7 +59,7 @@ namespace SailScores.Web.Controllers
             }
         }
 
-        public async Task< ActionResult> Edit(string clubInitials, Guid id)
+        public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
             var club = await _clubService.GetFullClub(clubInitials);
             if (!await _authService.CanUserEdit(User, club.Id))
