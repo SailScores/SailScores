@@ -267,15 +267,36 @@ namespace SailScores.Core.Services
                     " A club with those initials already exists.");
             }
             club.Id = Guid.NewGuid();
-            if((club.ScoringSystems?.Count ?? 0) > 0)
+
+
+            var defaultSystem = club.DefaultScoringSystem;
+            if(defaultSystem.Id == default)
             {
-                foreach(var system in club.ScoringSystems)
+                defaultSystem.Id = Guid.NewGuid();
+            }
+            if (defaultSystem != null)
+            {
+                if(club.ScoringSystems == null)
+                {
+                    club.ScoringSystems = new List<ScoringSystem>();
+                }
+                if(!club.ScoringSystems.Any(ss => ss == defaultSystem))
+                {
+                    club.ScoringSystems.Add(defaultSystem);
+                }
+            }
+            if ((club.ScoringSystems?.Count ?? 0) > 0)
+            {
+                foreach (var system in club.ScoringSystems)
                 {
                     system.ClubId = club.Id;
                 }
             }
+
             var dbClub = _mapper.Map<Db.Club>(club);
             _dbContext.Clubs.Add(dbClub);
+            dbClub.DefaultScoringSystem = null;
+            dbClub.DefaultScoringSystemId = null;
             var dbFleet = new Db.Fleet
             {
                 Id = Guid.NewGuid(),
@@ -286,6 +307,8 @@ namespace SailScores.Core.Services
                 Name = "All Boats in Club"
             };
             _dbContext.Fleets.Add(dbFleet);
+            await _dbContext.SaveChangesAsync();
+            dbClub.DefaultScoringSystemId = defaultSystem.Id;
             await _dbContext.SaveChangesAsync();
             return club.Id;
         }
