@@ -55,7 +55,7 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            var vm = _adminService.GetClubForEdit(clubInitials);
+            var vm = await _adminService.GetClubForEdit(clubInitials);
             return View(vm);
         }
 
