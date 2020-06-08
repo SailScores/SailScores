@@ -93,8 +93,11 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.SeriesIds, o => o.MapFrom(s => s.Series.Select(sr => sr.Id)))
                 .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore())
                 .ForMember(d => d.NeedsLocalDate, o => o.Ignore())
-                .ForMember(d => d.ClubInitials, o => o.Ignore());
+                .ForMember(d => d.ClubInitials, o => o.Ignore())
+                .ReverseMap();
 
+            CreateMap<RaceWithOptionsViewModel, Model.Race>()
+                .ForMember(d => d.Weather, o => o.Ignore());
 
             CreateMap<Model.ScoringSystem, ScoringSystemWithOptionsViewModel>()
                 .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())
@@ -117,6 +120,12 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Regatta, RegattaSummaryViewModel>()
                 .ForMember(d => d.ClubInitials, o => o.Ignore())
                 .ForMember(d => d.ClubName, o => o.Ignore());
+            CreateMap<RegattaViewModel, RegattaSummaryViewModel>()
+                .ForMember(d => d.ClubInitials, o => o.Ignore())
+                .ForMember(d => d.ClubName, o => o.Ignore())
+                .ReverseMap()
+                .ForMember(d => d.Fleets, o => o.Ignore());
+
 
             CreateMap<RaceViewModel, RaceDto>()
                 .ForMember(d => d.ScoreIds, o => o.MapFrom(r => r.Scores.Select(s => s.Id)))
