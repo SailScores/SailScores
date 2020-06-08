@@ -224,6 +224,8 @@ namespace SailScores.Core.Services
         {
             var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == race.Fleet.Id);
             var dbRegatta = await _dbContext.Regattas
+                .Include(r => r.Season)
+                .Include(r => r.RegattaSeries)
                 .SingleAsync(c => c.Id == regattaId);
 
             var series = await _dbContext.Regattas.SelectMany(r => r.RegattaSeries.Select(rs => rs.Series))
@@ -280,5 +282,16 @@ namespace SailScores.Core.Services
             }
         }
 
+        public async Task<Regatta> GetRegattaForRace(Guid raceId)
+        {
+            var seriesIds = _dbContext.Series
+                .Where(s => s.RaceSeries.Any(rs => rs.RaceId == raceId))
+                .Select(s => s.Id);
+
+            var r = await _dbContext.Regattas
+                .Where(r => r.RegattaSeries.Any(rs => seriesIds.Contains(rs.SeriesId)))
+                .FirstOrDefaultAsync();
+            return _mapper.Map<Regatta>(r);
+        }
     }
 }

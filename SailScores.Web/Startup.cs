@@ -268,6 +268,7 @@ namespace SailScores.Web
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapRazorPages();
                 endpoints.MapControllers();
                 endpoints.MapAreaControllerRoute(
                     "areas",

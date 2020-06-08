@@ -109,6 +109,7 @@ namespace SailScores.Core.Services
             existingFleet.NickName = fleet.NickName;
             existingFleet.Description = fleet.Description;
             existingFleet.FleetType = fleet.FleetType;
+            existingFleet.IsActive = fleet.IsActive;
 
             CleanUpClasses(fleet, existingFleet);
             CleanUpCompetitors(fleet, existingFleet);
@@ -179,11 +180,28 @@ namespace SailScores.Core.Services
 
         public async Task<Fleet> Get(Guid fleetId)
         {
-            var dbClass = await _dbContext.Fleets
+            var dbFleet = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
+                .ThenInclude(fbc => fbc.BoatClass)
                 .SingleAsync(c => c.Id == fleetId);
-            return _mapper.Map<Fleet>(dbClass);
+            return _mapper.Map<Fleet>(dbFleet);
 
+        }
+
+        public async Task<IEnumerable<Fleet>> GetAllFleetsForClub(Guid clubId)
+        {
+            var dbFleets = _dbContext.Fleets
+                .Include(f => f.FleetBoatClasses)
+                .Where(c => c.ClubId == clubId);
+            return _mapper.Map<IEnumerable<Fleet>>(dbFleets);
+        }
+
+        public async Task<IEnumerable<Series>> GetSeriesForFleet(Guid fleetId)
+        {
+            var dbSeries = _dbContext.Series
+                .Where(
+                s => s.RaceSeries.Any(rs => rs.Race.Fleet.Id == fleetId));
+            return _mapper.Map<IEnumerable<Series>>(dbSeries);
         }
     }
 }

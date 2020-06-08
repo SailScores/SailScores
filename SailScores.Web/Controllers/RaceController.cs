@@ -246,10 +246,9 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                // todo: remove this call to GetFullClub (which is really slow.)
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.Races.Any(c => c.Id == id))
+                var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
+                if (!await _authService.CanUserEdit(User, clubInitials)
+                    || race == null)
                 {
                     return Unauthorized();
                 }

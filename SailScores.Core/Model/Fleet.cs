@@ -25,12 +25,13 @@ namespace SailScores.Core.Model
 
         // Short Alias Name, does not need to be unique: used for display in regattas
         // Example: MC Scows
-        [Required]
         [StringLength(30)]
         public String NickName { get; set; }
 
         [StringLength(2000)]
         public String Description { get; set; }
+
+        public bool IsActive { get; set; }
 
         [Required]
         public FleetType FleetType { get; set; }

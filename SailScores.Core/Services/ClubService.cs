@@ -17,7 +17,7 @@ namespace SailScores.Core.Services
     {
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
-        
+
         //used for copying club
         private Dictionary<Guid, Guid> guidMapper;
 
@@ -43,7 +43,7 @@ namespace SailScores.Core.Services
             var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
 
             // ignored in mapper to avoid loops.
-            foreach(var fleet in dbFleets)
+            foreach (var fleet in dbFleets)
             {
                 var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
                 bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
@@ -54,6 +54,33 @@ namespace SailScores.Core.Services
                     = _mapper.Map<IList<Competitor>>(competitors);
             }
 
+            return bizObj;
+        }
+
+        public async Task<IList<Fleet>> GetActiveFleets(Guid clubId)
+        {
+            var dbFleets = await _dbContext
+                .Fleets
+                .Include(f => f.FleetBoatClasses)
+                    .ThenInclude(fbc => fbc.BoatClass)
+                .Include(f => f.CompetitorFleets)
+                    .ThenInclude(cf => cf.Competitor)
+                .Where(f => f.ClubId == clubId && (f.IsActive ?? true))
+                .ToListAsync();
+
+            var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
+
+            // ignored in mapper to avoid loops.
+            foreach (var fleet in dbFleets)
+            {
+                var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
+                bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
+                    = _mapper.Map<IList<BoatClass>>(boatClasses);
+
+                var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
+                bizObj.First(bo => bo.Id == fleet.Id).Competitors
+                    = _mapper.Map<IList<Competitor>>(competitors);
+            }
             return bizObj;
         }
 
@@ -110,6 +137,58 @@ namespace SailScores.Core.Services
 
             return await GetFullClub(guid);
         }
+
+
+        public async Task<Model.Club> GetFullClubExceptScores(string id)
+        {
+            var guid = await GetClubId(id);
+
+            return await GetFullClubExceptScores(guid);
+        }
+
+
+        public async Task<Model.Club> GetFullClubExceptScores(Guid id)
+        {
+            IQueryable<Db.Club> clubQuery =
+                            _dbContext.Clubs.Where(c => c.Id == id)
+                            .Include(c => c.Seasons);
+            var club = await clubQuery.FirstAsync();
+
+            await clubQuery
+                .Include(c => c.Races)
+                    .ThenInclude(r => r.Fleet)
+                    .LoadAsync();
+            await clubQuery
+                .Include(c => c.Seasons)
+                .Include(c => c.Series)
+                    .ThenInclude(s => s.RaceSeries).LoadAsync();
+            await clubQuery
+                .Include(c => c.Competitors)
+                .Include(c => c.BoatClasses)
+                .LoadAsync();
+            await clubQuery.Include(c => c.DefaultScoringSystem)
+                .Include(c => c.ScoringSystems)
+                .Include(c => c.Fleets)
+                    .ThenInclude(f => f.CompetitorFleets)
+                .Include(c => c.Fleets)
+                    .ThenInclude(f => f.FleetBoatClasses)
+                .Include(c => c.Regattas)
+                    .ThenInclude(r => r.RegattaSeries)
+                .Include(c => c.Regattas)
+                    .ThenInclude(r => r.RegattaFleet)
+                .Include(c => c.WeatherSettings)
+                .FirstOrDefaultAsync();
+
+            var retClub = _mapper.Map<Model.Club>(club);
+
+            retClub.Seasons = retClub.Seasons.OrderByDescending(s => s.Start).ToList();
+            retClub.Series = retClub.Series
+                .OrderByDescending(s => s.Season.Start)
+                .ThenBy(s => s.Name)
+                .ToList();
+            return retClub;
+        }
+
 
         public async Task<Model.Club> GetFullClub(Guid id)
         {
@@ -188,15 +267,36 @@ namespace SailScores.Core.Services
                     " A club with those initials already exists.");
             }
             club.Id = Guid.NewGuid();
-            if((club.ScoringSystems?.Count ?? 0) > 0)
+
+
+            var defaultSystem = club.DefaultScoringSystem;
+            if(defaultSystem.Id == default)
             {
-                foreach(var system in club.ScoringSystems)
+                defaultSystem.Id = Guid.NewGuid();
+            }
+            if (defaultSystem != null)
+            {
+                if(club.ScoringSystems == null)
+                {
+                    club.ScoringSystems = new List<ScoringSystem>();
+                }
+                if(!club.ScoringSystems.Any(ss => ss == defaultSystem))
+                {
+                    club.ScoringSystems.Add(defaultSystem);
+                }
+            }
+            if ((club.ScoringSystems?.Count ?? 0) > 0)
+            {
+                foreach (var system in club.ScoringSystems)
                 {
                     system.ClubId = club.Id;
                 }
             }
+
             var dbClub = _mapper.Map<Db.Club>(club);
             _dbContext.Clubs.Add(dbClub);
+            dbClub.DefaultScoringSystem = null;
+            dbClub.DefaultScoringSystemId = null;
             var dbFleet = new Db.Fleet
             {
                 Id = Guid.NewGuid(),
@@ -207,6 +307,8 @@ namespace SailScores.Core.Services
                 Name = "All Boats in Club"
             };
             _dbContext.Fleets.Add(dbFleet);
+            await _dbContext.SaveChangesAsync();
+            dbClub.DefaultScoringSystemId = defaultSystem.Id;
             await _dbContext.SaveChangesAsync();
             return club.Id;
         }
@@ -403,6 +505,5 @@ namespace SailScores.Core.Services
         {
             return await _dbContext.Competitors.AnyAsync(c => c.ClubId == clubId);
         }
-
     }
 }

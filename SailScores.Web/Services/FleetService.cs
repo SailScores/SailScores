@@ -14,34 +14,41 @@ namespace SailScores.Web.Services
     {
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IFleetService _coreFleetService;
+        private readonly Core.Services.ICompetitorService _coreCompetitorService;
         private readonly IRegattaService _regattaService;
         private readonly IMapper _mapper;
 
         public FleetService(
             Core.Services.IClubService clubService,
             Core.Services.IFleetService coreFleetService,
+            Core.Services.ICompetitorService coreCompetitorService,
             IRegattaService regattaService,
             IMapper mapper)
         {
             _coreClubService = clubService;
             _coreFleetService = coreFleetService;
+            _coreCompetitorService = coreCompetitorService;
             _regattaService = regattaService;
             _mapper = mapper;
         }
 
         public async Task<IList<FleetSummary>> GetAllFleetSummary(string clubInitials)
         {
-            var coreObject = await _coreClubService.GetFullClub(clubInitials);
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            var coreFleets = await _coreFleetService.GetAllFleetsForClub(clubId);
 
-            return _mapper.Map<IList<FleetSummary>>(coreObject.Fleets);
+            return _mapper.Map<IList<FleetSummary>>(coreFleets);
         }
 
         public async Task<FleetSummary> GetFleet(string clubInitials, string fleetShortName)
         {
-            var coreObject = await _coreClubService.GetFullClub(clubInitials);
-            var retFleet = _mapper.Map<FleetSummary>(coreObject.Fleets.First(f => f.ShortName == fleetShortName));
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            var allFleets = await _coreFleetService.GetAllFleetsForClub(clubId);
 
-            retFleet.Series = coreObject.Series.Where(s => s.Races.Any(r => r.Fleet.Id == retFleet.Id)).ToList();
+            var retFleet = _mapper.Map<FleetSummary>(allFleets.First(f => f.ShortName == fleetShortName));
+
+            var series = await _coreFleetService.GetSeriesForFleet(retFleet.Id);
+            retFleet.Series = series.ToList();
 
             return retFleet;
         }
@@ -59,19 +66,18 @@ namespace SailScores.Web.Services
         public async Task SaveNew(FleetWithOptionsViewModel fleet)
         {
             var coreModel = _mapper.Map<Fleet>(fleet);
-            var club = await _coreClubService.GetFullClub(fleet.ClubId);
             if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
                 && fleet.BoatClassIds != null)
             {
                 coreModel.BoatClasses =
-                    club.BoatClasses
+                    (await _coreClubService.GetAllBoatClasses(fleet.ClubId))
                     .Where(c => fleet.BoatClassIds.Contains(c.Id))
                     .ToList();
             } else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats
                   && fleet.CompetitorIds != null)
             {
                 coreModel.Competitors =
-                    club.Competitors
+                    (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null))
                     .Where(c => fleet.CompetitorIds.Contains(c.Id))
                     .ToList();
             }
@@ -85,12 +91,11 @@ namespace SailScores.Web.Services
         public async Task Update(FleetWithOptionsViewModel fleet)
         {
             var coreModel = _mapper.Map<Fleet>(fleet);
-            var club = await _coreClubService.GetFullClub(fleet.ClubId);
             if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
                 && fleet.BoatClassIds != null)
             {
                 coreModel.BoatClasses =
-                    club.BoatClasses
+                    (await _coreClubService.GetAllBoatClasses(fleet.ClubId))
                     .Where(c => fleet.BoatClassIds.Contains(c.Id))
                     .ToList();
             }
@@ -98,7 +103,7 @@ namespace SailScores.Web.Services
                     && fleet.CompetitorIds != null)
             {
                 coreModel.Competitors =
-                    club.Competitors
+                    (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null))
                     .Where(c => fleet.CompetitorIds.Contains(c.Id))
                     .ToList();
             }
@@ -109,14 +114,16 @@ namespace SailScores.Web.Services
             string clubInitials,
             Guid? regattaId)
         {
-            var club = await _coreClubService.GetFullClub(clubInitials);
+            var clubId = await _coreClubService.GetClubId(clubInitials);
             var vm = new FleetWithOptionsViewModel();
-            vm.BoatClassOptions = club.BoatClasses;
-            vm.CompetitorOptions = club.Competitors;
+            vm.BoatClassOptions = await _coreClubService.GetAllBoatClasses(clubId);
+            vm.CompetitorOptions =
+                await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
+
             vm.RegattaId = regattaId;
             if (regattaId.HasValue)
             {
-                var regatta = club.Regattas.Single(r => r.Id == regattaId);
+                var regatta = _regattaService.GetRegattaAsync(regattaId.Value);
                 vm.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
             }
             return vm;
