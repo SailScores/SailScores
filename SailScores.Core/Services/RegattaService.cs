@@ -229,6 +229,7 @@ namespace SailScores.Core.Services
                 .SingleAsync(c => c.Id == regattaId);
 
             var series = await _dbContext.Regattas.SelectMany(r => r.RegattaSeries.Select(rs => rs.Series))
+                .Include(s => s.RaceSeries)
                 .SingleOrDefaultAsync(s => s.FleetId == dbFleet.Id);
 
             if(series == null)
