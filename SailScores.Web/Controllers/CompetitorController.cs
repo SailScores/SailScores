@@ -4,9 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
@@ -347,7 +345,9 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error occurred deleting this competitor. Are they assigned scores in existing races?");
+                var competitor = await _competitorService.GetCompetitorAsync(id);
+                return View(competitor);
             }
         }
     }

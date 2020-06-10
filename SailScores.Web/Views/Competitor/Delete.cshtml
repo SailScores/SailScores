@@ -11,6 +11,7 @@
 <div>
     <h4>Competitor</h4>
     <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Name)
@@ -49,7 +50,7 @@
             @Html.DisplayFor(model => model.BoatClassId)
         </dd>
     </dl>
-    
+
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="ClubId" />
