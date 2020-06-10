@@ -71,5 +71,23 @@ namespace SailScores.Core.Services
             existingSeason.End = season.End;
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<IList<String>> GetSavingSeasonErrors(Season season)
+        {
+            var errors = new List<String>();
+            var existingSeasons = _dbContext.Seasons.Where(s =>
+                s.ClubId == season.ClubId);
+            if(await existingSeasons.AnyAsync(s => s.Name == season.Name && s.Id != season.Id))
+            {
+                errors.Add("A season with this name exists. Please choose a unique name.");
+            }
+            var overlappingSeason = await existingSeasons.FirstOrDefaultAsync(s => s.Start <= season.End
+                    && s.End >= season.Start && s.Id != season.Id);
+            if (overlappingSeason != null)
+            {
+                errors.Add($"An existing season ( {overlappingSeason.Name} ) overlaps with this time range.");
+            }
+            return errors;
+        }
     }
 }

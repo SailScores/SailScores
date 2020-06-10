@@ -44,6 +44,12 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = club.Id;
+
+                var errors = await _seasonService.GetSavingSeasonErrors(model);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(String.Empty, error);
+                }
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -54,7 +60,8 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error occurred saving these changes.");
+                return View(model);
             }
         }
 
@@ -87,6 +94,11 @@ namespace SailScores.Web.Controllers
                 {
                     return Unauthorized();
                 }
+                var errors = await _seasonService.GetSavingSeasonErrors(model);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(String.Empty, error);
+                }
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -97,7 +109,8 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error occurred saving these changes.");
+                return View(model);
             }
         }
 
@@ -132,12 +145,13 @@ namespace SailScores.Web.Controllers
             try
             {
                 await _seasonService.Delete(id);
-
                 return RedirectToAction("Index", "Admin");
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error occurred deleting this season. Is it in use?");
+                var season = club.Seasons.SingleOrDefault(c => c.Id == id);
+                return View(season);
             }
         }
     }
