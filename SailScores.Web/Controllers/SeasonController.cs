@@ -44,6 +44,12 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
                 model.ClubId = club.Id;
+
+                var errors = await _seasonService.GetSavingSeasonErrors(model);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(String.Empty, error);
+                }
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -86,6 +92,11 @@ namespace SailScores.Web.Controllers
                     || !club.Seasons.Any(c => c.Id == model.Id))
                 {
                     return Unauthorized();
+                }
+                var errors = await _seasonService.GetSavingSeasonErrors(model);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(String.Empty, error);
                 }
                 if (!ModelState.IsValid)
                 {
