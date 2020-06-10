@@ -60,7 +60,8 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error occurred saving these changes.");
+                return View(model);
             }
         }
 
@@ -108,7 +109,8 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error occurred saving these changes.");
+                return View(model);
             }
         }
 
@@ -143,12 +145,13 @@ namespace SailScores.Web.Controllers
             try
             {
                 await _seasonService.Delete(id);
-
                 return RedirectToAction("Index", "Admin");
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error occurred deleting this season. Is it in use?");
+                var season = club.Seasons.SingleOrDefault(c => c.Id == id);
+                return View(season);
             }
         }
     }
