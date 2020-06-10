@@ -488,12 +488,14 @@ namespace SailScores.Core.Services
                 .ToList();
             foreach (var race in racesToRemove)
             {
-
-                fullSeries.Races.Remove(race);
-                if (fullSeries.Races.Count > 0)
+                if (race != racesToRemove.Last())
                 {
-                    await CalculateScoresAsync(fullSeries);
-                    entries.AddRange(GetChartDataPoints(fullSeries));
+                    fullSeries.Races.Remove(race);
+                    if (fullSeries.Races.Count > 0)
+                    {
+                        await CalculateScoresAsync(fullSeries);
+                        entries.AddRange(GetChartDataPoints(fullSeries));
+                    }
                 }
             }
             fullSeries.Races = copyOfRaces;
