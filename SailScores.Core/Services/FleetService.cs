@@ -183,6 +183,8 @@ namespace SailScores.Core.Services
             var dbFleet = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
                 .ThenInclude(fbc => fbc.BoatClass)
+                .Include(f => f.CompetitorFleets)
+                .ThenInclude(fcf => fcf.Competitor)
                 .SingleAsync(c => c.Id == fleetId);
             return _mapper.Map<Fleet>(dbFleet);
 
