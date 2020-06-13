@@ -43,13 +43,16 @@ namespace SailScores.Core.Services
         public async Task SaveNew(Season season)
         {
             var dbSeason =_mapper.Map<Db.Season>(season);
+
             dbSeason.Id = Guid.NewGuid();
+            dbSeason.UrlName = UrlUtility.GetUrlName(season.Name);
             if (_dbContext.Seasons.Any(s =>
                 s.ClubId == season.ClubId
-                && s.Name == season.Name))
+                && (s.Name == season.Name || s.UrlName == season.UrlName)))
             {
                 throw new InvalidOperationException("Cannot create season. A season with this name already exists.");
             }
+
             _dbContext.Seasons.Add(dbSeason);
             await _dbContext.SaveChangesAsync();
 
@@ -60,7 +63,7 @@ namespace SailScores.Core.Services
             if (_dbContext.Seasons.Any(s =>
                 s.Id != season.Id
                 && s.ClubId == season.ClubId
-                && s.Name == season.Name))
+                && (s.Name == season.Name || s.UrlName == season.UrlName)))
             {
                 throw new InvalidOperationException("Cannot update season. A season with this name already exists.");
             }
@@ -77,7 +80,8 @@ namespace SailScores.Core.Services
             var errors = new List<String>();
             var existingSeasons = _dbContext.Seasons.Where(s =>
                 s.ClubId == season.ClubId);
-            if(await existingSeasons.AnyAsync(s => s.Name == season.Name && s.Id != season.Id))
+            if(await existingSeasons.AnyAsync(s =>
+                (s.Name == season.Name || s.UrlName == season.UrlName) && s.Id != season.Id))
             {
                 errors.Add("A season with this name exists. Please choose a unique name.");
             }

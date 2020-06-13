@@ -13,6 +13,9 @@ namespace SailScores.Core.Model
         [StringLength(200)]
         public String Name { get; set; }
 
+        [StringLength(200)]
+        public String UrlName { get; set; }
+
         [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:Y}")]

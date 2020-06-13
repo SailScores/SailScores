@@ -95,7 +95,7 @@ namespace SailScores.Core.Services
                 .Where(r =>
                     r.ClubId == clubId &&
                     r.UrlName == regattaName &&
-                    r.Season.Name == seasonName).SingleOrDefaultAsync())?.Id;
+                    r.Season.UrlName == seasonName).SingleOrDefaultAsync())?.Id;
             if(!regattaId.HasValue)
             {
                 return null;

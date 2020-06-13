@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SailScores.Web.Models.SailScores;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Services;
-using SailScores.Web.Models.SailScores;
-using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
@@ -47,7 +43,7 @@ namespace SailScores.Web.Controllers
                 return RedirectToRoute("Race", new
                 {
                     clubInitials,
-                    seasonName = currentSeason.Name
+                    seasonName = currentSeason.UrlName
                 });
             }
             var races = await _raceService.GetAllRaceSummariesAsync(

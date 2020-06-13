@@ -142,7 +142,7 @@ namespace SailScores.Core.Services
                 .Where(s =>
                     s.ClubId == clubId)
                 .SingleOrDefaultAsync(s => s.UrlName == seriesUrlName
-                                  && s.Season.Name == seasonName);
+                                  && s.Season.UrlName == seasonName);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
             fullSeries.ShowCompetitorClub = club.ShowClubInResults;

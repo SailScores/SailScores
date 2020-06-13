@@ -61,7 +61,7 @@
                     @regatta.StartDate?.ToString("D") @:- @regatta.EndDate?.ToString("D")
                 }
                 <h3>
-                    <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.Name/@regatta.UrlName">
+                    <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.UrlName/@regatta.UrlName">
                         @regatta.Season.Name @regatta.Name
                     </a>
                 </h3>
@@ -79,7 +79,7 @@
                 @foreach (var series in Model.ImportantSeries)
                 {
                     <li>
-                        <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">
+                        <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">
                             @series.Season.Name @series.Name
                         </a>
                         @if (series.UpdatedDate.HasValue && series.UpdatedDate > DateTime.Now.AddDays(-15))
@@ -99,7 +99,7 @@
                 @foreach (var series in Model.RecentSeries)
                 {
                 <li>
-                    <a href="~/@ViewData["ClubInitials"]/@series.Season.Name/@series.UrlName">@series.Name</a>
+                    <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
                     @if (series.UpdatedDate.HasValue)
                     {
                         <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>

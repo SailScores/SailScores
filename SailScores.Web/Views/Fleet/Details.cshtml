@@ -13,7 +13,7 @@
     @foreach (var item in Model.Item.Series.OrderBy(s => s.Name))
     {
         <li>
-            <a href="~/@Model.ClubInitials/@item.Season.Name/@item.Name">
+            <a href="~/@Model.ClubInitials/@item.Season.UrlName/@item.Name">
                 @Html.DisplayFor(modelItem => item.Name) (@(item.Races?.Count.ToString() ?? "No") Races)
             </a>
 

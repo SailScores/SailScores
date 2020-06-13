@@ -11,6 +11,9 @@ namespace SailScores.Api.Dtos
 
         [StringLength(200)]
         public String Name { get; set; }
+
+        [StringLength(200)]
+        public String UrlName { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
         

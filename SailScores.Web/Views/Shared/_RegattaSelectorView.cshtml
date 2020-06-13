@@ -8,7 +8,7 @@
         <option selected>  ----or a current Regatta----  </option>
         @foreach (var regatta in Model.Regattas)
         {
-            <option value="@($"{regatta.ClubInitials}/Regatta/{regatta.Season.Name}/{regatta.UrlName}")">
+            <option value="@($"{regatta.ClubInitials}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}")">
                 @regatta.ClubInitials @regatta.Season.Name @regatta.Name
             </option>
         }
@@ -20,7 +20,7 @@
 <noscript>
     @foreach (var regatta in Model.Regattas)
     {
-        <a href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~")}/{regatta.ClubInitials}/Regatta/{regatta.Season.Name}/{regatta.UrlName}")">
+        <a href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~")}/{regatta.ClubInitials}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}")">
             @regatta.ClubInitials - @regatta.Season.Name - @regatta.Name
         </a><br />
         }

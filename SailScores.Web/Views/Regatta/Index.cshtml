@@ -18,7 +18,7 @@
                 @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
                 {
                     <li class="nav-item">
-                        <a class="nav-link active" href="#@item.Key">
+                        <a class="nav-link active" href="#@item.FirstOrDefault()?.Season?.UrlName">
                             @item.Key
                         </a>
                     </li>
@@ -33,7 +33,7 @@
 {
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
     {
-        <div id="@item.Key" class="row">
+        <div id="@item.FirstOrDefault()?.Season?.UrlName" class="row">
             <div class="col-12">
                 <h2>@item.Key</h2>
             </div>
@@ -43,7 +43,7 @@
 <div class="row">
     <div class="col-sm-4 col-lg-3">
         <a id="regattalink_@regatta.Id"
-           href="~/@Model.ClubInitials/Regatta/@regatta.Season.Name/@regatta.UrlName"
+           href="~/@Model.ClubInitials/Regatta/@regatta.Season.UrlName/@regatta.UrlName"
            >@Html.DisplayFor(modelItem => regatta.Name)</a>
         (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
     </div>
