@@ -103,7 +103,7 @@ namespace SailScores.Core.Services
                 return await GetMostRecentRaceSeasonAsync(clubId);
             }
             var dbSeason = await _dbContext.Seasons.FirstOrDefaultAsync(s =>
-                s.ClubId == clubId && s.Name == seasonName);
+                s.ClubId == clubId && s.UrlName == seasonName);
 
             return _mapper.Map<Season>(dbSeason);
         }

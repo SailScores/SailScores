@@ -25,7 +25,7 @@
                     <li class="nav-item">
                         <a asp-route="Race"
                            asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                           asp-route-seasonName="@item.Name"
+                           asp-route-seasonName="@item.UrlName"
                            class="nav-link active">@item.Name</a>
                     </li>
                 }
