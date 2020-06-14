@@ -18,7 +18,7 @@
                 @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
                 {
                     <li class="nav-item">
-                        <a class="nav-link active" href="#@item.Key">
+                        <a class="nav-link active" href="#@item.FirstOrDefault()?.Season?.UrlName">
                             @item.Key
                         </a>
                     </li>
@@ -32,7 +32,7 @@
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
     {
         <div class="row">
-            <div class="col-12" id="@item.Key">
+            <div class="col-12" id="@item.FirstOrDefault()?.Season?.UrlName">
                 <h2>@item.Key</h2>
             </div>
         </div>
@@ -40,7 +40,7 @@
         {
             <div class="row border-bottom mb-1 pb-1">
                 <div class="col-md-5">
-                    <a href="~/@Model.ClubInitials/@series.Season.Name/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
+                    <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
                     <span class="avoidwrap">(@(series.Races?.Count.ToString() ?? "No") @localizer["Races"])</span>
                 </div>
 

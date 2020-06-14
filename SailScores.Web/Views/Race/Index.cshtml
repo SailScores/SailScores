@@ -73,7 +73,7 @@
                 @foreach (var seriesUrlAndName in race.SeriesUrlAndNames)
                 {
                     var separator = seriesUrlAndName.Key != lastSeries.Key ? $", " : "";
-                    <a href="~/@Model.ClubInitials/@race.Season.Name/@seriesUrlAndName.Key">@seriesUrlAndName.Value</a>@separator
+                    <a href="~/@Model.ClubInitials/@race.Season.UrlName/@seriesUrlAndName.Key">@seriesUrlAndName.Value</a>@separator
                 }
             </div>
             <div class="col-2">
@@ -100,7 +100,7 @@
             {
                 <a asp-route="Race"
                    asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                   asp-route-seasonName="@item.Name"
+                   asp-route-seasonName="@item.UrlName"
                    class="nav-link active">@item.Name</a>
             }
         </div>

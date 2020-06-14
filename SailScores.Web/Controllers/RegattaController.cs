@@ -132,7 +132,7 @@ namespace SailScores.Web.Controllers
                 return RedirectToAction("Details", new
                 {
                     clubInitials = clubInitials,
-                    season = savedRegatta.Season.Name,
+                    season = savedRegatta.Season.UrlName,
                     regattaName = savedRegatta.UrlName
                 });
             }
@@ -215,7 +215,7 @@ namespace SailScores.Web.Controllers
                 return RedirectToAction("Details", new
                 {
                     clubInitials = clubInitials,
-                    season = savedRegatta.Season.Name,
+                    season = savedRegatta.Season.UrlName,
                     regattaName = savedRegatta.UrlName
                 });
             }

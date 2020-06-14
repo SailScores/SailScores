@@ -49,7 +49,7 @@ new { @class = "btn btn-outline-primary btn-sm" })
     @foreach (var series in @Model.Item.Series)
             {
         <li>
-            <a href="~/@Model.ClubInitials/@Model.Item.Season.Name/@series.UrlName">
+            <a href="~/@Model.ClubInitials/@Model.Item.Season.UrlName/@series.UrlName">
                 @Html.DisplayFor(modelItem => series.Name)
             </a>
         </li>
