@@ -273,12 +273,15 @@ namespace SailScores.Core.Services
                         CodePoints = score.CodePoints
                     };
 
-                    dbRace.Scores.Add(newScore);
+                    _dbContext.Scores.Add(newScore);
                 }
             }
             if (addToContext)
             {
                 _dbContext.Races.Add(dbRace);
+            } else
+            {
+                _dbContext.Races.Update(dbRace);
             }
 
             await _dbContext.SaveChangesAsync();
