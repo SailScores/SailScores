@@ -307,8 +307,7 @@ namespace SailScores.Core.Services
             var ranks = await _dbContext.GetCompetitorRankCountsAsync(
                 competitorId,
                 seasonName);
-            return _mapper.Map<List<PlaceCount>>(ranks
-                .Where(r => r.SeasonName == seasonName)
+            return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }
 
