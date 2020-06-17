@@ -90,6 +90,7 @@ namespace SailScores.Core.Services
         {
             var dbObject = await _dbContext
                 .Competitors
+                .Include(c => c.CompetitorFleets)
                 .FirstOrDefaultAsync(
                     c =>
                     c.Id == comp.Id);
