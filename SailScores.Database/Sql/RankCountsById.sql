@@ -5,97 +5,89 @@
 --set @SeasonName = '2019'
 
 DECLARE @ClubId UNIQUEIDENTIFIER
+
+DECLARE @SeasonId UNIQUEIDENTIFIER
+DECLARE @SeasonName2 NVARCHAR(100)
+DECLARE @SeasonStart DATETIME
+Declare @SeasonEnd DateTime
+
+
 SET @ClubId = (
 SELECT ClubId
 FROM Competitors
 WHERE Id = @CompetitorId
 )
+
+Select
+    @SeasonId = [Id],
+    @SeasonName2 = [Name],
+    @SeasonStart = [Start],
+    @SeasonEnd = [End]
+from Seasons
+where Name = @SeasonName
+and Seasons.ClubId = @ClubId
+
 ;
 WITH
 Results AS
-( SELECT
-                s.CompetitorId,
-                s.Place,
-                s.Code,
-                r.[Date]
-            FROM
-                Scores s
-                INNER JOIN Races r
-                ON r.Id = s.RaceId
-            WHERE s.CompetitorId = @CompetitorId
-                AND s.RaceId NOT IN ( SELECT r2.Id
-                FROM
-                    Races r2
-                    INNER JOIN SeriesRace sr2
-                    ON sr2.RaceId = r2.Id
-                    INNER JOIN Series s2
-                    ON sr2.SeriesId = s2.Id
-                WHERE s2.ExcludeFromCompetitorStats = 1
-
-) 
+(
+    SELECT
+        s.CompetitorId,
+        s.Place,
+        s.Code,
+        r.[Date]
+    FROM
+        Scores s
+        INNER JOIN Races r
+        ON r.Id = s.RaceId
+    WHERE s.CompetitorId = @CompetitorId
+        AND r.ClubId = @ClubId
+        AND s.RaceId NOT IN ( SELECT sr2.RaceId
+        FROM SeriesRace sr2 
+            INNER JOIN Series s2
+            ON sr2.SeriesId = s2.Id
+        WHERE s2.ExcludeFromCompetitorStats = 1
+        ) 
+        AND r.Date >= @SeasonStart
+        AND r.Date <= @SeasonEnd
  ) ,
     Ranks
     AS
     (
        SELECT 0 AS [Rank]
+
         UNION ALL
             SELECT [Rank] +1
             FROM Ranks
             WHERE Ranks.[Rank] < 100
     ),
-    RanksAndSeasons
-    AS
-    (
-        SELECT
-            Ranks.[Rank] AS [Rank],
-            Seasons.Name,
-            Seasons.Id AS SeasonId,
-            Seasons.[Start] AS SeasonStart,
-            Seasons.[End] AS SeasonEnd
-        FROM
-            Ranks CROSS JOIN Seasons
-        WHERE  seasons.ID IN (SELECT TOP 2
-            Seasons.ID
-        FROM Seasons
-        WHERE Seasons.Name = @SeasonName
-            AND Seasons.ClubId = @ClubId
-        ORDER BY [Start] DESC)
-    ),
     JoinedWithResults
     AS
     (
         SELECT
-            RanksAndSeasons.Name AS Season,
-            RanksAndSeasons.SeasonStart ,
-            RanksAndSeasons.Rank,
+            Ranks.Rank,
             Results.Place,
             Results.Code,
             count(results.CompetitorId) AS Count
         FROM
-            RanksAndSeasons
+            Ranks
             LEFT OUTER JOIN
             Results
-            ON results.[Date] >= RanksAndSeasons.[SeasonStart] AND results.[Date] <= RanksAndSeasons.[SeasonEnd]
-                AND ( results.Place = RanksAndSeasons.Rank OR ( ISNULL(Code, '') <> '' AND RanksAndSeasons.Rank =0))
+            ON ( results.Place = Ranks.Rank OR ( ISNULL(Code, '') <> '' AND Ranks.Rank =0))
         GROUP BY
- RanksAndSeasons.Name ,
- RanksAndSeasons.Rank ,
- RanksAndSeasons.SeasonStart ,
- Results.Place ,
- results.Code
+            Ranks.Rank ,
+            Results.Place ,
+            results.Code
     )
 SELECT
-    Season As SeasonName,
-    SeasonStart,
-    CASE WHEN Rank = 0 then null else rank END as Place,
-    Code,
+    @SeasonName2 As SeasonName ,
+    @SeasonStart AS SeasonStart ,
+    CASE WHEN Rank = 0 then null else rank END as Place ,
+    Code ,
     Count
 FROM JoinedWithResults
 WHERE
  Rank <= (SELECT MAX(Place)
     FROM JoinedWithResults)
 ORDER BY
-  SeasonStart,
   Rank
-
-

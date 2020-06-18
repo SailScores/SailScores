@@ -90,6 +90,7 @@ namespace SailScores.Core.Services
         {
             var dbObject = await _dbContext
                 .Competitors
+                .Include(c => c.CompetitorFleets)
                 .FirstOrDefaultAsync(
                     c =>
                     c.Id == comp.Id);
@@ -307,8 +308,7 @@ namespace SailScores.Core.Services
             var ranks = await _dbContext.GetCompetitorRankCountsAsync(
                 competitorId,
                 seasonName);
-            return _mapper.Map<List<PlaceCount>>(ranks
-                .Where(r => r.SeasonName == seasonName)
+            return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }
 

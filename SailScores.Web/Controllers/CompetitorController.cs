@@ -90,10 +90,13 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             var comp = new CompetitorWithOptionsViewModel();
-            //todo: remove getfullclub
-            var club = await _clubService.GetFullClub(clubInitials);
-            comp.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
-            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+
+            var clubId = await _clubService.GetClubId(clubInitials);
+
+            comp.BoatClassOptions = (await _clubService.GetAllBoatClasses(clubId))
+                .OrderBy(c => c.Name);
+            var fleets = (await _clubService.GetAllFleets(clubId))
+                .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 .OrderBy(f => f.Name);
             comp.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
 
@@ -178,7 +181,6 @@ namespace SailScores.Web.Controllers
             return View(vm);
         }
 
-        // POST: Competitor/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateMultiple(
@@ -187,9 +189,9 @@ namespace SailScores.Web.Controllers
             string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            var clubId = await _clubService.GetClubId(clubInitials);
             try
             {
-                var clubId = await _clubService.GetClubId(clubInitials);
                 int i = 0;
                 foreach (var comp in competitorsVm.Competitors) {
                     Guid? id = await _competitorService.GetCompetitorIdForSailnumberAsync(clubId, comp.SailNumber);
@@ -205,10 +207,10 @@ namespace SailScores.Web.Controllers
                     var fleets = (await _clubService.GetAllFleets(clubId))
                         .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                         .OrderBy(f => f.Name);
+                    competitorsVm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
 
                     competitorsVm.BoatClassOptions = (await _clubService.GetAllBoatClasses(clubId))
                         .OrderBy(c => c.Name);
-                    competitorsVm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
                     return View(competitorsVm);
                 }
                 if (!await _authService.CanUserEdit(User, clubId))
@@ -226,12 +228,13 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-
-                var club = await _clubService.GetFullClub(clubInitials);
-                competitorsVm.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
-                var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                var fleets = (await _clubService.GetAllFleets(clubId))
+                    .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                     .OrderBy(f => f.Name);
                 competitorsVm.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+
+                competitorsVm.BoatClassOptions = (await _clubService.GetAllBoatClasses(clubId))
+                    .OrderBy(c => c.Name);
                 return View(competitorsVm);
             }
         }
@@ -239,26 +242,29 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/Edit/5
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
-            //todo: replace getfullclub
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
+
             var competitor = await _competitorService.GetCompetitorAsync(id);
             if (competitor == null)
             {
                 return NotFound();
             }
-            if (competitor.ClubId != club.Id)
+            if (competitor.ClubId != clubId)
             {
                 return Unauthorized();
             }
             var compWithOptions = _mapper.Map<CompetitorWithOptionsViewModel>(competitor);
 
-            compWithOptions.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
-            var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
-                .OrderBy(f => f.Name);
+            compWithOptions.BoatClassOptions =
+                (await _clubService.GetAllBoatClasses(clubId))
+                .OrderBy(c => c.Name);
+            var fleets = (await _clubService.GetAllFleets(clubId))
+                    .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                    .OrderBy(f => f.Name);
             compWithOptions.FleetOptions = _mapper.Map<IList<FleetSummary>>(fleets);
 
             return View(compWithOptions);
@@ -277,9 +283,9 @@ namespace SailScores.Web.Controllers
                 {
                     return Unauthorized();
                 }
-                var club = await _clubService.GetFullClub(competitor.ClubId);
 
-                Guid? existingCompId = await _competitorService.GetCompetitorIdForSailnumberAsync(club.Id, competitor.SailNumber);
+                Guid? existingCompId = await _competitorService.GetCompetitorIdForSailnumberAsync(
+                    competitor.ClubId, competitor.SailNumber);
                 if (existingCompId.HasValue && existingCompId.Value != competitor.Id)
                 {
                     ModelState.AddModelError($"SailNumber", "Sail number is already assigned to an active competitor.");
@@ -287,8 +293,12 @@ namespace SailScores.Web.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    competitor.BoatClassOptions = club.BoatClasses.OrderBy(c => c.Name);
-                    var fleets = club.Fleets.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                    competitor.BoatClassOptions =
+                        (await _clubService.GetAllBoatClasses(competitor.ClubId))
+                        .OrderBy(c => c.Name);
+                    var fleets =
+                        (await _clubService.GetAllFleets(competitor.ClubId))
+                        .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                         .OrderBy(f => f.Name);
                     competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
                     return View(competitor);
@@ -332,10 +342,10 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                //todo: replace GetFullClub
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.Competitors.Any(c => c.Id == id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                var competitor = await _competitorService.GetCompetitorAsync(id);
+                if (!await _authService.CanUserEdit(User, clubId)
+                    || competitor.ClubId != clubId)
                 {
                     return Unauthorized();
                 }
@@ -345,7 +355,8 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                ModelState.AddModelError(String.Empty, "An error occurred deleting this competitor. Are they assigned scores in existing races?");
+                ModelState.AddModelError(String.Empty,
+                    "An error occurred deleting this competitor. Are they assigned scores in existing races?");
                 var competitor = await _competitorService.GetCompetitorAsync(id);
                 return View(competitor);
             }

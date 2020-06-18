@@ -66,7 +66,7 @@ namespace SailScores.Web.Services
             return vm;
         }
 
-        public async Task<List<PlaceCount>> GetCompetitorSeasonRanksAsync(
+        public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
             Guid competitorId,
             string seasonName)
         {
@@ -75,7 +75,7 @@ namespace SailScores.Web.Services
                 competitorId,
                 seasonName);
 
-            var vm = _mapper.Map<List<PlaceCount>>(seasonStats);
+            var vm = seasonStats;
             
             return vm;
         }

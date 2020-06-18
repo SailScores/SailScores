@@ -20,7 +20,7 @@ namespace SailScores.Web.Services
         Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(
             string clubInitials,
             string sailNumber);
-        Task<List<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonName);
+        Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonName);
         Task<Guid?> GetCompetitorIdForSailnumberAsync(
             Guid clubId,
             string sailNumber);
