@@ -1,5 +1,6 @@
 ﻿using SailScores.Core.Model;
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace SailScores.Core.Scoring
@@ -17,8 +18,8 @@ namespace SailScores.Core.Scoring
             var sb = new StringBuilder();
             sb.Append(RawScore?.Code + " ");
 
-            var placePart = ScoreValue?.ToString("N1") ??
-                RawScore?.Place?.ToString("N1");
+            var placePart = ScoreValue?.ToString("N1", CultureInfo.CurrentCulture) ??
+                RawScore?.Place?.ToString("N1", CultureInfo.CurrentCulture);
             sb.Append(placePart);
             
             return sb.ToString().Trim();

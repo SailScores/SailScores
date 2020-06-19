@@ -12,7 +12,7 @@ namespace SailScores.Core.Services
         Task<Club> GetFullClub(string id);
         Task<Club> GetFullClub(Guid id);
         Task<Club> GetFullClubExceptScores(Guid id);
-        Task<Club> GetFullClubExceptScores(string clubInitials);
+        Task<Club> GetFullClubExceptScores(string id);
         Task<Club> GetMinimalClub(Guid id);
         Task<Club> GetMinimalClub(string clubInitials);
         Task<Guid> SaveNewClub(Club club);

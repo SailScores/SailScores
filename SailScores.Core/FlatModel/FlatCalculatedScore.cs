@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 
 namespace SailScores.Core.FlatModel
@@ -16,8 +17,8 @@ namespace SailScores.Core.FlatModel
             var sb = new StringBuilder();
             sb.Append(Code + " ");
 
-            var placePart = ScoreValue?.ToString("N1") ??
-                Place?.ToString("N1");
+            var placePart = ScoreValue?.ToString("N1", CultureInfo.CurrentCulture) ??
+                Place?.ToString("N1", CultureInfo.CurrentCulture);
             sb.Append(placePart);
 
             return sb.ToString().Trim();

@@ -115,7 +115,9 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Create(
             string clubInitials,
             CompetitorWithOptionsViewModel competitor,
+#pragma warning disable CA1054 // Uri parameters should not be strings
             string returnUrl = null)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             ViewData["ReturnUrl"] = returnUrl;
             try
@@ -160,7 +162,9 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/CreateMultiple
         public async Task<ActionResult> CreateMultiple(
             string clubInitials,
+#pragma warning disable CA1054 // Uri parameters should not be strings
             string returnUrl = null)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             ViewData["ReturnUrl"] = returnUrl;
             var vm = new MultipleCompetitorsWithOptionsViewModel();
