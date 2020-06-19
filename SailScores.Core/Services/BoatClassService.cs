@@ -77,5 +77,12 @@ namespace SailScores.Core.Services
             existingClass.Description = boatClass.Description;
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<BoatClass> GetClass(Guid boatClassId)
+        {
+            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId);
+
+            return _mapper.Map<BoatClass>(dbClass);
+        }
     }
 }

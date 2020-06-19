@@ -9,6 +9,5 @@ namespace SailScores.Web.Services
     public interface IClubService
     {
         Task<Club> GetClubForClubHome(string clubInitials);
-        Task<Club> GetFullClub(string clubInitials);
     }
 }
