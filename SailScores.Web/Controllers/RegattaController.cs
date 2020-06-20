@@ -81,19 +81,14 @@ namespace SailScores.Web.Controllers
         [Authorize]
         public async Task<ActionResult> Create(string clubInitials)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            var vm = new RegattaWithOptionsViewModel
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
-                SeasonOptions = club.Seasons
-            };
-            var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-            scoringSystemOptions.Add(new ScoringSystem
-            {
-                Id = Guid.Empty,
-                Name = "<Use Club Default>"
-            });
-            vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
-            vm.FleetOptions = club.Fleets;
+                return Unauthorized();
+            }
+
+            var vm = await _regattaService.GetBlankRegattaWithOptions(clubId);
+
             return View(vm);
         }
 
@@ -104,9 +99,9 @@ namespace SailScores.Web.Controllers
             string clubInitials,
             RegattaWithOptionsViewModel model)
         {
+            var clubId = await _clubService.GetClubId(clubInitials);
             try
             {
-                var clubId = await _clubService.GetClubId(clubInitials);
                 if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
@@ -114,16 +109,12 @@ namespace SailScores.Web.Controllers
                 model.ClubId = clubId;
                 if (!ModelState.IsValid)
                 {
-                    var club = await _clubService.GetFullClub(clubInitials);
-                    model.SeasonOptions = club.Seasons;
-                    var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-                    scoringSystemOptions.Add(new ScoringSystem
-                    {
-                        Id = Guid.Empty,
-                        Name = "<Use Club Default>"
-                    });
-                    model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
-                    model.FleetOptions = club.Fleets;
+                    var blank = await _regattaService.GetBlankRegattaWithOptions(clubId);
+
+                    model.SeasonOptions = blank.SeasonOptions;
+                    model.ScoringSystemOptions = blank.ScoringSystemOptions;
+                    model.FleetOptions = blank.FleetOptions;
+
                     return View(model);
                 }
                 
@@ -138,15 +129,13 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                var club = await _clubService.GetFullClub(clubInitials);
-                model.SeasonOptions = club.Seasons;
-                var scoringSystemOptions = await _scoringService.GetScoringSystemsAsync(club.Id, true);
-                scoringSystemOptions.Add(new ScoringSystem
-                {
-                    Id = Guid.Empty,
-                    Name = "<Use Club Default>"
-                });
-                model.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+
+                var blank = await _regattaService.GetBlankRegattaWithOptions(clubId);
+
+                model.SeasonOptions = blank.SeasonOptions;
+                model.ScoringSystemOptions = blank.ScoringSystemOptions;
+                model.FleetOptions = blank.FleetOptions;
+
                 return View(model);
             }
         }

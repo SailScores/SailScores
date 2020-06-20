@@ -17,6 +17,6 @@ namespace SailScores.Web.Services
 
         Task<IEnumerable<RegattaSummaryViewModel>> GetCurrentRegattas();
         Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId);
-
+        Task<RegattaWithOptionsViewModel> GetBlankRegattaWithOptions(Guid clubId);
     }
 }

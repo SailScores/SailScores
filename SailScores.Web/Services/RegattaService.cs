@@ -14,15 +14,23 @@ namespace SailScores.Web.Services
     {
         private readonly Core.Services.IClubService _clubService;
         private readonly Core.Services.IRegattaService _coreRegattaService;
+        private readonly Core.Services.IScoringService _coreScoringService;
+        private readonly Core.Services.ISeasonService _coreSeasonService;
+        private readonly Core.Services.IFleetService _coreFleetService;
+
         private readonly IMapper _mapper;
 
         public RegattaService(
             Core.Services.IClubService clubService,
             Core.Services.IRegattaService coreRegattaService,
+            Core.Services.IScoringService coreScoringService,
+            Core.Services.ISeasonService coreSeasonService,
+            Core.Services.IFleetService coreFleetService,
             IMapper mapper)
         {
             _clubService = clubService;
             _coreRegattaService = coreRegattaService;
+            _coreScoringService = coreScoringService;
             _mapper = mapper;
         }
 
@@ -116,5 +124,23 @@ namespace SailScores.Web.Services
             await _coreRegattaService.AddFleetToRegattaAsync(fleetId, regattaId);
         }
 
+        public async Task<RegattaWithOptionsViewModel> GetBlankRegattaWithOptions(Guid clubId)
+        {
+            var vm = new RegattaWithOptionsViewModel
+            {
+                SeasonOptions = await _coreSeasonService.GetSeasons(clubId),
+                FleetOptions = await _coreFleetService.GetAllFleetsForClub(clubId)
+            };
+            var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, true);
+            scoringSystemOptions.Add(new ScoringSystem
+            {
+                Id = Guid.Empty,
+                Name = "<Use Club Default>"
+            });
+            vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+
+            return vm;
+
+        }
     }
 }
