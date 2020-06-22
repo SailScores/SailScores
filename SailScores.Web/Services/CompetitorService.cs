@@ -1,11 +1,7 @@
 using AutoMapper;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using SailScores.Api.Dtos;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,8 +37,8 @@ namespace SailScores.Web.Services
 
         public async Task<Competitor> GetCompetitorAsync(string clubInitials, string sailNumber)
         {
-            var club = await _coreClubService.GetMinimalClub(clubInitials);
-            var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
             return comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -51,8 +47,8 @@ namespace SailScores.Web.Services
             string sailNumber)
         {
 
-            var club = await _coreClubService.GetMinimalClub(clubInitials);
-            var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
 
             var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
             if(comp == null)
@@ -148,6 +144,13 @@ namespace SailScores.Web.Services
         {
             var competitor = await _coreCompetitorService.GetCompetitorBySailNumberAsync(clubId, sailNumber);
             return competitor?.Id;
+        }
+
+        public async Task<IList<Competitor>> GetCompetitorsAsync(Guid clubId)
+        {
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
+
+            return comps;
         }
     }
 }

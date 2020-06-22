@@ -87,22 +87,24 @@ namespace SailScores.Web.Services
 
         private async Task PrepRegattaVmAsync(RegattaWithOptionsViewModel model)
         {
-            var club = await _clubService.GetFullClub(model.ClubId);
             if (model.StartDate.HasValue)
             {
-                model.Season = club.Seasons.Single(s => s.Start <= model.StartDate.Value
-                && s.End >= model.StartDate.Value);
+                var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
+                model.Season = seasons.Single(s =>
+                    s.Start <= model.StartDate.Value
+                    && s.End >= model.StartDate.Value);
             }
             if (model.ScoringSystemId == Guid.Empty)
             {
                 model.ScoringSystemId = null;
             }
             model.Fleets = new List<Fleet>();
+            var fleets = await _coreFleetService.GetAllFleetsForClub(model.ClubId);
             if (model.FleetIds != null)
             {
                 foreach (var fleetId in model.FleetIds)
                 {
-                    model.Fleets.Add(club.Fleets
+                    model.Fleets.Add(fleets
                         .Single(f => f.Id == fleetId));
                 }
             }

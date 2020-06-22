@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SailScores.Web.Models.SailScores;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,14 +32,15 @@ namespace SailScores.Web.Controllers
 
         public async Task<ActionResult> Options(string clubInitials)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
+            IList<Core.Model.Competitor> competitors = await _competitorService.GetCompetitorsAsync(clubId);
             var vm = new MergeCompetitorViewModel
             {
-                TargetCompetitorOptions = club.Competitors.OrderBy(c => c.Name).ToList()
+                TargetCompetitorOptions = competitors.OrderBy(c => c.Name).ToList()
             };
             return View("SelectTarget", vm);
         }
@@ -46,8 +50,8 @@ namespace SailScores.Web.Controllers
             string clubInitials, 
             MergeCompetitorViewModel vm)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
@@ -61,16 +65,16 @@ namespace SailScores.Web.Controllers
             string clubInitials,
             MergeCompetitorViewModel vm)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
 
             vm.SourceCompetitor = await _competitorService.GetCompetitorAsync(vm.SourceCompetitorId.Value);
             vm.TargetCompetitor = await _competitorService.GetCompetitorAsync(vm.TargetCompetitorId.Value);
-            if(vm.SourceCompetitor.ClubId != club.Id ||
-                vm.TargetCompetitor.ClubId != club.Id)
+            if(vm.SourceCompetitor.ClubId != clubId ||
+                vm.TargetCompetitor.ClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -88,15 +92,15 @@ namespace SailScores.Web.Controllers
             string clubInitials,
             MergeCompetitorViewModel vm)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
             vm.SourceCompetitor = await _competitorService.GetCompetitorAsync(vm.SourceCompetitorId.Value);
             vm.TargetCompetitor = await _competitorService.GetCompetitorAsync(vm.TargetCompetitorId.Value);
-            if (vm.SourceCompetitor.ClubId != club.Id ||
-                vm.TargetCompetitor.ClubId != club.Id)
+            if (vm.SourceCompetitor.ClubId != clubId ||
+                vm.TargetCompetitor.ClubId != clubId)
             {
                 return Unauthorized();
             }
