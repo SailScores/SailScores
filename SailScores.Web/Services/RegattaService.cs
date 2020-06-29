@@ -29,6 +29,8 @@ namespace SailScores.Web.Services
             _clubService = clubService;
             _coreRegattaService = coreRegattaService;
             _coreScoringService = coreScoringService;
+            _coreSeasonService = coreSeasonService;
+            _coreFleetService = coreFleetService;
             _mapper = mapper;
         }
 

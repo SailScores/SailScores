@@ -1,3 +1,5 @@
+@using SailScores.Web.Extensions;
+
 @model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 
 @{
@@ -86,7 +88,7 @@
                                     <option>Select...</option>
                                     @foreach (var icon in Model.WeatherIconOptions)
                                     {
-                                <option data-content="<span class='wi @icon.Value'></span>" value="@icon.Key">@icon.Key</option>
+                                        <option data-content="<span class='wi @icon.Value'></span>" value="@icon.Key">@icon.Key</option>
                                     }
                                 </select>
                                 <input id="weatherDescription" asp-for="Weather.Description" class="form-control col-6 col-md-8" />
@@ -159,7 +161,7 @@
                 <ul class="list-group" id="results">
                     @await Html.PartialAsync("_scoreEntryPartial", Model)
                     @foreach (var score in (Model.Scores ??
-                     new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
+                    new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
                     {
                         <li id="@score.CompetitorId" class="list-group-item"
                             data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">

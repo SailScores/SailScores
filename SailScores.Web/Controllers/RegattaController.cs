@@ -14,20 +14,17 @@ namespace SailScores.Web.Controllers
         private readonly Web.Services.IRegattaService _regattaService;
         private readonly Core.Services.IClubService _clubService;
         private readonly Services.IAuthorizationService _authService;
-        private readonly IScoringService _scoringService;
         private readonly IMapper _mapper;
 
         public RegattaController(
             Web.Services.IRegattaService regattaService,
             Core.Services.IClubService clubService,
             Services.IAuthorizationService authService,
-            IScoringService scoringService,
             IMapper mapper)
         {
             _regattaService = regattaService;
             _clubService = clubService;
             _authService = authService;
-            _scoringService = scoringService;
             _mapper = mapper;
         }
 

@@ -81,7 +81,7 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Score, ScoreViewModel>()
                 .ForMember(d => d.ScoreCode, o => o.Ignore())
                 .ForMember(d => d.CodePointsString, o => o.MapFrom(s
-                    => s.CodePoints.HasValue ? s.CodePoints.Value.ToString("0.##") : String.Empty))
+                    => s.CodePoints.HasValue ? s.CodePoints.Value.ToString("0.##", CultureInfo.CurrentCulture) : String.Empty))
                 .ReverseMap()
                 .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)));
             CreateMap<ScoreViewModel, ScoreDto>()
