@@ -32,14 +32,16 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials, BoatClass model)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            BoatClass model)
         {
             try
             {
                 var clubId = await _clubService.GetClubId(clubInitials);
                 if (!await _authService.CanUserEdit(User, clubId))
                 {
-                    return Unauthorized();
+                    return Forbid();
                 }
                 model.ClubId = clubId;
                 if (!ModelState.IsValid)
@@ -52,7 +54,9 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty,
+                    "An error occurred saving these changes.");
+                return View(model);
             }
         }
 
@@ -69,7 +73,9 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(string clubInitials, BoatClass model)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            BoatClass model)
         {
             try
             {
