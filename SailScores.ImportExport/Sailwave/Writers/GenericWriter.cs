@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using SailScores.ImportExport.Sailwave.Attributes;
-using SailScores.ImportExport.Sailwave.Elements;
 using SailScores.ImportExport.Sailwave.Elements.File;
 
 namespace SailScores.ImportExport.Sailwave.Writers

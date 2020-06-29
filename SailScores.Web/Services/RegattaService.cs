@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core = SailScores.Core;
 
 namespace SailScores.Web.Services
 {

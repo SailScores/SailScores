@@ -1,10 +1,6 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Db = SailScores.Database.Entities;
-using Model = SailScores.Core.Model;
 
 namespace SailScores.Core.Mapping
 {

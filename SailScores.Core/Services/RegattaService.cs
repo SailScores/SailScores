@@ -1,15 +1,12 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
-using SailScores.Core.Scoring;
 using SailScores.Database;
 using dbObj = SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using SailScores.Core.FlatModel;
 
 namespace SailScores.Core.Services
 {

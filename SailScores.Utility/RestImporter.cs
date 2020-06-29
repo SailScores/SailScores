@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using SailScores.Api.Services;
 using SailScores.Api.Dtos;
 using System.Linq;
-using SailScores.Api;
 
 namespace SailScores.Utility
 {

@@ -1,9 +1,4 @@
-﻿using SailScores.ImportExport.Sailwave;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SailScores.ImportExport.Sailwave.Elements.File;
+﻿using SailScores.ImportExport.Sailwave.Elements.File;
 using SailScores.ImportExport.Sailwave.Parsers;
 using Xunit;
 

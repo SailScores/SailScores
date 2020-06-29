@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SailScores.Api.Dtos;
 using SailScores.Core.Model;
 
 namespace SailScores.Core.Services

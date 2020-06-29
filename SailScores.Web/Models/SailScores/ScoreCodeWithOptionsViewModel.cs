@@ -1,8 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SailScores.Api.Enumerations;
-using SailScores.Core.Model;
-using System;
 using System.Collections.Generic;
 
 namespace SailScores.Web.Models.SailScores

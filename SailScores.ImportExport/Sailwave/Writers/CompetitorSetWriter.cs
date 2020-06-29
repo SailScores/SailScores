@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using SailScores.ImportExport.Sailwave.Elements;
-using SailScores.ImportExport.Sailwave.Elements.File;
-using SailScores.ImportExport.Sailwave.Writers;
 
 namespace SailScores.ImportExport.Sailwave.Writers
 {

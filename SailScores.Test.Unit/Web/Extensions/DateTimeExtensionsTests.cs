@@ -1,8 +1,4 @@
-using SailScores.Core.Model;
-using SailScores.Core.Scoring;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 using SailScores.Web.Extensions;
 

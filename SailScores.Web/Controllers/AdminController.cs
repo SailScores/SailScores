@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Api.Dtos;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;

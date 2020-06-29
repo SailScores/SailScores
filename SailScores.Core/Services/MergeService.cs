@@ -3,13 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
-using SailScores.Api.Dtos;
 using Microsoft.Extensions.Logging;
 
 namespace SailScores.Core.Services

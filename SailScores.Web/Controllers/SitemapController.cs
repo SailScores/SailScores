@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Web.Models.SailScores;
-using SailScores.Core.Services;
-using SailScores.Web.Models;
 using SailScores.Web.Services;
 using SailScores.Web.Models.Sitemap;
 using Microsoft.Extensions.Configuration;

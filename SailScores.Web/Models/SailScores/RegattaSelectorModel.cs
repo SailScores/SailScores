@@ -1,5 +1,4 @@
-﻿using SailScores.Core.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SailScores.Web.Models.SailScores
 {

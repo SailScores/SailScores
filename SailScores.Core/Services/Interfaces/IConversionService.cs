@@ -1,8 +1,4 @@
-﻿using SailScores.Core.Model;
-using System;
-using System.Threading.Tasks;
-
-namespace SailScores.Core.Services
+﻿namespace SailScores.Core.Services
 {
     public interface IConversionService
     {

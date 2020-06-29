@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using Db = SailScores.Database.Entities;
 using Model = SailScores.Core.Model;
 

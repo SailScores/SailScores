@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SailScores.ImportExport.Sailwave.Attributes;
 using SailScores.ImportExport.Sailwave.Elements;
 using SailScores.ImportExport.Sailwave.Elements.File;
 

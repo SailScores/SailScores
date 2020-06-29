@@ -1,8 +1,5 @@
 using Humanizer;
-using SailScores.Web.Services;
 using System;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace SailScores.Web.Extensions
 {
