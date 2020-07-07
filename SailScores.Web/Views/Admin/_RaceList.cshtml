@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SailScores.Core.Model.Race>
+﻿@using SailScores.Core.Services
+@model IEnumerable<SailScores.Core.Model.Race>
 <div class="card">
     <div class="card-header" id="racesHeading">
         <h5>
@@ -36,18 +37,19 @@
                                 @foreach (var fleetRaces in yearRaces.OrderBy(r => r.Fleet?.Name).GroupBy(r => r.Fleet?.Name ?? String.Empty, r => r))
                                 {
                                     <div class="card">
-                                        <div class="card-header" id="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')">
+                                    <div class="card-header"
+                                         id="raceFleetHeading_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))">
                                             <h5>
-                                                <a id="@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" class="btn-link collapsed"
+                                                <a id="@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))" class="btn-link collapsed"
                                                    data-toggle="collapse"
-                                                   href="#collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')"
+                                                   href="#collapseFleet_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))"
                                                    aria-expanded="false" aria-controls="collapseRaces">
                                                     @fleetRaces.Key
                                                 </a>
                                             </h5>
                                         </div>
-                                        <div id="collapseFleet_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')" class="collapse"
-                                                aria-labelledby="raceFleetHeading_@(yearRaces.Key)_@fleetRaces.Key.Replace(' ','_')"
+                                        <div id="collapseFleet_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))" class="collapse"
+                                                aria-labelledby="raceFleetHeading_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))"
                                                 data-parent="#raceYearFleetAccordion_@(yearRaces.Key)">
                                             <div class="card-body p-1 p-md-20">
 
