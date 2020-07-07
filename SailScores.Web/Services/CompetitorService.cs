@@ -68,12 +68,12 @@ namespace SailScores.Web.Services
 
         public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
             Guid competitorId,
-            string seasonName)
+            string seasonUrlName)
         {
 
             var seasonStats = await _coreCompetitorService.GetCompetitorSeasonRanksAsync(
                 competitorId,
-                seasonName);
+                seasonUrlName);
 
             var vm = seasonStats;
             

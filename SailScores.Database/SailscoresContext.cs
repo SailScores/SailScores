@@ -70,11 +70,11 @@ namespace SailScores.Database
 
         public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
             Guid competitorId,
-            string seasonName)
+            string seasonUrlName)
         {
             var query = await GetSqlQuery("RankCountsById");
             var competitorParam = new SqlParameter("CompetitorId", competitorId);
-            var seasonParam = new SqlParameter("SeasonName", seasonName);
+            var seasonParam = new SqlParameter("SeasonUrlName", seasonUrlName);
             var result = await this.CompetitorRankStats
                 .FromSqlRaw(query, competitorParam, seasonParam)
                 .ToListAsync();

@@ -11,6 +11,8 @@ namespace SailScores.Core.Model
         [Display(Name = "Season")]
         public String SeasonName { get; set; }
 
+        public String SeasonUrlName { get; set; }
+
         [Display(Name = "Season Start")]
         public DateTime SeasonStart { get; internal set; }
         [Display(Name = "Season End")]

@@ -288,6 +288,7 @@ namespace SailScores.Core.Services
                 var seasonStats = new CompetitorSeasonStats
                 {
                     SeasonName = season.SeasonName,
+                    SeasonUrlName = season.SeasonUrlName,
                     SeasonStart = season.SeasonStart,
                     SeasonEnd = season.SeasonEnd,
                     RaceCount = season.RaceCount,
@@ -303,11 +304,11 @@ namespace SailScores.Core.Services
 
         public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
             Guid competitorId,
-            string seasonName)
+            string seasonUrlName)
         {
             var ranks = await _dbContext.GetCompetitorRankCountsAsync(
                 competitorId,
-                seasonName);
+                seasonUrlName);
             return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }
