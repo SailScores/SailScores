@@ -45,12 +45,12 @@ namespace SailScores.Database
         private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
         private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
 
-        public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber)
+        public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId)
         {
-            var query = "EXECUTE dbo.SS_SP_GetSeasonSummary @SailNumber = @sailNumber, @ClubInitials = @clubInitials";
+            var query = "EXECUTE dbo.SS_SP_GetSeasonSummary @CompetitorId = @competitorId, @ClubId = @clubId";
 
-            var clubParam = new SqlParameter("clubInitials", clubInitials);
-            var sailParam = new SqlParameter("sailNumber", sailNumber);
+            var clubParam = new SqlParameter("clubId", clubId);
+            var sailParam = new SqlParameter("competitorId", competitorId);
             var result = await this.CompetitorStatsSummary
                 .FromSqlRaw(query, sailParam, clubParam)
                 .ToListAsync();

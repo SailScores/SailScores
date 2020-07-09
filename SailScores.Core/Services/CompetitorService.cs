@@ -278,9 +278,9 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
+        public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(Guid clubId, Guid competitorId)
         {
-            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubInitials, sailNumber);
+            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubId, competitorId);
             
             var returnList = new List<CompetitorSeasonStats>();
             foreach(var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))

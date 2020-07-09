@@ -11,30 +11,14 @@ GO
 -- Description:	For more speed on Competitor Stats pages
 -- =============================================
 CREATE PROCEDURE SS_SP_GetSeasonSummary 
-	-- Add the parameters for the stored procedure here
-	@SailNumber NVARCHAR(30), 
-	@ClubInitials NVARCHAR(30)
+	@CompetitorId UniqueIdentifier, 
+	@ClubId UniqueIdentifier
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 	
-DECLARE @ClubId UNIQUEIDENTIFIER
-SET @ClubId = (
-    SELECT Id
-    FROM Clubs
-    WHERE Initials = @ClubInitials
-)
-DECLARE @CompetitorId UNIQUEIDENTIFIER
-SET @CompetitorId = (
-    SELECT top 1
-        Id
-    FROM Competitors
-    WHERE SailNumber = @SailNumber
-        AND ClubId = @ClubId
-        order by IsActive desc
-        )
 
 SELECT
     Seasons.Name AS SeasonName,

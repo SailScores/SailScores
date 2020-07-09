@@ -48,20 +48,25 @@ namespace SailScores.Web.Services
 
         public async Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(
             string clubInitials,
-            string sailNumber)
+            string sailor)
         {
+            // sailor will usually be sailNumber but fallsback to name if no number.
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
 
-            var club = await _coreClubService.GetMinimalClub(clubInitials);
-            var comps = await _coreCompetitorService.GetCompetitorsAsync(club.Id, null);
-
-            var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
+            var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
             if(comp == null)
+            {
+                comp = comps.FirstOrDefault(c => String.Equals(UrlUtility.GetUrlName(c.Name), sailor, StringComparison.OrdinalIgnoreCase));
+            }
+            if (comp == null)
             {
                 return null;
             }
+
             var vm = _mapper.Map<CompetitorStatsViewModel>(comp);
 
-            vm.SeasonStats = await _coreCompetitorService.GetCompetitorStatsAsync(clubInitials, sailNumber);
+            vm.SeasonStats = await _coreCompetitorService.GetCompetitorStatsAsync(clubId, comp.Id);
 
             return vm;
         }
