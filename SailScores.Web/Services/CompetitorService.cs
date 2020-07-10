@@ -99,7 +99,7 @@ namespace SailScores.Web.Services
                     && String.IsNullOrWhiteSpace(comp.SailNumber)
                     )
                 {
-                    break;
+                    continue;
                 }
                 var currentComp = _mapper.Map<Core.Model.Competitor>(comp);
                 currentComp.ClubId = clubId;
