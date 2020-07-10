@@ -24,7 +24,7 @@ Select
     @SeasonStart = [Start],
     @SeasonEnd = [End]
 from Seasons
-where Name = @SeasonName
+where UrlName = @SeasonUrlName
 and Seasons.ClubId = @ClubId
 
 ;

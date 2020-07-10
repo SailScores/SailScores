@@ -5,6 +5,7 @@ namespace SailScores.Database.Entities
     public class CompetitorStatsSummary
     {
         public string SeasonName { get; set; }
+        public string SeasonUrlName { get; set; }
         public DateTime SeasonStart { get; set; }
         public DateTime SeasonEnd { get; set; }
         public int RaceCount { get; set; }

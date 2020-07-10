@@ -159,7 +159,7 @@ function addNewCompetitor(competitor) {
     var span = compListItem.getElementsByClassName("competitor-name")[0];
     span.appendChild(document.createTextNode(competitor.name));
     span = compListItem.getElementsByClassName("sail-number")[0];
-    span.appendChild(document.createTextNode(competitor.sailNumber));
+    span.appendChild(document.createTextNode(competitor.sailNumber || ""));
     if (competitor.alternativeSailNumber) {
         span = compListItem.getElementsByClassName("alt-sail-number")[0];
         span.appendChild(document.createTextNode(" (" + competitor.alternativeSailNumber + ")"));
@@ -262,12 +262,15 @@ function getSuggestions() {
     allCompetitors.forEach(c => {
         if (!competitorIsInResults(c)) {
             let comp = {
-                value: c.sailNumber + " - " + c.name,
+                value: c.name,
                 data: c
             };
             if (c.alternativeSailNumber) {
                 comp.value = c.sailNumber + " ( " +
                     c.alternativeSailNumber + " ) - " + c.name;
+            }
+            else if (c.sailNumber) {
+                comp.value = c.sailNumber + ' - ' + c.name;
             }
             competitorSuggestions.push(comp);
         }
@@ -349,7 +352,7 @@ function initializeButtonFooter() {
         }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitorid="' + c.id + '" > ' +
-            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
     });
 }
 function updateButtonFooter() {
@@ -364,7 +367,7 @@ function updateButtonFooter() {
         }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitorid="' + c.id + '" > ' +
-            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
     });
 }
 function getCompetitorCode(compListItem) {

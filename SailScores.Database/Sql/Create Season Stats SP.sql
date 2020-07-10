@@ -1,51 +1,28 @@
--- ================================================
--- Template generated from Template Explorer using:
--- Create Procedure (New Menu).SQL
---
--- Use the Specify Values for Template Parameters 
--- command (Ctrl-Shift-M) to fill in the parameter 
--- values below.
---
--- This block of comments will not be included in
--- the definition of the procedure.
--- ================================================
+
+
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 -- =============================================
 -- Author:		Jamie Fraser
 -- Create date: April 30th, 2020
 -- Description:	For more speed on Competitor Stats pages
 -- =============================================
 CREATE PROCEDURE SS_SP_GetSeasonSummary 
-	-- Add the parameters for the stored procedure here
-	@SailNumber NVARCHAR(30), 
-	@ClubInitials NVARCHAR(30)
+	@CompetitorId UniqueIdentifier, 
+	@ClubId UniqueIdentifier
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 	
-DECLARE @ClubId UNIQUEIDENTIFIER
-SET @ClubId = (
-    SELECT Id
-    FROM Clubs
-    WHERE Initials = @ClubInitials
-)
-DECLARE @CompetitorId UNIQUEIDENTIFIER
-SET @CompetitorId = (
-    SELECT top 1
-        Id
-    FROM Competitors
-    WHERE SailNumber = @SailNumber
-        AND ClubId = @ClubId
-        order by IsActive desc
-        )
 
 SELECT
     Seasons.Name AS SeasonName,
+    Seasons.UrlName AS SeasonUrlName,
     Seasons.[Start] AS [SeasonStart],
     Seasons.[End] AS [SeasonEnd],
     count(distinct RaceResults.Id) AS RaceCount,
@@ -102,6 +79,7 @@ racerScore.Place
 	RaceResults.RacedDate >= Seasons.[Start] AND RaceResults.RacedDate <= Seasons.[End]
 GROUP BY
    Seasons.Name,
+   Seasons.UrlName,
    Seasons.[Start],
    Seasons.[End]
 

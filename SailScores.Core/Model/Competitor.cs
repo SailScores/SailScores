@@ -13,7 +13,6 @@ namespace SailScores.Core.Model
         [StringLength(200)]
         public String Name { get; set; }
 
-        [Required]
         [Display(Name = "Sail Number")]
         [StringLength(20)]
         public String SailNumber { get; set; }
