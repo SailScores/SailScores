@@ -26,11 +26,6 @@ namespace SailScores.Web.Services
             _coreRegattaService = regattaService;
         }
 
-        public async Task<Club> GetFullClub(string clubInitials)
-        {
-            return await _coreClubService.GetFullClub(clubInitials);
-        }
-
         public async Task<Club> GetClubForClubHome(string clubInitials)
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);

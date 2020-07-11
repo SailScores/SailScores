@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
@@ -38,12 +37,12 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = (await _clubService.GetFullClub(clubInitials));
-                if (!await _authService.CanUserEdit(User, club.Id))
+                var clubId = (await _clubService.GetClubId(clubInitials));
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
                     return Unauthorized();
                 }
-                model.ClubId = club.Id;
+                model.ClubId = clubId;
 
                 var errors = await _seasonService.GetSavingSeasonErrors(model);
                 foreach (var error in errors)
@@ -67,14 +66,13 @@ namespace SailScores.Web.Controllers
 
         public async Task< ActionResult> Edit(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
-            var season =
-                club.Seasons
-                .SingleOrDefault(c => c.Id == id);
+
+            var season = await _seasonService.GetSeasons(clubId);
             if (season == null)
             {
                 return NotFound();
@@ -88,9 +86,11 @@ namespace SailScores.Web.Controllers
         {
             try
             {
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.Seasons.Any(c => c.Id == model.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                var seasonFromDb = (await _seasonService.GetSeasons(clubId)
+                    ).FirstOrDefault(s => s.Id == model.Id);
+                if (!await _authService.CanUserEdit(User, clubId)
+                    || seasonFromDb != null)
                 {
                     return Unauthorized();
                 }
@@ -116,13 +116,14 @@ namespace SailScores.Web.Controllers
 
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.Seasons.Any(c => c.Id == id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
-            var season = club.Seasons.SingleOrDefault(c => c.Id == id);
+
+            var season = (await _seasonService.GetSeasons(clubId)
+                ).FirstOrDefault(s => s.Id == id);
             if (season == null)
             {
                 return NotFound();
@@ -136,9 +137,11 @@ namespace SailScores.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.Seasons.Any(c => c.Id == id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            var seasonFromDb = (await _seasonService.GetSeasons(clubId)
+                ).FirstOrDefault(s => s.Id == id);
+            if (!await _authService.CanUserEdit(User, clubId)
+                || seasonFromDb != null)
             {
                 return Unauthorized();
             }
@@ -150,8 +153,7 @@ namespace SailScores.Web.Controllers
             catch
             {
                 ModelState.AddModelError(String.Empty, "An error occurred deleting this season. Is it in use?");
-                var season = club.Seasons.SingleOrDefault(c => c.Id == id);
-                return View(season);
+                return View(seasonFromDb);
             }
         }
     }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
 using SailScores.Database;
 
 namespace SailScores.Core.Scoring

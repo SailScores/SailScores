@@ -2,7 +2,6 @@
 using SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,7 +32,7 @@ namespace SailScores.Database
 
         DbSet<ClubRequest> ClubRequests { get; set; }
 
-        Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber);
+        Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId);
 
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber);
         
@@ -41,6 +40,6 @@ namespace SailScores.Database
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
             Guid competitorId,
-            string seasonName);
+            string seasonUrlName);
     }
 }

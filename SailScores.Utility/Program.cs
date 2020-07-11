@@ -3,8 +3,6 @@ using System;
 using System.IO;
 using SwObjects = SailScores.ImportExport.Sailwave.Elements;
 using SsObjects = SailScores.Core.Model;
-using System.Collections.Generic;
-using SailScores.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Database;
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +10,6 @@ using Microsoft.Extensions.Configuration;
 using SailScores.Core.Mapping;
 using System.Reflection;
 using AutoMapper;
-using System.Threading.Tasks;
-using System.Linq;
 using SailScores.Api.Services;
 using SailScores.Core.Extensions;
 

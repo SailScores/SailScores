@@ -159,6 +159,9 @@ export function confirmDelete() {
     var resultItem = $(btn).closest("li");
     var compId = resultItem.data('competitorid');
     var compName = resultItem.find(".competitor-name").text();
+    if (!compName) {
+        compName = resultItem.find(".sail-number").text();
+    }
     var modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
     modal.find('#compIdToDelete').val(compId);
@@ -187,10 +190,10 @@ function addNewCompetitor(competitor: competitorDto) {
     compListItem.id = competitor.id.toString();
     compListItem.setAttribute("data-competitorId", competitor.id.toString());
     var span = compListItem.getElementsByClassName("competitor-name")[0] as HTMLElement;
-    span.appendChild(document.createTextNode(competitor.name));
+    span.appendChild(document.createTextNode(competitor.name || ""));
 
     span = compListItem.getElementsByClassName("sail-number")[0] as HTMLElement;
-    span.appendChild(document.createTextNode(competitor.sailNumber));
+    span.appendChild(document.createTextNode(competitor.sailNumber || ""));
     if (competitor.alternativeSailNumber) {
         span = compListItem.getElementsByClassName("alt-sail-number")[0] as HTMLElement;
         span.appendChild(document.createTextNode(" ("+competitor.alternativeSailNumber+")"));
@@ -307,12 +310,14 @@ function getSuggestions(): AutocompleteSuggestion[] {
     allCompetitors.forEach(c => {
         if (!competitorIsInResults(c)) {
             let comp = {
-                value: c.sailNumber + " - " + c.name,
+                value: c.name,
                 data: c
             };
             if (c.alternativeSailNumber) {
                 comp.value = c.sailNumber + " ( " +
                     c.alternativeSailNumber + " ) - " + c.name;
+            } else if (c.sailNumber) {
+                comp.value = c.sailNumber + ' - ' + c.name;
             }
             competitorSuggestions.push(comp);
         }
@@ -406,7 +411,7 @@ function initializeButtonFooter() {
         }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitorid="' + c.id + '" > ' +
-            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
     });
 }
 
@@ -421,7 +426,7 @@ function updateButtonFooter() {
         }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitorid="' + c.id + '" > ' +
-            (c.sailNumber || c.alternativeSailNumber) + ' </button>');
+            (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
 
     });
 }

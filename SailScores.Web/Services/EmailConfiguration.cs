@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SailScores.Web.Services
+﻿namespace SailScores.Web.Services
 {
     public interface IEmailConfiguration
     {

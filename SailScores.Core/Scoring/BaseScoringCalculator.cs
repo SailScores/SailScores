@@ -3,12 +3,12 @@ using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Schema;
 
 namespace SailScores.Core.Scoring
 {
     public abstract class BaseScoringCalculator : IScoringCalculator
     {
+#pragma warning disable CA1707 // Identifiers should not contain underscores
         protected const string AVERAGE_FORMULANAME = "AVE";
         protected const string AVE_AFTER_DISCARDS_FORMULANAME = "AVE ND";
         protected const string AVE_PRIOR_RACES_FORMULANAME = "AVE P";
@@ -28,6 +28,7 @@ namespace SailScores.Core.Scoring
 
         protected const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
 
+#pragma warning restore CA1707 // Identifiers should not contain underscores
 
         protected readonly ScoringSystem _scoringSystem;
 

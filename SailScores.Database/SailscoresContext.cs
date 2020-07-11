@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using SailScores.Api.Enumerations;
 using SailScores.Database.Entities;
 using File = SailScores.Database.Entities.File;
@@ -45,12 +43,12 @@ namespace SailScores.Database
         private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
         private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
 
-        public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(string clubInitials, string sailNumber)
+        public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId)
         {
-            var query = "EXECUTE dbo.SS_SP_GetSeasonSummary @SailNumber = @sailNumber, @ClubInitials = @clubInitials";
+            var query = "EXECUTE dbo.SS_SP_GetSeasonSummary @CompetitorId = @competitorId, @ClubId = @clubId";
 
-            var clubParam = new SqlParameter("clubInitials", clubInitials);
-            var sailParam = new SqlParameter("sailNumber", sailNumber);
+            var clubParam = new SqlParameter("clubId", clubId);
+            var sailParam = new SqlParameter("competitorId", competitorId);
             var result = await this.CompetitorStatsSummary
                 .FromSqlRaw(query, sailParam, clubParam)
                 .ToListAsync();
@@ -70,11 +68,11 @@ namespace SailScores.Database
 
         public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
             Guid competitorId,
-            string seasonName)
+            string seasonUrlName)
         {
             var query = await GetSqlQuery("RankCountsById");
             var competitorParam = new SqlParameter("CompetitorId", competitorId);
-            var seasonParam = new SqlParameter("SeasonName", seasonName);
+            var seasonParam = new SqlParameter("SeasonUrlName", seasonUrlName);
             var result = await this.CompetitorRankStats
                 .FromSqlRaw(query, competitorParam, seasonParam)
                 .ToListAsync();

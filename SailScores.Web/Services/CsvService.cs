@@ -5,11 +5,9 @@ using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Web.Resources;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SailScores.Web.Services
 {

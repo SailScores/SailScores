@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SailScores.Web.Models.SailScores
+﻿namespace SailScores.Web.Models.SailScores
 {
     public abstract class ClubBaseViewModel
     {

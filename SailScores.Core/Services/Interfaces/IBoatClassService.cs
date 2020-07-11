@@ -9,5 +9,6 @@ namespace SailScores.Core.Services
         Task SaveNew(BoatClass boatClass);
         Task Delete(Guid boatClassId);
         Task Update(BoatClass boatClass);
+        Task<BoatClass> GetClass(Guid boatClassId);
     }
 }

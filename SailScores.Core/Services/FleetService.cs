@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SailScores.Core.Model;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
 using System.Linq;
-using SailScores.Core.Model;
+using System.Threading.Tasks;
 using Db = SailScores.Database.Entities;
 
 namespace SailScores.Core.Services

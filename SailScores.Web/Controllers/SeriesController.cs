@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Model;
-using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 

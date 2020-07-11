@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
@@ -278,9 +276,9 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(string clubInitials, string sailNumber)
+        public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(Guid clubId, Guid competitorId)
         {
-            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubInitials, sailNumber);
+            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubId, competitorId);
             
             var returnList = new List<CompetitorSeasonStats>();
             foreach(var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
@@ -288,6 +286,7 @@ namespace SailScores.Core.Services
                 var seasonStats = new CompetitorSeasonStats
                 {
                     SeasonName = season.SeasonName,
+                    SeasonUrlName = season.SeasonUrlName,
                     SeasonStart = season.SeasonStart,
                     SeasonEnd = season.SeasonEnd,
                     RaceCount = season.RaceCount,
@@ -303,11 +302,11 @@ namespace SailScores.Core.Services
 
         public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
             Guid competitorId,
-            string seasonName)
+            string seasonUrlName)
         {
             var ranks = await _dbContext.GetCompetitorRankCountsAsync(
                 competitorId,
-                seasonName);
+                seasonUrlName);
             return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }

@@ -14,7 +14,9 @@ namespace SailScores.Core.Model
         public String Name { get; set; }
 
         [StringLength(200)]
+#pragma warning disable CA1056 // Uri properties should not be strings
         public String UrlName { get; set; }
+#pragma warning restore CA1056 // Uri properties should not be strings
 
         [Required]
         [DataType(DataType.Date)]

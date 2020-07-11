@@ -1,5 +1,3 @@
-using System;
-
 namespace SailScores.Web.Models
 {
     public class ErrorViewModel

@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
@@ -76,6 +74,13 @@ namespace SailScores.Core.Services
             existingClass.Name = boatClass.Name;
             existingClass.Description = boatClass.Description;
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<BoatClass> GetClass(Guid boatClassId)
+        {
+            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId);
+
+            return _mapper.Map<BoatClass>(dbClass);
         }
     }
 }

@@ -115,7 +115,9 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Create(
             string clubInitials,
             CompetitorWithOptionsViewModel competitor,
+#pragma warning disable CA1054 // Uri parameters should not be strings
             string returnUrl = null)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             ViewData["ReturnUrl"] = returnUrl;
             try
@@ -160,7 +162,9 @@ namespace SailScores.Web.Controllers
         // GET: Competitor/CreateMultiple
         public async Task<ActionResult> CreateMultiple(
             string clubInitials,
+#pragma warning disable CA1054 // Uri parameters should not be strings
             string returnUrl = null)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             ViewData["ReturnUrl"] = returnUrl;
             var vm = new MultipleCompetitorsWithOptionsViewModel();
@@ -194,12 +198,14 @@ namespace SailScores.Web.Controllers
             {
                 int i = 0;
                 foreach (var comp in competitorsVm.Competitors) {
-                    Guid? id = await _competitorService.GetCompetitorIdForSailnumberAsync(clubId, comp.SailNumber);
-                    if(id.HasValue)
-                    {
-                        ModelState.AddModelError($"Competitors[{i}].SailNumber", "Sail number is already assigned to an active competitor.");
+                    if(!String.IsNullOrWhiteSpace(comp.SailNumber)) {
+                        Guid? id = await _competitorService.GetCompetitorIdForSailnumberAsync(clubId, comp.SailNumber);
+                        if(id.HasValue)
+                        {
+                            ModelState.AddModelError($"Competitors[{i}].SailNumber", "Sail number is already assigned to an active competitor.");
+                        }
                     }
-                    i++;
+                i++;
                 }
 
                 if (!ModelState.IsValid)
@@ -284,11 +290,14 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
 
-                Guid? existingCompId = await _competitorService.GetCompetitorIdForSailnumberAsync(
-                    competitor.ClubId, competitor.SailNumber);
-                if (existingCompId.HasValue && existingCompId.Value != competitor.Id)
-                {
-                    ModelState.AddModelError($"SailNumber", "Sail number is already assigned to an active competitor.");
+                if(!string.IsNullOrWhiteSpace(competitor.SailNumber)) {
+                    Guid? existingCompId = await _competitorService.GetCompetitorIdForSailnumberAsync(
+                        competitor.ClubId, competitor.SailNumber);
+                    if (existingCompId.HasValue && existingCompId.Value != competitor.Id)
+                    {
+                        ModelState.AddModelError($"SailNumber",
+                            "Sail number is already assigned to an active competitor.");
+                    }
                 }
 
                 if (!ModelState.IsValid)

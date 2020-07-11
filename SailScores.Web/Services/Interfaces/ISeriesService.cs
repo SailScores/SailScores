@@ -1,4 +1,3 @@
-using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;

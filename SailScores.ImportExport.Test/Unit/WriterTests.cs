@@ -1,13 +1,6 @@
-﻿using SailScores.ImportExport.Sailwave;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using SailScores.ImportExport.Sailwave.Elements;
-using SailScores.ImportExport.Sailwave.Parsers;
 using SailScores.ImportExport.Sailwave.Writers;
 using Xunit;
 

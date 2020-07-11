@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Model;
-using CoreServices = SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Threading.Tasks;
+using CoreServices = SailScores.Core.Services;
 
 namespace SailScores.Web.Controllers
 {

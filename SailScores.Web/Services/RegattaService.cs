@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core = SailScores.Core;
 
 namespace SailScores.Web.Services
 {
@@ -14,15 +12,25 @@ namespace SailScores.Web.Services
     {
         private readonly Core.Services.IClubService _clubService;
         private readonly Core.Services.IRegattaService _coreRegattaService;
+        private readonly Core.Services.IScoringService _coreScoringService;
+        private readonly Core.Services.ISeasonService _coreSeasonService;
+        private readonly Core.Services.IFleetService _coreFleetService;
+
         private readonly IMapper _mapper;
 
         public RegattaService(
             Core.Services.IClubService clubService,
             Core.Services.IRegattaService coreRegattaService,
+            Core.Services.IScoringService coreScoringService,
+            Core.Services.ISeasonService coreSeasonService,
+            Core.Services.IFleetService coreFleetService,
             IMapper mapper)
         {
             _clubService = clubService;
             _coreRegattaService = coreRegattaService;
+            _coreScoringService = coreScoringService;
+            _coreSeasonService = coreSeasonService;
+            _coreFleetService = coreFleetService;
             _mapper = mapper;
         }
 
@@ -79,22 +87,24 @@ namespace SailScores.Web.Services
 
         private async Task PrepRegattaVmAsync(RegattaWithOptionsViewModel model)
         {
-            var club = await _clubService.GetFullClub(model.ClubId);
             if (model.StartDate.HasValue)
             {
-                model.Season = club.Seasons.Single(s => s.Start <= model.StartDate.Value
-                && s.End >= model.StartDate.Value);
+                var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
+                model.Season = seasons.Single(s =>
+                    s.Start <= model.StartDate.Value
+                    && s.End >= model.StartDate.Value);
             }
             if (model.ScoringSystemId == Guid.Empty)
             {
                 model.ScoringSystemId = null;
             }
             model.Fleets = new List<Fleet>();
+            var fleets = await _coreFleetService.GetAllFleetsForClub(model.ClubId);
             if (model.FleetIds != null)
             {
                 foreach (var fleetId in model.FleetIds)
                 {
-                    model.Fleets.Add(club.Fleets
+                    model.Fleets.Add(fleets
                         .Single(f => f.Id == fleetId));
                 }
             }
@@ -116,5 +126,23 @@ namespace SailScores.Web.Services
             await _coreRegattaService.AddFleetToRegattaAsync(fleetId, regattaId);
         }
 
+        public async Task<RegattaWithOptionsViewModel> GetBlankRegattaWithOptions(Guid clubId)
+        {
+            var vm = new RegattaWithOptionsViewModel
+            {
+                SeasonOptions = await _coreSeasonService.GetSeasons(clubId),
+                FleetOptions = await _coreFleetService.GetAllFleetsForClub(clubId)
+            };
+            var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, true);
+            scoringSystemOptions.Add(new ScoringSystem
+            {
+                Id = Guid.Empty,
+                Name = "<Use Club Default>"
+            });
+            vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+
+            return vm;
+
+        }
     }
 }

@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SailScores.Web.Controllers
@@ -34,17 +32,18 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(string clubInitials, BoatClass model)
+        public async Task<ActionResult> Create(
+            string clubInitials,
+            BoatClass model)
         {
             try
             {
-                var club = (await _clubService.GetClubs(true)).Single(c =>
-                    c.Initials == clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                if (!await _authService.CanUserEdit(User, clubId))
                 {
-                    return Unauthorized();
+                    return Forbid();
                 }
-                model.ClubId = club.Id;
+                model.ClubId = clubId;
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -55,32 +54,35 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty,
+                    "An error occurred saving these changes.");
+                return View(model);
             }
         }
 
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
-            var boatClass =
-                club.BoatClasses
-                .Single(c => c.Id == id);
+            var boatClass = await _classService.GetClass(id);
             return View(boatClass);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(string clubInitials, BoatClass model)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            BoatClass model)
         {
             try
             {
-                var club = await _clubService.GetFullClub(clubInitials);
-                if (!await _authService.CanUserEdit(User, club.Id)
-                    || !club.BoatClasses.Any(c => c.Id == model.Id))
+                var clubId = await _clubService.GetClubId(clubInitials);
+                var boatClass = await _classService.GetClass(model.Id);
+                if (!await _authService.CanUserEdit(User, clubId)
+                    || boatClass.ClubId != clubId)
                 {
                     return Unauthorized();
                 }
@@ -100,13 +102,13 @@ namespace SailScores.Web.Controllers
 
         public async Task<ActionResult> Delete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.BoatClasses.Any(c => c.Id == id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            var boatClass = await _classService.GetClass(id);
+            if (!await _authService.CanUserEdit(User, clubId)
+                || boatClass.ClubId != clubId)
             {
                 return Unauthorized();
             }
-            var boatClass = club.BoatClasses.Single(c => c.Id == id);
             //todo: add blocker if class contains boats. (or way to move boats.)
             return View(boatClass);
         }
@@ -116,9 +118,10 @@ namespace SailScores.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
         {
-            var club = await _clubService.GetFullClub(clubInitials);
-            if (!await _authService.CanUserEdit(User, club.Id)
-                || !club.BoatClasses.Any(c => c.Id == id))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            var boatClass = await _classService.GetClass(id);
+            if (!await _authService.CanUserEdit(User, clubId)
+                || boatClass.ClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -130,7 +133,7 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                return View(boatClass);
             }
         }
     }

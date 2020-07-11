@@ -8,7 +8,6 @@ using SailScores.Core.Services;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 

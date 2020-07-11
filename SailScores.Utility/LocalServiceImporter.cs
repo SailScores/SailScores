@@ -1,17 +1,8 @@
-﻿using SailScores.ImportExport.Sailwave.Parsers;
-using System;
-using System.IO;
+﻿using System;
 using SwObjects = SailScores.ImportExport.Sailwave.Elements;
 using SsObjects = SailScores.Core.Model;
 using System.Collections.Generic;
 using SailScores.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
-using SailScores.Database;
-using Microsoft.EntityFrameworkCore;
-using SailScores.Core.Mapping;
-using System.Reflection;
-using AutoMapper;
-using System.Threading.Tasks;
 using System.Linq;
 
 
