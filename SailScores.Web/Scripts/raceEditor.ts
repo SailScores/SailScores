@@ -159,6 +159,9 @@ export function confirmDelete() {
     var resultItem = $(btn).closest("li");
     var compId = resultItem.data('competitorid');
     var compName = resultItem.find(".competitor-name").text();
+    if (!compName) {
+        compName = resultItem.find(".sail-number").text();
+    }
     var modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
     modal.find('#compIdToDelete').val(compId);
@@ -187,7 +190,7 @@ function addNewCompetitor(competitor: competitorDto) {
     compListItem.id = competitor.id.toString();
     compListItem.setAttribute("data-competitorId", competitor.id.toString());
     var span = compListItem.getElementsByClassName("competitor-name")[0] as HTMLElement;
-    span.appendChild(document.createTextNode(competitor.name));
+    span.appendChild(document.createTextNode(competitor.name || ""));
 
     span = compListItem.getElementsByClassName("sail-number")[0] as HTMLElement;
     span.appendChild(document.createTextNode(competitor.sailNumber || ""));

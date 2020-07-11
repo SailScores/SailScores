@@ -1,16 +1,19 @@
-Select * from Clubs
+-- Select * from Clubs
 
-DECLARE @ClubName NVARCHAR(200);
+-- DECLARE @ClubName NVARCHAR(200);
 
-SET @ClubName = 'SS Ägir2'
+-- SET @ClubName = 'SS Ägir2'
+
+
+-- SET @ClubId = (
+--         SELECT TOP 1 Id
+--         FROM Clubs
+--         WHERE Name = @ClubName
+--         )
 
 DECLARE @ClubId UNIQUEIDENTIFIER;
 
-SET @ClubId = (
-        SELECT TOP 1 Id
-        FROM Clubs
-        WHERE Name = @ClubName
-        )
+        SET @ClubId = 'ec25867e-248f-437c-9a93-f440770757f2'
 
 
 PRINT N'Deleting Scores'
@@ -33,9 +36,7 @@ DELETE fbc
 FROM FleetBoatClass AS fbc
 INNER JOIN BoatClasses bc
     ON bc.Id = fbc.BoatClassId
-INNER JOIN Competitors c
-    ON c.BoatClassId = bc.Id
-WHERE c.ClubId = @ClubId
+WHERE bc.ClubId = @ClubId
 
 
 PRINT N'Deleting BoatClass'
