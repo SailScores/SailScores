@@ -28,9 +28,10 @@ export function initialize() {
         $('#date').val(now.toISOString().substring(0, 10));
         $('#needsLocalDate').val('false');
     }
-    $('#date').change(loadSeriesOptions);
+    $('#date').change(dateChanged);
 
     $('#raceState').change(raceStateChanged);
+    $('.weather-input').change(weatherChanged);
     $('#results').on('click', '.select-code', calculatePlaces);
     $('#results').on('click', '.move-up', moveUp);
     $('#results').on('click', '.move-down', moveDown);
@@ -75,10 +76,23 @@ export function loadFleet() {
     getCompetitors(clubId, fleetId);
 }
 
+export function dateChanged() {
+    console.log("dateChanged");
+    loadSeriesOptions();
+    if ($("#defaultWeather").val() === "true") {
+        console.log("defaultWeather was true");
+
+        clearWeatherFields();
+    }
+}
+
+export function weatherChanged() {
+    $("#defaultWeather").val("false");
+}
 export function raceStateChanged() {
     let state = $("#raceState").val();
-    if (state === "2"){
-        clearWeatherFields()
+    if (state === "2") {
+        clearWeatherFields();
     }
     if (state === "1") {
         populateEmptyWeatherFields();
