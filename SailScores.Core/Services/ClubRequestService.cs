@@ -26,6 +26,7 @@ namespace SailScores.Core.Services
         public async Task<IList<ClubRequest>> GetPendingRequests()
         {
             var dbObj = await _dbContext.ClubRequests
+                .Where(c => !(c.Complete ?? false))
                 .Where(c => c.RequestApproved == null
                 || c.TestClubId == null
                 || c.VisibleClubId == null)
@@ -73,6 +74,10 @@ namespace SailScores.Core.Services
             existingEntry.AdminNotes = clubRequest.AdminNotes;
             existingEntry.TestClubId = clubRequest.TestClubId;
             existingEntry.VisibleClubId = clubRequest.VisibleClubId;
+            if (existingEntry.RequestApproved == null)
+            {
+                existingEntry.RequestApproved = clubRequest.RequestApproved;
+            }
         }
     }
 }
