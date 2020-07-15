@@ -52,12 +52,12 @@ namespace SailScores.Core.Services
             using (var client = _clientFactory.CreateClient())
             {
 
-                var response = await client.SendAsync(request);
+                var response = await client.SendAsync(request).ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var responseString = await response.Content
-                        .ReadAsStringAsync();
+                        .ReadAsStringAsync().ConfigureAwait(false);
                     var responseObj = JsonConvert.DeserializeObject<CurrentWeatherResponse>(responseString);
                     var domainObj = _mapper.Map<Weather>(responseObj);
                     domainObj.Icon = GetIconName(responseObj.Weather?.First()?.Id);

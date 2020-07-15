@@ -18,7 +18,7 @@ namespace SailScores.Core.Scoring
             Model.ScoringSystem scoringSystem)
         {
 
-            var baseSystemName = await GetBaseScoringSystemNameAsync(scoringSystem);
+            var baseSystemName = await GetBaseScoringSystemNameAsync(scoringSystem).ConfigureAwait(false);
 
             if (baseSystemName.Contains("High Point"))
             {
@@ -37,10 +37,13 @@ namespace SailScores.Core.Scoring
                 return scoringSystem.Name;
             }
             Database.Entities.ScoringSystem currentSystem =
-                await _dbContext.ScoringSystems.SingleAsync(s => s.Id == scoringSystem.ParentSystemId); 
+                await _dbContext.ScoringSystems.SingleAsync(s => s.Id == scoringSystem.ParentSystemId)
+                .ConfigureAwait(false); 
             while (currentSystem.ParentSystemId != null)
             {
-                currentSystem = await _dbContext.ScoringSystems.SingleAsync(s => s.Id == currentSystem.ParentSystemId);
+                currentSystem = await _dbContext.ScoringSystems
+                    .SingleAsync(s => s.Id == currentSystem.ParentSystemId)
+                    .ConfigureAwait(false);
             }
             return currentSystem.Name;
         }

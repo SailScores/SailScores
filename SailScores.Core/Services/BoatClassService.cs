@@ -25,17 +25,18 @@ namespace SailScores.Core.Services
 
         public async Task Delete(Guid boatClassId)
         {
-            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId);
+            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId)
+                .ConfigureAwait(false);
             var fleets = await _dbContext.Fleets
                 .Where(f =>
                     f.FleetType == Api.Enumerations.FleetType.SelectedClasses
                     && f.FleetBoatClasses.Any(fbc =>
                         fbc.BoatClassId == dbClass.Id))
-                .ToListAsync();
+                .ToListAsync().ConfigureAwait(false);
 
             _dbContext.Fleets.RemoveRange(fleets);
             _dbContext.BoatClasses.Remove(dbClass);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task SaveNew(BoatClass boatClass)
@@ -63,22 +64,25 @@ namespace SailScores.Core.Services
                 }
             };
             _dbContext.Fleets.Add(dbFleet);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
         }
 
         public async Task Update(BoatClass boatClass)
         {
-            var existingClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClass.Id);
+            var existingClass = await _dbContext.BoatClasses
+                .SingleAsync(c => c.Id == boatClass.Id)
+                .ConfigureAwait(false);
 
             existingClass.Name = boatClass.Name;
             existingClass.Description = boatClass.Description;
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task<BoatClass> GetClass(Guid boatClassId)
         {
-            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId);
+            var dbClass = await _dbContext.BoatClasses.SingleAsync(c => c.Id == boatClassId)
+                .ConfigureAwait(false);
 
             return _mapper.Map<BoatClass>(dbClass);
         }

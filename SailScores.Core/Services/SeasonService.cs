@@ -27,15 +27,18 @@ namespace SailScores.Core.Services
         {
             var dbSeasons = _dbContext.Seasons.Where(s => s.ClubId == clubId)
                 .OrderByDescending(s => s.Start);
-            return _mapper.Map<List<Season>>(await dbSeasons.ToListAsync());
+            return _mapper.Map<List<Season>>(
+                await dbSeasons.ToListAsync()
+                .ConfigureAwait(false));
 
         }
 
         public async Task Delete(Guid seasonId)
         {
-            var dbSeason = await _dbContext.Seasons.SingleAsync(c => c.Id == seasonId);
+            var dbSeason = await _dbContext.Seasons.SingleAsync(c => c.Id == seasonId)
+                .ConfigureAwait(false);
             _dbContext.Seasons.Remove(dbSeason);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task SaveNew(Season season)
@@ -52,7 +55,7 @@ namespace SailScores.Core.Services
             }
 
             _dbContext.Seasons.Add(dbSeason);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
         }
 
@@ -63,14 +66,18 @@ namespace SailScores.Core.Services
                 && s.ClubId == season.ClubId
                 && (s.Name == season.Name || s.UrlName == season.UrlName)))
             {
-                throw new InvalidOperationException("Cannot update season. A season with this name already exists.");
+                throw new InvalidOperationException(
+                    "Cannot update season. A season with this name already exists.");
             }
-            var existingSeason = await _dbContext.Seasons.SingleAsync(c => c.Id == season.Id);
+            var existingSeason = await _dbContext.Seasons
+                .SingleAsync(c => c.Id == season.Id)
+                .ConfigureAwait(false);
 
             existingSeason.Name = season.Name;
             existingSeason.Start = season.Start;
             existingSeason.End = season.End;
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         public async Task<IList<String>> GetSavingSeasonErrors(Season season)
@@ -79,12 +86,14 @@ namespace SailScores.Core.Services
             var existingSeasons = _dbContext.Seasons.Where(s =>
                 s.ClubId == season.ClubId);
             if(await existingSeasons.AnyAsync(s =>
-                (s.Name == season.Name || s.UrlName == season.UrlName) && s.Id != season.Id))
+                (s.Name == season.Name || s.UrlName == season.UrlName) && s.Id != season.Id)
+                .ConfigureAwait(false))
             {
                 errors.Add("A season with this name exists. Please choose a unique name.");
             }
             var overlappingSeason = await existingSeasons.FirstOrDefaultAsync(s => s.Start <= season.End
-                    && s.End >= season.Start && s.Id != season.Id);
+                    && s.End >= season.Start && s.Id != season.Id)
+                .ConfigureAwait(false);
             if (overlappingSeason != null)
             {
                 errors.Add($"An existing season ( {overlappingSeason.Name} ) overlaps with this time range.");

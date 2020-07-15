@@ -56,7 +56,7 @@ namespace SailScores.Core.Services
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
                 .Where(s => includeRegattaSeries || !regattaSeriesId.Contains(s.Id))
-                .OrderBy(s => s.Name).ToListAsync();
+                .OrderBy(s => s.Name).ToListAsync().ConfigureAwait(false);
 
             var returnObj = _mapper.Map<List<Series>>(series);
             return returnObj;
@@ -67,16 +67,20 @@ namespace SailScores.Core.Services
             var seriesDb = await _dbContext
                 .Series
                 .Include(s => s.Season)
-                .FirstAsync(c => c.Id == seriesId);
+                .FirstAsync(c => c.Id == seriesId)
+                .ConfigureAwait(false);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
             if (fullSeries != null)
             {
-                var flatResults = await GetHistoricalResults(fullSeries);
+                var flatResults = await GetHistoricalResults(fullSeries)
+                    .ConfigureAwait(false);
                 if (flatResults == null)
                 {
-                    await UpdateSeriesResults(seriesDb.Id);
-                    flatResults = await GetHistoricalResults(fullSeries);
+                    await UpdateSeriesResults(seriesDb.Id)
+                        .ConfigureAwait(false);
+                    flatResults = await GetHistoricalResults(fullSeries)
+                        .ConfigureAwait(false);
                 }
                 fullSeries.FlatResults = flatResults;
             }
@@ -95,7 +99,8 @@ namespace SailScores.Core.Services
                     .ThenInclude(rs => rs.Race)
                         .ThenInclude(r => r.Scores)
                     .Include(s => s.Season)
-                .SingleAsync(s => s.Id == seriesId);
+                .SingleAsync(s => s.Id == seriesId)
+                .ConfigureAwait(false);
 
             if (dbSeries.ResultsLocked ?? false)
             {
@@ -103,24 +108,30 @@ namespace SailScores.Core.Services
             }
 
             var fullSeries = _mapper.Map<Series>(dbSeries);
-            await CalculateScoresAsync(fullSeries);
+            await CalculateScoresAsync(fullSeries)
+                .ConfigureAwait(false);
             dbSeries.UpdatedDate = DateTime.UtcNow;
-            await SaveHistoricalResults(fullSeries);
+            await SaveHistoricalResults(fullSeries)
+                .ConfigureAwait(false);
 
-            await SaveChartData(fullSeries);
+            await SaveChartData(fullSeries)
+                .ConfigureAwait(false);
         }
 
         private async Task CalculateScoresAsync(Series fullSeries)
         {
             var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
-                fullSeries);
+                fullSeries)
+                .ConfigureAwait(false);
 
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
             var calculator = await _scoringCalculatorFactory
-                .CreateScoringCalculatorAsync(fullSeries.ScoringSystem);
+                .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
+                .ConfigureAwait(false);
 
             fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
-            await PopulateCompetitorsAsync(fullSeries);
+            await PopulateCompetitorsAsync(fullSeries)
+                .ConfigureAwait(false);
 
             var results = calculator.CalculateResults(fullSeries);
             fullSeries.Results = results;
@@ -134,31 +145,37 @@ namespace SailScores.Core.Services
             var club = await _dbContext.Clubs
                 .Where(c =>
                    c.Initials == clubInitials
-                ).SingleAsync();
+                ).SingleAsync()
+                .ConfigureAwait(false);
             var clubId = club.Id;
             var seriesDb = await _dbContext
                 .Series
                 .Where(s =>
                     s.ClubId == clubId)
                 .SingleOrDefaultAsync(s => s.UrlName == seriesUrlName
-                                  && s.Season.UrlName == seasonName);
+                                  && s.Season.UrlName == seasonName)
+                .ConfigureAwait(false);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
             fullSeries.ShowCompetitorClub = club.ShowClubInResults;
             if (fullSeries != null)
             {
-                var flatResults = await GetHistoricalResults(fullSeries);
+                var flatResults = await GetHistoricalResults(fullSeries)
+                    .ConfigureAwait(false);
                 if (flatResults == null)
                 {
-                    await UpdateSeriesResults(seriesDb.Id);
-                    flatResults = await GetHistoricalResults(fullSeries);
+                    await UpdateSeriesResults(seriesDb.Id)
+                        .ConfigureAwait(false);
+                    flatResults = await GetHistoricalResults(fullSeries)
+                        .ConfigureAwait(false);
                 }
                 fullSeries.FlatResults = flatResults;
             }
             // get the current version of the competitors, so we can get current sail number.
             foreach(var comp in fullSeries.FlatResults.Competitors)
             {
-                comp.CurrentSailNumber = (await _dbContext.Competitors.FirstOrDefaultAsync(c => c.Id == comp.Id)).SailNumber;
+                comp.CurrentSailNumber = (await _dbContext.Competitors.FirstOrDefaultAsync(c => c.Id == comp.Id)
+                    .ConfigureAwait(false)).SailNumber;
             }
             return fullSeries;
         }
@@ -168,7 +185,8 @@ namespace SailScores.Core.Services
             var settings = await _dbContext.Clubs
                 .Where(c =>
                    c.Id == clubId
-                ).Select(c => c.WeatherSettings).SingleOrDefaultAsync();
+                ).Select(c => c.WeatherSettings).SingleOrDefaultAsync()
+                .ConfigureAwait(false);
             if(settings == null)
             {
                 return;
@@ -195,7 +213,8 @@ namespace SailScores.Core.Services
 
             var oldResults = await _dbContext
                 .HistoricalResults
-                .Where(r => r.SeriesId == series.Id).ToListAsync();
+                .Where(r => r.SeriesId == series.Id).ToListAsync()
+                .ConfigureAwait(false);
             oldResults.ForEach(r => r.IsCurrent = false);
 
             var todayPrevious = oldResults
@@ -218,7 +237,8 @@ namespace SailScores.Core.Services
                 Created = DateTime.Now
             });
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         private FlatResults FlattenResults(Series series)

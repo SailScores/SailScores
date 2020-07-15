@@ -54,7 +54,7 @@ namespace SailScores.Core.Services
             var userMatches = _dbContext.UserPermissions
                 .Where(u => u.UserEmail
                 == email);
-            if (await userMatches.AnyAsync(u => u.CanEditAllClubs))
+            if (await userMatches.AnyAsync(u => u.CanEditAllClubs).ConfigureAwait(false))
             {
                 return true;
             }
@@ -75,7 +75,7 @@ namespace SailScores.Core.Services
             var userMatches = _dbContext.UserPermissions
                 .Where(u => u.UserEmail
                 == email);
-            if (await userMatches.AnyAsync(u => u.CanEditAllClubs))
+            if (await userMatches.AnyAsync(u => u.CanEditAllClubs).ConfigureAwait(false))
             {
                 return true;
             }

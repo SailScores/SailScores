@@ -41,7 +41,8 @@ namespace SailScores.Core.Services
                     .Include(f => f.FleetBoatClasses)
                     .FirstOrDefaultAsync(f =>
                        f.Id == fleetId
-                       && f.ClubId == clubId);
+                       && f.ClubId == clubId)
+                    .ConfigureAwait(false);
                 if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses)
                 {
                     var classIds = fleet.FleetBoatClasses.Select(f => f.BoatClassId);
@@ -56,7 +57,8 @@ namespace SailScores.Core.Services
             var list = await dbObjects
                 .OrderBy(c => c.SailNumber)
                 .ThenBy(c => c.Name)
-                .ToListAsync();
+                .ToListAsync()
+                .ConfigureAwait(false);
             return _mapper.Map<List<Model.Competitor>>(list);
         }
 
@@ -65,7 +67,8 @@ namespace SailScores.Core.Services
             var competitor = await 
                 _dbContext
                 .Competitors
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == id)
+                .ConfigureAwait(false);
 
             return _mapper.Map<Model.Competitor>(competitor);
         }
@@ -79,7 +82,8 @@ namespace SailScores.Core.Services
                 .FirstOrDefaultAsync(c =>
                     c.ClubId == clubId &&
                     c.SailNumber == sailNumber &&
-                    (c.IsActive ?? true));
+                    (c.IsActive ?? true))
+                .ConfigureAwait(false);
 
             return _mapper.Map<Model.Competitor>(competitor);
         }
@@ -91,7 +95,8 @@ namespace SailScores.Core.Services
                 .Include(c => c.CompetitorFleets)
                 .FirstOrDefaultAsync(
                     c =>
-                    c.Id == comp.Id);
+                    c.Id == comp.Id)
+                .ConfigureAwait(false);
             var addingNew = dbObject == null;
             if(addingNew)
             {
@@ -100,7 +105,8 @@ namespace SailScores.Core.Services
                     comp.Id = Guid.NewGuid();
                 }
                 dbObject = _mapper.Map<Db.Competitor>(comp);
-                await _dbContext.Competitors.AddAsync(dbObject);
+                await _dbContext.Competitors.AddAsync(dbObject)
+                    .ConfigureAwait(false);
             }
             else
             {
@@ -173,7 +179,8 @@ namespace SailScores.Core.Services
                 }
             }
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
 
         }
 
@@ -184,7 +191,8 @@ namespace SailScores.Core.Services
                 .Include(c => c.CompetitorFleets)
                 .FirstOrDefaultAsync(
                     c =>
-                    c.Id == comp.Id);
+                    c.Id == comp.Id)
+                .ConfigureAwait(false);
             var addingNew = dbObject == null;
             if (addingNew)
             {
@@ -193,7 +201,8 @@ namespace SailScores.Core.Services
                     comp.Id = Guid.NewGuid();
                 }
                 dbObject = _mapper.Map<Db.Competitor>(comp);
-                await _dbContext.Competitors.AddAsync(dbObject);
+                await _dbContext.Competitors.AddAsync(dbObject)
+                    .ConfigureAwait(false);
             }
             else
             {
@@ -264,21 +273,25 @@ namespace SailScores.Core.Services
                 }
             }
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         public async Task DeleteCompetitorAsync(Guid competitorId)
         {
             var dbComp = await _dbContext
                 .Competitors
-                .SingleAsync(c => c.Id == competitorId);
+                .SingleAsync(c => c.Id == competitorId)
+                .ConfigureAwait(false);
             _dbContext.Competitors.Remove(dbComp);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(Guid clubId, Guid competitorId)
         {
-            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubId, competitorId);
+            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubId, competitorId)
+                .ConfigureAwait(false);
             
             var returnList = new List<CompetitorSeasonStats>();
             foreach(var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
@@ -306,7 +319,8 @@ namespace SailScores.Core.Services
         {
             var ranks = await _dbContext.GetCompetitorRankCountsAsync(
                 competitorId,
-                seasonUrlName);
+                seasonUrlName)
+                .ConfigureAwait(false);
             return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }

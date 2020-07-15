@@ -37,7 +37,8 @@ namespace SailScores.Core.Services
                 .Include(c => c.Season)
                 .Include(c => c.RegattaFleet)
                 .OrderBy(r => r.StartDate)
-                .ToListAsync();
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             var returnObj = _mapper.Map<List<Regatta>>(regattaDb);
             return returnObj;

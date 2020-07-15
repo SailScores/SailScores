@@ -52,7 +52,8 @@ namespace SailScores.Core.Services
                 .OrderByDescending(r => r.Date)
                 .ThenBy(r => r.Order)
                 .Include(r => r.Fleet)
-                .ToListAsync();
+                .ToListAsync()
+                .ConfigureAwait(false);
             return _mapper.Map<List<Model.Race>>(dbObjects);
         }
 

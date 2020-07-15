@@ -27,7 +27,8 @@ namespace SailScores.Core.Services
         {
             var dbClass = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
-                .SingleAsync(c => c.Id == fleetId);
+                .SingleAsync(c => c.Id == fleetId)
+                .ConfigureAwait(false);
             foreach(var link in dbClass.FleetBoatClasses.ToList())
             {
                 dbClass.FleetBoatClasses.Remove(link);
@@ -38,7 +39,8 @@ namespace SailScores.Core.Services
             }
             _dbContext.Fleets.Remove(dbClass);
             
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         public async Task<Guid> SaveNew(Fleet fleet)
@@ -82,7 +84,8 @@ namespace SailScores.Core.Services
             _dbContext.Fleets.Add(dbFleet);
 
             //todo: save classes.
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
             return dbFleet.Id;
 
         }
