@@ -402,7 +402,8 @@ namespace SailScores.Core.Services
                 && s.Name == model.Name
                 && s.Season.Id == model.Season.Id))
             {
-                throw new InvalidOperationException("Cannot update series. A series with this name in this season already exists.");
+                throw new InvalidOperationException(
+                    "Cannot update series. A series with this name in this season already exists.");
             }
             var existingSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
