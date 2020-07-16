@@ -158,19 +158,17 @@ namespace SailScores.Core.Services
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
             fullSeries.ShowCompetitorClub = club.ShowClubInResults;
-            if (fullSeries != null)
+            var flatResults = await GetHistoricalResults(fullSeries)
+                .ConfigureAwait(false);
+            if (flatResults == null)
             {
-                var flatResults = await GetHistoricalResults(fullSeries)
+                await UpdateSeriesResults(seriesDb.Id)
                     .ConfigureAwait(false);
-                if (flatResults == null)
-                {
-                    await UpdateSeriesResults(seriesDb.Id)
-                        .ConfigureAwait(false);
-                    flatResults = await GetHistoricalResults(fullSeries)
-                        .ConfigureAwait(false);
-                }
-                fullSeries.FlatResults = flatResults;
+                flatResults = await GetHistoricalResults(fullSeries)
+                    .ConfigureAwait(false);
             }
+            fullSeries.FlatResults = flatResults;
+
             // get the current version of the competitors, so we can get current sail number.
             foreach(var comp in fullSeries.FlatResults.Competitors)
             {
@@ -340,7 +338,9 @@ namespace SailScores.Core.Services
                 .Where(r => r != null)
                 .SelectMany(r => r.Scores)
                 .Select(s => s.CompetitorId);
-            var dbCompetitors = await _dbContext.Competitors.Where(c => compIds.Contains(c.Id)).ToListAsync();
+            var dbCompetitors = await _dbContext.Competitors
+                .Where(c => compIds.Contains(c.Id)).ToListAsync()
+                .ConfigureAwait(false);
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
 
@@ -354,13 +354,15 @@ namespace SailScores.Core.Services
         public async Task SaveNewSeries(Series series, Club club)
         {
             series.ClubId = club.Id;
-            await SaveNewSeries(series);
+            await SaveNewSeries(series)
+                .ConfigureAwait(false);
         }
 
         public async Task SaveNewSeries(Series series)
         {
             Database.Entities.Series dbSeries = await 
-                _dbObjectBuilder.BuildDbSeriesAsync(series);
+                _dbObjectBuilder.BuildDbSeriesAsync(series)
+                .ConfigureAwait(false);
             dbSeries.UrlName = UrlUtility.GetUrlName(series.Name);
             dbSeries.UpdatedDate = DateTime.UtcNow;
             if (dbSeries.Season == null && series.Season.Id != Guid.Empty && series.Season.Start != default)
@@ -384,9 +386,11 @@ namespace SailScores.Core.Services
             }
 
             _dbContext.Series.Add(dbSeries);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
 
-            await UpdateSeriesResults(dbSeries.Id);
+            await UpdateSeriesResults(dbSeries.Id)
+                .ConfigureAwait(false);
         }
 
 
@@ -402,7 +406,8 @@ namespace SailScores.Core.Services
             }
             var existingSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
-                .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId);
+                .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId)
+                .ConfigureAwait(false);
 
             existingSeries.Name = model.Name;
             // Don't update UrlName here: keep links to this series unchanged.
@@ -446,10 +451,12 @@ namespace SailScores.Core.Services
                 existingSeries.RaceSeries.Add(addRace);
             }
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
             if (!(existingSeries.ResultsLocked ?? false))
             {
-                await UpdateSeriesResults(existingSeries.Id);
+                await UpdateSeriesResults(existingSeries.Id)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -457,22 +464,26 @@ namespace SailScores.Core.Services
         {
             var dbSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
-                .SingleAsync(c => c.Id == seriesId);
+                .SingleAsync(c => c.Id == seriesId)
+                .ConfigureAwait(false);
             foreach (var link in dbSeries.RaceSeries.ToList())
             {
                 dbSeries.RaceSeries.Remove(link);
             }
             _dbContext.Series.Remove(dbSeries);
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         private async Task SaveChartData(Series fullSeries)
         {
-            FlatChartData chartData = await CalculateChartData(fullSeries);
+            FlatChartData chartData = await CalculateChartData(fullSeries)
+                .ConfigureAwait(false);
             var oldCharts = await _dbContext
                 .SeriesChartResults
-                .Where(r => r.SeriesId == fullSeries.Id).ToListAsync();
+                .Where(r => r.SeriesId == fullSeries.Id).ToListAsync()
+                .ConfigureAwait(false);
             
             foreach (var chart in oldCharts.ToList()) {
                 _dbContext.SeriesChartResults.Remove(chart);
@@ -487,7 +498,8 @@ namespace SailScores.Core.Services
                 Created = DateTime.Now
             };
             _dbContext.SeriesChartResults.Add(chartResults);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
 
         }
 
@@ -512,7 +524,8 @@ namespace SailScores.Core.Services
                     fullSeries.Races.Remove(race);
                     if (fullSeries.Races.Count > 0)
                     {
-                        await CalculateScoresAsync(fullSeries);
+                        await CalculateScoresAsync(fullSeries)
+                            .ConfigureAwait(false);
                         entries.AddRange(GetChartDataPoints(fullSeries));
                     }
                 }
@@ -555,7 +568,8 @@ namespace SailScores.Core.Services
             var dbRow = await _dbContext.HistoricalResults
                 .SingleOrDefaultAsync(r =>
                     r.SeriesId == series.Id
-                    && r.IsCurrent);
+                    && r.IsCurrent)
+                .ConfigureAwait(false);
 
             if (String.IsNullOrWhiteSpace(dbRow?.Results))
             {
@@ -563,7 +577,8 @@ namespace SailScores.Core.Services
             }
 
             var flatResults = Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
-            await LocalizeFlatResults(flatResults, series.ClubId);
+            await LocalizeFlatResults(flatResults, series.ClubId)
+                .ConfigureAwait(false);
             return flatResults;
         }
 
@@ -572,7 +587,8 @@ namespace SailScores.Core.Services
             var dbRow = await _dbContext.SeriesChartResults
                 .SingleOrDefaultAsync(r =>
                     r.SeriesId == seriesId
-                    && r.IsCurrent);
+                    && r.IsCurrent)
+                .ConfigureAwait(false);
 
             if (String.IsNullOrWhiteSpace(dbRow?.Results))
             {

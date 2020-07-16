@@ -63,7 +63,8 @@ namespace SailScores.Core.Services
             bool includeScheduled = true,
             bool includeAbandoned = true)
         {
-            var seasonToUse = await GetSeasonAsync(clubId, seasonName);
+            var seasonToUse = await GetSeasonAsync(clubId, seasonName)
+                .ConfigureAwait(false);
             var startDate = seasonToUse?.Start ?? DateTime.Today.AddYears(-5);
             var endDate = seasonToUse?.End ?? DateTime.Today.AddYears(1);
 
@@ -75,13 +76,17 @@ namespace SailScores.Core.Services
                 .Include( r => r.Scores)
                 .Include( r => r.SeriesRaces)
                 .ToListAsync()
+                .ConfigureAwait(false)
                 ).Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced ||
                         (includeScheduled && (r.State == RaceState.Scheduled)) ||
                         (includeAbandoned && (r.State == RaceState.Abandoned)));
+            //TODO: compare putting the above where clause into the IQueryable. Perf Improvement?
+
             var modelRaces = _mapper.Map<List<Model.Race>>(dbRaces);
             
             var dbSeries = await _dbContext.Series
-                .Where(s => s.ClubId == clubId).ToListAsync();
+                .Where(s => s.ClubId == clubId).ToListAsync()
+                .ConfigureAwait(false);
             var modelSeries = _mapper.Map<List<Model.Series>>(dbSeries);
 
             foreach (var race in modelRaces)
@@ -99,10 +104,11 @@ namespace SailScores.Core.Services
         {
             if (String.IsNullOrWhiteSpace(seasonName))
             {
-                return await GetMostRecentRaceSeasonAsync(clubId);
+                return await GetMostRecentRaceSeasonAsync(clubId).ConfigureAwait(false);
             }
             var dbSeason = await _dbContext.Seasons.FirstOrDefaultAsync(s =>
-                s.ClubId == clubId && s.UrlName == seasonName);
+                s.ClubId == clubId && s.UrlName == seasonName)
+                .ConfigureAwait(false);
 
             return _mapper.Map<Season>(dbSeason);
         }
@@ -112,7 +118,8 @@ namespace SailScores.Core.Services
             var race = await _dbContext.Races
                 .Where(r => r.ClubId == clubId)
                 .OrderByDescending(r => r.Date)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
 
             Db.Season dbSeason;
             if (race == null)
@@ -120,14 +127,17 @@ namespace SailScores.Core.Services
                 dbSeason = await _dbContext.Seasons
                     .Where(s => s.ClubId == clubId)
                     .OrderByDescending(s => s.Start)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
             }
-
-            dbSeason = await _dbContext.Seasons
-                .Where(s => s.ClubId == clubId)
-                .OrderByDescending(s => s.Start)
-                .FirstOrDefaultAsync(s => s.Start <= race.Date);
-
+            else
+            {
+                dbSeason = await _dbContext.Seasons
+                    .Where(s => s.ClubId == clubId)
+                    .OrderByDescending(s => s.Start)
+                    .FirstOrDefaultAsync(s => s.Start <= race.Date)
+                    .ConfigureAwait(false);
+            }
             return _mapper.Map<Season>(dbSeason);
         }
 
@@ -139,14 +149,16 @@ namespace SailScores.Core.Services
                 .Include(r => r.Fleet)
                 .Include(r => r.Scores)
                 .Include(r => r.Weather)
-                .FirstOrDefaultAsync(c => c.Id == raceId);
+                .FirstOrDefaultAsync(c => c.Id == raceId)
+                .ConfigureAwait(false);
             if (race == null)
             {
                 return null;
             }
             var modelRace = _mapper.Map<Model.Race>(race);
             
-            await PopulateCompetitors(modelRace);
+            await PopulateCompetitors(modelRace)
+                .ConfigureAwait(false);
 
             var dbSeason = _dbContext.Clubs
                 .Include(c => c.Seasons)
@@ -176,7 +188,10 @@ namespace SailScores.Core.Services
             }
             var compIds = race.Scores
                 .Select(s => s.CompetitorId);
-            var dbCompetitors = await _dbContext.Competitors.Where(c => compIds.Contains(c.Id)).ToListAsync();
+            var dbCompetitors = await _dbContext.Competitors
+                .Where(c => compIds.Contains(c.Id))
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             var dtoComps = _mapper.Map<IList<Competitor>>(dbCompetitors);
             
@@ -196,7 +211,8 @@ namespace SailScores.Core.Services
                     .Include(r => r.Scores)
                     .Include(r => r.SeriesRaces)
                     .Include(r => r.Weather)
-                    .SingleAsync(r => r.Id == race.Id);
+                    .SingleAsync(r => r.Id == race.Id)
+                    .ConfigureAwait(false);
                 var seriesFromRace = dbRace.SeriesRaces?.Select(r => r.SeriesId)?.ToList();
                 if(seriesFromRace != null)
                 {
@@ -233,10 +249,8 @@ namespace SailScores.Core.Services
                 dbRace.Weather.Id = id;
             }
 
-            if (race.FleetId != null)
-            {
-                dbRace.Fleet = _dbContext.Fleets.SingleOrDefault(f => f.Id == race.FleetId);
-            }
+            dbRace.Fleet = _dbContext.Fleets.SingleOrDefault(f => f.Id == race.FleetId);
+
             if(race.SeriesIds != null)
             {
                 if(dbRace.SeriesRaces == null)
@@ -283,7 +297,8 @@ namespace SailScores.Core.Services
                 _dbContext.Races.Update(dbRace);
             }
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
             seriesIdsToUpdate = seriesIdsToUpdate.Union(dbRace.SeriesRaces.Select(rs => rs.SeriesId).ToList());
             foreach (var seriesId in seriesIdsToUpdate)
             {
@@ -305,13 +320,12 @@ namespace SailScores.Core.Services
                 {
                     var scopedServices = scope.ServiceProvider;
                     var seriesService = scopedServices.GetRequiredService<ISeriesService>();
-                    // fake delay to test?
 
-                    //await Task.Delay(TimeSpan.FromSeconds(5), token);
                     try
                     {
                         // Do background-y stuff here.
-                        await seriesService.UpdateSeriesResults(seriesId);
+                        await seriesService.UpdateSeriesResults(seriesId)
+                            .ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -331,12 +345,15 @@ namespace SailScores.Core.Services
             var dbRace = await _dbContext
                 .Races
                 .Include(r => r.SeriesRaces)
-                .SingleAsync(r => r.Id ==  raceId);
+                .SingleAsync(r => r.Id ==  raceId)
+                .ConfigureAwait(false);
             _dbContext.Races.Remove(dbRace);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
             foreach(var seriesId in dbRace.SeriesRaces.Select(rs => rs.SeriesId))
             {
-                await _seriesService.UpdateSeriesResults(seriesId);
+                await _seriesService.UpdateSeriesResults(seriesId)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -348,7 +365,8 @@ namespace SailScores.Core.Services
             return await _dbContext
                 .Races
                 .Where(r => r.ClubId == clubId && r.Fleet.Id == fleetId)
-                .CountAsync(r => r.Date == raceDate);
+                .CountAsync(r => r.Date == raceDate)
+                .ConfigureAwait(false);
         }
     }
 }

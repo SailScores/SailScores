@@ -103,7 +103,8 @@ namespace SailScores.Core.Services
             var existingFleet = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
                 .Include(f => f.CompetitorFleets)
-                .SingleAsync(c => c.Id == fleet.Id);
+                .SingleAsync(c => c.Id == fleet.Id)
+                .ConfigureAwait(false);
 
             existingFleet.ShortName = fleet.ShortName;
             existingFleet.Name = fleet.Name;
@@ -115,7 +116,8 @@ namespace SailScores.Core.Services
             CleanUpClasses(fleet, existingFleet);
             CleanUpCompetitors(fleet, existingFleet);
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         private static void CleanUpClasses(Fleet fleet, Db.Fleet existingFleet)
@@ -186,7 +188,8 @@ namespace SailScores.Core.Services
                 .ThenInclude(fbc => fbc.BoatClass)
                 .Include(f => f.CompetitorFleets)
                 .ThenInclude(fcf => fcf.Competitor)
-                .SingleAsync(c => c.Id == fleetId);
+                .SingleAsync(c => c.Id == fleetId)
+                .ConfigureAwait(false);
             return _mapper.Map<Fleet>(dbFleet);
 
         }

@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Controllers;
 using SailScores.Web.Services;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Xunit;
-using ClubService = SailScores.Web.Services.ClubService;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {

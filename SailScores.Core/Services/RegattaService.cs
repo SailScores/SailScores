@@ -50,7 +50,8 @@ namespace SailScores.Core.Services
                 .Regattas
                 .Where(r => r.StartDate <= end && (r.EndDate >= start || r.StartDate >= start))
                 .Include(r => r.Season)
-                .ToListAsync();
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             var returnObj = _mapper.Map<List<Regatta>>(regattaDb);
             return returnObj;
@@ -68,13 +69,15 @@ namespace SailScores.Core.Services
                 .ThenInclude(cf => cf.Competitor)
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
-                .SingleAsync();
+                .SingleAsync()
+                .ConfigureAwait(false);
 
             var fullRegatta = _mapper.Map<Regatta>(regattaDb);
 
             foreach (var series in fullRegatta.Series)
             {
-                series.FlatResults = await _seriesService.GetHistoricalResults(series);
+                series.FlatResults = await _seriesService.GetHistoricalResults(series)
+                    .ConfigureAwait(false);
                 series.PreferAlternativeSailNumbers = fullRegatta.PreferAlternateSailNumbers;
                 series.ShowCompetitorClub = true;
             }
@@ -86,27 +89,35 @@ namespace SailScores.Core.Services
             var clubId = await _dbContext.Clubs
                 .Where(c =>
                    c.Initials == clubInitials
-                ).Select(c => c.Id).SingleAsync();
+                ).Select(c => c.Id).SingleAsync()
+                .ConfigureAwait(false);
 
-            var regattaId = (await _dbContext
+            var regattaId = await _dbContext
                 .Regattas
                 .Where(r =>
                     r.ClubId == clubId &&
                     r.UrlName == regattaName &&
-                    r.Season.UrlName == seasonName).SingleOrDefaultAsync())?.Id;
-            if(!regattaId.HasValue)
+                    r.Season.UrlName == seasonName)
+                .Select(r => r.Id)
+                .SingleOrDefaultAsync()
+                .ConfigureAwait(false);
+            if(regattaId == default)
             {
                 return null;
             }
-            return await GetRegattaAsync(regattaId.Value);
+            return await GetRegattaAsync(regattaId).ConfigureAwait(false);
         }
 
         public async Task<Guid> SaveNewRegattaAsync(Regatta regatta)
         {
-            Database.Entities.Regatta dbRegatta = await _dbObjectBuilder.BuildDbRegattaAsync(regatta);
+            Database.Entities.Regatta dbRegatta =
+                await _dbObjectBuilder.BuildDbRegattaAsync(regatta)
+                .ConfigureAwait(false);
             dbRegatta.UrlName = UrlUtility.GetUrlName(dbRegatta.Name);
             dbRegatta.UpdatedDate = DateTime.UtcNow;
-            if (dbRegatta.Season == null && regatta.Season.Id != Guid.Empty && regatta.Season.Start != default)
+            if (dbRegatta.Season == null
+                && regatta.Season.Id != Guid.Empty
+                && regatta.Season.Start != default)
             {
                 var season = _mapper.Map<dbObj.Season>(regatta.Season);
                 _dbContext.Seasons.Add(season);
@@ -114,7 +125,8 @@ namespace SailScores.Core.Services
             }
             if (dbRegatta.Season == null)
             {
-                throw new InvalidOperationException("Could not find or create season for new Regatta.");
+                throw new InvalidOperationException(
+                    "Could not find or create season for new Regatta.");
             }
 
             if (_dbContext.Regattas.Any(s =>
@@ -123,11 +135,13 @@ namespace SailScores.Core.Services
                     && s.UrlName == regatta.UrlName
                     && s.Season.Id == dbRegatta.Season.Id)))
             {
-                throw new InvalidOperationException("Cannot create regatta. A regatta with this name in this season already exists.");
+                throw new InvalidOperationException(
+                    "Cannot create regatta. A regatta with this name in this season already exists.");
             }
 
             _dbContext.Regattas.Add(dbRegatta);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
             return dbRegatta.Id;
         }
 
@@ -139,11 +153,13 @@ namespace SailScores.Core.Services
                 && r.Name == model.Name
                 && r.Season.Id == model.Season.Id))
             {
-                throw new InvalidOperationException("Cannot update Regatta. A regatta with this name in this season already exists.");
+                throw new InvalidOperationException(
+                    "Cannot update Regatta. A regatta with this name in this season already exists.");
             }
             var existingRegatta = await _dbContext.Regattas
                 .Include(r => r.RegattaFleet)
-                .SingleAsync(c => c.Id == model.Id);
+                .SingleAsync(c => c.Id == model.Id)
+                .ConfigureAwait(false);
 
             existingRegatta.Name = model.Name;
             existingRegatta.Url = model.Url;
@@ -163,7 +179,8 @@ namespace SailScores.Core.Services
 
             CleanupFleets(model, existingRegatta);
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
 
             return existingRegatta.Id;
         }
@@ -207,28 +224,33 @@ namespace SailScores.Core.Services
             var dbRegatta = await _dbContext.Regattas
                 .Include(r => r.RegattaFleet)
                 .Include(r => r.RegattaSeries)
-                .SingleAsync(c => c.Id == regattaId);
+                .SingleAsync(c => c.Id == regattaId)
+                .ConfigureAwait(false);
 
             dbRegatta.RegattaFleet.Clear();
             dbRegatta.RegattaSeries.Clear();
             _dbContext.Regattas.Remove(dbRegatta);
             
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
         }
 
         // based on the fleet of the race, find the correct series from the regatta
         // and then add race to that series. Create the series if necessary.
         public async Task AddRaceToRegattaAsync(Race race, Guid regattaId)
         {
-            var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == race.Fleet.Id);
+            var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == race.Fleet.Id)
+                .ConfigureAwait(false);
             var dbRegatta = await _dbContext.Regattas
                 .Include(r => r.Season)
                 .Include(r => r.RegattaSeries)
-                .SingleAsync(c => c.Id == regattaId);
+                .SingleAsync(c => c.Id == regattaId)
+                .ConfigureAwait(false);
 
             var series = await _dbContext.Regattas.SelectMany(r => r.RegattaSeries.Select(rs => rs.Series))
                 .Include(s => s.RaceSeries)
-                .SingleOrDefaultAsync(s => s.FleetId == dbFleet.Id);
+                .SingleOrDefaultAsync(s => s.FleetId == dbFleet.Id)
+                .ConfigureAwait(false);
 
             if(series == null)
             {
@@ -259,25 +281,29 @@ namespace SailScores.Core.Services
                 SeriesId = series.Id
             });
 
-            await _dbContext.SaveChangesAsync();
-            await _seriesService.UpdateSeriesResults(series.Id);
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            await _seriesService.UpdateSeriesResults(series.Id)
+                .ConfigureAwait(false);
 
         }
 
         public async Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId)
         {
             var exists = await _dbContext.Regattas.SelectMany(r => r.RegattaFleet)
-                .AnyAsync(rf => rf.FleetId == fleetId && rf.RegattaId == regattaId);
+                .AnyAsync(rf => rf.FleetId == fleetId && rf.RegattaId == regattaId)
+                .ConfigureAwait(false);
 
             if (!exists)
             {
-                var regatta = await _dbContext.Regattas.SingleAsync(r => r.Id == regattaId);
+                var regatta = await _dbContext.Regattas.SingleAsync(r => r.Id == regattaId)
+                    .ConfigureAwait(false);
                 regatta.RegattaFleet.Add(new dbObj.RegattaFleet
                 {
                     RegattaId = regattaId,
                     FleetId = fleetId
                 });
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync()
+                    .ConfigureAwait(false);
             }
         }
 
@@ -289,7 +315,8 @@ namespace SailScores.Core.Services
 
             var r = await _dbContext.Regattas
                 .Where(r => r.RegattaSeries.Any(rs => seriesIds.Contains(rs.SeriesId)))
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
             return _mapper.Map<Regatta>(r);
         }
     }
