@@ -229,7 +229,7 @@ namespace SailScores.Core.Services
             }
             dbRace.Name = race.Name;
             dbRace.Order = race.Order;
-            dbRace.Date = race.Date;
+            dbRace.Date = race.Date ?? DateTime.Today;
             dbRace.Description = race.Description;
             dbRace.State = race.State;
             dbRace.TrackingUrl = race.TrackingUrl;
