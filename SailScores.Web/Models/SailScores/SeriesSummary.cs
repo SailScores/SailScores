@@ -10,7 +10,9 @@ namespace SailScores.Web.Models.SailScores
 
         public Guid Id { get; set; }
         public String Name { get; set; }
+#pragma warning disable CA1056 // Uri properties should not be strings
         public String UrlName { get; set; }
+#pragma warning restore CA1056 // Uri properties should not be strings
         public String Description { get; set; }
         public IList<Race> Races { get; set; }
         public Season Season { get; set; }

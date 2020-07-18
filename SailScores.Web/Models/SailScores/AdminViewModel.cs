@@ -8,6 +8,8 @@ namespace SailScores.Web.Models.SailScores
     // Within the context of a single club, list things that can be administered.
     public class AdminViewModel
     {
+
+#pragma warning disable CA2227 // Collection properties should be read only
         public Guid Id { get; set; }
 
         [Required]
@@ -44,5 +46,7 @@ namespace SailScores.Web.Models.SailScores
         public string SpeedUnits { get; set; }
         public IList<string> SpeedUnitOptions { get; set; }
         public IList<string> TemperatureUnitOptions { get; set; }
+
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

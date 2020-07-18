@@ -25,18 +25,52 @@ namespace SailScores.Core.Scoring
                         && !ShouldAdjustOtherScores(s)
                         ) + 1);
 
-            // if this is one, no tie. (if zero Place doesn't have a value (= coded.))
+            // other results with same place are ties
             int numTied = allScores.Count(s =>
                 currentScore.Place.HasValue
                 && s.Race == currentScore.Race
                 && s.Place == currentScore.Place
                 && !ShouldAdjustOtherScores(s));
+
+            int tieBase = currentScore.Place ?? 1;
+            var tmpScore = currentScore;
+            bool tie = false;
+            // if current is tie look at previous scores until not a tie.
+            if ((GetScoreCode(currentScore?.Code)?.Formula ?? String.Empty) == "TIE")
+            {
+                do
+                {
+                    numTied++;
+                    var previousScore = GetPreviousScore(allScores, tmpScore);
+                    tieBase = previousScore?.Place ?? tieBase;
+                    tie = (GetScoreCode(previousScore?.Code)?.Formula ?? String.Empty) == "TIE";
+                    tmpScore = previousScore;
+
+                } while (tie);
+            }
+
+            //also need to look at next scores to see if they are ties.
+            tmpScore = currentScore;
+            tie= false;
+            do
+            {
+                var nextScore = GetNextScore(allScores, tmpScore);
+                tie = (GetScoreCode(nextScore?.Code)?.Formula ?? String.Empty) == "TIE";
+                if (tie)
+                {
+                    numTied++;
+                }
+                tmpScore = nextScore;
+
+            } while (tie);
+
             if (numTied > 1)
             {
+                currentScore.Code = "TIE";
                 int total = 0;
                 for (int i = 0; i < numTied; i++)
                 {
-                    total += ((int)currentScore.Place + i);
+                    total += (tieBase + i);
                 }
                 returnScore = (decimal)total / (decimal)numTied;
             }
@@ -44,5 +78,17 @@ namespace SailScores.Core.Scoring
             return returnScore;
         }
 
+        private static Score GetNextScore(IEnumerable<Score> allScores, Score currentScore)
+        {
+            return allScores.FirstOrDefault(s =>
+            s.Race == currentScore.Race
+            && s.Place == currentScore.Place + 1);
+        }
+        private static Score GetPreviousScore(IEnumerable<Score> allScores, Score currentScore)
+        {
+            return allScores.FirstOrDefault(s =>
+            s.Race == currentScore.Race
+            && s.Place == currentScore.Place - 1);
+        }
     }
 }

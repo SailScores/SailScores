@@ -19,7 +19,7 @@ namespace SailScores.Core.Services
         Task Delete(Guid raceId);
         Task<int> GetRaceCountAsync(
             Guid clubId,
-            DateTime? date,
+            DateTime? raceDate,
             Guid fleetId);
         Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId);
     }

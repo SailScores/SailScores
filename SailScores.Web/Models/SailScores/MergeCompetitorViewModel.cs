@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace SailScores.Web.Models.SailScores
 {
+
+#pragma warning disable CA2227 // Collection properties should be read only
     public class MergeCompetitorViewModel
     {
         public IList<Competitor> TargetCompetitorOptions { get; set; }
@@ -20,4 +22,5 @@ namespace SailScores.Web.Models.SailScores
 
         public IList<Season> SourceSeasons { get; set; }
     }
+#pragma warning restore CA2227 // Collection properties should be read only
 }

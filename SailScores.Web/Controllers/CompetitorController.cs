@@ -77,7 +77,6 @@ namespace SailScores.Web.Controllers
             if (ranks == null)
             {
                 return Json(String.Empty);
-                //return new NotFoundResult();
             }
             return Json(ranks);
         }
