@@ -66,6 +66,7 @@ namespace SailScores.Core.Scoring
 
             if (numTied > 1)
             {
+                currentScore.Code = "TIE";
                 int total = 0;
                 for (int i = 0; i < numTied; i++)
                 {
