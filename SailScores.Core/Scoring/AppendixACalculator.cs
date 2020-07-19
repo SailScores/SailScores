@@ -51,7 +51,6 @@ namespace SailScores.Core.Scoring
 
             //also need to look at next scores to see if they are ties.
             tmpScore = currentScore;
-            tie= false;
             do
             {
                 var nextScore = GetNextScore(allScores, tmpScore);
