@@ -76,7 +76,8 @@ new { @class = "btn btn-outline-primary btn-sm" })
         {
             <tr>
                 <td>
-                    @((score.Place == null || score.Place == 0) ? $"{score.Code} - {score.ScoreCode.Description}" : score.Place.ToString())
+                    @((score.Place != null && score.Place != 0) ? score.Place.ToString() : "")
+                    @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")
                 </td>
                 <td>
                     @score.Competitor.SailNumber

@@ -36,7 +36,8 @@ namespace SailScores.Core.Services
                 foreach (var series in regatta.Series)
                 {
                     series.ClubId = regatta.ClubId;
-                    var dbSeries = await BuildDbSeriesAsync(series);
+                    var dbSeries = await BuildDbSeriesAsync(series)
+                        .ConfigureAwait(false);
                     retObj.RegattaSeries.Add(new dbObj.RegattaSeries
                     {
                         Regatta = retObj,
@@ -110,7 +111,8 @@ namespace SailScores.Core.Services
                 {
                     dbScore.Place = null;
                 }
-                dbScore.Competitor = await FindOrBuildCompetitorAsync(clubId, score.Competitor);
+                dbScore.Competitor = await FindOrBuildCompetitorAsync(clubId, score.Competitor)
+                    .ConfigureAwait(false);
                 dbRace.Scores.Add(dbScore);
                 if (race.Fleet?.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 {

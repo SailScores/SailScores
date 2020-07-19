@@ -19,7 +19,8 @@ namespace SailScores.Core.Services
         public async Task AddPermision(Guid clubId, string userEmail)
         {
             var existingPermision = await _dbContext.UserPermissions
-                .FirstOrDefaultAsync(p => p.UserEmail == userEmail && p.ClubId == clubId);
+                .FirstOrDefaultAsync(p => p.UserEmail == userEmail && p.ClubId == clubId)
+                .ConfigureAwait(false);
 
             if(existingPermision == null)
             {
@@ -30,18 +31,20 @@ namespace SailScores.Core.Services
                         UserEmail = userEmail,
                         CanEditAllClubs = false
                     });
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync()
+                    .ConfigureAwait(false);
             }
         }
 
         public async Task<bool> IsUserAllowedToEdit(string email, string clubInitials)
         {
-            var clubId = ( await _dbContext.Clubs
-                    .SingleOrDefaultAsync(c =>
-                        c.Initials
-                        == clubInitials))
-                    ?.Id;
-            return await IsUserAllowedToEdit(email, clubId);
+            var clubId = await _dbContext.Clubs
+                .Where(c => c.Initials == clubInitials)
+                .Select(c => c.Id)
+                .SingleOrDefaultAsync()
+                .ConfigureAwait(false);
+            return await IsUserAllowedToEdit(email, clubId)
+                .ConfigureAwait(false);
 
         }
 
@@ -54,7 +57,7 @@ namespace SailScores.Core.Services
             var userMatches = _dbContext.UserPermissions
                 .Where(u => u.UserEmail
                 == email);
-            if (await userMatches.AnyAsync(u => u.CanEditAllClubs))
+            if (await userMatches.AnyAsync(u => u.CanEditAllClubs).ConfigureAwait(false))
             {
                 return true;
             }
@@ -62,7 +65,8 @@ namespace SailScores.Core.Services
             {
                 return false;
             }
-            return await userMatches.AnyAsync(u => u.ClubId == clubId);
+            return await userMatches.AnyAsync(u => u.ClubId == clubId)
+                .ConfigureAwait(false);
             
         }
 
@@ -75,11 +79,7 @@ namespace SailScores.Core.Services
             var userMatches = _dbContext.UserPermissions
                 .Where(u => u.UserEmail
                 == email);
-            if (await userMatches.AnyAsync(u => u.CanEditAllClubs))
-            {
-                return true;
-            }
-            return false;
+            return await userMatches.AnyAsync(u => u.CanEditAllClubs).ConfigureAwait(false);
         }
     }
 }

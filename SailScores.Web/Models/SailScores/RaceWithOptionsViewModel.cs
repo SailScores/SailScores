@@ -6,6 +6,8 @@ using System.Linq;
 
 namespace SailScores.Web.Models.SailScores
 {
+
+#pragma warning disable CA2227 // Collection properties should be read only
     public class RaceWithOptionsViewModel : RaceViewModel
     {
         internal bool ClubHasCompetitors;
@@ -25,7 +27,7 @@ namespace SailScores.Web.Models.SailScores
 
         public int? InitialOrder { get; set; }
 
-        public RegattaSummaryViewModel Regatta { get; set; }
+        public new RegattaSummaryViewModel Regatta { get; set; }
 
         public Guid? RegattaId { get; set; }
 
@@ -33,4 +35,5 @@ namespace SailScores.Web.Models.SailScores
         // help the client keep track of whether they might need to change the date.
         public bool NeedsLocalDate { get; set; }
     }
+#pragma warning restore CA2227 // Collection properties should be read only
 }
