@@ -47,11 +47,10 @@ namespace SailScores.Web.Services
             try {
                 await _emailSender.SendEmailAsync(notificationEmail, "SailScores - Club Request submitted.",
                        $"A club has been requested for {request.ClubName} by {request.ContactEmail}.");
-
             }
             catch (Exception)
             {
-                // if email is not sent , should add some alert for site admins, that there are 
+                // if email is not sent, should add some alert for site admins, that there are 
                 // requests to approve.
             }
         }
@@ -96,7 +95,6 @@ namespace SailScores.Web.Services
             }
             else
             {
-
                 var baseScoringSystem = await _coreScoringService.GetSiteDefaultSystemAsync();
 
                 ScoringSystem newScoringSystem = new ScoringSystem
