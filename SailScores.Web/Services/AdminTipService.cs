@@ -104,11 +104,11 @@ namespace SailScores.Web.Services
         public IList<AdminToDoViewModel> GetRaceCreateErrors(
             RaceWithOptionsViewModel race)
         {
+            var returnList = new List<AdminToDoViewModel>();
             if (race == null)
             {
-                return null;
+                return returnList;
             }
-            var returnList = new List<AdminToDoViewModel>();
             if(race.FleetOptions == null || race.FleetOptions.Count == 0)
             {
                 returnList.Add(new AdminToDoViewModel
@@ -157,11 +157,12 @@ namespace SailScores.Web.Services
 
         public IList<AdminToDoViewModel> GetSeriesCreateErrors(SeriesWithOptionsViewModel series)
         {
+            var returnList = new List<AdminToDoViewModel>();
+
             if (series == null)
             {
-                return null;
+                return returnList;
             }
-            var returnList = new List<AdminToDoViewModel>();
             if (series.SeasonOptions == null || !series.SeasonOptions.Any())
             {
                 returnList.Add(new AdminToDoViewModel
@@ -184,11 +185,11 @@ namespace SailScores.Web.Services
         public IList<AdminToDoViewModel> GetCompetitorCreateErrors(
             CompetitorWithOptionsViewModel competitor)
         {
+            var returnList = new List<AdminToDoViewModel>();
             if (competitor == null)
             {
-                return null;
+                return returnList;
             }
-            var returnList = new List<AdminToDoViewModel>();
             if (competitor.BoatClassOptions == null
                 || !competitor.BoatClassOptions.Any())
             {
@@ -210,11 +211,11 @@ namespace SailScores.Web.Services
         public IList<AdminToDoViewModel> GetMultipleCompetitorsCreateErrors(
             MultipleCompetitorsWithOptionsViewModel vm)
         {
+            var returnList = new List<AdminToDoViewModel>();
             if (vm == null)
             {
-                return null;
+                return returnList;
             }
-            var returnList = new List<AdminToDoViewModel>();
             if (vm.BoatClassOptions == null
                 || !vm.BoatClassOptions.Any())
             {

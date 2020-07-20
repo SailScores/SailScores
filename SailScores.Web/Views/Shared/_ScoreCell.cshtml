@@ -4,7 +4,7 @@
 
 @if (Model != null)
 {
-    <td class="text-center @(Model.Place == 1 ? "finish-first " : "") @(Model.Place == 2 ? "finish-second " : "") @(Model.Place == 3 ? "finish-third " : "") ">
+    <td class="text-center @(Model.ScoreValue == 1 ? "finish-first " : "") @(Model.ScoreValue == 2 ? "finish-second " : "") @(Model.ScoreValue == 3 ? "finish-third " : "") ">
         <span class="@(Model.Discard ? "text-muted" : "")">
             @if (Model.Discard)
             {

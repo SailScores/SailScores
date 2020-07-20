@@ -96,7 +96,7 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task SaveSeries_Unlocked_CalculatesScores()
         {
-            _service.Update(_fakeSeries);
+            await _service.Update(_fakeSeries);
 
             _mockScoringCalculatorFactory.Verify(cf =>
                 cf.CreateScoringCalculatorAsync(It.IsAny<ScoringSystem>()),
@@ -107,7 +107,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task SaveSeries_Locked_DoesNotCalculateScores()
         {
             _fakeSeries.ResultsLocked = true;
-            _service.Update(_fakeSeries);
+            await _service.Update(_fakeSeries);
 
             _mockScoringCalculatorFactory.Verify(cf =>
                 cf.CreateScoringCalculatorAsync(It.IsAny<ScoringSystem>()),

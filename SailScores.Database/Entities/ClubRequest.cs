@@ -34,6 +34,8 @@ namespace SailScores.Database.Entities
 
         public Guid? TestClubId { get; set; }
         public Guid? VisibleClubId { get; set; }
-        
+
+        public bool? Complete { get; set; }
+
     }
 }

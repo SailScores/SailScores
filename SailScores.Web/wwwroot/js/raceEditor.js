@@ -19,8 +19,9 @@ export function initialize() {
         $('#date').val(now.toISOString().substring(0, 10));
         $('#needsLocalDate').val('false');
     }
-    $('#date').change(loadSeriesOptions);
+    $('#date').change(dateChanged);
     $('#raceState').change(raceStateChanged);
+    $('.weather-input').change(weatherChanged);
     $('#results').on('click', '.select-code', calculatePlaces);
     $('#results').on('click', '.move-up', moveUp);
     $('#results').on('click', '.move-down', moveDown);
@@ -61,6 +62,17 @@ export function loadFleet() {
     }
     $("#createCompFleetId").val(fleetId);
     getCompetitors(clubId, fleetId);
+}
+export function dateChanged() {
+    console.log("dateChanged");
+    loadSeriesOptions();
+    if ($("#defaultWeather").val() === "true") {
+        console.log("defaultWeather was true");
+        clearWeatherFields();
+    }
+}
+export function weatherChanged() {
+    $("#defaultWeather").val("false");
 }
 export function raceStateChanged() {
     let state = $("#raceState").val();
@@ -132,6 +144,9 @@ export function confirmDelete() {
     var resultItem = $(btn).closest("li");
     var compId = resultItem.data('competitorid');
     var compName = resultItem.find(".competitor-name").text();
+    if (!compName) {
+        compName = resultItem.find(".sail-number").text();
+    }
     var modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
     modal.find('#compIdToDelete').val(compId);
@@ -157,7 +172,7 @@ function addNewCompetitor(competitor) {
     compListItem.id = competitor.id.toString();
     compListItem.setAttribute("data-competitorId", competitor.id.toString());
     var span = compListItem.getElementsByClassName("competitor-name")[0];
-    span.appendChild(document.createTextNode(competitor.name));
+    span.appendChild(document.createTextNode(competitor.name || ""));
     span = compListItem.getElementsByClassName("sail-number")[0];
     span.appendChild(document.createTextNode(competitor.sailNumber || ""));
     if (competitor.alternativeSailNumber) {

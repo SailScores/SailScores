@@ -28,7 +28,8 @@ namespace SailScores.Core.Services
             var allScoreCodes = await _dbContext
                 .ScoringSystems
                 .Where(s => s.ClubId == clubId || s.ClubId == null)
-                .SelectMany(s => s.ScoreCodes).ToListAsync();
+                .SelectMany(s => s.ScoreCodes).ToListAsync()
+                .ConfigureAwait(false);
             var distinctScoreCodes = allScoreCodes
                 .GroupBy(s => s.Name, (key, g) => g.OrderBy(e => e.Name).First());
 

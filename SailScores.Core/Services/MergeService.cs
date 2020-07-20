@@ -37,14 +37,16 @@ namespace SailScores.Core.Services
 
         public async Task<int?> GetRaceCountFor(Guid competitorId)
         {
-            return await _dbContext.Scores.CountAsync(s => s.CompetitorId == competitorId);
+            return await _dbContext.Scores.CountAsync(s => s.CompetitorId == competitorId)
+                .ConfigureAwait(false);
         }
 
         public async Task<IList<Season>> GetSeasonsFor(Guid competitorId)
         {
             var clubId = 
                 (await _dbContext.Competitors
-                .SingleAsync(c => c.Id == competitorId))
+                .SingleAsync(c => c.Id == competitorId)
+                .ConfigureAwait(false))
                 .ClubId;
             var raceDates = _dbContext.Competitors
                 .Where(c => c.Id == competitorId)
@@ -55,12 +57,14 @@ namespace SailScores.Core.Services
             var seasons = _dbContext.Seasons
                 .Where(s => s.ClubId == clubId)
                 .Where(s => raceDates.Any(r => r.HasValue && r.Value > s.Start && r.Value <= s.End));
-            return _mapper.Map<IList<Season>>(await seasons.ToListAsync());
+            return _mapper.Map<IList<Season>>(await seasons.ToListAsync()
+                .ConfigureAwait(false));
         }
 
         public async Task<IList<Competitor>> GetSourceOptionsFor(Guid targetCompetitorId)
         {
-            var targetComp = await _competitorService.GetCompetitorAsync(targetCompetitorId);
+            var targetComp = await _competitorService.GetCompetitorAsync(targetCompetitorId)
+                .ConfigureAwait(false);
             
             var targetRaceIds = GetRacesForComp(targetCompetitorId);
             
@@ -70,7 +74,8 @@ namespace SailScores.Core.Services
                 && !(c.Scores.Any(s => targetRaceIds.Contains(s.RaceId))))
                 .OrderBy(c => c.Name);
 
-            return _mapper.Map<IList<Competitor>>(await sourceList.ToListAsync());
+            return _mapper.Map<IList<Competitor>>(await sourceList.ToListAsync()
+                .ConfigureAwait(false));
 
         }
 
@@ -84,16 +89,21 @@ namespace SailScores.Core.Services
                 .SelectMany(s => s.SeriesRaces)
                 .Select(s => s.SeriesId)
                 .Distinct()
-                .ToListAsync();
+                .ToListAsync()
+                .ConfigureAwait(false);
 
-            await scoresToMove.ForEachAsync(s => s.CompetitorId = targetCompetitorId);
-            await _dbContext.SaveChangesAsync();
+            await scoresToMove.ForEachAsync(s => s.CompetitorId = targetCompetitorId)
+                .ConfigureAwait(false);
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
 
-            await _competitorService.DeleteCompetitorAsync(sourceCompetitorId);
+            await _competitorService.DeleteCompetitorAsync(sourceCompetitorId)
+                .ConfigureAwait(false);
 
             foreach(var seriesId in seriesIds)
             {
-                await _seriesService.UpdateSeriesResults(seriesId);
+                await _seriesService.UpdateSeriesResults(seriesId)
+                    .ConfigureAwait(false);
             }
         }
 

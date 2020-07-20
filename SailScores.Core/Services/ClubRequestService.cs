@@ -26,11 +26,12 @@ namespace SailScores.Core.Services
         public async Task<IList<ClubRequest>> GetPendingRequests()
         {
             var dbObj = await _dbContext.ClubRequests
+                .Where(c => !(c.Complete ?? false))
                 .Where(c => c.RequestApproved == null
                 || c.TestClubId == null
                 || c.VisibleClubId == null)
                 .OrderBy(c => c.RequestSubmitted)
-                .ToListAsync();
+                .ToListAsync().ConfigureAwait(false);
 
             return _mapper.Map<IList<ClubRequest>>(dbObj);
         }
@@ -39,7 +40,7 @@ namespace SailScores.Core.Services
         {
             var dbObj = await _dbContext.ClubRequests
                 .Where(c => c.Id == id)
-                .FirstAsync();
+                .FirstAsync().ConfigureAwait(false);
 
             return _mapper.Map<ClubRequest>(dbObj);
         }
@@ -49,7 +50,7 @@ namespace SailScores.Core.Services
             var dbObj = _mapper.Map<Db.ClubRequest>(clubRequest);
             _dbContext.ClubRequests.Add(dbObj);
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task UpdateRequest(ClubRequest clubRequest)
@@ -59,7 +60,7 @@ namespace SailScores.Core.Services
                 throw new ArgumentNullException(nameof(clubRequest));
             }
             var existingEntry = await _dbContext.ClubRequests
-                .SingleAsync(r => r.Id == clubRequest.Id);
+                .SingleAsync(r => r.Id == clubRequest.Id).ConfigureAwait(false);
 
             existingEntry.ClubName = clubRequest.ClubName;
             existingEntry.ClubInitials = clubRequest.ClubInitials;
@@ -73,6 +74,10 @@ namespace SailScores.Core.Services
             existingEntry.AdminNotes = clubRequest.AdminNotes;
             existingEntry.TestClubId = clubRequest.TestClubId;
             existingEntry.VisibleClubId = clubRequest.VisibleClubId;
+            if (existingEntry.RequestApproved == null)
+            {
+                existingEntry.RequestApproved = clubRequest.RequestApproved;
+            }
         }
     }
 }
