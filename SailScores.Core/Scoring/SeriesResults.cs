@@ -52,7 +52,7 @@ namespace SailScores.Core.Scoring
 
         public IEnumerable<Race> SailedRaces { get
             {
-                return Races.Where(r => (r?.State ?? RaceState.Raced) == RaceState.Raced);
+                return Races?.Where(r => (r?.State ?? RaceState.Raced) == RaceState.Raced) ?? new List<Race>();
             }
         }
     }

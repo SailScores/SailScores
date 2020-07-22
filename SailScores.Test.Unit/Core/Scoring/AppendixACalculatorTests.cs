@@ -542,6 +542,22 @@ namespace SailScores.Test.Unit
                 results.Results[fourthComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
+        [Fact]
+        public void CalculateResults_TiedForThirdButSavedWith4_BothGetThreeAndHalf()
+        {
+            var basicSeries = GetBasicSeries(10, 1);
+            var thirdComp = basicSeries.Competitors.Skip(2).First();
+            var fourthComp = basicSeries.Competitors.Skip(3).First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Code = "TIE";
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(3.5m,
+                results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
+            Assert.Equal(3.5m,
+                results.Results[fourthComp].CalculatedScores.Last().Value.ScoreValue);
+        }
+
         // https://www.rya.org.uk/SiteCollectionDocuments/Racing/RacingInformation/RaceOfficials/Resource%20Centre/Best%20Practice%20Guidelines%20Policies/Scoring.pdf
 
         // Example: Scoring: Low Point – one score excluded

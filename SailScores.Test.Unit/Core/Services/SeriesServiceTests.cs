@@ -18,7 +18,7 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Series _fakeSeries;
         private readonly DbObjectBuilder _dbObjectBuilder;
         private readonly SeriesService _service;
-
+        private readonly Mock<IScoringCalculator> _mockCalculator;
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
@@ -27,7 +27,11 @@ namespace SailScores.Test.Unit.Core.Services
 
         public SeriesServiceTests()
         {
+            _mockCalculator = new Mock<IScoringCalculator>();
+            _mockCalculator.Setup(c => c.CalculateResults(It.IsAny<Series>())).Returns(new SeriesResults());
             _mockScoringCalculatorFactory = new Mock<IScoringCalculatorFactory>();
+            _mockScoringCalculatorFactory.Setup(f => f.CreateScoringCalculatorAsync(It.IsAny<SailScores.Core.Model.ScoringSystem>()))
+                .ReturnsAsync(_mockCalculator.Object);
             _mockScoringService = new Mock<IScoringService>();
             _mockConversionService = new Mock<IConversionService>();
 
@@ -70,7 +74,8 @@ namespace SailScores.Test.Unit.Core.Services
                     Name = "New Season",
                     Start = new DateTime(2019, 1, 1),
                     End = new DateTime(2019, 12, 31)
-                }
+                },
+                Results = new SeriesResults()
             };
 
             _context.Series.Add(_mapper.Map<Database.Entities.Series>(_fakeSeries));
