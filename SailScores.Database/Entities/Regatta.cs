@@ -23,8 +23,8 @@ namespace SailScores.Database.Entities
 
         public IList<RegattaSeries> RegattaSeries { get; set; }
 
-        public IList<RegattaFleet> RegattaFleet { get; set; } 
- 
+        public IList<RegattaFleet> RegattaFleet { get; set; }
+
         [Required]
         public Season Season { get; set; }
 

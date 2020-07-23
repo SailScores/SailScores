@@ -15,6 +15,6 @@ namespace SailScores.Database.Entities
 
         [StringLength(2000)]
         public String Description { get; set; }
-        
+
     }
 }

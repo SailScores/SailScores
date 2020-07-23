@@ -14,7 +14,7 @@ namespace SailScores.ImportExport.Sailwave.Writers
                 Name = "scrcode",
                 Value = GetScoreCodeValue(code)
             };
-            
+
             return returnRow;
         }
 
@@ -26,24 +26,24 @@ namespace SailScores.ImportExport.Sailwave.Writers
 
             var strings = new List<string>();
 
-            strings.Add( code.Code );  // 0
-            strings.Add( code.Method );
-            strings.Add( code.Value );
-            strings.Add( Utilities.BoolToYesNo( code.Discardable) );
-            strings.Add( Utilities.BoolToYesNo( code.CameToStartArea)); //4
-            strings.Add( string.Empty );
-            strings.Add( spare );
-            strings.Add( spare );
-            strings.Add( spare );//8
-            strings.Add( spare );
-            strings.Add( spare );
+            strings.Add(code.Code);  // 0
+            strings.Add(code.Method);
+            strings.Add(code.Value);
+            strings.Add(Utilities.BoolToYesNo(code.Discardable));
+            strings.Add(Utilities.BoolToYesNo(code.CameToStartArea)); //4
+            strings.Add(string.Empty);
+            strings.Add(spare);
+            strings.Add(spare);
+            strings.Add(spare);//8
+            strings.Add(spare);
+            strings.Add(spare);
             strings.Add(Utilities.BoolToYesNo(code.Started)); // 11
             strings.Add(Utilities.BoolToYesNo(code.Finished));
             strings.Add(Utilities.BoolToYesNo(code.RuleA6d2Applies));
             strings.Add(code.ScoringSystemId.ToString());
             strings.Add(code.Format);
             strings.Add(code.Description); //16
-            
+
             return String.Join("|", strings);
         }
     }

@@ -16,7 +16,7 @@ namespace SailScores.Api.Dtos
         public String UrlName { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        
+
         public IEnumerable<Guid> SeriesIds { get; set; }
     }
 }

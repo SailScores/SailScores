@@ -32,7 +32,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             _signInManager = signInManager;
             _configuration = configuration;
         }
-        
+
         // from https://medium.com/@ozgurgul/asp-net-core-2-0-webapi-jwt-authentication-with-identity-mysql-3698eeba6ff8
         [HttpPost]
         [AllowAnonymous]

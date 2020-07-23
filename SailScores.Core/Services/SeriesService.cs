@@ -170,7 +170,7 @@ namespace SailScores.Core.Services
             fullSeries.FlatResults = flatResults;
 
             // get the current version of the competitors, so we can get current sail number.
-            foreach(var comp in fullSeries.FlatResults.Competitors)
+            foreach (var comp in fullSeries.FlatResults.Competitors)
             {
                 comp.CurrentSailNumber = (await _dbContext.Competitors.FirstOrDefaultAsync(c => c.Id == comp.Id)
                     .ConfigureAwait(false)).SailNumber;
@@ -185,13 +185,13 @@ namespace SailScores.Core.Services
                    c.Id == clubId
                 ).Select(c => c.WeatherSettings).SingleOrDefaultAsync()
                 .ConfigureAwait(false);
-            if(settings == null)
+            if (settings == null)
             {
                 return;
             }
-            foreach(var race in flatResults.Races)
+            foreach (var race in flatResults.Races)
             {
-                race.WindSpeed = 
+                race.WindSpeed =
                     _converter.Convert(
                      race.WindSpeedMeterPerSecond,
                      _converter.MeterPerSecond,
@@ -344,7 +344,7 @@ namespace SailScores.Core.Services
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
 
-            foreach(var score in series.Races
+            foreach (var score in series.Races
                 .Where(r => r != null).SelectMany(r => r.Scores))
             {
                 score.Competitor = series.Competitors.First(c => c.Id == score.CompetitorId);
@@ -360,7 +360,7 @@ namespace SailScores.Core.Services
 
         public async Task SaveNewSeries(Series series)
         {
-            Database.Entities.Series dbSeries = await 
+            Database.Entities.Series dbSeries = await
                 _dbObjectBuilder.BuildDbSeriesAsync(series)
                 .ConfigureAwait(false);
             dbSeries.UrlName = UrlUtility.GetUrlName(series.Name);
@@ -485,8 +485,9 @@ namespace SailScores.Core.Services
                 .SeriesChartResults
                 .Where(r => r.SeriesId == fullSeries.Id).ToListAsync()
                 .ConfigureAwait(false);
-            
-            foreach (var chart in oldCharts.ToList()) {
+
+            foreach (var chart in oldCharts.ToList())
+            {
                 _dbContext.SeriesChartResults.Remove(chart);
             }
 
@@ -545,7 +546,7 @@ namespace SailScores.Core.Services
         private IEnumerable<FlatChartPoint> GetChartDataPoints(Series fullSeries)
         {
             var lastRaceId = fullSeries.Races.OrderByDescending(r => r.Date).ThenByDescending(r => r.Order).FirstOrDefault()?.Id;
-            if(lastRaceId == null)
+            if (lastRaceId == null)
             {
                 yield break;
             }

@@ -44,7 +44,7 @@ namespace SailScores.Web.Services
                 .ThenBy(s => s.Name);
             return _mapper.Map<IList<RegattaSummaryViewModel>>(orderedRegattas);
         }
-        
+
         public async Task<IEnumerable<RegattaSummaryViewModel>> GetCurrentRegattas()
         {
             var start = DateTime.Today.AddDays(-7);
@@ -56,7 +56,7 @@ namespace SailScores.Web.Services
                 .ThenBy(s => s.Name);
             var vm = _mapper.Map<IList<RegattaSummaryViewModel>>(filteredRegattas);
             var regattasToRemove = new List<RegattaSummaryViewModel>();
-            foreach(var regatta in vm)
+            foreach (var regatta in vm)
             {
                 var club = await _clubService.GetMinimalClub(regatta.ClubId);
                 if (club.IsHidden)

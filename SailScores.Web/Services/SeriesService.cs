@@ -68,7 +68,7 @@ namespace SailScores.Web.Services
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);
             var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
-            var orderedSeries = 
+            var orderedSeries =
                 coreObject
                 .OrderByDescending(s => s.Season.Start)
                 .ThenBy(s => s.Name);
@@ -77,7 +77,7 @@ namespace SailScores.Web.Services
 
         public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesUrlName)
         {
-            var series = await _coreSeriesService.GetSeriesDetailsAsync(clubInitials, season, seriesUrlName );
+            var series = await _coreSeriesService.GetSeriesDetailsAsync(clubInitials, season, seriesUrlName);
 
             return series;
         }

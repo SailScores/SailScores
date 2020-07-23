@@ -63,7 +63,7 @@ namespace SailScores.Web.Controllers
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             ViewData["ReturnUrl"] = returnUrl;
-            
+
             var scoringSystem = await _scoringService.GetScoringSystemAsync(scoringSystemId);
             if (scoringSystem.ClubId != clubId)
             {
@@ -121,7 +121,7 @@ namespace SailScores.Web.Controllers
 
             var scoreCode = await _scoringService.GetScoreCodeAsync(id);
 
-            if(scoreCode == null)
+            if (scoreCode == null)
             {
                 return new NotFoundResult();
             }
@@ -144,7 +144,7 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
             var scoreSystem = await _scoringService.GetScoringSystemAsync(model.ScoringSystemId);
-            if(scoreSystem.ClubId != clubId)
+            if (scoreSystem.ClubId != clubId)
             {
                 throw new InvalidOperationException("Score code is not for current club.");
             }
@@ -203,12 +203,11 @@ namespace SailScores.Web.Controllers
             {
                 throw new InvalidOperationException("Score code is not for current club.");
             }
-            if(!(scoreSystem.ScoreCodes.Any(s => s.Id == id)))
+            if (!(scoreSystem.ScoreCodes.Any(s => s.Id == id)))
             {
                 throw new InvalidOperationException("Score code is not for current scoring system.");
             }
-            var scoreCode = await _scoringService.GetScoreCodeAsync(id);
-
+            
             await _scoringService.DeleteScoreCodeAsync(id);
 
             return Redirect(returnUrl);

@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\jbfraser1_sailscores\CSharp\SonarLint.xml" Link="SonarLint.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Sailwave\" />
   </ItemGroup>
 

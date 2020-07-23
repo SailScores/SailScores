@@ -280,7 +280,7 @@ namespace SailScores.Test.Unit
         [Fact]
         public void CalculateResults_ValidSeries_ReturnsResults()
         {
-            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3,3));
+            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3, 3));
 
             Assert.NotNull(results);
         }
@@ -448,7 +448,7 @@ namespace SailScores.Test.Unit
         // SailScores does not currently have a way to indicate multiple penalties: score codes are assigned one per result. The current work-around is manually scoring a result.
         // putting the test in here with an ignore as a note for future desireability.
 
-        [Fact(Skip ="Not implemented. See test comment")]
+        [Fact(Skip = "Not implemented. See test comment")]
         public void CalculateResults_MultiplePenalties_CumulativeImpact()
         {
             var basicSeries = GetBasicSeries(23, 1);
@@ -533,7 +533,7 @@ namespace SailScores.Test.Unit
             var fourthComp = basicSeries.Competitors.Skip(3).First();
             basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Code = "TIE";
             basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Place = 3;
-            
+
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
             Assert.Equal(3.5m,
@@ -760,7 +760,7 @@ namespace SailScores.Test.Unit
 
                     };
                 var scores = new List<Score>();
-                for( int j=0; j < competitors.Count; j++)
+                for (int j = 0; j < competitors.Count; j++)
                 {
                     scores.Add(new Score
                     {

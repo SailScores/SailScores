@@ -12,7 +12,7 @@ namespace SailScores.Database.Entities
         public String ClubName { get; set; }
         [StringLength(10)]
         public String ClubInitials { get; set; }
-        
+
         public String ClubLocation { get; set; }
         public String ClubWebsite { get; set; }
 

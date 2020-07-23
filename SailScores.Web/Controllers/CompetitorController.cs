@@ -53,7 +53,7 @@ namespace SailScores.Web.Controllers
             var competitorStats = await _competitorService.GetCompetitorStatsAsync(
                 clubInitials,
                 sailNumber);
-            if(competitorStats == null)
+            if (competitorStats == null)
             {
                 return new NotFoundResult();
             }
@@ -140,7 +140,7 @@ namespace SailScores.Web.Controllers
                 foreach (var fleetId in competitor.FleetIds)
                 {
                     var fleet = fleets.SingleOrDefault(f => f.Id == fleetId);
-                    if(fleet != null)
+                    if (fleet != null)
                     {
                         competitor.Fleets.Add(fleet);
                     }
@@ -196,15 +196,17 @@ namespace SailScores.Web.Controllers
             try
             {
                 int i = 0;
-                foreach (var comp in competitorsVm.Competitors) {
-                    if(!String.IsNullOrWhiteSpace(comp.SailNumber)) {
+                foreach (var comp in competitorsVm.Competitors)
+                {
+                    if (!String.IsNullOrWhiteSpace(comp.SailNumber))
+                    {
                         Guid? id = await _competitorService.GetCompetitorIdForSailnumberAsync(clubId, comp.SailNumber);
-                        if(id.HasValue)
+                        if (id.HasValue)
                         {
                             ModelState.AddModelError($"Competitors[{i}].SailNumber", "Sail number is already assigned to an active competitor.");
                         }
                     }
-                i++;
+                    i++;
                 }
 
                 if (!ModelState.IsValid)
@@ -289,7 +291,8 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
 
-                if(!string.IsNullOrWhiteSpace(competitor.SailNumber)) {
+                if (!string.IsNullOrWhiteSpace(competitor.SailNumber))
+                {
                     Guid? existingCompId = await _competitorService.GetCompetitorIdForSailnumberAsync(
                         competitor.ClubId, competitor.SailNumber);
                     if (existingCompId.HasValue && existingCompId.Value != competitor.Id)

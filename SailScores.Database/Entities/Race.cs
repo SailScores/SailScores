@@ -9,7 +9,7 @@ namespace SailScores.Database.Entities
     public class Race
     {
         public Guid Id { get; set; }
-        
+
         public Guid ClubId { get; set; }
         [StringLength(200)]
         public String Name { get; set; }
@@ -30,7 +30,7 @@ namespace SailScores.Database.Entities
 
         public Fleet Fleet { get; set; }
         public IList<Score> Scores { get; set; }
-        
+
         public IList<SeriesRace> SeriesRaces { get; set; }
 
         [Column("UpdatedDateUtc")]

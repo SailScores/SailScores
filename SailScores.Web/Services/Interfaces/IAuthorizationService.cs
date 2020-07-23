@@ -10,7 +10,7 @@ namespace SailScores.Web.Services
             ClaimsPrincipal claimsPrincipal,
             string clubInitials);
         Task<bool> CanUserEdit(
-            ClaimsPrincipal claimsPrincipal, 
+            ClaimsPrincipal claimsPrincipal,
             Guid clubId);
         Task<bool> IsUserFullAdmin(ClaimsPrincipal user);
     }

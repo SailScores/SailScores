@@ -15,6 +15,6 @@ namespace SailScores.Core.Model
 
         [StringLength(2000)]
         public String Description { get; set; }
-        
+
     }
 }

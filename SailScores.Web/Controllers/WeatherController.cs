@@ -8,7 +8,7 @@ namespace SailScores.Web.Controllers
     {
 
         private readonly Core.Services.IClubService _clubService;
-        private readonly Web.Services.IWeatherService  _weatherService;
+        private readonly Web.Services.IWeatherService _weatherService;
 
         public WeatherController(
             Core.Services.IClubService clubService,

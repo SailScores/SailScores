@@ -35,7 +35,7 @@ namespace SailScores.Utility
             _competitors = await GetCompetitors(series);
             await SaveRaces(series);
         }
-        
+
         private async Task<ClubDto> GetClub()
         {
             var clubs = await _apiClient.GetClubsAsync();
@@ -67,7 +67,7 @@ namespace SailScores.Utility
                 Int32.TryParse(input, out result);
             }
 
-            return clubs[result-1];
+            return clubs[result - 1];
         }
 
         private async Task<ClubDto> MakeNewClub()
@@ -90,7 +90,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
                 throw;
             }
 
@@ -150,7 +150,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
                 throw;
             }
 
@@ -171,7 +171,7 @@ namespace SailScores.Utility
             if (fleets.Count > 0)
             {
                 Console.WriteLine($"There are {fleets.Count} compatible fleets already in this club:");
-                foreach(var fleet in fleets)
+                foreach (var fleet in fleets)
                 {
                     Console.WriteLine(fleet.Name);
                 }
@@ -233,7 +233,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
                 throw;
             }
 
@@ -275,7 +275,7 @@ namespace SailScores.Utility
                     return seasons[result - 1];
                 }
             }
-            
+
             return await MakeNewSeason();
         }
 
@@ -301,7 +301,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
                 throw;
             }
 
@@ -326,13 +326,13 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
                 throw;
             }
             return seriesDto;
         }
 
-        private async Task<IDictionary<int,CompetitorDto>> GetCompetitors(SwObjects.Series series)
+        private async Task<IDictionary<int, CompetitorDto>> GetCompetitors(SwObjects.Series series)
         {
 
             List<CompetitorDto> competitors;
@@ -346,7 +346,7 @@ namespace SailScores.Utility
             }
 
             List<CompetitorDto> existingCompetitors = GetMatchedCompetitors(competitors, series);
-            foreach(var comp in existingCompetitors)
+            foreach (var comp in existingCompetitors)
             {
                 if (!(comp.FleetIds.Contains(_fleet.Id)))
                 {
@@ -358,7 +358,7 @@ namespace SailScores.Utility
             List<CompetitorDto> competitorsToCreate = GetCompetitorsToCreate(competitors, series);
 
 
-            foreach(var comp in competitorsToCreate)
+            foreach (var comp in competitorsToCreate)
             {
                 comp.FleetIds = new List<Guid>
                 {
@@ -371,14 +371,14 @@ namespace SailScores.Utility
 
             // build the dictionary
             var returnDict = new Dictionary<int, CompetitorDto>();
-            foreach(var swComp in series.Competitors)
+            foreach (var swComp in series.Competitors)
             {
-                if(series.Races.SelectMany(r => r.Results)
+                if (series.Races.SelectMany(r => r.Results)
                     .Any(r => r.CompetitorId == swComp.Id
                         && (r.Code != null || r.Place != 0)))
                 {
                     var match = FindMatch(shouldBeAllCompetitors, swComp);
-                    if(match == null)
+                    if (match == null)
                     {
                         throw new InvalidOperationException("Failed to find a competitor that should have just been created.");
                     }
@@ -412,12 +412,13 @@ namespace SailScores.Utility
         private List<CompetitorDto> GetCompetitorsToCreate(List<CompetitorDto> competitors, SwObjects.Series series)
         {
             var returnList = new List<CompetitorDto>();
-            foreach(var comp in series.Competitors)
+            foreach (var comp in series.Competitors)
             {
-                if(series.Races.SelectMany(r => r.Results)
+                if (series.Races.SelectMany(r => r.Results)
                     .Any(r => r.CompetitorId == comp.Id
                     && (r.Code != null || r.Place != 0))
-                    && FindMatch(competitors, comp) == null) {
+                    && FindMatch(competitors, comp) == null)
+                {
                     returnList.Add(
                         new CompetitorDto
                         {
@@ -436,13 +437,13 @@ namespace SailScores.Utility
             List<CompetitorDto> competitors,
             SwObjects.Competitor c)
         {
-            foreach(var comp in competitors)
+            foreach (var comp in competitors)
             {
                 if ((!String.IsNullOrWhiteSpace(c.SailNumber)
                     && c.SailNumber == comp.SailNumber)
                     || (!String.IsNullOrWhiteSpace(c.SailNumber)
                         && c.SailNumber == comp.AlternativeSailNumber))
-                    {
+                {
                     return comp;
                 }
                 if (String.IsNullOrWhiteSpace(c.SailNumber)
@@ -539,7 +540,7 @@ namespace SailScores.Utility
             {
                 return DateTime.Today;
             }
-            var parts = datepart.Split(new [] { '-', '/' });
+            var parts = datepart.Split(new[] { '-', '/' });
             int month = season.Start.Month;
             int day = season.Start.Day;
             Int32.TryParse(parts[0], out month);

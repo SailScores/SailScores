@@ -13,12 +13,12 @@ namespace SailScores.Test.Unit.Web.Controllers
 {
     public class BoatClassControllerTests
     {
-        private Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
-        private Mock<IAuthorizationService> _authServiceMock;
-        private Mock<IBoatClassService> _classServiceMock;
-        private BoatClassController _controller;
+        private readonly Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
+        private readonly Mock<IAuthorizationService> _authServiceMock;
+        private readonly Mock<IBoatClassService> _classServiceMock;
+        private readonly BoatClassController _controller;
 
-        private string _clubInitials = "LHYC";
+        private readonly string _clubInitials = "LHYC";
 
         public BoatClassControllerTests()
         {
@@ -96,7 +96,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             {
             };
             _controller.ModelState.AddModelError("Name", "The Name field is required.");
-            
+
             // Act
             var result = await _controller.Create(_clubInitials, vm);
 

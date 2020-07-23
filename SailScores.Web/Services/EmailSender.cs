@@ -20,10 +20,10 @@ namespace SailScores.Web.Services
 
             var apiKey = _emailConfiguration.SendGridApiKey;
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress(_emailConfiguration.FromAddress);            
+            var from = new EmailAddress(_emailConfiguration.FromAddress);
             var to = new EmailAddress(email);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, message, message);
-            var response = await client.SendEmailAsync(msg);
+            await client.SendEmailAsync(msg);
         }
     }
 }

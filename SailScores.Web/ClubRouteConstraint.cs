@@ -52,7 +52,7 @@ namespace SailScores.Web
                 {
                     clubInitials = context.Clubs.Select(c => c.Initials.ToUpperInvariant()).ToList();
                 }
-                
+
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromSeconds(60));
 

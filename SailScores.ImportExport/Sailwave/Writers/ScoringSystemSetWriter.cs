@@ -8,7 +8,7 @@ namespace SailScores.ImportExport.Sailwave.Writers
 {
     public class ScoringSystemSetWriter : GenericSetWriter<ScoringSystem>
     {
-        public ScoringSystemSetWriter() :base()
+        public ScoringSystemSetWriter() : base()
         {
             BoolsAsYesNo = true;
         }

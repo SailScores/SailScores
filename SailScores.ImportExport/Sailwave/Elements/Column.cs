@@ -14,7 +14,7 @@ namespace SailScores.ImportExport.Sailwave.Elements
 
         public ColumnType Type { get; set; } = ColumnType.Standard;
 
-        
+
         //"column","1|AltSailNo|15|No|No|40||","",""
         //"column","1|Boat|12|Yes|Yes|40||","",""
         //"column","1|BowNumber|7|No|No|40||","",""

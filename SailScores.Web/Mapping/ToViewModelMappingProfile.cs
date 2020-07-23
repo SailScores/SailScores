@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Db = SailScores.Database.Entities;
 using Model = SailScores.Core.Model;
 
 namespace SailScores.Web.Mapping
@@ -157,11 +156,11 @@ namespace SailScores.Web.Mapping
         private decimal? ParseDecimal(string decimalString)
         {
             decimal output;
-            if(Decimal.TryParse(decimalString, out output))
+            if (Decimal.TryParse(decimalString, out output))
             {
                 return output;
             }
-            if(Decimal.TryParse(decimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out output))
+            if (Decimal.TryParse(decimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out output))
             {
                 return output;
             }

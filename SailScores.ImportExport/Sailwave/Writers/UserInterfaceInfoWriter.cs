@@ -24,26 +24,26 @@ namespace SailScores.ImportExport.Sailwave.Writers
         {
             // 15 pipe separated values
             //"1|0|0|0|0|0|0|0|0|0|0|0|0|0|0"
-            
+
             var strings = new List<string>();
 
-            strings.Add( Utilities.BoolToOneZero(! OrAllTheValues(info) ));
+            strings.Add(Utilities.BoolToOneZero(!OrAllTheValues(info)));
 
-            strings.Add( Utilities.BoolToOneZero( info.MultipleScoringSystems));
-            strings.Add( Utilities.BoolToOneZero( info.ExtraCompetitorFields));
-            strings.Add( Utilities.BoolToOneZero( info.CompetitorAliasing));
-            strings.Add( Utilities.BoolToOneZero( info.SplitStarts));
-            strings.Add( Utilities.BoolToOneZero( info.QualificationProfile));
-            strings.Add( Utilities.BoolToOneZero( info.RaceWeightings));
-            strings.Add( Utilities.BoolToOneZero( info.MedalRace));
-            strings.Add( Utilities.BoolToOneZero( info.AppendixLE));
-            strings.Add( Utilities.BoolToOneZero( info.NonStandardRaceTieOptions));
-            strings.Add( Utilities.BoolToOneZero( info.NonStandardSeriesTieOptions));
-            strings.Add( Utilities.BoolToOneZero( info.NonStandardAccumulationOfPoints));
-            strings.Add( Utilities.BoolToOneZero( info.WindIndexedRatings));
-            strings.Add( Utilities.BoolToOneZero( info.HighPointScoring));
-            strings.Add( Utilities.BoolToOneZero( info.NationBasedPublishingTemplates));
-            
+            strings.Add(Utilities.BoolToOneZero(info.MultipleScoringSystems));
+            strings.Add(Utilities.BoolToOneZero(info.ExtraCompetitorFields));
+            strings.Add(Utilities.BoolToOneZero(info.CompetitorAliasing));
+            strings.Add(Utilities.BoolToOneZero(info.SplitStarts));
+            strings.Add(Utilities.BoolToOneZero(info.QualificationProfile));
+            strings.Add(Utilities.BoolToOneZero(info.RaceWeightings));
+            strings.Add(Utilities.BoolToOneZero(info.MedalRace));
+            strings.Add(Utilities.BoolToOneZero(info.AppendixLE));
+            strings.Add(Utilities.BoolToOneZero(info.NonStandardRaceTieOptions));
+            strings.Add(Utilities.BoolToOneZero(info.NonStandardSeriesTieOptions));
+            strings.Add(Utilities.BoolToOneZero(info.NonStandardAccumulationOfPoints));
+            strings.Add(Utilities.BoolToOneZero(info.WindIndexedRatings));
+            strings.Add(Utilities.BoolToOneZero(info.HighPointScoring));
+            strings.Add(Utilities.BoolToOneZero(info.NationBasedPublishingTemplates));
+
             return String.Join("|", strings);
         }
 

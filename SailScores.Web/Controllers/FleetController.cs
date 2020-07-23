@@ -115,7 +115,8 @@ namespace SailScores.Web.Controllers
         [Authorize]
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
         {
-            try {
+            try
+            {
                 if (!await _authService.CanUserEdit(User, clubInitials))
                 {
                     return Unauthorized();
@@ -178,7 +179,7 @@ namespace SailScores.Web.Controllers
             var fleet = await _fleetService.GetFleet(id);
             return View(fleet);
         }
-        
+
         [Authorize]
         [HttpPost]
         [ActionName("Delete")]

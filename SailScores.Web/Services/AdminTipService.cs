@@ -8,7 +8,7 @@ namespace SailScores.Web.Services
     {
         public void AddTips(ref AdminViewModel viewModel)
         {
-            if(viewModel == null)
+            if (viewModel == null)
             {
                 return;
             }
@@ -26,7 +26,7 @@ namespace SailScores.Web.Services
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",
-                        Controller = "BoatClass" 
+                        Controller = "BoatClass"
                     },
                     Completed = viewModel.BoatClasses.Any()
                 },
@@ -81,11 +81,11 @@ namespace SailScores.Web.Services
 
         public void AddTips(ref RaceWithOptionsViewModel race)
         {
-            if(race == null)
+            if (race == null)
             {
                 return;
             }
-            if((race.SeriesOptions == null || race.SeriesOptions.Count == 0))
+            if ((race.SeriesOptions == null || race.SeriesOptions.Count == 0))
             {
                 race.Tips = new List<AdminToDoViewModel> { new AdminToDoViewModel
                 {
@@ -109,7 +109,7 @@ namespace SailScores.Web.Services
             {
                 return returnList;
             }
-            if(race.FleetOptions == null || race.FleetOptions.Count == 0)
+            if (race.FleetOptions == null || race.FleetOptions.Count == 0)
             {
                 returnList.Add(new AdminToDoViewModel
                 {
@@ -123,7 +123,7 @@ namespace SailScores.Web.Services
                     Completed = false,
                 });
             }
-            if (!race.ClubHasCompetitors && ( race.CompetitorOptions == null || race.CompetitorOptions.Count == 0))
+            if (!race.ClubHasCompetitors && (race.CompetitorOptions == null || race.CompetitorOptions.Count == 0))
             {
                 returnList.Add(new AdminToDoViewModel
                 {
@@ -137,8 +137,8 @@ namespace SailScores.Web.Services
                     Completed = false
                 });
             }
-            if((returnList?.Count??0) >= 1
-                && ( race.SeriesOptions == null || race.SeriesOptions.Count == 0))
+            if ((returnList?.Count ?? 0) >= 1
+                && (race.SeriesOptions == null || race.SeriesOptions.Count == 0))
             {
                 returnList.Add(new AdminToDoViewModel
                 {

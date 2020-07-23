@@ -6,7 +6,7 @@ namespace SailScores.Database.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            
+
             migrationBuilder.AlterColumn<string>(
                 name: "Code",
                 table: "Scores",

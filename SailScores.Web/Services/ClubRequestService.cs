@@ -44,7 +44,8 @@ namespace SailScores.Web.Services
             coreRequest.RequestSubmitted = DateTime.Now;
             await _coreClubRequestService.Submit(coreRequest);
             var notificationEmail = _configuration["NotificationEmail"];
-            try {
+            try
+            {
                 await _emailSender.SendEmailAsync(notificationEmail, "SailScores - Club Request submitted.",
                        $"A club has been requested for {request.ClubName} by {request.ContactEmail}.");
             }
@@ -73,7 +74,7 @@ namespace SailScores.Web.Services
             var request = await _coreClubRequestService.GetRequest(id);
 
             var vm = _mapper.Map<ClubRequestWithOptionsViewModel>(request);
-            vm.ClubOptions = _mapper.Map<IList<ClubSummaryViewModel>>( await _coreClubService.GetClubs(true));
+            vm.ClubOptions = _mapper.Map<IList<ClubSummaryViewModel>>(await _coreClubService.GetClubs(true));
             return vm;
         }
 
@@ -113,13 +114,13 @@ namespace SailScores.Web.Services
                     IsHidden = test,
                     Url = request.ClubWebsite,
                     DefaultScoringSystem = newScoringSystem,
-                    Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_"+request.ClubLocation+"_"),
+                    Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_" + request.ClubLocation + "_"),
                     ScoringSystems = new List<ScoringSystem> { newScoringSystem }
                 };
 
                 newClubId = await _coreClubService.SaveNewClub(club);
 
-                if(test)
+                if (test)
                 {
                     request.TestClubId = newClubId;
 
@@ -133,7 +134,7 @@ namespace SailScores.Web.Services
             }
 
 #pragma warning disable CA1308 // Normalize strings to uppercase
-    // we are storing email in lowercase, and not round-tripping back to upper case.
+            // we are storing email in lowercase, and not round-tripping back to upper case.
             await _coreUserService.AddPermision(newClubId, request.ContactEmail.ToLowerInvariant());
 #pragma warning restore CA1308 // Normalize strings to uppercase
         }

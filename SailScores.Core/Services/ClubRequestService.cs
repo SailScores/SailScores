@@ -55,7 +55,7 @@ namespace SailScores.Core.Services
 
         public async Task UpdateRequest(ClubRequest clubRequest)
         {
-            if(clubRequest == null)
+            if (clubRequest == null)
             {
                 throw new ArgumentNullException(nameof(clubRequest));
             }

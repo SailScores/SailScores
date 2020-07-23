@@ -31,7 +31,7 @@ namespace SailScores.Web.Services
 
         public async Task<IList<Season>> GetSeasons(Guid? competitorId)
         {
-            if(competitorId == null)
+            if (competitorId == null)
             {
                 return new List<Season>();
             }
@@ -40,7 +40,7 @@ namespace SailScores.Web.Services
 
         public async Task<IList<Competitor>> GetSourceOptionsFor(Guid? targetCompetitorId)
         {
-            if(targetCompetitorId == null)
+            if (targetCompetitorId == null)
             {
                 return new List<Competitor>();
             }
@@ -50,7 +50,7 @@ namespace SailScores.Web.Services
 
         public async Task Merge(Guid? targetCompetitorId, Guid? sourceCompetitorId)
         {
-            if(targetCompetitorId == null || sourceCompetitorId == null)
+            if (targetCompetitorId == null || sourceCompetitorId == null)
             {
                 throw new ArgumentNullException("Missing a competitor id for merge");
             }

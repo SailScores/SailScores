@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using SwObjects = SailScores.ImportExport.Sailwave.Elements;
-using SsObjects = SailScores.Core.Model;
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Database;
 using Microsoft.EntityFrameworkCore;
@@ -127,10 +126,8 @@ namespace SailScores.Utility
 
         private static SwObjects.Series ImportSWFile(string fileName)
         {
-            using (var reader = new StreamReader(fileName))
-            {
-                return SeriesParser.GetSeries(reader);
-            }
+            using var reader = new StreamReader(fileName);
+            return SeriesParser.GetSeries(reader);
         }
 
     }

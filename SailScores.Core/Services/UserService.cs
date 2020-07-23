@@ -22,7 +22,7 @@ namespace SailScores.Core.Services
                 .FirstOrDefaultAsync(p => p.UserEmail == userEmail && p.ClubId == clubId)
                 .ConfigureAwait(false);
 
-            if(existingPermision == null)
+            if (existingPermision == null)
             {
                 _dbContext.UserPermissions.Add(
                     new Database.Entities.UserClubPermission
@@ -50,7 +50,7 @@ namespace SailScores.Core.Services
 
         public async Task<bool> IsUserAllowedToEdit(string email, Guid? clubId)
         {
-            if(String.IsNullOrWhiteSpace(email))
+            if (String.IsNullOrWhiteSpace(email))
             {
                 return false;
             }
@@ -67,7 +67,7 @@ namespace SailScores.Core.Services
             }
             return await userMatches.AnyAsync(u => u.ClubId == clubId)
                 .ConfigureAwait(false);
-            
+
         }
 
         public async Task<bool> IsUserFullAdmin(string email)

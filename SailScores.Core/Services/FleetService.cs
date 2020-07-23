@@ -29,7 +29,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.FleetBoatClasses)
                 .SingleAsync(c => c.Id == fleetId)
                 .ConfigureAwait(false);
-            foreach(var link in dbClass.FleetBoatClasses.ToList())
+            foreach (var link in dbClass.FleetBoatClasses.ToList())
             {
                 dbClass.FleetBoatClasses.Remove(link);
             }
@@ -38,7 +38,7 @@ namespace SailScores.Core.Services
                 dbClass.CompetitorFleets.Remove(link);
             }
             _dbContext.Fleets.Remove(dbClass);
-            
+
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
         }
@@ -49,16 +49,16 @@ namespace SailScores.Core.Services
             if (_dbContext.Fleets.Any(f =>
                 f.ClubId == fleet.ClubId
                 && (f.ShortName == fleet.ShortName
-                ||f.Name == fleet.Name)))
+                || f.Name == fleet.Name)))
             {
                 throw new InvalidOperationException("Cannot create fleet. A fleet with this name or short name already exists.");
             }
-            var dbFleet =_mapper.Map<Db.Fleet>(fleet);
+            var dbFleet = _mapper.Map<Db.Fleet>(fleet);
             dbFleet.Id = Guid.NewGuid();
             dbFleet.FleetBoatClasses = new List<Db.FleetBoatClass>();
-            if((fleet.BoatClasses?.Count ?? 0) != 0)
+            if ((fleet.BoatClasses?.Count ?? 0) != 0)
             {
-                foreach(var newClass in fleet.BoatClasses)
+                foreach (var newClass in fleet.BoatClasses)
                 {
                     dbFleet.FleetBoatClasses.Add(
                         new Db.FleetBoatClass
