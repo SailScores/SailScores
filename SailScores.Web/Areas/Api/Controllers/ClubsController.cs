@@ -70,6 +70,10 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Guid>> Post([FromBody] ClubDto club)
         {
+            if (club == null)
+            {
+                throw new ArgumentNullException(nameof(club));
+            }
             // special handling here, so that user can create new club if they have
             // global permissions.
             bool canEdit = false;

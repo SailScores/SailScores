@@ -278,6 +278,15 @@ namespace SailScores.Test.Unit
         }
 
         [Fact]
+        public void CalculateResults_NoRaces_NoResults()
+        {
+            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3, 0));
+
+            Assert.NotNull(results);
+        }
+
+
+        [Fact]
         public void CalculateResults_ValidSeries_ReturnsResults()
         {
             var results = _defaultCalculator.CalculateResults(GetBasicSeries(3, 3));
@@ -294,6 +303,20 @@ namespace SailScores.Test.Unit
             Assert.Equal(1, results.Results[firstCompetitor].CalculatedScores.Count(r => r.Value.Discard));
         }
 
+        [Fact]
+        public void CalculateResults_PreviousRaceTrend_TopCompGoesDown()
+        {
+            var basicSeries = GetBasicSeries(10, 6);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNE";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = 1;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            var firstCompetitor = results.Competitors.First();
+            Assert.True(results.Results[testComp].Trend < 0);
+        }
 
         [Fact]
         public void CalculateResults_5Races_OneDiscard()
@@ -781,6 +804,7 @@ namespace SailScores.Test.Unit
                 ClubId = Guid.NewGuid(),
                 Name = "Test Series",
                 Description = "Test Series Description",
+                TrendOption = Api.Enumerations.TrendOption.PreviousRace,
                 Races = races,
                 Competitors = competitors,
                 Season = new Season

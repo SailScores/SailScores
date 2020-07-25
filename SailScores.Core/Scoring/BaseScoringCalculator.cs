@@ -358,10 +358,10 @@ namespace SailScores.Core.Scoring
             return (scoreCode.Formula.ToUpperInvariant()) switch
             {
                 FINISHERSPLUS_FORMULANAME =>
-                    race.Scores.Where(s => CountsAsStarted(s)).Count() +
+                    race.Scores.Count(s => CountsAsStarted(s)) +
                         scoreCode.FormulaValue,
                 CAMETOSTARTPLUS_FORMULANAME =>
-                    race.Scores.Where(s => CameToStart(s)).Count() +
+                    race.Scores.Count(s => CameToStart(s)) +
                         scoreCode.FormulaValue,
                 PLACEPLUSPERCENT_FORMULANAME =>
                     GetPenaltyScore(score, race, scoreCode),

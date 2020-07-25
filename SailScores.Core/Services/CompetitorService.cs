@@ -92,6 +92,10 @@ namespace SailScores.Core.Services
 
         public async Task SaveAsync(Model.Competitor comp)
         {
+            if(comp == null)
+            {
+                throw new ArgumentNullException(nameof(comp));
+            }
             var dbObject = await _dbContext
                 .Competitors
                 .Include(c => c.CompetitorFleets)
@@ -189,6 +193,10 @@ namespace SailScores.Core.Services
 
         public async Task SaveAsync(CompetitorDto comp)
         {
+            if (comp == null)
+            {
+                throw new ArgumentNullException(nameof(comp));
+            }
             var dbObject = await _dbContext
                 .Competitors
                 .Include(c => c.CompetitorFleets)
