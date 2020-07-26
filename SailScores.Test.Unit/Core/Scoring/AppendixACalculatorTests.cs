@@ -272,6 +272,22 @@ namespace SailScores.Test.Unit
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "PAV",
+                    Description = "Average of Prior",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = false,
+                    Finished = false,
+                    Formula = "AVE P",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
             };
 
             return system;
@@ -318,6 +334,22 @@ namespace SailScores.Test.Unit
             Assert.True(results.Results[testComp].Trend < 0);
         }
 
+
+        [Fact]
+        public void CalculateResults_PreviousDayTrend_TopCompGoesDown()
+        {
+            var basicSeries = GetBasicSeries(10, 6);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousDay;
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNE";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = 1;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            var firstCompetitor = results.Competitors.First();
+            Assert.True(results.Results[testComp].Trend < 0);
+        }
+
         [Fact]
         public void CalculateResults_5Races_OneDiscard()
         {
@@ -342,6 +374,24 @@ namespace SailScores.Test.Unit
                 results.Results[testComp].TotalScore);
             Assert.True(
                 results.Results[testComp].Rank > 1);
+        }
+
+        [Fact]
+        public void CalculateResults_AveragePrior_UsesHalf()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(3, 6);
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races[3].Scores.First(s => s.Competitor == testComp).Code = "PAV";
+            basicSeries.Races[3].Scores.First(s => s.Competitor == testComp).Place = null;
+
+            basicSeries.Races[4].Scores.First(s => s.Competitor == testComp).Place = 3;
+            basicSeries.Races[5].Scores.First(s => s.Competitor == testComp).Place = 3;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(1,
+                results.Results[testComp].CalculatedScores[basicSeries.Races[3]].ScoreValue);
         }
 
         // This is a test of what happens to an undefined code: SB is not defined in the appenidx A system,
@@ -779,7 +829,7 @@ namespace SailScores.Test.Unit
                         Id = Guid.NewGuid(),
                         Name = $"Race {i}",
                         Order = i + 1,
-                        Date = DateTime.UtcNow
+                        Date = DateTime.UtcNow.AddDays(i)
 
                     };
                 var scores = new List<Score>();

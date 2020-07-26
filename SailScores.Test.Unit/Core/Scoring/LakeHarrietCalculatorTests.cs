@@ -72,6 +72,20 @@ namespace SailScores.Test.Unit
                     Formula = "AVE ND",
                     ScoreLike = null
                 },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "AVEA",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = null,
+                    AdjustOtherScores = null,
+                    CameToStart = false,
+                    Finished = false,
+                    Formula = "AVE",
+                    ScoreLike = null
+                },
             };
 
             return system;
@@ -243,7 +257,6 @@ namespace SailScores.Test.Unit
         [Fact]
         public void CalculateResults_LotsOfAverage_GivesNonZero()
         {
-            // Arrange: put in some coded results: SB
             var basicSeries = GetBasicSeries(10, 6);
             basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
             var firstComp = basicSeries.Competitors.First();
@@ -256,6 +269,24 @@ namespace SailScores.Test.Unit
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
             Assert.True(results.Results[firstComp].TotalScore > 0);
+        }
+
+
+        [Fact]
+        public void CalculateResults_FullAve_GivesNonZero()
+        {
+            var basicSeries = GetBasicSeries(10, 6);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
+            var firstComp = basicSeries.Competitors.First();
+            for (int i = 0; i < 4; i++)
+            {
+                basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Code = "AVEA";
+                basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Place = null;
+            }
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(1, results.Results[firstComp].CalculatedScores[basicSeries.Races[1]].ScoreValue);
         }
     }
 }

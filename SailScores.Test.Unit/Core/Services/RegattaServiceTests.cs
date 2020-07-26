@@ -20,12 +20,8 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Club _fakeClub;
         private readonly DbObjectBuilder _dbObjectBuilder;
         private readonly RegattaService _service;
-        private readonly Mock<IScoringCalculator> _mockCalculator;
-        private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
-        private readonly Mock<IScoringService> _mockScoringService;
-        private readonly Mock<IConversionService> _mockConversionService;
         private readonly Guid _clubId;
         private readonly Mock<ISeriesService> _mockSeriesService;
         private readonly Season _season;
@@ -85,7 +81,9 @@ namespace SailScores.Test.Unit.Core.Services
                 ClubId = _clubId,
                 Season = _season,
                 Fleets = new List<Fleet> { new
-                    Fleet { FleetType = Api.Enumerations.FleetType.AllBoatsInClub} }
+                    Fleet { FleetType = Api.Enumerations.FleetType.AllBoatsInClub} },
+                StartDate = DateTime.Today.AddDays(-3),
+                EndDate = DateTime.Today
             };
 
             _fakeClub = new Club
@@ -121,7 +119,39 @@ namespace SailScores.Test.Unit.Core.Services
             var result = await _service.GetAllRegattasAsync(_clubId);
 
             Assert.Equal(1, result.Count);
-            
+        }
+
+
+        [Fact]
+        public async Task GetRegattasDuringSpan_NoneInSpan_Returns0()
+        {
+            var result = await _service.GetRegattasDuringSpanAsync(DateTime.Today.AddDays(1), DateTime.Today.AddYears(3));
+
+            Assert.Equal(0, result.Count);
+        }
+
+        [Fact]
+        public async Task SaveNewRegattaAsync_Null_Throws()
+        {
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(() => _service.SaveNewRegattaAsync(null));
+
+            Assert.NotNull(ex);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Null_Throws()
+        {
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(() => _service.UpdateAsync(null));
+
+            Assert.NotNull(ex);
+        }
+
+        [Fact]
+        public async Task AddRaceToRegatta_Null_Throws()
+        {
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(() => _service.AddRaceToRegattaAsync(null, Guid.NewGuid()));
+
+            Assert.NotNull(ex);
         }
 
     }

@@ -119,15 +119,16 @@ namespace SailScores.Web.Controllers
 #pragma warning restore CA1054 // Uri parameters should not be strings
         {
             ViewData["ReturnUrl"] = returnUrl;
+
+            var clubId = await _clubService.GetClubId(clubInitials);
+            
+            if (!await _authService.CanUserEdit(User, clubId))
+            {
+                return Unauthorized();
+            }
+            competitor.ClubId = clubId;
             try
             {
-                var clubId = await _clubService.GetClubId(clubInitials);
-                if (!await _authService.CanUserEdit(User, clubId))
-                {
-                    return Unauthorized();
-                }
-                competitor.ClubId = clubId;
-
                 var fleets = (await _clubService.GetAllFleets(clubId))
                     .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                     .OrderBy(f => f.Name);
@@ -137,7 +138,7 @@ namespace SailScores.Web.Controllers
                     return View(competitor);
                 }
 
-                foreach (var fleetId in competitor.FleetIds)
+                foreach (var fleetId in (competitor.FleetIds ?? new List<Guid>()))
                 {
                     var fleet = fleets.SingleOrDefault(f => f.Id == fleetId);
                     if (fleet != null)
@@ -154,7 +155,13 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                return View();
+                var fleets = (await _clubService.GetAllFleets(clubId))
+                    .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                    .OrderBy(f => f.Name);
+                competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+                ModelState.AddModelError("Exception", "A problem occured while saving.");
+
+                return View(competitor);
             }
         }
 
