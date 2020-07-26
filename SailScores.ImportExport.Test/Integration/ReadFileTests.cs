@@ -12,7 +12,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Integration
         public void BasicReadFile()
         {
             var reader = new SailwaveFileReader(_simpleFilePath);
-            
+
             Assert.NotNull(reader.Series);
         }
 
@@ -32,7 +32,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Integration
         {
             var reader = new SailwaveFileReader(_lhycFilePath);
 
-            Assert.True( reader.Series.Competitors.Count > 40);
+            Assert.True(reader.Series.Competitors.Count > 40);
         }
     }
 }

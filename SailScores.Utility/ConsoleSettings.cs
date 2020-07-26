@@ -5,7 +5,7 @@ namespace SailScores.Utility
     class ConsoleSettings : Api.Services.ISettings
     {
         private string _serverUrl;
-//            = "https://localhost:5001/";
+        //            = "https://localhost:5001/";
         public string ServerUrl
         {
             get

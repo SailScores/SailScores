@@ -19,8 +19,8 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
         public async void BasicWriteFile()
         {
             var rows = await SeriesWriter.WriteSeries(_series);
-            
-            Assert.True( rows.Count() > 10 );
+
+            Assert.True(rows.Count() > 10);
 
         }
 
@@ -28,7 +28,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
         public async void WriteFile_GetsLotsOfDetails()
         {
             var rows = await SeriesWriter.WriteSeries(_series);
-            
+
             Assert.True(rows.Count(r => r.Name.StartsWith("ser")) > 20);
 
         }
@@ -56,7 +56,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
         {
             var rows = await SeriesWriter.WriteSeries(_series);
             var rowToCheck = rows.First(r => r.Name.Equals("scrtiefinals"));
-            
+
             Assert.True(rowToCheck.Value.Equals("Yes", StringComparison.InvariantCultureIgnoreCase)
                 || rowToCheck.Value.Equals("No", StringComparison.InvariantCultureIgnoreCase));
         }
@@ -87,7 +87,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
         public async void WriteFile_ScoreCodeRowsHaveNoTrueId()
         {
             var rows = await SeriesWriter.WriteSeries(_series);
-            
+
             var scrcodeRowsWithTrueId = rows.Count(r => r.Name.Equals("scrcode")
                                                     && r.CompetitorOrScoringSystemId.HasValue);
 
@@ -135,7 +135,8 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
 
             Assert.Equal(4, rows.Where(r => r.CompetitorOrScoringSystemId.HasValue
                                             && r.RaceId.HasValue)
-                .Select(r => new {
+                .Select(r => new
+                {
                     r.RaceId,
                     r.CompetitorOrScoringSystemId
                 })

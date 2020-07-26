@@ -9,7 +9,7 @@ namespace SailScores.Web.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class SitemapController : Controller
     {
-
+        private const string webPathDelimiter = "/";
         private readonly Core.Services.IClubService _clubservice;
         private readonly IConfiguration _config;
 
@@ -33,13 +33,13 @@ namespace SailScores.Web.Controllers
             var clubs = await _clubservice.GetClubs(false);
 
             var siteMapBuilder = new SitemapBuilder();
-            siteMapBuilder.AddUrl(baseUrl +"/", changeFrequency: ChangeFrequency.Monthly, priority: 0.8);
+            siteMapBuilder.AddUrl(baseUrl + webPathDelimiter, changeFrequency: ChangeFrequency.Monthly, priority: 0.8);
             siteMapBuilder.AddUrl(baseUrl + Url.Action("News", "Home"), changeFrequency: ChangeFrequency.Monthly, priority: 0.5);
             siteMapBuilder.AddUrl(baseUrl + Url.Action("About", "Home"), changeFrequency: ChangeFrequency.Monthly, priority: 0.5);
 
             foreach (var club in clubs)
             {
-                siteMapBuilder.AddUrl(baseUrl +"/"+ club.Initials, priority: 1.0);
+                siteMapBuilder.AddUrl(baseUrl + webPathDelimiter + club.Initials, priority: 1.0);
             }
 
             // generate the sitemap xml

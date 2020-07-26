@@ -10,7 +10,7 @@ namespace SailScores.Core.Scoring
     // Scoring system based on
     // https://www.ussailing.org/competition/rules-officiating/racing-rules/scoring-a-long-series/
 
-    public class HighPointPercentageCalculator : BaseScoringCalculator, IScoringCalculator
+    public class HighPointPercentageCalculator : BaseScoringCalculator
     {
         public HighPointPercentageCalculator(ScoringSystem scoringSystem) : base(scoringSystem)
         {
@@ -63,10 +63,10 @@ namespace SailScores.Core.Scoring
             IEnumerable<Score> scores)
         {
             results.IsPercentSystem = true;
-            results.PercentRequired = _scoringSystem.ParticipationPercent;
+            results.PercentRequired = ScoringSystem.ParticipationPercent;
             var raceCount = results.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced).Count();
-            var requiredRaces = raceCount * ((_scoringSystem.ParticipationPercent ?? 0) / 100m);
-            foreach ( var comp in results.Competitors)
+            var requiredRaces = raceCount * ((ScoringSystem.ParticipationPercent ?? 0) / 100m);
+            foreach (var comp in results.Competitors)
             {
                 var currentCompResults = results.Results[comp];
                 if (currentCompResults.CalculatedScores.Where(s => s.Value.RawScore.Code != DEFAULT_CODE).Count()

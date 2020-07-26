@@ -52,7 +52,7 @@ namespace SailScores.Web.Services
             var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
 
             var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
-            if(comp == null)
+            if (comp == null)
             {
                 comp = comps.FirstOrDefault(c => String.Equals(UrlUtility.GetUrlName(c.Name), sailor, StringComparison.OrdinalIgnoreCase));
             }
@@ -78,7 +78,7 @@ namespace SailScores.Web.Services
                 seasonUrlName);
 
             var vm = seasonStats;
-            
+
             return vm;
         }
 

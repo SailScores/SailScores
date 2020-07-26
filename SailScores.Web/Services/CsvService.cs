@@ -32,7 +32,7 @@ namespace SailScores.Web.Services
                 stream.Dispose();
             }
             stream = new MemoryStream();
-            if(streamWriter != null)
+            if (streamWriter != null)
             {
                 streamWriter.Dispose();
             }
@@ -40,7 +40,7 @@ namespace SailScores.Web.Services
 
             streamWriter.WriteLine(GetHeaders(series));
             var compList = series.FlatResults?.Competitors;
-            if(compList != null)
+            if (compList != null)
                 foreach (var comp in compList)
                 {
                     streamWriter.WriteLine(GetCompResults(series, comp));
@@ -102,10 +102,12 @@ namespace SailScores.Web.Services
                 if (race.State == RaceState.Scheduled)
                 {
                     sb.Append(GetEscapedValue("Sched"));
-                } else if (race.State == RaceState.Abandoned)
+                }
+                else if (race.State == RaceState.Abandoned)
                 {
                     sb.Append(GetEscapedValue("Aband"));
-                } else
+                }
+                else
                 {
                     var raceScore = series.FlatResults.GetScore(comp, race);
                     var cellSb = new StringBuilder();
@@ -144,7 +146,8 @@ namespace SailScores.Web.Services
             if (s.Contains(_separator))
             {
                 return _quote + returnString + _quote;
-            } else
+            }
+            else
             {
                 return returnString;
             }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SailScores.Database.Migrations
 {
-    public partial class weather : Migration
+    public partial class Weather : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

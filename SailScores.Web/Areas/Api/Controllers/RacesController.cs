@@ -31,7 +31,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<RaceDto>> Get(Guid clubId)
         {
-            var races =  await _service.GetRacesAsync(clubId);
+            var races = await _service.GetRacesAsync(clubId);
             return _mapper.Map<List<RaceDto>>(races);
         }
 
@@ -40,7 +40,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         {
             var r = await _service.GetRaceAsync(Guid.Parse(identifier));
 
-            return _mapper.Map<RaceDto>(r); ;
+            return _mapper.Map<RaceDto>(r);
         }
 
         [HttpPost]
@@ -50,7 +50,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             {
                 return Unauthorized();
             }
-            return Ok( await _service.SaveAsync(race));
+            return Ok(await _service.SaveAsync(race));
         }
 
     }

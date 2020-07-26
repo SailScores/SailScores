@@ -44,7 +44,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Guid>> Post([FromBody] BoatClassDto boatClass)
         {
-            if(! await _authService.CanUserEdit(User, boatClass.ClubId))
+            if (!await _authService.CanUserEdit(User, boatClass.ClubId))
             {
                 return Unauthorized();
             }

@@ -9,10 +9,8 @@ namespace SailScores.ImportExport.Sailwave.Tests.Utilities
 
         public static Series GetSeries(string filePath)
         {
-            using (var reader = new StreamReader(filePath))
-            {
-                return SeriesParser.GetSeries(reader);
-            }
+            using var reader = new StreamReader(filePath);
+            return SeriesParser.GetSeries(reader);
         }
     }
 }

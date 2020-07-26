@@ -15,7 +15,7 @@ namespace SailScores.Web.Services
         private ISailScoresContext _dbContext;
         private IMemoryCache _cache;
         private readonly string cacheKeyName = "ClubLocaleCache";
-        
+
         public async Task<ProviderCultureResult> DetermineProviderCultureResult(
             HttpContext httpContext)
         {

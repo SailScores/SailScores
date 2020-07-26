@@ -39,11 +39,12 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<ClubDto>> Get()
         {
-            var clubs =  await _clubService.GetClubs(true);
+            var clubs = await _clubService.GetClubs(true);
 
             var filteredClubs = new List<Club>();
-            foreach (var club in clubs) {
-                if(await _authService.CanUserEdit(User, club.Id))
+            foreach (var club in clubs)
+            {
+                if (await _authService.CanUserEdit(User, club.Id))
                 {
                     filteredClubs.Add(club);
                 }
@@ -69,13 +70,18 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Guid>> Post([FromBody] ClubDto club)
         {
+            if (club == null)
+            {
+                throw new ArgumentNullException(nameof(club));
+            }
             // special handling here, so that user can create new club if they have
             // global permissions.
             bool canEdit = false;
-            if(club.Id == default(Guid))
+            if (club.Id == default)
             {
                 canEdit = await _authService.CanUserEdit(User, club.Initials);
-            } else
+            }
+            else
             {
                 canEdit = await _authService.CanUserEdit(User, club.Id);
             }

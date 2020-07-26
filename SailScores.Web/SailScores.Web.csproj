@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\jbfraser1_sailscores\CSharp\SonarLint.xml" Link="SonarLint.xml" />
     <Content Include=".well-known\placeholder.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

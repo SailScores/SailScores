@@ -21,7 +21,7 @@ namespace SailScores.Database.Entities
         public String DiscardPattern { get; set; }
 
         public IList<ScoreCode> ScoreCodes { get; set; }
-        
+
         [ForeignKey("ParentSystemId")]
         public ScoringSystem ParentSystem { get; set; }
 

@@ -283,7 +283,7 @@ namespace SailScores.Core.Services
 
         public async Task<Guid> SaveNewClub(Club club)
         {
-            if(_dbContext.Clubs.Any(c => c.Initials == club.Initials))
+            if (_dbContext.Clubs.Any(c => c.Initials == club.Initials))
             {
                 throw new InvalidOperationException("Cannot create club." +
                     " A club with those initials already exists.");
@@ -292,17 +292,17 @@ namespace SailScores.Core.Services
 
 
             var defaultSystem = club.DefaultScoringSystem;
-            if(defaultSystem.Id == default)
+            if (defaultSystem.Id == default)
             {
                 defaultSystem.Id = Guid.NewGuid();
             }
             if (defaultSystem != null)
             {
-                if(club.ScoringSystems == null)
+                if (club.ScoringSystems == null)
                 {
                     club.ScoringSystems = new List<ScoringSystem>();
                 }
-                if(!club.ScoringSystems.Any(ss => ss == defaultSystem))
+                if (!club.ScoringSystems.Any(ss => ss == defaultSystem))
                 {
                     club.ScoringSystems.Add(defaultSystem);
                 }
@@ -442,7 +442,7 @@ namespace SailScores.Core.Services
             {
                 fleet.Id = GetNewGuid(fleet.Id);
                 fleet.ClubId = dbClub.Id;
-                foreach(var fleetBoatClass in fleet.FleetBoatClasses)
+                foreach (var fleetBoatClass in fleet.FleetBoatClasses)
                 {
                     fleetBoatClass.FleetId = fleet.Id;
                     fleetBoatClass.Fleet = null;
@@ -462,7 +462,7 @@ namespace SailScores.Core.Services
                     compFleet.Fleet = null;
                 }
             }
-            foreach(var season in dbClub.Seasons)
+            foreach (var season in dbClub.Seasons)
             {
                 season.ClubId = dbClub.Id;
                 season.Id = GetNewGuid(season.Id);
@@ -474,7 +474,7 @@ namespace SailScores.Core.Services
             dbClub.IsHidden = targetClub.IsHidden;
 
             Guid? oldDefaultScoringSystemId = null;
-            if(!(GetNewGuidIfSet(dbClub.DefaultScoringSystemId) == oldDefaultScoringSystemId))
+            if (!(GetNewGuidIfSet(dbClub.DefaultScoringSystemId) == oldDefaultScoringSystemId))
             {
                 oldDefaultScoringSystemId = dbClub.DefaultScoringSystemId;
                 dbClub.DefaultScoringSystemId = null;
@@ -503,7 +503,7 @@ namespace SailScores.Core.Services
 
         private Guid GetNewGuid(Guid oldGuid)
         {
-            if(guidMapper == null)
+            if (guidMapper == null)
             {
                 guidMapper = new Dictionary<Guid, Guid>();
             }

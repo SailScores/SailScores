@@ -45,9 +45,9 @@ namespace SailScores.Web.Models.SailScores
             get
             {
                 var raceWord = "Race";
-                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi" )
+                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
                 {
-                    raceWord = "Purjehdukset"; 
+                    raceWord = "Purjehdukset";
                 }
                 if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
                 {
@@ -72,13 +72,13 @@ namespace SailScores.Web.Models.SailScores
                 }
                 return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
             }
-        } 
+        }
 
         public int CompetitorCount
         {
             get
             {
-                if(Scores == null)
+                if (Scores == null)
                 {
                     return 0;
                 }

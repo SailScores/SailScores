@@ -46,27 +46,24 @@ namespace SailScores.Core.Services
             string url = builder.ToString();
 
 
-            using (var request = new HttpRequestMessage(
+            using var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                url)) 
-            using (var client = _clientFactory.CreateClient())
+                url);
+            using var client = _clientFactory.CreateClient();
+            var response = await client.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
             {
-
-                var response = await client.SendAsync(request).ConfigureAwait(false);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content
-                        .ReadAsStringAsync().ConfigureAwait(false);
-                    var responseObj = JsonConvert.DeserializeObject<CurrentWeatherResponse>(responseString);
-                    var domainObj = _mapper.Map<Weather>(responseObj);
-                    domainObj.Icon = GetIconName(responseObj.Weather?.First()?.Id);
-                    return domainObj;
-                }
-                else
-                {
-                    return null;
-                }
+                var responseString = await response.Content
+                    .ReadAsStringAsync().ConfigureAwait(false);
+                var responseObj = JsonConvert.DeserializeObject<CurrentWeatherResponse>(responseString);
+                var domainObj = _mapper.Map<Weather>(responseObj);
+                domainObj.Icon = GetIconName(responseObj.Weather?.First()?.Id);
+                return domainObj;
+            }
+            else
+            {
+                return null;
             }
         }
 

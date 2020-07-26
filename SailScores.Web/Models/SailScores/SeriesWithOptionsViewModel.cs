@@ -10,7 +10,7 @@ namespace SailScores.Web.Models.SailScores
         public IEnumerable<Season> SeasonOptions { get; set; }
 
         public IList<ScoringSystem> ScoringSystemOptions { get; set; }
-        
+
         private Guid _seasonId;
 
         [Required]
@@ -24,7 +24,8 @@ namespace SailScores.Web.Models.SailScores
                 }
                 return _seasonId;
             }
-            set {
+            set
+            {
                 _seasonId = value;
             }
 

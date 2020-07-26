@@ -41,7 +41,9 @@ namespace SailScores.Web.Models.SailScores
 
         public DateTime? UpdatedDate { get; set; }
 
-        public string DisplayName { get
+        public string DisplayName
+        {
+            get
             {
                 StringBuilder sb = new StringBuilder();
 

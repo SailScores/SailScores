@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    public class AppendixACalculator : BaseScoringCalculator, IScoringCalculator
+    public class AppendixACalculator : BaseScoringCalculator
     {
         public AppendixACalculator(ScoringSystem scoringSystem) : base(scoringSystem)
         {
@@ -16,6 +16,11 @@ namespace SailScores.Core.Scoring
             IEnumerable<Score> allScores,
             Score currentScore)
         {
+            if(currentScore == null)
+            {
+                throw new ArgumentNullException(nameof(currentScore));
+            }
+
             decimal? returnScore =
                 Convert.ToDecimal(allScores
                     .Count(s =>
@@ -26,7 +31,7 @@ namespace SailScores.Core.Scoring
                         ) + 1);
 
             returnScore = GetTiedScore(allScores, currentScore) ?? returnScore;
-            
+
             return returnScore;
         }
 

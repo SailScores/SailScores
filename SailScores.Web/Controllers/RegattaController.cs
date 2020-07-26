@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Controllers
@@ -50,7 +49,7 @@ namespace SailScores.Web.Controllers
             ViewData["ClubInitials"] = clubInitials;
 
             var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
-            if(regatta == null)
+            if (regatta == null)
             {
                 return new NotFoundResult();
             }
@@ -108,7 +107,7 @@ namespace SailScores.Web.Controllers
 
                     return View(model);
                 }
-                
+
                 var regattaId = await _regattaService.SaveNewAsync(model);
                 var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
                 return RedirectToAction("Details", new

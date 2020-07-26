@@ -43,7 +43,7 @@ namespace SailScores.Core.Services
 
         public async Task SaveNew(Season season)
         {
-            var dbSeason =_mapper.Map<Db.Season>(season);
+            var dbSeason = _mapper.Map<Db.Season>(season);
 
             dbSeason.Id = Guid.NewGuid();
             dbSeason.UrlName = UrlUtility.GetUrlName(season.Name);
@@ -85,8 +85,8 @@ namespace SailScores.Core.Services
             var errors = new List<String>();
             var existingSeasons = _dbContext.Seasons.Where(s =>
                 s.ClubId == season.ClubId);
-            if(await existingSeasons.AnyAsync(s =>
-                (s.Name == season.Name || s.UrlName == season.UrlName) && s.Id != season.Id)
+            if (await existingSeasons.AnyAsync(s =>
+                 (s.Name == season.Name || s.UrlName == season.UrlName) && s.Id != season.Id)
                 .ConfigureAwait(false))
             {
                 errors.Add("A season with this name exists. Please choose a unique name.");

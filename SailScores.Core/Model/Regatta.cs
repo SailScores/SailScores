@@ -26,7 +26,7 @@ namespace SailScores.Core.Model
         public Season Season { get; set; }
 
         public IList<Fleet> Fleets { get; set; }
-        
+
         public DateTime? UpdatedDate { get; set; }
 
         [Display(Name = "Start Date")]

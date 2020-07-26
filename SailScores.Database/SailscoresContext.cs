@@ -109,11 +109,11 @@ namespace SailScores.Database
 
 
             modelBuilder.Entity<CompetitorFleet>()
-                .HasKey(x => new {x.CompetitorId, x.FleetId});
+                .HasKey(x => new { x.CompetitorId, x.FleetId });
             modelBuilder.Entity<SeriesRace>()
-                .HasKey(x => new {x.SeriesId, x.RaceId});
+                .HasKey(x => new { x.SeriesId, x.RaceId });
             modelBuilder.Entity<FleetBoatClass>()
-                .HasKey(x => new {x.FleetId, x.BoatClassId});
+                .HasKey(x => new { x.FleetId, x.BoatClassId });
             modelBuilder.Entity<RegattaFleet>()
                 .HasKey(x => new { x.RegattaId, x.FleetId });
             modelBuilder.Entity<RegattaSeries>()
@@ -216,10 +216,6 @@ namespace SailScores.Database
                 });
         }
 
-        public override int SaveChanges()
-        {
-            return base.SaveChanges();
-        }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return base.SaveChangesAsync(cancellationToken);

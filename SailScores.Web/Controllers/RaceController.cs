@@ -63,12 +63,12 @@ namespace SailScores.Web.Controllers
         {
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
 
-            if(race == null)
+            if (race == null)
             {
                 return NotFound();
             }
             var canEdit = false;
-            if(User != null && (User.Identity?.IsAuthenticated ?? false))
+            if (User != null && (User.Identity?.IsAuthenticated ?? false))
             {
                 canEdit = await _authService.CanUserEdit(User, clubInitials);
             }
@@ -95,13 +95,13 @@ namespace SailScores.Web.Controllers
                     regattaId,
                     seriesId);
             var errors = _adminTipService.GetRaceCreateErrors(race);
-            if(errors != null && errors.Count > 0)
+            if (errors != null && errors.Count > 0)
             {
                 return View("CreateErrors", errors);
             }
             _adminTipService.AddTips(ref race);
             return View(race);
-            
+
         }
 
         [HttpPost]
@@ -202,7 +202,7 @@ namespace SailScores.Web.Controllers
                 race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
                 race.CompetitorOptions = raceOptions.CompetitorOptions;
                 race.SeriesOptions = raceOptions.SeriesOptions;
-                foreach(var score in race.Scores)
+                foreach (var score in race.Scores)
                 {
                     score.Competitor = raceOptions.CompetitorOptions.First(c => c.Id == score.CompetitorId);
                 }

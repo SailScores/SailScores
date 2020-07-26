@@ -37,7 +37,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             Guid clubId,
             Guid? fleetId)
         {
-            var competitors =  await _service.GetCompetitorsAsync(clubId, fleetId);
+            var competitors = await _service.GetCompetitorsAsync(clubId, fleetId);
             return _mapper.Map<List<CompetitorDto>>(competitors);
         }
 
@@ -46,9 +46,9 @@ namespace SailScores.Web.Areas.Api.Controllers
         {
             var c = await _service.GetCompetitorAsync(Guid.Parse(identifier));
 
-            return _mapper.Map<CompetitorDto>(c); ;
+            return _mapper.Map<CompetitorDto>(c);
         }
-        
+
         // POST: api/competitors
         [HttpPost]
         public async Task<ActionResult<Guid>> Post([FromBody] CompetitorDto competitor)

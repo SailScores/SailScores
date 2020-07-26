@@ -272,15 +272,40 @@ namespace SailScores.Test.Unit
                     ScoreLike = null,
                     ScoringSystemId = system.Id
                 },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "PAV",
+                    Description = "Average of Prior",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = 1,
+                    AdjustOtherScores = null,
+                    CameToStart = false,
+                    Finished = false,
+                    Formula = "AVE P",
+                    ScoreLike = null,
+                    ScoringSystemId = system.Id
+                },
             };
 
             return system;
         }
 
         [Fact]
+        public void CalculateResults_NoRaces_NoResults()
+        {
+            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3, 0));
+
+            Assert.NotNull(results);
+        }
+
+
+        [Fact]
         public void CalculateResults_ValidSeries_ReturnsResults()
         {
-            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3,3));
+            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3, 3));
 
             Assert.NotNull(results);
         }
@@ -294,6 +319,36 @@ namespace SailScores.Test.Unit
             Assert.Equal(1, results.Results[firstCompetitor].CalculatedScores.Count(r => r.Value.Discard));
         }
 
+        [Fact]
+        public void CalculateResults_PreviousRaceTrend_TopCompGoesDown()
+        {
+            var basicSeries = GetBasicSeries(10, 6);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNE";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = 1;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            var firstCompetitor = results.Competitors.First();
+            Assert.True(results.Results[testComp].Trend < 0);
+        }
+
+
+        [Fact]
+        public void CalculateResults_PreviousDayTrend_TopCompGoesDown()
+        {
+            var basicSeries = GetBasicSeries(10, 6);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousDay;
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Code = "DNE";
+            basicSeries.Races.Last().Scores.First(s => s.Competitor == testComp).Place = 1;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            var firstCompetitor = results.Competitors.First();
+            Assert.True(results.Results[testComp].Trend < 0);
+        }
 
         [Fact]
         public void CalculateResults_5Races_OneDiscard()
@@ -319,6 +374,24 @@ namespace SailScores.Test.Unit
                 results.Results[testComp].TotalScore);
             Assert.True(
                 results.Results[testComp].Rank > 1);
+        }
+
+        [Fact]
+        public void CalculateResults_AveragePrior_UsesHalf()
+        {
+            // Arrange: put in some coded results: SB
+            var basicSeries = GetBasicSeries(3, 6);
+            var testComp = basicSeries.Competitors.First();
+            basicSeries.Races[3].Scores.First(s => s.Competitor == testComp).Code = "PAV";
+            basicSeries.Races[3].Scores.First(s => s.Competitor == testComp).Place = null;
+
+            basicSeries.Races[4].Scores.First(s => s.Competitor == testComp).Place = 3;
+            basicSeries.Races[5].Scores.First(s => s.Competitor == testComp).Place = 3;
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(1,
+                results.Results[testComp].CalculatedScores[basicSeries.Races[3]].ScoreValue);
         }
 
         // This is a test of what happens to an undefined code: SB is not defined in the appenidx A system,
@@ -448,7 +521,7 @@ namespace SailScores.Test.Unit
         // SailScores does not currently have a way to indicate multiple penalties: score codes are assigned one per result. The current work-around is manually scoring a result.
         // putting the test in here with an ignore as a note for future desireability.
 
-        [Fact(Skip ="Not implemented. See test comment")]
+        [Fact(Skip = "Not implemented. See test comment")]
         public void CalculateResults_MultiplePenalties_CumulativeImpact()
         {
             var basicSeries = GetBasicSeries(23, 1);
@@ -533,7 +606,7 @@ namespace SailScores.Test.Unit
             var fourthComp = basicSeries.Competitors.Skip(3).First();
             basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Code = "TIE";
             basicSeries.Races.Last().Scores.First(s => s.Competitor == fourthComp).Place = 3;
-            
+
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
             Assert.Equal(3.5m,
@@ -756,11 +829,11 @@ namespace SailScores.Test.Unit
                         Id = Guid.NewGuid(),
                         Name = $"Race {i}",
                         Order = i + 1,
-                        Date = DateTime.UtcNow
+                        Date = DateTime.UtcNow.AddDays(i)
 
                     };
                 var scores = new List<Score>();
-                for( int j=0; j < competitors.Count; j++)
+                for (int j = 0; j < competitors.Count; j++)
                 {
                     scores.Add(new Score
                     {
@@ -781,6 +854,7 @@ namespace SailScores.Test.Unit
                 ClubId = Guid.NewGuid(),
                 Name = "Test Series",
                 Description = "Test Series Description",
+                TrendOption = Api.Enumerations.TrendOption.PreviousRace,
                 Races = races,
                 Competitors = competitors,
                 Season = new Season

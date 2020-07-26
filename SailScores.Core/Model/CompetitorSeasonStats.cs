@@ -8,7 +8,9 @@ namespace SailScores.Core.Model
         [Display(Name = "Season")]
         public String SeasonName { get; set; }
 
+#pragma warning disable CA1056 // Uri properties should not be strings
         public String SeasonUrlName { get; set; }
+#pragma warning restore CA1056 // Uri properties should not be strings
 
         [Display(Name = "Season Start")]
         public DateTime SeasonStart { get; internal set; }

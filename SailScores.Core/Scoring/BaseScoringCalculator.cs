@@ -30,20 +30,20 @@ namespace SailScores.Core.Scoring
 
 #pragma warning restore CA1707 // Identifiers should not contain underscores
 
-        protected readonly ScoringSystem _scoringSystem;
+        protected ScoringSystem ScoringSystem { get; set; }
 
         protected IComparer<SeriesCompetitorResults> CompetitorComparer;
 
         protected BaseScoringCalculator(ScoringSystem scoringSystem)
         {
-            _scoringSystem = scoringSystem;
+            ScoringSystem = scoringSystem;
             CompetitorComparer = new LowPointSeriesCompComparer();
         }
 
         public SeriesResults CalculateResults(Series series)
         {
             SeriesResults returnResults = GetResults(series);
-            AddTrend(returnResults,series);
+            AddTrend(returnResults, series);
             return returnResults;
         }
 
@@ -62,7 +62,7 @@ namespace SailScores.Core.Scoring
 
         private void AddTrend(SeriesResults results, Series series)
         {
-            if((series.TrendOption ?? TrendOption.None) == TrendOption.None)
+            if ((series.TrendOption ?? TrendOption.None) == TrendOption.None)
             {
                 return;
             }
@@ -79,22 +79,23 @@ namespace SailScores.Core.Scoring
                     newSeries.Races = RemoveLastWeeksRaces(series.Races);
                     break;
             }
-            if(!newSeries.Races.Any())
+            if (!newSeries.Races.Any())
             {
                 return;
             }
 
             var oldResults = GetResults(newSeries);
             int maxOldRank = oldResults.Results.Values.Max(v => v.Rank) ?? 0;
-            foreach(var comp in results.Competitors)
+            foreach (var comp in results.Competitors)
             {
                 int oldRank;
 
-                if(oldResults.Results.ContainsKey(comp)
+                if (oldResults.Results.ContainsKey(comp)
                     && oldResults.Results[comp]?.Rank != null)
                 {
                     oldRank = oldResults.Results[comp].Rank.Value;
-                } else
+                }
+                else
                 {
                     oldRank = maxOldRank + 1;
                 }
@@ -122,7 +123,7 @@ namespace SailScores.Core.Scoring
         }
         private IList<Race> RemoveLastRace(IList<Race> races)
         {
-            if(races.Count <= 1)
+            if (races.Count <= 1)
             {
                 return new List<Race>();
             }
@@ -208,7 +209,8 @@ namespace SailScores.Core.Scoring
                     if (IsTrivialCalculation(scoreCode))
                     {
                         score.ScoreValue = GetTrivialScoreValue(score);
-                    } else if (IsRaceBasedValue(scoreCode))
+                    }
+                    else if (IsRaceBasedValue(scoreCode))
                     {
                         score.ScoreValue = CalculateRaceBasedValue(score, race);
                     }
@@ -241,18 +243,14 @@ namespace SailScores.Core.Scoring
         {
             var score = compResults.CalculatedScores[race];
             var scoreCode = GetScoreCode(score.RawScore);
-            switch (scoreCode.Formula.ToUpperInvariant())
+            return (scoreCode.Formula.ToUpperInvariant()) switch
             {
-                case AVERAGE_FORMULANAME:
-                    return CalculateAverage(compResults);
-                case AVE_AFTER_DISCARDS_FORMULANAME:
-                    return CalculateAverageNoDiscards(compResults);
-                case AVE_PRIOR_RACES_FORMULANAME:
-                    return CalculateAverageOfPrior(compResults, race);
-                case SERIESCOMPETITORS_FORMULANAME:
-                    return GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0);
-            }
-            return null;
+                AVERAGE_FORMULANAME => CalculateAverage(compResults),
+                AVE_AFTER_DISCARDS_FORMULANAME => CalculateAverageNoDiscards(compResults),
+                AVE_PRIOR_RACES_FORMULANAME => CalculateAverageOfPrior(compResults, race),
+                SERIESCOMPETITORS_FORMULANAME => GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0),
+                _ => null,
+            };
         }
 
         private bool IsSeriesBasedScore(ScoreCode scoreCode)
@@ -292,7 +290,7 @@ namespace SailScores.Core.Scoring
             SeriesCompetitorResults prevComp = null;
             foreach (var comp in orderedComps)
             {
-                if(comp.TotalScore == null)
+                if (comp.TotalScore == null)
                 {
                     comp.Rank = null;
                 }
@@ -323,7 +321,7 @@ namespace SailScores.Core.Scoring
         private bool IsTrivialCalculation(ScoreCode scoreCode)
         {
             return scoreCode.Formula.Equals(MANUAL_FORMULANAME, CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals(FIXED_FORMULANAME,CASE_INSENSITIVE);
+                || scoreCode.Formula.Equals(FIXED_FORMULANAME, CASE_INSENSITIVE);
         }
 
         private decimal? GetTrivialScoreValue(CalculatedScore score)
@@ -346,7 +344,7 @@ namespace SailScores.Core.Scoring
             }
             return null;
         }
-        
+
         private bool IsRaceBasedValue(ScoreCode scoreCode)
         {
             return scoreCode.Formula.Equals(FINISHERSPLUS_FORMULANAME, CASE_INSENSITIVE)
@@ -357,18 +355,20 @@ namespace SailScores.Core.Scoring
         private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race)
         {
             var scoreCode = GetScoreCode(score.RawScore);
-            switch (scoreCode.Formula.ToUpperInvariant())
+            return (scoreCode.Formula.ToUpperInvariant()) switch
             {
-                case FINISHERSPLUS_FORMULANAME:
-                    return race.Scores.Where(s => CountsAsStarted(s)).Count() + 
-                        scoreCode.FormulaValue;
-                case CAMETOSTARTPLUS_FORMULANAME:
-                    return race.Scores.Where(s => CameToStart(s)).Count() +
-                        scoreCode.FormulaValue;
-                case PLACEPLUSPERCENT_FORMULANAME:
-                    return GetPenaltyScore(score, race, scoreCode);
-            }
-            throw new InvalidOperationException("Score code definition issue with race based score code.");
+                FINISHERSPLUS_FORMULANAME =>
+                    race.Scores.Count(s => CountsAsStarted(s)) +
+                        scoreCode.FormulaValue,
+                CAMETOSTARTPLUS_FORMULANAME =>
+                    race.Scores.Count(s => CameToStart(s)) +
+                        scoreCode.FormulaValue,
+                PLACEPLUSPERCENT_FORMULANAME =>
+                    GetPenaltyScore(score, race, scoreCode),
+                _ =>
+                    throw new InvalidOperationException(
+                        "Score code definition issue with race based score code."),
+            };
         }
 
         protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
@@ -420,7 +420,7 @@ namespace SailScores.Core.Scoring
                     RawScore = new Score { Code = defaultCode.Name }
                 }, race);
             }
-            if(IsSeriesBasedScore(defaultCode))
+            if (IsSeriesBasedScore(defaultCode))
             {
                 //Assume it's competitors plus for now. I suppose the default could be
                 // the competitors average, but that would create all sort of problems, I think.
@@ -433,10 +433,6 @@ namespace SailScores.Core.Scoring
         private decimal? CalculateAverage(
             SeriesCompetitorResults compResults)
         {
-            int numAverages = compResults.CalculatedScores
-                    .Values.Count(s =>
-                        IsAverage(s.RawScore.Code));
-
             var average = compResults.CalculatedScores.Values
                 .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                 .Average(s => s.ScoreValue) ?? 0m;
@@ -463,7 +459,8 @@ namespace SailScores.Core.Scoring
                     .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                     .OrderBy(s => s.ScoreValue)
                     .FirstOrDefault()?.ScoreValue ?? 0m;
-            } else
+            }
+            else
             {
                 average = compResults.CalculatedScores.Values
                    .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
@@ -488,9 +485,6 @@ namespace SailScores.Core.Scoring
                 .Where(s => racesToUse.Contains(s.Key))
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            int numAverages = resultsToUse
-                    .Values.Count(s =>
-                        IsAverage(s.RawScore.Code));
             var average = resultsToUse.Values
                 .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                 .Average(s => s.ScoreValue) ?? 0m;
@@ -547,7 +541,7 @@ namespace SailScores.Core.Scoring
             SeriesResults results,
             IEnumerable<Score> scores)
         {
-            foreach(var comp in results.Competitors)
+            foreach (var comp in results.Competitors)
             {
                 var compResults = results.Results[comp];
 
@@ -580,38 +574,41 @@ namespace SailScores.Core.Scoring
 
         protected int GetNumberOfDiscards(int numberOfRaces)
         {
-            if(numberOfRaces == 0)
+            if (numberOfRaces == 0)
             {
                 return 0;
             }
             string[] discardStrings;
-            if (String.IsNullOrWhiteSpace(_scoringSystem?.DiscardPattern)){
-                discardStrings = new string[]{ "0" };
-            } else
+            if (String.IsNullOrWhiteSpace(ScoringSystem?.DiscardPattern))
             {
-                discardStrings = _scoringSystem.DiscardPattern.Split(',');
+                discardStrings = new string[] { "0" };
+            }
+            else
+            {
+                discardStrings = ScoringSystem.DiscardPattern.Split(',');
             }
             string selectedString;
-            if(numberOfRaces > discardStrings.Length)
+            if (numberOfRaces > discardStrings.Length)
             {
-                 selectedString = discardStrings[discardStrings.Length - 1];
-            } else
+                selectedString = discardStrings[^1];
+            }
+            else
             {
                 selectedString = discardStrings[numberOfRaces - 1];
             }
 
             int returnValue = 0;
-            if(int.TryParse(selectedString, out returnValue))
+            if (int.TryParse(selectedString, out returnValue))
             {
                 return returnValue;
             }
 
-            if(numberOfRaces == 1)
+            if (numberOfRaces == 1)
             {
                 return 0;
             }
             return GetNumberOfDiscards(numberOfRaces - 1);
-            
+
         }
 
 
@@ -622,7 +619,7 @@ namespace SailScores.Core.Scoring
                     || r == s.Race));
             bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
                 c => c.Id == s.CompetitorId
-                    || c == s.Competitor ));
+                    || c == s.Competitor));
 
             //Used to check and make sure all score codes were found. but no more.
 
@@ -657,7 +654,7 @@ namespace SailScores.Core.Scoring
                     Discard = false,
                     RawScore = score
                 };
-                returnResults.CalculatedScores[score.Race].ScoreValue = 
+                returnResults.CalculatedScores[score.Race].ScoreValue =
                     GetBasicScore(scores, score);
 
             }
@@ -677,7 +674,7 @@ namespace SailScores.Core.Scoring
 
         private void ClearRawScores(IEnumerable<Score> scores)
         {
-            foreach(var score in scores)
+            foreach (var score in scores)
             {
                 if (!ShouldPreserveScore(score))
                 {
@@ -689,7 +686,7 @@ namespace SailScores.Core.Scoring
         protected bool ShouldPreserveScore(Score score)
         {
             return String.IsNullOrWhiteSpace(score.Code)
-                || ( GetScoreCode(score)?.PreserveResult ?? true);
+                || (GetScoreCode(score)?.PreserveResult ?? true);
         }
 
         protected ScoreCode GetScoreCode(Score score)
@@ -703,13 +700,13 @@ namespace SailScores.Core.Scoring
             {
                 return null;
             }
-            var returnScoreCode = _scoringSystem.ScoreCodes
+            var returnScoreCode = ScoringSystem.ScoreCodes
                     .SingleOrDefault(c =>
                         c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
 
             if (returnScoreCode == null)
             {
-                returnScoreCode = _scoringSystem.InheritedScoreCodes
+                returnScoreCode = ScoringSystem.InheritedScoreCodes
                     ?.SingleOrDefault(c =>
                         c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
             }
@@ -717,7 +714,7 @@ namespace SailScores.Core.Scoring
             if (returnScoreCode == null)
             {
                 returnScoreCode = GetScoreCode(DEFAULT_CODE);
-                if(returnScoreCode == null)
+                if (returnScoreCode == null)
                 {
                     returnScoreCode = new ScoreCode
                     {

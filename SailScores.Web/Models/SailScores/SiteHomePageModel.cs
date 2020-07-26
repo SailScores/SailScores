@@ -5,6 +5,6 @@
         public ClubSelectorModel ClubSelectorModel { get; set; }
 
         public RegattaSelectorModel RegattaSelectorModel { get; set; }
-        
+
     }
 }

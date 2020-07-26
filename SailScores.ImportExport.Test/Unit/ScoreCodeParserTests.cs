@@ -23,10 +23,10 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
         public void ParseSimpleRow()
         {
             var code = ScoreCodeParser.GetCode(GetSimpleScoreCodeRow());
-            
+
             Assert.NotNull(code);
             Assert.Equal(5, code.ScoringSystemId);
         }
-        
+
     }
 }

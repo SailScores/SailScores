@@ -12,7 +12,7 @@ namespace SailScores.Web.Models.SailScores
         [Display(Name = "Club name")]
         public String ClubName { get; set; }
 
-        [StringLength(10, ErrorMessage ="Initials are limited to 10 characters or less.")]
+        [StringLength(10, ErrorMessage = "Initials are limited to 10 characters or less.")]
         [Display(Name = "Club initials")]
         [Required(ErrorMessage = "Club initials are required")]
         public String ClubInitials { get; set; }

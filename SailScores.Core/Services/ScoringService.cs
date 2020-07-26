@@ -86,19 +86,19 @@ namespace SailScores.Core.Services
         public async Task<ScoringSystem> GetScoringSystemAsync(Series series)
         {
             Guid? scoringSystemId = series.ScoringSystemId;
-            if(scoringSystemId == null)
+            if (scoringSystemId == null)
             {
                 scoringSystemId = (await _dbContext.Clubs.Where(c => c.Id == series.ClubId)
                     .FirstOrDefaultAsync())
                     .DefaultScoringSystemId;
             }
-            if(scoringSystemId == null)
+            if (scoringSystemId == null)
             {
                 throw new InvalidOperationException("Scoring system for series not found and club default scoring system not found.");
             }
             return await GetScoringSystemAsync(scoringSystemId.Value);
         }
-        
+
         public async Task SaveScoringSystemAsync(ScoringSystem scoringSystem)
         {
             if (scoringSystem.Id == Guid.Empty)
@@ -106,11 +106,13 @@ namespace SailScores.Core.Services
                 scoringSystem.Id = Guid.NewGuid();
             }
             var dbObject = await _dbContext.ScoringSystems.Where(s => s.Id == scoringSystem.Id).SingleOrDefaultAsync();
-            if(dbObject == null)
+            if (dbObject == null)
             {
                 var newDbObject = _mapper.Map<Db.ScoringSystem>(scoringSystem);
                 _dbContext.ScoringSystems.Add(newDbObject);
-            } else {
+            }
+            else
+            {
                 _mapper.Map(scoringSystem, dbObject);
             }
             await _dbContext.SaveChangesAsync();
@@ -133,11 +135,12 @@ namespace SailScores.Core.Services
 
         public async Task SaveScoreCodeAsync(ScoreCode scoreCode)
         {
-            if(scoreCode.Id != null && scoreCode.Id != Guid.Empty)
+            if (scoreCode.Id != null && scoreCode.Id != Guid.Empty)
             {
                 Db.ScoreCode dbObject = await _dbContext.ScoreCodes.Where(sc => sc.Id == scoreCode.Id).SingleAsync();
                 _mapper.Map(scoreCode, dbObject);
-            } else
+            }
+            else
             {
                 Db.ScoreCode dbObject = _mapper.Map<Db.ScoreCode>(scoreCode);
                 dbObject.Id = Guid.NewGuid();
@@ -167,7 +170,7 @@ namespace SailScores.Core.Services
         private async Task<IEnumerable<ScoreCode>> GetAllCodesAsync(
             Guid? systemId)
         {
-            if(systemId == null)
+            if (systemId == null)
             {
                 return new List<Model.ScoreCode>();
             }

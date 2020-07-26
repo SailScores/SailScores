@@ -5,7 +5,7 @@ using SailScores.ImportExport.Sailwave.Elements.File;
 
 namespace SailScores.ImportExport.Sailwave.Csv
 {
-    public sealed class ColumnMapFromCsv :ClassMap<FileRow>
+    public sealed class ColumnMapFromCsv : ClassMap<FileRow>
     {
         public ColumnMapFromCsv()
         {

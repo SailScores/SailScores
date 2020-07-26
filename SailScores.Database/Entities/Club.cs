@@ -32,8 +32,8 @@ namespace SailScores.Database.Entities
 
         public ScoringSystem DefaultScoringSystem { get; set; }
         public Guid? DefaultScoringSystemId { get; set; }
-        public IList<ScoringSystem> ScoringSystems { get; set;}
+        public IList<ScoringSystem> ScoringSystems { get; set; }
 
-        
+
     }
 }

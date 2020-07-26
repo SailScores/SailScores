@@ -16,7 +16,7 @@ namespace SailScores.ImportExport.Sailwave
         public async Task WriteAsync(Series series, string filePath)
         {
             using (var writer = new StreamWriter(filePath))
-            { 
+            {
                 var csv = new CsvWriter(writer);
                 csv.Configuration.RegisterClassMap<ColumnMapToCsv>();
                 csv.Configuration.HasHeaderRecord = false;

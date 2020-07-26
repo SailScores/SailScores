@@ -39,7 +39,7 @@ namespace SailScores.ImportExport.Sailwave.Parsers
 
             return null;
         }
-        
+
         internal static decimal? GetDecimal(string input)
         {
             if (Decimal.TryParse(input, out decimal d))

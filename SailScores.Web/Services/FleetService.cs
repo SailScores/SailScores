@@ -71,8 +71,9 @@ namespace SailScores.Web.Services
                     (await _coreClubService.GetAllBoatClasses(fleet.ClubId))
                     .Where(c => fleet.BoatClassIds.Contains(c.Id))
                     .ToList();
-            } else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats
-                  && fleet.CompetitorIds != null)
+            }
+            else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats
+                && fleet.CompetitorIds != null)
             {
                 coreModel.Competitors =
                     (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null))

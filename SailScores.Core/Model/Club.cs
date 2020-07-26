@@ -33,6 +33,6 @@ namespace SailScores.Core.Model
         public Guid? DefaultScoringSystemId { get; set; }
 
         public IList<ScoringSystem> ScoringSystems { get; set; }
-        
+
     }
 }

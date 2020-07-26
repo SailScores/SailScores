@@ -18,7 +18,7 @@ namespace SailScores.Api.Dtos
         public String Description { get; set; }
 
         public FleetType FleetType { get; set; }
-        public IList<Guid> BoatClassIds {get;set;}
+        public IList<Guid> BoatClassIds { get; set; }
         public IList<Guid> CompetitorIds { get; set; }
     }
 }

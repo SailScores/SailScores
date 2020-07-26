@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace SailScores.Database
 {
-    public interface ISailScoresContext : IDisposable {
+    public interface ISailScoresContext : IDisposable
+    {
         DbSet<Club> Clubs { get; set; }
 
         DbSet<BoatClass> BoatClasses { get; set; }
@@ -35,11 +36,12 @@ namespace SailScores.Database
         Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId);
 
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber);
-        
-        int SaveChanges();
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
             Guid competitorId,
             string seasonUrlName);
+
+        int SaveChanges();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
     }
 }

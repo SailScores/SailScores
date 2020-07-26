@@ -101,7 +101,8 @@ namespace SailScores.Web.Services
             if (regattaId.HasValue)
             {
                 returnRace = await CreateRegattaRaceAsync(clubInitials, regattaId);
-            } else if (seriesId.HasValue)
+            }
+            else if (seriesId.HasValue)
             {
                 returnRace = await CreateSeriesRaceAsync(clubInitials, seriesId.Value);
             }
@@ -149,13 +150,13 @@ namespace SailScores.Web.Services
             Guid? regattaId)
         {
             var model = await CreateClubRaceAsync(clubInitials);
-            if(!regattaId.HasValue)
+            if (!regattaId.HasValue)
             {
                 return model;
             }
 
             var regatta = await _coreRegattaService.GetRegattaAsync(regattaId.Value);
-            
+
             model.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
             model.FleetOptions = regatta.Fleets;
             if (regatta.ScoringSystemId.HasValue)
@@ -196,7 +197,7 @@ namespace SailScores.Web.Services
         {
             var model = await CreateClubRaceAsync(clubInitials);
             var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
-            
+
             model.SeriesIds = new List<Guid>
             {
                 seriesId
@@ -215,7 +216,7 @@ namespace SailScores.Web.Services
                 model.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(model.ClubId))
                     .OrderBy(s => s.Name).ToList();
             }
-            
+
             return model;
         }
 
@@ -224,7 +225,8 @@ namespace SailScores.Web.Services
             if (raceWithOptions.RegattaId.HasValue)
             {
                 raceWithOptions.FleetOptions = await _coreClubService.GetAllFleets(raceWithOptions.ClubId);
-            } else
+            }
+            else
             {
                 raceWithOptions.FleetOptions = await _coreClubService.GetActiveFleets(raceWithOptions.ClubId);
             }
@@ -234,7 +236,7 @@ namespace SailScores.Web.Services
                 raceWithOptions.ClubId,
                 raceWithOptions.Date.HasValue ? raceWithOptions.Date.Value : DateTime.Today,
                 true);
-            
+
             raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(raceWithOptions.ClubId))
                 .OrderBy(s => s.Name).ToList();
             // CompetitorOptions should be set by the JS on the page at edit time.
@@ -247,7 +249,7 @@ namespace SailScores.Web.Services
         {
 
             var coreRace = await _coreRaceService.GetRaceAsync(id);
-            if(coreRace == null)
+            if (coreRace == null)
             {
                 return null;
             }
@@ -262,7 +264,7 @@ namespace SailScores.Web.Services
             {
                 score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
             }
-            retRace.Weather = await _weatherService.ConvertToLocalizedWeather(coreRace.Weather, coreRace.ClubId );
+            retRace.Weather = await _weatherService.ConvertToLocalizedWeather(coreRace.Weather, coreRace.ClubId);
             retRace.Regatta = await GetRegatta(retRace);
 
             return retRace;
@@ -281,10 +283,11 @@ namespace SailScores.Web.Services
             var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, DateTime.Today, false);
 
             // fill in series and fleets
-            if (race.SeriesIds != null) {
+            if (race.SeriesIds != null)
+            {
                 race.Series = series.Where(s => race.SeriesIds.Contains(s.Id)).ToList();
             }
-            if(race.FleetId != default)
+            if (race.FleetId != default)
             {
                 race.Fleet = fleets.Single(f => f.Id == race.FleetId);
                 // if a regatta race, give everyone in the fleet a result
@@ -304,7 +307,7 @@ namespace SailScores.Web.Services
                     }
                 }
             }
-            if(race.Order == 0)
+            if (race.Order == 0)
             {
                 if (race.InitialOrder.HasValue && race.InitialOrder.Value != 0)
                 {
@@ -349,7 +352,7 @@ namespace SailScores.Web.Services
 
 
             race.Id = raceId;
-            if(race.RegattaId.HasValue)
+            if (race.RegattaId.HasValue)
             {
                 await _coreRegattaService.AddRaceToRegattaAsync(
                     _mapper.Map<Race>(race), race.RegattaId.Value);

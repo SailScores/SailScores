@@ -25,7 +25,7 @@ namespace SailScores.Database.Entities
         [StringLength(32)]
         public string WindDirectionString { get; set; }
         public decimal? WindDirectionDegrees { get; set; }
-   
+
         [StringLength(32)]
         public string WindGustString { get; set; }
         public decimal? WindGustMeterPerSecond { get; set; }

@@ -29,9 +29,9 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<ScoreCodeDto>> Get(Guid clubId)
         {
-            var scoreCodes =  await _service.GetScoreCodesAsync(clubId);
+            var scoreCodes = await _service.GetScoreCodesAsync(clubId);
             return _mapper.Map<List<ScoreCodeDto>>(scoreCodes);
         }
-                
+
     }
 }

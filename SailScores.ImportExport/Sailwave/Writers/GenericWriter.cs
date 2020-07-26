@@ -9,7 +9,7 @@ using SailScores.ImportExport.Sailwave.Elements.File;
 namespace SailScores.ImportExport.Sailwave.Writers
 {
 
-    
+
     public class GenericWriter<T>
         where T : new()
     {
@@ -37,7 +37,7 @@ namespace SailScores.ImportExport.Sailwave.Writers
 
             return returnList;
         }
-        
+
         protected virtual string GetPropertyString(PropertyInfo property, object source)
         {
             var propValue = property.GetValue(source);
