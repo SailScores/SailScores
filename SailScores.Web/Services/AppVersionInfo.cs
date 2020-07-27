@@ -8,8 +8,8 @@ namespace SailScores.Web.Services
 {
     public class AppVersionInfo : IAppVersionService
     {
-        private static readonly string _buildFileName = ".buildinfo.json";
-        private string _buildFilePath;
+        private const string _buildFileName = ".buildinfo.json";
+        private readonly string _buildFilePath;
         private string _buildNumber;
         private string _buildId;
         private string _gitHash;

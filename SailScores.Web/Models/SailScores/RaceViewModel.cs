@@ -10,6 +10,7 @@ namespace SailScores.Web.Models.SailScores
     public class RaceViewModel
     {
 
+#pragma warning disable CA2227 // Collection properties should be read only
         public Guid Id { get; set; }
 
         public Guid ClubId { get; set; }
@@ -86,5 +87,6 @@ namespace SailScores.Web.Models.SailScores
 
         public IList<ScoreViewModel> Scores { get; set; }
 
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

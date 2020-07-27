@@ -90,12 +90,28 @@ namespace SailScores.Core.Services
             return _mapper.Map<Model.Competitor>(competitor);
         }
 
-        public async Task SaveAsync(Model.Competitor comp)
+        public Task SaveAsync(Model.Competitor comp)
         {
-            if(comp == null)
+            if (comp == null)
             {
                 throw new ArgumentNullException(nameof(comp));
             }
+
+            return SaveInternalAsync(comp);
+        }
+
+        public Task SaveAsync(CompetitorDto comp)
+        {
+            if (comp == null)
+            {
+                throw new ArgumentNullException(nameof(comp));
+            }
+
+            return SaveInternalAsync(comp);
+        }
+
+        private async Task SaveInternalAsync(Model.Competitor comp)
+        {
             var dbObject = await _dbContext
                 .Competitors
                 .Include(c => c.CompetitorFleets)
@@ -191,12 +207,9 @@ namespace SailScores.Core.Services
 
         }
 
-        public async Task SaveAsync(CompetitorDto comp)
+
+        private async Task SaveInternalAsync(CompetitorDto comp)
         {
-            if (comp == null)
-            {
-                throw new ArgumentNullException(nameof(comp));
-            }
             var dbObject = await _dbContext
                 .Competitors
                 .Include(c => c.CompetitorFleets)
@@ -284,6 +297,7 @@ namespace SailScores.Core.Services
 
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+
         }
 
         public async Task DeleteCompetitorAsync(Guid competitorId)

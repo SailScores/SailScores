@@ -182,7 +182,7 @@ namespace SailScores.Web.Controllers
                 var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
                 return RedirectToAction("Details", new
                 {
-                    clubInitials = clubInitials,
+                    clubInitials,
                     season = savedRegatta.Season.UrlName,
                     regattaName = savedRegatta.UrlName
                 });
@@ -228,7 +228,7 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                //todo: add error message
+                ModelState.AddModelError("Exception", "A problem occured while deleting.");
                 return View(regatta);
             }
         }

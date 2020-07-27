@@ -24,7 +24,7 @@ namespace SailScores.Core.Scoring
         // Code to use if no result is found or if scorecode is not found in the system.
         //  This will be used if code defined in a child scoring system is used but the
         // series is scored with the ancestor
-        protected readonly string DEFAULT_CODE = "DNC";
+        protected const string DEFAULT_CODE = "DNC";
 
         protected const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
 
@@ -32,7 +32,7 @@ namespace SailScores.Core.Scoring
 
         protected ScoringSystem ScoringSystem { get; set; }
 
-        protected IComparer<SeriesCompetitorResults> CompetitorComparer;
+        protected IComparer<SeriesCompetitorResults> CompetitorComparer { get; set; }
 
         protected BaseScoringCalculator(ScoringSystem scoringSystem)
         {
@@ -226,7 +226,7 @@ namespace SailScores.Core.Scoring
             {
                 var score = compResults.CalculatedScores[race];
                 var scoreCode = GetScoreCode(score.RawScore);
-                if (score != null && IsSeriesBasedScore(scoreCode))
+                if (IsSeriesBasedScore(scoreCode))
                 {
                     score.ScoreValue = CalculateSeriesBasedValue(
                         resultsWorkInProgress,
@@ -307,18 +307,18 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        private IList<Competitor> ReorderCompetitors(SeriesResults results)
+        private static IList<Competitor> ReorderCompetitors(SeriesResults results)
         {
             return results.Competitors.OrderBy(c => results.Results[c].Rank ?? int.MaxValue).ToList();
         }
 
-        protected int GetNumberOfCompetitors(SeriesResults seriesResults)
+        protected static int GetNumberOfCompetitors(SeriesResults seriesResults)
         {
             return seriesResults.Competitors.Count;
         }
 
 
-        private bool IsTrivialCalculation(ScoreCode scoreCode)
+        private static bool IsTrivialCalculation(ScoreCode scoreCode)
         {
             return scoreCode.Formula.Equals(MANUAL_FORMULANAME, CASE_INSENSITIVE)
                 || scoreCode.Formula.Equals(FIXED_FORMULANAME, CASE_INSENSITIVE);
@@ -398,7 +398,8 @@ namespace SailScores.Core.Scoring
                 }, race);
             }
 
-            return race.Scores.Where(s => CountsAsStarted(s)).Count() +
+            return race.Scores
+                       .Count(s => CountsAsStarted(s)) +
                         dnfCode.FormulaValue;
         }
 
@@ -426,7 +427,7 @@ namespace SailScores.Core.Scoring
                 // the competitors average, but that would create all sort of problems, I think.
                 return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0);
             }
-            return race.Scores.Where(s => CountsAsStarted(s)).Count() +
+            return race.Scores.Count(s => CountsAsStarted(s)) +
                         defaultCode.FormulaValue;
         }
 
@@ -517,6 +518,10 @@ namespace SailScores.Core.Scoring
 
         protected bool CountsAsStarted(Score s)
         {
+            if (s == null)
+            {
+                return false;
+            }
             if (String.IsNullOrWhiteSpace(s.Code) &&
                 (s.Place ?? 0) != 0)
             {
@@ -597,8 +602,7 @@ namespace SailScores.Core.Scoring
                 selectedString = discardStrings[numberOfRaces - 1];
             }
 
-            int returnValue = 0;
-            if (int.TryParse(selectedString, out returnValue))
+            if (int.TryParse(selectedString, out int returnValue))
             {
                 return returnValue;
             }

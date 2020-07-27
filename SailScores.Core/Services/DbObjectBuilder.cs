@@ -62,7 +62,8 @@ namespace SailScores.Core.Services
                 }
             }
 
-            var dbSeason = await GetSeasonAsync(regatta.ClubId, regatta);
+            var dbSeason = await GetSeasonAsync(regatta.ClubId, regatta)
+                .ConfigureAwait(false);
 
             retObj.Season = dbSeason;
 
@@ -81,7 +82,8 @@ namespace SailScores.Core.Services
             {
                 foreach (var race in series.Races)
                 {
-                    var dbRace = await BuildDbRaceObj(series.ClubId, race);
+                    var dbRace = await BuildDbRaceObj(series.ClubId, race)
+                        .ConfigureAwait(false);
                     retObj.RaceSeries.Add(new dbObj.SeriesRace
                     {
                         Series = retObj,
@@ -90,7 +92,8 @@ namespace SailScores.Core.Services
                 }
             }
 
-            var dbSeason = await GetSeasonAsync(series.ClubId, series);
+            var dbSeason = await GetSeasonAsync(series.ClubId, series)
+                .ConfigureAwait(false);
 
             retObj.Season = dbSeason;
 
@@ -116,7 +119,8 @@ namespace SailScores.Core.Services
                 dbRace.Scores.Add(dbScore);
                 if (race.Fleet?.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 {
-                    await EnsureCompetitorIsInFleet(dbScore.Competitor, race.Fleet);
+                    await EnsureCompetitorIsInFleet(dbScore.Competitor, race.Fleet)
+                        .ConfigureAwait(false);
                 }
             }
 
@@ -125,7 +129,8 @@ namespace SailScores.Core.Services
 
         private async Task EnsureCompetitorIsInFleet(dbObj.Competitor competitor, Fleet fleet)
         {
-            var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == fleet.Id);
+            var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == fleet.Id)
+                .ConfigureAwait(false);
             var Exists = dbFleet.CompetitorFleets != null
                 && dbFleet.CompetitorFleets.Any(cf => cf.CompetitorId == competitor.Id);
             if (!Exists)
@@ -164,7 +169,7 @@ namespace SailScores.Core.Services
 
         private bool AreCompetitorsMatch(Competitor competitor, dbObj.Competitor dbComp)
         {
-            bool matchFound = false;
+            bool matchFound;
 
             matchFound = !(String.IsNullOrWhiteSpace(competitor.SailNumber))
                 && !(String.IsNullOrWhiteSpace(dbComp.SailNumber))
@@ -193,11 +198,13 @@ namespace SailScores.Core.Services
                     .FirstOrDefaultAsync(s =>
                         s.ClubId == clubId
                         && (s.Id == regatta.Season.Id
-                            || s.Start == regatta.Season.Start));
+                            || s.Start == regatta.Season.Start))
+                    .ConfigureAwait(false);
             }
             if (retSeason == null)
             {
-                retSeason = await GetSeason(clubId, regatta.StartDate, regatta.EndDate, true);
+                retSeason = await GetSeason(clubId, regatta.StartDate, regatta.EndDate, true)
+                    .ConfigureAwait(false);
             }
             return retSeason;
         }
@@ -211,13 +218,15 @@ namespace SailScores.Core.Services
                     .FirstOrDefaultAsync(s =>
                         s.ClubId == clubId
                         && (s.Id == series.Season.Id
-                            || s.Start == series.Season.Start));
+                            || s.Start == series.Season.Start))
+                    .ConfigureAwait(false);
             }
             if (retSeason == null)
             {
                 DateTime? firstDate = series.Races?.Min(r => r.Date);
                 DateTime? lastDate = series.Races?.Max(r => r.Date);
-                retSeason = await GetSeason(clubId, firstDate, lastDate, true);
+                retSeason = await GetSeason(clubId, firstDate, lastDate, true)
+                    .ConfigureAwait(false);
             }
             return retSeason;
         }
@@ -234,7 +243,8 @@ namespace SailScores.Core.Services
                 .FirstOrDefaultAsync(
                 s => s.ClubId == clubId
                 && s.Start <= minDateToUse
-                && s.End > maxDateToUse);
+                && s.End > maxDateToUse)
+                .ConfigureAwait(false);
             if (retObj == null && createNew)
             {
                 retObj = CreateNewSeason(clubId, minDateToUse, minDateToUse);

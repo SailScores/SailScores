@@ -88,7 +88,7 @@ namespace SailScores.Core.Services
             return ConvertFromKelvin(tempInKelvin, destinationUnits);
         }
 
-        private decimal ConvertFromKelvin(decimal temp, Units destinationUnits)
+        private static decimal ConvertFromKelvin(decimal temp, Units destinationUnits)
         {
             if (destinationUnits == Units.Fahrenheit)
             {
@@ -125,7 +125,7 @@ namespace SailScores.Core.Services
             return ConvertFromMeterPerSecond(speedInMeterPerSecond, destinationUnits);
         }
 
-        private decimal ConvertFromMeterPerSecond(decimal speed, Units destinationUnits)
+        private static decimal ConvertFromMeterPerSecond(decimal speed, Units destinationUnits)
         {
             switch (destinationUnits)
             {
