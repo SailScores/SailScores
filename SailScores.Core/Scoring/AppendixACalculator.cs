@@ -1,4 +1,4 @@
-using SailScores.Core.Model;
+﻿using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,9 +105,11 @@ namespace SailScores.Core.Scoring
         }
         private static Score GetPreviousScore(IEnumerable<Score> allScores, Score currentScore)
         {
-            return allScores.FirstOrDefault(s =>
-            s.Race == currentScore.Race
-            && s.Place == currentScore.Place - 1);
+            return allScores.
+                Where(s => s.Race == currentScore.Race
+                && s.Place < currentScore.Place)
+                .OrderByDescending(s => s.Place)
+                .FirstOrDefault();
         }
     }
 }
