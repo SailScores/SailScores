@@ -36,6 +36,20 @@
                 <label asp-for="DiscardPattern" class="control-label"></label>
                 <input asp-for="DiscardPattern" class="form-control" />
                 <span asp-validation-for="DiscardPattern" class="text-danger"></span>
+                <p>A series of numbers indicating how many races should be discarded.
+                    The place of the number represents the number of races. The
+                    number itself represents the number of discards. For example:
+                    <ul>
+                        <li>0,0,1,1,1,2 - one race will be discarded if there are
+                            3, 4, or 5 races, and 2 races will be discarded if
+                            there are 6 or more races.</li>
+                        <li>0,0,0,1 - one race will be discarded if there are
+                            four or more races.</li>
+                        <li>0,0,1,1,1,2,2,2,3,3,3,4 - one
+                            discard for every three races, up to 12 races. more
+                            than 12 races will have four discards</li>
+                    </ul>
+                    </p>
             </div>
 
             <div class="form-group">
