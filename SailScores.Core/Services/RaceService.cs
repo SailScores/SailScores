@@ -200,12 +200,18 @@ namespace SailScores.Core.Services
             }
         }
 
-        public async Task<Guid> SaveAsync(RaceDto race)
+        public Task<Guid> SaveAsync(RaceDto race)
         {
             if (race == null)
             {
                 throw new ArgumentNullException(nameof(race));
             }
+
+            return SaveInternalAsync(race);
+        }
+
+        private async Task<Guid> SaveInternalAsync(RaceDto race)
+        {
             Db.Race dbRace;
             IEnumerable<Guid> seriesIdsToUpdate = new List<Guid>();
             bool addToContext = false;

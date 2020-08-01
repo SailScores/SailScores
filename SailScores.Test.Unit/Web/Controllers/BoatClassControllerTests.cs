@@ -34,7 +34,7 @@ namespace SailScores.Test.Unit.Web.Controllers
         }
 
         [Fact]
-        public async Task Create_DoesNotThrow()
+        public void Create_DoesNotThrow()
         {
             SetupAsAuthorized();
 
@@ -69,7 +69,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             {
 
             };
-            var result = await _controller.Create(_clubInitials, vm);
+            await _controller.Create(_clubInitials, vm);
 
             _classServiceMock.Verify(s => s.SaveNew(vm), Times.Once);
 
@@ -85,7 +85,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             var result = await _controller.Create(_clubInitials, vm);
 
             _classServiceMock.Verify(s => s.SaveNew(vm), Times.Never);
-            var unauth = Assert.IsType<ForbidResult>(result);
+            Assert.IsType<ForbidResult>(result);
         }
 
         [Fact]

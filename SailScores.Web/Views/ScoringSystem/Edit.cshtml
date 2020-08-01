@@ -10,7 +10,7 @@
 <h4>Scoring System</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8 col-lg-6">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
@@ -36,6 +36,23 @@
                 <label asp-for="DiscardPattern" class="control-label"></label>
                 <input asp-for="DiscardPattern" class="form-control" />
                 <span asp-validation-for="DiscardPattern" class="text-danger"></span>
+                <p class="small mx-3">A series of numbers indicating how many races should be discarded.
+                    The place of the number represents the number of races. The
+                    number itself represents the number of discards. For example:
+                </p>
+                <dl class="small mx-3">
+                    <dt class="col-sm-3">0,0,1,1,1,2</dt>
+                    <dd class="col-sm-9">One race will be discarded if there are
+                                three, four, or five races, and two races will be discarded if
+                                there are six or more races.</dd>
+                    <dt class="col-sm-3">0,0,0,1</dt>
+                    <dd class="col-sm-9">One race will be discarded if there are
+                        four or more races.</dd>
+                    <dt class="col-sm-3">0,0,1,1,1,2,2,2,3,3,3,4</dt>
+                    <dd class="col-sm-9">One
+                        discard for every three races, up to 12 races. more
+                        than 12 races will have four discards.</dd>
+                </dl>
             </div>
 
             <div class="form-group">

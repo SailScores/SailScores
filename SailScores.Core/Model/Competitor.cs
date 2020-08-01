@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Core.Model
 {
+
+#pragma warning disable CA2227 // Collection properties should be read only
     public class Competitor
     {
         public Guid Id { get; set; }
@@ -45,4 +47,6 @@ namespace SailScores.Core.Model
         }
 
     }
+
+#pragma warning restore CA2227 // Collection properties should be read only
 }

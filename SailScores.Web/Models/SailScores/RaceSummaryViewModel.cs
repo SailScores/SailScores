@@ -9,6 +9,8 @@ using System.Threading;
 
 namespace SailScores.Web.Models.SailScores
 {
+
+#pragma warning disable CA2227 // Collection properties should be read only
     public class RaceSummaryViewModel
     {
         public Guid Id { get; set; }
@@ -60,7 +62,6 @@ namespace SailScores.Web.Models.SailScores
         {
             get
             {
-
                 var raceLetter = "R";
                 if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
                 {
@@ -82,9 +83,11 @@ namespace SailScores.Web.Models.SailScores
                 {
                     return 0;
                 }
-                return Scores.Where(s => s.ScoreCode?.CameToStart ??
-                    (s.Place.HasValue && s.Place != 0)).Count();
+                return Scores
+                    .Count(s => s.ScoreCode?.CameToStart ?? 
+                                (s.Place.HasValue && s.Place != 0));
             }
         }
     }
+#pragma warning restore CA2227 // Collection properties should be read only
 }

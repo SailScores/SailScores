@@ -7,6 +7,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SailScores.Core.Model
 {
+
+#pragma warning disable CA2227 // Collection properties should be read only
     public class Series
     {
         public Guid Id { get; set; }
@@ -16,8 +18,10 @@ namespace SailScores.Core.Model
         [StringLength(200)]
         public String Name { get; set; }
 
+#pragma warning disable CA1056 // Uri properties should not be strings
         [StringLength(200)]
         public String UrlName { get; set; }
+#pragma warning restore CA1056 // Uri properties should not be strings
 
         [StringLength(2000)]
         public String Description { get; set; }
@@ -61,4 +65,6 @@ namespace SailScores.Core.Model
             return (Series)this.MemberwiseClone();
         }
     }
+#pragma warning restore CA2227 // Collection properties should be read only
+
 }

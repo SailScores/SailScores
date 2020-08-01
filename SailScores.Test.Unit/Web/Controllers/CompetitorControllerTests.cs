@@ -82,7 +82,7 @@ namespace SailScores.Test.Unit.Web.Controllers
 
 
             var vm = new CompetitorWithOptionsViewModel();
-            var result = await _controller.Create(_clubInitials, vm);
+            await _controller.Create(_clubInitials, vm);
 
             _competitorServiceMock.Verify(s => s.SaveAsync(vm), Times.Once);
 

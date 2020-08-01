@@ -47,7 +47,7 @@ namespace SailScores.Web.Controllers
 
         [AllowAnonymous]
         [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
-        // GET: {clubInitials}/Competitor/{sailNumber}
+        // {clubInitials}/Competitor/{sailNumber}
         public async Task<ActionResult> Details(string clubInitials, string sailNumber)
         {
             var competitorStats = await _competitorService.GetCompetitorStatsAsync(
