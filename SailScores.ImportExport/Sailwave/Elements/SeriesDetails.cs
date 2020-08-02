@@ -108,7 +108,7 @@ namespace SailScores.ImportExport.Sailwave.Elements
         public string EntryColumns { get; set; } = "Race 1, Race 2, Race 3";
 
         [SailwaveProperty("serdecalttitle")]
-        public string DeclarationOfAlternativePenaltiestTitle { get; set; } 
+        public string DeclarationOfAlternativePenaltiestTitle { get; set; }
             = "Declaration of Alternative Penalties";
         [SailwaveProperty("serdecaltcolumns")]
         public string DeclarationOfAlternativePenaltiesColumns { get; set; }

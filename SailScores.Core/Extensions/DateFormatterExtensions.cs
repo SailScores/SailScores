@@ -8,7 +8,7 @@ namespace SailScores.Core.Extensions
     {
         public static string ToShortString(this DateTime? date)
         {
-            return date?.ToString("ddd", CultureInfo.CurrentCulture) + 
+            return date?.ToString("ddd", CultureInfo.CurrentCulture) +
                 ", " + date?.ToString("M", CultureInfo.CurrentCulture);
         }
         public static string ToSuperShortString(this DateTime? date)

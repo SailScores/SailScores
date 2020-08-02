@@ -7,6 +7,6 @@ namespace SailScores.Web.Models.SailScores
     {
         public IEnumerable<Guid> BoatClassIds { get; set; }
         public Guid? RegattaId { get; set; }
-        
+
     }
 }

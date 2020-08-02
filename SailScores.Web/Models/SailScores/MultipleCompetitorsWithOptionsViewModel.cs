@@ -11,7 +11,7 @@ namespace SailScores.Web.Models.SailScores
         public IOrderedEnumerable<BoatClass> BoatClassOptions { get; set; }
 
         [Required]
-        [Display(Name="Boat Class")]
+        [Display(Name = "Boat Class")]
         public Guid BoatClassId { get; set; }
         public IList<FleetSummary> FleetOptions { get; set; }
 

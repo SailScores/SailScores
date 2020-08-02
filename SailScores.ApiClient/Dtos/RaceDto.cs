@@ -8,7 +8,7 @@ namespace SailScores.Api.Dtos
     public sealed class RaceDto : IEquatable<RaceDto>
     {
         public Guid Id { get; set; }
-        
+
         public Guid ClubId { get; set; }
 
         [StringLength(200)]

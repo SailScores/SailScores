@@ -32,13 +32,13 @@ namespace SailScores.Core.Scoring
 
         private async Task<string> GetBaseScoringSystemNameAsync(ScoringSystem scoringSystem)
         {
-            if(scoringSystem.ParentSystemId == null)
+            if (scoringSystem.ParentSystemId == null)
             {
                 return scoringSystem.Name;
             }
             Database.Entities.ScoringSystem currentSystem =
                 await _dbContext.ScoringSystems.SingleAsync(s => s.Id == scoringSystem.ParentSystemId)
-                .ConfigureAwait(false); 
+                .ConfigureAwait(false);
             while (currentSystem.ParentSystemId != null)
             {
                 currentSystem = await _dbContext.ScoringSystems

@@ -8,7 +8,7 @@ namespace SailScores.Core.Model
     public class Race : IEquatable<Race>
     {
         public Guid Id { get; set; }
-        
+
         public Guid ClubId { get; set; }
         [StringLength(200)]
         public String Name { get; set; }
@@ -27,7 +27,7 @@ namespace SailScores.Core.Model
         public Fleet Fleet { get; set; }
 
         public virtual IList<Score> Scores { get; set; }
-        
+
         public IList<Series> Series { get; set; }
 
         public Season Season { get; set; }

@@ -15,7 +15,6 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IWeatherService _coreWeatherService;
         private readonly Core.Services.IConversionService _converter;
-        private readonly ILogger<WeatherService> _logger;
         private static List<KeyValuePair<string, string>> IconList = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>(IconNames.Sunny.ToString(), "wi-day-sunny" ),
@@ -42,17 +41,15 @@ namespace SailScores.Web.Services
                 new KeyValuePair<string, string>(IconNames.Hurricane.ToString(), "wi-hurricane" )
             };
 
-    public WeatherService(
-            Core.Services.IClubService clubService,
-            Core.Services.IWeatherService weatherService,
-            Core.Services.IConversionService converter,
-            ILogger<WeatherService> logger
-        )
+        public WeatherService(
+                Core.Services.IClubService clubService,
+                Core.Services.IWeatherService weatherService,
+                Core.Services.IConversionService converter
+            )
         {
             _coreClubService = clubService;
             _coreWeatherService = weatherService;
             _converter = converter;
-            _logger = logger;
         }
 
 
@@ -65,7 +62,7 @@ namespace SailScores.Web.Services
         public async Task<WeatherViewModel> GetCurrentWeatherForClubAsync(Guid clubId)
         {
             var club = await _coreClubService.GetMinimalClub(clubId);
-            if(club.WeatherSettings?.Latitude == null || club.WeatherSettings?.Longitude == null)
+            if (club.WeatherSettings?.Latitude == null || club.WeatherSettings?.Longitude == null)
             {
                 return null;
             }
@@ -185,7 +182,8 @@ namespace SailScores.Web.Services
         {
             var tempDecimal = GetTemperatureDecimal(weather);
 
-            if (tempDecimal != null) {
+            if (tempDecimal != null)
+            {
 
                 return tempDecimal?.ToString("N2", CultureInfo.InvariantCulture);
             }
@@ -199,14 +197,16 @@ namespace SailScores.Web.Services
                 return null;
             }
             decimal tempDecimal;
-            if (Decimal.TryParse(weather.Temperature, out tempDecimal)){
-                var tempKelvin = 
+            if (Decimal.TryParse(weather.Temperature, out tempDecimal))
+            {
+                var tempKelvin =
                     _converter.Convert(
                         tempDecimal,
                         weather.TemperatureUnits,
                         _converter.Kelvin);
                 return tempKelvin;
-            } else
+            }
+            else
             {
                 return null;
             }
@@ -255,7 +255,7 @@ namespace SailScores.Web.Services
 
         private decimal? GetWindDirectionFromLetters(string windDirection)
         {
-            if(String.IsNullOrWhiteSpace(windDirection))
+            if (String.IsNullOrWhiteSpace(windDirection))
             {
                 return null;
             }

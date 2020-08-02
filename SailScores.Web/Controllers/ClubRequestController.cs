@@ -19,7 +19,7 @@ namespace SailScores.Web.Controllers
             _clubRequestService = clubRequestService;
             _authService = authService;
         }
-        
+
         public async Task<ActionResult> Index()
         {
             return View();
@@ -112,6 +112,6 @@ namespace SailScores.Web.Controllers
 
             return View(vm);
         }
-        
+
     }
 }

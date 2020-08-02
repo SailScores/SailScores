@@ -1,34 +1,37 @@
 # SailScores
 
 
-The code for the site hosted at [sailscores.com][1], a free service for hosting club sailing scores.
-Written on ASP.NET Core MVC with a REST API.
+The code for [sailscores.com][1], a free service for sharing club sailing scores.
 
-It's optimized for a range of screen sizes and fast entry of results. The site went
-live in spring of 2019 and is regularly used for [large series][2] as well as one evening events.
+## History
 
 I've been keeping scores for our club for a few years and decided to fix the
 weaknesses with available options for scorekeeping. I'm not aware of any other scoring
 software that: 1) has a modern interface, 2) supports mobile devices, 3) is inexpensive or free, and
-4) supports club series scoring as well as regatta scoring. SailScores scratches those itches.
+4) supports club series scoring as well as regatta scoring.
 
-SailScores top priorities:
-- easy to navigate and bookmark.
-- fast to use, particularly for entering new results.
-- web and mobile friendly.
-- Accurate Appendix A results, including proper rounding and tie-breaking.
-- Free for the foreseeable future.
-- Various niceties for scoring, like automatically including weather, but not at the expense of ease-of-use.
-- Additional scoring system options. Systems based on [High Point Percentage][4] and
-[Appendix A][3] are currently supported, with options for custom calculations and score codes.
-- Open REST API: I have plans for rich client software which will use the existing public,
-straightforward API.
-- Competitor Stats.
+## Features
+ - easy to navigate and bookmark.
+ - fast, particularly for entering new results.
+ - web and mobile friendly.
+ - Accurate Appendix A results, including proper rounding and tie-breaking.
+ - Supports [large series][2] as well as one evening events.
+ - Various niceties for scoring, like automatic weather, but not at the expense of ease-of-use.
+ - Additional scoring system options. Systems based on [High Point Percentage][4] and
+   [Appendix A][3] are currently supported, with options for custom calculations and score codes.
+ - An open REST API: client software can use the public, straightforward API.
+ - Stats for competitors and clubs.
 
-This code supports multiple tenants, including visible and hidden clubs. This winter includes
-work on some bigger features and a client app.
+### Technologies:
+ - .NET Core 3.1
+ - ASP.NET Core 3.1
+ - Entity Framework Core 3.1
+ - MS-SQL
 
-## License
+### Getting Started with development
+_...Coming soon..._
+
+### License
 
 Licensed with Mozilla Public License Version 2.0 : You may use this software, but
 share the source for modifications that you distribute.

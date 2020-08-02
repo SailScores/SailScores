@@ -16,7 +16,7 @@ namespace SailScores.Database.Entities
         public String UrlName { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        
+
         public IEnumerable<Series> Series { get; set; }
     }
 }

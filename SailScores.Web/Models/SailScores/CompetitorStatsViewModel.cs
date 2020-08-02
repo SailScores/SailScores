@@ -15,7 +15,7 @@ namespace SailScores.Web.Models.SailScores
         [Display(Name = "Sail Number")]
         [StringLength(20)]
         public String SailNumber { get; set; }
-        
+
         [Display(Name = "Boat Name")]
         [StringLength(200)]
         public String BoatName { get; set; }

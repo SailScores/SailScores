@@ -41,7 +41,7 @@ namespace SailScores.Core.Services
 
         public async Task SaveNew(BoatClass boatClass)
         {
-            var dbBoatClass =_mapper.Map<Db.BoatClass>(boatClass);
+            var dbBoatClass = _mapper.Map<Db.BoatClass>(boatClass);
             dbBoatClass.Id = Guid.NewGuid();
             _dbContext.BoatClasses.Add(dbBoatClass);
             var defaultShortName = boatClass.Name.Split(' ')[0];

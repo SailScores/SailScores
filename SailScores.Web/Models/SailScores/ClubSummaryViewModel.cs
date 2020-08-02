@@ -7,6 +7,8 @@ using SailScores.Api.Enumerations;
 
 namespace SailScores.Web.Models.SailScores
 {
+
+#pragma warning disable CA2227 // Collection properties should be read only
     public class ClubSummaryViewModel
     {
         public Guid Id { get; set; }
@@ -68,4 +70,5 @@ namespace SailScores.Web.Models.SailScores
             (r.StartDate.HasValue && r.StartDate.Value < DateTime.Today.AddDays(14)))
         .OrderBy(r => r.Name);
     }
+#pragma warning restore CA2227 // Collection properties should be read only
 }

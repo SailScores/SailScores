@@ -59,7 +59,7 @@ namespace SailScores.Web.Controllers
             ViewData["ClubInitials"] = clubInitials;
 
             var series = await _seriesService.GetSeriesAsync(clubInitials, season, seriesName);
-            if(series == null)
+            if (series == null)
             {
                 return new NotFoundResult();
             }
@@ -116,7 +116,7 @@ namespace SailScores.Web.Controllers
             Guid seriesId)
         {
             var chartData = await _seriesService.GetChartData(seriesId);
-            
+
             return Json(chartData);
         }
 

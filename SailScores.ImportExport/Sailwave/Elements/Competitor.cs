@@ -42,9 +42,9 @@ namespace SailScores.ImportExport.Sailwave.Elements
         public string HelmName { get; set; }
         [SailwaveProperty("comphigh")]
         public int High { get; set; }
-        
+
         // Going to try omitting these:
         //"compmedicalflag","0","57",""
-        
+
     }
 }

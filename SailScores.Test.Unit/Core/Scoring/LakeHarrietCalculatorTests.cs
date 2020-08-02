@@ -72,6 +72,20 @@ namespace SailScores.Test.Unit
                     Formula = "AVE ND",
                     ScoreLike = null
                 },
+                new ScoreCode
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "AVEA",
+                    PreserveResult = false,
+                    Discardable = true,
+                    Started = false,
+                    FormulaValue = null,
+                    AdjustOtherScores = null,
+                    CameToStart = false,
+                    Finished = false,
+                    Formula = "AVE",
+                    ScoreLike = null
+                },
             };
 
             return system;
@@ -80,7 +94,7 @@ namespace SailScores.Test.Unit
         [Fact]
         public void CalculateResults_ValidSeries_ReturnsResults()
         {
-            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3,3));
+            var results = _defaultCalculator.CalculateResults(GetBasicSeries(3, 3));
 
             Assert.NotNull(results);
         }
@@ -105,7 +119,7 @@ namespace SailScores.Test.Unit
             Assert.True(results.Results.First().Value.CalculatedScores.First().Value.RawScore.Place !=
                 results.Results.First().Value.CalculatedScores.First().Value.ScoreValue);
         }
-        
+
         [Fact]
         public void CalculateResults_SafetyBoat_IgnoresDiscard()
         {
@@ -187,7 +201,7 @@ namespace SailScores.Test.Unit
 
                     };
                 var scores = new List<Score>();
-                for( int j=0; j < competitors.Count; j++)
+                for (int j = 0; j < competitors.Count; j++)
                 {
                     scores.Add(new Score
                     {
@@ -232,7 +246,7 @@ namespace SailScores.Test.Unit
             var secondComp = basicSeries.Competitors.Skip(1).First();
             basicSeries.Races.Last().Scores.First(s => s.Competitor == secondComp).Code = null;
             basicSeries.Races.Last().Scores.First(s => s.Competitor == secondComp).Place = 1;
-            
+
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
             Assert.True(results.Results[firstComp].Trend < 0);
@@ -243,19 +257,36 @@ namespace SailScores.Test.Unit
         [Fact]
         public void CalculateResults_LotsOfAverage_GivesNonZero()
         {
-            // Arrange: put in some coded results: SB
             var basicSeries = GetBasicSeries(10, 6);
             basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
             var firstComp = basicSeries.Competitors.First();
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Code = "ORA";
                 basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Place = null;
             }
-            
+
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
             Assert.True(results.Results[firstComp].TotalScore > 0);
+        }
+
+
+        [Fact]
+        public void CalculateResults_FullAve_GivesNonZero()
+        {
+            var basicSeries = GetBasicSeries(10, 6);
+            basicSeries.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
+            var firstComp = basicSeries.Competitors.First();
+            for (int i = 0; i < 4; i++)
+            {
+                basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Code = "AVEA";
+                basicSeries.Races[i].Scores.First(s => s.Competitor == firstComp).Place = null;
+            }
+
+            var results = _defaultCalculator.CalculateResults(basicSeries);
+
+            Assert.Equal(1, results.Results[firstComp].CalculatedScores[basicSeries.Races[1]].ScoreValue);
         }
     }
 }

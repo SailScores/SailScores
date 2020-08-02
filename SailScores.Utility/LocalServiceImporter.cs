@@ -48,7 +48,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
             }
         }
 
@@ -270,7 +270,7 @@ namespace SailScores.Utility
             var clubName = Console.ReadLine().Trim();
             Console.Write("Enter the club initials > ");
             var clubInitials = Console.ReadLine().Trim();
-            
+
             var club = new SsObjects.Club
             {
                 Initials = clubInitials,
@@ -285,7 +285,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
             }
 
             return club;
@@ -338,7 +338,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
             }
 
             return boatClass;
@@ -396,7 +396,7 @@ namespace SailScores.Utility
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Oh Noes! There was an exception: {ex.ToString()}");
+                Console.WriteLine($"Oh Noes! There was an exception: {ex}");
             }
 
             return fleet;

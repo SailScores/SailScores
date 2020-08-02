@@ -19,7 +19,7 @@ namespace SailScores.ImportExport.Sailwave.Parsers
                 foreach (var property in typeof(T).GetProperties().Where(
                     prop => Attribute.IsDefined(prop, typeof(SailwavePropertyAttribute))))
                 {
-                    var swAtt = (SailwavePropertyAttribute) property.GetCustomAttributes(typeof(SailwavePropertyAttribute), false).FirstOrDefault();
+                    var swAtt = (SailwavePropertyAttribute)property.GetCustomAttributes(typeof(SailwavePropertyAttribute), false).FirstOrDefault();
                     if (swAtt.SaveFileAlias == row.Name)
                     {
                         var val = ParseValue(property, row.Value);

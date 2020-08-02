@@ -35,7 +35,7 @@ namespace SailScores.Core.Model
 
         [Required]
         public FleetType FleetType { get; set; }
-        public IList<BoatClass> BoatClasses {get;set;}
+        public IList<BoatClass> BoatClasses { get; set; }
         public IList<Competitor> Competitors { get; set; }
     }
 }

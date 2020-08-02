@@ -7,38 +7,56 @@ using SailScores.Web.Services;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
+using SailScores.Core.Mapping;
+using SailScores.Web.Models.SailScores;
 using Xunit;
+using ICompetitorService = SailScores.Web.Services.ICompetitorService;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {
-    public class BoatClassControllerTests
+    public class CompetitorControllerTests
     {
+        private readonly CompetitorController _controller;
+
+        private readonly IMapper _mapper;
         private readonly Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
         private readonly Mock<IAuthorizationService> _authServiceMock;
-        private readonly Mock<IBoatClassService> _classServiceMock;
-        private readonly BoatClassController _controller;
+        private readonly Mock<ICompetitorService> _competitorServiceMock;
+        private readonly Mock<IAdminTipService> _adminTipServiceMock;
+
 
         private readonly string _clubInitials = "LHYC";
 
-        public BoatClassControllerTests()
+        public CompetitorControllerTests()
         {
+            var config = new MapperConfiguration(opts =>
+            {
+                opts.AddProfile(new DbToModelMappingProfile());
+            });
+
+            _mapper = config.CreateMapper();
+
             _clubServiceMock = ControllerTestUtilities.MakeCoreClubServiceMock();
+            _competitorServiceMock = ControllerTestUtilities.MakeWebCompetitorServiceMock();
+            _adminTipServiceMock = ControllerTestUtilities.MakeAdminTipServiceMock();
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
 
-            _classServiceMock = new Mock<IBoatClassService>();
 
-            _controller = new BoatClassController(
+            _controller = new CompetitorController(
                 _clubServiceMock.Object,
-                _classServiceMock.Object,
-                _authServiceMock.Object);
+                _competitorServiceMock.Object,
+                _authServiceMock.Object,
+                _adminTipServiceMock.Object,
+                _mapper);
         }
 
         [Fact]
-        public void Create_DoesNotThrow()
+        public async Task Create_DoesNotThrow()
         {
             SetupAsAuthorized();
 
-            var action = _controller.Create();
+            var action = await _controller.Create(_clubInitials);
 
             Assert.IsType<ViewResult>(action);
         }
@@ -48,10 +66,7 @@ namespace SailScores.Test.Unit.Web.Controllers
         {
             SetupAsAuthorized();
 
-            var vm = new BoatClass
-            {
-
-            };
+            var vm = new CompetitorWithOptionsViewModel();
             var result = await _controller.Create(_clubInitials, vm);
 
             //Assert
@@ -65,43 +80,38 @@ namespace SailScores.Test.Unit.Web.Controllers
         {
             SetupAsAuthorized();
 
-            var vm = new BoatClass
-            {
 
-            };
+            var vm = new CompetitorWithOptionsViewModel();
             await _controller.Create(_clubInitials, vm);
 
-            _classServiceMock.Verify(s => s.SaveNew(vm), Times.Once);
+            _competitorServiceMock.Verify(s => s.SaveAsync(vm), Times.Once);
 
         }
 
         [Fact]
         public async Task Create_PostUnauthorized_ReturnForbidden()
         {
-            var vm = new BoatClass
-            {
 
-            };
+            var vm = new CompetitorWithOptionsViewModel();
             var result = await _controller.Create(_clubInitials, vm);
 
-            _classServiceMock.Verify(s => s.SaveNew(vm), Times.Never);
-            Assert.IsType<ForbidResult>(result);
+            _competitorServiceMock.Verify(s => s.SaveAsync(vm), Times.Never);
+            Assert.IsType<UnauthorizedResult>(result);
         }
 
         [Fact]
         public async Task Create_PostInvalidModel_ReturnsModel()
         {
             SetupAsAuthorized();
-            var vm = new BoatClass
-            {
-            };
+
+            var vm = new CompetitorWithOptionsViewModel();
             _controller.ModelState.AddModelError("Name", "The Name field is required.");
 
             // Act
             var result = await _controller.Create(_clubInitials, vm);
 
             // Assert
-            _classServiceMock.Verify(s => s.SaveNew(vm), Times.Never);
+            _competitorServiceMock.Verify(s => s.SaveAsync(vm), Times.Never);
             var viewresult = Assert.IsType<ViewResult>(result);
             Assert.NotNull(viewresult.Model);
             Assert.Equal(vm, viewresult.Model);
@@ -112,10 +122,10 @@ namespace SailScores.Test.Unit.Web.Controllers
         {
             // Arrange
             SetupAsAuthorized();
-            var vm = new BoatClass
-            {
-            };
-            _classServiceMock.Setup(s => s.SaveNew(It.IsAny<BoatClass>())).Throws(new InvalidOperationException());
+
+            var vm = new CompetitorWithOptionsViewModel();
+            _competitorServiceMock.Setup(s => s.SaveAsync(
+                It.IsAny<CompetitorWithOptionsViewModel>())).Throws(new InvalidOperationException());
 
             // Act
             var result = await _controller.Create(_clubInitials, vm);
@@ -125,9 +135,6 @@ namespace SailScores.Test.Unit.Web.Controllers
             Assert.NotNull(viewresult.Model);
             Assert.Equal(vm, viewresult.Model);
         }
-
-
-
 
 
         private void SetupAsAuthorized()

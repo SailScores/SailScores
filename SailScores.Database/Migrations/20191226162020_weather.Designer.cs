@@ -11,7 +11,7 @@ namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
     [Migration("20191226162020_weather")]
-    partial class weather
+    partial class Weather
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -21,7 +21,7 @@ namespace SailScores.Core.Scoring
             var placePart = ScoreValue?.ToString("N1", CultureInfo.CurrentCulture) ??
                 RawScore?.Place?.ToString("N1", CultureInfo.CurrentCulture);
             sb.Append(placePart);
-            
+
             return sb.ToString().Trim();
         }
     }

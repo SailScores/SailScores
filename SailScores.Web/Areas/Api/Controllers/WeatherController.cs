@@ -30,7 +30,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             Guid clubId
             )
         {
-            var result =  await _service.GetCurrentWeatherForClubAsync(clubId);
+            var result = await _service.GetCurrentWeatherForClubAsync(clubId);
             return result;
         }
     }

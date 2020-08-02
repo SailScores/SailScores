@@ -67,8 +67,10 @@ namespace SailScores.Web
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SailScores API", Version = "v1" });
-                c.IncludeXmlComments(string.Format(@"{0}/SailScores.Web.xml",
-                     System.AppDomain.CurrentDomain.BaseDirectory));
+                c.IncludeXmlComments(string.Format(
+                    CultureInfo.InvariantCulture,
+                    @"{0}/SailScores.Web.xml",
+                    System.AppDomain.CurrentDomain.BaseDirectory));
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
                     Description = "JWT Authorization header using the Bearer scheme.",
@@ -104,7 +106,7 @@ namespace SailScores.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<IdentityUser,IdentityRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<SailScoresIdentityContext>()
                 .AddDefaultTokenProviders();
 
@@ -135,7 +137,7 @@ namespace SailScores.Web
 
                 options.Events.OnRedirectToLogin = context =>
                 {
-                    if (context.Request.Path.StartsWithSegments("/api")
+                    if (context.Request.Path.StartsWithSegments("/api", StringComparison.InvariantCulture)
                         && context.Response.StatusCode == StatusCodes.Status200OK)
                     {
                         context.Response.Clear();
@@ -198,7 +200,7 @@ namespace SailScores.Web
         {
             services.RegisterCoreSailScoresServices();
             services.RegisterWebSailScoresServices();
-            
+
             services.AddDbContext<ISailScoresContext, SailScoresContext>();
         }
 
@@ -333,7 +335,7 @@ namespace SailScores.Web
                 endpoints.MapControllerRoute(
                     name: "Error",
                     pattern: "error/{code}",
-                    defaults: new { controller = "Error", action = "Error", code=500 });
+                    defaults: new { controller = "Error", action = "Error", code = 500 });
 
                 endpoints.MapControllerRoute(
                     "default", "{controller=Home}/{action=Index}/{id?}");

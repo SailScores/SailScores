@@ -6,7 +6,7 @@ using SailScores.ImportExport.Sailwave.Elements.File;
 namespace SailScores.ImportExport.Sailwave.Writers
 {
     public abstract class GenericSetWriter<T> : GenericWriter<T>
-        where T : new() 
+        where T : new()
     {
         public virtual async Task<IEnumerable<FileRow>> GetRowsForSet(Series series)
         {
@@ -30,7 +30,7 @@ namespace SailScores.ImportExport.Sailwave.Writers
         protected abstract IEnumerable<T> GetIndividualItems(Series series);
         protected abstract int? GetRaceId(T thing);
         protected abstract int? GetCompetitorOrScoreId(T thing);
-        
+
 
     }
 }

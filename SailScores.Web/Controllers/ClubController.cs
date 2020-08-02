@@ -22,7 +22,7 @@ namespace SailScores.Web.Controllers
             _authService = authService;
             _mapper = mapper;
         }
-        
+
         // GET: Club
         public async Task<ActionResult> Index(string clubInitials)
         {

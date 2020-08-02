@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Core.Model
 {
+
+#pragma warning disable CA2227 // Collection properties should be read only
     public class Club
     {
         public Guid Id { get; set; }
@@ -33,6 +35,8 @@ namespace SailScores.Core.Model
         public Guid? DefaultScoringSystemId { get; set; }
 
         public IList<ScoringSystem> ScoringSystems { get; set; }
-        
+
     }
+
+#pragma warning restore CA2227 // Collection properties should be read only
 }

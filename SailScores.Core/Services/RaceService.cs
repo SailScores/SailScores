@@ -68,22 +68,21 @@ namespace SailScores.Core.Services
             var startDate = seasonToUse?.Start ?? DateTime.Today.AddYears(-5);
             var endDate = seasonToUse?.End ?? DateTime.Today.AddYears(1);
 
-            var dbRaces = (await _dbContext.Races
+            var dbRaces = await _dbContext.Races
                 .Where(r => r.ClubId == clubId
                     && r.Date >= startDate
                     && r.Date <= endDate)
-                .Include(r => r.Fleet)
-                .Include( r => r.Scores)
-                .Include( r => r.SeriesRaces)
-                .ToListAsync()
-                .ConfigureAwait(false)
-                ).Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced ||
+                .Where(r => r.State == RaceState.Raced || r.State == null ||
                         (includeScheduled && (r.State == RaceState.Scheduled)) ||
-                        (includeAbandoned && (r.State == RaceState.Abandoned)));
-            //TODO: compare putting the above where clause into the IQueryable. Perf Improvement?
+                        (includeAbandoned && (r.State == RaceState.Abandoned)))
+                .Include(r => r.Fleet)
+                .Include(r => r.Scores)
+                .Include(r => r.SeriesRaces)
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             var modelRaces = _mapper.Map<List<Model.Race>>(dbRaces);
-            
+
             var dbSeries = await _dbContext.Series
                 .Where(s => s.ClubId == clubId).ToListAsync()
                 .ConfigureAwait(false);
@@ -143,7 +142,7 @@ namespace SailScores.Core.Services
 
         public async Task<Model.Race> GetRaceAsync(Guid raceId)
         {
-            var race = await 
+            var race = await
                 _dbContext
                 .Races
                 .Include(r => r.Fleet)
@@ -156,7 +155,7 @@ namespace SailScores.Core.Services
                 return null;
             }
             var modelRace = _mapper.Map<Model.Race>(race);
-            
+
             await PopulateCompetitors(modelRace)
                 .ConfigureAwait(false);
 
@@ -194,19 +193,30 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             var dtoComps = _mapper.Map<IList<Competitor>>(dbCompetitors);
-            
+
             foreach (var score in race.Scores)
             {
                 score.Competitor = dtoComps.First(c => c.Id == score.CompetitorId);
             }
         }
 
-        public async Task<Guid> SaveAsync(RaceDto race)
+        public Task<Guid> SaveAsync(RaceDto race)
+        {
+            if (race == null)
+            {
+                throw new ArgumentNullException(nameof(race));
+            }
+
+            return SaveInternalAsync(race);
+        }
+
+        private async Task<Guid> SaveInternalAsync(RaceDto race)
         {
             Db.Race dbRace;
             IEnumerable<Guid> seriesIdsToUpdate = new List<Guid>();
             bool addToContext = false;
-            if (race.Id != default) {
+            if (race.Id != default)
+            {
                 dbRace = await _dbContext.Races
                     .Include(r => r.Scores)
                     .Include(r => r.SeriesRaces)
@@ -214,11 +224,12 @@ namespace SailScores.Core.Services
                     .SingleAsync(r => r.Id == race.Id)
                     .ConfigureAwait(false);
                 var seriesFromRace = dbRace.SeriesRaces?.Select(r => r.SeriesId)?.ToList();
-                if(seriesFromRace != null)
+                if (seriesFromRace != null)
                 {
                     seriesIdsToUpdate = seriesFromRace;
                 }
-            } else
+            }
+            else
             {
                 dbRace = new Db.Race
                 {
@@ -251,14 +262,14 @@ namespace SailScores.Core.Services
 
             dbRace.Fleet = _dbContext.Fleets.SingleOrDefault(f => f.Id == race.FleetId);
 
-            if(race.SeriesIds != null)
+            if (race.SeriesIds != null)
             {
-                if(dbRace.SeriesRaces == null)
+                if (dbRace.SeriesRaces == null)
                 {
                     dbRace.SeriesRaces = new List<Db.SeriesRace>();
                 }
                 dbRace.SeriesRaces.Clear();
-                foreach(var seriesId in race.SeriesIds)
+                foreach (var seriesId in race.SeriesIds)
                 {
                     dbRace.SeriesRaces.Add(new Db.SeriesRace
                     {
@@ -292,7 +303,8 @@ namespace SailScores.Core.Services
             if (addToContext)
             {
                 _dbContext.Races.Add(dbRace);
-            } else
+            }
+            else
             {
                 _dbContext.Races.Update(dbRace);
             }
@@ -302,8 +314,6 @@ namespace SailScores.Core.Services
             seriesIdsToUpdate = seriesIdsToUpdate.Union(dbRace.SeriesRaces.Select(rs => rs.SeriesId).ToList());
             foreach (var seriesId in seriesIdsToUpdate)
             {
-                //await _seriesService.UpdateSeriesResults(seriesId);
-
                 AddUpdateSeriesJob(seriesId);
             }
 
@@ -345,12 +355,12 @@ namespace SailScores.Core.Services
             var dbRace = await _dbContext
                 .Races
                 .Include(r => r.SeriesRaces)
-                .SingleAsync(r => r.Id ==  raceId)
+                .SingleAsync(r => r.Id == raceId)
                 .ConfigureAwait(false);
             _dbContext.Races.Remove(dbRace);
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
-            foreach(var seriesId in dbRace.SeriesRaces.Select(rs => rs.SeriesId))
+            foreach (var seriesId in dbRace.SeriesRaces.Select(rs => rs.SeriesId))
             {
                 await _seriesService.UpdateSeriesResults(seriesId)
                     .ConfigureAwait(false);

@@ -70,7 +70,8 @@ namespace SailScores.Api.Services
                     {
                         await AuthenticateAsync();
                         return await PostAsync<T>(urlExtension, item, ++retryCount);
-                    } else
+                    }
+                    else
                     {
                         throw new UnauthorizedAccessException("Unauthorized for Web API. Check Credentials.");
                     }
@@ -80,13 +81,13 @@ namespace SailScores.Api.Services
 
                 var returnId = JsonConvert.DeserializeObject<Guid>(httpResponseBody);
                 return returnId;
-                
+
             }
         }
 
         private async Task AuthenticateAsync()
         {
-            if( String.IsNullOrWhiteSpace(_settings.UserName)
+            if (String.IsNullOrWhiteSpace(_settings.UserName)
                 || String.IsNullOrWhiteSpace(_settings.Password))
             {
                 throw new UnauthorizedAccessException("Could not login. Please provide credentials.");
@@ -110,7 +111,7 @@ namespace SailScores.Api.Services
                 var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
                 _token = httpResponseBody;
-                
+
             }
         }
 
@@ -190,7 +191,8 @@ namespace SailScores.Api.Services
             if (fleetId.HasValue)
             {
                 return await GetAsync<List<CompetitorDto>>($"/api/competitors/?clubId={clubId}&fleetId={fleetId}");
-            } else
+            }
+            else
             {
                 return await GetAsync<List<CompetitorDto>>($"/api/competitors/", clubId);
             }

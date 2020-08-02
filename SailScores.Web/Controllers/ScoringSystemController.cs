@@ -71,7 +71,7 @@ namespace SailScores.Web.Controllers
             await _scoringService.SaveScoringSystemAsync(
             _mapper.Map<ScoringSystem>(model));
 
-           return RedirectToAction("Edit", "ScoringSystem", new { id = model.Id });
+            return RedirectToAction("Edit", "ScoringSystem", new { id = model.Id });
         }
 
         public async Task<ActionResult> Edit(string clubInitials, Guid id)
@@ -119,8 +119,8 @@ namespace SailScores.Web.Controllers
             }
             var system = _mapper.Map<ScoringSystem>(model);
             await _scoringService.SaveScoringSystemAsync(system);
-            
-            return RedirectToAction("Index","Admin");
+
+            return RedirectToAction("Index", "Admin");
 
         }
 

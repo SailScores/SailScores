@@ -9,31 +9,27 @@ using SailScores.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SailScores.Api.Dtos;
 using Xunit;
 
 namespace SailScores.Test.Unit.Core.Services
 {
-    public class SeriesServiceTests
+    public class CompetitorServiceTests
     {
         private readonly Series _fakeSeries;
-        private readonly DbObjectBuilder _dbObjectBuilder;
-        private readonly SeriesService _service;
+        private readonly CompetitorService _service;
         private readonly Mock<IScoringCalculator> _mockCalculator;
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
-        private readonly Mock<IScoringService> _mockScoringService;
-        private readonly Mock<IConversionService> _mockConversionService;
 
-        public SeriesServiceTests()
+        public CompetitorServiceTests()
         {
             _mockCalculator = new Mock<IScoringCalculator>();
             _mockCalculator.Setup(c => c.CalculateResults(It.IsAny<Series>())).Returns(new SeriesResults());
             _mockScoringCalculatorFactory = new Mock<IScoringCalculatorFactory>();
             _mockScoringCalculatorFactory.Setup(f => f.CreateScoringCalculatorAsync(It.IsAny<SailScores.Core.Model.ScoringSystem>()))
                 .ReturnsAsync(_mockCalculator.Object);
-            _mockScoringService = new Mock<IScoringService>();
-            _mockConversionService = new Mock<IConversionService>();
 
             var options = new DbContextOptionsBuilder<SailScoresContext>()
                 .UseInMemoryDatabase(databaseName: "Series_Test_database")
@@ -82,41 +78,35 @@ namespace SailScores.Test.Unit.Core.Services
             _context.SaveChanges();
 
             //yep, this means we are testing the real DbObjectBuilder as well:
-            _dbObjectBuilder = new DbObjectBuilder(
+            _service = new SailScores.Core.Services.CompetitorService(
                 _context,
                 _mapper
                 );
-            _service = new SailScores.Core.Services.SeriesService(
-                _mockScoringCalculatorFactory.Object,
-                _mockScoringService.Object,
-                _mockConversionService.Object,
-                _dbObjectBuilder,
-                _context,
-                _mapper
-                );
-
-
         }
 
         [Fact]
-        public async Task SaveSeries_Unlocked_CalculatesScores()
+        public async Task SaveAsync_NullCompetitor_throws()
         {
-            await _service.Update(_fakeSeries);
+            // arrange
 
-            _mockScoringCalculatorFactory.Verify(cf =>
-                cf.CreateScoringCalculatorAsync(It.IsAny<ScoringSystem>()),
-                Times.Once);
+            // act
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(() => _service.SaveAsync((Competitor)null));
+
+            Assert.NotNull(ex);
+            // assert
         }
 
         [Fact]
-        public async Task SaveSeries_Locked_DoesNotCalculateScores()
+        public async Task SaveAsync_NullCompetitorDto_throws()
         {
-            _fakeSeries.ResultsLocked = true;
-            await _service.Update(_fakeSeries);
+            // arrange
 
-            _mockScoringCalculatorFactory.Verify(cf =>
-                cf.CreateScoringCalculatorAsync(It.IsAny<ScoringSystem>()),
-                Times.Never);
+            // act
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(() => _service.SaveAsync((CompetitorDto)null));
+
+            Assert.NotNull(ex);
+            // assert
         }
+
     }
 }

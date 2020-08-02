@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using SailScores.Core.Model;
-using Db = SailScores.Database.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace SailScores.Core.Services
@@ -43,7 +42,7 @@ namespace SailScores.Core.Services
 
         public async Task<IList<Season>> GetSeasonsFor(Guid competitorId)
         {
-            var clubId = 
+            var clubId =
                 (await _dbContext.Competitors
                 .SingleAsync(c => c.Id == competitorId)
                 .ConfigureAwait(false))
@@ -65,10 +64,10 @@ namespace SailScores.Core.Services
         {
             var targetComp = await _competitorService.GetCompetitorAsync(targetCompetitorId)
                 .ConfigureAwait(false);
-            
+
             var targetRaceIds = GetRacesForComp(targetCompetitorId);
-            
-            var sourceList = 
+
+            var sourceList =
                 _dbContext.Competitors.Where(c => c.ClubId == targetComp.ClubId
                 && c.Id != targetComp.Id
                 && !(c.Scores.Any(s => targetRaceIds.Contains(s.RaceId))))
@@ -100,7 +99,7 @@ namespace SailScores.Core.Services
             await _competitorService.DeleteCompetitorAsync(sourceCompetitorId)
                 .ConfigureAwait(false);
 
-            foreach(var seriesId in seriesIds)
+            foreach (var seriesId in seriesIds)
             {
                 await _seriesService.UpdateSeriesResults(seriesId)
                     .ConfigureAwait(false);

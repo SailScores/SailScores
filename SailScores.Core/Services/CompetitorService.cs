@@ -48,7 +48,9 @@ namespace SailScores.Core.Services
                     var classIds = fleet.FleetBoatClasses.Select(f => f.BoatClassId);
                     dbObjects = dbObjects
                         .Where(c => classIds.Contains(c.BoatClassId));
-                } else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats) {
+                }
+                else if (fleet.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                {
                     dbObjects = dbObjects
                         .Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleetId));
                 }
@@ -64,7 +66,7 @@ namespace SailScores.Core.Services
 
         public async Task<Model.Competitor> GetCompetitorAsync(Guid id)
         {
-            var competitor = await 
+            var competitor = await
                 _dbContext
                 .Competitors
                 .FirstOrDefaultAsync(c => c.Id == id)
@@ -88,7 +90,27 @@ namespace SailScores.Core.Services
             return _mapper.Map<Model.Competitor>(competitor);
         }
 
-        public async Task SaveAsync(Model.Competitor comp)
+        public Task SaveAsync(Model.Competitor comp)
+        {
+            if (comp == null)
+            {
+                throw new ArgumentNullException(nameof(comp));
+            }
+
+            return SaveInternalAsync(comp);
+        }
+
+        public Task SaveAsync(CompetitorDto comp)
+        {
+            if (comp == null)
+            {
+                throw new ArgumentNullException(nameof(comp));
+            }
+
+            return SaveInternalAsync(comp);
+        }
+
+        private async Task SaveInternalAsync(Model.Competitor comp)
         {
             var dbObject = await _dbContext
                 .Competitors
@@ -98,9 +120,9 @@ namespace SailScores.Core.Services
                     c.Id == comp.Id)
                 .ConfigureAwait(false);
             var addingNew = dbObject == null;
-            if(addingNew)
+            if (addingNew)
             {
-                if(comp.Id == null || comp.Id == Guid.Empty)
+                if (comp.Id == Guid.Empty)
                 {
                     comp.Id = Guid.NewGuid();
                 }
@@ -125,7 +147,7 @@ namespace SailScores.Core.Services
             if (comp.Fleets != null)
             {
                 // remove fleets
-                if(dbObject.CompetitorFleets == null)
+                if (dbObject.CompetitorFleets == null)
                 {
                     dbObject.CompetitorFleets = new List<Db.CompetitorFleet>();
                 }
@@ -141,7 +163,8 @@ namespace SailScores.Core.Services
                 foreach (var fleet in comp.Fleets)
                 {
                     if (!dbObject.CompetitorFleets.Any(
-                        cf => cf.FleetId == fleet.Id)) {
+                        cf => cf.FleetId == fleet.Id))
+                    {
                         var dbFleet = _dbContext.Fleets
                             .SingleOrDefault(f => f.Id == fleet.Id
                                 && f.ClubId == comp.ClubId
@@ -153,100 +176,6 @@ namespace SailScores.Core.Services
                             {
                                 Competitor = dbObject,
                                 Fleet = dbFleet
-                            });
-                        }
-                        //todo: create new fleets here if needed.
-                    }
-                }
-                //add built in club fleets
-                var autoAddFleets = _dbContext.Fleets
-                    .Where(f => f.ClubId == comp.ClubId
-                    && (f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
-                    || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
-                    && f.FleetBoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
-                foreach(var dbFleet in autoAddFleets)
-                {
-                    if (!dbObject.CompetitorFleets.Any(
-                        cf => cf.FleetId == dbFleet.Id))
-                    {
-                        dbObject.CompetitorFleets.Add(
-                            new Db.CompetitorFleet
-                            {
-                                Competitor = dbObject,
-                                Fleet = dbFleet
-                            });
-                    }
-                }
-            }
-
-            await _dbContext.SaveChangesAsync()
-                .ConfigureAwait(false);
-
-        }
-
-        public async Task SaveAsync(CompetitorDto comp)
-        {
-            var dbObject = await _dbContext
-                .Competitors
-                .Include(c => c.CompetitorFleets)
-                .FirstOrDefaultAsync(
-                    c =>
-                    c.Id == comp.Id)
-                .ConfigureAwait(false);
-            var addingNew = dbObject == null;
-            if (addingNew)
-            {
-                if (comp.Id == null || comp.Id == Guid.Empty)
-                {
-                    comp.Id = Guid.NewGuid();
-                }
-                dbObject = _mapper.Map<Db.Competitor>(comp);
-                await _dbContext.Competitors.AddAsync(dbObject)
-                    .ConfigureAwait(false);
-            }
-            else
-            {
-                dbObject.Name = comp.Name;
-                dbObject.SailNumber = comp.SailNumber;
-                dbObject.AlternativeSailNumber = comp.AlternativeSailNumber;
-                dbObject.BoatName = comp.BoatName;
-                dbObject.Notes = comp.Notes;
-                // should scores get added here?
-                // I don't think so. Those will be recorded as a race update or scores update.
-            }
-            if(dbObject.CompetitorFleets == null)
-            {
-                dbObject.CompetitorFleets = new List<Db.CompetitorFleet>();
-            }
-
-            if (comp.FleetIds != null)
-            {
-                // remove fleets
-                foreach (var existingFleet in dbObject.CompetitorFleets.ToList())
-                {
-                    if (!comp.FleetIds.Any(f => f == existingFleet.FleetId))
-                    {
-                        dbObject.CompetitorFleets.Remove(existingFleet);
-                    }
-                }
-
-                // add fleets
-                foreach (var fleetId in comp.FleetIds)
-                {
-                    if (!dbObject.CompetitorFleets.Any(
-                        cf => cf.FleetId == fleetId))
-                    {
-                        var dbFleet = _dbContext.Fleets
-                            .SingleOrDefault(f => f.Id == fleetId
-                                && f.ClubId == comp.ClubId);
-                        if (fleetId != null)
-                        {
-                            dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
-                            {
-                                Competitor = dbObject,
-                                CompetitorId = dbObject.Id,
-                                Fleet = dbFleet,
-                                FleetId = dbFleet.Id
                             });
                         }
                         //todo: create new fleets here if needed.
@@ -275,6 +204,100 @@ namespace SailScores.Core.Services
 
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+
+        }
+
+
+        private async Task SaveInternalAsync(CompetitorDto comp)
+        {
+            var dbObject = await _dbContext
+                .Competitors
+                .Include(c => c.CompetitorFleets)
+                .FirstOrDefaultAsync(
+                    c =>
+                    c.Id == comp.Id)
+                .ConfigureAwait(false);
+            var addingNew = dbObject == null;
+            if (addingNew)
+            {
+                if (comp.Id == Guid.Empty)
+                {
+                    comp.Id = Guid.NewGuid();
+                }
+                dbObject = _mapper.Map<Db.Competitor>(comp);
+                await _dbContext.Competitors.AddAsync(dbObject)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                dbObject.Name = comp.Name;
+                dbObject.SailNumber = comp.SailNumber;
+                dbObject.AlternativeSailNumber = comp.AlternativeSailNumber;
+                dbObject.BoatName = comp.BoatName;
+                dbObject.Notes = comp.Notes;
+                // should scores get added here?
+                // I don't think so. Those will be recorded as a race update or scores update.
+            }
+            if (dbObject.CompetitorFleets == null)
+            {
+                dbObject.CompetitorFleets = new List<Db.CompetitorFleet>();
+            }
+
+            if (comp.FleetIds != null)
+            {
+                // remove fleets
+                foreach (var existingFleet in dbObject.CompetitorFleets.ToList())
+                {
+                    if (!comp.FleetIds.Any(f => f == existingFleet.FleetId))
+                    {
+                        dbObject.CompetitorFleets.Remove(existingFleet);
+                    }
+                }
+
+                // add fleets
+                foreach (var fleetId in comp.FleetIds)
+                {
+                    if (!dbObject.CompetitorFleets.Any(
+                        cf => cf.FleetId == fleetId))
+                    {
+                        var dbFleet = _dbContext.Fleets
+                            .SingleOrDefault(f => f.Id == fleetId
+                                && f.ClubId == comp.ClubId);
+                        dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
+                        {
+                            Competitor = dbObject,
+                            CompetitorId = dbObject.Id,
+                            Fleet = dbFleet,
+                            FleetId = dbFleet.Id
+                        });
+                        // Create new fleets here if needed.
+                    }
+                }
+
+                //add built in club fleets
+                var autoAddFleets = _dbContext.Fleets
+                    .Where(f => f.ClubId == comp.ClubId
+                    && (f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
+                    || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
+                    && f.FleetBoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
+                foreach (var dbFleet in autoAddFleets)
+                {
+                    if (!dbObject.CompetitorFleets.Any(
+                        cf => cf.FleetId == dbFleet.Id))
+                    {
+                        dbObject.CompetitorFleets.Add(
+                            new Db.CompetitorFleet
+                            {
+                                Competitor = dbObject,
+                                Fleet = dbFleet
+                            });
+                    }
+                }
+            }
+
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
+
         }
 
         public async Task DeleteCompetitorAsync(Guid competitorId)
@@ -290,11 +313,11 @@ namespace SailScores.Core.Services
 
         public async Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(Guid clubId, Guid competitorId)
         {
-            var seasonSummaries =  await _dbContext.GetCompetitorStatsSummaryAsync(clubId, competitorId)
+            var seasonSummaries = await _dbContext.GetCompetitorStatsSummaryAsync(clubId, competitorId)
                 .ConfigureAwait(false);
-            
+
             var returnList = new List<CompetitorSeasonStats>();
-            foreach(var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
+            foreach (var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
             {
                 var seasonStats = new CompetitorSeasonStats
                 {
@@ -313,9 +336,11 @@ namespace SailScores.Core.Services
             return returnList;
         }
 
+#pragma warning disable CA1054 // Uri parameters should not be strings
         public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
             Guid competitorId,
             string seasonUrlName)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             var ranks = await _dbContext.GetCompetitorRankCountsAsync(
                 competitorId,
@@ -324,6 +349,5 @@ namespace SailScores.Core.Services
             return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }
-
     }
 }

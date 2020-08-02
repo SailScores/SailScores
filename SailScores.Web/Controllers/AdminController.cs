@@ -43,7 +43,7 @@ namespace SailScores.Web.Controllers
             return View(vm);
         }
 
-       
+
         // GET: Admin/Edit/5
         public async Task<ActionResult> Edit(string clubInitials)
         {

@@ -101,15 +101,23 @@ namespace SailScores.Core.Services
                 .Select(r => r.Id)
                 .SingleOrDefaultAsync()
                 .ConfigureAwait(false);
-            if(regattaId == default)
+            if (regattaId == default)
             {
                 return null;
             }
             return await GetRegattaAsync(regattaId).ConfigureAwait(false);
         }
 
-        public async Task<Guid> SaveNewRegattaAsync(Regatta regatta)
+        public Task<Guid> SaveNewRegattaAsync(Regatta regatta)
         {
+            if (regatta == null)
+            {
+                throw new ArgumentNullException(nameof(regatta));
+            }
+            return SaveNewRegattaInternalAsync(regatta);
+        }
+
+        private async Task<Guid> SaveNewRegattaInternalAsync(Regatta regatta) { 
             Database.Entities.Regatta dbRegatta =
                 await _dbObjectBuilder.BuildDbRegattaAsync(regatta)
                 .ConfigureAwait(false);
@@ -145,7 +153,16 @@ namespace SailScores.Core.Services
             return dbRegatta.Id;
         }
 
-        public async Task<Guid> UpdateAsync(Regatta model)
+        public Task<Guid> UpdateAsync(Regatta model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+            return UpdateInternalAsync(model);
+        }
+
+        private async Task<Guid> UpdateInternalAsync(Regatta model)
         {
             if (_dbContext.Regattas.Any(r =>
                 r.Id != model.Id
@@ -230,14 +247,22 @@ namespace SailScores.Core.Services
             dbRegatta.RegattaFleet.Clear();
             dbRegatta.RegattaSeries.Clear();
             _dbContext.Regattas.Remove(dbRegatta);
-            
+
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
         }
 
         // based on the fleet of the race, find the correct series from the regatta
         // and then add race to that series. Create the series if necessary.
-        public async Task AddRaceToRegattaAsync(Race race, Guid regattaId)
+        public Task AddRaceToRegattaAsync(Race race, Guid regattaId)
+        {
+            if (race == null) { throw new ArgumentNullException(nameof(race));
+            }
+
+            return AddRaceToRegattaInternalAsync(race, regattaId);
+        }
+
+        private async Task AddRaceToRegattaInternalAsync(Race race, Guid regattaId)
         {
             var dbFleet = await _dbContext.Fleets.SingleAsync(f => f.Id == race.Fleet.Id)
                 .ConfigureAwait(false);
@@ -252,7 +277,7 @@ namespace SailScores.Core.Services
                 .SingleOrDefaultAsync(s => s.FleetId == dbFleet.Id)
                 .ConfigureAwait(false);
 
-            if(series == null)
+            if (series == null)
             {
                 // create a new series for this fleet.
                 var seriesName = $"{dbRegatta.Season.Name} {dbRegatta.Name} {dbFleet.NickName}";

@@ -37,9 +37,10 @@ namespace SailScores.Web.Models.SailScores
         {
             get
             {
-                if (String.IsNullOrWhiteSpace(TemperatureUnits)) {
+                if (String.IsNullOrWhiteSpace(TemperatureUnits))
+                {
                     return String.Empty;
-                                        }
+                }
                 else if (TemperatureUnits.StartsWith("F", StringComparison.InvariantCultureIgnoreCase))
                 {
                     return "°F";

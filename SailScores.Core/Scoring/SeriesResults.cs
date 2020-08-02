@@ -12,7 +12,7 @@ namespace SailScores.Core.Scoring
         public IList<Competitor> Competitors { get; set; }
 
         public Dictionary<Competitor, int?> Places { get; set; }
-        
+
         public int NumberOfDiscards { get; set; }
 
         public bool IsPercentSystem { get; set; }
@@ -50,9 +50,11 @@ namespace SailScores.Core.Scoring
                 ?? 0;
         }
 
-        public IEnumerable<Race> SailedRaces { get
+        public IEnumerable<Race> SailedRaces
+        {
+            get
             {
-                return Races.Where(r => (r?.State ?? RaceState.Raced) == RaceState.Raced);
+                return Races?.Where(r => (r?.State ?? RaceState.Raced) == RaceState.Raced) ?? new List<Race>();
             }
         }
     }

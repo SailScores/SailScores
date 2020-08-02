@@ -13,6 +13,6 @@ namespace SailScores.Api.Dtos
 
         [StringLength(2000)]
         public String Description { get; set; }
-        
+
     }
 }

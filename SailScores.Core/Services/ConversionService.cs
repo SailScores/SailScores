@@ -27,7 +27,7 @@ namespace SailScores.Core.Services
         public decimal? Convert(string measure, string sourceUnits, string destinationUnits)
         {
             decimal decimalMeasure;
-            if(decimal.TryParse(measure, out decimalMeasure))
+            if (decimal.TryParse(measure, out decimalMeasure))
             {
                 return Convert(measure, sourceUnits, destinationUnits);
             }
@@ -65,7 +65,8 @@ namespace SailScores.Core.Services
                 _logger.LogInformation("About to convert Temp");
 
                 return ConvertTemperature(measure, sourceUnitEnum, destinationUnitEnum);
-            } else if (GetUnitType(sourceUnitEnum) == UnitType.Speed)
+            }
+            else if (GetUnitType(sourceUnitEnum) == UnitType.Speed)
             {
                 _logger.LogInformation("About to convert speed");
 
@@ -87,7 +88,7 @@ namespace SailScores.Core.Services
             return ConvertFromKelvin(tempInKelvin, destinationUnits);
         }
 
-        private decimal ConvertFromKelvin(decimal temp, Units destinationUnits)
+        private static decimal ConvertFromKelvin(decimal temp, Units destinationUnits)
         {
             if (destinationUnits == Units.Fahrenheit)
             {
@@ -124,7 +125,7 @@ namespace SailScores.Core.Services
             return ConvertFromMeterPerSecond(speedInMeterPerSecond, destinationUnits);
         }
 
-        private decimal ConvertFromMeterPerSecond(decimal speed, Units destinationUnits)
+        private static decimal ConvertFromMeterPerSecond(decimal speed, Units destinationUnits)
         {
             switch (destinationUnits)
             {
@@ -136,7 +137,7 @@ namespace SailScores.Core.Services
                     return speed * 1.944m;
                 default:
                     return speed;
-            }    
+            }
         }
 
         private decimal ConvertToMeterPerSecond(decimal speed, Units sourceUnits)

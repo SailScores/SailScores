@@ -47,10 +47,10 @@ namespace SailScores.ImportExport.Sailwave.Parsers
             int typeNumber = Utilities.GetInt(s) ?? 1;
             if (typeof(ColumnType).IsEnumDefined(typeNumber))
             {
-                return (ColumnType) typeNumber;
+                return (ColumnType)typeNumber;
             }
             return ColumnType.Standard;
         }
-        
+
     }
 }

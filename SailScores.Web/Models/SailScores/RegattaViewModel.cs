@@ -3,7 +3,7 @@
 namespace SailScores.Web.Models.SailScores
 {
     public class RegattaViewModel : Core.Model.Regatta
-    {        
+    {
         private Guid _seasonId;
         public Guid SeasonId
         {
@@ -15,7 +15,8 @@ namespace SailScores.Web.Models.SailScores
                 }
                 return _seasonId;
             }
-            set {
+            set
+            {
                 _seasonId = value;
             }
 

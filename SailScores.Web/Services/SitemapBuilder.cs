@@ -39,11 +39,9 @@ namespace SailScores.Web.Services
                     select CreateItemElement(item)
                     ));
 
-            using (TextWriter writer = new Utf8StringWriter())
-            {
-                sitemap.Save(writer);
-                return writer.ToString();
-            }
+            using TextWriter writer = new Utf8StringWriter();
+            sitemap.Save(writer);
+            return writer.ToString();
         }
 
         private XElement CreateItemElement(SitemapUrl url)

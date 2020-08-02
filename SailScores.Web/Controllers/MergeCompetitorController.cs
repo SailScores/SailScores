@@ -44,7 +44,7 @@ namespace SailScores.Web.Controllers
 
         [HttpPost]
         public async Task<ActionResult> Options(
-            string clubInitials, 
+            string clubInitials,
             MergeCompetitorViewModel vm)
         {
             var clubId = await _clubService.GetClubId(clubInitials);
@@ -52,7 +52,7 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            
+
             vm.SourceCompetitorOptions = await _mergeService.GetSourceOptionsFor(vm.TargetCompetitorId);
             return View("SelectSource", vm);
         }
@@ -70,7 +70,7 @@ namespace SailScores.Web.Controllers
 
             vm.SourceCompetitor = await _competitorService.GetCompetitorAsync(vm.SourceCompetitorId.Value);
             vm.TargetCompetitor = await _competitorService.GetCompetitorAsync(vm.TargetCompetitorId.Value);
-            if(vm.SourceCompetitor.ClubId != clubId ||
+            if (vm.SourceCompetitor.ClubId != clubId ||
                 vm.TargetCompetitor.ClubId != clubId)
             {
                 return Unauthorized();

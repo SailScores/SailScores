@@ -26,11 +26,13 @@ namespace SailScores.Core.JobQueue
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var workItem = await TaskQueue.DequeueAsync(stoppingToken);
+                var workItem = await TaskQueue.DequeueAsync(stoppingToken)
+                    .ConfigureAwait(false);
 
                 try
                 {
-                    await workItem(stoppingToken);
+                    await workItem(stoppingToken)
+                        .ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

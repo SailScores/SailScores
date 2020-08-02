@@ -17,9 +17,9 @@ namespace SailScores.ImportExport.Sailwave.Writers
                 Value = GetColumnValue(thing)
             };
 
-            return new List<FileRow>{returnRow};
+            return new List<FileRow> { returnRow };
         }
-        
+
         private static string GetColumnValue(Column column)
         {
             // 8 pipe separated values

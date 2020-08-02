@@ -12,7 +12,7 @@ namespace SailScores.ImportExport.Sailwave.Tests.Unit
         public void BasicReadFile()
         {
             var series = SeriesParser.GetSeries(Utilities.SimpleFile.GetStream());
-            
+
             Assert.NotNull(series);
         }
 
