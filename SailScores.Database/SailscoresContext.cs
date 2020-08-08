@@ -40,8 +40,11 @@ namespace SailScores.Database
 
         public DbSet<ClubRequest> ClubRequests { get; set; }
 
+
+        // these sets below are not tables in the database 
         private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
         private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
+        private DbSet<ClubSeasonStats> ClubSeasonStats { get; set; }
 
         public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId)
         {
@@ -75,6 +78,17 @@ namespace SailScores.Database
             var seasonParam = new SqlParameter("SeasonUrlName", seasonUrlName);
             var result = await this.CompetitorRankStats
                 .FromSqlRaw(query, competitorParam, seasonParam)
+                .ToListAsync();
+            return result;
+        }
+
+        public async Task<IList<ClubSeasonStats>> GetClubStats(
+            string clubInitials)
+        {
+            var query = await GetSqlQuery("ClubStats");
+            var clubParam = new SqlParameter("ClubInitials", clubInitials);
+            var result = await this.ClubSeasonStats
+                .FromSqlRaw(query, clubParam)
                 .ToListAsync();
             return result;
         }
@@ -210,6 +224,12 @@ namespace SailScores.Database
                     cs.HasNoKey();
                 });
             modelBuilder.Entity<CompetitorRankStats>(
+                cs =>
+                {
+                    cs.HasNoKey();
+                });
+
+            modelBuilder.Entity<ClubSeasonStats>(
                 cs =>
                 {
                     cs.HasNoKey();

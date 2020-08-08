@@ -155,7 +155,10 @@ namespace SailScores.Core.Services
                 .SingleOrDefaultAsync(s => s.UrlName == seriesUrlName
                                   && s.Season.UrlName == seasonName)
                 .ConfigureAwait(false);
-
+            if(seriesDb == null)
+            {
+                return null;
+            }
             var fullSeries = _mapper.Map<Series>(seriesDb);
             fullSeries.ShowCompetitorClub = club.ShowClubInResults;
             var flatResults = await GetHistoricalResults(fullSeries)

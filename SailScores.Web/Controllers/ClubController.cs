@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
@@ -33,5 +34,13 @@ namespace SailScores.Web.Controllers
             return View(viewModel);
         }
 
+        // GET: Club
+        public async Task<ActionResult> Stats(string clubInitials)
+        {
+            ViewData["ClubInitials"] = clubInitials;
+
+            var stats = await _clubService.GetClubStats(clubInitials);
+            return View(stats);
+        }
     }
 }

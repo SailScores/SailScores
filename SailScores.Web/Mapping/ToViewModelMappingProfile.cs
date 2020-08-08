@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Model = SailScores.Core.Model;
+using Db = SailScores.Database.Entities;
 
 namespace SailScores.Web.Mapping
 {
@@ -92,6 +93,8 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.ClubRequest, ClubRequestWithOptionsViewModel>()
                 .ForMember(d => d.ClubOptions, o => o.Ignore());
 
+            CreateMap<Db.ClubSeasonStats, ClubSeasonStatsViewModel>()
+                ;
             MapRegattaObjects();
         }
 
