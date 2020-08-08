@@ -492,6 +492,17 @@ namespace SailScores.Core.Services
             return dbClub.Id;
         }
 
+        public async Task<bool> DoesClubHaveCompetitors(Guid clubId)
+        {
+            return await _dbContext.Competitors.AnyAsync(c => c.ClubId == clubId)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<IList<Db.ClubSeasonStats>> GetClubStats(string clubInitials)
+        {
+            return await _dbContext.GetClubStats(clubInitials);
+        }
+
         private Guid? GetNewGuid(Guid? oldGuid)
         {
             if (!oldGuid.HasValue)
@@ -529,12 +540,6 @@ namespace SailScores.Core.Services
                 return guidMapper[oldGuid.Value];
             }
             return oldGuid;
-        }
-
-        public async Task<bool> DoesClubHaveCompetitors(Guid clubId)
-        {
-            return await _dbContext.Competitors.AnyAsync(c => c.ClubId == clubId)
-                .ConfigureAwait(false);
         }
     }
 }

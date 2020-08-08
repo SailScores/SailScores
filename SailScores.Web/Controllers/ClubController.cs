@@ -38,8 +38,9 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Stats(string clubInitials)
         {
             ViewData["ClubInitials"] = clubInitials;
-            //TODO
-            return View(viewModel);
+
+            var stats = await _clubService.GetClubStats(clubInitials);
+            return View(stats);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Core.Model;
+using Entities = SailScores.Database.Entities;
 
 namespace SailScores.Core.Services
 {
@@ -26,6 +27,6 @@ namespace SailScores.Core.Services
         Task<IEnumerable<BoatClass>> GetAllBoatClasses(Guid clubId);
         Task<bool> DoesClubHaveCompetitors(Guid clubId);
         Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId);
-
+        Task<IList<Entities.ClubSeasonStats>> GetClubStats(string clubInitials);
     }
 }
