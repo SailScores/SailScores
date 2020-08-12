@@ -508,15 +508,6 @@ namespace SailScores.Core.Services
             return await _dbContext.GetSiteStats().ConfigureAwait(false);
         }
 
-        private Guid? GetNewGuid(Guid? oldGuid)
-        {
-            if (!oldGuid.HasValue)
-            {
-                return null;
-            }
-            return GetNewGuid(oldGuid.Value);
-        }
-
         private Guid GetNewGuid(Guid oldGuid)
         {
             if (guidMapper == null)
@@ -546,6 +537,5 @@ namespace SailScores.Core.Services
             }
             return oldGuid;
         }
-
     }
 }
