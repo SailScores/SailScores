@@ -45,6 +45,7 @@ namespace SailScores.Database
         private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
         private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
         private DbSet<ClubSeasonStats> ClubSeasonStats { get; set; }
+        private DbSet<SiteStats> SiteStats { get; set; }
 
         public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId)
         {
@@ -93,6 +94,15 @@ namespace SailScores.Database
             return result;
         }
 
+        public async Task<IList<SiteStats>> GetSiteStats()
+        {
+            var query = await GetSqlQuery("SiteStats");
+            var result = await this.SiteStats
+                .FromSqlRaw(query)
+                .ToListAsync();
+            return result;
+        }
+
         private async Task<string> GetSqlQuery(string name)
         {
             string resourceName = $"SailScores.Database.Sql.{name}.sql";
@@ -120,7 +130,6 @@ namespace SailScores.Database
                 // EF Core 3
                 property.SetColumnType("decimal(18, 2)");
             }
-
 
             modelBuilder.Entity<CompetitorFleet>()
                 .HasKey(x => new { x.CompetitorId, x.FleetId });
@@ -230,6 +239,12 @@ namespace SailScores.Database
                 });
 
             modelBuilder.Entity<ClubSeasonStats>(
+                cs =>
+                {
+                    cs.HasNoKey();
+                });
+
+            modelBuilder.Entity<SiteStats>(
                 cs =>
                 {
                     cs.HasNoKey();

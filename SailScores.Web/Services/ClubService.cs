@@ -33,6 +33,12 @@ namespace SailScores.Web.Services
             _mapper = mapper;
         }
 
+        public async Task<IEnumerable<AllClubStatsViewModel>> GetAllClubStats()
+        {
+            var coreEnumeration = await _coreClubService.GetAllStats();
+            return _mapper.Map<IEnumerable<AllClubStatsViewModel>>(coreEnumeration);
+        }
+
         public async Task<Club> GetClubForClubHome(string clubInitials)
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);

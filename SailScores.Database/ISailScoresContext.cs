@@ -43,5 +43,6 @@ namespace SailScores.Database
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task<IList<ClubSeasonStats>> GetClubStats(string clubInitials);
+        Task<IList<SiteStats>> GetSiteStats();
     }
 }

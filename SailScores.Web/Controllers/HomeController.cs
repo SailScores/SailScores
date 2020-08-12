@@ -12,16 +12,19 @@ namespace SailScores.Web.Controllers
     {
 
         private readonly CoreServices.IClubService _clubservice;
+        private readonly Services.IClubService _webClubService;
         private readonly IRegattaService _regattaService;
         private readonly AppVersionInfo _versionService;
 
         public HomeController(
             CoreServices.IClubService clubService,
+            Services.IClubService webClubService,
             IRegattaService regattaService,
             AppVersionInfo versionService)
 
         {
             _clubservice = clubService;
+            _webClubService = webClubService;
             _regattaService = regattaService;
             _versionService = versionService;
         }
@@ -61,6 +64,12 @@ namespace SailScores.Web.Controllers
 #if DEBUG
             vm.Version = _versionService.InformationalVersion;
 #endif
+            return View(vm);
+        }
+
+        public async Task<IActionResult> Stats()
+        {
+            var vm = await _webClubService.GetAllClubStats();
             return View(vm);
         }
 

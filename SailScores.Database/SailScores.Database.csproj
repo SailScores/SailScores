@@ -25,6 +25,7 @@
     <None Remove="Sql\ClubStats.sql" />
     <None Remove="Sql\RankCounts.sql" />
     <None Remove="Sql\RankCountsById.sql" />
+    <None Remove="Sql\SiteStats.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sql\SiteStats.sql" />
     <EmbeddedResource Include="Sql\ClubStats.sql" />
     <EmbeddedResource Include="Sql\RankCountsById.sql" />
     <EmbeddedResource Include="Sql\RankCounts.sql" />

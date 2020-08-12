@@ -500,7 +500,12 @@ namespace SailScores.Core.Services
 
         public async Task<IList<Db.ClubSeasonStats>> GetClubStats(string clubInitials)
         {
-            return await _dbContext.GetClubStats(clubInitials);
+            return await _dbContext.GetClubStats(clubInitials).ConfigureAwait(false);
+        }
+
+        public async Task<IList<Db.SiteStats>> GetAllStats()
+        {
+            return await _dbContext.GetSiteStats().ConfigureAwait(false);
         }
 
         private Guid? GetNewGuid(Guid? oldGuid)
@@ -541,5 +546,6 @@ namespace SailScores.Core.Services
             }
             return oldGuid;
         }
+
     }
 }

@@ -1,0 +1,55 @@
+﻿@using Microsoft.Extensions.Localization;
+@using SailScores.Web.Resources;
+@using SailScores.Web.Extensions;
+@using SailScores.Web.Services;
+
+@inject IStringLocalizer<SharedResource> localizer
+@model IList<SailScores.Web.Models.SailScores.AllClubStatsViewModel>
+@{
+    ViewBag.Title = "SailScores " + localizer["Stats"];
+}
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Club</th>
+                <th>Last Race</th>
+                <th>Last Update</th>
+                <th>Races in last 10 days</th>
+                <th>Scores in last 10 days</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var club in Model.OrderBy(s => s.ClubName))
+            {
+
+                <tr>
+                    <td>
+                        <a asp-controller="club"
+                           asp-action="index"
+                           asp-route-clubInitials="@club.ClubInitials">
+                            @club.ClubName
+                        </a>
+                        <a asp-controller="club"
+                           asp-action="stats"
+                           asp-route-clubInitials="@club.ClubInitials">
+                            <span class="fa fa-table" aria-hidden="true"></span>
+                        </a>
+                    </td>
+                    <td>
+                        @club.LastRaceDate?.ToString("D")
+                    </td>
+                    <td>
+                        @club.LastRaceUpdate?.ToString("D")
+                    </td>
+                    <td>
+                        @club.RaceCount
+                    </td>
+                    <td>
+                        @club.ScoreCount
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

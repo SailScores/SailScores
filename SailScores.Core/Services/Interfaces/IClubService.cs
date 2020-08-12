@@ -28,5 +28,6 @@ namespace SailScores.Core.Services
         Task<bool> DoesClubHaveCompetitors(Guid clubId);
         Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId);
         Task<IList<Entities.ClubSeasonStats>> GetClubStats(string clubInitials);
+        Task<IList<Entities.SiteStats>> GetAllStats();
     }
 }

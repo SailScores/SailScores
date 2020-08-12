@@ -93,8 +93,9 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.ClubRequest, ClubRequestWithOptionsViewModel>()
                 .ForMember(d => d.ClubOptions, o => o.Ignore());
 
-            CreateMap<Db.ClubSeasonStats, ClubSeasonStatsViewModel>()
-                ;
+            CreateMap<Db.ClubSeasonStats, ClubSeasonStatsViewModel>();
+            CreateMap<Db.SiteStats, AllClubStatsViewModel>();
+
             MapRegattaObjects();
         }
 

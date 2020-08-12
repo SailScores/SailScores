@@ -10,5 +10,7 @@ namespace SailScores.Web.Services
     {
         Task<Club> GetClubForClubHome(string clubInitials);
         Task<ClubStatsViewModel> GetClubStats(string clubInitials);
+
+        Task<IEnumerable<AllClubStatsViewModel>> GetAllClubStats();
     }
 }
