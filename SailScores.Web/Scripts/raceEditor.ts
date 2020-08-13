@@ -22,11 +22,11 @@ function checkEnter(e: KeyboardEvent) {
 export function initialize() {
     document.querySelector('form').onkeypress = checkEnter;
     $('#fleetId').change(loadFleet);
-    if ($('#needsLocalDate').val() === "true") {
+    if ($('#needsLocalDate').val() === "True") {
         var now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         $('#date').val(now.toISOString().substring(0, 10));
-        $('#needsLocalDate').val('false');
+        $('#needsLocalDate').val('');
     }
     $('#date').change(dateChanged);
 
