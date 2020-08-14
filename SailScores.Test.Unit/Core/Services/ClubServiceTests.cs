@@ -21,6 +21,7 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
+        private Club _fakeClub;
 
         public ClubServiceTests()
         {
@@ -35,13 +36,47 @@ namespace SailScores.Test.Unit.Core.Services
                 opts.AddProfile(new DbToModelMappingProfile());
             });
 
+            var compA = new Competitor
+            {
+                Name = "Comp A"
+            };
+            var race1 = new Race
+            {
+                Date = DateTime.Today
+            };
+
+            _fakeClub = new Club
+            {
+                Id = Guid.NewGuid(),
+                Name = "Fake Club",
+                Competitors = new List<Competitor>
+                {
+                    compA
+                }
+            };
+
+
             _mapper = config.CreateMapper();
+
+            _context.Clubs.Add(_mapper.Map<Database.Entities.Club>(_fakeClub));
+
             _context.SaveChanges();
 
             _service = new SailScores.Core.Services.ClubService(
                 _context,
                 _mapper
                 );
+        }
+
+        [Fact]
+        public async Task DoesClubHaveCompetitors_competitors_ReturnsTrue()
+        {
+            //arrange
+            // act
+            var result = await _service.DoesClubHaveCompetitors(_fakeClub.Id);
+
+            // Assert
+            Assert.True(result);
         }
 
     }
