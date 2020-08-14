@@ -3,6 +3,7 @@ using SailScores.Database;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SailScores.Database.Entities;
 
 namespace SailScores.Test.Unit.Utilities
 {
@@ -15,6 +16,23 @@ namespace SailScores.Test.Unit.Utilities
                 .Options;
 
             var context = new SailScoresContext(options);
+
+            var club = new Club
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Club"
+            };
+
+            context.Clubs.Add(club);
+
+            context.Competitors.Add(new Competitor
+            {
+                Id = Guid.NewGuid(),
+                Name = "Comp1",
+                BoatName = "Comp1Boat",
+                ClubId = club.Id
+            });
+            context.SaveChanges();
 
             return context;
 

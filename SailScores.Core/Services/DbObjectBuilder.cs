@@ -167,11 +167,16 @@ namespace SailScores.Core.Services
             return dbComp;
         }
 
-        private bool AreCompetitorsMatch(Competitor competitor, dbObj.Competitor dbComp)
+        private bool AreCompetitorsMatch(
+            Competitor competitor,
+            dbObj.Competitor dbComp)
         {
             bool matchFound;
 
-            matchFound = !(String.IsNullOrWhiteSpace(competitor.SailNumber))
+            matchFound = competitor.Id != Guid.Empty
+                         && competitor.Id == dbComp.Id; 
+
+            matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.SailNumber))
                 && !(String.IsNullOrWhiteSpace(dbComp.SailNumber))
                 && competitor.SailNumber.Equals(dbComp.SailNumber, StringComparison.InvariantCultureIgnoreCase);
             matchFound = matchFound || !(String.IsNullOrWhiteSpace(competitor.SailNumber))
