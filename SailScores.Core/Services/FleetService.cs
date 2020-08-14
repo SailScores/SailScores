@@ -23,26 +23,6 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task Delete(Guid fleetId)
-        {
-            var dbClass = await _dbContext.Fleets
-                .Include(f => f.FleetBoatClasses)
-                .SingleAsync(c => c.Id == fleetId)
-                .ConfigureAwait(false);
-            foreach (var link in dbClass.FleetBoatClasses.ToList())
-            {
-                dbClass.FleetBoatClasses.Remove(link);
-            }
-            foreach (var link in dbClass.CompetitorFleets.ToList())
-            {
-                dbClass.CompetitorFleets.Remove(link);
-            }
-            _dbContext.Fleets.Remove(dbClass);
-
-            await _dbContext.SaveChangesAsync()
-                .ConfigureAwait(false);
-        }
-
         public async Task<Guid> SaveNew(Fleet fleet)
         {
 
@@ -120,6 +100,56 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
         }
 
+        public async Task Delete(Guid fleetId)
+        {
+            var dbClass = await _dbContext.Fleets
+                .Include(f => f.FleetBoatClasses)
+                .SingleAsync(c => c.Id == fleetId)
+                .ConfigureAwait(false);
+            foreach (var link in dbClass.FleetBoatClasses.ToList())
+            {
+                dbClass.FleetBoatClasses.Remove(link);
+            }
+            foreach (var link in dbClass.CompetitorFleets.ToList())
+            {
+                dbClass.CompetitorFleets.Remove(link);
+            }
+            _dbContext.Fleets.Remove(dbClass);
+
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
+        }
+
+        public async Task<Fleet> Get(Guid fleetId)
+        {
+            var dbFleet = await _dbContext.Fleets
+                .Include(f => f.FleetBoatClasses)
+                .ThenInclude(fbc => fbc.BoatClass)
+                .Include(f => f.CompetitorFleets)
+                .ThenInclude(fcf => fcf.Competitor)
+                .SingleAsync(c => c.Id == fleetId)
+                .ConfigureAwait(false);
+            return _mapper.Map<Fleet>(dbFleet);
+
+        }
+
+        public async Task<IEnumerable<Fleet>> GetAllFleetsForClub(Guid clubId)
+        {
+            var dbFleets = _dbContext.Fleets
+                .Include(f => f.FleetBoatClasses)
+                .Where(c => c.ClubId == clubId);
+            return _mapper.Map<IEnumerable<Fleet>>(dbFleets);
+        }
+
+        public async Task<IEnumerable<Series>> GetSeriesForFleet(Guid fleetId)
+        {
+            var dbSeries = _dbContext.Series
+                .Where(
+                s => s.RaceSeries.Any(rs => rs.Race.Fleet.Id == fleetId));
+            return _mapper.Map<IEnumerable<Series>>(dbSeries);
+        }
+
+
         private static void CleanUpClasses(Fleet fleet, Db.Fleet existingFleet)
         {
             var classesToRemove = existingFleet.FleetBoatClasses.ToList();
@@ -179,35 +209,6 @@ namespace SailScores.Core.Services
             {
                 existingFleet.CompetitorFleets.Add(addCompetitor);
             }
-        }
-
-        public async Task<Fleet> Get(Guid fleetId)
-        {
-            var dbFleet = await _dbContext.Fleets
-                .Include(f => f.FleetBoatClasses)
-                .ThenInclude(fbc => fbc.BoatClass)
-                .Include(f => f.CompetitorFleets)
-                .ThenInclude(fcf => fcf.Competitor)
-                .SingleAsync(c => c.Id == fleetId)
-                .ConfigureAwait(false);
-            return _mapper.Map<Fleet>(dbFleet);
-
-        }
-
-        public async Task<IEnumerable<Fleet>> GetAllFleetsForClub(Guid clubId)
-        {
-            var dbFleets = _dbContext.Fleets
-                .Include(f => f.FleetBoatClasses)
-                .Where(c => c.ClubId == clubId);
-            return _mapper.Map<IEnumerable<Fleet>>(dbFleets);
-        }
-
-        public async Task<IEnumerable<Series>> GetSeriesForFleet(Guid fleetId)
-        {
-            var dbSeries = _dbContext.Series
-                .Where(
-                s => s.RaceSeries.Any(rs => rs.Race.Fleet.Id == fleetId));
-            return _mapper.Map<IEnumerable<Series>>(dbSeries);
         }
     }
 }
