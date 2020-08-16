@@ -11,31 +11,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Api.Dtos;
 using Xunit;
+using SailScores.Test.Unit.Utilities;
 
 namespace SailScores.Test.Unit.Core.Services
 {
     public class ClubServiceTests
     {
         private readonly ClubService _service;
-        private readonly Mock<IScoringCalculator> _mockCalculator;
-        private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
         private Club _fakeClub;
 
         public ClubServiceTests()
         {
-            var options = new DbContextOptionsBuilder<SailScoresContext>()
-                .UseInMemoryDatabase(databaseName: "Series_Test_database")
-                .Options;
-
-            _context = new SailScoresContext(options);
-
-            var config = new MapperConfiguration(opts =>
-            {
-                opts.AddProfile(new DbToModelMappingProfile());
-            });
-
             var compA = new Competitor
             {
                 Name = "Comp A"
@@ -55,12 +43,13 @@ namespace SailScores.Test.Unit.Core.Services
                 }
             };
 
-
-            _mapper = config.CreateMapper();
+            _context = InMemoryContextBuilder.GetContext();
+            _mapper = MapperBuilder.GetSailScoresMapper();
 
             _context.Clubs.Add(_mapper.Map<Database.Entities.Club>(_fakeClub));
-
             _context.SaveChanges();
+
+            _mapper = MapperBuilder.GetSailScoresMapper();
 
             _service = new SailScores.Core.Services.ClubService(
                 _context,
