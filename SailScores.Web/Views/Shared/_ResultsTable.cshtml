@@ -54,7 +54,7 @@
                                 <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
                             }
                             @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
-                            {<span data-toggle="tooltip" title="mph">@race.WindSpeed</span>}
+                            {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
                             @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
                             {
                                 <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
@@ -83,7 +83,7 @@
                                 <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
                             }
                             @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
-                            {<span data-toggle="tooltip" title="mph">@race.WindSpeed</span>}
+                            {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
                             @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
                             {
                                 <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
