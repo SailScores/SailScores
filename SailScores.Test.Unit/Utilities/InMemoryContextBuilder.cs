@@ -22,16 +22,25 @@ namespace SailScores.Test.Unit.Utilities
                 Id = Guid.NewGuid(),
                 Name = "Test Club"
             };
-
             context.Clubs.Add(club);
+
+            var boatClass = new BoatClass
+            {
+                Id = Guid.NewGuid(),
+                Name = "The Boat Class",
+                ClubId = club.Id
+            };
+            context.BoatClasses.Add(boatClass);
 
             context.Competitors.Add(new Competitor
             {
                 Id = Guid.NewGuid(),
                 Name = "Comp1",
                 BoatName = "Comp1Boat",
-                ClubId = club.Id
+                ClubId = club.Id,
+                BoatClass = boatClass
             });
+
             context.SaveChanges();
 
             return context;
