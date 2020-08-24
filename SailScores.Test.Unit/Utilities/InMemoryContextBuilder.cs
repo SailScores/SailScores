@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SailScores.Database.Entities;
+using System.Linq;
 
 namespace SailScores.Test.Unit.Utilities
 {
@@ -32,13 +33,29 @@ namespace SailScores.Test.Unit.Utilities
             };
             context.BoatClasses.Add(boatClass);
 
-            context.Competitors.Add(new Competitor
+            var competitor = new Competitor
             {
                 Id = Guid.NewGuid(),
                 Name = "Comp1",
                 BoatName = "Comp1Boat",
                 ClubId = club.Id,
                 BoatClass = boatClass
+            };
+            context.Competitors.Add(competitor);
+            
+            context.Races.Add(new Race
+            {
+                Id = Guid.NewGuid(),
+                Date = DateTime.Now,
+                ClubId = club.Id,
+                Scores = new List<Score>
+                {
+                    new Score
+                    {
+                        CompetitorId = competitor.Id,
+                        Place = 1
+                    }
+                }
             });
 
             context.SaveChanges();

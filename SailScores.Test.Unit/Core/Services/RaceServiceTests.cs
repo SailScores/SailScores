@@ -15,6 +15,7 @@ using Moq;
 using SailScores.Core.JobQueue;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using SailScores.Api.Dtos;
 
 namespace SailScores.Test.Unit.Core.Services
 {
@@ -61,8 +62,32 @@ namespace SailScores.Test.Unit.Core.Services
                 );
 
             // fail for now
-            Assert.True(false);
+            Assert.True(result.Count() > 0);
         }
 
+        
+        [Fact]
+        public async Task Save_Null_Throws()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(async() => await _service.SaveAsync(null));
+
+        }
+
+        [Fact]
+        public async Task Save_Existing_DoesNotChangeCount()
+        {
+            var racesBefore = await _service.GetRacesAsync(
+                _clubId
+            );
+
+            var dto = _mapper.Map<RaceDto>(racesBefore.First());
+            await _service.SaveAsync(dto);
+
+            var racesAfter = await _service.GetRacesAsync(
+                _clubId
+            );
+            Assert.Equal(racesBefore.Count(), racesAfter.Count());
+
+        }
     }
 }
