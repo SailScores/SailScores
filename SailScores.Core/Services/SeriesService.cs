@@ -204,6 +204,7 @@ namespace SailScores.Core.Services
                          race.WindSpeedMeterPerSecond,
                          _converter.MeterPerSecond,
                          settings?.WindSpeedUnits)?.ToString("N0");
+                race.WindSpeedUnits = settings?.WindSpeedUnits;
             }
         }
 

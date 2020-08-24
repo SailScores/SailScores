@@ -40,12 +40,88 @@ namespace SailScores.Test.Unit.Core.Services
                 Name = "myFleet"
             };
 
-            _service.SaveNew(newFleet);
+            await _service.SaveNew(newFleet);
 
             Assert.NotEmpty(_context.Fleets
                 .Where(f => f.Name == newFleet.Name));
             Assert.Equal(startingFleetCount + 1,
                 _context.Fleets.Count());
+        }
+
+        [Fact]
+        public async Task Delete_Fleet_RemovesFromDb()
+        {
+            // Arrange
+            var boatClass = await _context.BoatClasses.FirstAsync();
+            var newFleet = new Fleet
+            {
+                Name = "myFleet",
+                BoatClasses = new List<BoatClass>
+                {
+                    new BoatClass
+                    {
+                        Id = boatClass.Id,
+                        ClubId = boatClass.ClubId,
+                        Name = boatClass.Name
+                    }
+                }
+
+            };
+
+            await _service.SaveNew(newFleet);
+
+            Assert.NotEmpty(_context.Fleets
+                .Where(f => f.Name == newFleet.Name).SelectMany(
+                f => f.FleetBoatClasses));
+
+            var newFleetId = _context.Fleets
+                .Where(f => f.Name == newFleet.Name).First().Id;
+
+            //Act 
+            await _service.Delete(newFleetId);
+
+            // Assert
+            Assert.Empty(_context.Fleets
+                .Where(f => f.Name == newFleet.Name));
+
+        }
+
+
+        [Fact]
+        public async Task Get_Fleet_ReturnsFromDb()
+        {
+            // Arrange
+            var boatClass = await _context.BoatClasses.FirstAsync();
+            var newFleet = new Fleet
+            {
+                Name = "myFleet",
+                BoatClasses = new List<BoatClass>
+                {
+                    new BoatClass
+                    {
+                        Id = boatClass.Id,
+                        ClubId = boatClass.ClubId,
+                        Name = boatClass.Name
+                    }
+                }
+
+            };
+
+            await _service.SaveNew(newFleet);
+
+            Assert.NotEmpty(_context.Fleets
+                .Where(f => f.Name == newFleet.Name).SelectMany(
+                f => f.FleetBoatClasses));
+
+            var newFleetId = _context.Fleets
+                .Where(f => f.Name == newFleet.Name).First().Id;
+
+            //Act 
+            var testresult = await _service.Get(newFleetId);
+
+            // Assert
+            Assert.Equal(newFleet.Name, testresult.Name);
+
         }
     }
 }
