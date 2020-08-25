@@ -109,7 +109,7 @@ namespace SailScores.Test.Unit.Core.Services
             await _service.SaveScoringSystemAsync(scoringSystem);
 
             // Assert
-            Assert.Contains(_context.ScoringSystems, (ss) =>  ss.Name == "Hah");
+            Assert.Contains(_context.ScoringSystems, (ss) => ss.Name == "Hah");
         }
 
         [Fact]
@@ -121,14 +121,10 @@ namespace SailScores.Test.Unit.Core.Services
                 Name = "Hah"
             };
 
-
-            // Act
             await _service.SaveScoringSystemAsync(scoringSystem);
-
-            // Assert
             Assert.Contains(_context.ScoringSystems, (ss) => ss.Name == "Hah");
 
-
+            // Act again
             await _service.DeleteScoringSystemAsync(scoringSystem.Id);
 
             // Assert
@@ -136,5 +132,96 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
 
+
+
+        [Fact]
+        public async Task GetScoreCodeAsync_ReturnsFromDb()
+        {
+            // Arrange
+            var id = (await _context.ScoreCodes.FirstAsync()).Id;
+            // Act
+            var result = _service.GetScoreCodeAsync(id);
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task SaveScoreCodeAsync_NewCode_SavesToDb()
+        {
+            // Arrange
+            var system = await _context.ScoringSystems.FirstAsync();
+            var code = new ScoreCode
+            {
+                Name = "FIFO",
+                ScoringSystemId = system.Id
+            };
+            // Act
+            await _service.SaveScoreCodeAsync(code);
+
+            // Assert
+            Assert.Contains(_context.ScoreCodes, sc => sc.Name == "FIFO");
+        }
+
+        [Fact]
+        public async Task SaveScoreCodeAsync_ExistingCode_SavesToDb()
+        {
+            // Arrange
+            var existingCode = await _context.ScoreCodes.FirstAsync();
+            existingCode.Name = "HMM";
+
+            var code = _mapper.Map<ScoreCode>(existingCode);
+            
+            // Act
+            await _service.SaveScoreCodeAsync(code);
+
+            // Assert
+            Assert.Contains(_context.ScoreCodes, sc => sc.Name == "HMM");
+        }
+
+        [Fact]
+        public async Task DeleteScoreCodeAsync_RemovesFromDb()
+        {
+            // Arrange
+            var existingCode = await _context.ScoreCodes.FirstAsync();
+            Assert.Contains(_context.ScoreCodes, sc => sc.Id == existingCode.Id);
+
+            // Act
+            await _service.DeleteScoreCodeAsync(existingCode.Id);
+
+            // Assert
+            Assert.DoesNotContain(_context.ScoreCodes, sc => sc.Id == existingCode.Id);
+        }
+
+        [Fact]
+        public async Task IsScoringSystemInUseAsync_NotInUse_ReturnsFalse()
+        {
+
+           // Act
+           var result = await _service.IsScoringSystemInUseAsync(Guid.NewGuid());
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task IsScoringSystemInUseAsync_InUse_ReturnsTrue()
+        {
+            // Arrange
+            var existingClub = await _context.Clubs.FirstAsync();
+
+            // Act
+            var result = await _service.IsScoringSystemInUseAsync(existingClub.DefaultScoringSystemId.Value);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact(Skip = "not implemented yet")]
+        public async Task GetAllCodesAsync_ReturnsAllIncludingParent()
+        {
+            // Arrange
+            // Act
+            // Assert
+        }
     }
 }

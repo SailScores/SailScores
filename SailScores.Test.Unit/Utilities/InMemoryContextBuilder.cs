@@ -73,6 +73,7 @@ namespace SailScores.Test.Unit.Utilities
                 }
             };
             context.ScoringSystems.Add(scoringSystem);
+            club.DefaultScoringSystemId = scoringSystem.Id;
 
             var defaultScoringSystem = new ScoringSystem
             {
@@ -88,6 +89,7 @@ namespace SailScores.Test.Unit.Utilities
                     }
                 }
             };
+
 
             context.ScoringSystems.Add(defaultScoringSystem);
 
