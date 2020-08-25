@@ -58,6 +58,41 @@ namespace SailScores.Test.Unit.Utilities
                 }
             });
 
+            var scoringSystem = new ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Default for fake club",
+                ClubId = club.Id,
+                ScoreCodes = new List<ScoreCode>
+                {
+                    new Database.Entities.ScoreCode
+                    {
+                        Name = "DNC",
+                        CameToStart = false
+                    }
+                }
+            };
+            context.ScoringSystems.Add(scoringSystem);
+            club.DefaultScoringSystemId = scoringSystem.Id;
+
+            var defaultScoringSystem = new ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Appendix A Low Point For Series",
+                ClubId = null,
+                ScoreCodes = new List<ScoreCode>
+                {
+                    new Database.Entities.ScoreCode
+                    {
+                        Name = "DNC",
+                        CameToStart = false
+                    }
+                }
+            };
+
+
+            context.ScoringSystems.Add(defaultScoringSystem);
+
             context.SaveChanges();
 
             return context;
