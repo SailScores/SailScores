@@ -21,7 +21,9 @@ namespace SailScores.Test.Unit.Utilities
             var club = new Club
             {
                 Id = Guid.NewGuid(),
-                Name = "Test Club"
+                Name = "Test Club",
+                Initials = "TEST",
+                Competitors = new List<Competitor>()
             };
             context.Clubs.Add(club);
 
@@ -33,13 +35,38 @@ namespace SailScores.Test.Unit.Utilities
             };
             context.BoatClasses.Add(boatClass);
 
-            var competitor = new Competitor
+            var fleet = new Fleet
+            {
+                Id = Guid.NewGuid(),
+                Name = "The Fleet",
+                FleetType = Api.Enumerations.FleetType.AllBoatsInClub,
+                ClubId = club.Id
+            };
+            context.Fleets.Add(fleet);
+            var fleet2 = new Fleet
+            {
+                Id = Guid.NewGuid(),
+                Name = "A competitor fleet",
+                FleetType = Api.Enumerations.FleetType.SelectedBoats,
+                ClubId = club.Id
+            };
+            context.Fleets.Add(fleet2);
+
+
+        var competitor = new Competitor
             {
                 Id = Guid.NewGuid(),
                 Name = "Comp1",
                 BoatName = "Comp1Boat",
                 ClubId = club.Id,
-                BoatClass = boatClass
+                BoatClass = boatClass,
+                CompetitorFleets = new List<CompetitorFleet>
+                {
+                    new CompetitorFleet
+                    {
+                        FleetId = fleet2.Id
+                    }
+                }
             };
             context.Competitors.Add(competitor);
             
@@ -74,6 +101,8 @@ namespace SailScores.Test.Unit.Utilities
             };
             context.ScoringSystems.Add(scoringSystem);
             club.DefaultScoringSystemId = scoringSystem.Id;
+
+
 
             var defaultScoringSystem = new ScoringSystem
             {

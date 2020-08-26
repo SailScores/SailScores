@@ -216,12 +216,5 @@ namespace SailScores.Test.Unit.Core.Services
             Assert.True(result);
         }
 
-        [Fact(Skip = "not implemented yet")]
-        public async Task GetAllCodesAsync_ReturnsAllIncludingParent()
-        {
-            // Arrange
-            // Act
-            // Assert
-        }
     }
 }
