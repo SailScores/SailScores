@@ -22,11 +22,13 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
         private Guid _clubId;
+        private string _clubInitials;
 
         public ClubServiceTests()
         {
             _context = Utilities.InMemoryContextBuilder.GetContext();
             _clubId = _context.Clubs.First().Id;
+            _clubInitials = _context.Clubs.First().Initials;
             _mapper = MapperBuilder.GetSailScoresMapper();
 
             _service = new SailScores.Core.Services.ClubService(
@@ -78,28 +80,48 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task GetClubId_ReturnsCorrectId()
         {
-            var result = await _service.GetClubId("TEST");
+            var result = await _service.GetClubId(_clubInitials);
             Assert.Equal(_clubId, result);
         }
 
         [Fact]
         public async Task GetFullClub_Initials_ReturnsClub()
         {
-            var result = await _service.GetFullClub("TEST");
+            var result = await _service.GetFullClub(_clubInitials);
+            Assert.Equal(_clubId, result.Id);
+        }
+
+
+        [Fact]
+        public async Task GetFullClubExceptScores_Initials_ReturnsClub()
+        {
+            var result = await _service.GetFullClubExceptScores(_clubInitials);
+            Assert.Equal(_clubId, result.Id);
+        }
+
+        [Fact]
+        public async Task GetMinimalClub_Initials_ReturnsClub()
+        {
+            var result = await _service.GetMinimalClub(_clubInitials);
+            Assert.Equal(_clubId, result.Id);
+        }
+
+        [Fact]
+        public async Task GetMinimalClub_ById_ReturnsClub()
+        {
+            var result = await _service.GetMinimalClub(_clubId);
             Assert.Equal(_clubId, result.Id);
         }
 
         [Fact]
         public async Task DoesClubHaveCompetitors_competitors_ReturnsTrue()
         {
-            //arrange
+            // arrange
             // act
             var result = await _service.DoesClubHaveCompetitors(_clubId);
 
             // Assert
             Assert.True(result);
         }
-
-
     }
 }

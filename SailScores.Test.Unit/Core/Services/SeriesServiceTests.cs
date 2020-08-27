@@ -8,6 +8,7 @@ using SailScores.Core.Services;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,6 +23,8 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
+        private readonly string _clubInitials;
+        private readonly string _seriesUrlName;
         private readonly Mock<IScoringService> _mockScoringService;
         private readonly Mock<IConversionService> _mockConversionService;
 
@@ -34,6 +37,10 @@ namespace SailScores.Test.Unit.Core.Services
                 .ReturnsAsync(_mockCalculator.Object);
             _mockScoringService = new Mock<IScoringService>();
             _mockConversionService = new Mock<IConversionService>();
+
+            _context = Utilities.InMemoryContextBuilder.GetContext();
+            _clubInitials = _context.Clubs.First().Initials;
+            _seriesUrlName = _context.Series.First().UrlName;
 
             var options = new DbContextOptionsBuilder<SailScoresContext>()
                 .UseInMemoryDatabase(databaseName: "Series_Test_database")
@@ -117,6 +124,22 @@ namespace SailScores.Test.Unit.Core.Services
             _mockScoringCalculatorFactory.Verify(cf =>
                 cf.CreateScoringCalculatorAsync(It.IsAny<ScoringSystem>()),
                 Times.Never);
+        }
+
+        [Fact]
+        public async Task GetSeriesDetailAsync_ReturnsFromDb()
+        {
+            // Arrange
+            var season = await _context.Seasons.FirstAsync();
+
+            // Act
+            var result = _service.GetSeriesDetailsAsync(
+                _clubInitials,
+                season.Name,
+                _seriesUrlName);
+
+            // Assert
+            Assert.NotNull(result);
         }
     }
 }

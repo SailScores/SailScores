@@ -2,22 +2,21 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using SailScores.Core.Mapping;
-using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using SailScores.Database.Entities;
 using Xunit;
 
 namespace SailScores.Test.Unit.Core.Services
 {
     public class RegattaServiceTests
     {
-        private readonly Series _fakeSeries;
-        private readonly Regatta _fakeRegatta;
-        private readonly Club _fakeClub;
+        private readonly Regatta _regatta;
         private readonly DbObjectBuilder _dbObjectBuilder;
         private readonly RegattaService _service;
         private readonly IMapper _mapper;
@@ -25,18 +24,18 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Guid _clubId;
         private readonly Mock<ISeriesService> _mockSeriesService;
         private readonly Season _season;
+        private readonly string _clubInitials;
 
         public RegattaServiceTests()
         {
-            _clubId = Guid.NewGuid();
+
+            _context = Utilities.InMemoryContextBuilder.GetContext();
+            _clubInitials = _context.Clubs.First().Initials;
+            _clubId = _context.Clubs.First().Id;
+            _regatta = _context.Regattas.First();
+
 
             _mockSeriesService = new Mock<ISeriesService>();
-
-            var options = new DbContextOptionsBuilder<SailScoresContext>()
-                .UseInMemoryDatabase(databaseName: "Series_Test_database")
-                .Options;
-
-            _context = new SailScoresContext(options);
 
             var config = new MapperConfiguration(opts =>
             {
@@ -44,59 +43,6 @@ namespace SailScores.Test.Unit.Core.Services
             });
 
             _mapper = config.CreateMapper();
-
-            var compA = new Competitor
-            {
-                Name = "Comp A"
-            };
-            var race1 = new Race
-            {
-                Date = DateTime.Today
-            };
-
-            _season = new Season
-            {
-                Id = Guid.NewGuid(),
-                Name = "New Season",
-                Start = new DateTime(2019, 1, 1),
-                End = new DateTime(2019, 12, 31)
-            };
-            _fakeSeries = new Series
-            {
-                Id = Guid.NewGuid(),
-                Name = "Fake Series",
-                Competitors = new List<Competitor> {
-                    compA
-                },
-                Races = new List<Race>
-                {
-                    race1
-                },
-                Results = new SeriesResults()
-            };
-
-
-            _fakeRegatta = new Regatta
-            {
-                ClubId = _clubId,
-                Season = _season,
-                Fleets = new List<Fleet> { new
-                    Fleet { FleetType = Api.Enumerations.FleetType.AllBoatsInClub} },
-                StartDate = DateTime.Today.AddDays(-3),
-                EndDate = DateTime.Today
-            };
-
-            _fakeClub = new Club
-            {
-                Name = "Fake Club",
-                Id = _clubId,
-                Regattas = new List<Regatta> { _fakeRegatta }
-            };
-
-            _context.Series.Add(_mapper.Map<Database.Entities.Series>(_fakeSeries));
-            _context.Clubs.Add(_mapper.Map<Database.Entities.Club>(_fakeClub));
-
-            _context.SaveChanges();
 
             //yep, this means we are testing the real DbObjectBuilder as well:
             _dbObjectBuilder = new DbObjectBuilder(
@@ -152,6 +98,17 @@ namespace SailScores.Test.Unit.Core.Services
             Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(() => _service.AddRaceToRegattaAsync(null, Guid.NewGuid()));
 
             Assert.NotNull(ex);
+        }
+
+        [Fact]
+        public async Task GetRegattaAsync_ReturnsRegatta()
+        {
+            var result = await _service.GetRegattaAsync(
+                _clubInitials,
+                _regatta.Season.UrlName,
+                _regatta.UrlName);
+
+            Assert.NotNull(result);
         }
 
     }
