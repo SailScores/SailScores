@@ -52,8 +52,15 @@ namespace SailScores.Test.Unit.Utilities
             };
             context.Fleets.Add(fleet2);
 
+            var season = new Season
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Season",
+                Start = new DateTime(2020, 1, 1),
+                End = new DateTime(2021, 1, 1)
+            };
 
-        var competitor = new Competitor
+            var competitor = new Competitor
             {
                 Id = Guid.NewGuid(),
                 Name = "Comp1",
@@ -69,21 +76,7 @@ namespace SailScores.Test.Unit.Utilities
                 }
             };
             context.Competitors.Add(competitor);
-            
-            context.Races.Add(new Race
-            {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Now,
-                ClubId = club.Id,
-                Scores = new List<Score>
-                {
-                    new Score
-                    {
-                        CompetitorId = competitor.Id,
-                        Place = 1
-                    }
-                }
-            });
+
 
             var scoringSystem = new ScoringSystem
             {
@@ -119,8 +112,54 @@ namespace SailScores.Test.Unit.Utilities
                 }
             };
 
-
             context.ScoringSystems.Add(defaultScoringSystem);
+
+            var series = new Series
+            {
+                Name = "Series One",
+                UrlName = "SeriesOne",
+                Season = season
+            };
+            context.Series.Add(series);
+
+            context.Races.Add(new Race
+            {
+                Id = Guid.NewGuid(),
+                Date = DateTime.Now,
+                ClubId = club.Id,
+                Scores = new List<Score>
+                {
+                    new Score
+                    {
+                        CompetitorId = competitor.Id,
+                        Place = 1
+                    }
+                },
+                SeriesRaces = new List<SeriesRace> {
+                    new SeriesRace
+                    {
+                        Series = series
+                    }
+                }
+            });
+
+            var regattaFleet = new
+                Fleet
+                {FleetType = Api.Enumerations.FleetType.AllBoatsInClub};
+            var regatta = new Regatta
+            {
+                ClubId = club.Id,
+                Season = season,
+                RegattaFleet = new List<RegattaFleet>
+                { new RegattaFleet
+                    {
+                        Fleet = regattaFleet
+                    }
+                },
+                StartDate = season.Start.AddMonths(6),
+                EndDate = season.Start.AddMonths(6).AddDays(3)
+            };
+            context.Regattas.Add(regatta);
 
             context.SaveChanges();
 

@@ -37,7 +37,9 @@ namespace SailScores.Test.Unit.Core.Services
 
             var newFleet = new Fleet
             {
-                Name = "myFleet"
+                Name = "myFleet",
+                ShortName = "myFleet",
+                NickName = "myFleet",
             };
 
             await _service.SaveNew(newFleet);
@@ -56,6 +58,8 @@ namespace SailScores.Test.Unit.Core.Services
             var newFleet = new Fleet
             {
                 Name = "myFleet",
+                ShortName = "myFleet",
+                NickName ="myFleet",
                 BoatClasses = new List<BoatClass>
                 {
                     new BoatClass
@@ -95,6 +99,8 @@ namespace SailScores.Test.Unit.Core.Services
             var newFleet = new Fleet
             {
                 Name = "myFleet",
+                ShortName = "myFleet",
+                NickName = "myFleet",
                 BoatClasses = new List<BoatClass>
                 {
                     new BoatClass
