@@ -143,6 +143,12 @@ namespace SailScores.Test.Unit.Utilities
                 }
             });
 
+            var regattaSeries = new Series
+            {
+                Id = Guid.NewGuid(),
+                Name = "Regatta Series",
+                UrlName = "RegattaurlName"
+            };
             var regattaFleet = new
                 Fleet
                 {FleetType = Api.Enumerations.FleetType.AllBoatsInClub};
@@ -157,7 +163,14 @@ namespace SailScores.Test.Unit.Utilities
                     }
                 },
                 StartDate = season.Start.AddMonths(6),
-                EndDate = season.Start.AddMonths(6).AddDays(3)
+                EndDate = season.Start.AddMonths(6).AddDays(3),
+                RegattaSeries = new List<RegattaSeries>
+                {
+                    new RegattaSeries
+                    {
+                        Series = regattaSeries
+                    }
+                }
             };
             context.Regattas.Add(regatta);
 

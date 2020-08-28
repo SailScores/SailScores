@@ -245,11 +245,15 @@ namespace SailScores.Core.Services
 
         private FlatResults FlattenResults(Series series)
         {
-            series.Competitors =
-                series.Competitors.OrderBy(c => series.Results.Results.Keys.Contains(c) ?
-                    (series.Results.Results[c].Rank ?? int.MaxValue)
-                    : (int.MaxValue))
-                .ToList();
+            if (series?.Results?.Results != null)
+            {
+                series.Competitors =
+                    series.Competitors.OrderBy(c => series.Results.Results.Keys.Contains(c) ?
+                        (series.Results.Results[c].Rank ?? int.MaxValue)
+                        : (int.MaxValue))
+                    .ToList();
+
+            }
             var races = FlattenRaces(series);
             var flatResults = new FlatResults
             {
@@ -495,15 +499,19 @@ namespace SailScores.Core.Services
                 _dbContext.SeriesChartResults.Remove(chart);
             }
 
-            var chartResults = new Database.Entities.SeriesChartResults
+            if (chartData != null)
             {
-                Id = Guid.NewGuid(),
-                SeriesId = fullSeries.Id,
-                IsCurrent = true,
-                Results = Newtonsoft.Json.JsonConvert.SerializeObject(chartData),
-                Created = DateTime.Now
-            };
-            _dbContext.SeriesChartResults.Add(chartResults);
+                var chartResults = new Database.Entities.SeriesChartResults
+                {
+                    Id = Guid.NewGuid(),
+                    SeriesId = fullSeries.Id,
+                    IsCurrent = true,
+                    Results = Newtonsoft.Json.JsonConvert.SerializeObject(chartData),
+                    Created = DateTime.Now
+                };
+                _dbContext.SeriesChartResults.Add(chartResults);
+            }
+
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
 
@@ -556,8 +564,8 @@ namespace SailScores.Core.Services
             }
             foreach (var comp in fullSeries.Competitors)
             {
-                var calcScore = fullSeries.Results.Results.FirstOrDefault(r => r.Key == comp).Value;
-                var raceScore = calcScore.CalculatedScores.FirstOrDefault(s => s.Key.Id == lastRaceId).Value;
+                var calcScore = fullSeries.Results?.Results?.FirstOrDefault(r => r.Key == comp).Value;
+                var raceScore = calcScore?.CalculatedScores?.FirstOrDefault(s => s.Key.Id == lastRaceId).Value;
                 yield return new FlatChartPoint
                 {
                     RaceId = lastRaceId.Value,
