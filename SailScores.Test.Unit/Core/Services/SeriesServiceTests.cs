@@ -40,13 +40,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             _context = Utilities.InMemoryContextBuilder.GetContext();
             _clubInitials = _context.Clubs.First().Initials;
-            _seriesUrlName = _context.Series.First().UrlName;
 
-            var options = new DbContextOptionsBuilder<SailScoresContext>()
-                .UseInMemoryDatabase(databaseName: "Series_Test_database")
-                .Options;
-
-            _context = new SailScoresContext(options);
 
             var config = new MapperConfiguration(opts =>
             {
@@ -55,38 +49,8 @@ namespace SailScores.Test.Unit.Core.Services
 
             _mapper = config.CreateMapper();
 
-            var compA = new Competitor
-            {
-                Name = "Comp A"
-            };
-            var race1 = new Race
-            {
-                Date = DateTime.Today
-            };
-
-            _fakeSeries = new Series
-            {
-                Id = Guid.NewGuid(),
-                Name = "Fake Series",
-                Competitors = new List<Competitor> {
-                    compA
-                },
-                Races = new List<Race>
-                {
-                    race1
-                },
-                Season = new Season
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "New Season",
-                    Start = new DateTime(2019, 1, 1),
-                    End = new DateTime(2019, 12, 31)
-                },
-                Results = new SeriesResults()
-            };
-
-            _context.Series.Add(_mapper.Map<Database.Entities.Series>(_fakeSeries));
-            _context.SaveChanges();
+            _fakeSeries = _mapper.Map<Series>(_context.Series.First());
+            _seriesUrlName = _fakeSeries.UrlName;
 
             //yep, this means we are testing the real DbObjectBuilder as well:
             _dbObjectBuilder = new DbObjectBuilder(
@@ -108,6 +72,7 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task SaveSeries_Unlocked_CalculatesScores()
         {
+            _fakeSeries.Competitors = new List<Competitor> { };
             await _service.Update(_fakeSeries);
 
             _mockScoringCalculatorFactory.Verify(cf =>
