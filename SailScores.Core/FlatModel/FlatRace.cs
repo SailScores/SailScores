@@ -26,6 +26,8 @@ namespace SailScores.Core.FlatModel
 
         public string WindSpeed { get; internal set; }
         public string WindGust { get; internal set; }
+        public string WindSpeedUnits { get; internal set; }
+
 
         public String CalculatedName
         {
