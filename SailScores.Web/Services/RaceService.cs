@@ -198,6 +198,13 @@ namespace SailScores.Web.Services
             var model = await CreateClubRaceAsync(clubInitials);
             var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
 
+            if (series.Races.Any())
+            {
+                model.FleetId = series.Races.OrderByDescending(r => r.Date)
+                    .ThenByDescending(r => r.Order).First().Fleet?.Id
+                    ?? Guid.Empty;
+            }
+
             model.SeriesIds = new List<Guid>
             {
                 seriesId
