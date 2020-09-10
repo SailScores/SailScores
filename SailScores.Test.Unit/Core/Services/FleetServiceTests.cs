@@ -57,6 +57,7 @@ namespace SailScores.Test.Unit.Core.Services
         {
             // Arrange
             var boatClass = await _context.BoatClasses.FirstAsync();
+            var comp = await _context.Competitors.FirstAsync();
             var newFleet = new Fleet
             {
                 Name = "myFleet",
@@ -70,8 +71,16 @@ namespace SailScores.Test.Unit.Core.Services
                         ClubId = boatClass.ClubId,
                         Name = boatClass.Name
                     }
+                },
+                Competitors = new List<Competitor>
+                {
+                    new Competitor
+                    {
+                        Id = comp.Id,
+                        ClubId = comp.ClubId,
+                        Name = comp.Name
+                    }
                 }
-
             };
 
             await _service.SaveNew(newFleet);
@@ -143,6 +152,33 @@ namespace SailScores.Test.Unit.Core.Services
             // Assert
             Assert.NotEmpty(fleets);
 
+        }
+
+        [Fact]
+        public async Task GetSeriesForFleet_returnsFromDb()
+        {
+            //Arrange
+            var race = await _context.Races.FirstAsync();
+            var fleet = await _context.Fleets.FirstAsync();
+            var series = await _context.Series.FirstAsync();
+
+            race.Fleet = fleet;
+            series.RaceSeries = new List<Database.Entities.SeriesRace>
+            {
+                new Database.Entities.SeriesRace
+                {
+                    RaceId = race.Id,
+                    SeriesId = series.Id
+
+                }
+            };
+            await _context.SaveChangesAsync();
+
+            // Act
+            var returnedValue = await _service.GetSeriesForFleet(fleet.Id) ;
+
+            // Assert
+            Assert.NotEmpty(returnedValue);
         }
     }
 }
