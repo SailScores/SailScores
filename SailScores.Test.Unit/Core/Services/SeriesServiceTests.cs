@@ -106,5 +106,15 @@ namespace SailScores.Test.Unit.Core.Services
             // Assert
             Assert.NotNull(result);
         }
+
+        [Fact]
+        public async Task UpdateSeriesResultsAsync_SavesHistoricalResults()
+        {
+            var historicalRsultCount = _context.HistoricalResults.Count();
+
+            await _service.UpdateSeriesResults(_fakeSeries.Id);
+
+            Assert.True(_context.HistoricalResults.Count() > historicalRsultCount);
+        }
     }
 }
