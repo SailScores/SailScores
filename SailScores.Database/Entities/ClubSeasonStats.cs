@@ -16,6 +16,7 @@ namespace SailScores.Database.Entities
         public int? CompetitorsStarted { get; set; }
         public int? DistinctCompetitorsStarted { get; set; }
         public decimal? AverageCompetitorsPerRace { get; set; }
+        public int? DistinctDaysRaced { get; set; }
         public DateTime? LastRace { get; set; }
         public DateTime? FirstRace { get; set; }
     }

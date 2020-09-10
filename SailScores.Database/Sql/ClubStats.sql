@@ -13,6 +13,7 @@ SELECT
     COUNT(DISTINCT s.Id) AS [CompetitorsStarted],
     COUNT(DISTINCT s.CompetitorId) AS [DistinctCompetitorsStarted],
     COUNT(DISTINCT s.Id) * 1.0  / ISNULL(COUNT(DISTINCT r.Id),1.0) AS AverageCompetitorsPerRace,
+    COUNT(DISTINCT r.Date) AS DistinctDaysRaced,
     MAX(r.Date) AS LastRace,
     MIN(r.Date) AS FirstRace
 
