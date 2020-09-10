@@ -149,7 +149,8 @@ namespace SailScores.Core.Services
 
         public async Task<Model.Club> GetFullClub(Guid id)
         {
-            return await GetFullClub(id, true);
+            return await GetFullClub(id, true)
+                .ConfigureAwait(false);
         }
 
         public async Task<Model.Club> GetFullClubExceptScores(string id)
@@ -163,7 +164,8 @@ namespace SailScores.Core.Services
 
         public async Task<Model.Club> GetFullClubExceptScores(Guid id)
         {
-            return await GetFullClub(id, false);
+            return await GetFullClub(id, false)
+                .ConfigureAwait(false);
         }
 
         private async Task<Club> GetFullClub(Guid id,

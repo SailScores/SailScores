@@ -19,11 +19,13 @@ namespace SailScores.Test.Unit.Core.Services
         FleetService _service;
 
         private readonly ISailScoresContext _context;
+        private readonly Guid _clubId;
         private readonly IMapper _mapper;
 
         public FleetServiceTests()
         {
             _context = InMemoryContextBuilder.GetContext();
+            _clubId = _context.Clubs.First().Id;
             _mapper = MapperBuilder.GetSailScoresMapper();
             _service = new FleetService(
                 _context,
@@ -127,6 +129,19 @@ namespace SailScores.Test.Unit.Core.Services
 
             // Assert
             Assert.Equal(newFleet.Name, testresult.Name);
+
+        }
+
+        [Fact]
+        public async Task GetAllFleetsForClub_ReturnFromDb()
+        {
+            // Arrange
+
+            // Act
+            var fleets = await _service.GetAllFleetsForClub(_clubId);
+
+            // Assert
+            Assert.NotEmpty(fleets);
 
         }
     }
