@@ -137,22 +137,6 @@ namespace SailScores.Core.Services
             return clubGuid;
         }
 
-        public async Task<Model.Club> GetFullClub(string id)
-        {
-            var guid = await GetClubId(id)
-                .ConfigureAwait(false);
-
-            return await GetFullClub(guid)
-                .ConfigureAwait(false);
-        }
-
-
-        public async Task<Model.Club> GetFullClub(Guid id)
-        {
-            return await GetFullClub(id, true)
-                .ConfigureAwait(false);
-        }
-
         public async Task<Model.Club> GetFullClubExceptScores(string id)
         {
             var guid = await GetClubId(id)
@@ -190,8 +174,6 @@ namespace SailScores.Core.Services
             else
             {
                 await clubQuery
-                    .Include(c => c.Races)
-                    .ThenInclude(r => r.Fleet)
                     .LoadAsync()
                     .ConfigureAwait(false);
             }

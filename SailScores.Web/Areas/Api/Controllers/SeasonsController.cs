@@ -33,7 +33,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<SeasonDto>> Get(Guid clubId)
         {
-            var club = await _clubService.GetFullClub(clubId);
+            var club = await _clubService.GetFullClubExceptScores(clubId);
             return _mapper.Map<List<SeasonDto>>(club.Seasons);
         }
 
@@ -47,7 +47,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             var seasonBizObj = _mapper.Map<Season>(season);
             await _clubService.SaveNewSeason(seasonBizObj);
             var savedSeason =
-                (await _clubService.GetFullClub(season.ClubId))
+                (await _clubService.GetFullClubExceptScores(season.ClubId))
                 .Seasons
                 .First(c => c.Name == season.Name);
             return Ok(savedSeason.Id);

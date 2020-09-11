@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SailScores.Web.Services
@@ -9,17 +11,21 @@ namespace SailScores.Web.Services
     {
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.IScoringService _coreScoringService;
+        private readonly Core.Services.IRaceService _coreRaceService;
         private readonly IWeatherService _weatherService;
         private readonly IMapper _mapper;
 
         public AdminService(
             Core.Services.IClubService clubService,
             Core.Services.IScoringService scoringService,
+            Core.Services.IRaceService raceService,
+
             Services.IWeatherService weatherService,
             IMapper mapper)
         {
             _coreClubService = clubService;
             _coreScoringService = scoringService;
+            _coreRaceService = raceService;
             _weatherService = weatherService;
             _mapper = mapper;
         }
@@ -44,6 +50,8 @@ namespace SailScores.Web.Services
 
             var vm = _mapper.Map<AdminViewModel>(club);
             vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);
+            vm.HasRaces = vm.BoatClasses.Count != 0 &&
+                              (await _coreRaceService.GetRacesAsync(club.Id)).Any();
 
             return vm;
         }

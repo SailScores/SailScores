@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
 
 @inject IStringLocalizer<SharedResource> localizer
@@ -29,18 +29,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#competitors">Competitors</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#races">Races</a>
-                </li>
-                @foreach (var item in Model.Races.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
-                {
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#@item.Key">
-                            @item.Key
-                        </a>
-                    </li>
-                }
-
             </ul>
         </div>
     </nav>
@@ -106,7 +94,7 @@
     @await Html.PartialAsync("_SeasonList", Model.Seasons)
     @await Html.PartialAsync("_SeriesList", Model.Series)
     @await Html.PartialAsync("_CompetitorList", Model.Competitors)
-    @await Html.PartialAsync("_RaceList", Model.Races)
+    @await Html.PartialAsync("_RaceList", Model)
     @await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
     @await Html.PartialAsync("_RegattaList", Model.Regattas)
 </div>
