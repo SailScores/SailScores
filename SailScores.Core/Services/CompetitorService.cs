@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -69,9 +70,11 @@ namespace SailScores.Core.Services
             var competitor = await
                 _dbContext
                 .Competitors
+                .Include(c => c.CompetitorFleets)
+                .ThenInclude(cf => cf.Fleet)
                 .FirstOrDefaultAsync(c => c.Id == id)
                 .ConfigureAwait(false);
-
+            
             return _mapper.Map<Model.Competitor>(competitor);
         }
 
