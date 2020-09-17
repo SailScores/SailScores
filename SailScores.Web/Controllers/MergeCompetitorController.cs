@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SailScores.Identity.Entities;
 
 namespace SailScores.Web.Controllers
 {
@@ -13,17 +15,20 @@ namespace SailScores.Web.Controllers
         private readonly Core.Services.IClubService _clubService;
         private readonly Web.Services.ICompetitorService _competitorService;
         private readonly Services.IAuthorizationService _authService;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly Services.IMergeService _mergeService;
 
         public MergeCompetitorController(
             Core.Services.IClubService clubService,
             Web.Services.ICompetitorService competitorService,
             Services.IAuthorizationService authService,
+            UserManager<ApplicationUser> userManager,
             Services.IMergeService mergeService)
         {
             _clubService = clubService;
             _competitorService = competitorService;
             _authService = authService;
+            _userManager = userManager;
             _mergeService = mergeService;
         }
 
@@ -101,10 +106,19 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            await _mergeService.Merge(vm.TargetCompetitorId, vm.SourceCompetitorId);
+            await _mergeService.Merge(
+                vm.TargetCompetitorId,
+                vm.SourceCompetitorId,
+                await GetUserStringAsync());
             vm.TargetNumberOfRaces = await _mergeService.GetNumberOfRaces(vm.TargetCompetitorId);
 
             return View("Done", vm);
+        }
+
+        private async Task<string> GetUserStringAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return user.GetDisplayName();
         }
     }
 }

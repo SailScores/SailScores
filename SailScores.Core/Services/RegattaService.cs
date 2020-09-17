@@ -307,7 +307,7 @@ namespace SailScores.Core.Services
             });
 
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-            await _seriesService.UpdateSeriesResults(series.Id)
+            await _seriesService.UpdateSeriesResults(series.Id, race.UpdatedBy)
                 .ConfigureAwait(false);
 
         }

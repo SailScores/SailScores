@@ -77,7 +77,7 @@ namespace SailScores.Core.Services
                     .ConfigureAwait(false);
                 if (flatResults == null)
                 {
-                    await UpdateSeriesResults(seriesDb.Id)
+                    await UpdateSeriesResults(seriesDb.Id, seriesDb.UpdatedBy)
                         .ConfigureAwait(false);
                     flatResults = await GetHistoricalResults(fullSeries)
                         .ConfigureAwait(false);
@@ -88,7 +88,8 @@ namespace SailScores.Core.Services
         }
 
         public async Task UpdateSeriesResults(
-            Guid seriesId)
+            Guid seriesId,
+            String updatedBy)
         {
             var dbSeries = await _dbContext
                 .Series
@@ -108,6 +109,7 @@ namespace SailScores.Core.Services
             }
 
             var fullSeries = _mapper.Map<Series>(dbSeries);
+            fullSeries.UpdatedBy = updatedBy;
             await CalculateScoresAsync(fullSeries)
                 .ConfigureAwait(false);
             dbSeries.UpdatedDate = DateTime.UtcNow;
@@ -165,7 +167,7 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             if (flatResults == null)
             {
-                await UpdateSeriesResults(seriesDb.Id)
+                await UpdateSeriesResults(seriesDb.Id, seriesDb.UpdatedBy)
                     .ConfigureAwait(false);
                 flatResults = await GetHistoricalResults(fullSeries)
                     .ConfigureAwait(false);
@@ -265,7 +267,8 @@ namespace SailScores.Core.Services
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),
                 IsPercentSystem = series.Results.IsPercentSystem,
                 PercentRequired = series.Results.PercentRequired,
-                ScoringSystemName = series.ScoringSystem?.Name
+                ScoringSystemName = series.ScoringSystem?.Name,
+                UpdatedBy =series.UpdatedBy
             };
             return flatResults;
         }
@@ -397,7 +400,7 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
 
-            await UpdateSeriesResults(dbSeries.Id)
+            await UpdateSeriesResults(dbSeries.Id, series.UpdatedBy)
                 .ConfigureAwait(false);
         }
 
@@ -426,6 +429,7 @@ namespace SailScores.Core.Services
             existingSeries.ScoringSystemId = model.ScoringSystemId;
             existingSeries.TrendOption = model.TrendOption;
             existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
+            existingSeries.UpdatedBy = model.UpdatedBy;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty
@@ -464,7 +468,7 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             if (!(existingSeries.ResultsLocked ?? false))
             {
-                await UpdateSeriesResults(existingSeries.Id)
+                await UpdateSeriesResults(existingSeries.Id, existingSeries.UpdatedBy)
                     .ConfigureAwait(false);
             }
         }

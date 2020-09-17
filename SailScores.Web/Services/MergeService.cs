@@ -48,14 +48,17 @@ namespace SailScores.Web.Services
             return await _coreMergeService.GetSourceOptionsFor(targetCompetitorId.Value);
         }
 
-        public async Task Merge(Guid? targetCompetitorId, Guid? sourceCompetitorId)
+        public async Task Merge(
+            Guid? targetCompetitorId,
+            Guid? sourceCompetitorId,
+            string userName)
         {
             if (targetCompetitorId == null || sourceCompetitorId == null)
             {
                 throw new ArgumentNullException("Missing a competitor id for merge");
             }
 
-            await _coreMergeService.Merge(targetCompetitorId.Value, sourceCompetitorId.Value);
+            await _coreMergeService.Merge(targetCompetitorId.Value, sourceCompetitorId.Value, userName);
         }
     }
 }

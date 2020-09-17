@@ -315,13 +315,15 @@ namespace SailScores.Core.Services
             seriesIdsToUpdate = seriesIdsToUpdate.Union(dbRace.SeriesRaces.Select(rs => rs.SeriesId).ToList());
             foreach (var seriesId in seriesIdsToUpdate)
             {
-                AddUpdateSeriesJob(seriesId);
+                AddUpdateSeriesJob(seriesId, race.UpdatedBy);
             }
 
             return dbRace.Id;
         }
 
-        private void AddUpdateSeriesJob(Guid seriesId)
+        private void AddUpdateSeriesJob(
+            Guid seriesId,
+            string updatedBy)
         {
             Queue.QueueBackgroundWorkItem(async token =>
             {
@@ -335,7 +337,7 @@ namespace SailScores.Core.Services
                     try
                     {
                         // Do background-y stuff here.
-                        await seriesService.UpdateSeriesResults(seriesId)
+                        await seriesService.UpdateSeriesResults(seriesId, updatedBy)
                             .ConfigureAwait(false);
                     }
                     catch (Exception ex)
@@ -351,7 +353,7 @@ namespace SailScores.Core.Services
             });
         }
 
-        public async Task Delete(Guid raceId)
+        public async Task Delete(Guid raceId, string deletedBy)
         {
             var dbRace = await _dbContext
                 .Races
@@ -363,7 +365,7 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             foreach (var seriesId in dbRace.SeriesRaces.Select(rs => rs.SeriesId))
             {
-                await _seriesService.UpdateSeriesResults(seriesId)
+                await _seriesService.UpdateSeriesResults(seriesId, deletedBy)
                     .ConfigureAwait(false);
             }
         }

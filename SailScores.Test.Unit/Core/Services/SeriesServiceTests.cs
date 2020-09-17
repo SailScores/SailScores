@@ -115,7 +115,7 @@ namespace SailScores.Test.Unit.Core.Services
         {
             var historicalResultCount = _context.HistoricalResults.Count();
 
-            await _service.UpdateSeriesResults(_fakeSeries.Id);
+            await _service.UpdateSeriesResults(_fakeSeries.Id, String.Empty);
 
             Assert.True(_context.HistoricalResults.Count() > historicalResultCount);
         }

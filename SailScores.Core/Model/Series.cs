@@ -43,6 +43,7 @@ namespace SailScores.Core.Model
 
 
         public DateTime? UpdatedDate { get; set; }
+        public String UpdatedBy { get; set; }
 
         public Guid? ScoringSystemId { get; set; }
         public ScoringSystem ScoringSystem { get; set; }

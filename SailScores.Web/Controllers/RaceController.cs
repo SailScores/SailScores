@@ -263,7 +263,7 @@ namespace SailScores.Web.Controllers
                 {
                     return Unauthorized();
                 }
-                await _raceService.Delete(id);
+                await _raceService.Delete(id, await GetUserStringAsync());
 
                 return RedirectToAction("Index", "Admin");
             }

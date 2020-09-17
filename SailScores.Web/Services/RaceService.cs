@@ -46,9 +46,9 @@ namespace SailScores.Web.Services
             _logger = logger;
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid id, string userName)
         {
-            await _coreRaceService.Delete(id);
+            await _coreRaceService.Delete(id, userName);
         }
 
         public async Task<RaceSummaryListViewModel> GetAllRaceSummariesAsync(

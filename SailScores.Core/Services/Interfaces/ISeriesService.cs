@@ -20,7 +20,7 @@ namespace SailScores.Core.Services
         Task SaveNewSeries(Series series);
         Task Update(Series model);
         Task Delete(Guid seriesId);
-        Task UpdateSeriesResults(Guid seriesId);
+        Task UpdateSeriesResults(Guid seriesId, string updatedBy);
         Task<FlatModel.FlatResults> GetHistoricalResults(Series series);
         Task<FlatModel.FlatChartData> GetChartData(Guid seriesId);
     }

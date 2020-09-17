@@ -10,6 +10,9 @@ namespace SailScores.Core.Services
         Task<IList<Competitor>> GetSourceOptionsFor(Guid targetCompetitorId);
         Task<int?> GetRaceCountFor(Guid competitorId);
         Task<IList<Season>> GetSeasonsFor(Guid competitorId);
-        Task Merge(Guid targetCompetitorId, Guid sourceCompetitorId);
+        Task Merge(
+            Guid targetCompetitorId,
+            Guid sourceCompetitorId,
+            string mergedBy);
     }
 }
