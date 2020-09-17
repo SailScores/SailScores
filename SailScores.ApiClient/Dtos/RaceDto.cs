@@ -36,6 +36,7 @@ namespace SailScores.Api.Dtos
         public WeatherDto Weather { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public String UpdatedBy { get; set; }
 
         public bool Equals(RaceDto other)
         {

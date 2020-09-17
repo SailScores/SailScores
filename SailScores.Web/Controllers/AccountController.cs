@@ -15,6 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using SailScores.Identity.Entities;
 
 namespace SailScores.Web.Controllers
 {
@@ -25,15 +26,15 @@ namespace SailScores.Web.Controllers
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
 
         public AccountController(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ILogger<AccountController> logger,
             IConfiguration configuration)
@@ -230,7 +231,13 @@ namespace SailScores.Web.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName
+                };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -322,7 +329,10 @@ namespace SailScores.Web.Controllers
                 {
                     throw new ApplicationException("Error loading external login information during confirmation.");
                 }
-                var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email, Email = model.Email
+                };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -488,7 +498,7 @@ namespace SailScores.Web.Controllers
         }
 
 
-        private async Task<object> GenerateJwtToken(string email, IdentityUser user)
+        private async Task<object> GenerateJwtToken(string email, ApplicationUser user)
         {
             var claims = new List<Claim>
             {

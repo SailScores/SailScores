@@ -41,6 +41,7 @@ namespace SailScores.Web.Models.SailScores
         public WeatherViewModel Weather { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public String UpdatedBy { get; set; }
 
         public string DisplayName
         {

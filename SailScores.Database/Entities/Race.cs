@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -35,6 +35,8 @@ namespace SailScores.Database.Entities
 
         [Column("UpdatedDateUtc")]
         public DateTime? UpdatedDate { get; set; }
+        [StringLength(128)]
+        public String UpdatedBy { get; set; }
 
         public Weather Weather { get; set; }
     }

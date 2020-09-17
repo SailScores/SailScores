@@ -5,6 +5,8 @@ using SailScores.Web.Models.SailScores;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using SailScores.Identity.Entities;
 
 namespace SailScores.Web.Controllers
 {
@@ -15,6 +17,7 @@ namespace SailScores.Web.Controllers
         private readonly Web.Services.IRaceService _raceService;
         private readonly Services.IAuthorizationService _authService;
         private readonly Services.IAdminTipService _adminTipService;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
         public RaceController(
@@ -22,12 +25,14 @@ namespace SailScores.Web.Controllers
             Web.Services.IRaceService raceService,
             Services.IAuthorizationService authService,
             Services.IAdminTipService adminTipService,
+            UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
             _clubService = clubService;
             _raceService = raceService;
             _authService = authService;
             _adminTipService = adminTipService;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
@@ -136,6 +141,7 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
             race.ClubId = clubId;
+            race.UpdatedBy = await GetUserStringAsync();
             await _raceService.SaveAsync(race);
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -143,6 +149,12 @@ namespace SailScores.Web.Controllers
             }
             return RedirectToAction("Index", "Admin");
 
+        }
+
+        private async Task<string> GetUserStringAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return user.GetDisplayName();
         }
 
         [Authorize]
@@ -209,6 +221,8 @@ namespace SailScores.Web.Controllers
                 }
                 return View(race);
             }
+
+            race.UpdatedBy = await GetUserStringAsync();
             await _raceService.SaveAsync(race);
 
             return RedirectToLocal(returnUrl);

@@ -245,6 +245,7 @@ namespace SailScores.Core.Services
             dbRace.State = race.State;
             dbRace.TrackingUrl = race.TrackingUrl;
             dbRace.UpdatedDate = DateTime.UtcNow;
+            dbRace.UpdatedBy = race.UpdatedBy;
 
             if (dbRace.Weather == null)
             {

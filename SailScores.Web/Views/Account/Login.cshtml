@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using SailScores.Identity.Entities
 @model SailScores.Web.Models.AccountViewModels.LoginViewModel
-@inject SignInManager<IdentityUser> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager
 
 @{
     ViewData["Title"] = "Log in";
