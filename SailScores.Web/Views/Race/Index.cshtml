@@ -23,7 +23,7 @@
                 {
                     <li class="nav-item">
                         <a asp-route="Race"
-                           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                           asp-route-clubInitials="@Model.ClubInitials"
                            asp-route-seasonName="@item.UrlName"
                            class="nav-link active">@item.Name</a>
                     </li>
@@ -35,8 +35,7 @@
 }
 
 <h2>
-    @Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()
-@localizer["Races"]
+    @Model.ClubInitials @localizer["Races"]
 </h2>
 
 <div class="container">
@@ -82,9 +81,27 @@
             <div class="col-1 d-none d-md-inline">
                 @race.State
             </div>
-            <div class="col-12 d-none d-md-inline">
+            <div class="col-12 col-md-10 d-none d-md-inline">
                 @Html.DisplayFor(modelItem => race.Name)
                 @Html.DisplayFor(modelItem => race.Description)
+            </div>
+            <div class="col-12 col-md-2">
+                @if (Model.CanEdit)
+                {
+                    <a id="racelink_@race.Id"
+                       asp-action="Edit"
+                       asp-controller="Race"
+                       asp-route-id=@race.Id
+                       class="text-primary"
+                        >Edit</a>
+                    @("|")
+                    <a id="racelink_@race.Id"
+                        asp-action="Delete"
+                        asp-controller="Race"
+                        asp-route-id=@race.Id
+                        class="text-danger"
+                        >Delete</a>
+                }
             </div>
         </div>
     }
@@ -98,7 +115,7 @@
                Model.Item.Seasons)
             {
                 <a asp-route="Race"
-                   asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                   asp-route-clubInitials="@Model.ClubInitials"
                    asp-route-seasonName="@item.UrlName"
                    class="nav-link active">@item.Name</a>
             }

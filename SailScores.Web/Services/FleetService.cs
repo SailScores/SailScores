@@ -120,9 +120,10 @@ namespace SailScores.Web.Services
                 await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
 
             vm.RegattaId = regattaId;
+            vm.IsActive = true;
             if (regattaId.HasValue)
             {
-                var regatta = _regattaService.GetRegattaAsync(regattaId.Value);
+                var regatta = await _regattaService.GetRegattaAsync(regattaId.Value);
                 vm.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
             }
             return vm;

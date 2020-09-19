@@ -137,65 +137,6 @@ namespace SailScores.Core.Services
             return clubGuid;
         }
 
-        public async Task<Model.Club> GetFullClub(string id)
-        {
-            var guid = await GetClubId(id)
-                .ConfigureAwait(false);
-
-            return await GetFullClub(guid)
-                .ConfigureAwait(false);
-        }
-
-
-        public async Task<Model.Club> GetFullClub(Guid id)
-        {
-            IQueryable<Db.Club> clubQuery =
-                            _dbContext.Clubs.Where(c => c.Id == id)
-                            .Include(c => c.Seasons);
-            var club = await clubQuery.FirstAsync()
-                .ConfigureAwait(false);
-
-            await clubQuery
-                .Include(c => c.Races)
-                    .ThenInclude(r => r.Scores)
-                .Include(c => c.Races)
-                    .ThenInclude(r => r.Fleet)
-                    .LoadAsync()
-                    .ConfigureAwait(false);
-            await clubQuery
-                .Include(c => c.Seasons)
-                .Include(c => c.Series)
-                    .ThenInclude(s => s.RaceSeries).LoadAsync()
-                    .ConfigureAwait(false);
-            await clubQuery
-                .Include(c => c.Competitors)
-                .Include(c => c.BoatClasses)
-                .LoadAsync()
-                .ConfigureAwait(false);
-            await clubQuery.Include(c => c.DefaultScoringSystem)
-                .Include(c => c.ScoringSystems)
-                .Include(c => c.Fleets)
-                    .ThenInclude(f => f.CompetitorFleets)
-                .Include(c => c.Fleets)
-                    .ThenInclude(f => f.FleetBoatClasses)
-                .Include(c => c.Regattas)
-                    .ThenInclude(r => r.RegattaSeries)
-                .Include(c => c.Regattas)
-                    .ThenInclude(r => r.RegattaFleet)
-                .Include(c => c.WeatherSettings)
-                .LoadAsync()
-                .ConfigureAwait(false);
-
-            var retClub = _mapper.Map<Model.Club>(club);
-
-            retClub.Seasons = retClub.Seasons.OrderByDescending(s => s.Start).ToList();
-            retClub.Series = retClub.Series
-                .OrderByDescending(s => s.Season.Start)
-                .ThenBy(s => s.Name)
-                .ToList();
-            return retClub;
-        }
-
         public async Task<Model.Club> GetFullClubExceptScores(string id)
         {
             var guid = await GetClubId(id)
@@ -205,25 +146,43 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
         }
 
-
         public async Task<Model.Club> GetFullClubExceptScores(Guid id)
         {
+            return await GetFullClub(id, false)
+                .ConfigureAwait(false);
+        }
+
+        private async Task<Club> GetFullClub(Guid id,
+            bool includeScores)
+        {
             IQueryable<Db.Club> clubQuery =
-                            _dbContext.Clubs.Where(c => c.Id == id)
-                            .Include(c => c.Seasons);
+                _dbContext.Clubs.Where(c => c.Id == id)
+                    .Include(c => c.Seasons);
             var club = await clubQuery.FirstAsync()
                 .ConfigureAwait(false);
 
-            await clubQuery
-                .Include(c => c.Races)
+            if (includeScores)
+            {
+                await clubQuery
+                    .Include(c => c.Races)
+                    .ThenInclude(r => r.Scores)
+                    .Include(c => c.Races)
                     .ThenInclude(r => r.Fleet)
                     .LoadAsync()
                     .ConfigureAwait(false);
+            }
+            else
+            {
+                await clubQuery
+                    .LoadAsync()
+                    .ConfigureAwait(false);
+            }
+
             await clubQuery
                 .Include(c => c.Seasons)
                 .Include(c => c.Series)
-                    .ThenInclude(s => s.RaceSeries).LoadAsync()
-                    .ConfigureAwait(false);
+                .ThenInclude(s => s.RaceSeries).LoadAsync()
+                .ConfigureAwait(false);
             await clubQuery
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
@@ -232,13 +191,13 @@ namespace SailScores.Core.Services
             await clubQuery.Include(c => c.DefaultScoringSystem)
                 .Include(c => c.ScoringSystems)
                 .Include(c => c.Fleets)
-                    .ThenInclude(f => f.CompetitorFleets)
+                .ThenInclude(f => f.CompetitorFleets)
                 .Include(c => c.Fleets)
-                    .ThenInclude(f => f.FleetBoatClasses)
+                .ThenInclude(f => f.FleetBoatClasses)
                 .Include(c => c.Regattas)
-                    .ThenInclude(r => r.RegattaSeries)
+                .ThenInclude(r => r.RegattaSeries)
                 .Include(c => c.Regattas)
-                    .ThenInclude(r => r.RegattaFleet)
+                .ThenInclude(r => r.RegattaFleet)
                 .Include(c => c.WeatherSettings)
                 .LoadAsync()
                 .ConfigureAwait(false);
@@ -252,7 +211,6 @@ namespace SailScores.Core.Services
                 .ToList();
             return retClub;
         }
-
 
         public async Task<Model.Club> GetMinimalClub(Guid id)
         {

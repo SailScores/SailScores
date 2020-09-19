@@ -29,7 +29,6 @@ namespace SailScores.Web.Models.SailScores
         public IList<BoatClass> BoatClasses { get; set; }
         public IList<Season> Seasons { get; set; }
         public IList<Series> Series { get; set; }
-        public IList<Race> Races { get; set; }
         public IList<Regatta> Regattas { get; set; }
 
         public string DefaultScoringSystemName { get; set; }
@@ -46,6 +45,8 @@ namespace SailScores.Web.Models.SailScores
         public string SpeedUnits { get; set; }
         public IList<string> SpeedUnitOptions { get; set; }
         public IList<string> TemperatureUnitOptions { get; set; }
+
+        public bool HasRaces { get; set; }
 
 #pragma warning restore CA2227 // Collection properties should be read only
     }

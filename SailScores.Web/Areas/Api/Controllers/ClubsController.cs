@@ -61,7 +61,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("{identifier}")]
         public async Task<ClubDto> Get([FromRoute] string identifier)
         {
-            var club = await _clubService.GetFullClub(identifier);
+            var club = await _clubService.GetFullClubExceptScores(identifier);
 
             return _mapper.Map<ClubDto>(club);
         }

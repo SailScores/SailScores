@@ -74,7 +74,6 @@ namespace SailScores.Web.Controllers
                 {
                     var club = await _adminService.GetClubForEdit(clubInitials);
                     clubAdmin.Seasons = club.Seasons;
-                    clubAdmin.Races = club.Races;
                     clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
                     clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
                     clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
@@ -100,7 +99,6 @@ namespace SailScores.Web.Controllers
             {
                 var club = await _adminService.GetClubForEdit(clubInitials);
                 clubAdmin.Seasons = club.Seasons;
-                clubAdmin.Races = club.Races;
                 clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
                 clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
                 clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;

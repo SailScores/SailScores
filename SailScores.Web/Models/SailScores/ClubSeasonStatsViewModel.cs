@@ -13,6 +13,7 @@ namespace SailScores.Web.Models.SailScores
         public int? RaceCount { get; set; }
         public int? CompetitorsStarted { get; set; }
         public int? DistinctCompetitorsStarted { get; set; }
+        public int? DistinctDaysRaced { get; set; }
         public double? AverageCompetitorsPerRace { get; set; }
         public DateTime? LastRace { get; set; }
         public DateTime? FirstRace { get; set; }

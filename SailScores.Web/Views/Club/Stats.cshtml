@@ -25,6 +25,7 @@
             <th>Competitors</th>
             <th>Races</th>
             <th>Total Starts</th>
+            <th>Race Days</th>
             <th>Ave Comp / race</th>
             <th>Dates</th>
         </tr>
@@ -66,6 +67,9 @@
                     </td>
                     <td class="@(firstRow ? "h5" :"")">
                         @stat.CompetitorsStarted
+                    </td>
+                    <td class="@(firstRow ? "h5" :"")">
+                        @stat.DistinctDaysRaced
                     </td>
                     <td class="@(firstRow ? "h5" :"")">
                         @String.Format(

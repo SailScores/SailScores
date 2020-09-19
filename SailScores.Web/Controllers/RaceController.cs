@@ -55,7 +55,8 @@ namespace SailScores.Web.Controllers
             return View(new ClubItemViewModel<RaceSummaryListViewModel>
             {
                 Item = races,
-                ClubInitials = clubInitials
+                ClubInitials = clubInitials,
+                CanEdit = await _authService.CanUserEdit(User, clubInitials)
             });
         }
 
