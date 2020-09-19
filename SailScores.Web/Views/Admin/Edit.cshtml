@@ -25,18 +25,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#competitors">Competitors</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#races">Races</a>
-                </li>
-                @foreach (var item in Model.Races.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
-                {
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#@item.Key">
-                            @item.Key
-                        </a>
-                    </li>
-                }
-
             </ul>
         </div>
     </nav>

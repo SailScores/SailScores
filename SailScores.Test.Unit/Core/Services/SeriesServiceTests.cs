@@ -31,7 +31,10 @@ namespace SailScores.Test.Unit.Core.Services
         public SeriesServiceTests()
         {
             _mockCalculator = new Mock<IScoringCalculator>();
-            _mockCalculator.Setup(c => c.CalculateResults(It.IsAny<Series>())).Returns(new SeriesResults());
+            _mockCalculator.Setup(c => c.CalculateResults(It.IsAny<Series>())).Returns(new SeriesResults
+            {
+                Results = new Dictionary<Competitor, SeriesCompetitorResults>()
+            });
             _mockScoringCalculatorFactory = new Mock<IScoringCalculatorFactory>();
             _mockScoringCalculatorFactory.Setup(f => f.CreateScoringCalculatorAsync(It.IsAny<SailScores.Core.Model.ScoringSystem>()))
                 .ReturnsAsync(_mockCalculator.Object);
@@ -110,11 +113,11 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task UpdateSeriesResultsAsync_SavesHistoricalResults()
         {
-            var historicalRsultCount = _context.HistoricalResults.Count();
+            var historicalResultCount = _context.HistoricalResults.Count();
 
             await _service.UpdateSeriesResults(_fakeSeries.Id);
 
-            Assert.True(_context.HistoricalResults.Count() > historicalRsultCount);
+            Assert.True(_context.HistoricalResults.Count() > historicalResultCount);
         }
     }
 }

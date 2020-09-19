@@ -85,14 +85,6 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task GetFullClub_Initials_ReturnsClub()
-        {
-            var result = await _service.GetFullClub(_clubInitials);
-            Assert.Equal(_clubId, result.Id);
-        }
-
-
-        [Fact]
         public async Task GetFullClubExceptScores_Initials_ReturnsClub()
         {
             var result = await _service.GetFullClubExceptScores(_clubInitials);

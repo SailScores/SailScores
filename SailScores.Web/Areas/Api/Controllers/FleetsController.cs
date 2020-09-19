@@ -48,8 +48,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             var fleetBizObj = _mapper.Map<Fleet>(fleet);
             await _clubService.SaveNewFleet(fleetBizObj);
             var savedFleet =
-                (await _clubService.GetFullClub(fleet.ClubId))
-                .Fleets
+                (await _clubService.GetAllFleets(fleet.ClubId))
                 .First(c => c.Name == fleet.Name);
             return Ok(savedFleet.Id);
         }

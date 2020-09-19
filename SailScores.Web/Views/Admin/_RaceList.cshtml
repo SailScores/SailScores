@@ -1,5 +1,5 @@
 ﻿@using SailScores.Core.Services
-@model IEnumerable<SailScores.Core.Model.Race>
+@model SailScores.Web.Models.SailScores.AdminViewModel
 <div class="card">
     <div class="card-header" id="racesHeading">
         <h5>
@@ -11,86 +11,12 @@
     <div id="collapseRaces" class="collapse" aria-labelledby="racesHeading" data-parent="#accordion">
         <div class="card-body p-1 p-md-20">
             <p>
-                <a class="btn btn-primary" asp-action="Create" asp-controller="Race">
-                    Create
-                </a>
-            </p>
-            <div id="raceAccordion">
-                @foreach (var yearRaces in Model.OrderByDescending(r => r.Date)
-                   .GroupBy(r => r.Date?.Year.ToString() ?? String.Empty, r => r))
-                {
-                <div class="card">
-                    <div class="card-header" id="raceYearHeading_@yearRaces.Key">
-                        <h5>
-                            <a id="@yearRaces.Key" class="btn-link collapsed" data-toggle="collapse"
-                                    href="#collapseYear_@yearRaces.Key"
-                                    aria-expanded="false" >
-                                @yearRaces.Key
-                            </a>
-                        </h5>
-                    </div>
-                    <div id="collapseYear_@yearRaces.Key" class="collapse"
-                            aria-labelledby="raceYearHeading_@yearRaces.Key"
-                            data-parent="#raceAccordion">
-                        <div class="card-body p-1 p-md-20">
-                            <div id="raceYearFleetAccordion_@(yearRaces.Key)">
-                                @foreach (var fleetRaces in yearRaces.OrderBy(r => r.Fleet?.Name).GroupBy(r => r.Fleet?.Name ?? String.Empty, r => r))
-                                {
-                                    <div class="card">
-                                    <div class="card-header"
-                                         id="raceFleetHeading_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))">
-                                            <h5>
-                                                <a id="@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))" class="btn-link collapsed"
-                                                   data-toggle="collapse"
-                                                   href="#collapseFleet_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))"
-                                                   aria-expanded="false" aria-controls="collapseRaces">
-                                                    @fleetRaces.Key
-                                                </a>
-                                            </h5>
-                                        </div>
-                                        <div id="collapseFleet_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))" class="collapse"
-                                                aria-labelledby="raceFleetHeading_@(yearRaces.Key)_@(UrlUtility.GetUrlName(fleetRaces.Key).Replace('.','_'))"
-                                                data-parent="#raceYearFleetAccordion_@(yearRaces.Key)">
-                                            <div class="card-body p-1 p-md-20">
+                Race changes can be completed on the 
+                <a asp-controller="race"
+                   asp-action="index"
+                >race page</a>.
 
-                                                @foreach (var item in fleetRaces.OrderByDescending(r => r.Date).ThenBy(r => r.Order))
-                                                {
-                                                <div class="row mb-3 mb-md-1">
-                                                    <div class="col-sm-2">
-                                                        @Html.DisplayFor(modelItem => item.Date)
-                                                    </div>
-                                                    <div class="col-sm-1">
-                                                        @Html.DisplayFor(modelItem => item.Order)
-                                                    </div>
-                                                    <div class="col-sm-2">
-                                                        @Html.DisplayFor(modelItem => item.Name)
-                                                    </div>
-                                                    <div class="d-none d-lg-block col-lg-3">
-                                                        @Html.DisplayFor(modelItem => item.Description)
-                                                    </div>
-                                                    <div class="d-none d-md-block col-md-2">
-                                                        (@(item.Series?.Count ?? 0) series)
-                                                    </div>
-                                                    <div class="col-sm-3 col-md-2">
-                                                        @Html.ActionLink("Edit", "Edit", "Race",
-                                                        new { id = item.Id },
-                                                        new { @class = "text-primary" }) |
-                                                        @Html.ActionLink("Delete", "Delete", "Race", new { id = item.Id },
-                                                        new { @class = "text-danger" })
-                                                    </div>
-                                                </div>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                }
-            </div>
-           
-                </div>
+            </p>
         </div>
+    </div>
 </div>

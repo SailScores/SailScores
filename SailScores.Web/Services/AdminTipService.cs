@@ -12,7 +12,7 @@ namespace SailScores.Web.Services
             {
                 return;
             }
-            if (viewModel.Races?.Any() ?? false)
+            if (viewModel.HasRaces)
             {
                 return;
             }
@@ -73,7 +73,7 @@ namespace SailScores.Web.Services
                         Action = "Create",
                         Controller = "Race"
                     },
-                    Completed = viewModel.Races.Any()
+                    Completed = viewModel.HasRaces
                 },
             };
 

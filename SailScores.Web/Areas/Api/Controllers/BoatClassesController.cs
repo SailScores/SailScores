@@ -37,7 +37,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<BoatClassDto>> Get(Guid clubId)
         {
-            var club = await _clubService.GetFullClub(clubId);
+            var club = await _clubService.GetFullClubExceptScores(clubId);
             return _mapper.Map<List<BoatClassDto>>(club.BoatClasses);
         }
 
@@ -51,7 +51,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             var classBizObj = _mapper.Map<BoatClass>(boatClass);
             await _classService.SaveNew(classBizObj);
             var savedClass =
-                (await _clubService.GetFullClub(boatClass.ClubId))
+                (await _clubService.GetFullClubExceptScores(boatClass.ClubId))
                 .BoatClasses
                 .First(c => c.Name == boatClass.Name);
             return Ok(savedClass.Id);
