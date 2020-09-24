@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -19,6 +19,8 @@
     <Compile Remove="Migrations\20190808011642_CreateRegatta.Designer.cs" />
     <Compile Remove="Migrations\20191219184130_weather.cs" />
     <Compile Remove="Migrations\20191219184130_weather.Designer.cs" />
+    <Compile Remove="Migrations\20200923212129_isPreliminary.cs" />
+    <Compile Remove="Migrations\20200923212129_isPreliminary.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,10 +42,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.3">
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.0-preview1.20235.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0-rc.1.20451.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0-rc.1.20451.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0-rc.1.20451.13">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

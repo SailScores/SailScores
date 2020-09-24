@@ -15,7 +15,12 @@ namespace SailScores.Web.Mapping
         public ToViewModelMappingProfile()
         {
             CreateMap<Model.Club, ClubSummaryViewModel>()
-                .ForMember(d => d.CanEdit, o => o.Ignore());
+                .ForMember(d => d.CanEdit, o => o.Ignore())
+                .ForMember(d => d.RecentRaces, o => o.Ignore())
+                .ForMember(d => d.RecentSeries, o => o.Ignore())
+                .ForMember(d => d.ImportantSeries, o => o.Ignore())
+                .ForMember(d => d.UpcomingRaces, o => o.Ignore())
+                .ForMember(d => d.CurrentRegattas, o => o.Ignore());
 
             CreateMap<Model.Club, AdminViewModel>()
                 .ForMember(d => d.ScoringSystemOptions, o => o.Ignore())

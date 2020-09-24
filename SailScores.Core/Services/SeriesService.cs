@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Core.FlatModel;
+using SailScores.Api.Enumerations;
 
 namespace SailScores.Core.Services
 {
@@ -268,6 +269,7 @@ namespace SailScores.Core.Services
                 IsPercentSystem = series.Results.IsPercentSystem,
                 PercentRequired = series.Results.PercentRequired,
                 ScoringSystemName = series.ScoringSystem?.Name,
+                IsPreliminary = series.Races.Any(r => r.State == RaceState.Preliminary),
                 UpdatedBy =series.UpdatedBy
             };
             return flatResults;
@@ -528,6 +530,7 @@ namespace SailScores.Core.Services
             entries.AddRange(GetChartDataPoints(fullSeries));
             fullSeries.Races = fullSeries.Races
                 .Where(r => r.State == null || r.State == Api.Enumerations.RaceState.Raced
+                || r.State == RaceState.Preliminary
                 || r.Id == lastRaceId)
                 .ToList();
             var copyOfRaces = fullSeries.Races.ToList();

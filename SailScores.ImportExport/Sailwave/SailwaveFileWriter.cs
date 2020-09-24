@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using CsvHelper;
 using SailScores.ImportExport.Sailwave.Csv;
@@ -17,7 +18,7 @@ namespace SailScores.ImportExport.Sailwave
         {
             using (var writer = new StreamWriter(filePath))
             {
-                var csv = new CsvWriter(writer);
+                var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 csv.Configuration.RegisterClassMap<ColumnMapToCsv>();
                 csv.Configuration.HasHeaderRecord = false;
                 csv.Configuration.ShouldQuote = (s, c) => true;

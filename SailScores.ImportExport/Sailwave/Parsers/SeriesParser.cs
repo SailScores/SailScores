@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using CsvHelper;
@@ -12,7 +13,7 @@ namespace SailScores.ImportExport.Sailwave.Parsers
     {
         public static Series GetSeries(StreamReader reader)
         {
-            var csv = new CsvReader(reader);
+            var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             csv.Configuration.RegisterClassMap<ColumnMapFromCsv>();
             csv.Configuration.HasHeaderRecord = false;
             var rows = csv.GetRecords<FileRow>().ToList();

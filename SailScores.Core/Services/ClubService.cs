@@ -163,32 +163,20 @@ namespace SailScores.Core.Services
 
             if (includeScores)
             {
-                await clubQuery
+                clubQuery
                     .Include(c => c.Races)
                     .ThenInclude(r => r.Scores)
                     .Include(c => c.Races)
-                    .ThenInclude(r => r.Fleet)
-                    .LoadAsync()
-                    .ConfigureAwait(false);
-            }
-            else
-            {
-                await clubQuery
-                    .LoadAsync()
-                    .ConfigureAwait(false);
+                    .ThenInclude(r => r.Fleet);
             }
 
             await clubQuery
                 .Include(c => c.Seasons)
                 .Include(c => c.Series)
-                .ThenInclude(s => s.RaceSeries).LoadAsync()
-                .ConfigureAwait(false);
-            await clubQuery
+                .ThenInclude(s => s.RaceSeries)
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
-                .LoadAsync()
-                .ConfigureAwait(false);
-            await clubQuery.Include(c => c.DefaultScoringSystem)
+                .Include(c => c.DefaultScoringSystem)
                 .Include(c => c.ScoringSystems)
                 .Include(c => c.Fleets)
                 .ThenInclude(f => f.CompetitorFleets)
@@ -199,8 +187,8 @@ namespace SailScores.Core.Services
                 .Include(c => c.Regattas)
                 .ThenInclude(r => r.RegattaFleet)
                 .Include(c => c.WeatherSettings)
-                .LoadAsync()
-                .ConfigureAwait(false);
+                .AsSplitQuery()
+                .LoadAsync().ConfigureAwait(false);
 
             var retClub = _mapper.Map<Model.Club>(club);
 
