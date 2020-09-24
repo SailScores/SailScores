@@ -125,6 +125,16 @@
         <div class="tab-content" id="@($"Tab{fleet.ShortName}Content")">
             <div class="tab-pane fade @(fleetHasResults ? "" : "show active")" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
                  aria-labelledby="@($"Competitors{fleet.ShortName}-tab")">
+                @if (Model.CanEdit)
+                {
+                <div class="py-2">
+                    <a asp-controller="Fleet"
+                       asp-action="Edit"
+                       asp-route-Id="@fleet.Id"
+                       title="Add existing competitors"
+                       class="btn btn-outline-primary">Edit Fleet</a>
+                </div>
+                }
                 <table class="table table-hover table-sm">
                     <thead>
                         <tr>
@@ -136,8 +146,8 @@
                     </thead>
                     <tbody>
                         @foreach (var comp in fleet.Competitors.OrderBy(
-                     c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
-                     .ThenBy(c => c.Name))
+                    c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
+                    .ThenBy(c => c.Name))
                         {
                             <tr>
                                 <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
