@@ -73,6 +73,7 @@ namespace SailScores.Core.Services
                     && r.Date >= startDate
                     && r.Date <= endDate)
                 .Where(r => r.State == RaceState.Raced || r.State == null ||
+                    r.State == RaceState.Abandoned ||
                         (includeScheduled && (r.State == RaceState.Scheduled)) ||
                         (includeAbandoned && (r.State == RaceState.Abandoned)))
                 .Include(r => r.Fleet)

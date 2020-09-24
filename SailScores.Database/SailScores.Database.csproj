@@ -19,6 +19,8 @@
     <Compile Remove="Migrations\20190808011642_CreateRegatta.Designer.cs" />
     <Compile Remove="Migrations\20191219184130_weather.cs" />
     <Compile Remove="Migrations\20191219184130_weather.Designer.cs" />
+    <Compile Remove="Migrations\20200923212129_isPreliminary.cs" />
+    <Compile Remove="Migrations\20200923212129_isPreliminary.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

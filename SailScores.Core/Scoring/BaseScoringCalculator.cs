@@ -110,14 +110,16 @@ namespace SailScores.Core.Scoring
 
         private IList<Race> RemoveLastDaysRaces(IList<Race> races)
         {
-            var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
+            var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
+                || r.State == RaceState.Preliminary)
                 .Max(r => r.Date) ?? DateTime.Today;
             return races.Where(r => r.Date == null || r.Date <= lastRaceDate.AddDays(-1)).ToList();
         }
 
         private IList<Race> RemoveLastWeeksRaces(IList<Race> races)
         {
-            var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
+            var lastRaceDate = races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
+                || r.State == RaceState.Preliminary)
                 .Max(r => r.Date) ?? DateTime.Today;
             return races.Where(r => r.Date == null || r.Date <= lastRaceDate.AddDays(-7)).ToList();
         }
@@ -128,7 +130,8 @@ namespace SailScores.Core.Scoring
                 return new List<Race>();
             }
             var lastRaceId = races
-                .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced)
+                .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
+                    || r.State == RaceState.Preliminary)
                 .OrderBy(r => r.Date).ThenBy(r => r.Order).Last().Id;
             return races.Where(r => r.Id != lastRaceId).ToList();
         }
@@ -649,7 +652,8 @@ namespace SailScores.Core.Scoring
             };
             foreach (var score in scores.Where(s => s.Competitor == comp))
             {
-                if ((score.Race?.State ?? RaceState.Raced) != RaceState.Raced)
+                if ((score.Race?.State ?? RaceState.Raced) != RaceState.Raced
+                    && score.Race?.State != RaceState.Preliminary)
                 {
                     continue;
                 }
