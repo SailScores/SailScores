@@ -157,7 +157,9 @@ namespace SailScores.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> Edit(string clubInitials, RegattaWithOptionsViewModel model)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            RegattaWithOptionsViewModel model)
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             try

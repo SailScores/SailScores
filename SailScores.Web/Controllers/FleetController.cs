@@ -113,10 +113,14 @@ namespace SailScores.Web.Controllers
         }
 
         [Authorize]
-        public async Task<ActionResult> Edit(string clubInitials, Guid id)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            Guid id,
+            string returnUrl = null)
         {
             try
             {
+                ViewData["ReturnUrl"] = returnUrl;
                 if (!await _authService.CanUserEdit(User, clubInitials))
                 {
                     return Unauthorized();
@@ -140,7 +144,10 @@ namespace SailScores.Web.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(string clubInitials, FleetWithOptionsViewModel model)
+        public async Task<ActionResult> Edit(
+            string clubInitials,
+            FleetWithOptionsViewModel model,
+            string returnUrl = null)
         {
             try
             {
@@ -161,6 +168,10 @@ namespace SailScores.Web.Controllers
                 }
                 await _fleetService.Update(model);
 
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
                 return RedirectToAction("Index", "Admin");
             }
             catch
@@ -184,7 +195,10 @@ namespace SailScores.Web.Controllers
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
+        public async Task<ActionResult> PostDelete(
+            string clubInitials,
+            Guid id,
+            string returnUrl = null)
         {
             if (!await _authService.CanUserEdit(User, clubInitials))
             {
@@ -194,6 +208,10 @@ namespace SailScores.Web.Controllers
             {
                 await _fleetService.Delete(id);
 
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
                 return RedirectToAction("Index", "Admin");
             }
             catch

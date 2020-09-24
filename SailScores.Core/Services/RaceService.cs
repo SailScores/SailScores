@@ -79,6 +79,7 @@ namespace SailScores.Core.Services
                 .Include(r => r.Fleet)
                 .Include(r => r.Scores)
                 .Include(r => r.SeriesRaces)
+                .AsSplitQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
 

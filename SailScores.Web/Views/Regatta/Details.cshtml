@@ -82,6 +82,7 @@
                     <a asp-controller="Regatta"
                        asp-action="Edit"
                        asp-route-Id="@Model.Item.Id"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["Edit Regatta"]</a>
                 </div>
                 <div class="col-sm-4">&nbsp;</div>
@@ -130,7 +131,8 @@
                 <div class="py-2">
                     <a asp-controller="Fleet"
                        asp-action="Edit"
-                       asp-route-Id="@fleet.Id"
+                       asp-route-id="@fleet.Id"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        title="Add existing competitors"
                        class="btn btn-outline-primary">Edit Fleet</a>
                 </div>

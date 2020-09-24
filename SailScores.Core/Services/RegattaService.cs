@@ -37,6 +37,7 @@ namespace SailScores.Core.Services
                 .Include(c => c.Season)
                 .Include(c => c.RegattaFleet)
                 .OrderBy(r => r.StartDate)
+                .AsSplitQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
 
@@ -69,6 +70,7 @@ namespace SailScores.Core.Services
                 .ThenInclude(cf => cf.Competitor)
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
+                .AsSplitQuery()
                 .SingleAsync()
                 .ConfigureAwait(false);
 
