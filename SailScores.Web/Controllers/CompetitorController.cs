@@ -138,6 +138,7 @@ namespace SailScores.Web.Controllers
                     return View(competitor);
                 }
 
+                competitor.Fleets = new List<Fleet>();
                 foreach (var fleetId in (competitor.FleetIds ?? new List<Guid>()))
                 {
                     var fleet = fleets.SingleOrDefault(f => f.Id == fleetId);
@@ -155,6 +156,9 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
+
+                competitor.BoatClassOptions = (await _clubService.GetAllBoatClasses(clubId))
+                    .OrderBy(c => c.Name);
                 var fleets = (await _clubService.GetAllFleets(clubId))
                     .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                     .OrderBy(f => f.Name);
