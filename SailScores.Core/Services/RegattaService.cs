@@ -322,7 +322,9 @@ namespace SailScores.Core.Services
 
             if (!exists)
             {
-                var regatta = await _dbContext.Regattas.SingleAsync(r => r.Id == regattaId)
+                var regatta = await _dbContext.Regattas
+                    .Include(r => r.RegattaFleet)
+                    .SingleAsync(r => r.Id == regattaId)
                     .ConfigureAwait(false);
                 regatta.RegattaFleet.Add(new dbObj.RegattaFleet
                 {

@@ -108,6 +108,10 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
+                var vm = await _fleetService.GetBlankFleetWithOptionsAsync(
+                    clubInitials,
+                    model.RegattaId);
+                model.BoatClassOptions = vm.BoatClassOptions;
                 return View(model);
             }
         }
