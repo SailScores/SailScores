@@ -138,7 +138,7 @@ namespace SailScores.Web.Services
             foreach (var fleetId in competitor.FleetIds)
             {
                 var fleet = fleets.SingleOrDefault(f => f.Id == fleetId);
-                if (fleet != null)
+                if (fleet != null && !competitor.Fleets.Any(f => f.Id == fleet.Id))
                 {
                     competitor.Fleets.Add(fleet);
                 }
