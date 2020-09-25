@@ -16,7 +16,7 @@ namespace SailScores.Core.Services
             bool includeAbandoned = true);
         Task<Race> GetRaceAsync(Guid raceId);
         Task<Guid> SaveAsync(RaceDto race);
-        Task Delete(Guid raceId);
+        Task Delete(Guid raceId, string deletedBy);
         Task<int> GetRaceCountAsync(
             Guid clubId,
             DateTime? raceDate,

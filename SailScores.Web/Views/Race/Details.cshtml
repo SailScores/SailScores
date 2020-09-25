@@ -8,9 +8,9 @@
 }
 <div class="row">
     <div class="col-sm-6">
-        <h2 id="racetitle">
+        <h1 id="racetitle" class="h2">
             @Model.Item.DisplayName
-        </h2>
+        </h1>
         @if (Model.CanEdit)
         {
             @Html.ActionLink("Edit", "Edit", "Race",
@@ -30,77 +30,82 @@ new { @class = "btn btn-outline-primary btn-sm" })
             @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindSpeed))
             {
                 //This is hideous, but the easiest way to avoid a space between the two elements.
-                @(Model.Item.Weather.WindSpeed)}@if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindGust)){@($"(g{Model.Item.Weather.WindGust})")
+                @(Model.Item.Weather.WindSpeed)}@if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindGust))
+            {@($"(g{Model.Item.Weather.WindGust})")
             }
-        </span>
-        @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Icon))
-        {
-            <span class="wi @weatherService.GetIconCharacter(Model.Item.Weather?.Icon) ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather?.Description"></span>
-        }
-        @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Temperature))
-        {
-            <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.TemperatureUnits">@Model.Item.Weather.Temperature°</span>
-        }
-    </div>
-</div>
-<ul>
-    @foreach (var series in @Model.Item.Series)
+            </span>
+            @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Icon))
             {
-        <li>
-            <a href="~/@Model.ClubInitials/@Model.Item.Season.UrlName/@series.UrlName">
-                @Html.DisplayFor(modelItem => series.Name)
-            </a>
-        </li>
-    }
-</ul>
-<p>@Model.Item.Description</p>
-@if (!String.IsNullOrWhiteSpace(Model.Item.TrackingUrl))
+                <span class="wi @weatherService.GetIconCharacter(Model.Item.Weather?.Icon) ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather?.Description"></span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Temperature))
             {
-    <div class="row">
-        <div class="col-12">
-            <p><a href="@Model.Item.TrackingUrl" target="_blank"><span class="fas fa-external-link-alt"></span> Race Tracking</a></p>
+                <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.TemperatureUnits">@Model.Item.Weather.Temperature°</span>
+            }
         </div>
     </div>
-}
-<table class="table" aria-describedby="racetitle" >
-    <thead>
-        <tr>
-            <th scope="col">Place</th>
-            <th scope="col">Sail</th>
-            <th scope="col">Sailor</th>
-            <th scope="col">Boat</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var score in Model.Item.Scores)
+    <ul>
+        @foreach (var series in @Model.Item.Series)
         {
-            <tr>
-                <td>
-                    @((score.Place != null && score.Place != 0) ? score.Place.ToString() : "")
-                    @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")
-                </td>
-                <td>
-                    @score.Competitor.SailNumber
-                    @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
-                    {
-                        @:(@score.Competitor.AlternativeSailNumber)
-                    }
-                </td>
-                <td>
-                    @score.Competitor.Name
-                </td>
-                <td>
-                    @score.Competitor.BoatName
-                </td>
-            </tr>
+            <li>
+                <a href="~/@Model.ClubInitials/@Model.Item.Season.UrlName/@series.UrlName">
+                    @Html.DisplayFor(modelItem => series.Name)
+                </a>
+            </li>
         }
-    </tbody>
-</table>
+    </ul>
+    @if (Model.Item.State == SailScores.Api.Enumerations.RaceState.Preliminary)
+    {
+        <p class="text-warning"><strong>Preliminary Results</strong></p>
+    }
+    <p>@Model.Item.Description</p>
+    @if (!String.IsNullOrWhiteSpace(Model.Item.TrackingUrl))
+    {
+        <div class="row">
+            <div class="col-12">
+                <p><a href="@Model.Item.TrackingUrl" target="_blank"><span class="fas fa-external-link-alt"></span> Race Tracking</a></p>
+            </div>
+        </div>
+    }
+    <table class="table" aria-describedby="racetitle">
+        <thead>
+            <tr>
+                <th scope="col">Place</th>
+                <th scope="col">Sail</th>
+                <th scope="col">Sailor</th>
+                <th scope="col">Boat</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var score in Model.Item.Scores)
+            {
+                <tr>
+                    <td>
+                        @((score.Place != null && score.Place != 0) ? score.Place.ToString() : "")
+                        @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")
+                    </td>
+                    <td>
+                        @score.Competitor.SailNumber
+                        @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
+                        {
+                            @:(@score.Competitor.AlternativeSailNumber)
+                        }
+                    </td>
+                    <td>
+                        @score.Competitor.Name
+                    </td>
+                    <td>
+                        @score.Competitor.BoatName
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-@section Scripts {
-    <script>
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-    </script>
-}
+    @section Scripts {
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        </script>
+    }

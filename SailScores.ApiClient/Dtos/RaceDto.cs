@@ -33,9 +33,11 @@ namespace SailScores.Api.Dtos
         public IList<Guid> SeriesIds { get; set; }
 
         public RaceState State { get; set; }
+
         public WeatherDto Weather { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public String UpdatedBy { get; set; }
 
         public bool Equals(RaceDto other)
         {

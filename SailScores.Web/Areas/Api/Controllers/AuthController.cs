@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using SailScores.Identity.Entities;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -19,13 +20,13 @@ namespace SailScores.Web.Areas.Api.Controllers
     [Route("[controller]/[action]")]
     public class AuthController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
 
         public AuthController(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration)
         {
             _userManager = userManager;
@@ -51,7 +52,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         #region Helpers
 
-        private async Task<object> GenerateJwtToken(string email, IdentityUser user)
+        private async Task<object> GenerateJwtToken(string email, ApplicationUser user)
         {
             var claims = new List<Claim>
             {

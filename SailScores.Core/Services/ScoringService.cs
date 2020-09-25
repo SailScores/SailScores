@@ -90,6 +90,11 @@ namespace SailScores.Core.Services
         public async Task<ScoringSystem> GetScoringSystemAsync(Series series)
         {
             Guid? scoringSystemId = series.ScoringSystemId;
+            var regatta = await _dbContext.Regattas
+                .FirstOrDefaultAsync(r =>
+                    r.RegattaSeries.Any(rs => rs.SeriesId == series.Id))
+                .ConfigureAwait(false);
+            scoringSystemId = regatta?.ScoringSystemId ?? scoringSystemId;
             if (scoringSystemId == null)
             {
                 scoringSystemId = (await _dbContext.Clubs.Where(c => c.Id == series.ClubId)

@@ -1,6 +1,7 @@
 ﻿using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace SailScores.Web.Models.SailScores
@@ -22,6 +23,7 @@ namespace SailScores.Web.Models.SailScores
         public bool? ResultsLocked { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public String UpdatedBy { get; set; }
 
         public String DateString
         {

@@ -38,7 +38,8 @@ namespace SailScores.Web.Models.SailScores
 
         private DateTime recentCutoff = DateTime.Now.AddDays(-8);
         public IEnumerable<RaceSummaryViewModel> RecentRaces => Races?.Where(r => r.Date > recentCutoff
-            && (r.State ?? RaceState.Raced) == RaceState.Raced)
+            && ((r.State ?? RaceState.Raced) == RaceState.Raced
+            || r.State == RaceState.Preliminary))
             .OrderByDescending(r => r.Date)
             .ThenBy(r => r.Order);
 
@@ -46,11 +47,15 @@ namespace SailScores.Web.Models.SailScores
                 ?.Where(s =>
                     s.Races
                     ?.Any(r => r.Date > recentCutoff
-                        && (r.State ?? RaceState.Raced) == RaceState.Raced) ?? false)
-            .OrderByDescending(s => s.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced).Max(r => r.Date))
+                        && ((r.State ?? RaceState.Raced) == RaceState.Raced
+                    || r.State == RaceState.Preliminary )) ?? false)
+            .OrderByDescending(s => s.Races
+                .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
+                || r.State == RaceState.Preliminary).Max(r => r.Date))
             .ThenBy(s => s.Name);
 
-        public IEnumerable<RaceSummaryViewModel> UpcomingRaces => Races?.Where(r => r.Date >= DateTime.Today.AddDays(-1)
+        public IEnumerable<RaceSummaryViewModel> UpcomingRaces => Races?.Where(r =>
+            r.Date >= DateTime.Today.AddDays(-1)
             && (r.State ?? RaceState.Raced) == RaceState.Scheduled)
             .OrderBy(r => r.Date)
             .ThenBy(r => r.Order)

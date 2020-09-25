@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Identity.Entities;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 
@@ -18,6 +20,7 @@ namespace SailScores.Web.Controllers
         private readonly Services.IAuthorizationService _authService;
         private readonly Services.IAdminTipService _adminTipService;
         private readonly ICsvService _csvService;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
         public SeriesController(
@@ -26,6 +29,7 @@ namespace SailScores.Web.Controllers
             Services.IAuthorizationService authService,
             Services.IAdminTipService adminTipService,
             Services.ICsvService csvService,
+            UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
             _seriesService = seriesService;
@@ -33,6 +37,7 @@ namespace SailScores.Web.Controllers
             _authService = authService;
             _adminTipService = adminTipService;
             _csvService = csvService;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
@@ -155,6 +160,8 @@ namespace SailScores.Web.Controllers
                     model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                     return View(model);
                 }
+
+                model.UpdatedBy = await GetUserStringAsync();
                 await _seriesService.SaveNew(model);
 
                 return RedirectToAction("Index", "Admin");
@@ -166,6 +173,12 @@ namespace SailScores.Web.Controllers
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 return View(model);
             }
+        }
+
+        private async Task<string> GetUserStringAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return user.GetDisplayName();
         }
 
         [Authorize]
@@ -210,6 +223,8 @@ namespace SailScores.Web.Controllers
                     model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                     return View(model);
                 }
+
+                model.UpdatedBy = await GetUserStringAsync();
                 await _seriesService.Update(model);
 
                 return RedirectToAction("Index", "Admin");

@@ -17,6 +17,7 @@ namespace SailScores.Core.FlatModel
         public RaceState? State { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public String UpdatedBy { get; set; }
 
         public Decimal? WindSpeedMeterPerSecond { get; set; }
         public Decimal? WindGustMeterPerSecond { get; set; }

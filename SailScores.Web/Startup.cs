@@ -17,6 +17,7 @@ using SailScores.Core.Extensions;
 using SailScores.Core.JobQueue;
 using SailScores.Core.Mapping;
 using SailScores.Database;
+using SailScores.Identity.Entities;
 using SailScores.Web.Data;
 using SailScores.Web.Extensions;
 using SailScores.Web.Mapping;
@@ -106,7 +107,7 @@ namespace SailScores.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<SailScoresIdentityContext>()
                 .AddDefaultTokenProviders();
 

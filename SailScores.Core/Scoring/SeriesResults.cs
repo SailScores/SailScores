@@ -46,7 +46,8 @@ namespace SailScores.Core.Scoring
         public int GetSailedRaceCount()
         {
             return Races?.Count(r =>
-            (r.State ?? RaceState.Raced) == RaceState.Raced)
+            (r.State ?? RaceState.Raced) == RaceState.Raced
+            || r.State == RaceState.Preliminary)
                 ?? 0;
         }
 
@@ -54,7 +55,10 @@ namespace SailScores.Core.Scoring
         {
             get
             {
-                return Races?.Where(r => (r?.State ?? RaceState.Raced) == RaceState.Raced) ?? new List<Race>();
+                return Races?.
+                    Where(r => (r?.State ?? RaceState.Raced) == RaceState.Raced
+                        || r.State == RaceState.Preliminary)
+                    ?? new List<Race>();
             }
         }
     }

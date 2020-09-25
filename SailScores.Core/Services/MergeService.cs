@@ -78,7 +78,7 @@ namespace SailScores.Core.Services
 
         }
 
-        public async Task Merge(Guid targetCompetitorId, Guid sourceCompetitorId)
+        public async Task Merge(Guid targetCompetitorId, Guid sourceCompetitorId, string mergedBy)
         {
             _logger.LogInformation("Merging competitors {0} and {1}", targetCompetitorId, sourceCompetitorId);
             var scoresToMove = _dbContext.Scores
@@ -101,7 +101,7 @@ namespace SailScores.Core.Services
 
             foreach (var seriesId in seriesIds)
             {
-                await _seriesService.UpdateSeriesResults(seriesId)
+                await _seriesService.UpdateSeriesResults(seriesId, mergedBy)
                     .ConfigureAwait(false);
             }
         }

@@ -37,6 +37,7 @@ namespace SailScores.Core.Model
         public Weather Weather { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public String UpdatedBy { get; set; }
 
         public bool Equals(Race other)
         {
