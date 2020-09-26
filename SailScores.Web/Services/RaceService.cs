@@ -302,7 +302,7 @@ namespace SailScores.Web.Services
                 {
                     foreach (var competitor in race.Fleet.Competitors)
                     {
-                        if (!race.Scores.Any(s => s.CompetitorId == competitor.Id))
+                        if (!race.Scores?.Any(s => s.CompetitorId == competitor.Id) ?? false)
                         {
                             race.Scores.Add(new ScoreViewModel
                             {
