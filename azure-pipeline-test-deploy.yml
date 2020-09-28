@@ -18,7 +18,8 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '3.1.x'
+    version: '5.0.x'
+    includePreviewVersions: true
 
 - task: Npm@1
   inputs:
@@ -31,7 +32,7 @@ steps:
   displayName: 'dotnet build $(buildConfiguration)'
   inputs:
     command: 'build'
-    arguments: '-r $(rid) --configuration $(buildConfiguration) -p:SourceRevisionId=$(Build.SourceVersion) -p:Version=$(VERSION_TAG)'
+    arguments: '--configuration $(buildConfiguration) -p:SourceRevisionId=$(Build.SourceVersion) -p:Version=$(VERSION_TAG)'
 
 - script: 'echo -e "$(Build.BuildNumber)\n$(Build.BuildId)" > .buildinfo.json'
   displayName: "Emit build number"

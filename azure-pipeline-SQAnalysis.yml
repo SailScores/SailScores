@@ -19,7 +19,8 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '3.1.x'
+    version: '5.0.x'
+    includePreviewVersions: true
 
 - task: UseDotNet@2
   displayName: 'Install .NET Core 2.0 runtime for SonarCloud plugin'
@@ -51,7 +52,7 @@ steps:
   displayName: 'dotnet build $(buildConfiguration)'
   inputs:
     command: 'build'
-    arguments: '-r $(rid) --configuration $(buildConfiguration) -p:SourceRevisionId=$(Build.SourceVersion)'
+    arguments: '--configuration $(buildConfiguration) -p:SourceRevisionId=$(Build.SourceVersion)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
