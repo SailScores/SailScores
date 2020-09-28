@@ -20,6 +20,7 @@ export function initialize() {
         $('#needsLocalDate').val('');
     }
     $('#date').change(dateChanged);
+    $('#raceState').data("previous", $('#raceState').val());
     $('#raceState').change(raceStateChanged);
     $('.weather-input').change(weatherChanged);
     $('#results').on('click', '.select-code', calculatePlaces);
@@ -79,9 +80,10 @@ export function raceStateChanged() {
     if (state === "2") {
         clearWeatherFields();
     }
-    if (state === "1") {
+    if (state === "1" && $("#raceState").data("previous") !== "4") {
         populateEmptyWeatherFields();
     }
+    $("#raceState").data("previous", state);
 }
 export function compCreateSubmit(e) {
     e.preventDefault();
