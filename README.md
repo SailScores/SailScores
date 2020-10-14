@@ -23,10 +23,11 @@ software that: 1) has a modern interface, 2) supports mobile devices, 3) is inex
  - Stats for competitors and clubs.
 
 ### Technologies:
- - .NET Core 3.1
- - ASP.NET Core 3.1
- - Entity Framework Core 3.1
+ - .NET 5
+ - ASP.NET 5
+ - Entity Framework Core 5
  - MS-SQL
+ - Production is running on Azure App Service Linux
 
 ### Getting Started with development
 _...Coming soon..._
