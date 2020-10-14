@@ -67,40 +67,45 @@ new { @class = "btn btn-outline-primary btn-sm" })
             </div>
         </div>
     }
-    <table class="table" aria-describedby="racetitle">
-        <thead>
-            <tr>
-                <th scope="col">Place</th>
-                <th scope="col">Sail</th>
-                <th scope="col">Sailor</th>
-                <th scope="col">Boat</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var score in Model.Item.Scores)
-            {
-                <tr>
-                    <td>
-                        @((score.Place != null && score.Place != 0) ? score.Place.ToString() : "")
-                        @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")
-                    </td>
-                    <td>
-                        @score.Competitor.SailNumber
-                        @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
-                        {
-                            @:(@score.Competitor.AlternativeSailNumber)
-                        }
-                    </td>
-                    <td>
-                        @score.Competitor.Name
-                    </td>
-                    <td>
-                        @score.Competitor.BoatName
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<table class="table" aria-describedby="racetitle">
+    <thead>
+    <tr>
+        <th scope="col">Place</th>
+        <th scope="col">Sail</th>
+        <th scope="col">Sailor</th>
+        <th scope="col">Boat</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var score in Model.Item.Scores)
+    {
+        <tr>
+            <td>
+                @((score.Place != null && score.Place != 0) ? score.Place.ToString() : "")
+                @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")
+            </td>
+            <td>
+                @score.Competitor.SailNumber
+                @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
+                {
+                    @:(@score.Competitor.AlternativeSailNumber)
+                }
+            </td>
+            <td>
+                @score.Competitor.Name
+            </td>
+            <td>
+                @score.Competitor.BoatName
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@if (!String.IsNullOrWhiteSpace(Model.Item.UpdatedBy))
+{
+<span class="text-right"><small><em>Updated by @Model.Item.UpdatedBy</em></small></span><br />
+}
+
 
     @section Scripts {
         <script>

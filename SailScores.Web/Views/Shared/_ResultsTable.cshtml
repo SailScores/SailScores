@@ -20,7 +20,7 @@
         <div><strong><span class="text-warning">Results are preliminary.</span> Protests may be pending.</strong></div>
     }
     <div class="table-responsive-sm">
-        <table class="table table-hover table-sm" summary="Results for series">
+        <table class="table table-hover table-sm mb-1 " summary="Results for series">
             <thead>
                 <tr>
                     <th scope="col">@localizer["Place"]</th>
@@ -242,7 +242,7 @@
         <div class="row">
             <div class="col-md-9">
                 @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
-                    && !((bool?)ViewData["IsExport"] ?? false))
+                     && !((bool?)ViewData["IsExport"] ?? false))
                 {
                     <span class="d-none d-sm-inline">
                         * @localizer["Rank change from"] @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
@@ -251,7 +251,11 @@
             </div>
             <div class="col-md-3 text-right">
                 @if(!((bool?)ViewData["IsExport"] ?? false))
-                { 
+                {
+                    if (!String.IsNullOrWhiteSpace(Model.FlatResults.UpdatedBy))
+                    {
+                        <span class="text-right"><small><em>Updated by @Model.FlatResults.UpdatedBy</em></small></span><br />
+                    }
                     <a class="btn btn-outline-secondary btn-sm"
                        asp-action="ExportHtml"
                        asp-controller="Series"
