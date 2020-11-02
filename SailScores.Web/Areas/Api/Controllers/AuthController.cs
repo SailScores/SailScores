@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using SailScores.Identity.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -43,7 +44,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             if (result.Succeeded)
             {
-                var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
+                var appUser = await _userManager.Users.SingleOrDefaultAsync(r => r.Email == model.Email);
                 return await GenerateJwtToken(model.Email, appUser);
             }
 
