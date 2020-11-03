@@ -421,7 +421,7 @@ namespace SailScores.Core.Services
             dbClub.IsHidden = targetClub.IsHidden;
 
             Guid? oldDefaultScoringSystemId = null;
-            if (!(GetNewGuidIfSet(dbClub.DefaultScoringSystemId) == oldDefaultScoringSystemId))
+            if (GetNewGuidIfSet(dbClub.DefaultScoringSystemId) != oldDefaultScoringSystemId)
             {
                 oldDefaultScoringSystemId = dbClub.DefaultScoringSystemId;
                 dbClub.DefaultScoringSystemId = null;
