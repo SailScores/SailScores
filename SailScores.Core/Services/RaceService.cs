@@ -214,9 +214,12 @@ namespace SailScores.Core.Services
 
         private async Task<Guid> SaveInternalAsync(RaceDto race)
         {
-            Db.Race dbRace;
-            IEnumerable<Guid> seriesIdsToUpdate = new List<Guid>();
-            bool addToContext = false;
+            var dbRace = new Db.Race
+            {
+                Id = Guid.NewGuid(),
+                ClubId = race.ClubId
+            };
+
             if (race.Id != default)
             {
                 dbRace = await _dbContext.Races
@@ -225,21 +228,10 @@ namespace SailScores.Core.Services
                     .Include(r => r.Weather)
                     .SingleAsync(r => r.Id == race.Id)
                     .ConfigureAwait(false);
-                var seriesFromRace = dbRace.SeriesRaces?.Select(r => r.SeriesId)?.ToList();
-                if (seriesFromRace != null)
-                {
-                    seriesIdsToUpdate = seriesFromRace;
-                }
             }
-            else
-            {
-                dbRace = new Db.Race
-                {
-                    Id = Guid.NewGuid(),
-                    ClubId = race.ClubId
-                };
-                addToContext = true;
-            }
+            IEnumerable<Guid> seriesIdsToUpdate =
+                dbRace.SeriesRaces?.Select(r => r.SeriesId)?.ToList() ?? new List<Guid>();
+
             dbRace.Name = race.Name;
             dbRace.Order = race.Order;
             dbRace.Date = race.Date ?? DateTime.Today;
@@ -249,28 +241,13 @@ namespace SailScores.Core.Services
             dbRace.UpdatedDate = DateTime.UtcNow;
             dbRace.UpdatedBy = race.UpdatedBy;
 
-            if (dbRace.Weather == null)
-            {
-                var dbObj = _mapper.Map<Database.Entities.Weather>(race.Weather);
-                dbRace.Weather = dbObj;
-            }
-            else
-            {
-                var id = dbRace.Weather.Id;
-                var createdDate = dbRace.Weather.CreatedDate;
-                _mapper.Map<WeatherDto, Database.Entities.Weather>(race.Weather, dbRace.Weather);
-                dbRace.Weather.CreatedDate = createdDate;
-                dbRace.Weather.Id = id;
-            }
+            PopulateWeather(race, dbRace);
 
             dbRace.Fleet = _dbContext.Fleets.SingleOrDefault(f => f.Id == race.FleetId);
 
             if (race.SeriesIds != null)
             {
-                if (dbRace.SeriesRaces == null)
-                {
-                    dbRace.SeriesRaces = new List<Db.SeriesRace>();
-                }
+                dbRace.SeriesRaces ??= new List<Db.SeriesRace>();
                 dbRace.SeriesRaces.Clear();
                 foreach (var seriesId in race.SeriesIds)
                 {
@@ -283,10 +260,8 @@ namespace SailScores.Core.Services
             }
             if (race.Scores != null)
             {
-                if (dbRace.Scores == null)
-                {
-                    dbRace.Scores = new List<Db.Score>();
-                }
+                dbRace.Scores ??= new List<Db.Score>();
+
                 dbRace.Scores.Clear();
                 foreach (var score in race.Scores)
                 {
@@ -303,7 +278,7 @@ namespace SailScores.Core.Services
                     _dbContext.Scores.Add(newScore);
                 }
             }
-            if (addToContext)
+            if (race.Id == default)
             {
                 _dbContext.Races.Add(dbRace);
             }
@@ -314,13 +289,32 @@ namespace SailScores.Core.Services
 
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
-            seriesIdsToUpdate = seriesIdsToUpdate.Union(dbRace.SeriesRaces.Select(rs => rs.SeriesId).ToList());
+            seriesIdsToUpdate = seriesIdsToUpdate.Union(
+                dbRace.SeriesRaces?.Select(rs => rs.SeriesId).ToList() ?? new List<Guid>());
+
             foreach (var seriesId in seriesIdsToUpdate)
             {
                 AddUpdateSeriesJob(seriesId, race.UpdatedBy);
             }
 
             return dbRace.Id;
+        }
+
+        private void PopulateWeather(RaceDto race, Db.Race dbRace)
+        {
+            if (dbRace.Weather == null)
+            {
+                var dbObj = _mapper.Map<Database.Entities.Weather>(race.Weather);
+                dbRace.Weather = dbObj;
+            }
+            else
+            {
+                var id = dbRace.Weather.Id;
+                var createdDate = dbRace.Weather.CreatedDate;
+                _mapper.Map<WeatherDto, Database.Entities.Weather>(race.Weather, dbRace.Weather);
+                dbRace.Weather.CreatedDate = createdDate;
+                dbRace.Weather.Id = id;
+            }
         }
 
         private void AddUpdateSeriesJob(
