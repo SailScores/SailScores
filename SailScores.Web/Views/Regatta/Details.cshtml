@@ -11,6 +11,7 @@
 @{
     ViewBag.Title = Model.Item.Name;
     Layout = "_ClubLayout";
+    ViewData["MetaDescription"] = $"{Model.ClubInitials} {Model.Item.Season.Name} {Model.Item.Name} Regatta Results";
 }
 
 <div class="row">
