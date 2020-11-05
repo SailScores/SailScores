@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SailScores.Core.Scoring
 {
@@ -7,31 +8,48 @@ namespace SailScores.Core.Scoring
     {
         public int Compare(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
-            //put zeroes at the end of rankings 
-            decimal? xScoreToUse =
-                (x.TotalScore.HasValue && x.TotalScore == 0
-                ? decimal.MaxValue
-                : x.TotalScore);
-            decimal? yScoreToUse =
-                (y.TotalScore.HasValue && y.TotalScore == 0
-                ? decimal.MaxValue
-                : y.TotalScore);
+            int totalComparison = CompareTotals(x, y);
 
-
-            if (xScoreToUse != yScoreToUse)
+            if (totalComparison != 0)
             {
-                return xScoreToUse < yScoreToUse ? -1 : 1;
+                return totalComparison;
             }
 
-            // tied total, so return the score with the most firsts, then seconds, etc.
+            var tiebreakerOne = WhichHasFewerOfPlace(x, y);
+            if (tiebreakerOne != 0)
+            {
+                return tiebreakerOne;
+            }
+
+            return WhichWonLatest(x, y);
+        }
+
+        private int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        {
+
+            //put zeros at the end of rankings 
+            decimal xScoreToUse = x.TotalScore ?? decimal.MaxValue;
+            xScoreToUse = xScoreToUse == 0 ? decimal.MaxValue : xScoreToUse;
+
+            decimal yScoreToUse = y.TotalScore ?? decimal.MaxValue;
+            yScoreToUse = yScoreToUse == 0 ? decimal.MaxValue : yScoreToUse;
+
+            return xScoreToUse.CompareTo(yScoreToUse);
+
+        }
+
+        private static int WhichHasFewerOfPlace(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        {
+
+            // return the score with the most firsts, then seconds, etc.
             // must not include discarded results.
             var xScoresLowToHigh =
-                    x.CalculatedScores.Values
+                x.CalculatedScores.Values
                     .Where(s => !s.Discard)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
                     .OrderBy(s => s).ToArray();
             var yScoresLowToHigh =
-                    y.CalculatedScores.Values
+                y.CalculatedScores.Values
                     .Where(s => !s.Discard)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
                     .OrderBy(s => s).ToArray();
@@ -48,7 +66,7 @@ namespace SailScores.Core.Scoring
                     yScoresLowToHigh[i])
                 {
                     return xScoresLowToHigh[i] <
-                    yScoresLowToHigh[i] ? -1 : 1;
+                           yScoresLowToHigh[i] ? -1 : 1;
                 }
             }
             if (xScoresLowToHigh.Length < yScoresLowToHigh.Length)
@@ -57,7 +75,12 @@ namespace SailScores.Core.Scoring
                 return 1;
             }
 
-            // still tied, take the last race where the value wasn't the same for both
+            return 0;
+        }
+
+        private int WhichWonLatest(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        {
+            // take the last race where the value wasn't the same for both
             for (int i = 0; i < x.CalculatedScores.Count; i++)
             {
                 var xScore = x.CalculatedScores
@@ -74,13 +97,14 @@ namespace SailScores.Core.Scoring
                 {
                     return
                         xScore < yScore
-                        ? -1
-                        : 1;
+                            ? -1
+                            : 1;
                 }
             }
 
             // wow, really tied.
             return 0;
         }
+
     }
 }

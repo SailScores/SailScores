@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace SailScores.Test.Unit.Core.Services
+namespace SailScores.Test.Unit.Core.Scoring
 {
 
 

@@ -27,7 +27,7 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task Convert_String32F_returns0C()
+        public void Convert_String32F_returns0C()
         {
             var result = _service.Convert("32", "Fahrenheit", "Celsius");
 
@@ -36,7 +36,7 @@ namespace SailScores.Test.Unit.Core.Services
 
 
         [Fact]
-        public async Task Convert_String0C_returns32F()
+        public void Convert_String0C_returns32F()
         {
             var result = _service.Convert("0", "Celsius", "Fahrenheit");
 
@@ -45,7 +45,7 @@ namespace SailScores.Test.Unit.Core.Services
 
 
         [Fact]
-        public async Task Convert_String100C_returns212F()
+        public void Convert_String100C_returns212F()
         {
             var result = _service.Convert("100", "Celsius", "Fahrenheit");
 
@@ -54,7 +54,7 @@ namespace SailScores.Test.Unit.Core.Services
 
 
         [Fact]
-        public async Task Convert_String212F_returns100C()
+        public void Convert_String212F_returns100C()
         {
             var result = _service.Convert("212", "Fahrenheit", "Celsius");
 
@@ -63,7 +63,7 @@ namespace SailScores.Test.Unit.Core.Services
 
 
         [Fact]
-        public async Task Convert_String0Mph_returns0metersPerSecond()
+        public void Convert_String0Mph_returns0metersPerSecond()
         {
             var result = _service.Convert("0", "MPH", "m/s");
 
@@ -71,7 +71,7 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task Convert_String15Mph_returns6_7metersPerSecond()
+        public void Convert_String15Mph_returns6_7metersPerSecond()
         {
             var result = _service.Convert("15", "MPH", "m/s");
 
@@ -79,7 +79,7 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task Convert_String15Mph_returns13Knots()
+        public void Convert_String15Mph_returns13Knots()
         {
             var result = _service.Convert("15", "MPH", "knots");
 
@@ -87,7 +87,7 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task Convert_String15Mph_returns24kmPerHour()
+        public void Convert_String15Mph_returns24kmPerHour()
         {
             var result = _service.Convert("15", "MPH", "km/h");
 
@@ -95,7 +95,7 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task Convert_CannotConvertTempToSpeed()
+        public void Convert_CannotConvertTempToSpeed()
         {
             Assert.Throws<InvalidOperationException>(
                 () => _service.Convert("10", "Celsius", "MPH"));
