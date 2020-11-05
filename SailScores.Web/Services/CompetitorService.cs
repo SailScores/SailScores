@@ -47,15 +47,21 @@ namespace SailScores.Web.Services
             string clubInitials,
             string sailor)
         {
-            // sailor will usually be sailNumber but fallsback to name if no number.
+            // sailor will usually be sailNumber but falls back to name if no number.
             var clubId = await _coreClubService.GetClubId(clubInitials);
             var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
+            IList<Competitor> inactiveCompetitors;
 
             var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
             if (comp == null)
             {
-                comp = comps.FirstOrDefault(c => String.Equals(UrlUtility.GetUrlName(c.Name), sailor, StringComparison.OrdinalIgnoreCase));
+                inactiveCompetitors = await _coreCompetitorService.GetInactiveCompetitorsAsync(clubId, null);
+                comp = inactiveCompetitors
+                    .FirstOrDefault(c =>
+                        String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
             }
+            comp ??= comps.FirstOrDefault(c =>
+                String.Equals(UrlUtility.GetUrlName(c.Name), sailor, StringComparison.OrdinalIgnoreCase));
             if (comp == null)
             {
                 return null;
