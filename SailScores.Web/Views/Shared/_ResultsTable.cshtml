@@ -25,6 +25,8 @@
                 <tr>
                     <th scope="col">@localizer["Place"]</th>
                     @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
+                        && (Model.FlatResults?.Races?.Max(r => r.Date ?? DateTime.MinValue) ??DateTime.MinValue)
+                            > DateTime.Today.AddMonths(-1)
                         && !((bool?)ViewData["IsExport"] ?? false))
                     {
                         <th scope="col" class="d-none d-sm-table-cell">@localizer["Change"]*</th>
@@ -131,6 +133,8 @@
                 <tr>
                     <th scope="row">@Model.FlatResults.GetScore(comp)?.Rank</th>
                     @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
+                        && (Model.FlatResults?.Races?.Max(r => r.Date ?? DateTime.MinValue) ??DateTime.MinValue)
+                            > DateTime.Today.AddMonths(-1)
                         && !((bool?)ViewData["IsExport"] ?? false))
                     {
                         <th scope="row" class="d-none d-sm-table-cell">
@@ -242,6 +246,8 @@
         <div class="row">
             <div class="col-md-9">
                 @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
+                     && (Model.FlatResults?.Races?.Max(r => r.Date ?? DateTime.MinValue) ??DateTime.MinValue)
+                     > DateTime.Today.AddMonths(-1)
                      && !((bool?)ViewData["IsExport"] ?? false))
                 {
                     <span class="d-none d-sm-inline">
