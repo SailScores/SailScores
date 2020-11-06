@@ -24,7 +24,6 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-
         public async Task<IList<Model.Competitor>> GetInactiveCompetitorsAsync(
             Guid clubId,
             Guid? fleetId)
@@ -165,75 +164,11 @@ namespace SailScores.Core.Services
             }
 
 
-            AddFleets(comp, dbObject);
+            AddFleetsToDbObject(comp, dbObject);
 
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
 
-        }
-
-        private void AddFleets(Competitor comp, Db.Competitor dbObject)
-        {
-            if (comp.Fleets != null)
-            {
-                // remove fleets
-                if (dbObject.CompetitorFleets == null)
-                {
-                    dbObject.CompetitorFleets = new List<Db.CompetitorFleet>();
-                }
-
-                foreach (var existingFleet in dbObject.CompetitorFleets.ToList())
-                {
-                    if (comp.Fleets.All(f => f.Id != existingFleet.FleetId))
-                    {
-                        dbObject.CompetitorFleets.Remove(existingFleet);
-                    }
-                }
-
-                // add fleets
-                foreach (var fleet in comp.Fleets)
-                {
-                    if (dbObject.CompetitorFleets.All(
-                        cf => cf.FleetId != fleet.Id))
-                    {
-                        var dbFleet = _dbContext.Fleets
-                            .SingleOrDefault(f => f.Id == fleet.Id
-                                                  && f.ClubId == comp.ClubId
-                                                  && f.FleetType != Api.Enumerations.FleetType.AllBoatsInClub
-                                                  && f.FleetType != Api.Enumerations.FleetType.SelectedClasses);
-                        if (dbFleet != null)
-                        {
-                            dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
-                            {
-                                Competitor = dbObject,
-                                Fleet = dbFleet
-                            });
-                        }
-
-                        //todo: create new fleets here if needed.
-                    }
-                }
-
-                //add built in club fleets
-                var autoAddFleets = _dbContext.Fleets
-                    .Where(f => f.ClubId == comp.ClubId
-                                && (f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
-                                    || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
-                                        && f.FleetBoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
-                foreach (var dbFleet in autoAddFleets)
-                {
-                    if (dbObject.CompetitorFleets.All(
-                        cf => cf.FleetId != dbFleet.Id))
-                    {
-                        dbObject.CompetitorFleets.Add(
-                            new Db.CompetitorFleet
-                            {
-                                Competitor = dbObject,
-                                Fleet = dbFleet
-                            });
-                    }
-                }
-            }
         }
 
 
@@ -244,7 +179,7 @@ namespace SailScores.Core.Services
                 .Include(c => c.CompetitorFleets)
                 .FirstOrDefaultAsync(
                     c =>
-                    c.Id == comp.Id)
+                        c.Id == comp.Id)
                 .ConfigureAwait(false);
 
             if (dbObject == null)
@@ -268,14 +203,80 @@ namespace SailScores.Core.Services
                 // I don't think so. Those will be recorded as a race update or scores update.
             }
 
-            AddFleets(comp, dbObject);
+            AddFleetsToDbObject(comp, dbObject);
 
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
 
         }
 
-        private void AddFleets(CompetitorDto comp, Db.Competitor dbObject)
+        private void AddFleetsToDbObject(Competitor comp, Db.Competitor dbObject)
+        {
+            if (comp.Fleets == null)
+            {
+                return;
+            }
+
+            // remove fleets
+            dbObject.CompetitorFleets ??= new List<Db.CompetitorFleet>();
+
+            foreach (var existingFleet in dbObject.CompetitorFleets.ToList())
+            {
+                if (comp.Fleets.All(f => f.Id != existingFleet.FleetId))
+                {
+                    dbObject.CompetitorFleets.Remove(existingFleet);
+                }
+            }
+
+            // add fleets
+            foreach (var fleet in comp.Fleets)
+            {
+                if (dbObject.CompetitorFleets
+                    .Any(cf => cf.FleetId == fleet.Id))
+                {
+                    // already there, so skip.
+                    continue;
+                }
+                var dbFleet = _dbContext.Fleets
+                    .SingleOrDefault(f => f.Id == fleet.Id
+                                      && f.ClubId == comp.ClubId
+                                      && f.FleetType != Api.Enumerations.FleetType.AllBoatsInClub
+                                      && f.FleetType != Api.Enumerations.FleetType.SelectedClasses);
+                if (dbFleet != null)
+                {
+                    dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
+                    {
+                        Competitor = dbObject,
+                        Fleet = dbFleet
+                    });
+                }
+
+                //todo: create new fleets here if needed.
+            }
+
+            //add built in club fleets
+            var autoAddFleets = GetClubAutomaticFleets(
+                comp.ClubId,
+                comp.BoatClassId);
+            foreach (var dbFleet in autoAddFleets)
+            {
+                if (dbObject.CompetitorFleets
+                    .Any(cf => cf.FleetId == dbFleet.Id))
+                {
+                    // already there, move on.
+                    continue;
+                }
+                dbObject.CompetitorFleets.Add(
+                    new Db.CompetitorFleet
+                    {
+                        Competitor = dbObject,
+                        Fleet = dbFleet
+                    });
+            }
+
+        }
+
+        private void AddFleetsToDbObject(CompetitorDto comp, Db.Competitor dbObject)
         {
             dbObject.CompetitorFleets ??= new List<Db.CompetitorFleet>();
 
@@ -292,46 +293,59 @@ namespace SailScores.Core.Services
             // add fleets
             foreach (var fleetId in comp.FleetIds)
             {
-                if (dbObject.CompetitorFleets.All(
-                    cf => cf.FleetId != fleetId))
+                if (dbObject.CompetitorFleets
+                    .Any(cf => cf.FleetId == fleetId))
                 {
-                    var dbFleet = _dbContext.Fleets
-                        .SingleOrDefault(f => f.Id == fleetId
-                                              && f.ClubId == comp.ClubId);
-                    if (dbFleet != null)
-                    {
-                        dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
-                        {
-                            Competitor = dbObject,
-                            CompetitorId = dbObject.Id,
-                            Fleet = dbFleet,
-                            FleetId = dbFleet.Id
-                        });
-                    }
-
-                    // Create new fleets here if needed.
+                    continue;
                 }
+                var dbFleet = _dbContext.Fleets
+                    .SingleOrDefault(f => f.Id == fleetId
+                                          && f.ClubId == comp.ClubId);
+                if (dbFleet != null)
+                {
+                    dbObject.CompetitorFleets.Add(new Db.CompetitorFleet
+                    {
+                        Competitor = dbObject,
+                        CompetitorId = dbObject.Id,
+                        Fleet = dbFleet,
+                        FleetId = dbFleet.Id
+                    });
+                }
+
+                // Create new fleets here if needed.
             }
 
             //add built in club fleets
-            var autoAddFleets = _dbContext.Fleets
-                .Where(f => f.ClubId == comp.ClubId
-                            && (f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
-                                || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
-                                    && f.FleetBoatClasses.Any(c => c.BoatClassId == comp.BoatClassId))));
+            var autoAddFleets = GetClubAutomaticFleets(
+                comp.ClubId,
+                comp.BoatClassId);
             foreach (var dbFleet in autoAddFleets)
             {
-                if (dbObject.CompetitorFleets.All(cf =>
-                    cf.FleetId != dbFleet.Id))
+                if (dbObject.CompetitorFleets
+                    .Any(cf => cf.FleetId == dbFleet.Id))
                 {
-                    dbObject.CompetitorFleets.Add(
-                        new Db.CompetitorFleet
-                        {
-                            Competitor = dbObject,
-                            Fleet = dbFleet
-                        });
+                    continue;
                 }
+                dbObject.CompetitorFleets.Add(
+                    new Db.CompetitorFleet
+                    {
+                        Competitor = dbObject,
+                        Fleet = dbFleet
+                    });
             }
+        }
+
+
+        private IQueryable<Db.Fleet> GetClubAutomaticFleets(
+            Guid clubId,
+            Guid boatClassId)
+        {
+            return _dbContext.Fleets
+                .Where(f => f.ClubId == clubId)
+                .Where(f =>
+                    f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub
+                   || (f.FleetType == Api.Enumerations.FleetType.SelectedClasses
+                       && f.FleetBoatClasses.Any(c => c.BoatClassId == boatClassId)));
         }
 
         public async Task DeleteCompetitorAsync(Guid competitorId)

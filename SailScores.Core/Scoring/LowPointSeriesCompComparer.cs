@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace SailScores.Core.Scoring
 {
@@ -24,7 +23,7 @@ namespace SailScores.Core.Scoring
             return WhichWonLatest(x, y);
         }
 
-        private int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        private static int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
 
             //put zeros at the end of rankings 
@@ -78,7 +77,7 @@ namespace SailScores.Core.Scoring
             return 0;
         }
 
-        private int WhichWonLatest(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        private static int WhichWonLatest(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
             // take the last race where the value wasn't the same for both
             for (int i = 0; i < x.CalculatedScores.Count; i++)

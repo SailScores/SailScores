@@ -26,7 +26,7 @@ namespace SailScores.Core.Scoring
 
         }
 
-        private int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        private static int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
             // if total is null, drop to bottom.
             var xScoreToUse = x.TotalScore ?? -1;
@@ -74,7 +74,7 @@ namespace SailScores.Core.Scoring
             return 0;
         }
 
-        private int WhichWonLatest(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        private static int WhichWonLatest(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
             for (int i = 0; i < x.CalculatedScores.Count; i++)
             {
