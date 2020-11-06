@@ -4,6 +4,7 @@
 
 @{
     ViewBag.Title = Model.ClubInitials + " " + Model.Item.DisplayName;
+    ViewData["MetaDescription"] = $"{Model.ClubInitials} {Model.Item.DisplayName} Race Results";
     Layout = "_ClubLayout";
 }
 <div class="row">
@@ -13,9 +14,17 @@
         </h1>
         @if (Model.CanEdit)
         {
-            @Html.ActionLink("Edit", "Edit", "Race",
-new { id = Model.Item.Id, returnUrl = Context.Request.Path },
-new { @class = "btn btn-outline-primary btn-sm" })
+            <a class="btn btn-outline-primary btn-sm"
+               asp-area=""
+               asp-action="Edit"
+               asp-route-returnUrl="@Context.Request.Path"
+               asp-route-id="@Model.Item.Id"
+            >Edit</a>
+            <a class="btn btn-outline-danger btn-sm"
+               asp-area=""
+               asp-action="Delete"
+               asp-route-id="@Model.Item.Id"
+               >Delete</a>
         }
         <h4>
             @Model.Item.Fleet.Name

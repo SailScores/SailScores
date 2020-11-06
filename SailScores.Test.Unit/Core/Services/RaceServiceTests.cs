@@ -89,5 +89,53 @@ namespace SailScores.Test.Unit.Core.Services
             Assert.Equal(racesBefore.Count(), racesAfter.Count());
 
         }
+
+        [Fact]
+        public async Task Save_New_IncreasesCount()
+        {
+            var racesBefore = await _service.GetRacesAsync(
+                _clubId
+            );
+
+            var dto = new RaceDto
+            {
+                ClubId = _clubId,
+                Date = DateTime.Today,
+                Order = 1,
+                SeriesIds = new List<Guid>()
+
+            };
+            await _service.SaveAsync(dto);
+
+            var racesAfter = await _service.GetRacesAsync(
+                _clubId
+            );
+            Assert.Equal(racesBefore.Count() + 1, racesAfter.Count());
+
+        }
+
+        [Fact]
+        public async Task Save_NewNoSeries_IncreasesCount()
+        {
+            var racesBefore = await _service.GetRacesAsync(
+                _clubId
+            );
+
+            var dto = new RaceDto
+            {
+                ClubId = _clubId,
+                Date = DateTime.Today,
+                Order = 1
+
+            };
+            await _service.SaveAsync(dto);
+
+            var racesAfter = await _service.GetRacesAsync(
+                _clubId
+            );
+            Assert.Equal(racesBefore.Count() + 1, racesAfter.Count());
+
+        }
+
     }
 }

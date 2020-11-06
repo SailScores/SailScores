@@ -9,6 +9,7 @@ namespace SailScores.Core.Services
     public interface ICompetitorService
     {
         Task<IList<Model.Competitor>> GetCompetitorsAsync(Guid clubId, Guid? fleetId);
+        Task<IList<Model.Competitor>> GetInactiveCompetitorsAsync(Guid clubId, Guid? fleetId);
         Task<Competitor> GetCompetitorAsync(Guid id);
         Task<Competitor> GetCompetitorBySailNumberAsync(Guid clubId, String sailNumber);
         Task SaveAsync(Competitor comp);

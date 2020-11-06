@@ -8,6 +8,11 @@ namespace SailScores.Core.Services
 
         public static string GetUrlName(string rawName)
         {
+            if (String.IsNullOrWhiteSpace(rawName))
+            {
+                return null;
+            }
+
             return RemoveWhitespace(RemoveDisallowedCharacters(rawName));
         }
 

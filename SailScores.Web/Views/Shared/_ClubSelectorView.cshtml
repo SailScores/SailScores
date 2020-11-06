@@ -11,10 +11,11 @@
     document.getElementById("clubSelect").removeAttribute('hidden');
 </script>
 <noscript>
+    <h4>Club scores</h4>
     @foreach (var club in Model.Clubs)
     {
         <a href="@($"/{club.Initials}")">
-        @club.Initials - @club.Name
-        </a><br />
+            @club.Initials - @club.Name
+        </a><br/>
     }
 </noscript>

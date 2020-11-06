@@ -7,35 +7,49 @@ namespace SailScores.Core.Scoring
     {
         public int Compare(SeriesCompetitorResults x, SeriesCompetitorResults y)
         {
-            //put nulls at the end of rankings 
-            decimal? xScoreToUse =
-                !x.TotalScore.HasValue
-                ? -1
-                : x.TotalScore;
-            decimal? yScoreToUse =
-                !y.TotalScore.HasValue
-                ? -1
-                : y.TotalScore;
+            int totalComparison = CompareTotals(x, y);
 
-
-            if (xScoreToUse != yScoreToUse)
+            if (totalComparison != 0)
             {
-                return xScoreToUse > yScoreToUse ? -1 : 1;
+                return totalComparison;
             }
 
-            // tied total, so return the score with the most firsts, then seconds, etc.
+            var tiebreakerOne = WhichHasFewerOfPlace(x, y);
+            if (tiebreakerOne != 0)
+            {
+                return tiebreakerOne;
+            }
+
+            // still tied, take the last race where the value wasn't the same for both
+
+            return WhichWonLatest(x, y);
+
+        }
+
+        private int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        {
+            // if total is null, drop to bottom.
+            var xScoreToUse = x.TotalScore ?? -1;
+            var yScoreToUse = y.TotalScore ?? -1;
+
+            return yScoreToUse.CompareTo(xScoreToUse);
+        }
+
+        private static int WhichHasFewerOfPlace(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        {
+
+            // Return the score with the most firsts, then seconds, etc.
             // must not include discarded results.
             var xScoresLowToHigh =
-                    x.CalculatedScores.Values
+                x.CalculatedScores.Values
                     .Where(s => !s.Discard)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
                     .OrderByDescending(s => s).ToArray();
             var yScoresLowToHigh =
-                    y.CalculatedScores.Values
+                y.CalculatedScores.Values
                     .Where(s => !s.Discard)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
                     .OrderByDescending(s => s).ToArray();
-
 
             for (int i = 0; i < xScoresLowToHigh.Length; i++)
             {
@@ -44,20 +58,24 @@ namespace SailScores.Core.Scoring
                     // x had more scores, so it wins tiebreaker. (all earlier scores were ties.)
                     return -1;
                 }
-                if (xScoresLowToHigh[i] !=
-                    yScoresLowToHigh[i])
+
+                if (xScoresLowToHigh[i] != yScoresLowToHigh[i])
                 {
-                    return xScoresLowToHigh[i] >
-                    yScoresLowToHigh[i] ? -1 : 1;
+                    return yScoresLowToHigh[i].CompareTo(xScoresLowToHigh[i]);
                 }
             }
+
             if (xScoresLowToHigh.Length < yScoresLowToHigh.Length)
             {
                 // y had more scores, but scores they both had were ties, so y wins tiebreaker.
                 return 1;
             }
 
-            // still tied, take the last race where the value wasn't the same for both
+            return 0;
+        }
+
+        private int WhichWonLatest(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        {
             for (int i = 0; i < x.CalculatedScores.Count; i++)
             {
                 var xScore = x.CalculatedScores
@@ -74,13 +92,13 @@ namespace SailScores.Core.Scoring
                 {
                     return
                         xScore > yScore
-                        ? -1
-                        : 1;
+                            ? -1
+                            : 1;
                 }
             }
 
-            // wow, really tied.
             return 0;
         }
+
     }
 }

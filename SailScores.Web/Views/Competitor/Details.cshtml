@@ -9,12 +9,13 @@
 @{
     ViewBag.Title = Model.Item.SailNumber + " " + (!String.IsNullOrWhiteSpace(Model.Item.Name) ? Model.Item.Name : "") + " Stats";
     Layout = "_ClubLayout";
+    ViewData["MetaDescription"] = $"Competitor Summary for {Model.Item.SailNumber} : {Model.Item.Name} with {Model.ClubInitials}";
 }
 
 
 <div class="row">
     <div class="col-12">
-        <span class="h2 avoidwrap">@Model.Item.SailNumber</span>&emsp;
+        <h1 class="h2 avoidwrap">@Model.Item.SailNumber</h1>&emsp;
         <span class="avoidwrap">
             <span class="h3 avoidwrap">@Model.Item.Name</span>&emsp;
             <span class="h3 avoidwrap"><em>@Model.Item.BoatName</em></span>

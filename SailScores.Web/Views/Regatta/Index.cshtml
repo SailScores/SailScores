@@ -7,6 +7,7 @@
 @model ClubCollectionViewModel<RegattaSummaryViewModel>
 @{
     ViewBag.Title = Model.ClubInitials + " " + localizer["Regattas"];
+    ViewData["MetaDescription"] = $"{Model.ClubInitials} {localizer["Regattas"]} list";
     Layout = "_ClubLayout";
 }
 
@@ -27,7 +28,7 @@
         </div>
     </nav>
 }
-
+<h1 class="h2">Regattas</h1>
 @if (Model.List.Any())
 {
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))

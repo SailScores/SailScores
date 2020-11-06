@@ -29,7 +29,7 @@ namespace SailScores.Core.Services
             decimal decimalMeasure;
             if (decimal.TryParse(measure, out decimalMeasure))
             {
-                return Convert(measure, sourceUnits, destinationUnits);
+                return Convert(decimalMeasure, sourceUnits, destinationUnits);
             }
             return null;
         }
@@ -42,38 +42,30 @@ namespace SailScores.Core.Services
             }
             return Convert(measure.Value, sourceUnits, destinationUnits);
         }
+
         public decimal Convert(decimal measure, string sourceUnits, string destinationUnits)
         {
-            _logger.LogInformation("In Convert!");
             var sourceUnitEnum = GetUnit(sourceUnits);
-            _logger.LogInformation("About to GetDestinationUnit");
 
             var destinationUnitEnum = GetUnit(destinationUnits);
-            _logger.LogInformation("About to Compare unit types!");
             if (GetUnitType(sourceUnitEnum) != GetUnitType(destinationUnitEnum))
             {
-                _logger.LogInformation("About to throw since types don't match");
+                _logger.LogInformation("Error: types don't match");
 
                 throw new InvalidOperationException(
                     $"Could not convert between {sourceUnits} and {destinationUnits}");
             }
 
-            _logger.LogInformation("About to test temp conversion");
-
             if (GetUnitType(sourceUnitEnum) == UnitType.Temperature)
             {
-                _logger.LogInformation("About to convert Temp");
-
                 return ConvertTemperature(measure, sourceUnitEnum, destinationUnitEnum);
             }
             else if (GetUnitType(sourceUnitEnum) == UnitType.Speed)
             {
-                _logger.LogInformation("About to convert speed");
-
                 return ConvertSpeed(measure, sourceUnitEnum, destinationUnitEnum);
             }
-            _logger.LogInformation("Couldn't complete conversion, so throwing");
 
+            _logger.LogInformation("Couldn't complete conversion, so throwing");
             throw new InvalidOperationException("Could not complete conversion for the unit types.");
         }
 
@@ -82,9 +74,7 @@ namespace SailScores.Core.Services
             Units sourceUnits,
             Units destinationUnits)
         {
-            _logger.LogInformation("About to convertToKelvin");
             var tempInKelvin = ConvertToKelvin(temp, sourceUnits);
-            _logger.LogInformation("Now convert from kelvin");
             return ConvertFromKelvin(tempInKelvin, destinationUnits);
         }
 
@@ -164,7 +154,8 @@ namespace SailScores.Core.Services
             {
                 return Units.MilesPerHour;
             }
-            if (units.ToUpperInvariant() == "KM/H" || units.ToUpperInvariant() == "KPH")
+            if (units.ToUpperInvariant() == "KM/H" || units.ToUpperInvariant() == "KPH"
+                || units.ToUpperInvariant() == "KMPH")
             {
                 return Units.KilometersPerHour;
             }
@@ -176,27 +167,24 @@ namespace SailScores.Core.Services
             {
                 return Units.MeterPerSecond;
             }
-            _logger.LogInformation("About to check the temperature types");
 
             if (units.StartsWith("F", StringComparison.InvariantCultureIgnoreCase)
                 || units.StartsWith("°F", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Fahrenheit;
             }
-            _logger.LogInformation("About to check for Celsius");
 
             if (units.StartsWith("CE", StringComparison.InvariantCultureIgnoreCase)
                 || units.StartsWith("°C", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Celsius;
             }
-            _logger.LogInformation("About to check for Kelvin");
+
             if (units.StartsWith("KE", StringComparison.InvariantCultureIgnoreCase)
                 || units.StartsWith("°K", StringComparison.InvariantCultureIgnoreCase))
             {
                 return Units.Kelvin;
             }
-            _logger.LogInformation("About to throw from could not convert");
 
             throw new InvalidOperationException("Could not convert. Unknown units");
         }
