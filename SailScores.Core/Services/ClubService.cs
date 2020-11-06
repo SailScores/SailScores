@@ -420,20 +420,19 @@ namespace SailScores.Core.Services
             dbClub.Url = targetClub.Url;
             dbClub.IsHidden = targetClub.IsHidden;
 
-            Guid? oldDefaultScoringSystemId = null;
-            if (GetNewGuidIfSet(dbClub.DefaultScoringSystemId) != oldDefaultScoringSystemId)
-            {
-                oldDefaultScoringSystemId = dbClub.DefaultScoringSystemId;
-                dbClub.DefaultScoringSystemId = null;
-            }
+            Guid? oldDefaultScoringSystemId = dbClub.DefaultScoringSystemId;
+            dbClub.DefaultScoringSystemId = null;
 
             _dbContext.Clubs.Add(dbClub);
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
-            if (oldDefaultScoringSystemId != null)
-            {
-                dbClub.DefaultScoringSystemId = GetNewGuidIfSet(oldDefaultScoringSystemId);
-            }
+
+            var newScoringSystemId = GetNewGuidIfSet(oldDefaultScoringSystemId);
+            dbClub.DefaultScoringSystemId =
+                dbClub.ScoringSystems.Any(s => s.Id == newScoringSystemId)
+                    ? newScoringSystemId
+                    : oldDefaultScoringSystemId;
+
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
             return dbClub.Id;
