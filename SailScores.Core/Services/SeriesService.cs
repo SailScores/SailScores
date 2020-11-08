@@ -173,13 +173,21 @@ namespace SailScores.Core.Services
                 flatResults = await GetHistoricalResults(fullSeries)
                     .ConfigureAwait(false);
             }
+
+            if (flatResults.NumberOfSailedRaces == 0)
+            {
+                flatResults.NumberOfSailedRaces = flatResults.Races.Count();
+            }
             fullSeries.FlatResults = flatResults;
 
             // get the current version of the competitors, so we can get current sail number.
             foreach (var comp in fullSeries.FlatResults.Competitors)
             {
-                comp.CurrentSailNumber = (await _dbContext.Competitors.FirstOrDefaultAsync(c => c.Id == comp.Id)
-                    .ConfigureAwait(false)).SailNumber;
+                comp.CurrentSailNumber = await _dbContext.Competitors
+                    .Where(c => c.Id == comp.Id)
+                    .Select(c => c.SailNumber)
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
             }
             return fullSeries;
         }
