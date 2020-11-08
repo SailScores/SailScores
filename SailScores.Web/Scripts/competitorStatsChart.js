@@ -36,8 +36,8 @@
             //var svgElement = d3.select(chartElementId)
             //    .attr("width", chartWidth)
             //    .attr("height", chartHeight)
-            //    //.call(responsivefy)
-                ;
+            //    //.call(responsivefy);
+
             var svgElement = d3.select(chartElementId)
                 .attr("width", chartWidth + margin.left + margin.right)
                 .attr("height", chartHeight + margin.top + margin.bottom)
@@ -62,7 +62,15 @@
                 .domain([minCount, maxCount])
                 .range([chartHeight, 0]);
 
-            svgElement.append("g").call(d3.axisLeft(yScale));
+            
+            var yAxisTicks = yScale.ticks()
+                .filter(tick => Number.isInteger(tick));
+
+            var yAxis = d3.axisLeft(yScale)
+                .tickValues(yAxisTicks)
+                .tickFormat(d3.format('d'));
+
+            svgElement.append("g").call(yAxis);
 
             svgElement.append("text")
                 .attr("text-anchor", "middle")
@@ -88,77 +96,6 @@
                 .attr("width", xScale.bandwidth())
                 .attr("height", function (d) { return chartHeight - yScale(d.count); })
                 .attr("fill", "#265180")
-
-
-            //function onMouseOver(d) {
-            //    compId = d.competitorId || d.id;
-            //    svgElement
-            //        .selectAll("path.compLine")
-            //        .attr("opacity", .4);
-            //    svgElement
-            //        .selectAll("path[data-compId='" + compId + "']")
-            //        .attr("stroke-width", 4)
-            //        .attr("opacity", 1);
-            //    svgElement
-            //        .selectAll("g.legendEntry")
-            //        .attr("opacity", .4);
-            //    svgElement
-            //        .selectAll("g.legendEntry[data-compId='" + compId + "']")
-            //        .attr("opacity", 1);
-            //    svgElement
-            //        .selectAll("g.legendEntry[data-compId='" + compId + "'] rect")
-            //        .attr("stroke", (c) => color(c.id));
-            //    svgElement.selectAll("circle")
-            //        .attr("opacity", .4);
-            //    svgElement
-            //        .selectAll("circle[data-compId='" + compId + "']")
-            //        .attr("opacity", 1);
-
-            //}
-            //function onMouseOut(d) {
-            //    svgElement
-            //        .selectAll("path.compLine")
-            //        .attr("stroke-width", 1.5);
-            //    svgElement
-            //        .selectAll("path.compLine")
-            //        .attr("opacity", 1);
-            //    svgElement
-            //        .selectAll("g.legendEntry rect")
-            //        .attr("stroke", "none");
-            //    tooltipGroup
-            //        .attr("opacity", 0)
-            //        .attr("transform", "translate(" + chartOverallWidth + ","
-            //            + chartOverallHeight + ")");
-
-            //    svgElement
-            //        .selectAll("path.compLine")
-            //        .attr("opacity", 1);
-            //    svgElement
-            //        .selectAll("g.legendEntry")
-            //        .attr("opacity", 1);
-            //    svgElement.selectAll("circle")
-            //        .attr("opacity", 1);
-            //}
-
-
-
-            //lineData = d3.line()
-            //    .x(d => xScale(getDate(d, data)))
-            //    .y(d => getY(d, data));
-
-
-            //tooltipGroup = svgElement
-            //    .append("g")
-            //    .attr("opacity", 0);
-            //tooltipGroup.append("rect")
-            //    .attr("width", 120)
-            //    .attr("height", legendLineHeight * 3)
-            //    .attr("fill", "white")
-            //    .attr("fill-opacity", ".7");
-            //tooltipGroup.append("text")
-            //    .attr('x', 5)
-            //    .attr("y", legendLineHeight - 5)
-            //    .style("font-size", "11px");
 
         }
     }
@@ -191,124 +128,7 @@
         //    svg.attr("width", targetWidth);
         //    svg.attr("height", Math.round(targetWidth / aspect));
         //}
-    }
-
-    function processChartData(data) {
-        if (data === null) {
-            return;
-        }
-        var counts = data.map(r => r.count || 0);
-        let minCount = 0;
-        let maxCount = Math.max(...counts);
-
-
-        var svgElement = d3.select(chartElementId)
-            .attr("width", chartWidth)
-            .attr("height", chartHeight)
-            //.call(responsivefy)
-            ;
-
-        var xScale = d3.scaleBand()
-            .range([0, chartWidth])
-            .domain(data.map(function (d) { return (""+d.place) || d.code; }))
-            .padding(0.3);
-
-        svgElement.append("g")
-            .attr("transform", "translate(0," + chartHeight + ")")
-            .call(d3.axisBottom(xScale))
-            .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end");
-
-
-        var yScale = d3.scaleLinear()
-            .domain([minCount, maxCount])
-            .range([chartHeight, 0]);
-
-        svgElement.append("g").call(d3.axisLeft(yScale));
-
-        // Bars
-        svgElement.selectAll("mybar")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("x", function (d) { return xScale(("" + d.place) || d.code); })
-            .attr("y", function (d) { return yScale(d.count); })
-            .attr("width", xScale.bandwidth())
-            .attr("height", function (d) { return chartHeight - yScale(d.count); })
-            .attr("fill", "#69b3a2")
-
-
-        //function onMouseOver(d) {
-        //    compId = d.competitorId || d.id;
-        //    svgElement
-        //        .selectAll("path.compLine")
-        //        .attr("opacity", .4);
-        //    svgElement
-        //        .selectAll("path[data-compId='" + compId + "']")
-        //        .attr("stroke-width", 4)
-        //        .attr("opacity", 1);
-        //    svgElement
-        //        .selectAll("g.legendEntry")
-        //        .attr("opacity", .4);
-        //    svgElement
-        //        .selectAll("g.legendEntry[data-compId='" + compId + "']")
-        //        .attr("opacity", 1);
-        //    svgElement
-        //        .selectAll("g.legendEntry[data-compId='" + compId + "'] rect")
-        //        .attr("stroke", (c) => color(c.id));
-        //    svgElement.selectAll("circle")
-        //        .attr("opacity", .4);
-        //    svgElement
-        //        .selectAll("circle[data-compId='" + compId + "']")
-        //        .attr("opacity", 1);
-
-        //}
-        //function onMouseOut(d) {
-        //    svgElement
-        //        .selectAll("path.compLine")
-        //        .attr("stroke-width", 1.5);
-        //    svgElement
-        //        .selectAll("path.compLine")
-        //        .attr("opacity", 1);
-        //    svgElement
-        //        .selectAll("g.legendEntry rect")
-        //        .attr("stroke", "none");
-        //    tooltipGroup
-        //        .attr("opacity", 0)
-        //        .attr("transform", "translate(" + chartOverallWidth + ","
-        //            + chartOverallHeight + ")");
-
-        //    svgElement
-        //        .selectAll("path.compLine")
-        //        .attr("opacity", 1);
-        //    svgElement
-        //        .selectAll("g.legendEntry")
-        //        .attr("opacity", 1);
-        //    svgElement.selectAll("circle")
-        //        .attr("opacity", 1);
-        //}
-
-
-
-        //lineData = d3.line()
-        //    .x(d => xScale(getDate(d, data)))
-        //    .y(d => getY(d, data));
-
-
-        //tooltipGroup = svgElement
-        //    .append("g")
-        //    .attr("opacity", 0);
-        //tooltipGroup.append("rect")
-        //    .attr("width", 120)
-        //    .attr("height", legendLineHeight * 3)
-        //    .attr("fill", "white")
-        //    .attr("fill-opacity", ".7");
-        //tooltipGroup.append("text")
-        //    .attr('x', 5)
-        //    .attr("y", legendLineHeight - 5)
-        //    .style("font-size", "11px");
-
+    
     }
     return {
         drawChart: drawChart
