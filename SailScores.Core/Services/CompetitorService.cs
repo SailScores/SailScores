@@ -44,13 +44,13 @@ namespace SailScores.Core.Services
         private async Task<IList<Model.Competitor>> GetCompetitorsAsync(
             Guid clubId,
             Guid? fleetId,
-            bool includeInactive)
+            bool onlyInactive)
         {
 
             var dbObjects = _dbContext.Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Competitors)
-                .Where(c => includeInactive || (c.IsActive ?? true));
+                .Where(c => onlyInactive ^ (c.IsActive ?? true));
 
             if (fleetId.HasValue && fleetId != Guid.Empty)
             {

@@ -8,8 +8,10 @@ using SailScores.Core.Services;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Api.Dtos;
+using SailScores.Test.Unit.Utilities;
 using Xunit;
 
 namespace SailScores.Test.Unit.Core.Services
@@ -22,6 +24,8 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
+        private readonly Guid _clubId;
+        private readonly String _clubInitials;
 
         public CompetitorServiceTests()
         {
@@ -31,58 +35,47 @@ namespace SailScores.Test.Unit.Core.Services
             _mockScoringCalculatorFactory.Setup(f => f.CreateScoringCalculatorAsync(It.IsAny<SailScores.Core.Model.ScoringSystem>()))
                 .ReturnsAsync(_mockCalculator.Object);
 
-            var options = new DbContextOptionsBuilder<SailScoresContext>()
-                .UseInMemoryDatabase(databaseName: "Series_Test_database")
-                .Options;
+            _context = Utilities.InMemoryContextBuilder.GetContext();
+            _clubId = _context.Clubs.First().Id;
+            _clubInitials = _context.Clubs.First().Initials;
+            _mapper = MapperBuilder.GetSailScoresMapper();
 
-            _context = new SailScoresContext(options);
-
-            var config = new MapperConfiguration(opts =>
-            {
-                opts.AddProfile(new DbToModelMappingProfile());
-            });
-
-            _mapper = config.CreateMapper();
-
-            var compA = new Competitor
-            {
-                Name = "Comp A"
-            };
-            var race1 = new Race
-            {
-                Date = DateTime.Today
-            };
-
-            _fakeSeries = new Series
-            {
-                Id = Guid.NewGuid(),
-                Name = "Fake Series",
-                Competitors = new List<Competitor> {
-                    compA
-                },
-                Races = new List<Race>
-                {
-                    race1
-                },
-                Season = new Season
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "New Season",
-                    Start = new DateTime(2019, 1, 1),
-                    End = new DateTime(2019, 12, 31)
-                },
-                Results = new SeriesResults()
-            };
-
-            _context.Series.Add(_mapper.Map<Database.Entities.Series>(_fakeSeries));
-            _context.SaveChanges();
-
-            //yep, this means we are testing the real DbObjectBuilder as well:
             _service = new SailScores.Core.Services.CompetitorService(
                 _context,
                 _mapper
                 );
         }
+
+        [Fact]
+        public async Task GetInactive_ReturnsOnlyInactive()
+        {
+            // arrange
+
+            // act
+            var result = await _service.GetInactiveCompetitorsAsync(
+                _clubId,
+                null);
+
+            Assert.True(result.Any());
+            Assert.True(result.All(c => !c.IsActive));
+            // assert
+        }
+
+        [Fact]
+        public async Task GetCompetitors_ReturnsActive()
+        {
+            // arrange
+
+            // act
+            var result = await _service.GetCompetitorsAsync(
+                _clubId,
+                null);
+
+            Assert.True(result.Any());
+            Assert.True(result.All(c => c.IsActive));
+            // assert
+        }
+
 
         [Fact]
         public async Task SaveAsync_NullCompetitor_throws()

@@ -76,6 +76,26 @@ namespace SailScores.Test.Unit.Utilities
                 }
             };
             context.Competitors.Add(competitor);
+            
+            var inactiveCompetitor = new Competitor
+            {
+                Id = Guid.NewGuid(),
+                Name = "Comp12",
+                BoatName = "Comp12Boat",
+                ClubId = club.Id,
+                BoatClass = boatClass,
+                CompetitorFleets = new List<CompetitorFleet>
+                {
+                    new CompetitorFleet
+                    {
+                        FleetId = fleet2.Id
+                    }
+                },
+                IsActive = false
+            };
+            context.Competitors.Add(inactiveCompetitor);
+
+
 
 
             var scoringSystem = new ScoringSystem
