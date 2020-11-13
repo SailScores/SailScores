@@ -57,7 +57,8 @@ namespace SailScores.Test.Unit.Utilities
                 Id = Guid.NewGuid(),
                 Name = "Test Season",
                 Start = new DateTime(2020, 1, 1),
-                End = new DateTime(2021, 1, 1)
+                End = new DateTime(2021, 1, 1),
+                UrlName = "TestSeason"
             };
 
             var competitor = new Competitor
@@ -138,6 +139,7 @@ namespace SailScores.Test.Unit.Utilities
             {
                 Name = "Series One",
                 UrlName = "SeriesOne",
+                ClubId = club.Id,
                 Season = season
             };
             context.Series.Add(series);
