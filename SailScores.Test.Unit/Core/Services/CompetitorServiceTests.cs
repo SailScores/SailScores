@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Api.Dtos;
+using SailScores.Api.Enumerations;
 using SailScores.Test.Unit.Utilities;
 using Xunit;
 
@@ -56,8 +57,8 @@ namespace SailScores.Test.Unit.Core.Services
                 _clubId,
                 null);
 
-            Assert.True(result.Any());
-            Assert.True(result.All(c => !c.IsActive));
+            Assert.True(result.Any(), "No competitors were returned.");
+            Assert.True(result.All(c => !c.IsActive), "Some active competitors were returned.");
             // assert
         }
 
@@ -99,6 +100,66 @@ namespace SailScores.Test.Unit.Core.Services
 
             Assert.NotNull(ex);
             // assert
+        }
+
+        [Fact]
+        public async Task SaveAsync_NewCompetitor_AddsToDb()
+        {
+            // arrange
+            var sailNumber = "tmpNum";
+            var boatClass = await _context.BoatClasses.FirstAsync();
+            Competitor newComp = new Competitor
+            {
+                Name = "Newbie",
+                SailNumber = sailNumber,
+                BoatClassId = boatClass.Id,
+                ClubId = _clubId
+            };
+
+            // act
+            _service.SaveAsync(newComp);
+
+            // assert
+            Assert.NotEmpty(_context.Competitors.Where(c => c.SailNumber == sailNumber));
+        }
+
+
+        [Fact]
+        public async Task SaveAsync_ExistingCompetitor_SavesName()
+        {
+            // arrange
+            var newName = "tmpName";
+            var existingComp = await _context.Competitors.FirstAsync();
+
+            var existingCompCount = await _context.Competitors.CountAsync();
+
+            var coreObject = _mapper.Map<Competitor>(existingComp);
+            coreObject.Name = newName;
+
+            // act
+            _service.SaveAsync(coreObject);
+            var newCompCount = await _context.Competitors.CountAsync();
+
+            // assert
+            Assert.Equal(existingCompCount, newCompCount);
+            Assert.NotEmpty(_context.Competitors.Where(c => c.Name == newName));
+        }
+
+
+        [Fact]
+        public async Task GetCompetitors_ForAllBoatsFleet_ReturnsCompetitors()
+        {
+            // arrange
+            var allBoatsFleet = await _context.Fleets.SingleAsync(
+                f => f.FleetType == FleetType.AllBoatsInClub
+                && f.ClubId == _clubId);
+
+            // act
+            var result = await _service.GetCompetitorsAsync(
+                _clubId, allBoatsFleet.Id);
+
+            // assert
+            Assert.NotEmpty(result);
         }
 
     }

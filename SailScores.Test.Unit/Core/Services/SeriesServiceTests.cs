@@ -101,9 +101,9 @@ namespace SailScores.Test.Unit.Core.Services
             var season = await _context.Seasons.FirstAsync();
 
             // Act
-            var result = _service.GetSeriesDetailsAsync(
+            var result = await _service.GetSeriesDetailsAsync(
                 _clubInitials,
-                season.Name,
+                season.UrlName,
                 _seriesUrlName);
 
             // Assert

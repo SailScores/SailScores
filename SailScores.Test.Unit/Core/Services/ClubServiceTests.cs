@@ -1,18 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using SailScores.Core.Mapping;
-using SailScores.Core.Model;
-using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 using SailScores.Database;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using SailScores.Api.Dtos;
-using Xunit;
 using SailScores.Test.Unit.Utilities;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace SailScores.Test.Unit.Core.Services
 {
@@ -21,8 +14,8 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly ClubService _service;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
-        private Guid _clubId;
-        private string _clubInitials;
+        private readonly Guid _clubId;
+        private readonly string _clubInitials;
 
         public ClubServiceTests()
         {

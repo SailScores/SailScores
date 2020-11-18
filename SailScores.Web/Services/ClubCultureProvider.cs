@@ -16,6 +16,8 @@ namespace SailScores.Web.Services
         private IMemoryCache _cache;
         private readonly string cacheKeyName = "ClubLocaleCache";
 
+        private string _defaultCultureString = "en-US";
+
         public async Task<ProviderCultureResult> DetermineProviderCultureResult(
             HttpContext httpContext)
         {
@@ -58,18 +60,16 @@ namespace SailScores.Web.Services
                     // swallowing: this is a likely error on initial load.
                 }
             }
-            if (clubInitialsToLocales != null)
-            {
-                foreach (var key in clubInitialsToLocales.Keys)
-                {
-                    if (path.StartsWithSegments($"/{key}", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return clubInitialsToLocales[key];
-                    }
-                }
-            }
 
-            return "en-US";
+            if (clubInitialsToLocales == null) return _defaultCultureString;
+
+            var clubCulture = clubInitialsToLocales
+                .FirstOrDefault(kvp =>
+                    path.StartsWithSegments($"/{kvp.Key}", StringComparison.InvariantCultureIgnoreCase));
+
+            return clubCulture.Equals(default(KeyValuePair<string, string>))
+                ? _defaultCultureString
+                : clubCulture.Value;
         }
     }
 }

@@ -50,7 +50,8 @@ namespace SailScores.Core.Services
             var dbObjects = _dbContext.Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Competitors)
-                .Where(c => onlyInactive || ((c.IsActive ?? true) && !onlyInactive));
+                .Where(c => (onlyInactive && !(c.IsActive ?? true))
+                            || ((c.IsActive ?? true) && !onlyInactive));
 
             if (fleetId.HasValue && fleetId != Guid.Empty)
             {
