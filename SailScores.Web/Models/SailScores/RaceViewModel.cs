@@ -3,6 +3,7 @@ using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Text;
 
 namespace SailScores.Web.Models.SailScores
@@ -18,7 +19,7 @@ namespace SailScores.Web.Models.SailScores
         public String Name { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:MMMM d, yyyy}")]
+        [DisplayFormat(DataFormatString = "{0:D}")]
         public DateTime? Date { get; set; }
 
         // Typically the order of the race for a given date
@@ -62,18 +63,19 @@ namespace SailScores.Web.Models.SailScores
                 }
                 switch (State)
                 {
-                    case Api.Enumerations.RaceState.Scheduled:
+                    case RaceState.Scheduled:
                         sb.Append("Scheduled for ");
                         break;
-                    case Api.Enumerations.RaceState.Abandoned:
+                    case RaceState.Abandoned:
                         sb.Append("Abandoned. ");
                         break;
                 }
                 if (Date.HasValue)
                 {
-                    sb.Append(Date.Value.ToString("MMMM d, yyyy"));
+                    sb.Append(Date.Value.ToString("D", CultureInfo.CurrentCulture));
                 }
-                if (Order > 0)
+                if (Order > 0
+                    && State != RaceState.Scheduled)
                 {
                     sb.Append(" R");
                     sb.Append(Order);

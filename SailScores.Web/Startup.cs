@@ -53,11 +53,15 @@ namespace SailScores.Web
                 options.SupportedCultures = new List<CultureInfo> {
                     new CultureInfo("en-US"),
                     new CultureInfo("fi-FI"),
-                    new CultureInfo("sv-FI")};
+                    new CultureInfo("sv-FI"),
+                    new CultureInfo("en-AU"),
+                };
                 options.SupportedUICultures = new List<CultureInfo> {
                     new CultureInfo("en-US"),
                     new CultureInfo("fi-FI"),
-                    new CultureInfo("sv-FI")};
+                    new CultureInfo("sv-FI"),
+                    new CultureInfo("en-AU")
+                };
 
                 options.RequestCultureProviders = new List<IRequestCultureProvider>
                 { new ClubCultureProvider()

@@ -25,7 +25,7 @@
                 @item.Series.Sum(s => s.Races.Count()) Races
             </div>
             <div class="col-6 col-sm-4 col-md-3">
-                @Html.DisplayFor(modelItem => item.Description)
+                @Html.DisplayFor(modelItem => item.StartDate)
             </div>
             <div class="col-6 col-sm-4 col-md-2">
                 @Html.ActionLink("Edit", "Edit", "Regatta", new { id = item.Id }) |
