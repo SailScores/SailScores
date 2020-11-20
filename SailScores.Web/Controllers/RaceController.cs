@@ -39,7 +39,7 @@ namespace SailScores.Web.Controllers
         public async Task<ActionResult> Index(
             string clubInitials,
             string seasonName,
-            bool showScheduled = false,
+            bool showScheduled = true,
             bool showAbandoned = true)
         {
             if (String.IsNullOrWhiteSpace(seasonName))
