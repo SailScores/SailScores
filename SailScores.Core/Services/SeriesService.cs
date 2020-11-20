@@ -176,7 +176,9 @@ namespace SailScores.Core.Services
 
             if (flatResults.NumberOfSailedRaces == 0)
             {
-                flatResults.NumberOfSailedRaces = flatResults.Races.Count();
+                flatResults.NumberOfSailedRaces = flatResults.Races
+                    .Count(r => (r.State ?? RaceState.Raced) == RaceState.Raced
+                                 || r.State == RaceState.Preliminary);
             }
             fullSeries.FlatResults = flatResults;
 
