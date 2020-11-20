@@ -31,7 +31,7 @@ software that: 1) has a modern interface, 2) supports mobile devices, 3) is inex
 
 ### Getting Started with development
 
-[docs/development.md][5] has instructions for getting started with development with Visual Studio.
+[docs/Development.md][5] has instructions for getting started with development with Visual Studio.
 
 ### License
 
@@ -53,4 +53,4 @@ jamie@widernets.com
 [2]: https://sailscores.com/LHYC/2019/Wednesday%20Evenings
 [3]: https://www.racingrulesofsailing.org/rules?part_id=53
 [4]: https://www.ussailing.org/competition/rules-officiating/racing-rules/scoring-a-long-series/
-[5]: docs/development.md
+[5]: docs/Development.md

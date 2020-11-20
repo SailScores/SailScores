@@ -32,10 +32,3 @@ OUTER APPLY (
            AND Races.ClubId = '23cc00a0-ba27-4fe2-8c1c-e448b1f68eba'
     ) AS w
 ORDER BY r.[range];
-
-
-Select top 100 w.* FROM Weather AS w
-    --- In a CROSS/OUTER APPLY, the WHERE clause works like
-    --- the JOIN condition:
-    INNER JOIN Races
-    on w.Id = Races.WeatherId
