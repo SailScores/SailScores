@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using SailScores.Core.Mapping;
-using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 using SailScores.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Database.Entities;
@@ -136,24 +133,22 @@ namespace SailScores.Test.Unit.Core.Services
                 _mapper.Map<SailScores.Core.Model.Race>(race),
                 _regatta.Id);
 
-            Assert.True(
-                _context.Regattas.First().RegattaSeries.Any(rs =>
+            Assert.Contains(_context.Regattas.First().RegattaSeries, rs =>
                     rs.Series.RaceSeries != null
-                    && rs.Series.RaceSeries.Any(r => r.RaceId == race.Id)));
+                    && rs.Series.RaceSeries.Any(r => r.RaceId == race.Id));
         }
 
         [Fact]
         public async Task AddFleetTorRegattaAsync_AddsToDb()
         {
-            var fleet = _context.Fleets.ToList()
+            var fleet = _context.Fleets
                     .Where(f => !_regatta.RegattaFleet.Any(rf => rf.FleetId == f.Id))
                     .First();
 
             await _service.AddFleetToRegattaAsync(fleet.Id, _regatta.Id);
 
-            Assert.True(
-                _context.Regattas.First().RegattaFleet.Any(rf =>
-                    rf.FleetId == fleet.Id));
+            Assert.Contains(_context.Regattas.First().RegattaFleet, rf =>
+                    rf.FleetId == fleet.Id);
         }
 
     }
