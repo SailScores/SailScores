@@ -11,7 +11,6 @@ namespace SailScores.Web.Models.SailScores
 
         public bool CanEdit { get; set; }
 
-        [Required]
         [StringLength(200)]
         public String Name { get; set; }
         [StringLength(10)]

@@ -1,0 +1,117 @@
+@using Microsoft.Extensions.Localization;
+@using SailScores.Web.Resources;
+@using SailScores.Web.Services;
+
+@inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
+
+@model SailScores.Web.Models.SailScores.ClubStatsViewModel
+@{
+    ViewBag.Title = Model.Name + " " + localizer["Stats"];
+    Layout = "_ClubLayout";
+    ViewData["MetaDescription"] = $"Sailing results and scores for racing at {Model.Name} ({Model.Initials})";
+}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4">@Model.Name @localizer["Stats"]</h1>
+    </div>
+</div>
+
+
+<div class="row">
+    <form asp-action="Stats">
+        <input hidden asp-for="Id" class="form-control" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="StatisticsDescription" class="control-label">@localizer["Stats Notes"]</label>
+            <a target="_blank" href="https://www.markdownguide.org/">
+                <span title="Supports MarkDown formatting" class="fab fa-markdown"></span>
+            </a>
+            <textarea asp-for="StatisticsDescription" class="form-control" cols="60" rows="6"></textarea>
+            <span asp-validation-for="StatisticsDescription" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Competitors</th>
+            <th>Races</th>
+            <th>Total Starts</th>
+            <th>Race Days</th>
+            <th>Ave Comp / race</th>
+            <th>Dates</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if(Model.SeasonStats != null){
+    @foreach (var seasonGroup in Model.SeasonStats.OrderBy(s => s.SeasonStart).GroupBy(s => s.SeasonName).OrderByDescending(g => g.Max(e => e.SeasonStart)))
+    {
+        var firstRow = true;
+
+        @foreach (var stat in seasonGroup)
+        {
+            @if (String.IsNullOrWhiteSpace(stat.ClassName) && seasonGroup.Count() == 2)
+            {
+                continue;
+            }
+            <tr>
+                @if (firstRow)
+                {
+                    <th rowspan="@(seasonGroup.Count() == 2 ? 1 : seasonGroup.Count())">
+                        <h3>@seasonGroup.Key</h3>
+                    </th>
+                }
+                <th>
+                    @if (String.IsNullOrWhiteSpace(stat.ClassName))
+                    {
+                        <h4>Total</h4>
+                    }
+                    else
+                    {
+                        firstRow = false;
+                        <h5>@stat.ClassName</h5>
+                    }
+                </th>
+                <td class="@(firstRow ? "h5" : "")">
+                    @stat.DistinctCompetitorsStarted
+                </td>
+                <td class="@(firstRow ? "h5" : "")">
+                    @stat.RaceCount
+                </td>
+                <td class="@(firstRow ? "h5" : "")">
+                    @stat.CompetitorsStarted
+                </td>
+                <td class="@(firstRow ? "h5" : "")">
+                    @stat.DistinctDaysRaced
+                </td>
+                <td class="@(firstRow ? "h5" : "")">
+                    @String.Format(
+                        System.Globalization.CultureInfo.CurrentCulture,
+                        "{0:0.0}", stat.AverageCompetitorsPerRace)
+                </td>
+                <td class="@(firstRow ? "h5" : "")">
+                    @stat.FirstRace?.ToString("M") &ndash;
+                    @stat.LastRace?.ToString("M")
+                </td>
+            </tr>
+            {
+                firstRow = false;
+            }
+        }
+    }
+    }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
