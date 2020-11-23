@@ -1,5 +1,4 @@
 ﻿using SailScores.Core.Model;
-using Entities = SailScores.Database.Entities;
 using SailScores.Web.Models.SailScores;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -54,6 +53,7 @@ namespace SailScores.Web.Services
         {
             var seasonStats = await _coreClubService.GetClubStats(clubInitials);
             var firstSeason = seasonStats.FirstOrDefault();
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
 
             ClubStatsViewModel returnObj;
             if (seasonStats != null && firstSeason != null)
@@ -62,15 +62,16 @@ namespace SailScores.Web.Services
                 {
                     Initials = firstSeason.ClubInitials,
                     Name = firstSeason.ClubName,
+                    StatisticsDescription = club.StatisticsDescription,
                     SeasonStats = _mapper.Map<IEnumerable<ClubSeasonStatsViewModel>>(seasonStats)
                 };
             } else
             {
-                Club club = await _coreClubService.GetMinimalClub(clubInitials);
                 returnObj = new ClubStatsViewModel
                 {
                     Initials = club.Initials,
                     Name = club.Name,
+                    StatisticsDescription = club.StatisticsDescription,
                     SeasonStats = new List<ClubSeasonStatsViewModel>()
                 };
             }

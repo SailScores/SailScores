@@ -1,14 +1,10 @@
-﻿using SailScores.Core.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using SailScores.Api.Enumerations;
 
 namespace SailScores.Web.Models.SailScores
 {
 
-#pragma warning disable CA2227 // Collection properties should be read only
     public class ClubStatsViewModel
     {
         public Guid Id { get; set; }
@@ -21,8 +17,9 @@ namespace SailScores.Web.Models.SailScores
         [StringLength(10)]
         public String Initials { get; set; }
 
+        public String StatisticsDescription { get; set; }
+
         public IEnumerable<ClubSeasonStatsViewModel> SeasonStats { get; set; }
 
     }
-#pragma warning restore CA2227 // Collection properties should be read only
 }

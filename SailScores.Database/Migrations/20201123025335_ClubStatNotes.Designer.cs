@@ -2,13 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20201123025335_ClubStatNotes")]
+    partial class ClubStatNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,7 +76,7 @@ namespace SailScores.Database.Migrations
                     b.Property<bool?>("ShowClubInResults")
                         .HasColumnType("bit");
 
-                    b.Property<string>("StatisticsDesciption")
+                    b.Property<string>("StatisticsDescription")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Url")
