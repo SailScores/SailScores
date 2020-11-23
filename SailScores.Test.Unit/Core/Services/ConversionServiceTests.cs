@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SailScores.Core.Model;
 using SailScores.Core.Services;
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SailScores.Test.Unit.Core.Services

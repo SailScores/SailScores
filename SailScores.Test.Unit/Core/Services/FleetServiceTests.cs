@@ -5,11 +5,9 @@ using SailScores.Test.Unit.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
-using SailScores.Web.Models.SailScores;
 using Xunit;
 
 namespace SailScores.Test.Unit.Core.Services
