@@ -1,3 +1,5 @@
+@using SailScores.Web.Extensions
+
 @model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 
 @{
@@ -160,7 +162,7 @@
                 <ul class="list-group" id="results">
                     @await Html.PartialAsync("_scoreEntryPartial", Model)
                     @foreach (var score in (Model.Scores ??
-                    new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
+                  new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
                     {
                         <li id="@score.CompetitorId" class="list-group-item"
                             data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">

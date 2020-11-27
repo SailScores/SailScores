@@ -104,13 +104,14 @@ namespace SailScores.Core.Services
         {
             var dbClass = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
+                .Include(f => f.CompetitorFleets)
                 .SingleAsync(c => c.Id == fleetId)
                 .ConfigureAwait(false);
             foreach (var link in dbClass.FleetBoatClasses.ToList())
             {
                 dbClass.FleetBoatClasses.Remove(link);
             }
-            foreach (var link in dbClass.CompetitorFleets.ToList())
+            foreach (var link in dbClass.CompetitorFleets?.ToList())
             {
                 dbClass.CompetitorFleets.Remove(link);
             }

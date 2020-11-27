@@ -72,7 +72,8 @@ namespace SailScores.Web.Controllers
                 return Unauthorized();
             }
 
-            var season = await _seasonService.GetSeasons(clubId);
+            var season = (await _seasonService.GetSeasons(clubId))
+                .SingleOrDefault(s => s.Id == id);
             if (season == null)
             {
                 return NotFound();
@@ -90,7 +91,7 @@ namespace SailScores.Web.Controllers
                 var seasonFromDb = (await _seasonService.GetSeasons(clubId)
                     ).FirstOrDefault(s => s.Id == model.Id);
                 if (!await _authService.CanUserEdit(User, clubId)
-                    || seasonFromDb != null)
+                    || seasonFromDb == null)
                 {
                     return Unauthorized();
                 }
@@ -141,7 +142,7 @@ namespace SailScores.Web.Controllers
             var seasonFromDb = (await _seasonService.GetSeasons(clubId)
                 ).FirstOrDefault(s => s.Id == id);
             if (!await _authService.CanUserEdit(User, clubId)
-                || seasonFromDb != null)
+                || seasonFromDb == null)
             {
                 return Unauthorized();
             }
