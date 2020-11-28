@@ -57,7 +57,7 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label asp-for="FleetId" class="control-label">Fleet</label>
-                <small class="text-muted">Controls the list of available competitors</small>
+                <small>Controls the list of available competitors</small>
                 <select id="fleetId" asp-for="FleetId" class="form-control">
                     @if (Model.FleetOptions.Count > 1)
                     {
@@ -116,7 +116,7 @@
                                 <div class="form-row">
                                     <label asp-for="InitialOrder" class="control-label col-6 col-md-4 col-form-label">
                                         Order
-                                        <small class="text-muted d-none d-sm-inline">Within date</small>
+                                        <small class="d-none d-sm-inline">Within date</small>
                                     </label>
                                     <input asp-for="InitialOrder" class="form-control col-6 col-md-8" />
                                     <span asp-validation-for="InitialOrder" class="text-danger"></span>
