@@ -3,6 +3,8 @@
 $my-dark-color: #001156;
 $my-link-color: #0063CC;
 $my-hover-color: #265180;
+$my-link-color-alt: #3987DB;
+$my-hover-color-alt: #2F90F7;
 $theme-colors: (
     'dark' : $my-dark-color,
     'primary' : $my-link-color
@@ -10,19 +12,26 @@ $theme-colors: (
 
 $font-family-base: "Open Sans", "Segoe UI", sans-serif;
 
-@import "./node_modules/bootstrap/scss/bootstrap";
+@import "./bootstrap-dark/scss/bootstrap-dark";
 
 body {
+    /* Margin bottom by footer height */
+    margin-bottom: 130px;
 }
 
 a {
     color: $my-link-color;
 }
+
 a:hover {
     color: $my-hover-color;
 }
 .table-not-wide {
     width: auto;
+}
+
+.bg-almost {
+    background: #f8f9fa;
 }
 
 #results {
@@ -88,6 +97,8 @@ span.avoidwrap {
     }
 }
 
+
+
 [data-toggle="collapse"]:after {
     display: inline-block;
     font-family: "Font Awesome 5 Free";
@@ -103,13 +114,6 @@ span.avoidwrap {
 
 [data-toggle="collapse"].collapsed:after {
     transform: rotate(0deg);
-}
-
-
-
-body {
-    /* Margin bottom by footer height */
-    margin-bottom: 130px;
 }
 
 .score-entry {
@@ -178,9 +182,108 @@ form label.required:not(.custom-control-label)::after {
     font-size: 80%;
 }
 
-
 @include media-breakpoint-up(md) {
     .small-on-small {
         font-size: 100%;
+    }
+}
+
+
+
+@media (prefers-color-scheme: dark) {
+
+    $secondary-background: #3B3B3B;
+
+    a {
+        color: $my-link-color-alt;
+    }
+
+    a:hover {
+        color: $my-hover-color-alt;
+    }
+
+    svg text {
+        color: $white-alt;
+        fill: $white-alt;
+    }
+
+    .bg-almost {
+        background: $secondary-background;
+    }
+
+    .btn-light {
+        color: #B1B1B1;
+        background: $secondary-background !important;
+    }
+
+    .btn-outline-primary {
+        color: $white-alt;
+    }
+
+    .bg-secondary {
+        background: $secondary-background !important;
+    }
+
+    .finish-first {
+        background: #473F24;
+    }
+
+    .finish-second {
+        background: #393939;
+    }
+
+    .finish-third {
+        background: #473829;
+    }
+
+    .abandoned {
+        background: #3B2121;
+    }
+
+    .scheduled {
+        background: #424242;
+    }
+
+    .dropdown-menu {
+        background: $secondary-background;
+    }
+
+    .dropdown-item {
+        color: #B1B1B1;
+    }
+
+    .dropdown-item:hover {
+        background: #CECECE;
+        color: $dark-alt;
+    }
+
+    .autocomplete-suggestions {
+        background: $secondary-background;
+    }
+
+    .autocomplete-suggestion {
+        background: $secondary-background;
+    }
+
+    .autocomplete-selected {
+        color: $black-alt;
+        background: #CECECE;
+    }
+
+    .autocomplete-suggestions strong {
+    }
+
+    .autocomplete-group {
+    }
+
+    .autocomplete-group strong {
+    }
+
+    option {
+        color: #B1B1B1;
+    }
+
+    .score-entry {
+        background-color: $secondary-background;
     }
 }

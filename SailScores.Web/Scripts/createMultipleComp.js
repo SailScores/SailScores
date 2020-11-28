@@ -31,7 +31,7 @@
             event.preventDefault();
         };
     };
-    var closeBox = docuemnt.getElementById("closebutton");
+    var closeBox = document.getElementById("closebutton");
     closeBox.onclick = function (event) {
             $("#compCreateAlert").hide();
     }
