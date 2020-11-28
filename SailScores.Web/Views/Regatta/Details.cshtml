@@ -164,10 +164,22 @@
             </div>
             <div class="tab-pane fade @(fleetHasResults ? "show active" : "")" id="@($"Results{fleet.ShortName}")" role="tabpanel"
                  aria-labelledby="@($"Results{fleet.ShortName}-tab")">
-                @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
+                @{ var currentSeries = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id);}
+                @if (currentSeries != null && currentSeries.FlatResults != null)
                 {
-                    @await Html.PartialAsync("_ResultsTable", Model.Item.Series.First(s => s.FleetId == fleet.Id),
+                    @await Html.PartialAsync("_ResultsTable", currentSeries,
                         new ViewDataDictionary(this.ViewData) { { "ExcludeCompetitorLinks", true } })
+                    @if (currentSeries.UpdatedDate.HasValue)
+                    {
+                        <br />
+                        <span class="font-italic">
+                            @localizer["Updated"] @(currentSeries.UpdatedDate.Value.ToString("f")) UTC
+                        @if (!String.IsNullOrWhiteSpace(currentSeries.FlatResults.UpdatedBy))
+                        {
+                            @:by @currentSeries.FlatResults.UpdatedBy
+                        }
+                    </span>
+                }   
                 }
                 else
                 {

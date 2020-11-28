@@ -78,7 +78,12 @@
 @if (Model.Item.UpdatedDate.HasValue)
 {
     <br />
-    <span class="font-italic">@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</span>
+    <span class="font-italic">@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC
+        @if (!String.IsNullOrWhiteSpace(Model.Item.FlatResults.UpdatedBy))
+        {
+            @:by @Model.Item.FlatResults.UpdatedBy
+        }
+    </span>
 }
 
 @section Scripts {

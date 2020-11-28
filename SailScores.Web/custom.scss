@@ -14,7 +14,22 @@ $font-family-base: "Open Sans", "Segoe UI", sans-serif;
 
 @import "./bootstrap-dark/scss/bootstrap-dark";
 
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+
 body {
+    padding-bottom: 20px;
     /* Margin bottom by footer height */
     margin-bottom: 130px;
 }
