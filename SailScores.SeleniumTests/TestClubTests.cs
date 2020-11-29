@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using Xunit;
 
 namespace SailScores.SeleniumTests
@@ -77,7 +78,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id("classes")).Click();
 
             var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{className}')]/..//a[contains(text(),'Delete')]"));
+                By.XPath($"//div/div[contains(text(), '{className}')]/..//a[contains(text(),'Delete')]"));
 
             deleteButton.Click();
 
@@ -115,7 +116,7 @@ namespace SailScores.SeleniumTests
 
 
             var editButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{compName}')]/..//a[contains(text(),'Edit')]"));
+                By.XPath($"//div/div[contains(text(), '{compName}')]/..//a[contains(text(),'Edit')]"));
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -124,7 +125,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id("competitors")).Click();
 
             var deleteButton = driver.WaitUntilClickable(
-                By.XPath($"//tr/td[contains(text(), '{compName}')]/..//a[contains(text(),'Delete')]"));
+                By.XPath($"//div/div[contains(text(), '{compName}')]/..//a[contains(text(),'Delete')]"));
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -164,7 +165,7 @@ namespace SailScores.SeleniumTests
 
 
             var editButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{fleetName}')]/..//a[contains(text(),'Edit')]"));
+                By.XPath($"//div/div[contains(text(), '{fleetName}')]/..//a[contains(text(),'Edit')]"));
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -173,7 +174,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id("fleets")).Click();
 
             var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{fleetName}')]/..//a[contains(text(),'Delete')]"));
+                By.XPath($"//div/div[contains(text(), '{fleetName}')]/..//a[contains(text(),'Delete')]"));
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -209,7 +210,7 @@ namespace SailScores.SeleniumTests
 
 
             var editButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{seasonName}')]/..//a[contains(text(),'Edit')]"));
+                By.XPath($"//div/div[contains(text(), '{seasonName}')]/..//a[contains(text(),'Edit')]"));
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -218,7 +219,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id(sectionName)).Click();
 
             var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{seasonName}')]/..//a[contains(text(),'Delete')]"));
+                By.XPath($"//div/div[contains(text(), '{seasonName}')]/..//a[contains(text(),'Delete')]"));
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -251,7 +252,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id(sectionName)).Click();
 
             var editButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{seriesName}')]/..//a[contains(text(),'Edit')]"));
+                By.XPath($"//div/div[contains(text(), '{seriesName}')]/..//a[contains(text(),'Edit')]"));
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -260,7 +261,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id(sectionName)).Click();
 
             var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{seriesName}')]/..//a[contains(text(),'Delete')]"));
+                By.XPath($"//div/div[contains(text(), '{seriesName}')]/..//a[contains(text(),'Delete')]"));
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -300,7 +301,7 @@ namespace SailScores.SeleniumTests
             driver.WaitUntilVisible(By.Id(sectionName)).Click();
 
             var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//tr/td[contains(text(), '{seriesName}')]/..//a[contains(text(),'Delete')]"));
+                By.XPath($"//div/div[contains(text(), '{seriesName}')]/..//a[contains(text(),'Delete')]"));
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -361,6 +362,8 @@ namespace SailScores.SeleniumTests
             // go to this series.
             driver.WaitUntilVisible(By.LinkText("TEST")).Click();
 
+            // since results are calculated as a background thread, need to pause here:
+            Thread.Sleep(1000);
             driver.WaitUntilVisible(By.LinkText("Test Series")).Click();
 
             // verify series includes race heading

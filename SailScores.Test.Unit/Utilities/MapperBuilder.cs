@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
 using SailScores.Core.Mapping;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using SailScores.Web.Mapping;
 
 namespace SailScores.Test.Unit.Utilities

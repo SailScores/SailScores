@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -20,6 +20,8 @@
     <link rel="icon" type="image/png" href="~/images/favicon/favicon-32x32.png" sizes="32x32">
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="msapplication-TileImage" content="~/images/favicon/mstile-144x144.png">
+    <meta name="color-scheme" content="light dark">
+    
     <title>@ViewData["Title"]</title>
     @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaDescription"]))
     {
@@ -30,15 +32,13 @@
         <meta name="keywords" content="@ViewData["MetaKeywords"]" />
     }
 
-<environment include="Development">
-    <link rel="stylesheet" href="~/css/custom.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/custom.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-</environment>
-<environment exclude="Development">
-    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-</environment>
 </head>
 <body>
     <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">

@@ -30,13 +30,16 @@ namespace SailScores.Web.Controllers
                 return View("Error404");
             }
 
-            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-            _telemetryClient.TrackException(exceptionHandlerPathFeature.Error);
-            _telemetryClient.TrackEvent("Error.ServerError", new Dictionary<string, string>
+            var exceptionHandlerPathFeature = HttpContext?.Features?.Get<IExceptionHandlerPathFeature>();
+            if (exceptionHandlerPathFeature != null && _telemetryClient != null)
             {
-                ["originalPath"] = exceptionHandlerPathFeature.Path,
-                ["error"] = exceptionHandlerPathFeature.Error.Message
-            });
+                _telemetryClient.TrackException(exceptionHandlerPathFeature.Error);
+                _telemetryClient.TrackEvent("Error.ServerError", new Dictionary<string, string>
+                {
+                    ["originalPath"] = exceptionHandlerPathFeature?.Path,
+                    ["error"] = exceptionHandlerPathFeature?.Error?.Message
+                });
+            }
 
             return View();
         }

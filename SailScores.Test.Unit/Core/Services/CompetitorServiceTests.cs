@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using SailScores.Core.Mapping;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 using SailScores.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Api.Dtos;
@@ -19,14 +17,12 @@ namespace SailScores.Test.Unit.Core.Services
 {
     public class CompetitorServiceTests
     {
-        private readonly Series _fakeSeries;
         private readonly CompetitorService _service;
         private readonly Mock<IScoringCalculator> _mockCalculator;
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
         private readonly Guid _clubId;
-        private readonly String _clubInitials;
 
         public CompetitorServiceTests()
         {
@@ -38,7 +34,6 @@ namespace SailScores.Test.Unit.Core.Services
 
             _context = Utilities.InMemoryContextBuilder.GetContext();
             _clubId = _context.Clubs.First().Id;
-            _clubInitials = _context.Clubs.First().Initials;
             _mapper = MapperBuilder.GetSailScoresMapper();
 
             _service = new SailScores.Core.Services.CompetitorService(
@@ -108,7 +103,7 @@ namespace SailScores.Test.Unit.Core.Services
             // arrange
             var sailNumber = "tmpNum";
             var boatClass = await _context.BoatClasses.FirstAsync();
-            Competitor newComp = new Competitor
+            var newComp = new Competitor
             {
                 Name = "Newbie",
                 SailNumber = sailNumber,
@@ -117,7 +112,7 @@ namespace SailScores.Test.Unit.Core.Services
             };
 
             // act
-            _service.SaveAsync(newComp);
+            await _service.SaveAsync(newComp);
 
             // assert
             Assert.NotEmpty(_context.Competitors.Where(c => c.SailNumber == sailNumber));
@@ -137,7 +132,7 @@ namespace SailScores.Test.Unit.Core.Services
             coreObject.Name = newName;
 
             // act
-            _service.SaveAsync(coreObject);
+            await _service.SaveAsync(coreObject);
             var newCompCount = await _context.Competitors.CountAsync();
 
             // assert

@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
-using SailScores.Core.Model;
-using SailScores.Core.Services;
 using SailScores.Web.Controllers;
 using SailScores.Web.Services;
 using System;

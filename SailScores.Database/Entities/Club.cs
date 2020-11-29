@@ -16,10 +16,14 @@ namespace SailScores.Database.Entities
         public String Description { get; set; }
         public bool IsHidden { get; set; }
         public bool? ShowClubInResults { get; set; }
+
+        [StringLength(150)]
         public String Url { get; set; }
 
+        [StringLength(30)]
         public String Locale { get; set; }
 
+        public String StatisticsDescription { get; set; }
         public WeatherSettings WeatherSettings { get; set; }
 
         public IList<Fleet> Fleets { get; set; }

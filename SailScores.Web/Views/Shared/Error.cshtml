@@ -1,21 +1,14 @@
-﻿@model ErrorViewModel
-@{
+﻿@{
     ViewData["Title"] = "Error";
 }
 
 <h1 class="text-danger">Oops.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
 
-@if ((Model?.ShowRequestId ?? false ) == true)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
 
 <h3>
     Don't worry, it's probably us, not you.
 </h3>
 <p>
-    We've logged the error and will let people know that something went wrong. If they're not out sailing.
+    We've logged the error and will let people know that something went wrong.
 </p>

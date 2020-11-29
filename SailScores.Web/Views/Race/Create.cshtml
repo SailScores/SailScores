@@ -1,5 +1,4 @@
-@using SailScores.Web.Extensions;
-
+@using SailScores.Web.Extensions
 @model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 
 @{
@@ -12,7 +11,7 @@
     <hr />
     @if (Model.Tips != null && Model.Tips.Count != 0)
     {
-        <div class="row bg-light alert alert-primary">
+        <div class="row bg-almost alert alert-primary">
             <div class="col-12">
                 <dl class="row">
                     @foreach (var tip in Model.Tips)
@@ -58,7 +57,7 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label asp-for="FleetId" class="control-label">Fleet</label>
-                <small class="text-muted">Controls the list of available competitors</small>
+                <small>Controls the list of available competitors</small>
                 <select id="fleetId" asp-for="FleetId" class="form-control">
                     @if (Model.FleetOptions.Count > 1)
                     {
@@ -109,7 +108,6 @@
                         </a>
                     </h5>
                 </div>
-
                 <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                     <div class="card-body">
                         <div class="row">
@@ -117,7 +115,7 @@
                                 <div class="form-row">
                                     <label asp-for="InitialOrder" class="control-label col-6 col-md-4 col-form-label">
                                         Order
-                                        <small class="text-muted d-none d-sm-inline">Within date</small>
+                                        <small class="d-none d-sm-inline">Within date</small>
                                     </label>
                                     <input asp-for="InitialOrder" class="form-control col-6 col-md-8" />
                                     <span asp-validation-for="InitialOrder" class="text-danger"></span>

@@ -454,6 +454,14 @@ namespace SailScores.Core.Services
             return await _dbContext.GetSiteStats().ConfigureAwait(false);
         }
 
+        public async Task UpdateStatsDescription(Guid clubId, string statisticsDescription)
+        {
+            var dbClub = await _dbContext.Clubs
+                .SingleAsync(c => c.Id == clubId).ConfigureAwait(false);
+            dbClub.StatisticsDescription = statisticsDescription;
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
         private Guid GetNewGuid(Guid oldGuid)
         {
             if (guidMapper == null)

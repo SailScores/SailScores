@@ -39,7 +39,7 @@
 }
 @if (Model.CanEdit && (Model.Races?.Count() ?? 0) == 0)
 {
-    <div class="row bg-light">
+    <div class="row bg-almost">
         <div class="col-12">
             <p>
                 Follow the steps on the
@@ -175,7 +175,7 @@
 {
     <br />
     <hr />
-    <div class="row bg-light">
+    <div class="row bg-almost">
         <div class="col-sm-3 my-2">
             <a asp-controller="Admin"
                class="btn btn-outline-primary">@localizer["Admin Page"]</a>

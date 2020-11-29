@@ -258,10 +258,6 @@
             <div class="col-md-3 text-right">
                 @if(!((bool?)ViewData["IsExport"] ?? false))
                 {
-                    if (!String.IsNullOrWhiteSpace(Model.FlatResults.UpdatedBy))
-                    {
-                        <span class="text-right"><small><em>Updated by @Model.FlatResults.UpdatedBy</em></small></span><br />
-                    }
                     <a class="btn btn-outline-secondary btn-sm"
                        asp-action="ExportHtml"
                        asp-controller="Series"

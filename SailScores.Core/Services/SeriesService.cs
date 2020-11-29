@@ -45,7 +45,7 @@ namespace SailScores.Core.Services
         {
 
             var regattaSeriesId = _dbContext.Regattas.SelectMany(r =>
-            r.RegattaSeries).Select(rs => rs.SeriesId);
+                r.RegattaSeries).Select(rs => rs.SeriesId);
 
             var series = await _dbContext
                 .Clubs

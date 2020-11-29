@@ -47,7 +47,7 @@
         {
             <br class="d-md-none" />
             <hr class="d-md-none" />
-            <div class="row bg-light">
+            <div class="row bg-almost">
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Race"
                        asp-action="Create"
@@ -78,7 +78,12 @@
 @if (Model.Item.UpdatedDate.HasValue)
 {
     <br />
-    <span class="font-italic">@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC</span>
+    <span class="font-italic">@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC
+        @if (!String.IsNullOrWhiteSpace(Model.Item.FlatResults.UpdatedBy))
+        {
+            @:by @Model.Item.FlatResults.UpdatedBy
+        }
+    </span>
 }
 
 @section Scripts {

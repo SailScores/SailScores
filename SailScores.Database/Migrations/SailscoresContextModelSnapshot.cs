@@ -2,9 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
@@ -17,7 +14,7 @@ namespace SailScores.Database.Migrations
             modelBuilder
                 .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.0-rc.1.20451.13");
+                .HasAnnotation("ProductVersion", "5.0.0");
 
             modelBuilder.Entity("SailScores.Database.Entities.BoatClass", b =>
                 {
@@ -63,7 +60,8 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Locale")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -73,8 +71,12 @@ namespace SailScores.Database.Migrations
                     b.Property<bool?>("ShowClubInResults")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("StatisticsDesciption")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<Guid?>("WeatherSettingsId")
                         .HasColumnType("uniqueidentifier");
@@ -434,9 +436,6 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid?>("FleetId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsPreliminary")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -453,8 +452,8 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2")
@@ -746,8 +745,8 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2")

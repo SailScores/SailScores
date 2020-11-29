@@ -2,9 +2,7 @@
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using SailScores.Database.Entities;
-using System.Linq;
 
 namespace SailScores.Test.Unit.Utilities
 {

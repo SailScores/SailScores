@@ -12,7 +12,7 @@
 }
 
 @section Sidebar {
-    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+    <nav class="col-md-2 d-none d-md-block bg-almost sidebar">
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
                 @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))

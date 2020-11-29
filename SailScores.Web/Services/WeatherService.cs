@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SailScores.Api.Enumerations;
+﻿using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using System;

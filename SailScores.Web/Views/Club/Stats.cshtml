@@ -1,6 +1,5 @@
 @using Microsoft.Extensions.Localization;
 @using SailScores.Web.Resources;
-@using SailScores.Web.Extensions;
 @using SailScores.Web.Services;
 
 @inject IStringLocalizer<SharedResource> localizer
@@ -17,6 +16,25 @@
         <h1 class="display-4">@Model.Name @localizer["Stats"]</h1>
     </div>
 </div>
+@if (!String.IsNullOrWhiteSpace(Model.StatisticsDescription))
+{
+    <hr />
+    <div class="row">
+        <div class="col-md-9">
+            @Html.Raw(Markdig.Markdown.ToHtml(Model.StatisticsDescription))
+        </div>
+        <div class="col-md-3">
+            @if (Model.CanEdit)
+            {
+                <a asp-controller="Club"
+                   class="btn btn-outline-primary">@localizer["Edit Notes"]</a>
+            }
+        </div>
+    </div>
+} else if (Model.CanEdit) {
+<a asp-controller="Club" asp-action="EditStats"
+   class="btn btn-outline-primary">@localizer["Add Notes"]</a>
+}
 <table class="table">
     <thead>
         <tr>

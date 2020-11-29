@@ -77,12 +77,12 @@ namespace SailScores.SeleniumTests
             currentElement = driver.WaitUntilClickable(By.LinkText("Races"));
             currentElement.Click();
 
-            currentElement = driver.FindElementByXPath("//*[@id='racelink_faceec7e-d3db-4a5c-964d-9846cf64a009']");
+            currentElement = driver.FindElementByXPath("//*[@id='racelink_5e191bc2-04aa-4c5a-8a19-76b1484a95bb']");
             currentElement.Click();
 
             // Relying on these to throw exception if not found.
-            driver.FindElement(By.XPath("//*[contains(.,'Colburn, Bill')]"));
-            driver.FindElement(By.XPath("//*[contains(.,'Mango')]"));
+            driver.FindElement(By.XPath("//*[contains(.,'Grosch, Ryan')]"));
+            driver.FindElement(By.XPath("//*[contains(.,'Black Cat')]"));
         }
 
         [Trait("Read Only", "True")]
@@ -108,10 +108,12 @@ namespace SailScores.SeleniumTests
             currentElement = driver.WaitUntilClickable(By.LinkText("Regattas"));
             currentElement.Click();
 
-            currentElement = driver.WaitUntilClickable(By.XPath("//*[@id='regattalink_6f2e4bfe-8d0d-41b5-485e-08d732752bb6']"));
+            currentElement = driver.WaitUntilClickable(By.CssSelector("a[href*= '/2020/DieHard']"));
             currentElement.Click();
 
-            currentElement = driver.WaitUntilVisible(By.XPath("//*[@id='Results2019DieHardMC']/div/table/tbody/tr[1]/th[4]"));
+            currentElement = driver.WaitUntilVisible(By.XPath("//*[contains(.,'Grosch, Ryan')]"));
+
+            //*[@id="regattalink_6f2e4bfe-8d0d-41b5-485e-08d732752bb6"]
             Assert.Contains("Grosch", currentElement.Text);
         }
 

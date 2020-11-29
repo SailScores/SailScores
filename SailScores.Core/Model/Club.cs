@@ -36,6 +36,8 @@ namespace SailScores.Core.Model
 
         public IList<ScoringSystem> ScoringSystems { get; set; }
 
+        public String StatisticsDescription { get; set; }
+
     }
 
 #pragma warning restore CA2227 // Collection properties should be read only
