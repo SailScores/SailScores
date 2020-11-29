@@ -204,10 +204,10 @@ form label.required:not(.custom-control-label)::after {
 }
 
 
-
 @media (prefers-color-scheme: dark) {
 
     $secondary-background: #3B3B3B;
+    $almost-background: #2A2A2A;
 
     a {
         color: $my-link-color-alt;
@@ -223,7 +223,7 @@ form label.required:not(.custom-control-label)::after {
     }
 
     .bg-almost {
-        background: $secondary-background;
+        background: $almost-background;
     }
 
     .btn-light {
@@ -232,7 +232,8 @@ form label.required:not(.custom-control-label)::after {
     }
 
     .btn-outline-primary {
-        color: $white-alt;
+        //color: $white-alt;
+        color: $my-link-color-alt;
     }
 
     .bg-secondary {
