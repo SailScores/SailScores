@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using SailScores.Web.Services;
 using System;
 using System.Collections.Generic;

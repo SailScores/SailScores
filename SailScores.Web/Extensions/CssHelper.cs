@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Extensions
 {
     public static class CssHelper
     {
-        public static IHtmlContent EmbedCss(this IHtmlHelper htmlHelper, string path)
+        public static async Task<IHtmlContent> EmbedCss(this IHtmlHelper htmlHelper, string path)
         {
             var env = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IHostingEnvironment>();
 
@@ -17,7 +18,7 @@ namespace SailScores.Web.Services
             // load the contents of that file
             try
             {
-                var cssText = File.ReadAllText(cssFilePath);
+                var cssText = await File.ReadAllTextAsync(cssFilePath);
                 return htmlHelper.Raw("<style>\n" + cssText + "\n</style>");
             }
             catch

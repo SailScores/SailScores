@@ -1,7 +1,7 @@
 ﻿@using SailScores.Core.Model
 @using Microsoft.Extensions.Localization
+@using SailScores.Web.Extensions
 @using SailScores.Web.Resources
-@using SailScores.Web.Services
 
 @inject IStringLocalizer<SharedResource> localizer
 
@@ -29,8 +29,8 @@
     {
         <meta name="keywords" content="@ViewData["MetaKeywords"]" />
     }
-
-    @Html.EmbedCss("css\\site.min.css")
+    @await Html.EmbedCss("css\\site.min.css")
+    @*<inline-style href="css/site.min.css" />*@
 </head>
 <body>
     <div class="body-content">
