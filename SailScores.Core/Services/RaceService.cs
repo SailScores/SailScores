@@ -57,6 +57,24 @@ namespace SailScores.Core.Services
             return _mapper.Map<List<Model.Race>>(dbObjects);
         }
 
+
+        public async Task<IList<Model.Race>> GetRecentRacesAsync(
+            Guid clubId,
+            int daysBack)
+        {
+            var cutoffDate = DateTime.Today.AddDays(0 - Math.Abs(daysBack));
+            var dbObjects = await _dbContext
+                .Races
+                .Where(r => r.ClubId == clubId
+                && r.Date >= cutoffDate)
+                .OrderByDescending(r => r.Date)
+                .ThenBy(r => r.Order)
+                .Include(r => r.Fleet)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            return _mapper.Map<List<Model.Race>>(dbObjects);
+        }
+
         public async Task<IList<Model.Race>> GetFullRacesAsync(
             Guid clubId,
             string seasonName,

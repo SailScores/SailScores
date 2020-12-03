@@ -50,7 +50,8 @@ namespace SailScores.Web.Services
             var start = DateTime.Today.AddDays(-7);
             var end = DateTime.Today.AddDays(7);
 
-            var coreRegattas = await _coreRegattaService.GetRegattasDuringSpanAsync(start, end);
+            var coreRegattas = await _coreRegattaService.GetRegattasDuringSpanAsync(start, end)
+                .ConfigureAwait(false);
             var filteredRegattas = coreRegattas
                 .OrderBy(s => s.StartDate)
                 .ThenBy(s => s.Name);

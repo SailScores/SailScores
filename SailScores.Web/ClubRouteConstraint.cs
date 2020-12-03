@@ -39,13 +39,11 @@ namespace SailScores.Web
             RouteValueDictionary values,
             RouteDirection routeDirection)
         {
-            // could rewrite to cache misses as well as hits. Right now, misses will always force a call to the DB.
-
             List<string> clubInitials;
 
-            string potentialClubInitials = values[routeKey].ToString().ToUpperInvariant();
+            string potentialClubInitials = values[routeKey]?.ToString()?.ToUpperInvariant();
 
-            if (!_cache.TryGetValue(cacheKeyName, out clubInitials) || !clubInitials.Contains(potentialClubInitials))
+            if (!_cache.TryGetValue(cacheKeyName, out clubInitials))
             {
                 // Key not in cache, so get data.
                 using (var context = _createDbContext())

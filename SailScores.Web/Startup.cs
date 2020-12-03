@@ -275,7 +275,11 @@ namespace SailScores.Web
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                var clubRouteConstraint = new ClubRouteConstraint(() =>
+                        app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
+                    app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
+                );
+
                 endpoints.MapControllers();
                 endpoints.MapAreaControllerRoute(
                     "areas",
@@ -285,58 +289,28 @@ namespace SailScores.Web
                     name: "ClubRoute",
                     pattern: "{clubInitials}/{controller}/{action}/{id?}",
                     defaults: new { controller = "Club", action = "Index" },
-                    constraints: new
-                    {
-                        clubInitials = new ClubRouteConstraint(() =>
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
-                        )
-                    });
+                    constraints: new { clubInitials = clubRouteConstraint });
 
                 endpoints.MapControllerRoute(
                     name: "Competitor",
                     pattern: "{clubInitials}/Competitor/{sailNumber}/",
                     defaults: new { controller = "Competitor", action = "Details" },
-                    constraints: new
-                    {
-                        clubInitials = new ClubRouteConstraint(() =>
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
-                        )
-                    });
+                    constraints: new { clubInitials = clubRouteConstraint });
                 endpoints.MapControllerRoute(
                     name: "Race",
                     pattern: "{clubInitials}/Race/{seasonName}",
                     defaults: new { controller = "Race", action = "Index" },
-                    constraints: new
-                    {
-                        clubInitials = new ClubRouteConstraint(() =>
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
-                        )
-                    });
+                    constraints: new { clubInitials = clubRouteConstraint });
                 endpoints.MapControllerRoute(
                     name: "Series",
                     pattern: "{clubInitials}/{season}/{seriesName}",
                     defaults: new { controller = "Series", action = "Details" },
-                    constraints: new
-                    {
-                        clubInitials = new ClubRouteConstraint(() =>
-                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
-                        )
-                    });
+                    constraints: new { clubInitials = clubRouteConstraint });
                 endpoints.MapControllerRoute(
                     name: "Regatta",
                     pattern: "{clubInitials}/Regatta/{season}/{regattaName}",
                     defaults: new { controller = "Regatta", action = "Details" },
-                    constraints: new
-                    {
-                        clubInitials = new ClubRouteConstraint(() =>
-                                app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
-                            app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
-                        )
-                    });
+                    constraints: new { clubInitials = clubRouteConstraint });
 
                 endpoints.MapControllerRoute(
                     name: "Error",

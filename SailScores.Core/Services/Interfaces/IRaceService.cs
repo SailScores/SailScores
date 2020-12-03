@@ -9,6 +9,7 @@ namespace SailScores.Core.Services
     public interface IRaceService
     {
         Task<IList<Model.Race>> GetRacesAsync(Guid clubId);
+        Task<IList<Model.Race>> GetRecentRacesAsync(Guid clubId, int daysBack);
         Task<IList<Model.Race>> GetFullRacesAsync(
             Guid clubId,
             string seasonName,

@@ -48,8 +48,8 @@ namespace SailScores.Web.Services
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);
             var club = await _coreClubService.GetMinimalClub(clubId);
-            club.Seasons = await _coreSeasonService.GetSeasons(clubId);
-            club.Races = await _coreRaceService.GetRacesAsync(clubId);
+            // 10 days back, but view filters down to 8 days back.
+            club.Races = await _coreRaceService.GetRecentRacesAsync(clubId, 10);
             club.Series = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
             club.Regattas = await _coreRegattaService.GetAllRegattasAsync(clubId);
             return club;
