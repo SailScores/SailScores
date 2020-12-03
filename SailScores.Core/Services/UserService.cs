@@ -54,20 +54,25 @@ namespace SailScores.Core.Services
             {
                 return false;
             }
-            var userMatches = _dbContext.UserPermissions
-                .Where(u => u.UserEmail
-                == email);
-            if (await userMatches.AnyAsync(u => u.CanEditAllClubs).ConfigureAwait(false))
+
+            if (clubId.HasValue)
             {
-                return true;
+                var permission = await _dbContext.UserPermissions
+                    .AnyAsync(u => u.UserEmail == email && u.ClubId == clubId)
+                    .ConfigureAwait(false);
+
+                if (permission)
+                {
+                    return true;
+                }
             }
-            if (!clubId.HasValue)
-            {
-                return false;
-            }
-            return await userMatches.AnyAsync(u => u.ClubId == clubId)
+
+            var editAny = await _dbContext.UserPermissions
+                .Where(u => u.UserEmail == email)
+                .AnyAsync(u => u.CanEditAllClubs)
                 .ConfigureAwait(false);
 
+            return editAny;
         }
 
         public async Task<bool> IsUserFullAdmin(string email)
@@ -76,10 +81,10 @@ namespace SailScores.Core.Services
             {
                 return false;
             }
-            var userMatches = _dbContext.UserPermissions
-                .Where(u => u.UserEmail
-                == email);
-            return await userMatches.AnyAsync(u => u.CanEditAllClubs).ConfigureAwait(false);
+            return await _dbContext.UserPermissions
+                .AnyAsync(u => u.UserEmail == email &&
+                               u.CanEditAllClubs)
+                .ConfigureAwait(false);
         }
     }
 }

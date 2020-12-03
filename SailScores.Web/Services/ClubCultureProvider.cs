@@ -23,7 +23,7 @@ namespace SailScores.Web.Services
         {
             _dbContext = httpContext.RequestServices.GetService<ISailScoresContext>();
             _cache = httpContext.RequestServices.GetService<IMemoryCache>();
-            var locale = await GetLocaleAsync(httpContext.Request.Path);
+            var locale = await GetLocaleAsync(httpContext.Request.Path).ConfigureAwait(false);
             if (String.IsNullOrWhiteSpace(locale))
             {
                 return null;
@@ -49,7 +49,7 @@ namespace SailScores.Web.Services
                     //even if it is getting frequent use.
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                     {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60)
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(300)
                     };
 
                     // Save data in cache.
