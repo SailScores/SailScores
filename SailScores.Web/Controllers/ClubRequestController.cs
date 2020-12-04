@@ -33,6 +33,12 @@ namespace SailScores.Web.Controllers
                 return View(request);
             }
 
+            if (!(await _clubRequestService.VerifyInitials(request.ClubInitials)))
+            {
+                ModelState.AddModelError("ClubInitials", "Initials not valid.");
+                return View(request);
+            }
+
             await _clubRequestService.SubmitRequest(request);
 
             return View("RequestSubmitted", request);
@@ -113,5 +119,15 @@ namespace SailScores.Web.Controllers
             return View(vm);
         }
 
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> VerifyInitials(string clubInitials)
+        {
+            if (!await _clubRequestService.VerifyInitials(clubInitials))
+            {
+                return Json($"Not available. The initials must be alphanumeric and not in use.");
+            }
+
+            return Json(true);
+        }
     }
 }

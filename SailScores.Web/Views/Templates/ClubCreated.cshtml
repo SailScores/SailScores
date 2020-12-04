@@ -1,0 +1,64 @@
+﻿@using Microsoft.Extensions.Configuration
+@model SailScores.Web.Models.SailScores.ClubRequestViewModel
+
+@inject IConfiguration _config;
+@{
+    var preferredhost = _config["PreferredHost"];
+    string baseUrl = $"https://{preferredhost}";
+    var clubUrl = $"{baseUrl}/{Model.ClubInitials + ((Model.ForTesting ?? false) ? "TEST" : "")}";
+    var accountUrl = $"{baseUrl}/Account/Register";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: "Open Sans", "Segoe UI", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <a href="@clubUrl">
+            @Model.ClubInitials - @Model.ClubName
+        </a>
+    </div>
+    <div>
+        <p>@Model.ContactName,</p>
+    </div>
+    <div>
+        <h3>Thanks for your interest in SailScores!</h3>
+    </div>
+    <p>
+        A club has been set up for @Model.ClubName at: <br />
+        <a href="@clubUrl">@clubUrl</a>
+        <br />
+    </p>
+<p>
+    This was set up as a "hidden" club. That means the club won't show up on the
+    home page of SailScores, but it is still accessible to any users that have
+    the url above. If you haven't already, create an account at
+    <a href="@accountUrl">@accountUrl</a> using the email address you provided
+    ( @Model.ContactEmail ). That account will have permission to edit this club.
+    Additional accounts can be given permission by emailing us.
+</p>
+<p>
+    Someone will take a look at your club set up and, if you provided them, help
+    set up the discard pattern and list of boat types you sail.
+</p>
+    <p>
+        There are a few other things, such as the list of competitors, that
+        you need to set up before you can score your first race. You'll find
+        these listed on the club admin page:
+        <a href="@clubUrl/admin/">@clubUrl/admin/</a>
+    </p>
+    <p>
+        Please let us know about your experience: if there are areas of SailScores that are
+        causing you trouble or if you see an opportunity for improvement, please
+        let us know. A public list of issues, bugs and feature requests is at
+        <a href="https://github.com/SailScores/SailScores/issues">https://github.com/SailScores/SailScores/issues</a> . Or feel free to email me at
+        <a href="mailto:jamie@widernets.com">jamie@widernets.com</a>
+    </p>
+</body>
+</html>

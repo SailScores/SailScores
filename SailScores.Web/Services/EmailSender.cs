@@ -1,6 +1,7 @@
 ﻿using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
+using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Services
 {
@@ -9,10 +10,14 @@ namespace SailScores.Web.Services
     public class EmailSender : IEmailSender
     {
         private readonly IEmailConfiguration _emailConfiguration;
+        private readonly ITemplateHelper _templateHelper;
 
-        public EmailSender(IEmailConfiguration emailConfiguration)
+        public EmailSender(
+            IEmailConfiguration emailConfiguration,
+            ITemplateHelper templateHelper)
         {
             _emailConfiguration = emailConfiguration;
+            _templateHelper = templateHelper;
         }
 
         public async Task SendEmailAsync(string email, string subject, string message)
@@ -24,6 +29,13 @@ namespace SailScores.Web.Services
             var to = new EmailAddress(email);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, message, message);
             await client.SendEmailAsync(msg);
+        }
+
+        public async Task<string> GetHtmlFromView<T>(
+            string viewName,
+            T model)
+        {
+            return await _templateHelper.GetTemplateHtmlAsStringAsync(viewName, model);
         }
     }
 }

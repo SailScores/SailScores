@@ -12,5 +12,6 @@ namespace SailScores.Web.Services
         Task<ClubRequestWithOptionsViewModel> GetRequest(Guid id);
         Task ProcessRequest(Guid id, bool test, Guid? copyFromClubId);
         Task UpdateRequest(ClubRequestViewModel vm);
+        Task<bool> VerifyInitials(string initials);
     }
 }

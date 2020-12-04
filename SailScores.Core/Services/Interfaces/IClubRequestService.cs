@@ -7,7 +7,7 @@ namespace SailScores.Core.Services
 {
     public interface IClubRequestService
     {
-        Task Submit(ClubRequest clubRequest);
+        Task<Guid> Submit(ClubRequest clubRequest);
         Task<IList<ClubRequest>> GetPendingRequests();
         Task<ClubRequest> GetRequest(Guid id);
         Task UpdateRequest(ClubRequest clubRequest);

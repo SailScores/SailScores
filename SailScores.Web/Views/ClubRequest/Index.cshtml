@@ -11,16 +11,16 @@
 <div class="row">
     <div class="col-12">
         <p>
-            Fill out the form and we'll create a test club
-            for you. If you like how things are working, we can copy the competitors
-            and settings to a club visible on the front page, or you can start
-            with a clean slate.
+            When clubs are created, they are not listed on the front page, but are
+            accessible to anyone with the URL. If you would like your club's data cleared
+            out or reset, <a href="mailto:info@sailscores.com">let us know.</a>
         </p>
         <p>
             Inactive clubs will be archived and removed from the site
-            periodically.  (A club is considered inactive if it hasn't had
+            periodically.  A club is considered inactive if it hasn't had
             any activity in a year, or if the initial setup isn't completed
-            within 2 months.)
+            within 2 months. We'll contact you and give you a chance to export
+            data first.
         </p>
         <br />
     </div>
@@ -108,18 +108,16 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <input type="submit" value="Submit" class="btn btn-primary" />
-                    </div>
+                <div class="col-md-3">
+                    <input type="submit" value="Submit" class="btn btn-primary btn-block" />
+                </div>
+                <div class="col-md-3">
+                    <a asp-controller="Home" asp-action="Index"
+                       class="btn btn-outline-primary btn-block">Cancel</a>
                 </div>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-controller="Home" asp-action="Index">Back to the main page</a>
 </div>
 
 @section Scripts {
