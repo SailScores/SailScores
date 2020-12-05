@@ -20,7 +20,10 @@
                             {
                                 if (@tip.Link != null)
                                 {
-                                    <span class="far fa-check-square"></span> <s><a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">@tip.Title</a></s>
+                            <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">
+                                <span class="far fa-check-square"></span>
+                                <s>@tip.Title</s>
+                            </a>
                                 }
                                 else
                                 {
@@ -29,7 +32,8 @@
                             }
                             else if (@tip.Link != null)
                             {
-                                <span class="far fa-square"></span> <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">@tip.Title</a>
+                                <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">
+                                <span class="far fa-square"></span>@tip.Title</a>
                             }
                             else
                             {
