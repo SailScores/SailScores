@@ -90,7 +90,7 @@ namespace SailScores.Web.Services
                 race.Tips = new List<AdminToDoViewModel> { new AdminToDoViewModel
                 {
                     Title = "Add a series",
-                    Details = "If you want to score races together, add a series.",
+                    Details = "If you want to score races together, add a series and a season covering this date.",
                     Link = new ToDoLinkViewModel
                     {
                         Action = "Create",

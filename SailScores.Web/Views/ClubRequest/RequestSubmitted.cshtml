@@ -4,21 +4,25 @@
     ViewData["Title"] = "Request Submitted";
 }
 
-<h1>Request Submitted</h1>
+<h1>Club Created</h1>
 
 <h4>Check your email</h4>
 <hr />
 <div class="row">
     <div class="col-12">
-        <p>If everything looks good, we're sending an email to @Model.ContactEmail with information about how to complete your club set up.</p>
+        <p>If everything looks good, we're sending an email to you at <strong>
+            @Model.ContactEmail</strong>
+            with information about your club setup.</p>
         <p>
-            If you don't receive an email within the next hour please reach out via
-            Twitter (@@SailScores) or email (<a href="mailto:info@sailscores.com">info@sailscores.com</a>
-            or <a href="mailto:jamie@widernets.com">jamie@widernets.com</a>).
+            If you don't receive an email within the next hour please reach out
+            by email (<a href="mailto:info@sailscores.com">info@sailscores.com</a>
+            or <a href="mailto:jamie@widernets.com">jamie@widernets.com</a>) or via
+            Twitter (@@SailScores).
         </p>
         <p>
-            If you haven't already, you can <a asp-controller="Account" asp-action="Register">
-                register your login information.</a> Be sure to use the contact email you provided in the Club Request.
+            If you haven't already, please <a asp-controller="Account" asp-action="Register">
+            register for an account.</a> Be sure to use the contact email you
+            provided in the Club Request.
         </p>
         <br />
 </div>
