@@ -125,4 +125,4 @@ WHERE Id = @ClubId
 PRINT N'Deleting orphaned weather entries'
 DELETE
 FROM Weather
-WHERE Id NOT IN (Select WeatherId from Races)
+WHERE Id NOT IN (Select WeatherId from Races where weatherId is not null)
