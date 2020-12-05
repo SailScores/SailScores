@@ -122,3 +122,7 @@ DELETE
 FROM Clubs
 WHERE Id = @ClubId
 
+PRINT N'Deleting orphaned weather entries'
+DELETE
+FROM Weather
+WHERE Id NOT IN (Select WeatherId from Races)

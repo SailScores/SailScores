@@ -144,7 +144,8 @@ namespace SailScores.Core.Services
             if (race == null)
             {
                 dbSeason = await _dbContext.Seasons
-                    .Where(s => s.ClubId == clubId)
+                    .Where(s => s.ClubId == clubId
+                        && s.Start <= DateTime.UtcNow)
                     .OrderByDescending(s => s.Start)
                     .FirstOrDefaultAsync()
                     .ConfigureAwait(false);
@@ -155,6 +156,14 @@ namespace SailScores.Core.Services
                     .Where(s => s.ClubId == clubId)
                     .OrderByDescending(s => s.Start)
                     .FirstOrDefaultAsync(s => s.Start <= race.Date)
+                    .ConfigureAwait(false);
+            }
+            if (dbSeason == null)
+            {
+                dbSeason = await _dbContext.Seasons
+                    .Where(s => s.ClubId == clubId)
+                    .OrderByDescending(s => s.Start)
+                    .FirstOrDefaultAsync()
                     .ConfigureAwait(false);
             }
             return _mapper.Map<Season>(dbSeason);

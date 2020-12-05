@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SailScores.Web.Models.SailScores
 {
@@ -15,6 +16,7 @@ namespace SailScores.Web.Models.SailScores
         [StringLength(10, ErrorMessage = "Initials are limited to 10 characters or less.")]
         [Display(Name = "Club initials")]
         [Required(ErrorMessage = "Club initials are required")]
+        [Remote(action: "VerifyInitials", controller: "ClubRequest")]
         public String ClubInitials { get; set; }
 
         [Display(Name = "Club location")]
@@ -35,11 +37,11 @@ namespace SailScores.Web.Models.SailScores
         public bool? ForTesting { get; set; }
 
         [Display(Name = "Classes", Description =
-            "What classes does your club race? We'll get started on the set up.")]
+            "What classes of boats are raced?")]
         public String Classes { get; set; }
 
         [Display(Name = "Usual discard rules", Description =
-            "What is the typical pattern of discards used by your club?")]
+            "Do you have a typical pattern for race discards?")]
         public String TypicalDiscardRules { get; set; }
         [Display(Name = "Other Comments")]
         public String Comments { get; set; }

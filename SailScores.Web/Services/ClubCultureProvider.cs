@@ -45,8 +45,6 @@ namespace SailScores.Web.Services
                     .ToDictionary(
                         c => c.Initials.ToUpperInvariant(),
                         c => c.Locale);
-                    //TODO: need to test reloading the cache from db occasionally,
-                    //even if it is getting frequent use.
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(300)

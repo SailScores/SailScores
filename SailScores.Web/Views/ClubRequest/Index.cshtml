@@ -6,21 +6,17 @@
 
 <h1>Give it a try. It's free.</h1>
 
-<h4>Interested in seeing how SailScores works?</h4>
+<h4>Interested in trying out SailScores?</h4>
 <hr />
 <div class="row">
     <div class="col-12">
         <p>
-            Fill out the form and we'll create a test club
-            for you. If you like how things are working, we can copy the competitors
-            and settings to a club visible on the front page, or you can start
-            with a clean slate.
+            Complete the information below to create club pages for your group. The
+            club won't be listed on the front page, but is
+            accessible to anyone with the URL that we'll email you.
         </p>
-        <p>
-            Inactive clubs will be archived and removed from the site
-            periodically.  (A club is considered inactive if it hasn't had
-            any activity in a year, or if the initial setup isn't completed
-            within 2 months.)
+        <p>If you would like the club's data reset,
+           <a href="mailto:info@sailscores.com">let us know.</a>
         </p>
         <br />
     </div>
@@ -108,19 +104,31 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <input type="submit" value="Submit" class="btn btn-primary" />
-                    </div>
+                <div class="col-md-3">
+                    <input type="submit" value="Submit" class="btn btn-primary btn-block" />
+                </div>
+                <div class="col-md-3">
+                    <a asp-controller="Home" asp-action="Index"
+                       class="btn btn-outline-primary btn-block">Cancel</a>
                 </div>
             </div>
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-controller="Home" asp-action="Index">Back to the main page</a>
+<div class="row">
+    <div class="col-12">
+        <br/>
+        <p><em>
+            Inactive clubs will be archived and removed from the site
+            periodically. A club is considered inactive if it hasn't had
+            any activity in a year or the initial setup isn't completed
+            within 2 months.
+        </em></p>
+    </div>
 </div>
+
+
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

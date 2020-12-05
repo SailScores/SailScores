@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SailScores.Web.Services;
+using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Extensions
 {
@@ -21,6 +22,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IClubRequestService, ClubRequestService>();
             services.AddScoped<IWeatherService, WeatherService>();
             services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<ITemplateHelper, TemplateHelper>();
 
             services.AddSingleton<AppVersionInfo>();
             services.AddSingleton<AppSettingsService>();

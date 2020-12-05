@@ -5,7 +5,10 @@ using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using SailScores.Core.FlatModel;
 
 namespace SailScores.Web.Services
 {
@@ -17,8 +20,11 @@ namespace SailScores.Web.Services
         private readonly IUserService _coreUserService;
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _memoryCache;
         private readonly IMapper _mapper;
 
+
+        private const string clubCacheKeyName = "CachedClubList";
 
         public ClubRequestService(
             Core.Services.IClubService clubService,
@@ -27,6 +33,7 @@ namespace SailScores.Web.Services
             Core.Services.IUserService userService,
             IEmailSender emailSender,
             IConfiguration configuration,
+            IMemoryCache memoryCache,
             IMapper mapper)
         {
             _coreClubService = clubService;
@@ -35,6 +42,7 @@ namespace SailScores.Web.Services
             _coreUserService = userService;
             _emailSender = emailSender;
             _configuration = configuration;
+            _memoryCache = memoryCache;
             _mapper = mapper;
         }
 
@@ -42,18 +50,18 @@ namespace SailScores.Web.Services
         {
             var coreRequest = _mapper.Map<Core.Model.ClubRequest>(request);
             coreRequest.RequestSubmitted = DateTime.Now;
-            await _coreClubRequestService.Submit(coreRequest);
-            var notificationEmail = _configuration["NotificationEmail"];
-            try
-            {
-                await _emailSender.SendEmailAsync(notificationEmail, "SailScores - Club Request submitted.",
-                       $"A club has been requested for {request.ClubName} by {request.ContactEmail}.");
-            }
-            catch (Exception)
-            {
-                // if email is not sent, should add some alert for site admins, that there are 
-                // requests to approve.
-            }
+            var id = await _coreClubRequestService.Submit(coreRequest);
+
+            await ProcessRequest(id, false, null);
+
+            await SendUserNotice(request);
+            await SendAdminNotice(coreRequest);
+        }
+
+        private async Task SendUserNotice(ClubRequestViewModel request)
+        {
+            var emailBody = await _emailSender.GetHtmlFromView("Templates/ClubCreated", request);
+            await _emailSender.SendEmailAsync(request.ContactEmail, "SailScores Club Created", emailBody);
         }
 
         public async Task UpdateRequest(ClubRequestViewModel vm)
@@ -78,12 +86,24 @@ namespace SailScores.Web.Services
             return vm;
         }
 
+        public async Task<bool> VerifyInitials(string initials)
+        {
+            if (CheckInitialsBasics(initials))
+            {
+                return !(await AreInitialsInUse(initials));
+            }
+
+            return false;
+        }
+        
         public async Task ProcessRequest(
             Guid id,
             bool test,
             Guid? copyFromClubId)
         {
             var request = await _coreClubRequestService.GetRequest(id);
+
+            request.ClubInitials = request.ClubInitials.ToUpperInvariant();
 
             Guid newClubId;
 
@@ -101,7 +121,7 @@ namespace SailScores.Web.Services
                 ScoringSystem newScoringSystem = new ScoringSystem
                 {
                     ParentSystemId = baseScoringSystem.Id,
-                    Name = $"{request.ClubName} scoring based on App. A Low Point",
+                    Name = $"{request.ClubInitials} scoring based on App. A Low Point",
                     DiscardPattern = "0,1"
                 };
 
@@ -111,7 +131,7 @@ namespace SailScores.Web.Services
                     Id = Guid.Empty,
                     Name = request.ClubName,
                     Initials = initialsToUse,
-                    IsHidden = test,
+                    IsHidden = true,
                     Url = request.ClubWebsite,
                     DefaultScoringSystem = newScoringSystem,
                     Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_" + request.ClubLocation + "_"),
@@ -119,8 +139,9 @@ namespace SailScores.Web.Services
                 };
 
                 newClubId = await _coreClubService.SaveNewClub(club);
+                ClearClubMemoryCache();
 
-                if (test)
+                if (club.IsHidden)
                 {
                     request.TestClubId = newClubId;
 
@@ -139,6 +160,27 @@ namespace SailScores.Web.Services
 #pragma warning restore CA1308 // Normalize strings to uppercase
         }
 
+        private void ClearClubMemoryCache()
+        {
+            _memoryCache.Remove(clubCacheKeyName);
+        }
+
+
+        private async Task SendAdminNotice(ClubRequest request)
+        {
+            try
+            {
+                var notificationEmail = _configuration["NotificationEmail"];
+                await _emailSender.SendEmailAsync(notificationEmail, "SailScores - Club created",
+                    $"A club has been created for {request.ClubName} by {request.ContactEmail}.");
+            }
+            catch (Exception)
+            {
+                // if email is not sent, should add some alert for site admins, that there are 
+                // requests to approve.
+            }
+        }
+
         private async Task<Guid> CopyClub(Guid copyFromClubId,
             ClubRequest request,
             bool test)
@@ -153,6 +195,35 @@ namespace SailScores.Web.Services
             return await _coreClubService.CopyClubAsync(
                 copyFromClubId,
                 targetClub);
+        }
+
+        private bool CheckInitialsBasics(string initials)
+        {
+
+            return initials != null
+                   && initials.Length > 2
+                   && AllValidCharacters(initials);
+        }
+
+        private bool AllValidCharacters(string initials)
+        {
+            foreach (char c in initials)
+            {
+                if(!char.IsLetterOrDigit(c))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> AreInitialsInUse(string initials)
+        {
+            var clubInitials = (await _coreClubService.GetClubs(true).ConfigureAwait(false))
+                .Select(c => c.Initials.ToUpperInvariant());
+
+            return clubInitials.Contains(initials.ToUpperInvariant());
         }
 
     }

@@ -45,12 +45,13 @@ namespace SailScores.Core.Services
             return _mapper.Map<ClubRequest>(dbObj);
         }
 
-        public async Task Submit(ClubRequest clubRequest)
+        public async Task<Guid> Submit(ClubRequest clubRequest)
         {
             var dbObj = _mapper.Map<Db.ClubRequest>(clubRequest);
             _dbContext.ClubRequests.Add(dbObj);
 
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            return dbObj.Id;
         }
 
         public async Task UpdateRequest(ClubRequest clubRequest)
