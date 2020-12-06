@@ -6,6 +6,7 @@ using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace SailScores.Web.Services
         private readonly Core.Services.ISeriesService _coreSeriesService;
         private readonly IScoringService _coreScoringService;
         private readonly Core.Services.IRegattaService _coreRegattaService;
-        private readonly ISeasonService _coreSeasonService;
+        private readonly Core.Services.ISeasonService _coreSeasonService;
         private readonly IWeatherService _weatherService;
         private readonly IMapper _mapper;
         private readonly ILogger<RaceService> _logger;
@@ -286,6 +287,7 @@ namespace SailScores.Web.Services
 
         public async Task SaveAsync(RaceWithOptionsViewModel race)
         {
+            await EnsureSeasonExists(race.ClubId, race.Date);
             var fleets = await _coreClubService.GetAllFleets(race.ClubId);
             var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, DateTime.Today, false);
 
@@ -363,6 +365,104 @@ namespace SailScores.Web.Services
             {
                 await _coreRegattaService.AddRaceToRegattaAsync(
                     _mapper.Map<Race>(race), race.RegattaId.Value);
+            }
+        }
+
+        private async Task EnsureSeasonExists(
+            Guid clubId,
+            DateTime? raceDate)
+        {
+            // raceDate should not be null, but creating a season for today
+            // shoutdn't cause much trouble.
+
+            var dateToUse = raceDate ?? DateTime.UtcNow;
+            var seasons = await _coreSeasonService.GetSeasons(clubId);
+
+            if (!seasons.Any(s => s.Start <= raceDate && s.End >= raceDate))
+            {
+                await CreateSeasonForDate(clubId, dateToUse, seasons);
+            }
+        }
+
+        private async Task CreateSeasonForDate(
+            Guid clubId,
+            DateTime dateToUse,
+            IEnumerable<Season> existingSeasons)
+        {
+            var lastSeason = existingSeasons.OrderByDescending(s => s.Start).FirstOrDefault();
+
+            Season newSeason = null;
+            //if no seasons exist
+            if (lastSeason == null)
+            {
+                newSeason = new Season
+                {
+                    Start = new DateTime(dateToUse.Year, 1, 1),
+                    End = new DateTime(dateToUse.Year, 12, 31),
+                    Name = dateToUse.Year.ToString(CultureInfo.InvariantCulture),
+                    ClubId = clubId
+                };
+            }
+            else
+            {
+                int direction = lastSeason.Start < dateToUse ? 1 : -1;
+                int yearCounter = direction;
+                while (newSeason == null)
+                {
+                    if (lastSeason.Start.AddYears(yearCounter) <= dateToUse
+                        && lastSeason.End.AddYears(yearCounter) >= dateToUse)
+                    {
+                        newSeason = new Season
+                        {
+                            Start = lastSeason.Start.AddYears(yearCounter),
+                            End = lastSeason.End.AddYears(yearCounter),
+                            ClubId = clubId
+                        };
+                    }
+
+                    // move one more, future or past. 
+                    yearCounter += direction;
+                }
+
+                yearCounter -= direction;
+                // now, starting at the same place, look for a name. hopefully first try finds it.
+                while (string.IsNullOrWhiteSpace(newSeason.Name))
+                {
+                    var proposedName = lastSeason.Start.AddYears(yearCounter).Year
+                        .ToString(CultureInfo.InvariantCulture);
+                    if (!existingSeasons.Any(s => s.Name == proposedName))
+                    {
+                        newSeason.Name = proposedName;
+                    }
+             
+                    // move one more, future or past. 
+                    yearCounter += direction;
+                }
+            }
+
+            EnsureSeasonDatesDoNotOverlap(newSeason, existingSeasons, dateToUse);
+
+            await _coreSeasonService.SaveNew(newSeason);
+
+        }
+
+        private void EnsureSeasonDatesDoNotOverlap(
+            Season newSeason,
+            IEnumerable<Season> existingSeasons,
+            DateTime mustIncludeDate)
+        {
+            var seasonBefore = existingSeasons.OrderByDescending(s => s.End)
+                .FirstOrDefault(s => s.End < mustIncludeDate);
+            if (seasonBefore != null)
+            {
+                newSeason.Start = seasonBefore.End > newSeason.Start ? seasonBefore.End.AddDays(1) : newSeason.Start;
+            }
+
+            var seasonAfter = existingSeasons.OrderBy(s => s.Start)
+                .FirstOrDefault(s => s.Start > mustIncludeDate);
+            if (seasonAfter != null)
+            {
+                newSeason.End = seasonAfter.Start < newSeason.End ? seasonAfter.Start.AddDays(-1) : newSeason.End;
             }
         }
 
