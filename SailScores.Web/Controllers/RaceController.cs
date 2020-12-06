@@ -45,11 +45,14 @@ namespace SailScores.Web.Controllers
             if (String.IsNullOrWhiteSpace(seasonName))
             {
                 var currentSeason = await _raceService.GetCurrentSeasonAsync(clubInitials);
-                return RedirectToRoute("Race", new
+                if (currentSeason != null)
                 {
-                    clubInitials,
-                    seasonName = currentSeason.UrlName
-                });
+                    return RedirectToRoute("Race", new
+                    {
+                        clubInitials,
+                        seasonName = currentSeason.UrlName
+                    });
+                }
             }
             var races = await _raceService.GetAllRaceSummariesAsync(
                 clubInitials,

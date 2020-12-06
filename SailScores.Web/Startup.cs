@@ -279,7 +279,7 @@ namespace SailScores.Web
                         app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
                     app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()
                 );
-
+                endpoints.MapRazorPages();
                 endpoints.MapControllers();
                 endpoints.MapAreaControllerRoute(
                     "areas",

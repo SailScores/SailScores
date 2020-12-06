@@ -46,6 +46,8 @@ namespace SailScores.Core.Services
             _dbContext.BoatClasses.Add(dbBoatClass);
             var defaultShortName = boatClass.Name.Split(' ')[0];
             var fleetId = Guid.NewGuid();
+
+            var fleetName = boatClass.Name.EndsWith('s') ? boatClass.Name : $"{boatClass.Name}s";
             var dbFleet = new Db.Fleet
             {
                 Id = fleetId,
@@ -53,7 +55,7 @@ namespace SailScores.Core.Services
                 FleetType = Api.Enumerations.FleetType.SelectedClasses,
                 IsHidden = false,
                 ShortName = defaultShortName,
-                Name = $"{boatClass.Name}s",
+                Name = fleetName,
                 FleetBoatClasses = new List<Db.FleetBoatClass>
                 {
                     new Db.FleetBoatClass

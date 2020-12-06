@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
+using CoreServices = SailScores.Core.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
@@ -12,12 +13,12 @@ namespace SailScores.Web.Controllers
     public class SeasonController : Controller
     {
 
-        private readonly IClubService _clubService;
+        private readonly CoreServices.IClubService _clubService;
         private readonly ISeasonService _seasonService;
         private readonly Services.IAuthorizationService _authService;
 
         public SeasonController(
-            IClubService clubService,
+            CoreServices.IClubService clubService,
             ISeasonService seasonService,
             Services.IAuthorizationService authService)
         {
@@ -26,9 +27,12 @@ namespace SailScores.Web.Controllers
             _authService = authService;
         }
 
-        public ActionResult Create()
+        public async Task<ActionResult> Create(string clubInitials)
         {
-            return View();
+
+            var clubId = await _clubService.GetClubId(clubInitials);
+            Season suggestion = await _seasonService.GetSeasonSuggestion(clubId);
+            return View(suggestion);
         }
 
         [HttpPost]

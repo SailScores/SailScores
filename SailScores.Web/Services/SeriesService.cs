@@ -15,7 +15,7 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IClubService _coreClubService;
         private readonly Core.Services.ISeriesService _coreSeriesService;
         private readonly IScoringService _coreScoringService;
-        private readonly ISeasonService _coreSeasonService;
+        private readonly Core.Services.ISeasonService _coreSeasonService;
         private readonly IMapper _mapper;
 
         public SeriesService(
