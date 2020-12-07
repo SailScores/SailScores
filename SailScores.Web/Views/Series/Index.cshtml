@@ -1,8 +1,10 @@
 ﻿@using SailScores.Web.Models.SailScores;
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
+@using SailScores.Web.Services
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
 
 @model ClubCollectionViewModel<SeriesSummary>
 @{
@@ -30,6 +32,19 @@
 
 <div class="container">
     <h1 class="h2">Series by Seasons</h1>
+    @if (Model.CanEdit)
+    {
+
+        <div class="row bg-almost">
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Series"
+                   asp-action="Create"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   class="btn btn-outline-primary">@localizer["New Series"]</a>
+            </div>
+        </div>
+        <br />
+    }
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
     {
         <div class="row">
