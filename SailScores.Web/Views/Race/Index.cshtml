@@ -2,8 +2,10 @@
 @using SailScores.Core.Extensions;
 @using SailScores.Web.Resources
 @using Microsoft.Extensions.Localization
+@using SailScores.Web.Services
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
 
 @model ClubItemViewModel<RaceSummaryListViewModel>
 
@@ -18,7 +20,7 @@
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
                 @foreach (var item in
-                 Model.Item.Seasons)
+                Model.Item.Seasons)
                 {
                     <li class="nav-item">
                         <a asp-route="Race"
@@ -38,6 +40,20 @@
 </h2>
 
 <div class="container">
+    @if (Model.CanEdit)
+    {
+
+        <div class="row bg-almost">
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Race"
+                   asp-action="Create"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   class="btn btn-outline-primary">@localizer["New Race"]</a>
+            </div>
+        </div>
+        <br />
+    }
+
     <div class="row">
         <div class="col-12">
             <h2>@Model.Item.CurrentSeason?.Name</h2>
@@ -49,18 +65,18 @@
             <div class="col-6 col-md-4">
                 <span class="d-md-none">
                     <a id="smallracelink_@race.Id"
-                        asp-action="Details"
-                        asp-controller="Race"
-                        asp-route-id=@race.Id>
+                       asp-action="Details"
+                       asp-controller="Race"
+                       asp-route-id=@race.Id>
                         @race.FleetShortName:
                         R@(race.Order) @race.Date.ToShortString()
                     </a>
                 </span>
                 <span class="d-none d-md-inline">
                     <a id="racelink_@race.Id"
-                        asp-action="Details"
-                        asp-controller="Race"
-                        asp-route-id=@race.Id>
+                       asp-action="Details"
+                       asp-controller="Race"
+                       asp-route-id=@race.Id>
                         @race.CalculatedName
                     </a>
                 </span>
@@ -91,23 +107,21 @@
                        asp-action="Edit"
                        asp-controller="Race"
                        asp-route-id=@race.Id
-                       class="text-primary"
-                        >Edit</a>
+                       class="text-primary">Edit</a>
                     @("|")
                     <a id="racelink_@race.Id"
-                        asp-action="Delete"
-                        asp-controller="Race"
-                        asp-route-id=@race.Id
-                        class="text-danger"
-                        >Delete</a>
+                       asp-action="Delete"
+                       asp-controller="Race"
+                       asp-route-id=@race.Id
+                       class="text-danger">Delete</a>
                 }
             </div>
         </div>
     }
     <br />
-<div class="row">
-    <div class="d-md-none col-12">
-        <h3>Other Seasons</h3>
+    <div class="row">
+        <div class="d-md-none col-12">
+            <h3>Other Seasons</h3>
         </div>
         <div class="d-md-none col-12">
             @foreach (var item in

@@ -29,7 +29,7 @@
     {
         <meta name="keywords" content="@ViewData["MetaKeywords"]" />
     }
-    @await Html.EmbedCss("css\\site.min.css")
+    @await Html.EmbedCss($"css{System.IO.Path.DirectorySeparatorChar}site.min.css")
     @*<inline-style href="css/site.min.css" />*@
 </head>
 <body>

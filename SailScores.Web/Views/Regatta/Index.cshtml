@@ -1,8 +1,10 @@
 ﻿@using SailScores.Web.Models.SailScores;
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
+@using SailScores.Web.Services
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
 
 @model ClubCollectionViewModel<RegattaSummaryViewModel>
 @{
@@ -29,6 +31,19 @@
     </nav>
 }
 <h1 class="h2">Regattas</h1>
+@if (Model.CanEdit)
+{
+
+    <div class="row bg-almost">
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Regatta"
+               asp-action="Create"
+               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+               class="btn btn-outline-primary">@localizer["New Regatta"]</a>
+        </div>
+    </div>
+    <br />
+}
 @if (Model.List.Any())
 {
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
@@ -40,26 +55,25 @@
         </div>
         foreach (var regatta in item)
         {
-<div class="row">
-    <div class="col-sm-4 col-lg-3">
-        <a id="regattalink_@regatta.Id"
-           href="~/@Model.ClubInitials/Regatta/@regatta.Season.UrlName/@regatta.UrlName"
-           >@Html.DisplayFor(modelItem => regatta.Name)</a>
-        (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
-    </div>
-    <div class="col-sm-4 col-lg-3">
-        @regatta.StartDate?.ToString("d") -
-        @regatta.EndDate?.ToString("d")
-    </div>
-    <div class="col-sm-4 col-lg-3">
-        @if (regatta.UpdatedDate.HasValue)
-        {
-            <span class="d-none d-md-table-cell">
-            <em>@localizer["Updated"] @(regatta.UpdatedDate.Value.ToString("d"))</em>
-            </span>
-        }
-    </div>
-</div>
+            <div class="row">
+                <div class="col-sm-4 col-lg-3">
+                    <a id="regattalink_@regatta.Id"
+                       href="~/@Model.ClubInitials/Regatta/@regatta.Season.UrlName/@regatta.UrlName">@Html.DisplayFor(modelItem => regatta.Name)</a>
+                    (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
+                </div>
+                <div class="col-sm-4 col-lg-3">
+                    @regatta.StartDate?.ToString("d") -
+                    @regatta.EndDate?.ToString("d")
+                </div>
+                <div class="col-sm-4 col-lg-3">
+                    @if (regatta.UpdatedDate.HasValue)
+                    {
+                        <span class="d-none d-md-table-cell">
+                            <em>@localizer["Updated"] @(regatta.UpdatedDate.Value.ToString("d"))</em>
+                        </span>
+                    }
+                </div>
+            </div>
         }
     }
 }
