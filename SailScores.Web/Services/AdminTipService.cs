@@ -19,7 +19,18 @@ namespace SailScores.Web.Services
 
             viewModel.Tips = new List<AdminToDoViewModel>
             {
-                new AdminToDoViewModel
+                new()
+                {
+                    Title = "Add location to club",
+                    Details = "Not required, but SailScores will get current weather automatically if a location is provided.",
+                    Link = new ToDoLinkViewModel
+                    {
+                        Action = "Edit",
+                        Controller = "Admin"
+                    },
+                    Completed = viewModel.Latitude.HasValue
+                },
+                new()
                 {
                     Title = "Add classes of boats",
                     Details = "Even if the club sails a single type of boat, set up a class to use SailScores.",
@@ -30,7 +41,7 @@ namespace SailScores.Web.Services
                     },
                     Completed = viewModel.BoatClasses.Any()
                 },
-                new AdminToDoViewModel
+                new()
                 {
                     Title = "Add a season",
                     Details = "Usually a year long, seasons are required. Each series will be associated with a season.",
@@ -41,7 +52,7 @@ namespace SailScores.Web.Services
                     },
                     Completed = viewModel.Seasons.Any()
                 },
-                new AdminToDoViewModel
+                new()
                 {
                     Title = "Add a series",
                     Details = "A group of races scored together is called a series.",
@@ -52,7 +63,7 @@ namespace SailScores.Web.Services
                     },
                     Completed = viewModel.Series.Any()
                 },
-                new AdminToDoViewModel
+                new()
                 {
                     Title = "Add competitors",
                     Details = "Before adding a race, set up the competitors.",
@@ -64,7 +75,7 @@ namespace SailScores.Web.Services
                     Completed = viewModel.Competitors.Any()
                 },
 
-                new AdminToDoViewModel
+                new()
                 {
                     Title = "Add races",
                     Details = "Enter some results in a new race.",
@@ -87,7 +98,7 @@ namespace SailScores.Web.Services
             }
             if ((race.SeriesOptions == null || race.SeriesOptions.Count == 0))
             {
-                race.Tips = new List<AdminToDoViewModel> { new AdminToDoViewModel
+                race.Tips = new List<AdminToDoViewModel> { new()
                 {
                     Title = "Add a series",
                     Details = "If you want to score races together, add a series and a season covering this date.",

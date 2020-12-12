@@ -44,6 +44,13 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
+        public async Task<bool> HasRacesAsync(Guid clubId)
+        {
+            return await _dbContext.Races
+                .AnyAsync(r => r.ClubId == clubId)
+                .ConfigureAwait(false);
+        }
+
         public async Task<IList<Model.Race>> GetRacesAsync(Guid clubId)
         {
             var dbObjects = await _dbContext

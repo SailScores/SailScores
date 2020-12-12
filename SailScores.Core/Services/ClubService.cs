@@ -198,6 +198,8 @@ namespace SailScores.Core.Services
                 .OrderByDescending(s => s.Season.Start)
                 .ThenBy(s => s.Name)
                 .ToList();
+            retClub.BoatClasses = retClub.BoatClasses
+                .OrderBy(c => c.Name).ToList();
             return retClub;
         }
 

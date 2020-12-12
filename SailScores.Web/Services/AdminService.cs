@@ -50,7 +50,7 @@ namespace SailScores.Web.Services
             var vm = _mapper.Map<AdminViewModel>(club);
             vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);
             vm.HasRaces = vm.BoatClasses.Count != 0 &&
-                              (await _coreRaceService.GetRacesAsync(club.Id)).Any();
+                          (await _coreRaceService.HasRacesAsync(club.Id));
 
             return vm;
         }
