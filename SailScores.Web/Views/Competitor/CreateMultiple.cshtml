@@ -115,100 +115,107 @@
                     {
                         for (int i = 0; i < Model.Competitors.Count; i++)
                         {
-                <div class="row competitor-row">
-                    <div class="col-3 d-md-none">
-                        @localizer["Sail"]
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[@i].SailNumber" class="form-control
+                            <div class="row competitor-row">
+                                <div class="col-3 d-md-none">
+                                    @localizer["Sail"]
+                                </div>
+                                <div class="col-9 col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[@i].SailNumber" class="form-control
                                                @(ViewData.ModelState[$"competitors[{i}].SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
-                                   data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber" />
-                            <span asp-validation-for="Competitors[i].SailNumber" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-3 d-md-none">
-                        @localizer["Helm"]
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[@i].Name" class="form-control"
-                                   data-column="1" data-row="@i" value="@Model.Competitors[i].Name" />
-                        </div>
-                    </div>
-                    <div class="col-3 d-md-none">
-                        @localizer["Boat"]
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[@i].BoatName" class="form-control"
-                                   data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName" />
-                        </div>
-                    </div>
-                    <div class="col-3 d-md-none">
-                        Home Club
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[@i].HomeClubName" class="form-control"
-                                   data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName" />
-                        </div>
-                    </div>
-                    <div class="col-12 d-md-none">
-                        <hr class="d-md-none" />
-                    </div>
-                </div>
+                                               data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber" />
+                                        <span asp-validation-for="Competitors[i].SailNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-md-none">
+                                    @localizer["Helm"]
+                                </div>
+                                <div class="col-9 col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[@i].Name" class="form-control"
+                                               data-column="1" data-row="@i" value="@Model.Competitors[i].Name" />
+                                    </div>
+                                </div>
+                                <div class="col-3 d-md-none">
+                                    @localizer["Boat"]
+                                </div>
+                                <div class="col-9 col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[@i].BoatName" class="form-control"
+                                               data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName" />
+                                    </div>
+                                </div>
+                                <div class="col-3 d-md-none">
+                                    Home Club
+                                </div>
+                                <div class="col-9 col-md-3">
+                                    <div class="form-group">
+                                        <input type="text" name="competitors[@i].HomeClubName" class="form-control"
+                                               data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName" />
+                                    </div>
+                                </div>
+                                <div class="col-12 d-md-none">
+                                    <hr class="d-md-none" />
+                                </div>
+                            </div>
                         }
                     }
                     else
                     {
-                <div class="row competitor-row">
-                    <div class="col-3 d-md-none">
-                        @localizer["Sail"]
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].SailNumber" class="form-control"
-                                   data-column="0" data-row="0" />
+                        <div class="row competitor-row">
+                            <div class="col-3 d-md-none">
+                                @localizer["Sail"]
+                            </div>
+                            <div class="col-9 col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].SailNumber" class="form-control"
+                                           data-column="0" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-3 d-md-none">
+                                @localizer["Helm"]
+                            </div>
+                            <div class="col-9 col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].Name" class="form-control"
+                                           data-column="1" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-3 d-md-none">
+                                @localizer["Boat"]
+                            </div>
+                            <div class="col-9 col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].BoatName" class="form-control"
+                                           data-column="2" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-3 d-md-none">
+                                Home Club
+                            </div>
+                            <div class="col-9 col-md-3">
+                                <div class="form-group">
+                                    <input type="text" name="competitors[0].HomeClubName" class="form-control"
+                                           data-column="3" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-12 d-md-none">
+                                <hr class="d-md-none" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-3 d-md-none">
-                        @localizer["Helm"]
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].Name" class="form-control"
-                                   data-column="1" data-row="0" />
-                        </div>
-                    </div>
-                    <div class="col-3 d-md-none">
-                        @localizer["Boat"]
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].BoatName" class="form-control"
-                                   data-column="2" data-row="0" />
-                        </div>
-                    </div>
-                    <div class="col-3 d-md-none">
-                        Home Club
-                    </div>
-                    <div class="col-9 col-md-3">
-                        <div class="form-group">
-                            <input type="text" name="competitors[0].HomeClubName" class="form-control"
-                                   data-column="3" data-row="0" />
-                        </div>
-                    </div>
-                    <div class="col-12 d-md-none">
-                        <hr class="d-md-none" />
-                    </div>
-                </div>
                     }
                 </div>
+
+            </div>
+            <div class="col-2">
                 <button class="btn btn-light" type="button"
                         onclick="addNewRow()">
                     <span class="fas fa-plus"></span>
                 </button>
+            </div>
+
+            <div class="col-10 d-none d-md-block">
+                <span class="small"><em>Paste cells from Excel or Google Sheets to add many at once.</em></span>
             </div>
         </div>
         <div class="row">

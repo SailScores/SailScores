@@ -23,5 +23,6 @@ namespace SailScores.Core.Services
             DateTime? raceDate,
             Guid fleetId);
         Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId);
+        Task<bool> HasRacesAsync(Guid clubId);
     }
 }
