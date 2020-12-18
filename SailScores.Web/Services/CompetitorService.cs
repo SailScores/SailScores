@@ -164,5 +164,12 @@ namespace SailScores.Web.Services
 
             return comps;
         }
+
+        public async Task<IList<Competitor>> GetCompetitorsAsync(string clubInitials)
+        {
+            var clubId = await _coreClubService.GetClubId(clubInitials);
+
+            return await GetCompetitorsAsync(clubId);
+        }
     }
 }

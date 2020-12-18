@@ -21,7 +21,7 @@
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
                 @foreach (var item in
-                Model.Item.Seasons)
+               Model.Item.Seasons)
                 {
                     <li class="nav-item">
                         <a asp-route="Race"
@@ -44,14 +44,19 @@
     @if (Model.CanEdit)
     {
 
-        <div class="row bg-almost">
-            <div class="col-sm-3 my-2">
-                <a asp-controller="Race"
-                   asp-action="Create"
-                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                   class="btn btn-outline-primary">@localizer["New Race"]</a>
-            </div>
+    <div class="row bg-almost">
+        <div class="col-sm-3 my-2">
+            <a asp-controller="Race"
+               asp-action="Create"
+               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+               class="btn btn-outline-primary">@localizer["New Race"]</a>
         </div>
+        <div class="col-sm-3">
+            <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
+                Club Admin
+            </a>
+        </div>
+    </div>
         <br />
     }
 
@@ -126,7 +131,7 @@
         </div>
         <div class="d-md-none col-12">
             @foreach (var item in
-               Model.Item.Seasons)
+             Model.Item.Seasons)
             {
                 <a asp-route="Race"
                    asp-route-clubInitials="@Model.ClubInitials"

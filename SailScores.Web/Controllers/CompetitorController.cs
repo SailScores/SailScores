@@ -35,12 +35,14 @@ namespace SailScores.Web.Controllers
         }
 
         // GET: Competitor
-        public ActionResult Index(string clubInitials)
+        public async Task<ActionResult> Index(string clubInitials)
         {
+            var competitors = await _competitorService.GetCompetitorsAsync(clubInitials);
             var vm = new ClubCollectionViewModel<Competitor>
             {
                 ClubInitials = clubInitials,
-                List = new List<Competitor>()
+                List = competitors,
+                CanEdit = await _authService.CanUserEdit(User, clubInitials)
             };
             return View(vm);
         }

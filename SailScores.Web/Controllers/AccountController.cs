@@ -254,7 +254,8 @@ namespace SailScores.Web.Controllers
                     UserName = model.Email,
                     Email = model.Email,
                     FirstName = model.FirstName,
-                    LastName = model.LastName
+                    LastName = model.LastName,
+                    EnableAppInsights = model.EnableAppInsights
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
