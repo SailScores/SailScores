@@ -192,7 +192,6 @@ namespace SailScores.Web
 
             RegisterBackgroundQueueServices(services);
 
-
         }
 
         private void RegisterBackgroundQueueServices(IServiceCollection services)

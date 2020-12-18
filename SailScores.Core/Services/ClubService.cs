@@ -227,7 +227,15 @@ namespace SailScores.Core.Services
             var retClub = _mapper.Map<Model.Club>(dbClub);
 
             return retClub;
+        }
 
+        public async Task<string> GetClubName(string clubInitials)
+        {
+            return await _dbContext.Clubs
+                .Where(
+                c => c.Initials == clubInitials)
+                .Select(c => c.Name)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<Guid> SaveNewClub(Club club)
