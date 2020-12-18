@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using SailScores.Identity.Entities;
+using IAuthorizationService = SailScores.Web.Services.IAuthorizationService;
 
 namespace SailScores.Web.Controllers
 {
@@ -29,6 +30,7 @@ namespace SailScores.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly IAuthorizationService _authService;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
 
@@ -36,12 +38,14 @@ namespace SailScores.Web.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
+            IAuthorizationService authService,
             ILogger<AccountController> logger,
             IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _authService = authService;
             _logger = logger;
             _configuration = configuration;
         }
@@ -72,10 +76,24 @@ namespace SailScores.Web.Controllers
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(
+                    model.Email,
+                    model.Password,
+                    model.RememberMe,
+                    lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    string homeClub = await _authService.GetHomeClub(model.Email);
+                    if (!String.IsNullOrWhiteSpace(homeClub) && (
+                        String.IsNullOrWhiteSpace(returnUrl) ||
+                        !returnUrl.Contains($"/{homeClub}")))
+                    {
+                        return RedirectToAction(
+                            controllerName: "Club",
+                            actionName: "Index",
+                            routeValues: new {ClubInitials = homeClub});
+                    }
                     return Redirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

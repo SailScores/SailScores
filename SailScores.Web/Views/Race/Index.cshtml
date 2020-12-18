@@ -12,6 +12,7 @@
 
 @{
     ViewBag.Title = Model.ClubInitials + " " + @localizer["Races"];
+    ViewData["MetaDescription"] = $"{Model.ClubName} {localizer["Races"]} list";
     Layout = "_ClubLayout";
 }
 
@@ -35,9 +36,9 @@
     </nav>
 }
 
-<h2>
+<h1 class="h2">
     @Model.ClubInitials @localizer["Races"]
-</h2>
+</h1>
 
 <div class="container">
     @if (Model.CanEdit)

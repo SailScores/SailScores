@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 
@@ -34,6 +35,24 @@ namespace SailScores.Core.Services
                 await _dbContext.SaveChangesAsync()
                     .ConfigureAwait(false);
             }
+        }
+
+        public async Task<IEnumerable<string>> GetClubInitials(string email)
+        {
+            var clubIds = await _dbContext.UserPermissions
+                .Where(u => u.UserEmail == email
+                            && !u.CanEditAllClubs)
+                .Select(u => u.ClubId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            
+            var initials = (await _dbContext.Clubs
+                .ToListAsync()
+                .ConfigureAwait(false))
+                .Where(c => clubIds.Contains(c.Id))
+                .Select(c => c.Initials);
+
+            return initials;
         }
 
         public async Task<bool> IsUserAllowedToEdit(string email, string clubInitials)

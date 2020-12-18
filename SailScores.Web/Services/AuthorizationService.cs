@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -57,6 +60,18 @@ namespace SailScores.Web.Services
             }
             return await _userService.IsUserFullAdmin(
                 email);
+        }
+
+        public async Task<string> GetHomeClub(string email)
+        {
+            var clubInitials = await _userService.GetClubInitials(email);
+
+            if (clubInitials.Count() <= 1)
+            {
+                return clubInitials.FirstOrDefault();
+            }
+
+            return String.Empty;
         }
     }
 }

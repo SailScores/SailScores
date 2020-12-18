@@ -21,7 +21,7 @@
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="msapplication-TileImage" content="~/images/favicon/mstile-144x144.png">
     <meta name="color-scheme" content="light dark">
-    
+
     <title>@ViewData["Title"]</title>
     @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaDescription"]))
     {
@@ -39,6 +39,7 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
     <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">
@@ -59,9 +60,10 @@
         <hr />
         <footer>
             <div class="row">
-                <div class="col-12 col-sm-6"><small>&copy; 2020 - J. Fraser</small></div>
+                <div class="col-12 col-sm-6"><small>&copy; 2020 - J. Fraser &ndash;
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a></small></div>
                 <div class="col-12 col-sm-6 text-sm-right">
-                        @await Html.PartialAsync("_LoginPartial")
+                    @await Html.PartialAsync("_LoginPartial")
                 </div>
             </div>
         </footer>

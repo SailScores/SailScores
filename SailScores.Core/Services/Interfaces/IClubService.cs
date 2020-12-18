@@ -28,5 +28,6 @@ namespace SailScores.Core.Services
         Task<IList<Entities.ClubSeasonStats>> GetClubStats(string clubInitials);
         Task<IList<Entities.SiteStats>> GetAllStats();
         Task UpdateStatsDescription(Guid clubId, string statisticsDescription);
+        Task<string> GetClubName(string clubInitials);
     }
 }

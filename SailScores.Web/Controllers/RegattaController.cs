@@ -33,11 +33,13 @@ namespace SailScores.Web.Controllers
             ViewData["ClubInitials"] = clubInitials;
 
             var regattas = await _regattaService.GetAllRegattaSummaryAsync(clubInitials);
+            var clubName = await _clubService.GetClubName(clubInitials);
 
             return View(new ClubCollectionViewModel<RegattaSummaryViewModel>
             {
                 List = regattas,
                 ClubInitials = clubInitials,
+                ClubName = clubName,
                 CanEdit = await _authService.CanUserEdit(User, clubInitials)
             });
         }

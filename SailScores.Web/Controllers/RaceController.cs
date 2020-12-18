@@ -54,6 +54,7 @@ namespace SailScores.Web.Controllers
                     });
                 }
             }
+            var clubName = await _clubService.GetClubName(clubInitials);
             var races = await _raceService.GetAllRaceSummariesAsync(
                 clubInitials,
                 seasonName,
@@ -64,6 +65,7 @@ namespace SailScores.Web.Controllers
             {
                 Item = races,
                 ClubInitials = clubInitials,
+                ClubName = clubName,
                 CanEdit = await _authService.CanUserEdit(User, clubInitials)
             });
         }

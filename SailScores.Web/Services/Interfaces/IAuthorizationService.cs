@@ -13,5 +13,6 @@ namespace SailScores.Web.Services
             ClaimsPrincipal claimsPrincipal,
             Guid clubId);
         Task<bool> IsUserFullAdmin(ClaimsPrincipal user);
+        Task<string> GetHomeClub(string email);
     }
 }

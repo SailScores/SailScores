@@ -1,12 +1,13 @@
 
+--    Select * from Clubs
+
 DECLARE @NewClubId UNIQUEIDENTIFIER
 SET @NewClubId = NEWID()
 
 DECLARE @FromInitials NVARCHAR(20)
-SET @FromInitials = 'SBYCTEST'
+SET @FromInitials = 'AWRYTEST'
 
--- Select *
--- from Clubs
+-- Select * from Clubs
 -- where Initials = @FromInitials
 
 DECLARE @FromClubId UNIQUEIDENTIFIER
@@ -30,8 +31,8 @@ INSERT INTO Clubs
     )
 SELECT
     @NewClubId,
-    Name + '2',
-    Initials + '2',
+    Name,
+    'AWRY',
     Description,
     1,
     url,
@@ -230,9 +231,9 @@ WHERE ClubId = @FromClubId
 
 INSERT INTO ScoringSystems
     (
-    Id, ClubId, Name, [DiscardPattern], [ParentSystemId], [ParticipationPercent], OwningClubId
+    Id, ClubId, Name, [DiscardPattern], [ParentSystemId], [ParticipationPercent]
     )
-SELECT trans.ToId, @NewClubId, ss.Name, [DiscardPattern], [ParentSystemId], [ParticipationPercent], OwningClubId
+SELECT trans.ToId, @NewClubId, ss.Name, [DiscardPattern], [ParentSystemId], [ParticipationPercent]
 FROM ScoringSystems ss
 
     LEFT OUTER JOIN #IdTranslation AS trans
@@ -492,6 +493,65 @@ BEGIN
     UPDATE hr
     SET hr.Results = REPLACE(hr.Results, @FromId, @ToId)
     FROM HistoricalResults AS hr
+    WHERE hr.Id IN (SELECT ToId
+    FROM #IdTranslation)
+
+    SET @runningCount = @runningCount + 1;
+    IF(@runningCount % 10 = 0) BEGIN
+        SET @ErrMsg = CONVERT(VARCHAR(10), @runningCount) + ' / ' + CONVERT(VARCHAR(10), @TotalCount)
+        RAISERROR ( @ErrMsg, 0, 1) WITH NOWAIT
+    END
+    FETCH NEXT FROM guid_cursor
+    INTO @FromId, @ToId
+END
+CLOSE guid_cursor;
+DEALLOCATE guid_cursor;
+
+
+
+INSERT INTO #IdTranslation
+    (fromId, ToId)
+SELECT
+    SeriesChartResults.Id, NewId()
+FROM SeriesChartResults INNER JOIN Series
+    ON SeriesChartResults.SeriesId = Series.Id
+WHERE Series.ClubId = @FromClubId
+
+INSERT INTO SeriesChartResults
+    (Id,
+    SeriesId,
+    IsCurrent,
+    Results,
+    Created)
+SELECT
+    historyTrans.ToId,
+    seriestrans.ToId,
+    IsCurrent,
+    Results,
+    Created
+FROM SeriesChartResults
+    INNER JOIN #IdTranslation historyTrans
+    ON SeriesChartResults.Id = historyTrans.FromId
+    INNER JOIN #IdTranslation seriestrans
+    ON SeriesId = seriestrans.FromId
+
+DECLARE guid_cursor CURSOR FOR   
+SELECT CONVERT(VARCHAR(50), FromId), CONVERT(VARCHAR(50), ToId)
+FROM #IdTranslation
+WHERE ConvertHistoricalJson = 1
+ORDER BY FromId;
+
+OPEN guid_cursor
+
+FETCH NEXT FROM guid_cursor   
+INTO @FromId, @ToId
+
+WHILE @@FETCH_STATUS = 0  
+BEGIN
+
+    UPDATE hr
+    SET hr.Results = REPLACE(hr.Results, @FromId, @ToId)
+    FROM SeriesChartResults AS hr
     WHERE hr.Id IN (SELECT ToId
     FROM #IdTranslation)
 
