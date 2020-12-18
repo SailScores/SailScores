@@ -51,7 +51,10 @@
         <link rel="stylesheet" type="text/css" href="~/css/weather-icons.min.css" />
         <link rel="stylesheet" type="text/css" href="~/css/weather-icons-wind.min.css" />
     </noscript>
-    @Html.Raw(JavaScriptSnippet.FullScript)
+    @if ((bool?)ViewData["EnableAppInsights"] ?? false)
+    {
+        @Html.Raw(JavaScriptSnippet.FullScript)
+    }
 </head>
 <body>
     <header class="navbar navbar-expand-md navbar-dark bg-dark">
