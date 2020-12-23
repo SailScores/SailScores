@@ -10,7 +10,9 @@ namespace SailScores.Core.Services
     {
         Task<IList<Model.Club>> GetClubs(bool includeHidden);
         Task<Club> GetFullClubExceptScores(Guid id);
-        Task<Club> GetFullClubExceptScores(string id);
+        Task<Club> GetFullClubExceptScores(string clubInitials);
+        Task<Club> GetClubForAdmin(Guid id);
+        Task<Club> GetClubForAdmin(string clubInitials);
         Task<Club> GetMinimalClub(Guid id);
         Task<Club> GetMinimalClub(string clubInitials);
         Task<Guid> SaveNewClub(Club club);

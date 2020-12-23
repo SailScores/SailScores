@@ -1,38 +1,61 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Regatta>
-
-<div class="card">
-    <div class="card-header" id="regattaHeading">
-        <h5>
-            <a id="regatta" class="collapsed" data-toggle="collapse" href="#collapseRegatta" aria-expanded="false" aria-controls="collapseRegatta">
-                Regattas
-            </a>
-        </h5>
-    </div>
-    <div id="collapseRegatta" class="collapse" aria-labelledby="regattaHeading" data-parent="#accordion">
-        <div class="card-body">
-            <p>
-                <a class="btn btn-primary" asp-action="Create" asp-controller="Regatta">
-                    Create
+<div id="regattasdiv">
+    <div class="row">
+        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+            <h3 class="float-left">
+                <a id="regattas">
+                    Regattas
                 </a>
-            </p>
-            @foreach (var item in Model)
-            {
-        <div class="row border-bottom mb-1 pb-1">
-            <div class="col-6 col-sm-4 col-md-4">
+                <a class="text-primary"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus hover"
+                    data-content="
+            Regattas are an event over one or a few days. A regatta
+            can involve multiple fleets.">
+                    <span class="far fa-question-circle"></span>
+                </a>
+            </h3>
+        </div>
+        <div class="col-2 col-sm-4">
+            <a class="btn btn-primary"
+                asp-action="Create"
+                asp-controller="Regatta">
+                <span class="fas fa-plus"></span>
+                <span class="d-none d-sm-inline">
+                    New Regatta
+                </span>
+            </a>
+        </div>
+    </div>
+    @foreach (var item in Model)
+    {
+        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+            <div class="col-sm-8 col-md-4">
+                <a class="btn btn-sm btn-outline-danger"
+                    asp-action="Delete"
+                    asp-controller="Regatta"
+                    asp-route-id="@item.Id"
+                    title="Delete">
+                    <span class="fas fa-trash"></span>
+                </a> &nbsp;
+                <a class="btn btn-sm btn-outline-primary"
+                    asp-action="Edit"
+                    asp-controller="Regatta"
+                    asp-route-id="@item.Id"
+                    title="Edit">
+                    <span class="fas fa-pen"></span>
+                </a> &nbsp;
                 @Html.DisplayFor(modelItem => item.Name)
             </div>
             <div class="col-6 col-sm-4 col-md-3">
                 @item.Series.Sum(s => s.Races.Count()) Races
             </div>
-            <div class="col-6 col-sm-4 col-md-3">
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </div>
-            <div class="col-6 col-sm-4 col-md-2">
-                @Html.ActionLink("Edit", "Edit", "Regatta", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", "Regatta", new { id = item.Id })
+            <div class="col-6 col-sm-6col-md-3">
+                <span class="d-none d-md-inline">@item.StartDate?.ToString("D")</span>
+                <span class="d-md-none">@item.StartDate?.ToString("d")</span>
             </div>
         </div>
-            }
-        </div>
-    </div>
+    }
 </div>

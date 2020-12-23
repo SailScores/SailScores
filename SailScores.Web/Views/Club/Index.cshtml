@@ -37,7 +37,7 @@
         </div>
     </div>
 }
-@if (Model.CanEdit && (Model.Races?.Count() ?? 0) == 0)
+@if (Model.CanEdit && (Model.Series?.Count() ?? 0) == 0)
 {
     <div class="row bg-almost">
         <div class="col-12">
@@ -182,9 +182,9 @@
         </div>
         <div class="col-sm-3 my-2">
             <a asp-controller="Competitor"
-               asp-action="CreateMultiple"
+               asp-action="Index"
                asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-               class="btn btn-outline-primary">@localizer["New Competitor"]</a>
+               class="btn btn-outline-primary">@localizer["Manage Competitors"]</a>
         </div>
         <div class="col-sm-3 my-2">
             <a asp-controller="Race"

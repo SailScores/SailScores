@@ -1,41 +1,73 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Series>
-
-<div class="card">
-    <div class="card-header" id="seriesHeading">
-        <h5>
-            <a id="series" class="collapsed" data-toggle="collapse" href="#collapseSeries" aria-expanded="false" aria-controls="collapseSeries">
-                Series
+<div id="seriesdiv">
+    <div class="row">
+        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+            <h3 class="float-left">
+                <a id="series">Series</a>
+                <a class="text-primary"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus hover"
+                    data-content="Series are groups of races to be scored together. A race can belong to multiple series.">
+                    <span class="far fa-question-circle"></span>
+                </a>
+            </h3>
+        </div>
+        <div class="col-2 col-sm-4">
+            <a class="btn btn-primary"
+                asp-action="Create"
+                asp-controller="Series">
+                <span class="fas fa-plus"></span>
+                <span class="d-none d-sm-inline">
+                    New Series
+                </span>
             </a>
-        </h5>
-    </div>
-    <div id="collapseSeries" class="collapse" aria-labelledby="seriesHeading" data-parent="#accordion">
-            <div class="card-body">
-                <p>
-                    <a class="btn btn-primary" asp-action="Create" asp-controller="Series">
-                        Create
-                    </a>
-                </p>
-                @foreach (var item in Model)
-                {
-                    <div class="row border-bottom mb-1 pb-1">
-                        <div class="col-6 col-sm-4 col-md-4">
-                            @Html.DisplayFor(modelItem => item.Season.Name)
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-3">
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-3">
-                            @Html.DisplayFor(modelItem => item.Races.Count) Races
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-3">
-                            @Html.DisplayFor(modelItem => item.Description)
-                        </div>
-                        <div class="col-6 col-sm-4 col-md-2">
-                            @Html.ActionLink("Edit", "Edit", "Series", new { id = item.Id }) |
-                            @Html.ActionLink("Delete", "Delete", "Series", new { id = item.Id })
-                        </div>
-                    </div>
-                }
-            </div>
         </div>
     </div>
+    @foreach (var seasonGroup in Model.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+    {
+        var season = seasonGroup.First().Season;
+        var initCollapsed = season.End >= DateTime.Today.AddYears(-1);
+        <div class="row">
+            <div class="col-12" id="header-@season?.UrlName">
+                <a class="@(initCollapsed ? "" : "collapsed")" data-toggle="collapse" href="#content-@season?.UrlName" role="button"
+                    aria-expanded="true"
+                    aria-controls="content-@season?.UrlName">
+                    <h4 class="float-left">@seasonGroup.Key Series&nbsp;</h4>
+                </a>
+            </div>
+        </div>
+        <div class="collapse @((initCollapsed) ? " show":"")" id="content-@season?.UrlName">
+            @foreach (var item in seasonGroup)
+            {
+                <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+                    <div class="col-md-6 col-lg-5">
+                        <a class="btn btn-sm btn-outline-danger"
+                            asp-action="Delete"
+                            asp-controller="Series"
+                            asp-route-id="@item.Id"
+                            title="Delete">
+                            <span class="fas fa-trash"></span>
+                        </a> &nbsp;
+                        <a class="btn btn-sm btn-outline-primary"
+                            asp-action="Edit"
+                            asp-controller="Series"
+                            asp-route-id="@item.Id"
+                            title="Edit">
+                            <span class="fas fa-pen"></span>
+                        </a>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </div>
+                    <div class="d-none d-sm-inline col-sm-4 col-md-2">
+                        @Html.DisplayFor(modelItem => item.Races.Count) Races
+                    </div>
+                    <div class="d-none d-md-inline col-md-3 col-lg-4">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </div>
+                </div>
+            }
+            <br />
+        </div>
+    }
+</div>

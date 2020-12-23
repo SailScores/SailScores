@@ -1,6 +1,7 @@
 ﻿
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
@@ -35,8 +36,8 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id("Password")).SendKeys(configuration.TestPassword);
             driver.FindElement(By.CssSelector("form")).Submit();
 
-            // go to (hidden) test club
-            driver.Url = UrlCombine(driver.Url, configuration.TestClubInitials);
+            // used go to (hidden) test club
+            driver.Url = UrlCombine(configuration.BaseUrl, configuration.TestClubInitials);
         }
 
         //thank you stack overflow:
@@ -62,12 +63,13 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void AddAndDeleteBoatClass()
         {
+            var sectionId = "classes";
             using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             LoginAndGoToHiddenTestClub(driver);
             driver.WaitUntilClickable(By.LinkText("Admin Page")).Click();
-            driver.WaitUntilClickable(By.Id("classes")).Click();
+            driver.WaitUntilClickable(By.Id(sectionId)).Click();
 
-            var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
+            var createLink = driver.WaitUntilClickable(By.LinkText("New Class"));
             createLink.Click();
             var className = $"AutoTest Class {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
             driver.FindElement(By.Id("Name")).SendKeys(className);
@@ -77,8 +79,7 @@ namespace SailScores.SeleniumTests
 
             driver.FindElement(By.Id("classes")).Click();
 
-            var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{className}')]/..//a[contains(text(),'Delete')]"));
+            var deleteButton = GetDeleteButtonForRow(driver, sectionId, className);
 
             deleteButton.Click();
 
@@ -94,7 +95,9 @@ namespace SailScores.SeleniumTests
             using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             LoginAndGoToHiddenTestClub(driver);
             driver.FindElement(By.LinkText("Admin Page")).Click();
-            driver.FindElement(By.Id("competitors")).Click();
+            
+            //link to competitor page
+            driver.FindElement(By.LinkText("Competitor page")).Click();
 
             var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
             createLink.Click();
@@ -112,37 +115,38 @@ namespace SailScores.SeleniumTests
             var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
             submitButton.Click();
 
-            driver.FindElement(By.Id("competitors")).Click();
-
 
             var editButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{compName}')]/..//a[contains(text(),'Edit')]"));
+                By.XPath($"//div[. = '{compName}']/..//a[@title = 'Edit']"));
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
             submitButton.Click();
 
-            driver.FindElement(By.Id("competitors")).Click();
 
-            var deleteButton = driver.WaitUntilClickable(
-                By.XPath($"//div/div[contains(text(), '{compName}')]/..//a[contains(text(),'Delete')]"));
+            var deleteButton = driver.WaitUntilVisible(
+                By.XPath(
+                $"//div[contains(@class, 'container')]//div[contains(@class, 'row')]" +
+                $"//div[contains(@class, 'row') and contains(., '{compName}')]" +
+                "//a[@title='Delete']"));
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
             submitButton.Click();
 
-            Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete competitor");
+            Assert.True(driver.Url.EndsWith("/TEST/Competitor"), "Failed to delete competitor");
         }
 
         [Fact]
         public void AddEditDeleteFleet()
         {
+            var sectionName = "fleets";
             using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             LoginAndGoToHiddenTestClub(driver);
             driver.FindElement(By.LinkText("Admin Page")).Click();
-            driver.FindElement(By.Id("fleets")).Click();
+            driver.FindElement(By.Id(sectionName)).Click();
 
-            var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
+            var createLink = driver.WaitUntilClickable(By.LinkText("New Fleet"));
             createLink.Click();
             var fleetName = $"AutoTest Fleet {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
             driver.FindElement(By.Id("Name")).SendKeys(fleetName);
@@ -159,22 +163,24 @@ namespace SailScores.SeleniumTests
 
 
             var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
+
+            Actions actions = new Actions(driver);
+            actions.MoveToElement(submitButton);
+            actions.Perform();
             submitButton.Click();
 
-            driver.FindElement(By.Id("fleets")).Click();
+            driver.FindElement(By.Id(sectionName)).Click();
 
-
-            var editButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{fleetName}')]/..//a[contains(text(),'Edit')]"));
+            var editButton = GetEditButtonForRow(driver, sectionName, fleetName);
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
             submitButton.Click();
 
-            driver.FindElement(By.Id("fleets")).Click();
+            driver.FindElement(By.Id(sectionName)).Click();
 
-            var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{fleetName}')]/..//a[contains(text(),'Delete')]"));
+
+            var deleteButton = GetDeleteButtonForRow(driver, sectionName, fleetName);
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -192,7 +198,7 @@ namespace SailScores.SeleniumTests
             var sectionName = "seasons";
             driver.FindElement(By.Id(sectionName)).Click();
 
-            var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
+            var createLink = driver.WaitUntilClickable(By.LinkText("New Season"));
             createLink.Click();
             var startDate = DateTime.Today.AddYears(-5);
             var finishDate = DateTime.Today.AddDays(1).AddYears(-5);
@@ -209,8 +215,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id(sectionName)).Click();
 
 
-            var editButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{seasonName}')]/..//a[contains(text(),'Edit')]"));
+            var editButton = GetEditButtonForRow(driver, sectionName, seasonName);
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -218,8 +223,8 @@ namespace SailScores.SeleniumTests
 
             driver.FindElement(By.Id(sectionName)).Click();
 
-            var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{seasonName}')]/..//a[contains(text(),'Delete')]"));
+
+            var deleteButton = GetDeleteButtonForRow(driver, sectionName, seasonName);
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -239,7 +244,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.LinkText("Admin Page")).Click();
             driver.FindElement(By.Id(sectionName)).Click();
 
-            var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
+            var createLink = driver.WaitUntilClickable(By.LinkText("New Series"));
             createLink.Click();
             driver.FindElement(By.Id("Name")).SendKeys(seriesName);
 
@@ -251,8 +256,7 @@ namespace SailScores.SeleniumTests
 
             driver.FindElement(By.Id(sectionName)).Click();
 
-            var editButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{seriesName}')]/..//a[contains(text(),'Edit')]"));
+            var editButton = GetEditButtonForRow(driver, sectionName, seriesName);
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -260,8 +264,7 @@ namespace SailScores.SeleniumTests
 
             driver.FindElement(By.Id(sectionName)).Click();
 
-            var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{seriesName}')]/..//a[contains(text(),'Delete')]"));
+            var deleteButton = GetDeleteButtonForRow(driver, sectionName, seriesName);
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -273,8 +276,8 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void AddEditDeleteRegatta()
         {
-            var sectionName = "regatta";
-            var seriesName = $"Test Regatta {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
+            var sectionName = "regattas";
+            var regattaName = $"Test Regatta {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
 
             using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             LoginAndGoToHiddenTestClub(driver);
@@ -282,9 +285,9 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id(sectionName)).Click();
 
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
-            var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
+            var createLink = driver.WaitUntilClickable(By.LinkText("New Regatta"));
             createLink.Click();
-            driver.FindElement(By.Id("Name")).SendKeys(seriesName);
+            driver.FindElement(By.Id("Name")).SendKeys(regattaName);
             driver.FindElement(By.Name("StartDate")).SendKeys(DateTime.Today.AddDays(-1).ToString("MM/dd/yyyy"));
             driver.FindElement(By.Name("EndDate")).SendKeys(DateTime.Today.AddDays(1).ToString("MM/dd/yyyy"));
 
@@ -300,8 +303,7 @@ namespace SailScores.SeleniumTests
 
             driver.WaitUntilVisible(By.Id(sectionName)).Click();
 
-            var deleteButton = driver.WaitUntilVisible(
-                By.XPath($"//div/div[contains(text(), '{seriesName}')]/..//a[contains(text(),'Delete')]"));
+            var deleteButton = GetDeleteButtonForRow(driver, sectionName, regattaName);
             deleteButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
@@ -371,6 +373,36 @@ namespace SailScores.SeleniumTests
             var raceLink = driver.FindElement(By.LinkText(linkText));
 
             Assert.NotNull(raceLink);
+        }
+
+        private IWebElement GetDeleteButtonForRow(
+            IWebDriver driver,
+            string sectionId,
+            string itemName
+            )
+        {
+            return driver.WaitUntilVisible(
+                GetButtonSelector("Delete", sectionId, itemName));
+        }
+        private IWebElement GetEditButtonForRow(
+           IWebDriver driver,
+           string sectionId,
+           string itemName
+           )
+        {
+            return driver.WaitUntilVisible(
+                GetButtonSelector("Edit", sectionId, itemName));
+        }
+
+        private By GetButtonSelector(
+            string buttonTitle,
+            string sectionId,
+            string itemInRowText)
+        {
+            return By.XPath(
+                $"//div[@id='{sectionId}div']/" +
+                $".//div[contains(., '{itemInRowText}')]/.//a[@title='{buttonTitle}']");
+            
         }
     }
 }

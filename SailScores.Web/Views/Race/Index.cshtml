@@ -51,7 +51,7 @@
                asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                class="btn btn-outline-primary">@localizer["New Race"]</a>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-3 my-2">
             <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
                 Club Admin
             </a>
@@ -69,12 +69,29 @@
     {
         <div class="row border-bottom mb-1 pb-1">
             <div class="col-6 col-md-4">
+                @if (Model.CanEdit)
+                {
+                    <a class="btn btn-sm btn-outline-danger"
+                       asp-action="Delete"
+                       asp-controller="Race"
+                       asp-route-id="@race.Id"
+                       title="Delete">
+                        <span class="fas fa-trash"></span>
+                    </a> @:&nbsp;
+                    <a class="btn btn-sm btn-outline-primary"
+                       asp-action="Edit"
+                       asp-controller="Race"
+                       asp-route-id="@race.Id"
+                       title="Edit">
+                        <span class="fas fa-pen"></span>
+                    </a> @:&nbsp;
+                }
                 <span class="d-md-none">
                     <a id="smallracelink_@race.Id"
                        asp-action="Details"
                        asp-controller="Race"
                        asp-route-id=@race.Id>
-                        @race.FleetShortName:
+                        @race.FleetName:
                         R@(race.Order) @race.Date.ToShortString()
                     </a>
                 </span>
@@ -105,22 +122,6 @@
             <div class="col-12 col-md-10 d-none d-md-inline">
                 @Html.DisplayFor(modelItem => race.Name)
                 @Html.DisplayFor(modelItem => race.Description)
-            </div>
-            <div class="col-12 col-md-2">
-                @if (Model.CanEdit)
-                {
-                    <a id="racelink_@race.Id"
-                       asp-action="Edit"
-                       asp-controller="Race"
-                       asp-route-id=@race.Id
-                       class="text-primary">Edit</a>
-                    @("|")
-                    <a id="racelink_@race.Id"
-                       asp-action="Delete"
-                       asp-controller="Race"
-                       asp-route-id=@race.Id
-                       class="text-danger">Delete</a>
-                }
             </div>
         </div>
     }

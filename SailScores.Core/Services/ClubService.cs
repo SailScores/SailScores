@@ -138,6 +138,58 @@ namespace SailScores.Core.Services
             return clubGuid;
         }
 
+        public async Task<Model.Club> GetClubForAdmin(string initials)
+        {
+            var guid = await GetClubId(initials)
+                .ConfigureAwait(false);
+
+            return await GetClubForAdmin(guid)
+                .ConfigureAwait(false);
+        }
+
+
+        public async Task<Model.Club> GetClubForAdmin(Guid id)
+        {
+
+            IQueryable<Db.Club> clubQuery =
+                _dbContext.Clubs.Where(c => c.Id == id)
+                    .Include(c => c.Seasons);
+            var club = await clubQuery.FirstAsync()
+                .ConfigureAwait(false);
+
+            await clubQuery
+                .Include(c => c.Seasons)
+                .Include(c => c.Series)
+                .ThenInclude(s => s.RaceSeries)
+                .Include(c => c.BoatClasses)
+                .Include(c => c.DefaultScoringSystem)
+                .Include(c => c.ScoringSystems)
+                .Include(c => c.Fleets)
+                .ThenInclude(f => f.CompetitorFleets)
+                .Include(c => c.Fleets)
+                .ThenInclude(f => f.FleetBoatClasses)
+                .Include(c => c.Regattas)
+                .ThenInclude(r => r.RegattaSeries)
+                .Include(c => c.Regattas)
+                .ThenInclude(r => r.RegattaFleet)
+                .Include(c => c.WeatherSettings)
+                .AsSplitQuery()
+                .LoadAsync().ConfigureAwait(false);
+
+            var retClub = _mapper.Map<Model.Club>(club);
+
+            retClub.Seasons = retClub.Seasons.OrderByDescending(s => s.Start).ToList();
+            retClub.Series = retClub.Series
+                .OrderByDescending(s => s.Season.Start)
+                .ThenBy(s => s.Name)
+                .ToList();
+            retClub.BoatClasses = retClub.BoatClasses
+                .OrderBy(c => c.Name).ToList();
+            return retClub;
+
+
+        }
+
         public async Task<Model.Club> GetFullClubExceptScores(string id)
         {
             var guid = await GetClubId(id)

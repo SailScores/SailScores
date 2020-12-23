@@ -33,7 +33,7 @@ namespace SailScores.Web.Services
         public async Task<AdminViewModel> GetClubForEdit(string clubInitials)
         {
 
-            var club = await _coreClubService.GetFullClubExceptScores(clubInitials);
+            var club = await _coreClubService.GetClubForAdmin(clubInitials);
 
             var vm = _mapper.Map<AdminViewModel>(club);
             vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);
@@ -45,7 +45,7 @@ namespace SailScores.Web.Services
 
         public async Task<AdminViewModel> GetClub(string clubInitials)
         {
-            var club = await _coreClubService.GetFullClubExceptScores(clubInitials);
+            var club = await _coreClubService.GetClubForAdmin(clubInitials);
 
             var vm = _mapper.Map<AdminViewModel>(club);
             vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);

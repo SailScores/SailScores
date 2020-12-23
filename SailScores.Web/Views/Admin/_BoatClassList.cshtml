@@ -1,38 +1,55 @@
-﻿@model IEnumerable<SailScores.Core.Model.BoatClass>
+@model IEnumerable<SailScores.Core.Model.BoatClass>
 
-<div class="card">
-    <div class="card-header" id="classesHeading">
-        <h5>
-            <a class="collapsed" id="classes" data-toggle="collapse" href="#collapseClasses" aria-expanded="false" aria-controls="collapseClasses">
-                Classes
-            </a>
-        </h5>
-    </div>
-    <div id="collapseClasses" class="collapse" aria-labelledby="classesHeading" data-parent="#accordion">
-        <div class="card-body">
-            <p>
-                Class refers to the type of boat. A competitor can only belong to one class.
-            </p>
-            <p>
-                <a class="btn btn-primary" asp-action="Create" asp-controller="BoatClass">
-                    Create
+<div id="classesdiv">
+    <div class="row">
+        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+            <h3 class="float-left">
+                <a id="classes">Classes</a>
+                <a class="text-primary"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus hover"
+                    data-content="Class refers to the type of
+            boat. A competitor can only belong to one class.">
+                    <span class="far fa-question-circle"></span>
                 </a>
-            </p>
-            @foreach (var item in Model)
-            {
-        <div class="row border-bottom mb-1 pb-1">
-            <div class="col-6 col-sm-4 col-md-3">
+            </h3>
+        </div>
+        <div class="col-2 col-sm-4">
+            <a class="btn btn-primary"
+                asp-action="Create"
+                asp-controller="BoatClass">
+                <span class="fas fa-plus"></span>
+                <span class="d-none d-sm-inline">
+                    New Class
+                </span>
+            </a>
+        </div>
+    </div>
+    @foreach (var item in Model)
+    {
+        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+            <div class="col-12 col-md-6 col-lg-4">
+                <a class="btn btn-sm btn-outline-danger"
+                    asp-action="Delete"
+                    asp-controller="BoatClass"
+                    asp-route-id="@item.Id"
+                    title="Delete">
+                    <span class="fas fa-trash"></span>
+                </a> &nbsp;
+                <a class="btn btn-sm btn-outline-primary"
+                    asp-action="Edit"
+                    asp-controller="BoatClass"
+                    asp-route-id="@item.Id"
+                    title="Edit">
+                    <span class="fas fa-pen"></span>
+                </a> &nbsp;
                 @Html.DisplayFor(modelItem => item.Name)
             </div>
-            <div class="col-6 col-sm-4 col-md-3">
+            <div class="col-12 col-md-6 col-lg-8">
                 @Html.DisplayFor(modelItem => item.Description)
             </div>
-            <div class="col-6 col-sm-4 col-md-3">
-                @Html.ActionLink("Edit", "Edit", "BoatClass", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", "BoatClass", new { id = item.Id })
-            </div>
         </div>
-            }
-        </div>
-    </div>
+    }
 </div>

@@ -1,20 +1,16 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Competitor>
 
-<div class="card">
-    <div class="card-header" id="competitorsHeading">
-        <h5>
-            <a class="collapsed" id="competitors" data-toggle="collapse" href="#collapseCompetitors" aria-expanded="false" aria-controls="collapseCompetitors">
-                Competitors
-            </a>
-        </h5>
+<div class="row">
+    <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+        <h3>
+            <a id="competitors">Competitors</a>
+        </h3>
     </div>
-    <div id="collapseCompetitors" class="collapse" aria-labelledby="competitorsHeading" data-parent="#accordion">
-        <div class="card-body p-1 p-md-20">
-            <p>
-                Competitor changes can be completed on the
-                <a asp-controller="competitor"
-                   asp-action="index">competitor page</a>.
-            </p>
-        </div>
+</div>
+<div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+    <div class="col-12">
+        Competitors may be added and changed on the
+        <a asp-controller="competitor"
+            asp-action="index">Competitor page</a>.
     </div>
 </div>
