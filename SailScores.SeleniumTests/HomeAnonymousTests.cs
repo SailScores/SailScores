@@ -92,8 +92,8 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id("ContactEmail")).SendKeys("test@jamie.com");
             driver.FindElement(By.Id("Classes")).SendKeys("MC ");
             driver.FindElement(By.Id("Comments")).SendKeys("Nothing");
-            driver.FindElement(By.CssSelector(".btn-primary")).Click();
-            driver.FindElement(By.XPath("//h1[contains(.,'Request Submitted')]"));
+            driver.FindElement(By.CssSelector(".btn-success")).Click();
+            driver.FindElement(By.XPath("//h1[contains(.,'Club Created')]"));
         }
 
     }

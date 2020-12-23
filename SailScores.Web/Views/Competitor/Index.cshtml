@@ -6,7 +6,7 @@
 @inject IStringLocalizer<SharedResource> localizer
 @inject AppSettingsService settingsService
 
-@model ClubCollectionViewModel<CompetitorViewModel>
+@model ClubCollectionViewModel<SailScores.Core.Model.Competitor>
 
 @{
     ViewBag.Title = Model.ClubInitials + " " + localizer["Competitors"];
@@ -18,15 +18,64 @@
             <h1>@Model.ClubInitials @localizer["Competitors"]</h1>
         </div>
     </div>
-    @foreach (var competitor in Model.List)
+    @if (Model.CanEdit)
     {
         <div class="row">
+            <div class="col-sm-3">
+                <a class="btn btn-primary" asp-action="CreateMultiple" asp-controller="Competitor">
+                    Create
+                </a>
+            </div>
+            <div class="col-sm-3">
+                <a class="btn btn-warning" asp-action="Options" asp-controller="MergeCompetitor">
+                    Merge Competitors
+                </a>
+            </div>
+            <div class="col-sm-3">
+                <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
+                    Club Admin
+                </a>
+            </div>
+        </div>
+        <br/>
+    }
+    @foreach (var item in Model.List.OrderBy(c => c.Name).ThenBy(c => c.SailNumber))
+    {
+        <div class="row border-bottom mb-1 pb-1">
+            <div class="col-6 col-sm-4 col-lg-3">
+                @if (Model.CanEdit)
+                {
+                    <a class="btn btn-sm btn-outline-danger"
+                        asp-action="Delete"
+                        asp-controller="Competitor"
+                        asp-route-id="@item.Id"
+                        title="Delete">
+                        <span class="fas fa-trash"></span>
+                    </a> @:&nbsp;
+                    <a class="btn btn-sm btn-outline-primary"
+                        asp-action="Edit"
+                        asp-controller="Competitor"
+                        asp-route-id="@item.Id"
+                        title="Edit">
+                        <span class="fas fa-pen"></span>
+                    </a> @:&nbsp;
+                }
+                <a asp-route="Competitor"
+                    asp-route-clubInitials="@Model.ClubInitials"
+                    asp-route-sailNumber="@item.SailNumber">
+                    <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
+                </a>
+            </div>
+            <div class="col-6 col-sm-4 col-md-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
+            <div class="col-3 d-sm-none"></div>
+            <div class="col-6 col-sm-3 col-md-4 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
+            <div class="col-6 col-md-2 small">
+                <em>@(item.IsActive ? "" : "Inactive")</em>
+                @Html.DisplayFor(modelItem => item.BoatClass.Name)
+            </div>
             <div class="col-12">
-                <h2><a asp-route="Competitor"
-                       asp-route-clubInitials="@Model.ClubInitials"
-                       asp-route-sailNumber="@competitor.SailNumber"
-                       >@competitor.Name</a></h2>
+                @Html.DisplayFor(modelItem => item.Notes)
             </div>
         </div>
     }
-</div>
+    </div>

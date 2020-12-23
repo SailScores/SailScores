@@ -11,16 +11,16 @@
             <h4>Create a new account.</h4>
             <hr />
             <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">  
-                <label asp-for="FirstName"></label>  
-                <input asp-for="FirstName" class="form-control" />  
-                <span asp-validation-for="FirstName" class="text-danger"></span>  
-            </div>  
-            <div class="form-group">  
-                <label asp-for="LastName"></label>  
-                <input asp-for="LastName" class="form-control" />  
-                <span asp-validation-for="LastName" class="text-danger"></span>  
-            </div>  
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Email"></label>
                 <input asp-for="Email" class="form-control" />
@@ -36,6 +36,16 @@
                 <label asp-for="ConfirmPassword"></label>
                 <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <input asp-for="EnableAppInsights" class="form-check-input" />
+                <label asp-for="EnableAppInsights" class="form-check-label"></label>
+                <span asp-validation-for="EnableAppInsights" class="text-danger"></span>
+                <div class="alert alert-success" role="alert">
+                    If checked, SailScores will submit information about the page speed and errors you encounter.
+                    This will greatly assist in improving the service. No data is shared with any other organization. See our
+                    <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a> for details.
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Register</button>
         </form>

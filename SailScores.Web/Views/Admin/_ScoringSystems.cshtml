@@ -1,35 +1,43 @@
 ﻿@model IEnumerable<SailScores.Core.Model.ScoringSystem>
-
-<div class="card">
-    <div class="card-header" id="scoringHeading">
-        <h5>
-            <a id="scoring" class="collapsed" data-toggle="collapse" href="#collapseScoring"
-                  aria-expanded="false" aria-controls="collapseScoring">
-                Scoring Systems
-            </a>
-            <span class="text-danger">&ensp;<span class="small"><em>Advanced</em></span></span>
-        </h5>
+<div id="scoringdiv">
+<div class="row">
+    <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+        <h3 class="float-left">
+            <a id="scoring">Scoring Systems</a><br />
+            <span class="text-danger"><span class="small"><em>Advanced</em></span></span>
+        </h3>
     </div>
-    <div id="collapseScoring" class="collapse" aria-labelledby="scoringHeading" data-parent="#accordion">
-        <div class="card-body">
-            <p>
-                <a class="btn btn-primary" asp-action="Create" asp-controller="ScoringSystem">
-                    Create
-                </a>
-            </p>
-
-            @foreach (var item in Model)
-            {
-                <div class="row border-bottom mb-1 pb-1">
-                    <div class="col-6 col-sm-4 col-md-4">
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </div>
-                    <div class="col-6 col-sm-4 col-md-2">
-                        @Html.ActionLink("Edit", "Edit", "ScoringSystem", new { id = item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", "ScoringSystem", new { id = item.Id })
-                    </div>
-                </div>
-            }
-        </div>
+    <div class="col-2 col-sm-4">
+        <a class="btn btn-primary"
+            asp-action="Create"
+            asp-controller="ScoringSystem">
+            <span class="fas fa-plus"></span>
+            <span class="d-none d-sm-inline">
+                New System
+            </span>
+        </a>
     </div>
+    </div>
+    @foreach (var item in Model)
+    {
+    <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+    <div class="col-12">
+        <a class="btn btn-sm btn-outline-danger"
+            asp-action="Delete"
+            asp-controller="ScoringSystem"
+            asp-route-id="@item.Id"
+            title="Delete">
+            <span class="fas fa-trash"></span>
+        </a> &nbsp;
+        <a class="btn btn-sm btn-outline-primary"
+            asp-action="Edit"
+            asp-controller="ScoringSystem"
+            asp-route-id="@item.Id"
+            title="Edit">
+            <span class="fas fa-pen"></span>
+        </a> &nbsp;
+        @Html.DisplayFor(modelItem => item.Name)
+    </div>
+</div>
+}
 </div>

@@ -1,0 +1,42 @@
+﻿@page
+@model UpdateProfileModel
+@{
+    ViewData["Title"] = "Update user profile";
+}
+
+<h4>@ViewData["Title"]</h4>
+<div class="text-danger">@Model.StatusMessage</div>
+<a class="btn btn-lg btn-outline-warning float-md-right" href="/Identity/Account/Manage/ChangePassword" 
+   title="Change Password">Change Password</a>
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <form id="update-profile-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.FirstName"></label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.LastName"></label>
+                <input asp-for="Input.LastName" class="form-control" />
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <input asp-for="Input.EnableAppInsights" class="form-check-input" />
+                <label asp-for="Input.EnableAppInsights" class="form-check-label"></label>
+                <span asp-validation-for="Input.EnableAppInsights" class="text-danger"></span>
+                <div class="alert alert-success" role="alert">
+                    If checked, SailScores will submit information about the page speed and errors you encounter.
+                    This will greatly assist in improving the service. No data is shared with any other organization. See our
+                    <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a> for details.
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Update profile</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

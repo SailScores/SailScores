@@ -112,7 +112,7 @@
             }
             else
             {
-                <main class="col-12 py-md-3 pl-md-5 bd-content" role="main">
+                <main class="col-12 py-md-3 @(IsSectionDefined("Sidebar")?"pl-md-5" :"") bd-content" role="main">
                     @RenderBody()
                 </main>
             }

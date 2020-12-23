@@ -34,13 +34,16 @@ namespace SailScores.Web.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         // GET: Competitor
-        public ActionResult Index(string clubInitials)
+        public async Task<ActionResult> Index(string clubInitials)
         {
+            var competitors = await _competitorService.GetCompetitorsAsync(clubInitials);
             var vm = new ClubCollectionViewModel<Competitor>
             {
                 ClubInitials = clubInitials,
-                List = new List<Competitor>()
+                List = competitors,
+                CanEdit = await _authService.CanUserEdit(User, clubInitials)
             };
             return View(vm);
         }
@@ -242,7 +245,7 @@ namespace SailScores.Web.Controllers
                 {
                     return Redirect(returnUrl);
                 }
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "Competitor");
             }
             catch
             {
@@ -327,7 +330,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _competitorService.SaveAsync(competitor);
 
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "Competitor");
             }
             catch
             {
@@ -373,7 +376,7 @@ namespace SailScores.Web.Controllers
                 }
                 await _competitorService.DeleteCompetitorAsync(id);
 
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "Competitor");
             }
             catch
             {

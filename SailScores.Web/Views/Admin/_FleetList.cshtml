@@ -1,42 +1,57 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Fleet>
-
-    <div class="card">
-        <div class="card-header" id="fleetsHeading">
-            <h5>
-                <a id="fleets" class="collapsed" data-toggle="collapse" href="#collapseFleets" aria-expanded="false" aria-controls="collapseFleets">
-                    Fleets
+<div id="fleetsdiv">
+    <div class="row">
+        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+            <h3 class="float-left">
+                <a id="fleets">Fleets</a>
+                <a class="text-primary"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus hover"
+                    data-content="Fleets group boats that race against each other. Competitors can belong to
+        multiple fleets.">
+                    <span class="far fa-question-circle"></span>
                 </a>
-            </h5>
+            </h3>
         </div>
-        <div id="collapseFleets" class="collapse" aria-labelledby="fleetsHeading" data-parent="#accordion">
-            <div class="card-body">
-                <p>
-                    Fleets group boats that race against each other. Competitors can belong to
-                    multiple fleets.
-                </p>
-                <p>
-                    <a class="btn btn-primary" asp-action="Create" asp-controller="Fleet">
-                        Create
-                    </a>
-                </p>
-                @foreach (var item in Model.OrderBy(f => f.Name))
-                {
-            <div class="row border-bottom mb-1 pb-1">
-                <div class="col-6 col-sm-4 col-md-4">
-                    @Html.DisplayFor(modelItem => item.Name)
-                </div>
-                <div class="col-6 col-sm-4 col-md-3">
-                    @Html.DisplayFor(modelItem => item.Description)
-                </div>
-                <div class="col-6 col-sm-4 col-md-3">
-                    @Html.DisplayFor(modelItem => item.FleetType)
-                </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    @Html.ActionLink("Edit", "Edit", "Fleet", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", "Fleet", new { id = item.Id })
-                </div>
-            </div>
-                }
-            </div>
-        </div>            
+        <div class="col-2 col-sm-4">
+            <a class="btn btn-primary"
+                asp-action="Create"
+                asp-controller="Fleet">
+                <span class="fas fa-plus"></span>
+                <span class="d-none d-sm-inline">
+                    New Fleet
+                </span>
+            </a>
+        </div>
     </div>
+    @foreach (var item in Model.OrderBy(f => f.Name))
+    {
+        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+            <div class="col-12 col-sm-6 col-md-4">
+                <a class="btn btn-sm btn-outline-danger"
+                    asp-action="Delete"
+                    asp-controller="Fleet"
+                    asp-route-id="@item.Id"
+                    title="Delete">
+                    <span class="fas fa-trash"></span>
+                </a> &nbsp;
+                <a class="btn btn-sm btn-outline-primary"
+                    asp-action="Edit"
+                    asp-controller="Fleet"
+                    asp-route-id="@item.Id"
+                    title="Edit">
+                    <span class="fas fa-pen"></span>
+                </a> &nbsp;
+                @Html.DisplayFor(modelItem => item.Name)
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                @Html.DisplayFor(modelItem => item.FleetType)
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                @Html.DisplayFor(modelItem => item.Description)
+            </div>
+        </div>
+    }
+</div>

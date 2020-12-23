@@ -44,7 +44,7 @@ namespace SailScores.Web.Controllers
         }
 
 
-        // GET: Admin/Edit/5
+        // GET: Admin/Edit/LHYC
         public async Task<ActionResult> Edit(string clubInitials)
         {
             ViewData["ClubInitials"] = clubInitials;
@@ -56,7 +56,7 @@ namespace SailScores.Web.Controllers
             return View(vm);
         }
 
-        // POST: Admin/Edit/5
+        // POST: Admin/Edit/LHYC
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(

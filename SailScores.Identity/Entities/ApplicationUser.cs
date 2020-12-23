@@ -7,6 +7,7 @@ namespace SailScores.Identity.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public bool? EnableAppInsights { get; set; }
 
         public string GetDisplayName()
         {

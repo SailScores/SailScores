@@ -27,43 +27,45 @@
                     <a class="nav-link" href="#series">Series</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#competitors">Competitors</a>
+                    <a class="nav-link" asp-controller="Competitor"
+                       asp-action="index">Competitors</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Race"
+                       asp-action="index">Races</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#scoring">Scoring</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#regattas">Regattas</a>
                 </li>
             </ul>
         </div>
     </nav>
 }
 
-<h2>@Model.Name</h2>
-<h3>Admin</h3>
+<h2>@Model.Name Admin</h2>
 <hr />
 @if (Model.Tips != null)
 {
     @await Html.PartialAsync("_AdminToDoList", Model.Tips)
 }
 <div class="row">
-    <div class="col-sm-4">
+    <div class="col-6 col-sm-4">
         <a asp-controller="Race"
            asp-action="Create"
            class="btn btn-outline-primary btn-sm">@localizer["New Race"]</a>
     </div>
-    <div class="col-sm-4">
+    <div class="col-6 col-sm-4">
         <a asp-controller="Admin"
            asp-action="Edit"
            class="btn btn-outline-primary btn-sm">@localizer["Edit Club Info"]</a>
     </div>
 </div>
 <hr />
-<div class="row">
+<div class="row d-none d-md-inline">
     <div class="col-lg-6">
-        <div class="row">
-            <div class="col-4 col-md-2">
-                <span class="font-italic">@Html.DisplayNameFor(model => model.Initials)</span>
-            </div>
-            <div class="col-8 col-md-10">
-                <strong>@Html.DisplayFor(model => model.Initials)</strong>
-            </div>
-        </div>
         <div class="row">
             <div class="col-md-2">
                 <span class="font-italic">@Html.DisplayNameFor(model => model.Description)</span>
@@ -73,40 +75,77 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-4 col-md-2"></div>
+            <div class="col-4 col-md-2">
+                <span class="font-italic">Default Scoring</span>
+            </div>
             <div class="col-8 col-md-10">
-                @if (Model.IsHidden) {
-                    @:This club does not appear on the front page club list.
-                }
+                @Model.DefaultScoringSystemName
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
-                <label asp-for="DefaultScoringSystemId"><span class="font-italic">Default Scoring System:</span></label>
-                @Html.DisplayFor(model => model.DefaultScoringSystemName)
+            <div class="col-4 col-md-2"></div>
+            <div class="col-8 col-md-10">
+                @if (Model.IsHidden)
+                {
+                <span class="text-warning">Not listed on SailScores front page.</span>
+                }
             </div>
         </div>
     </div>
 </div>
-<div id="accordion">
-    @await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
-    @await Html.PartialAsync("_FleetList", Model.Fleets)
-    @await Html.PartialAsync("_SeasonList", Model.Seasons)
-    @await Html.PartialAsync("_SeriesList", Model.Series)
-    @await Html.PartialAsync("_CompetitorList", Model.Competitors)
-    @await Html.PartialAsync("_RaceList", Model)
-    @await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
-    @await Html.PartialAsync("_RegattaList", Model.Regattas)
+<div class="d-md-none">
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" href="#classes">Classes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#fleets">Fleets</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#seasons">Seasons</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#series">Series</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Competitor"
+               asp-action="index">Competitors</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Race"
+               asp-action="index">Races</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#scoring">Scoring</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#regattas">Regattas</a>
+        </li>
+    </ul>
 </div>
+<br />
+@await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
+<br />
+@await Html.PartialAsync("_FleetList", Model.Fleets)
+<br />
+@await Html.PartialAsync("_SeasonList", Model.Seasons)
+<br />
+@await Html.PartialAsync("_SeriesList", Model.Series)
+<br />
+@await Html.PartialAsync("_CompetitorList", Model.Competitors)
+<br />
+@await Html.PartialAsync("_RaceList", Model)
+<br />
+@await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
+<br />
+@await Html.PartialAsync("_RegattaList", Model.Regattas)
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        $('.collapse').on('show.bs.collapse', function (e) {
-            var $card = $(this).closest('.card');
-            $('html,body').animate({
-                scrollTop: $card.offset().top - 50
-            }, 300);
-        });
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+
     </script>
 }

@@ -39,11 +39,17 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    @if ((bool?)ViewData["EnableAppInsights"] ?? false)
+
+
+    @if (SignInManager.IsSignedIn(User))
     {
-        @Html.Raw(JavaScriptSnippet.FullScript)
+        var user = await UserManager.GetUserAsync(User);
+        @if (user?.EnableAppInsights ?? false)
+        {
+            @Html.Raw(JavaScriptSnippet.FullScript)
+        }
     }
-</head>
+    </head>
 <body>
     <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">
         <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">SailScores.com</a>
@@ -56,7 +62,7 @@
         </div>
     </header>
 
-    <div class="container body-content">
+    <div class="container-lg body-content">
         <main class="col-12 py-md-3 pl-md-5 bd-content" role="main">
             @RenderBody()
         </main>

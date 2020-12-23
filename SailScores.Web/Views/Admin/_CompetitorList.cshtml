@@ -1,46 +1,16 @@
 ﻿@model IEnumerable<SailScores.Core.Model.Competitor>
 
-<div class="card">
-    <div class="card-header" id="competitorsHeading">
-        <h5>
-            <a class="collapsed" id="competitors" data-toggle="collapse" href="#collapseCompetitors" aria-expanded="false" aria-controls="collapseCompetitors">
-                Competitors
-            </a>
-        </h5>
+<div class="row">
+    <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+        <h3>
+            <a id="competitors">Competitors</a>
+        </h3>
     </div>
-    <div id="collapseCompetitors" class="collapse" aria-labelledby="competitorsHeading" data-parent="#accordion">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-sm-6">
-                    <a class="btn btn-primary" asp-action="CreateMultiple" asp-controller="Competitor">
-                        Create
-                    </a>
-                </div>
-                <div class="col-sm-3">
-                    <a class="btn btn-warning" asp-action="Options" asp-controller="MergeCompetitor">
-                        Merge Competitors
-                    </a>
-                </div>
-            </div>
-            @foreach (var item in Model.OrderBy(c => c.Name))
-            {
-        <div class="row border-bottom mb-1 pb-1">
-            <div class="col-3 col-sm-2"><strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong></div>
-            <div class="col-9 col-sm-4 col-md-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
-            <div class="col-4 col-sm-3 col-md-3 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
-            <div class="col-4 col-md-2 small">
-                <em>@(item.IsActive ? "" : "Inactive")</em>
-                @Html.DisplayFor(modelItem => item.BoatClass.Name)
-            </div>
-            <div class="col-12 col-md-6 col-lg-3 col-xl-3">
-                @Html.ActionLink("Edit", "Edit", "Competitor", new { id = item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", "Competitor", new { id = item.Id })
-                    </div>
-            <div class="col-12">
-                @Html.DisplayFor(modelItem => item.Notes)
-            </div>
-        </div>
-            }
-        </div>
+</div>
+<div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+    <div class="col-12">
+        Competitors may be added and changed on the
+        <a asp-controller="competitor"
+            asp-action="index">Competitor page</a>.
     </div>
 </div>

@@ -1,21 +1,16 @@
 ﻿@model SailScores.Web.Models.SailScores.AdminViewModel
-<div class="card">
-    <div class="card-header" id="racesHeading">
-        <h5>
-            <a id="races" class="collapsed" data-toggle="collapse" href="#collapseRaces" aria-expanded="false" aria-controls="collapseRaces">
-                Races
-            </a>
-        </h5>
-    </div>
-    <div id="collapseRaces" class="collapse" aria-labelledby="racesHeading" data-parent="#accordion">
-        <div class="card-body p-1 p-md-20">
-            <p>
-                Race changes can be completed on the 
-                <a asp-controller="race"
-                   asp-action="index"
-                >race page</a>.
 
-            </p>
-        </div>
+<div class="row">
+    <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+        <h3>
+            <a id="races">Races</a>
+        </h3>
+    </div>
+</div>
+<div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+    <div class="col-12">
+        Races may be edited on the
+        <a asp-controller="race"
+            asp-action="index">race page</a>.
     </div>
 </div>
