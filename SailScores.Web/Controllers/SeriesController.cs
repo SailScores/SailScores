@@ -45,7 +45,7 @@ namespace SailScores.Web.Controllers
         [ResponseCache(Duration = 3600)]
         public async Task<ActionResult> Index(string clubInitials)
         {
-            ViewData["ClubInitials"] = clubInitials;
+            ViewData["ClubInitials"] = clubInitials.ToUpperInvariant();
 
             var series = await _seriesService.GetNonRegattaSeriesSummariesAsync(clubInitials);
             var clubName = await _clubService.GetClubName(clubInitials);
