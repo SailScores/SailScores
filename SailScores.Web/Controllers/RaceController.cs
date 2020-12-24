@@ -42,21 +42,22 @@ namespace SailScores.Web.Controllers
             bool showScheduled = true,
             bool showAbandoned = true)
         {
+            var capInitials = clubInitials.ToUpperInvariant();
             if (String.IsNullOrWhiteSpace(seasonName))
             {
-                var currentSeason = await _raceService.GetCurrentSeasonAsync(clubInitials);
+                var currentSeason = await _raceService.GetCurrentSeasonAsync(capInitials);
                 if (currentSeason != null)
                 {
                     return RedirectToRoute("Race", new
                     {
-                        clubInitials,
+                        capInitials,
                         seasonName = currentSeason.UrlName
                     });
                 }
             }
-            var clubName = await _clubService.GetClubName(clubInitials);
+            var clubName = await _clubService.GetClubName(capInitials);
             var races = await _raceService.GetAllRaceSummariesAsync(
-                clubInitials,
+                capInitials,
                 seasonName,
                 showScheduled,
                 showAbandoned);
@@ -64,9 +65,9 @@ namespace SailScores.Web.Controllers
             return View(new ClubItemViewModel<RaceSummaryListViewModel>
             {
                 Item = races,
-                ClubInitials = clubInitials,
+                ClubInitials = capInitials,
                 ClubName = clubName,
-                CanEdit = await _authService.CanUserEdit(User, clubInitials)
+                CanEdit = await _authService.CanUserEdit(User, capInitials)
             });
         }
 
