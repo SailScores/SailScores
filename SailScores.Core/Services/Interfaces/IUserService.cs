@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Database.Entities;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,7 +10,10 @@ namespace SailScores.Core.Services
         Task<bool> IsUserAllowedToEdit(string email, string clubInitials);
         Task<bool> IsUserAllowedToEdit(string email, Guid? clubId);
         Task<bool> IsUserFullAdmin(string email);
-        Task AddPermision(Guid clubId, string userEmail);
+        Task AddPermission(Guid clubId, string userEmail, string addedBy = null);
         Task<IEnumerable<string>> GetClubInitials(string email);
+        Task<IEnumerable<UserClubPermission>> GetAllPermissionsForClub(Guid clubId);
+        Task<UserClubPermission> GetPermission(Guid permissionId);
+        Task Delete(Guid permissionId);
     }
 }

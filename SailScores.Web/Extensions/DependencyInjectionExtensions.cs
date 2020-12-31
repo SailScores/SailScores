@@ -24,6 +24,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IWeatherService, WeatherService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<ITemplateHelper, TemplateHelper>();
+            services.AddScoped<IPermissionService, PermissionService>();
 
             services.AddSingleton<AppVersionInfo>();
             services.AddSingleton<AppSettingsService>();

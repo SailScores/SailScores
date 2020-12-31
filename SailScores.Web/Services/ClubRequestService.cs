@@ -156,7 +156,7 @@ namespace SailScores.Web.Services
 
 #pragma warning disable CA1308 // Normalize strings to uppercase
             // we are storing email in lowercase, and not round-tripping back to upper case.
-            await _coreUserService.AddPermision(newClubId, request.ContactEmail.ToLowerInvariant());
+            await _coreUserService.AddPermission(newClubId, request.ContactEmail.ToLowerInvariant());
 #pragma warning restore CA1308 // Normalize strings to uppercase
         }
 

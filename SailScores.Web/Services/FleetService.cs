@@ -76,7 +76,7 @@ namespace SailScores.Web.Services
                 && fleet.CompetitorIds != null)
             {
                 coreModel.Competitors =
-                    (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null))
+                    (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null, false))
                     .Where(c => fleet.CompetitorIds.Contains(c.Id))
                     .ToList();
             }
@@ -102,7 +102,7 @@ namespace SailScores.Web.Services
                     && fleet.CompetitorIds != null)
             {
                 coreModel.Competitors =
-                    (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null))
+                    (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null, false))
                     .Where(c => fleet.CompetitorIds.Contains(c.Id))
                     .ToList();
             }
@@ -117,7 +117,7 @@ namespace SailScores.Web.Services
             var vm = new FleetWithOptionsViewModel();
             vm.BoatClassOptions = await _coreClubService.GetAllBoatClasses(clubId);
             vm.CompetitorOptions =
-                await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
+                await _coreCompetitorService.GetCompetitorsAsync(clubId, null, false);
 
             vm.RegattaId = regattaId;
             vm.IsActive = true;

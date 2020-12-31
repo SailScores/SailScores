@@ -37,7 +37,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             Guid clubId,
             Guid? fleetId)
         {
-            var competitors = await _service.GetCompetitorsAsync(clubId, fleetId);
+            var competitors = await _service.GetCompetitorsAsync(clubId, fleetId, true);
             return _mapper.Map<List<CompetitorDto>>(competitors);
         }
 
@@ -60,7 +60,7 @@ namespace SailScores.Web.Areas.Api.Controllers
             await _service.SaveAsync(competitor);
 
             var savedCompetitor =
-                (await _service.GetCompetitorsAsync(competitor.ClubId, null))
+                (await _service.GetCompetitorsAsync(competitor.ClubId, null, true))
                 .First(c => c.Name == competitor.Name
                 && c.SailNumber == competitor.SailNumber
                 && c.AlternativeSailNumber == competitor.AlternativeSailNumber);

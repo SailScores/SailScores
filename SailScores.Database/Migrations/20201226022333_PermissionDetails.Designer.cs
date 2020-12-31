@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20201226022333_PermissionDetails")]
+    partial class PermissionDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,8 +102,7 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AdminNotes")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Classes")
                         .HasColumnType("nvarchar(max)");
@@ -111,8 +112,7 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("ClubLocation")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClubName")
                         .IsRequired()
@@ -120,8 +120,7 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("ClubWebsite")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
@@ -130,12 +129,10 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ContactEmail")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("ForTesting")
                         .HasColumnType("bit");
@@ -856,8 +853,7 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserEmail")
                         .HasMaxLength(254)
@@ -938,12 +934,10 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TemperatureUnits")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WindSpeedUnits")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

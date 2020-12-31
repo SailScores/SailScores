@@ -24,34 +24,18 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IList<Model.Competitor>> GetInactiveCompetitorsAsync(
-            Guid clubId,
-            Guid? fleetId)
-        {
 
-            return await GetCompetitorsAsync(clubId, fleetId, true)
-                .ConfigureAwait(false);
-        }
 
         public async Task<IList<Model.Competitor>> GetCompetitorsAsync(
             Guid clubId,
-            Guid? fleetId)
-        {
-            return await GetCompetitorsAsync(clubId, fleetId, false)
-                .ConfigureAwait(false);
-        }
-
-        private async Task<IList<Model.Competitor>> GetCompetitorsAsync(
-            Guid clubId,
             Guid? fleetId,
-            bool onlyInactive)
+            bool includeInactive)
         {
 
             var dbObjects = _dbContext.Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Competitors)
-                .Where(c => (onlyInactive && !(c.IsActive ?? true))
-                            || ((c.IsActive ?? true) && !onlyInactive));
+                .Where(c => (includeInactive || (c.IsActive ?? true)));
 
             if (fleetId.HasValue && fleetId != Guid.Empty)
             {
@@ -78,6 +62,7 @@ namespace SailScores.Core.Services
             var list = await dbObjects
                 .OrderBy(c => c.SailNumber)
                 .ThenBy(c => c.Name)
+                .Include(c => c.BoatClass)
                 .ToListAsync()
                 .ConfigureAwait(false);
             return _mapper.Map<List<Model.Competitor>>(list);

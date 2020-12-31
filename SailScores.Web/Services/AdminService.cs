@@ -12,6 +12,7 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IScoringService _coreScoringService;
         private readonly Core.Services.IRaceService _coreRaceService;
         private readonly IWeatherService _weatherService;
+        private readonly IPermissionService _permissionService;
         private readonly IMapper _mapper;
 
         public AdminService(
@@ -20,12 +21,14 @@ namespace SailScores.Web.Services
             Core.Services.IRaceService raceService,
 
             Services.IWeatherService weatherService,
+            IPermissionService permissionService,
             IMapper mapper)
         {
             _coreClubService = clubService;
             _coreScoringService = scoringService;
             _coreRaceService = raceService;
             _weatherService = weatherService;
+            _permissionService = permissionService;
             _mapper = mapper;
         }
 
@@ -51,6 +54,7 @@ namespace SailScores.Web.Services
             vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);
             vm.HasRaces = vm.BoatClasses.Count != 0 &&
                           (await _coreRaceService.HasRacesAsync(club.Id));
+            vm.Users = await _permissionService.GetUsersAsync(club.Id);
 
             return vm;
         }

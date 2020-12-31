@@ -39,7 +39,7 @@ namespace SailScores.Web.Services
         public async Task<Competitor> GetCompetitorAsync(string clubInitials, string sailNumber)
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);
-            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null, false);
             return comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailNumber, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -49,14 +49,15 @@ namespace SailScores.Web.Services
         {
             // sailor will usually be sailNumber but falls back to name if no number.
             var clubId = await _coreClubService.GetClubId(clubInitials);
-            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null, true);
             IList<Competitor> inactiveCompetitors;
 
-            var comp = comps.FirstOrDefault(c => String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
+            var comp = comps.Where(c => c.IsActive)
+                .FirstOrDefault(c => String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
             if (comp == null)
             {
-                inactiveCompetitors = await _coreCompetitorService.GetInactiveCompetitorsAsync(clubId, null);
-                comp = inactiveCompetitors
+                // check for inactive.
+                comp = comps.Where(c => !c.IsActive)
                     .FirstOrDefault(c =>
                         String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
             }
@@ -158,18 +159,18 @@ namespace SailScores.Web.Services
             return competitor?.Id;
         }
 
-        public async Task<IList<Competitor>> GetCompetitorsAsync(Guid clubId)
+        public async Task<IList<Competitor>> GetCompetitorsAsync(Guid clubId, bool includeInactive)
         {
-            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null);
+            var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null, includeInactive);
 
             return comps;
         }
 
-        public async Task<IList<Competitor>> GetCompetitorsAsync(string clubInitials)
+        public async Task<IList<Competitor>> GetCompetitorsAsync(string clubInitials, bool includeInactive)
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);
 
-            return await GetCompetitorsAsync(clubId);
+            return await GetCompetitorsAsync(clubId, includeInactive);
         }
     }
 }

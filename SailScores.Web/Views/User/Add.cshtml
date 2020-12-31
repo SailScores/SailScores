@@ -1,0 +1,54 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "Add Scorekeeper";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+<div class="container-md">
+    <h1>Add Scorekeeper</h1>
+    <hr />
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <p>
+                Allow someone else to edit this club and its races. They will have the same features
+                as any other administrator of the club.
+            </p>
+            <p>
+                Adding a scorekeeper takes two steps (in any order):
+            </p>
+            <ul>
+                <li>Add their email address here to give permission for this club.</li>
+                <li>They must set up an account (and password) with the same email address.
+                    They can browse to the login page and click the "Register as a new user?"
+                    link or go to:<br />
+                    <a href="https://www.sailscores.com/Account/Register">https://www.sailscores.com/Account/Register</a>
+                </li>
+            </ul>
+            <p>After adding them below, the club admin page will indicate if they've registered.</p>
+        </div>
+        <div class="d-none d-lg-inline col-lg-6"></div>
+        <br />
+        <div class="col-lg-4 col-md-8">
+            <form asp-action="Add"
+                  asp-route-returnurl="@ViewData["ReturnUrl"]">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="EmailAddress" class="control-label"></label>
+                    <input asp-for="EmailAddress" class="form-control" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Add" class="btn btn-primary" />
+                    <a asp-controller="Admin"
+                       asp-action="Index"
+                       asp-fragment="scorekeepers"
+                       class="btn btn-outline-primary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

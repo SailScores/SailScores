@@ -1,0 +1,26 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "Oops. Error";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+<div class="container-md">
+    <h1>Error</h1>
+    <hr />
+    <div class="row">
+        <div class="col-12 col-md-8 col-xl-4">
+            <p>
+                Something went wrong while changing permissions. Please contact
+                <a href="mailto:info@sailscores.com">info@sailscores.com</a> to fix any
+                problems with your club's permissions.
+            </p>
+        </div>
+        <br />
+        <div class="col-lg-4 col-md-8">
+            <a asp-controller="Admin"
+                asp-action="Index"
+                asp-fragment="scorekeepers"
+                class="btn btn-outline-primary">Club Admin</a>
+        </div>
+    </div>
+</div>

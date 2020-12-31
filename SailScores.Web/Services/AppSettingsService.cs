@@ -32,5 +32,23 @@ namespace SailScores.Web.Services
 
             return absoluteUri;
         }
+
+
+        public string GetPreferredBase(HttpRequest request)
+        {
+            var preferredhost = _config["PreferredHost"];
+            if (!String.IsNullOrWhiteSpace(preferredhost))
+            {
+                request.Host = new HostString(preferredhost);
+            }
+
+            var absoluteUri = string.Concat(
+                        request.Scheme,
+                        "://",
+                        request.Host.ToUriComponent(),
+                        request.PathBase.ToUriComponent());
+
+            return absoluteUri;
+        }
     }
 }

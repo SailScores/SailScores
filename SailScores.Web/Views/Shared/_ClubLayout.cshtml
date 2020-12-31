@@ -28,6 +28,13 @@
     <meta name="msapplication-TileImage" content="~/images/favicon/mstile-144x144.png">
     <meta name="color-scheme" content="light dark">
 
+
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+    @inject AppSettingsService SettingsService
+    <base href="@settingsService.GetPreferredUri(HttpContextAccessor.HttpContext.Request)" />
+    <link rel="canonical" href="@settingsService.GetPreferredUri(HttpContextAccessor.HttpContext.Request)" />
+
+
     <title>@ViewData["Title"]</title>
     @if (!String.IsNullOrWhiteSpace((String)ViewData["MetaDescription"]))
     {

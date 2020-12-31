@@ -1,0 +1,53 @@
+﻿@model IEnumerable<SailScores.Web.Models.SailScores.UserViewModel>
+<div id="usersdiv">
+    <div class="row">
+        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
+            <h3 class="float-left">
+                <a id="scorekeepers">Scorekeepers</a>
+                <a class="text-primary"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus hover"
+                    data-content="Allow other users to edit results. Scorekeepers
+                        may be added and removed, but not edited.">
+                    <span class="far fa-question-circle"></span>
+                </a>
+            </h3>
+        </div>
+        <div class="col-2 col-sm-4">
+            <a class="btn btn-primary"
+                asp-action="Add"
+                asp-controller="User">
+                <span class="fas fa-plus"></span>
+                <span class="d-none d-sm-inline">
+                    New Admin
+                </span>
+            </a>
+        </div>
+    </div>
+    @foreach (var item in Model.OrderBy(f => f.Name))
+    {
+        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+            <div class="col-12 col-sm-6 col-md-4">
+                <a class="btn btn-sm btn-outline-danger"
+                    asp-action="Delete"
+                    asp-controller="User"
+                    asp-route-id="@item.Id"
+                    title="Delete">
+                    <span class="fas fa-trash"></span>
+                </a> &nbsp;
+                <a class="btn btn-sm btn-outline-primary disabled">
+                    <span class="fas fa-pen"></span>
+                </a> &nbsp;
+                @Html.DisplayFor(modelItem => item.Name)
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                @Html.DisplayFor(modelItem => item.EmailAddress)
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                @(!item.Registered ? "Not" : "") Registered
+            </div>
+        </div>
+    }
+</div>
