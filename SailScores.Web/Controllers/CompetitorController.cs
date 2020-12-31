@@ -38,7 +38,8 @@ namespace SailScores.Web.Controllers
         // GET: Competitor
         public async Task<ActionResult> Index(string clubInitials)
         {
-            var competitors = await _competitorService.GetCompetitorsAsync(clubInitials);
+            var canEdit = await _authService.CanUserEdit(User, clubInitials);
+            var competitors = await _competitorService.GetCompetitorsAsync(clubInitials, canEdit);
             var vm = new ClubCollectionViewModel<Competitor>
             {
                 ClubInitials = clubInitials,

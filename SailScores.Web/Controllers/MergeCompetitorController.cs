@@ -39,7 +39,7 @@ namespace SailScores.Web.Controllers
             {
                 return Unauthorized();
             }
-            IList<Core.Model.Competitor> competitors = await _competitorService.GetCompetitorsAsync(clubId);
+            IList<Core.Model.Competitor> competitors = await _competitorService.GetCompetitorsAsync(clubId, false);
             var vm = new MergeCompetitorViewModel
             {
                 TargetCompetitorOptions = competitors.OrderBy(c => c.Name).ToList()

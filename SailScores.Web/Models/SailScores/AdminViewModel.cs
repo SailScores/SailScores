@@ -30,6 +30,7 @@ namespace SailScores.Web.Models.SailScores
         public IList<Season> Seasons { get; set; }
         public IList<Series> Series { get; set; }
         public IList<Regatta> Regattas { get; set; }
+        public IList<UserViewModel> Users { get; set; }
 
         public string DefaultScoringSystemName { get; set; }
         public Guid? DefaultScoringSystemId { get; set; }

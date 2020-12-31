@@ -83,5 +83,10 @@ namespace SailScores.Web.Services
             }
             return returnObj;
         }
+
+        public Task<System.Guid> GetClubId(string initials)
+        {
+            return _coreClubService.GetClubId(initials);
+        }
     }
 }

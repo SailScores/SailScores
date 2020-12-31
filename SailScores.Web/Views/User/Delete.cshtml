@@ -1,0 +1,49 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h1>Remove Permission</h1>
+
+<h3>Are you sure you want to remove permissions for @(Model.EmailAddress)?</h3>
+@if (Model.Registered)
+{
+    <p>Removing the permissions will not disable their account but will remove their
+    ability to edit this club and its information. They will still
+    be able to login.</p>
+}
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EmailAddress)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EmailAddress)
+        </dd>
+        <dt>
+            Registered
+        </dt>
+        <dd>
+            @(Model.Registered ? "Yes" : "No")
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-controller="Admin"
+           asp-action="Index"
+           asp-fragment="scorekeepers"
+           class="btn btn-outline-primary">Cancel</a>
+    </form>
+</div>

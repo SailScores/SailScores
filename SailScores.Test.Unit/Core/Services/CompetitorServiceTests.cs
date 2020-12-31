@@ -43,17 +43,18 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task GetInactive_ReturnsOnlyInactive()
+        public async Task GetIncludeInactive_ReturnsSomeInactive()
         {
             // arrange
 
             // act
-            var result = await _service.GetInactiveCompetitorsAsync(
+            var result = await _service.GetCompetitorsAsync(
                 _clubId,
-                null);
+                null,
+                true);
 
             Assert.True(result.Any(), "No competitors were returned.");
-            Assert.True(result.All(c => !c.IsActive), "Some active competitors were returned.");
+            Assert.True(result.Any(c => !c.IsActive), "No inactive competitors were returned.");
             // assert
         }
 
@@ -65,7 +66,8 @@ namespace SailScores.Test.Unit.Core.Services
             // act
             var result = await _service.GetCompetitorsAsync(
                 _clubId,
-                null);
+                null,
+                false);
 
             Assert.True(result.Any());
             Assert.True(result.All(c => c.IsActive));
@@ -151,7 +153,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             // act
             var result = await _service.GetCompetitorsAsync(
-                _clubId, allBoatsFleet.Id);
+                _clubId, allBoatsFleet.Id, true);
 
             // assert
             Assert.NotEmpty(result);

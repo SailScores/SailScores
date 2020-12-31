@@ -142,6 +142,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task AddFleetTorRegattaAsync_AddsToDb()
         {
             var fleet = _context.Fleets
+                    .ToList()
                     .Where(f => !_regatta.RegattaFleet.Any(rf => rf.FleetId == f.Id))
                     .First();
 

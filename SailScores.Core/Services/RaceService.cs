@@ -201,7 +201,7 @@ namespace SailScores.Core.Services
                 .Seasons
                 .SingleOrDefault(s => race.Date.HasValue
                        && s.Start <= race.Date
-                       && s.End > race.Date);
+                       && s.End >= race.Date);
             modelRace.Season = _mapper.Map<Model.Season>(dbSeason);
 
             var dbSeries = _dbContext.Clubs

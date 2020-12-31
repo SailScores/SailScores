@@ -41,41 +41,43 @@
     }
     @foreach (var item in Model.List.OrderBy(c => c.Name).ThenBy(c => c.SailNumber))
     {
-        <div class="row border-bottom mb-1 pb-1">
-            <div class="col-6 col-sm-4 col-lg-3">
-                @if (Model.CanEdit)
-                {
-                    <a class="btn btn-sm btn-outline-danger"
-                        asp-action="Delete"
-                        asp-controller="Competitor"
-                        asp-route-id="@item.Id"
-                        title="Delete">
-                        <span class="fas fa-trash"></span>
-                    </a> @:&nbsp;
-                    <a class="btn btn-sm btn-outline-primary"
-                        asp-action="Edit"
-                        asp-controller="Competitor"
-                        asp-route-id="@item.Id"
-                        title="Edit">
-                        <span class="fas fa-pen"></span>
-                    </a> @:&nbsp;
-                }
-                <a asp-route="Competitor"
-                    asp-route-clubInitials="@Model.ClubInitials"
-                    asp-route-sailNumber="@item.SailNumber">
-                    <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
-                </a>
-            </div>
-            <div class="col-6 col-sm-4 col-md-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
-            <div class="col-3 d-sm-none"></div>
-            <div class="col-6 col-sm-3 col-md-4 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
-            <div class="col-6 col-md-2 small">
-                <em>@(item.IsActive ? "" : "Inactive")</em>
-                @Html.DisplayFor(modelItem => item.BoatClass.Name)
-            </div>
-            <div class="col-12">
-                @Html.DisplayFor(modelItem => item.Notes)
-            </div>
-        </div>
+<div class="row border-bottom mb-1 pb-1">
+    <div class="col-6 col-sm-4 col-lg-3">
+        @if (Model.CanEdit)
+        {
+            <a class="btn btn-sm btn-outline-danger"
+               asp-action="Delete"
+               asp-controller="Competitor"
+               asp-route-id="@item.Id"
+               title="Delete">
+                <span class="fas fa-trash"></span>
+            </a> @:&nbsp;
+            <a class="btn btn-sm btn-outline-primary"
+               asp-action="Edit"
+               asp-controller="Competitor"
+               asp-route-id="@item.Id"
+               title="Edit">
+                <span class="fas fa-pen"></span>
+            </a> @:&nbsp;
+        }
+        <a asp-route="Competitor"
+           asp-route-clubInitials="@Model.ClubInitials"
+           asp-route-sailNumber="@item.SailNumber">
+            <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
+        </a>
+    </div>
+    <div class="col-6 col-sm-4 col-lg-3 small">
+        @Html.DisplayFor(modelItem => item.BoatClass.Name)
+        <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
+    </div>
+    <div class="col-6 col-sm-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
+    <div class="d-none d-sm-inline d-lg-none col-sm-4 ">
+    </div>
+    <div class="col-6 col-sm-3 col-md-4 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
+
+    <div class="col-12">
+        @Html.DisplayFor(modelItem => item.Notes)
+    </div>
+</div>
     }
     </div>

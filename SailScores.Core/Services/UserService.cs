@@ -17,7 +17,10 @@ namespace SailScores.Core.Services
             _dbContext = dbContext;
         }
 
-        public async Task AddPermision(Guid clubId, string userEmail)
+        public async Task AddPermission(
+            Guid clubId,
+            string userEmail,
+            string addedBy)
         {
             var existingPermision = await _dbContext.UserPermissions
                 .FirstOrDefaultAsync(p => p.UserEmail == userEmail && p.ClubId == clubId)
@@ -30,11 +33,28 @@ namespace SailScores.Core.Services
                     {
                         ClubId = clubId,
                         UserEmail = userEmail,
-                        CanEditAllClubs = false
+                        CanEditAllClubs = false,
+                        Created = DateTime.UtcNow,
+                        CreatedBy = addedBy
                     });
                 await _dbContext.SaveChangesAsync()
                     .ConfigureAwait(false);
             }
+        }
+
+        public async Task Delete(Guid permissionId)
+        {
+            var existingPermision = await _dbContext.UserPermissions
+                .SingleOrDefaultAsync(p => p.Id == permissionId)
+                .ConfigureAwait(false);
+            _dbContext.UserPermissions.Remove(existingPermision);
+            await _dbContext.SaveChangesAsync()
+                .ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<Database.Entities.UserClubPermission>> GetAllPermissionsForClub(Guid clubId)
+        {
+            return _dbContext.UserPermissions.Where(p => p.ClubId == clubId);
         }
 
         public async Task<IEnumerable<string>> GetClubInitials(string email)
@@ -53,6 +73,12 @@ namespace SailScores.Core.Services
                 .Select(c => c.Initials);
 
             return initials;
+        }
+
+        public async Task<Database.Entities.UserClubPermission> GetPermission(Guid permissionId)
+        {
+            return await _dbContext.UserPermissions
+                .FirstOrDefaultAsync(p => p.Id == permissionId);
         }
 
         public async Task<bool> IsUserAllowedToEdit(string email, string clubInitials)

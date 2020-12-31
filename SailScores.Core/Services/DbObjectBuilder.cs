@@ -248,7 +248,7 @@ namespace SailScores.Core.Services
                 .FirstOrDefaultAsync(
                 s => s.ClubId == clubId
                 && s.Start <= minDateToUse
-                && s.End > maxDateToUse)
+                && s.End >= maxDateToUse)
                 .ConfigureAwait(false);
             if (retObj == null && createNew)
             {
