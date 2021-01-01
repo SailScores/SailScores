@@ -210,17 +210,32 @@ namespace SailScores.Web.Controllers
             var clubId = await _clubService.GetClubId(clubInitials);
             try
             {
+                // we check for errors against previously saved competitors
+                // but we don't check for errors against other competitors
+                // currently being saved.
                 int i = 0;
                 foreach (var comp in competitorsVm.Competitors)
                 {
-                    if (!String.IsNullOrWhiteSpace(comp.SailNumber))
+                    var compModel = _mapper.Map<Competitor>(comp);
+                    compModel.BoatClassId = competitorsVm.BoatClassId;
+                    compModel.ClubId = clubId;
+                    IEnumerable<KeyValuePair<string, string>> errors =
+                        await _competitorService.GetSaveErrors(compModel);
+                    if (errors != null)
                     {
-                        Guid? id = await _competitorService.GetCompetitorIdForSailnumberAsync(clubId, comp.SailNumber);
-                        if (id.HasValue)
+                        foreach (var error in errors)
                         {
-                            ModelState.AddModelError($"Competitors[{i}].SailNumber", "Sail number is already assigned to an active competitor.");
+                            if (String.IsNullOrWhiteSpace(error.Key))
+                            {
+                                ModelState.AddModelError(string.Empty, error.Value);
+                            }
+                            else
+                            {
+                                ModelState.AddModelError($"Competitors[{i}].{error.Key}", error.Value);
+                            }
                         }
                     }
+
                     i++;
                 }
 
@@ -306,14 +321,13 @@ namespace SailScores.Web.Controllers
                     return Unauthorized();
                 }
 
-                if (!string.IsNullOrWhiteSpace(competitor.SailNumber))
+                IEnumerable<KeyValuePair<string, string>> errors =
+                    await _competitorService.GetSaveErrors(competitor);
+                if(errors != null)
                 {
-                    Guid? existingCompId = await _competitorService.GetCompetitorIdForSailnumberAsync(
-                        competitor.ClubId, competitor.SailNumber);
-                    if (existingCompId.HasValue && existingCompId.Value != competitor.Id)
+                    foreach(var error in errors)
                     {
-                        ModelState.AddModelError($"SailNumber",
-                            "Sail number is already assigned to an active competitor.");
+                        ModelState.AddModelError(error.Key, error.Value);
                     }
                 }
 
