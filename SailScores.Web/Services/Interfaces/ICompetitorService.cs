@@ -26,5 +26,6 @@ namespace SailScores.Web.Services
             string sailNumber);
         Task<IList<Competitor>> GetCompetitorsAsync(Guid clubId, bool includeInactive);
         Task<IList<Competitor>> GetCompetitorsAsync(string clubInitials, bool includeInactive);
+        Task<IEnumerable<KeyValuePair<string, string>>> GetSaveErrors(Competitor competitor);
     }
 }

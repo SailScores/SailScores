@@ -5,51 +5,42 @@
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Delete</h2>
+<h2>Delete Competitor</h2>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>Are you sure you want to delete @Model.SailNumber @Model.Name?</h3>
 <div>
-    <h4>Competitor</h4>
-    <hr />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.SailNumber)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.SailNumber)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.AlternativeSailNumber)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.AlternativeSailNumber)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.BoatName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.BoatName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Notes)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.BoatClassId)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.BoatClassId)
-        </dd>
-    </dl>
+        @if (!String.IsNullOrWhiteSpace(Model.AlternativeSailNumber))
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.AlternativeSailNumber)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.AlternativeSailNumber)
+            </dd>
+        }
+        @if (!String.IsNullOrWhiteSpace(Model.BoatName))
+        {
+
+            <dt>
+                @Html.DisplayNameFor(model => model.BoatName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.BoatName)
+            </dd>
+        }
+        @if (!String.IsNullOrWhiteSpace(Model.Notes))
+        {
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Notes)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Notes)
+            </dd>
+        }
+        </dl>
 
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />

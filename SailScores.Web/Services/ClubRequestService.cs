@@ -86,14 +86,31 @@ namespace SailScores.Web.Services
             return vm;
         }
 
-        public async Task<bool> VerifyInitials(string initials)
+        public async Task<bool> AreInitialsAllowed(string initials)
         {
-            if (CheckInitialsBasics(initials))
+            if (!AreInitialsBasicAllowed(initials))
             {
-                return !(await AreInitialsInUse(initials));
+                return false;
+            }
+            if(await AreInitialsInUse(initials))
+            {
+                return false;
+            }
+            
+            var disallowedInitials = new List<string>
+            {
+                "TEST",
+                "HOME",
+                "ACCOUNT"
+                // Should obscenities be added here?
+            };
+
+            if (disallowedInitials.Contains(initials.ToUpperInvariant())){
+                return false;
             }
 
-            return false;
+            // made it through all the checks.
+            return true;
         }
         
         public async Task ProcessRequest(
@@ -197,7 +214,7 @@ namespace SailScores.Web.Services
                 targetClub);
         }
 
-        private bool CheckInitialsBasics(string initials)
+        private bool AreInitialsBasicAllowed(string initials)
         {
 
             return initials != null

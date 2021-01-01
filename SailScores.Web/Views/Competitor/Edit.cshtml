@@ -81,7 +81,7 @@
                                 <span asp-validation-for="AlternativeSailNumber" class="text-danger"></span>
                             </div>
                             <div class="form-check">
-                                <input type="checkbox" name="IsActive" value="true" class="form-check-input" checked />
+                                <input asp-for="@Model.IsActive" type="checkbox" class="form-check-input" />
                                 <label asp-for="IsActive" class="control-label"></label>
                                 <span asp-validation-for="IsActive" class="text-danger"></span>
                             </div>
@@ -97,9 +97,8 @@
             <br />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-controller="Admin"
+                <a asp-controller="Competitor"
                    asp-action="Index"
-                   asp-fragment="competitors"
                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>

@@ -33,7 +33,7 @@ namespace SailScores.Web.Controllers
                 return View(request);
             }
 
-            if (!(await _clubRequestService.VerifyInitials(request.ClubInitials)))
+            if (!(await _clubRequestService.AreInitialsAllowed(request.ClubInitials)))
             {
                 ModelState.AddModelError("ClubInitials", "Initials not valid.");
                 return View(request);
@@ -122,7 +122,7 @@ namespace SailScores.Web.Controllers
         [AcceptVerbs("GET", "POST")]
         public async Task<IActionResult> VerifyInitials(string clubInitials)
         {
-            if (!await _clubRequestService.VerifyInitials(clubInitials))
+            if (!await _clubRequestService.AreInitialsAllowed(clubInitials))
             {
                 return Json($"Not available. The initials must be alphanumeric and not in use.");
             }
