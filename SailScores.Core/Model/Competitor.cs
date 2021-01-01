@@ -6,12 +6,11 @@ namespace SailScores.Core.Model
 {
 
 #pragma warning disable CA2227 // Collection properties should be read only
-    public class Competitor
+    public class Competitor : IValidatableObject
     {
         public Guid Id { get; set; }
         public Guid ClubId { get; set; }
 
-        [Required]
         [StringLength(200)]
         public String Name { get; set; }
 
@@ -46,6 +45,15 @@ namespace SailScores.Core.Model
             return BoatName + " : " + Name + " : " + SailNumber + " : " + Id;
         }
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (String.IsNullOrWhiteSpace(SailNumber) && String.IsNullOrWhiteSpace(Name))
+            {
+                yield return new ValidationResult(
+                    "Either Sail Number or Name must be entered.",
+                    new string[] { "SailNumber", "Name" });
+            }
+        }
     }
 
 #pragma warning restore CA2227 // Collection properties should be read only
