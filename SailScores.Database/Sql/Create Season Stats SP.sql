@@ -31,11 +31,14 @@ SELECT
     SUM(RaceResults.FinisherCount - 1) AS BoatsRacedAgainst,
     SUM(RaceResults.FinisherCount - RaceResults.Place ) AS BoatsBeat
 FROM
-(SELECT TOP 2
+(SELECT TOP 3
         *
     FROM Seasons
     WHERE Seasons.[Start] < GETDATE()
         AND Seasons.ClubId = @ClubId
+        AND Seasons.[Start] <
+            ( Select MAX(races.Date) from Races
+                where Races.ClubId = @ClubId )
     ORDER BY [Start] DESC) AS Seasons
     LEFT OUTER JOIN
     (
