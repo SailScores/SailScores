@@ -279,6 +279,7 @@ namespace SailScores.Core.Services
                 IsPercentSystem = series.Results.IsPercentSystem,
                 PercentRequired = series.Results.PercentRequired,
                 ScoringSystemName = series.ScoringSystem?.Name,
+                ScoreCodesUsed = series.Results.ScoreCodesUsed,
                 IsPreliminary = series.Races.Any(r => r.State == RaceState.Preliminary),
                 UpdatedBy =series.UpdatedBy
             };

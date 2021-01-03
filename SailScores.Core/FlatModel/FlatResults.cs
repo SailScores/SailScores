@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SailScores.Core.Scoring;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,6 +21,8 @@ namespace SailScores.Core.FlatModel
         public string ScoringSystemName { get; set; }
 
         public String UpdatedBy { get; set; }
+        public Dictionary<string, ScoreCodeSummary> ScoreCodesUsed { get; set; }
+
         public FlatSeriesScore GetScore(FlatCompetitor comp)
         {
             return CalculatedScores.FirstOrDefault(s => s.CompetitorId == comp.Id);

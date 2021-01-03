@@ -349,16 +349,12 @@ namespace SailScores.Web.Services
                     race.Weather.TemperatureUnits = weatherSettings?.TemperatureUnits;
                 }
             }
-            _logger.LogInformation("About to standardize weather for race create");
+
             var weather = _weatherService.GetStandardWeather(race.Weather);
 
-            _logger.LogInformation("About to automapper weather for race create");
             raceDto.Weather = _mapper.Map<WeatherDto>(weather);
 
-
-            _logger.LogInformation("About to save race for race create");
             var raceId = await _coreRaceService.SaveAsync(raceDto);
-
 
             race.Id = raceId;
             if (race.RegattaId.HasValue)
@@ -373,7 +369,7 @@ namespace SailScores.Web.Services
             DateTime? raceDate)
         {
             // raceDate should not be null, but creating a season for today
-            // shoutdn't cause much trouble.
+            // shouldn't cause much trouble.
 
             var dateToUse = raceDate ?? DateTime.UtcNow;
             var seasons = await _coreSeasonService.GetSeasons(clubId);

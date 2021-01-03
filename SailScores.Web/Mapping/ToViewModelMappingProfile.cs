@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using Model = SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
+using SailScores.Core.Model;
 
 namespace SailScores.Web.Mapping
 {
@@ -94,6 +95,7 @@ namespace SailScores.Web.Mapping
             CreateMap<ScoreViewModel, ScoreDto>()
                 .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)))
                 .ReverseMap();
+            CreateMap<ScoreCodeWithOptionsViewModel, ScoreCode>();
 
             CreateMap<Model.ClubRequest, ClubRequestViewModel>()
                 .ReverseMap();

@@ -1,0 +1,33 @@
+﻿@using SailScores.Core.Model
+@using SailScores.Web.Services
+
+@model Series
+
+@if (Model != null
+   && Model.FlatResults?.ScoreCodesUsed != null
+   && Model.FlatResults.ScoreCodesUsed.Count > 0)
+{
+    <div class="container">
+        Scored using @Model.FlatResults?.ScoringSystemName
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Code</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var code in Model.FlatResults.ScoreCodesUsed.OrderBy(c => c.Key))
+                {
+                    <tr>
+                        <th scope="row">@code.Key</th>
+                        <td>@code.Value.Description</td>
+                        <td>@code.Value.Formula</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+

@@ -1,27 +1,41 @@
 ﻿@using Humanizer
 
-@model SailScores.Core.FlatModel.FlatCalculatedScore
+@model SailScores.Web.Models.SailScores.ScoreCellViewModel
 
 @if (Model != null)
 {
-    <td class="text-center @(Model.ScoreValue == 1 ? "finish-first " : "") @(Model.ScoreValue == 2 ? "finish-second " : "") @(Model.ScoreValue == 3 ? "finish-third " : "") ">
-        <span class="@(Model.Discard ? "text-muted" : "")">
-            @if (Model.Discard)
+    <td class="text-center
+        @(Model.Result.ScoreValue == 1 ? "finish-first ": "")
+        @(Model.Result.ScoreValue == 2 ? "finish-second " : "")
+        @(Model.Result.ScoreValue == 3 ? "finish-third " : "") ">
+        <span class="@(Model.Result.Discard ? "text-muted" : "")">
+            @if (Model.Result.Discard)
             {
                 @Html.Raw("<s>")
             }
-            @Model.Code @((Model.ScoreValue ?? Model.Place)?.ToString("N1"))
-            @if ((bool)ViewData["IsPercentSystem"]
-            && Model.Place.HasValue)
+            @if (Model.Result.Code != null
+               && Model.ScoreCodesUsed != null
+               && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
             {
-                <span class="small">(@Model.Place.Value.Ordinalize())</span>
+                @Html.Raw($"<span title=\"{ Model.ScoreCodesUsed[Model.Result.Code].Description}\">")
             }
-            @if (Model.Discard)
+            @Model.Result.Code
+            @if (Model.Result.Code != null
+               && Model.ScoreCodesUsed != null
+               && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
+            {
+                @Html.Raw("</span>")
+            } @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
+            @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
+            {
+                <span class="small">(@Model.Result.Place.Value.Ordinalize())</span>
+            }
+            @if (Model.Result.Discard)
             {
                 @Html.Raw("</s>")
             }
         </span>
-    </td>
+</td>
 }
 else
 {

@@ -58,6 +58,8 @@
             @{ ViewData["IsExport"] = true; }
 
             @await Html.PartialAsync("_ResultsTable", Model)
+
+            @await Html.PartialAsync("_CodeGlossary", Model)
             <br />
             <div class="row">
                 @if (Model.UpdatedDate.HasValue)

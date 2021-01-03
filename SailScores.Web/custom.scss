@@ -3,7 +3,7 @@
 $my-dark-color: #001156;
 $my-link-color: #0063CC;
 $my-hover-color: #265180;
-$my-link-color-alt: #3987DB;
+$my-link-color-alt: #439BF9;
 $my-hover-color-alt: #2F90F7;
 $theme-colors: (
     'dark' : $my-dark-color,
@@ -286,20 +286,16 @@ form label.required:not(.custom-control-label)::after {
         background: #CECECE;
     }
 
-    .autocomplete-suggestions strong {
-    }
-
-    .autocomplete-group {
-    }
-
-    .autocomplete-group strong {
-    }
-
-    option {
+     option {
         color: #B1B1B1;
     }
 
     .score-entry {
         background-color: $secondary-background;
+    }
+
+    input:-internal-autofill-selected,
+    input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 30px #3b3b3b inset !important;
     }
 }

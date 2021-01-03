@@ -3,6 +3,7 @@ using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace SailScores.Core.Scoring
 {
@@ -43,8 +44,102 @@ namespace SailScores.Core.Scoring
         public SeriesResults CalculateResults(Series series)
         {
             SeriesResults returnResults = GetResults(series);
+            AddCodesUsed(returnResults);
             AddTrend(returnResults, series);
             return returnResults;
+        }
+
+        private void AddCodesUsed(SeriesResults results)
+        {
+            var scoreCodes = new Dictionary<string, ScoreCodeSummary>();
+
+            foreach(var comp in results.Competitors)
+                foreach(var race in results.SailedRaces)
+                {
+                    var curScore = results.Results[comp].CalculatedScores[race];
+                    if (!String.IsNullOrWhiteSpace(curScore.RawScore.Code)
+                        && !scoreCodes.ContainsKey(curScore.RawScore.Code))
+                    {
+                        scoreCodes.Add(curScore.RawScore.Code,
+                            GetScoreCodeSummary(curScore.RawScore.Code));
+                    }
+                }
+
+            results.ScoreCodesUsed = scoreCodes;
+        }
+
+        private ScoreCodeSummary GetScoreCodeSummary(string code)
+        {
+            var codeDef = GetScoreCode(code);
+
+            return new ScoreCodeSummary
+            {
+                Name = codeDef.Name,
+                Description = codeDef.Description,
+                Formula = GetFormulaString(codeDef)
+            };
+
+        }
+
+        private string GetFormulaString(ScoreCode codeDef)
+        {
+            var returnString = new StringBuilder();
+            switch (codeDef.Formula.ToUpperInvariant())
+            {
+                case "COD":
+                    returnString.Append($"Scored like {codeDef.ScoreLike}");
+                    break;
+                case "FIN+":
+                    returnString.Append("Number of boats that finished race");
+                    returnString.Append(GetNumberIfExists(codeDef));
+                    break;
+                case "SER+":
+                    returnString.Append("Number of boats entered in series");
+                    returnString.Append(GetNumberIfExists(codeDef));
+                    break;
+                case "CTS+":
+                    returnString.Append("Number of boats that came to starting area");
+                    returnString.Append(GetNumberIfExists(codeDef));
+                    break;
+                case "AVE":
+                    returnString.Append("Average of results");
+                    break;
+                case "AVE ND":
+                    returnString.Append("Average of non-discarded results");
+                    break;
+                case "AVE P":
+                    returnString.Append("Average of results in prior races");
+                    break;
+                case "PLC%":
+                    returnString.Append($"Place + penalty ({codeDef.FormulaValue}% of DNF score)");
+                    break;
+                case "MAN":
+                    returnString.Append($"Manually entered value");
+                    break;
+                case "FIX":
+                    returnString.Append($"Fixed at {codeDef.FormulaValue}");
+                    break;
+                case "TIE":
+                    returnString.Append($"Average of tied places");
+                    break;
+            }
+
+            if (!(codeDef.Discardable ?? true))
+            {
+                returnString.Append("; not excludable");
+            }
+            return returnString.ToString();
+        }
+
+        private string GetNumberIfExists(ScoreCode codeDef)
+        {
+            
+            if ((codeDef.FormulaValue ?? 0) == 0)
+            {
+                return string.Empty;
+            }
+
+            return $" + {codeDef.FormulaValue}";
         }
 
         private SeriesResults GetResults(Series series)
@@ -57,6 +152,7 @@ namespace SailScores.Core.Scoring
                 .SelectMany(
                     r => r
                         .Scores));
+
             return returnResults;
         }
 

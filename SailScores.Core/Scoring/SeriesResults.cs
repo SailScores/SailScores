@@ -21,6 +21,8 @@ namespace SailScores.Core.Scoring
 
         public Dictionary<Competitor, SeriesCompetitorResults> Results { get; set; }
 
+        public Dictionary<string,ScoreCodeSummary> ScoreCodesUsed { get; set; }
+
         public CalculatedScore GetResult(
             Competitor comp,
             Race race)
