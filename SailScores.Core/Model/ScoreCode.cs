@@ -13,7 +13,7 @@ namespace SailScores.Core.Model
         [StringLength(1000)]
         public String Description { get; set; }
 
-        // can be:
+        // Formula can be:
         // COD - Use value of ScoreLike to find another code to use
         // FIN+ - competitors who finished this race + FormulaValue
         // SER+ - competitors in this series + FormulaValue

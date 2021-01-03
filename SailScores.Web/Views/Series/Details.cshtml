@@ -75,6 +75,8 @@
     </div>
 }
 
+@await Html.PartialAsync("_CodeGlossary", Model.Item)
+
 @if (Model.Item.UpdatedDate.HasValue)
 {
     <br />

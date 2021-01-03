@@ -50,7 +50,7 @@ namespace SailScores.Web.Controllers
                 {
                     return RedirectToRoute("Race", new
                     {
-                        capInitials,
+                        clubInitials = capInitials,
                         seasonName = currentSeason.UrlName
                     });
                 }

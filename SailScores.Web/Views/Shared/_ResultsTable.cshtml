@@ -124,8 +124,9 @@
                         NoCompetitors = true;
                     }
                 }
-                @{ var cellViewData = new ViewDataDictionary(ViewData)
-                                               {{ "IsPercentSystem", Model.FlatResults.IsPercentSystem }};
+                @{ var cellViewData = new ViewDataDictionary(ViewData) {
+                       { "IsPercentSystem", Model.FlatResults.IsPercentSystem },
+                       { "ScoreCodesUsed", Model.FlatResults.ScoreCodesUsed } };
                 }
                 @foreach (var comp in compList)
                 {
@@ -225,7 +226,12 @@
                         {
                             var result = Model.FlatResults.GetScore(comp, race);
 
-                            @await Html.PartialAsync("_ScoreCell", result, cellViewData)
+                            @await Html.PartialAsync("_ScoreCell", new ScoreCellViewModel
+                       {
+                           Result = result,
+                           IsPercentSystem = Model.FlatResults.IsPercentSystem,
+                           ScoreCodesUsed = Model.FlatResults.ScoreCodesUsed
+                       })
                         }
                         if (++colCount % 25 == 0 && (Model.FlatResults.NumberOfSailedRaces - colCount) > 10)
                         {
