@@ -19,12 +19,15 @@ namespace SailScores.Core.Model
         [Display(Name = "Number of Races")]
         public int RaceCount { get; internal set; }
         [Display(Name = "Average Finish Place")]
-        public double? AverageFinishPlace { get; internal set; }
+        public double? AverageFinishRank { get; internal set; }
         [Display(Name = "Days Raced")]
         public int? DaysRaced { get; internal set; }
         [Display(Name = "Boats Raced Against")]
         public int? BoatsRacedAgainst { get; internal set; }
         [Display(Name = "Boats Beat")]
         public int? BoatsBeat { get; internal set; }
+        [Display(Name = "Latest Date Raced")]
+        [DataType(DataType.Date)]
+        public DateTime? LastRacedDate { get; internal set; }
     }
 }

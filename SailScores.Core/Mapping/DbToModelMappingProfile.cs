@@ -69,6 +69,8 @@ namespace SailScores.Core.Mapping
                 .ReverseMap();
 
             CreateMap<Db.CompetitorRankStats, Model.PlaceCount>();
+
+            CreateMap<Db.CompetitorStatsSummary, Model.CompetitorSeasonStats>();
         }
     }
 }

@@ -9,7 +9,7 @@
 @{
     ViewBag.Title = Model.Item.SailNumber + " " + (!String.IsNullOrWhiteSpace(Model.Item.Name) ? Model.Item.Name : "") + " Stats";
     Layout = "_ClubLayout";
-    ViewData["MetaDescription"] = $"Competitor Summary for {Model.Item.SailNumber} : {Model.Item.Name} with {Model.ClubInitials}";
+    ViewData["MetaDescription"] = $"Competitor Stats for {Model.Item.SailNumber} : {Model.Item.Name} with {Model.ClubName}";
 }
 
 
@@ -20,6 +20,10 @@
             <span class="h3 avoidwrap">@Model.Item.Name</span>&emsp;
             <span class="h3 avoidwrap"><em>@Model.Item.BoatName</em></span>
         </span>
+        @if (Model.Item.SeasonStats?.Max(s => s.LastRacedDate) != null)
+        {
+    <p>Last raced @Model.Item.SeasonStats.Max(s => s.LastRacedDate).Value.ToString("D")</p>
+        }
     </div>
 </div>
 <div class="row">
@@ -33,7 +37,7 @@
             @:on <strong>@SeasonStats.DaysRaced</strong> days&emsp;
             @if (SeasonStats.DaysRaced > 2)
             {
-                @:Average place: @(SeasonStats.AverageFinishPlace.HasValue ? String.Format("{0:0.0}", SeasonStats.AverageFinishPlace) : "No")&emsp;
+                @:Average place: @(SeasonStats.AverageFinishRank.HasValue ? String.Format("{0:0.0}", SeasonStats.AverageFinishRank) : "No")&emsp;
                 @:Raced against @SeasonStats.BoatsRacedAgainst boats
                 @if (SeasonStats.BoatsBeat.HasValue && ((SeasonStats.BoatsBeat * 100m) / SeasonStats.BoatsRacedAgainst) > 25)
                 {

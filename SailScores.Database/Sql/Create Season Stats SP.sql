@@ -29,7 +29,8 @@ SELECT
     AVG(CAST(RaceResults.Place AS FLOAT)) AS AverageFinishRank,
     count(DISTINCT RacedDate) AS DaysRaced,
     SUM(RaceResults.FinisherCount - 1) AS BoatsRacedAgainst,
-    SUM(RaceResults.FinisherCount - RaceResults.Place ) AS BoatsBeat
+    SUM(RaceResults.FinisherCount - RaceResults.Place ) AS BoatsBeat,
+    Max(RacedDate) as LastRacedDate
 FROM
 (SELECT TOP 3
         *
