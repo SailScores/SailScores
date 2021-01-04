@@ -15,5 +15,6 @@ namespace SailScores.Database.Entities
         public int? DaysRaced { get; set; }
         public int? BoatsRacedAgainst { get; set; }
         public int? BoatsBeat { get; set; }
+        public DateTime? LastRacedDate { get; set; }
     }
 }

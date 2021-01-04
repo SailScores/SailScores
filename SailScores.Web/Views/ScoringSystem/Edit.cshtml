@@ -36,29 +36,36 @@
                 <label asp-for="DiscardPattern" class="control-label"></label>
                 <input asp-for="DiscardPattern" class="form-control" />
                 <span asp-validation-for="DiscardPattern" class="text-danger"></span>
-                <p class="small mx-3">A series of numbers indicating how many races should be discarded.
+                <p class="small mx-3">
+                    A series of numbers indicating how many races should be discarded.
                     The place of the number represents the number of races. The
                     number itself represents the number of discards. For example:
                 </p>
                 <dl class="small mx-3">
                     <dt class="col-sm-3">0,0,1,1,1,2</dt>
-                    <dd class="col-sm-9">One discard if there are
-                                three, four, or five races, and two discards if
-                                there are six or more races.</dd>
+                    <dd class="col-sm-9">
+                        One discard if there are
+                        three, four, or five races, and two discards if
+                        there are six or more races.
+                    </dd>
                     <dt class="col-sm-3">0,0,0,1</dt>
-                    <dd class="col-sm-9">One discard if there are
-                        four or more races.</dd>
+                    <dd class="col-sm-9">
+                        One discard if there are
+                        four or more races.
+                    </dd>
                     <dt class="col-sm-3">0,0,1,1,1,2,2,2,3,3,3,4</dt>
-                    <dd class="col-sm-9">One
+                    <dd class="col-sm-9">
+                        One
                         discard for every three races, up to 12 races. More
-                        than 12 races will have four discards.</dd>
+                        than 12 races will have four discards.
+                    </dd>
                 </dl>
             </div>
 
             <div class="form-group">
                 <label asp-for="ParticipationPercent" class="control-label"></label>
                 <span class="small"><em>&ensp;Used for High Score Percent systems</em></span>
-                <input asp-for="ParticipationPercent" class="form-control" type="number"/>
+                <input asp-for="ParticipationPercent" class="form-control" type="number" />
                 <span asp-validation-for="ParticipationPercent" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -69,76 +76,102 @@
                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
-        <h3>Score Codes</h3>
-        <a asp-action="Create" asp-controller="ScoreCode"           
-            asp-route-scoringsystemid="@Model.Id"
-            asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Create</a>
-        <table class="table" summary="Score Codes in system">
-            <thead>
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                    <th scope="col">Formula</th>
-                    <th scope="col">Can be Discarded?</th>
-                    <th scope="col">Came To Start?</th>
-                    <th scope="col">Started?</th>
-                    <th scope="col">Finished?</th>
-                    <th scope="col">Keep Result?</th>
-                    <th scope="col">Adjust other scores?</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var code in Model.ScoreCodes.OrderBy(c => c.Name))
-                {
-                    <tr>
-                        <td>@code.Name</td>
-                        <td>@code.Description</td>
-                        <td>@code.Formula@code.FormulaValue</td>
-                        <td>@((code.Discardable ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.CameToStart ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.Started ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
-                        <td>
-                            <a asp-action="Edit" asp-controller="ScoreCode" asp-route-id="@code.Id"
-                               asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Edit</a>
-                            <a asp-action="Delete" asp-controller="ScoreCode" asp-route-id="@code.Id"
-                               asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Delete</a>
-                        </td>
-                    </tr>
-                }
-                <tr>
-                    <td colspan="9">
-                        <h4>Inherited codes</h4>
-                    </td>
-                </tr>
-
-                @foreach (var code in Model.InheritedScoreCodes.OrderBy(c => c.Name))
-                {
-                    <tr>
-                        <td>@code.Name</td>
-                        <td>@code.Description</td>
-                        <td>@code.Formula@code.FormulaValue</td>
-                        <td>@((code.Discardable ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.CameToStart ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.Started ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
-                        <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
-                        <td>
-                            <a asp-action="Override" asp-controller="ScoreCode"
-                               asp-route-code="@code.Name"
-                               asp-route-scoringsystemid="@Model.Id"
-                               asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Override</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
     </div>
 </div>
+    <div class="row">
+        <div class="col-12">
+            <h3>Score Codes
+            <a class="btn btn-primary"
+   asp-action="Create"
+   asp-controller="ScoreCode"
+   asp-route-scoringsystemid="@Model.Id"
+   asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">
+    <span class="fas fa-plus"></span>
+    <span class="d-none d-sm-inline">
+        New Score Code
+    </span>
+</a></h3>
+            <table class="table" summary="Score Codes in system">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                        <th scope="col">Formula</th>
+                        <th scope="col">Can be Discarded</th>
+                        <th scope="col">Came To Start</th>
+                        <th scope="col">Started</th>
+                        <th scope="col">Finished</th>
+                        <th scope="col">Keep Result</th>
+                        <th scope="col">Adjust other scores</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var code in Model.ScoreCodes.OrderBy(c => c.Name))
+                    {
+                        <tr>
+                            <td>
+                                <a class="btn btn-sm btn-outline-danger"
+                                   asp-action="Delete"
+                                   asp-controller="ScoreCode"
+                                   asp-route-id="@code.Id"
+                                   asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"
+                                   title="Delete">
+                                    <span class="fas fa-trash"></span>
+                                </a> &nbsp;
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="Edit"
+                                   asp-controller="ScoreCode"
+                                   asp-route-id="@code.Id"
+                                   asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"
+                                   title="Edit">
+                                    <span class="fas fa-pen"></span>
+                                </a>
+                            </td>
+                            <td>
+                                @code.Name
+                            </td>
+                            <td>@code.Description</td>
+                            <td>@code.Formula@code.FormulaValue</td>
+                            <td>@((code.Discardable ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.CameToStart ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.Started ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="9">
+                            <h4>Inherited codes</h4>
+                        </td>
+                    </tr>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+                    @foreach (var code in Model.InheritedScoreCodes.OrderBy(c => c.Name))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Override" asp-controller="ScoreCode"
+                                   asp-route-code="@code.Name"
+                                   asp-route-scoringsystemid="@Model.Id"
+                                   asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">Override</a>
+                            </td>
+                            <td>@code.Name</td>
+                            <td>@code.Description</td>
+                            <td>@code.Formula@code.FormulaValue</td>
+                            <td>@((code.Discardable ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.CameToStart ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.Started ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        </div>
+
+        @section Scripts {
+            @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        }

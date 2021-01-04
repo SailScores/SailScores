@@ -353,19 +353,7 @@ namespace SailScores.Core.Services
             var returnList = new List<CompetitorSeasonStats>();
             foreach (var season in seasonSummaries.OrderByDescending(s => s.SeasonStart))
             {
-                var seasonStats = new CompetitorSeasonStats
-                {
-                    SeasonName = season.SeasonName,
-                    SeasonUrlName = season.SeasonUrlName,
-                    SeasonStart = season.SeasonStart,
-                    SeasonEnd = season.SeasonEnd,
-                    RaceCount = season.RaceCount,
-                    AverageFinishPlace = season.AverageFinishRank,
-                    DaysRaced = season.DaysRaced,
-                    BoatsRacedAgainst = season.BoatsRacedAgainst,
-                    BoatsBeat = season.BoatsBeat,
-                };
-                returnList.Add(seasonStats);
+                returnList.Add(_mapper.Map<CompetitorSeasonStats>(season));
             }
             return returnList;
         }
