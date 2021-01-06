@@ -11,7 +11,7 @@
 
 
 @{
-    ViewBag.Title = Model.ClubInitials + " " + @localizer["Races"];
+    ViewBag.Title = $"{Model.Item.CurrentSeason?.Name} {Model.ClubInitials} {localizer["Races"]}";
     ViewData["MetaDescription"] = $"{Model.ClubName} {localizer["Races"]} list";
     Layout = "_ClubLayout";
 }

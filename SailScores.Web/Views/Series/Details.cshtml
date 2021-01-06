@@ -10,7 +10,7 @@
 @model ClubItemViewModel<Series>
 
 @{
-    ViewBag.Title = Model.Item.Name;
+    ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} - {Model.ClubInitials}";
     Layout = "_ClubLayout";
     ViewData["MetaDescription"] = $"Results for {Model.Item.Name} series racing at {Model.ClubInitials}";
 }
