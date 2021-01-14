@@ -153,6 +153,7 @@ namespace SailScores.Core.Services
             var clubId = club.Id;
             var seriesDb = await _dbContext
                 .Series
+                .Include(s => s.Season)
                 .Where(s =>
                     s.ClubId == clubId)
                 .SingleOrDefaultAsync(s => s.UrlName == seriesUrlName
