@@ -101,7 +101,9 @@ namespace SailScores.Core.Services
                     .ThenInclude(rs => rs.Race)
                         .ThenInclude(r => r.Scores)
                     .Include(s => s.Season)
+                    .AsSplitQuery()
                 .SingleAsync(s => s.Id == seriesId)
+                
                 .ConfigureAwait(false);
 
             if (dbSeries.ResultsLocked ?? false)
