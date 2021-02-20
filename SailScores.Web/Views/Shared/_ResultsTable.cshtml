@@ -11,11 +11,12 @@
 @model Series
 @{
     bool NoCompetitors = false;
+    var results = Model.FlatResults;
 }
 
 @if (Model != null)
 {
-    if (Model.FlatResults.IsPreliminary ?? false)
+    if (results.IsPreliminary ?? false)
     {
         <div><strong><span class="text-warning">Results are preliminary.</span> Protests may be pending.</strong></div>
     }
@@ -25,9 +26,9 @@
                 <tr>
                     <th scope="col">@localizer["Place"]</th>
                     @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
-                        && (Model.FlatResults?.Races?.Max(r => r.Date ?? DateTime.MinValue) ??DateTime.MinValue)
-                            > DateTime.Today.AddMonths(-1)
-                        && !((bool?)ViewData["IsExport"] ?? false))
+                      && (results?.Races?.Max(r => r.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
+                          > DateTime.Today.AddMonths(-1)
+                      && !((bool?)ViewData["IsExport"] ?? false))
                     {
                         <th scope="col" class="d-none d-sm-table-cell">@localizer["Change"]*</th>
                     }
@@ -39,74 +40,85 @@
                         <th scope="col" class="d-none d-sm-table-cell">@localizer["Club"]</th>
                     }
                     <th scope="col" class="text-center">@localizer["Total"]</th>
-                    @{ var colCount = 0;}
-                    @foreach (var race in Model.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())
+                    @{
+                        var colCount = 0;
+                        var needCompNameColumn = false;
+                        DateTime? prevRaceDate = null;
+                    }
+                    @foreach (var race in results?.Races ?? Enumerable.Empty<FlatRace>())
                     {
+                        ++colCount;
+                        if (!needCompNameColumn)
+                        {
+                            needCompNameColumn = colCount % 23 == 20 && (results.NumberOfSailedRaces - colCount) > 10;
+                        }
+                        if (needCompNameColumn && (race.Date != prevRaceDate || colCount % 23 == 4 ))
+                        {
+                            needCompNameColumn = false;
+                            <th scope="col">@localizer["Helm"]</th>
+                        }
                         if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                         {
-                <th class="text-center d-none d-sm-table-cell" scope="col">
-                    @if (((bool?)ViewData["IsExport"] ?? false))
-                    {
-                        @race.ShortName
-                    }
-                    else
-                    {
-                        @Html.ActionLink(
-                                     @race.ShortName
-                                     , "Details", "Race", new { id = race.Id })
-                        <div class="weather">
-                            @if (race.WindDirectionDegrees.HasValue)
-                            {
-                                <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
-                            {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
-                            @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
-                            {
-                                <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
-                            }
-                        </div>
-                    }
+                            <th class="text-center d-none d-sm-table-cell" scope="col">
+                                @if (((bool?)ViewData["IsExport"] ?? false))
+                                {
+                                    @race.ShortName
+                                }
+                                else
+                                {
+                                    @Html.ActionLink(
+                                                 @race.ShortName
+                                                 , "Details", "Race", new { id = race.Id })
+                                    <div class="weather">
+                                        @if (race.WindDirectionDegrees.HasValue)
+                                        {
+                                            <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
+                                        {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
+                                        @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
+                                        {
+                                            <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
+                                        }
+                                    </div>
+                                }
 
-                </th>
+                            </th>
                         }
                         else
                         {
-                <th class="text-center" scope="col">
-                    @if (((bool?)ViewData["IsExport"] ?? false))
-                    {
-                        @race.ShortName
-                    }
-                    else
-                    {
-                        <a asp-controller="Race"
-                           asp-action="Details"
-                           asp-route-id="@race.Id"
-                           class=" @(race.State == RaceState.Preliminary ? "text-warning" : "")">@race.ShortName</a>
-                        <br />
-                        <div class="weather">
-                            @if (race.WindDirectionDegrees.HasValue)
-                            {
-                                <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
-                            {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
-                            @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
-                            {
-                                <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
-                            }
-                        </div>
-                    }
-                </th>
+                            <th class="text-center" scope="col">
+                                @if (((bool?)ViewData["IsExport"] ?? false))
+                                {
+                                    @race.ShortName
+                                }
+                                else
+                                {
+                                    <a asp-controller="Race"
+                                       asp-action="Details"
+                                       asp-route-id="@race.Id"
+                                       class=" @(race.State == RaceState.Preliminary ? "text-warning" : "")">@race.ShortName</a>
+                                    <br />
+                                    <div class="weather">
+                                        @if (race.WindDirectionDegrees.HasValue)
+                                        {
+                                            <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
+                                        {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
+                                        @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
+                                        {
+                                            <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
+                                        }
+                                    </div>
+                                }
+                            </th>
                         }
-                        if (++colCount % 25 == 0 && (Model.FlatResults.NumberOfSailedRaces - colCount) > 10)
-                        {
-                            <th scope="col">@localizer["Helm"]</th>
-                        }
+                        prevRaceDate = race.Date;
                     }
-                    @if ((Model.FlatResults.NumberOfSailedRaces) > 4)
+                    @if ((results.NumberOfSailedRaces) > 4)
                     {
-                        <th scope="col" class="d-table-cell @((Model.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")">
+                        <th scope="col" class="d-table-cell @((results.NumberOfSailedRaces < 25)?"d-md-none":"")">
                             @localizer["Helm"]
                         </th>
                     }
@@ -114,8 +126,8 @@
             </thead>
             <tbody>
                 @{ var firstRow = true;
-                    var compList = Model.FlatResults?.Competitors;
-                    if (compList == null || compList.Count() == 0)
+                    var compList = results?.Competitors;
+                    if ((compList?.Count() ?? 0) == 0)
                     {
                         compList = new List<FlatCompetitor>{
                         new FlatCompetitor {
@@ -125,32 +137,32 @@
                     }
                 }
                 @{ var cellViewData = new ViewDataDictionary(ViewData) {
-                       { "IsPercentSystem", Model.FlatResults.IsPercentSystem },
-                       { "ScoreCodesUsed", Model.FlatResults.ScoreCodesUsed } };
+                       { "IsPercentSystem", results.IsPercentSystem },
+                       { "ScoreCodesUsed", results.ScoreCodesUsed } };
                 }
                 @foreach (var comp in compList)
                 {
                     colCount = 0;
                 <tr>
-                    <th scope="row">@Model.FlatResults.GetScore(comp)?.Rank</th>
+                    <th scope="row">@results.GetScore(comp)?.Rank</th>
                     @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
-                        && (Model.FlatResults?.Races?.Max(r => r.Date ?? DateTime.MinValue) ??DateTime.MinValue)
-                            > DateTime.Today.AddMonths(-1)
-                        && !((bool?)ViewData["IsExport"] ?? false))
+                    && (results?.Races?.Max(r => r.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
+                        > DateTime.Today.AddMonths(-1)
+                    && !((bool?)ViewData["IsExport"] ?? false))
                     {
                         <th scope="row" class="d-none d-sm-table-cell">
-                            @if (Model.FlatResults.GetScore(comp)?.Trend > 0)
+                            @if (results.GetScore(comp)?.Trend > 0)
                             {
                                 <span class="text-success">
                                     <span class="fas fa-arrow-up"></span>
-                                    @Model.FlatResults.GetScore(comp).Trend.Value
+                                    @results.GetScore(comp).Trend.Value
                                 </span>
                             }
-                            else if (Model.FlatResults.GetScore(comp)?.Trend < 0)
+                            else if (results.GetScore(comp)?.Trend < 0)
                             {
                                 <span class="text-danger">
                                     <span class="fas fa-arrow-down"></span>
-                                    @Math.Abs(Model.FlatResults.GetScore(comp).Trend.Value)
+                                    @Math.Abs(results.GetScore(comp).Trend.Value)
                                 </span>
                             }
 
@@ -158,7 +170,7 @@
                     }
                     <th scope="row">
                         @if ((Model.PreferAlternativeSailNumbers ?? false)
-                         && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber))
+                     && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber))
                         {
                             @comp.AlternativeSailNumber
                         }
@@ -169,13 +181,13 @@
                     </th>
                     <th scope="row">
                         @if (((bool?)ViewData["IsExport"] ?? false)
-                            || ((bool?)ViewData["ExcludeCompetitorLinks"] ?? false) || NoCompetitors)
+                        || ((bool?)ViewData["ExcludeCompetitorLinks"] ?? false) || NoCompetitors)
                         {
                             @comp.Name
                         }
                         else
                         {
-                            
+
                             <a asp-route="Competitor"
                                asp-route-sailNumber="@(comp.CurrentSailNumber ?? comp.Name)"
                                asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]">@comp.Name</a>
@@ -188,27 +200,42 @@
                     }
                     <td scope="row" class="text-center">
                         <strong>
-                            @String.Format("{0:0.##}", Model.FlatResults.GetScore(comp)?.TotalScore)
+                            @String.Format("{0:0.##}", results.GetScore(comp)?.TotalScore)
 
-                            @if (Model.FlatResults.IsPercentSystem &&
-                  Model.FlatResults.GetScore(comp)?.TotalScore != null)
+                            @if (results.IsPercentSystem &&
+              results.GetScore(comp)?.TotalScore != null)
                             {
                                 <br />
                                 <span class="small">
-                                    (@Model.FlatResults.GetScore(comp).PointsEarned /
-                                    @Model.FlatResults.GetScore(comp).PointsPossible.Value.ToString("N0"))
+                                    (@results.GetScore(comp).PointsEarned /
+                                    @results.GetScore(comp).PointsPossible.Value.ToString("N0"))
                                 </span>
                             }
                         </strong>
                     </td>
-
-                    @foreach (var race in Model.FlatResults.Races)
+                    @{
+                        colCount = 0;
+                        needCompNameColumn = false;
+                        prevRaceDate = null;
+                    }
+                    @foreach (var race in results.Races)
                     {
+                        ++colCount;
+                        if (!needCompNameColumn)
+                        {
+                            needCompNameColumn = colCount % 23 == 20 && (results.NumberOfSailedRaces - colCount) > 10;
+                        }
+                        if (needCompNameColumn && (race.Date != prevRaceDate || colCount % 23 == 4))
+                        {
+                            needCompNameColumn = false;
+                            <td>@comp.Name</td>
+
+                        }
                         if (race.State == RaceState.Abandoned)
                         {
                             if (firstRow)
                             {
-                                <td rowspan="@(Model.FlatResults?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
+                                <td rowspan="@(results?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
                                     <span>ABANDONED</span>
                                 </td>
                             }
@@ -217,44 +244,42 @@
                         {
                             if (firstRow)
                             {
-                                <td rowspan="@(Model.FlatResults?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
+                                <td rowspan="@(results?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
                                     <span>SCHEDULED</span>
                                 </td>
                             }
                         }
                         else
                         {
-                            var result = Model.FlatResults.GetScore(comp, race);
+                            var result = results.GetScore(comp, race);
 
                             @await Html.PartialAsync("_ScoreCell", new ScoreCellViewModel
                        {
                            Result = result,
-                           IsPercentSystem = Model.FlatResults.IsPercentSystem,
-                           ScoreCodesUsed = Model.FlatResults.ScoreCodesUsed
+                           IsPercentSystem = results.IsPercentSystem,
+                           ScoreCodesUsed = results.ScoreCodesUsed
                        })
                         }
-                        if (++colCount % 25 == 0 && (Model.FlatResults.NumberOfSailedRaces - colCount) > 10)
-                        {
-                            <td>@comp.Name</td>
-                        }
+                        prevRaceDate = race.Date;
                     }
-                    @if ((Model.FlatResults.NumberOfSailedRaces) > 4)
+                    @if ((results.NumberOfSailedRaces) > 4)
                     {
-                        <th class="d-table-cell @(( Model.FlatResults.NumberOfSailedRaces < 25)?"d-md-none":"")"
+                        <th class="d-table-cell @(( results.NumberOfSailedRaces < 25)?"d-md-none":"")"
                             scope="row">@comp.Name</th>
-                    }
-                    @{firstRow = false;
+                        }
+                    @{
+                        firstRow = false;
                     }
                 </tr>
-                }
+                        }
             </tbody>
         </table>
         <div class="row">
             <div class="col-md-9">
                 @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
-                     && (Model.FlatResults?.Races?.Max(r => r.Date ?? DateTime.MinValue) ??DateTime.MinValue)
-                     > DateTime.Today.AddMonths(-1)
-                     && !((bool?)ViewData["IsExport"] ?? false))
+                    && (results?.Races?.Max(r => r.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
+                    > DateTime.Today.AddMonths(-1)
+                    && !((bool?)ViewData["IsExport"] ?? false))
                 {
                     <span class="d-none d-sm-inline">
                         * @localizer["Rank change from"] @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
@@ -262,7 +287,7 @@
                 }
             </div>
             <div class="col-md-3 text-right">
-                @if(!((bool?)ViewData["IsExport"] ?? false))
+                @if (!((bool?)ViewData["IsExport"] ?? false))
                 {
                     <a class="btn btn-outline-secondary btn-sm"
                        asp-action="ExportHtml"

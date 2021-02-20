@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using SailScores.Api.Enumerations;
 using SailScores.Database.Entities;
 using File = SailScores.Database.Entities.File;
@@ -254,6 +255,16 @@ namespace SailScores.Database
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return base.SaveChangesAsync(cancellationToken);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+#if DEBUG
+            optionsBuilder.ConfigureWarnings(w =>
+                w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
+
+#endif
+            base.OnConfiguring(optionsBuilder);
         }
 
     }

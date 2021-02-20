@@ -10,12 +10,11 @@
 @model ClubItemViewModel<Series>
 
 @{
-    ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} - {Model.ClubInitials}";
-    Layout = "_ClubLayout";
-    ViewData["MetaDescription"] = $"Results for {Model.Item.Name} series racing at {Model.ClubInitials}";
-}
-@{
     var results = Model.Item.FlatResults;
+
+    ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} - {Model.ClubInitials}";
+    Layout = ((results.Races?.Count() ?? 0) > 7 ? "_WideLayout" : "_ClubLayout");
+    ViewData["MetaDescription"] = $"Results for {Model.Item.Name} series racing at {Model.ClubInitials}";
 }
 
 <div class="row">
@@ -80,7 +79,8 @@
 @if (Model.Item.UpdatedDate.HasValue)
 {
     <br />
-    <span class="font-italic">@localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC
+    <span class="font-italic">
+        @localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC
         @if (!String.IsNullOrWhiteSpace(Model.Item.FlatResults.UpdatedBy))
         {
             @:by @Model.Item.FlatResults.UpdatedBy

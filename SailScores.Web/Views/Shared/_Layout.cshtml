@@ -58,14 +58,21 @@
     }
 </head>
 <body>
-    <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">
-        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">SailScores.com</a>
-        <div class="navbar-nav-scroll">
-            <ul class="navbar-nav flex-row">
-                <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
-                <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="News" class="nav-link">News</a></li>
-                <li class="nav-item"><a asp-area="" asp-controller="ClubRequest" asp-action="Index" class="nav-link">Try it out</a></li>
-            </ul>
+    <header class="bg-dark">
+        <div class="container-lg py-0">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">SailScores</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
+                        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="News" class="nav-link">News</a></li>
+                        <li class="nav-item"><a asp-area="" asp-controller="ClubRequest" asp-action="Index" class="nav-link">Try it out</a></li>
+                    </ul>
+                </div>
+            </nav>
         </div>
     </header>
 
@@ -76,8 +83,12 @@
         <hr />
         <footer>
             <div class="row">
-                <div class="col-12 col-sm-6"><small>&copy; 2020 - J. Fraser &ndash;
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a></small></div>
+                <div class="col-12 col-sm-6">
+                    <small>
+                        &copy; 2020 - J. Fraser &ndash;
+                        <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                    </small>
+                </div>
                 <div class="col-12 col-sm-6 text-sm-right">
                     @await Html.PartialAsync("_LoginPartial")
                 </div>
