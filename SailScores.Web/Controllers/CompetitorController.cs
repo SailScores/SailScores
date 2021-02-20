@@ -167,7 +167,7 @@ namespace SailScores.Web.Controllers
                     .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                     .OrderBy(f => f.Name);
                 competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
-                ModelState.AddModelError("Exception", "A problem occured while saving.");
+                ModelState.AddModelError(String.Empty, "A problem occurred while saving.");
 
                 return View(competitor);
             }

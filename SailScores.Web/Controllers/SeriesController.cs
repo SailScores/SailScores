@@ -174,6 +174,10 @@ namespace SailScores.Web.Controllers
                 var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
                 model.SeasonOptions = blankVm.SeasonOptions;
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+
+                ModelState.AddModelError(String.Empty,
+                    "A problem occurred while saving. Is there already a series for this season with this name?");
+
                 return View(model);
             }
         }
