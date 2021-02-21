@@ -65,6 +65,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.CompetitorFleets)
                     .ThenInclude(cf => cf.Competitor)
                 .Where(f => f.ClubId == clubId && (f.IsActive ?? true))
+                .AsSingleQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
 

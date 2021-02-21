@@ -83,6 +83,7 @@ namespace SailScores.Core.Services
             var existingFleet = await _dbContext.Fleets
                 .Include(f => f.FleetBoatClasses)
                 .Include(f => f.CompetitorFleets)
+                .AsSingleQuery()
                 .SingleAsync(c => c.Id == fleet.Id)
                 .ConfigureAwait(false);
 
