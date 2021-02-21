@@ -2,7 +2,7 @@
 
 @model SailScores.Web.Models.SailScores.ScoreCellViewModel
 
-@if (Model != null)
+@if (Model != null && Model.Result != null )
 {
     <td class="text-center
         @(Model.Result.ScoreValue == 1 ? "finish-first ": "")
