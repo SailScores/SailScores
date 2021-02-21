@@ -13,7 +13,8 @@
     var results = Model.Item.FlatResults;
 
     ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} - {Model.ClubInitials}";
-    Layout = ((results.Races?.Count() ?? 0) > 7 ? "_WideLayout" : "_ClubLayout");
+    Layout = "_ClubLayout";
+    ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
     ViewData["MetaDescription"] = $"Results for {Model.Item.Name} series racing at {Model.ClubInitials}";
 }
 
