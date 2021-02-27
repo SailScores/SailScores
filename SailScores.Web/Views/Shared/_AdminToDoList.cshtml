@@ -20,24 +20,25 @@
                             {
                                 if (@tip.Link != null)
                                 {
-                            <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">
-                                <span class="far fa-check-square"></span>
-                                <s>@tip.Title</s>
-                            </a>
+                                    <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">
+                                        <span class="far fa-check-square"></span>&nbsp;
+                                        <s>@tip.Title</s>
+                                    </a>
                                 }
                                 else
                                 {
-                                    <span class="far fa-check-square"></span> <s>@tip.Title</s>
+                                    <span class="far fa-check-square"></span>@:&nbsp;<s>@tip.Title</s>
                                 }
                             }
                             else if (@tip.Link != null)
                             {
                                 <a asp-action="@tip.Link.Action" asp-controller="@tip.Link.Controller">
-                                <span class="far fa-square"></span>@tip.Title</a>
+                                    <span class="far fa-square"></span>&nbsp;@tip.Title
+                                </a>
                             }
                             else
                             {
-                                <span class="far fa-square"></span> <a href="@tip">@tip.Title</a>
+                                <span class="far fa-square"></span>@:&nbsp;<a href="@tip">@tip.Title</a>
                             }
                         </span>
                     </dt>

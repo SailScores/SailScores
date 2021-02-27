@@ -26,6 +26,6 @@ namespace SailScores.Database.Entities
         public ScoringSystem ParentSystem { get; set; }
 
         public Decimal? ParticipationPercent { get; set; }
-
+        public bool? IsSiteDefault { get; set; }
     }
 }

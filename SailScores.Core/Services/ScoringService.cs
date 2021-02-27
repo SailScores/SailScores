@@ -56,7 +56,7 @@ namespace SailScores.Core.Services
             var dbObject = await _dbContext
                 .ScoringSystems
                 .Where(s => s.ClubId == null
-                && s.Name == "Appendix A Low Point For Series")
+                && (s.IsSiteDefault ?? false))
                 .Include(s => s.ScoreCodes)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);

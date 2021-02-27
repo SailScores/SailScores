@@ -31,7 +31,7 @@
 }
 
 <h2>@Model.Name</h2>
-<h3>Club Properties</h3>
+<h3>Basic Club Information</h3>
 <hr />
 <div class="row">
     <form asp-action="Edit">
@@ -131,6 +131,9 @@
         </div>
         <div class="form-group">
             <input type="submit" value="Save" class="btn btn-primary" />
+            <a asp-controller="Admin"
+               asp-action="Index"
+               class="btn btn-outline-primary">Cancel</a>
         </div>
     </form>
 </div>
