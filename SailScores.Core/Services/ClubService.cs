@@ -65,6 +65,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.CompetitorFleets)
                     .ThenInclude(cf => cf.Competitor)
                 .Where(f => f.ClubId == clubId && (f.IsActive ?? true))
+                .AsSingleQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
 
@@ -552,6 +553,13 @@ namespace SailScores.Core.Services
                 return guidMapper[oldGuid.Value];
             }
             return oldGuid;
+        }
+
+        public async Task<bool> HasCompetitorsAsync(Guid id)
+        {
+            return await _dbContext.Competitors
+                .AnyAsync(r => r.ClubId == id)
+                .ConfigureAwait(false);
         }
     }
 }

@@ -48,6 +48,7 @@ namespace SailScores.Web.Models.SailScores
         public IList<string> TemperatureUnitOptions { get; set; }
 
         public bool HasRaces { get; set; }
+        public bool HasCompetitors { get; internal set; }
 
 #pragma warning restore CA2227 // Collection properties should be read only
     }

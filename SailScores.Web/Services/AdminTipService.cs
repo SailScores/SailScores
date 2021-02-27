@@ -72,7 +72,7 @@ namespace SailScores.Web.Services
                         Action = "CreateMultiple",
                         Controller = "Competitor"
                     },
-                    Completed = viewModel.Competitors.Any()
+                    Completed = viewModel.HasCompetitors
                 },
 
                 new()

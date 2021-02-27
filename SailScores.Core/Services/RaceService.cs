@@ -260,6 +260,7 @@ namespace SailScores.Core.Services
                     .Include(r => r.Scores)
                     .Include(r => r.SeriesRaces)
                     .Include(r => r.Weather)
+                    .AsSingleQuery()
                     .SingleAsync(r => r.Id == race.Id)
                     .ConfigureAwait(false);
             }

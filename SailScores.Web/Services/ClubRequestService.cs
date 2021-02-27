@@ -138,7 +138,7 @@ namespace SailScores.Web.Services
                 ScoringSystem newScoringSystem = new ScoringSystem
                 {
                     ParentSystemId = baseScoringSystem.Id,
-                    Name = $"{request.ClubInitials} scoring based on App. A Low Point",
+                    Name = $"{request.ClubInitials} scoring based on App. A Rule 5.3",
                     DiscardPattern = "0,1"
                 };
 
