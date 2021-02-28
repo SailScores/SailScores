@@ -35,9 +35,10 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<CompetitorDto>> Get(
             Guid clubId,
-            Guid? fleetId)
+            Guid? fleetId,
+            bool includeInactive = false)
         {
-            var competitors = await _service.GetCompetitorsAsync(clubId, fleetId, true);
+            var competitors = await _service.GetCompetitorsAsync(clubId, fleetId, includeInactive);
             return _mapper.Map<List<CompetitorDto>>(competitors);
         }
 

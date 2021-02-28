@@ -17,22 +17,40 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ShortName" class="control-label"></label>
-                <small>
-                    Should not be the same as any other fleet name for this club, e.g. <em>2019DieHardMCs</em><br />
-                    Used to create URLs for regattas.
-                </small>
+                <a class="text-primary"
+                   data-container="body"
+                   data-toggle="popover"
+                   data-placement="top"
+                   data-trigger="focus hover"
+                   data-content="Used to create URLs; avoid spaces. Should be unique in the club, e.g. 2019DieHardMCs">
+                    <span class="far fa-question-circle"></span>
+                </a>
                 <input asp-for="ShortName" class="form-control" />
                 <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <small>The full name of the fleet, with spaces, such as <em>2019 Die Hard MC Scows</em></small>
+                <a class="text-primary"
+                   data-container="body"
+                   data-toggle="popover"
+                   data-placement="top"
+                   data-trigger="focus hover"
+                   data-content="Full name including spaces such as: 2019 Die Hard MC Scows">
+                    <span class="far fa-question-circle"></span>
+                </a>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="NickName" class="control-label"></label>
-                <small>Does not need to be unique, used as a display nickname only, e.g. <em>MC Scows</em></small>
+                <a class="text-primary"
+                   data-container="body"
+                   data-toggle="popover"
+                   data-placement="top"
+                   data-trigger="focus hover"
+                   data-content="Used as a display name, this does not need to be unique, e.g. MC Scows">
+                    <span class="far fa-question-circle"></span>
+                </a>
                 <input asp-for="NickName" class="form-control" />
                 <span asp-validation-for="NickName" class="text-danger"></span>
             </div>
@@ -72,8 +90,8 @@
                 <label asp-for="CompetitorIds" class="control-label">Competitors</label>
                 <select multiple asp-for="CompetitorIds" class="form-control custom-select selectpicker">
                     @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber)
-                .ThenBy(c => c.AlternativeSailNumber)
-                .ThenBy(c => c.Name))
+               .ThenBy(c => c.AlternativeSailNumber)
+               .ThenBy(c => c.Name))
                     {
                         <option value="@competitor.Id">
                             @competitor.SailNumber - @competitor.Name (@competitor.BoatClass.Name)
@@ -114,4 +132,9 @@
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    </script>
 }

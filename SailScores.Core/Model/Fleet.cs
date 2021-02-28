@@ -15,6 +15,7 @@ namespace SailScores.Core.Model
         // Example: 2019DieHardMCs
         [Required]
         [StringLength(30)]
+        [Display(Name = "Short Name")]
         public String ShortName { get; set; }
 
         // Full display Name
@@ -26,15 +27,21 @@ namespace SailScores.Core.Model
         // Short Alias Name, does not need to be unique: used for display in regattas
         // Example: MC Scows
         [StringLength(30)]
+        [Display(Name = "Nickname")]
         public String NickName { get; set; }
 
         [StringLength(2000)]
         public String Description { get; set; }
 
+
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
         [Required]
+        [Display(Name = "Fleet Type")]
         public FleetType FleetType { get; set; }
+
+        [Display(Name = "Boat Classes")]
         public IList<BoatClass> BoatClasses { get; set; }
         public IList<Competitor> Competitors { get; set; }
     }

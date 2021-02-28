@@ -4,6 +4,14 @@
 @using System.Globalization;
 
 @inject IStringLocalizer<SharedResource> localizer
+
+@{
+    var wideLayout = false;
+    if (((bool?)ViewData["WideLayout"]) ?? false)
+    {
+        wideLayout = true;
+    }
+}
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentCulture.TwoLetterISOLanguageName">
 <head>
@@ -65,54 +73,60 @@
 </head>
 <body>
     <header class="bg-dark">
-        <div class="container-sm py-0">
-            <nav class="navbar navbar-expand-md navbar-dark bg-dark p-0">
-                <a asp-area="" asp-controller="Club" asp-action="Index"
-                   asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                   class="navbar-brand">@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        @if (!wideLayout)
+        {
+            @Html.Raw("<div class=\"container-sm py-0\">");
+        }
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark @(wideLayout? "py-0" : "p-0")">
+            <a asp-area="" asp-controller="Club" asp-action="Index"
+               asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+               class="navbar-brand">@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a asp-area=""
-                               asp-controller="Series"
-                               asp-action="Index"
-                               asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                               class="nav-link">
-                                @localizer["Series"]
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-area=""
-                               asp-controller="Race"
-                               asp-action="Index"
-                               asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                               class="nav-link">
-                                @localizer["Races"]
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-area=""
-                               asp-controller="Regatta"
-                               asp-action="Index"
-                               asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                               class="nav-link">
-                                @localizer["Regattas"]
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav navbar-right">
-                        <li class="nav-item"><a href="~/" class="nav-link navbar-brand">SailScores</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a asp-area=""
+                           asp-controller="Series"
+                           asp-action="Index"
+                           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                           class="nav-link">
+                            @localizer["Series"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-area=""
+                           asp-controller="Race"
+                           asp-action="Index"
+                           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                           class="nav-link">
+                            @localizer["Races"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-area=""
+                           asp-controller="Regatta"
+                           asp-action="Index"
+                           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
+                           class="nav-link">
+                            @localizer["Regattas"]
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav navbar-right">
+                    <li class="nav-item"><a href="~/" class="nav-link navbar-brand">SailScores</a></li>
+                </ul>
+            </div>
+        </nav>
+        @if (!wideLayout)
+        {
+            @Html.Raw("</div>");
+        }
     </header>
 
-    <div class="container body-content">
+    <div class=" @(wideLayout? "container-fluid" : "container") body-content">
         <div class="row">
             @if (IsSectionDefined("Sidebar"))
             {

@@ -117,7 +117,7 @@ namespace SailScores.Web.Services
             var vm = new FleetWithOptionsViewModel();
             vm.BoatClassOptions = await _coreClubService.GetAllBoatClasses(clubId);
             vm.CompetitorOptions =
-                await _coreCompetitorService.GetCompetitorsAsync(clubId, null, false);
+                await _coreCompetitorService.GetCompetitorsAsync(clubId, null, true);
 
             vm.RegattaId = regattaId;
             vm.IsActive = true;

@@ -220,5 +220,40 @@ namespace SailScores.Core.Services
 
             return returnCodes;
         }
+
+        public static IEnumerable<string> GetDiscardSequenceErrors(string discardSequence)
+        {
+            var discardCounts = discardSequence.Split(',');
+            var raceCounter = 1;
+
+            bool numberTooHigh = false;
+            bool numberNotInt = false;
+
+            foreach(var discardCount in discardCounts)
+            {
+                int parsed = 0;
+                if(!int.TryParse(discardCount, out parsed))
+                {
+                    numberNotInt = true;
+                } else
+                {
+                    if (parsed >= raceCounter)
+                    {
+                        numberTooHigh = true;
+                    }
+                }
+                raceCounter++;
+            }
+
+            if (numberNotInt)
+            {
+                yield return "pattern should be whole numbers separated by commas ";
+            }
+            if (numberTooHigh)
+            {
+                yield return "number of discards should be less than the number of races ";
+            }
+
+        }
     }
 }

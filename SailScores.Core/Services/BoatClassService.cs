@@ -44,7 +44,11 @@ namespace SailScores.Core.Services
             var dbBoatClass = _mapper.Map<Db.BoatClass>(boatClass);
             dbBoatClass.Id = Guid.NewGuid();
             _dbContext.BoatClasses.Add(dbBoatClass);
-            var defaultShortName = boatClass.Name.Split(' ')[0];
+            var defaultShortName = new string(
+                boatClass.Name
+                .Where(c => !Char.IsWhiteSpace(c))
+                .ToArray());
+
             var fleetId = Guid.NewGuid();
 
             var fleetName = boatClass.Name.EndsWith('s') ? boatClass.Name : $"{boatClass.Name}s";
