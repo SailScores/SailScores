@@ -41,7 +41,8 @@ namespace SailScores.Web.Controllers
             }
             var vm = new ScoringSystemWithOptionsViewModel
             {
-                ClubId = clubId
+                ClubId = clubId,
+                DiscardPattern = "0"
             };
             var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
             vm.ParentSystemOptions = potentialParents.ToList();
