@@ -176,7 +176,8 @@ namespace SailScores.Web.Controllers
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
 
                 ModelState.AddModelError(String.Empty,
-                    "A problem occurred while saving. Is there already a series for this season with this name?");
+                    "A problem occurred creating this series. Does a " +
+                    "series with this season and this name already exist?");
 
                 return View(model);
             }

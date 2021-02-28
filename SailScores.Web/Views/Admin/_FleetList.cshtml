@@ -51,6 +51,7 @@
             </div>
             <div class="col-12 col-sm-6 col-md-3">
                 @Html.DisplayFor(modelItem => item.Description)
+                <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
             </div>
         </div>
     }
