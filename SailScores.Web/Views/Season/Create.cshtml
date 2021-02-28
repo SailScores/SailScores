@@ -15,8 +15,15 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <span class="small">Usually named after the year, such as @DateTime.UtcNow.Year </span>
-                <input asp-for="Name" class="form-control" autocomplete="off"/>
+                <a class="text-primary"
+                   data-container="body"
+                   data-toggle="popover"
+                   data-placement="top"
+                   data-trigger="focus hover"
+                   data-content="Usually named after the year, such as @DateTime.UtcNow.Year">
+                    <span class="far fa-question-circle"></span>
+                </a>
+                <input asp-for="Name" class="form-control" autocomplete="off" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -42,4 +49,9 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    </script>
 }

@@ -47,6 +47,16 @@ namespace SailScores.Web.Services
             {
                 SeasonOptions = seasons
             };
+            var selectedSeason = seasons.FirstOrDefault(s =>
+                s.Start < DateTime.Now && s.End > DateTime.Now);
+            if(selectedSeason == null && seasons.Count() == 1)
+            {
+                selectedSeason = seasons.First();
+            }
+            if(selectedSeason != null)
+            {
+                vm.SeasonId = selectedSeason.Id;
+            }
             var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, true);
             scoringSystemOptions.Add(new ScoringSystem
             {
