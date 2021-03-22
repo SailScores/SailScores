@@ -103,6 +103,16 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.ClubRequest, ClubRequestWithOptionsViewModel>()
                 .ForMember(d => d.ClubOptions, o => o.Ignore());
 
+
+            CreateMap<Model.ClubRequest, AccountAndClubRequestViewModel>()
+                .ForMember(d => d.ConfirmPassword, o => o.Ignore())
+                .ForMember(d => d.ContactFirstName, o => o.Ignore())
+                .ForMember(d => d.ContactLastName, o => o.Ignore())
+                .ForMember(d => d.Password, o => o.Ignore())
+                .ForMember(d => d.EnableAppInsights, o => o.Ignore())
+                .ReverseMap();
+
+
             CreateMap<Db.ClubSeasonStats, ClubSeasonStatsViewModel>();
             CreateMap<Db.SiteStats, AllClubStatsViewModel>();
 

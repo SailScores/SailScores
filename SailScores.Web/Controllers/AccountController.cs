@@ -17,6 +17,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using SailScores.Identity.Entities;
 using IAuthorizationService = SailScores.Web.Services.IAuthorizationService;
+using System.Collections;
 
 namespace SailScores.Web.Controllers
 {
@@ -85,9 +86,14 @@ namespace SailScores.Web.Controllers
                 {
                     _logger.LogInformation("User logged in.");
                     string homeClub = await _authService.GetHomeClub(model.Email);
+
+                    //if they have a home club and return url isn't in it
+                    // and isn't to club request page
+                    // redirect to home club front page.
                     if (!String.IsNullOrWhiteSpace(homeClub) && (
                         String.IsNullOrWhiteSpace(returnUrl) ||
-                        !returnUrl.Contains($"/{homeClub}")))
+                        (!returnUrl.Contains($"/{homeClub}", StringComparison.InvariantCultureIgnoreCase) &&
+                        !returnUrl.Contains("clubrequest", StringComparison.InvariantCultureIgnoreCase))))
                     {
                         return RedirectToAction(
                             controllerName: "Club",

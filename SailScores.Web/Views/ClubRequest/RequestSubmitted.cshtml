@@ -1,30 +1,47 @@
-﻿@model SailScores.Web.Models.SailScores.ClubRequestViewModel
+﻿@using Microsoft.Extensions.Configuration
+@model SailScores.Web.Models.SailScores.ClubRequestViewModel
 
+@inject IConfiguration _config;
 @{
-    ViewData["Title"] = "Request Submitted";
+    ViewData["Title"] = "Club Requested";
+
+    var preferredhost = _config["PreferredHost"];
+    if(String.IsNullOrEmpty(preferredhost)) {
+        var request = Context.Request;
+        preferredhost = request.Host.ToString();
+    }
+    string baseUrl = $"https://{preferredhost}";
+    var clubUrl = $"{baseUrl}/{Model.ClubInitials.ToUpperInvariant() + ((Model.ForTesting ?? false) ? "TEST" : "")}";
 }
 
 <h1>Club Created</h1>
 
-<h4>Check your email</h4>
+<h4>
+    <a href="@clubUrl">
+        @Model.ClubInitials - @Model.ClubName
+    </a>
+</h4>
 <hr />
 <div class="row">
     <div class="col-12">
-        <p>If everything looks good, we're sending an email to you at <strong>
-            @Model.ContactEmail</strong>
-            with information about your club setup.</p>
+        <p></p>
         <p>
-            If you don't receive a message within the next hour please reach out
+            Your SailScores club has been created at <br />
+            <a href="@clubUrl">@clubUrl</a></p>
+        <p>
+            If you provided a discard pattern or classes on the previous page,
+            we'll review those and make sure they are set up for your club. It
+            might be a few hours before we do that.
+        </p>
+        <p>
+            If you have any questions, please reach out
             by email (<a href="mailto:info@sailscores.com">info@sailscores.com</a>
             or <a href="mailto:jamie@widernets.com">jamie@widernets.com</a>) or via
             Twitter (@@SailScores).
         </p>
         <p>
-            <strong>
-                <a asp-controller="Account" asp-action="Register">
-                    Register for an account.
-                </a> </strong> Be sure to use the contact email you
-                provided in the Club Request.
+            If you would like the club's data reset,
+            <a href="mailto:info@sailscores.com">let us know.</a>
         </p>
         <br />
 </div>

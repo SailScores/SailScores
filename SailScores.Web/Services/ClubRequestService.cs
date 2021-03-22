@@ -50,6 +50,7 @@ namespace SailScores.Web.Services
         {
             var coreRequest = _mapper.Map<Core.Model.ClubRequest>(request);
             coreRequest.RequestSubmitted = DateTime.Now;
+            coreRequest.ClubInitials = request.ClubInitials.ToUpper();
             var id = await _coreClubRequestService.Submit(coreRequest);
 
             await ProcessRequest(id, false, null);
