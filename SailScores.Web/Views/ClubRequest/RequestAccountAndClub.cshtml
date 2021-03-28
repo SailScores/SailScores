@@ -1,27 +1,87 @@
-﻿@model SailScores.Web.Models.SailScores.ClubRequestViewModel
+﻿@model SailScores.Web.Models.SailScores.AccountAndClubRequestViewModel
 
 @{
-    ViewData["Title"] = "SailScores Sign-up";
+    ViewData["Title"] = "SailScores Sign up";
     ViewData["MetaDescription"] = "Request the creation of a new club hosted at SailScores";
 }
 
-<h1>Give it a try. It's free.</h1>
-
-<h4>Interested in easy race results?</h4>
+<h1>Set up your club's scoring</h1>
 <hr />
 <div class="row">
     <div class="col-12">
         <p>
-            Complete the information below to create club pages for your
-            group.
+           Initially the club's pages will be hidden. When you're ready, the club
+           can be listed on the front page and added to search engine results.
+        </p>
+        <p>
+            SailScores is donated to the sailing community. Use it for free.
         </p>
         <br />
     </div>
 </div>
 <div class="row">
     <div class="col-12">
-        <form asp-action="RequestClub">
+        <form asp-action="RequestAccountAndClub">
+            <div class="row">
+                <div class="col-12">
+                    <h3>User Info</h3>
+                </div>
+            </div>
             <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="row">
+                <div class="col-12">
+                    Set up your account. You can add other administrators after the club is created.<br/>
+                    (Already have a SailScores account?
+                    <a asp-area="" asp-controller="Account" asp-action="Login"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">Sign in</a> before creating a club.)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="ContactFirstName"></label>
+                        <input asp-for="ContactFirstName" class="form-control" />
+                        <span asp-validation-for="ContactFirstName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="ContactLastName"></label>
+                        <input asp-for="ContactLastName" class="form-control" />
+                        <span asp-validation-for="ContactLastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="ContactEmail" class="control-label"></label>
+                        <input asp-for="ContactEmail" class="form-control" />
+                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Password"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-12">
+                    <h3>Club Info</h3>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -52,18 +112,6 @@
                         <input asp-for="ClubWebsite" class="form-control" />
                         <span asp-validation-for="ClubWebsite" class="text-danger"></span>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="ContactEmail" class="control-label"></label>
-                        <input asp-for="ContactEmail" class="form-control" readonly />
-                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-<p>You can add other accounts once the SailScores club is created.</p>
                 </div>
             </div>
             <div class="row">
@@ -101,21 +149,23 @@
                 </div>
                 <div class="col-md-3">
                     <a asp-controller="Home" asp-action="Index"
-                        class="btn btn-outline-primary btn-block">Cancel</a>
+                       class="btn btn-outline-primary btn-block">Cancel</a>
                 </div>
             </div>
-</form>
+        </form>
     </div>
 </div>
 <div class="row">
     <div class="col-12">
-        <br/>
-        <p><em>
-            Inactive clubs will be archived and removed from the site
-            periodically. A club is considered inactive if it hasn't had
-            any activity in a year or the initial setup isn't completed
-            within 2 months.
-        </em></p>
+        <br />
+        <p>
+            <em>
+                Inactive clubs will be archived and removed from the site
+                periodically. A club is considered inactive if it hasn't had
+                any activity in a year or the initial setup isn't completed
+                within 2 months.
+            </em>
+        </p>
     </div>
 </div>
 

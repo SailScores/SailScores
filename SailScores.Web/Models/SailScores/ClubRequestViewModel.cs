@@ -8,7 +8,7 @@ namespace SailScores.Web.Models.SailScores
     {
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "A club name is required")]
+        [Required(ErrorMessage = "Club name is required")]
         [StringLength(200)]
         [Display(Name = "Club name")]
         public String ClubName { get; set; }
@@ -25,12 +25,11 @@ namespace SailScores.Web.Models.SailScores
         public String ClubWebsite { get; set; }
 
         [Display(Name = "Contact name")]
-        [Required(ErrorMessage = "Contact name is required")]
         public String ContactName { get; set; }
 
-        [Display(Name = "Contact email")]
-        [Required(ErrorMessage = "Contact email is required")]
-        [EmailAddress(ErrorMessage = "Invalid Email")]
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
         public String ContactEmail { get; set; }
 
         public bool? Hide { get; set; }

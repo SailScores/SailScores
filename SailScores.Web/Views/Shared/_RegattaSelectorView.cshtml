@@ -3,7 +3,7 @@
         aria-label="Select Regatta"
         onchange="window.location.href = '/' + this.value;"
         autocomplete="off">
-        <option selected>  ----or a current Regatta----  </option>
+        <option selected value="">  ----or a current Regatta----  </option>
         @foreach (var regatta in Model.Regattas)
         {
             <option value="@($"{regatta.ClubInitials}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}")">

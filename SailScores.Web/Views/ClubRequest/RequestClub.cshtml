@@ -1,19 +1,20 @@
 ﻿@model SailScores.Web.Models.SailScores.ClubRequestViewModel
 
 @{
-    ViewData["Title"] = "SailScores Sign-up";
+    ViewData["Title"] = "SailScores Sign up";
     ViewData["MetaDescription"] = "Request the creation of a new club hosted at SailScores";
 }
 
-<h1>Give it a try. It's free.</h1>
-
-<h4>Interested in easy race results?</h4>
+<h1>Set up your club's scoring</h1>
 <hr />
 <div class="row">
     <div class="col-12">
         <p>
-            Complete the information below to create club pages for your
-            group.
+           Initially the club's pages will be hidden. When you're ready, the club
+           can be listed on the front page and added to search engine results.
+        </p>
+        <p>
+            SailScores is donated to the sailing community. Use it for free.
         </p>
         <br />
     </div>
@@ -58,12 +59,11 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="ContactEmail" class="control-label"></label>
+
+                        <span class="mt-0 form-text small">You can add other accounts once the SailScores club is created.</span>
                         <input asp-for="ContactEmail" class="form-control" readonly />
                         <span asp-validation-for="ContactEmail" class="text-danger"></span>
                     </div>
-                </div>
-                <div class="col-md-6">
-<p>You can add other accounts once the SailScores club is created.</p>
                 </div>
             </div>
             <div class="row">

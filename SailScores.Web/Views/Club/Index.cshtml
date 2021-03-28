@@ -32,7 +32,7 @@
 @if (!String.IsNullOrWhiteSpace(Model.Description))
 {
     <div class="row">
-        <div class="col-md-6 d-none d-md-block">
+        <div class="col-md-9 d-none d-md-block">
             @Html.Raw(Markdig.Markdown.ToHtml(Model.Description))
         </div>
     </div>
@@ -43,7 +43,7 @@
         <div class="col-12">
             <p>
                 Follow the steps on the
-                <a asp-controller="Admin" asp-action="Index">Admin page</a> to set up this club.
+                <a asp-controller="Admin" asp-action="Index">Club Admin page</a> to set up this club.
             </p>
         </div>
     </div>
