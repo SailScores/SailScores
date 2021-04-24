@@ -144,10 +144,7 @@
         </div>
 
         <hr />
-        @if (IsSectionDefined("PreFooter"))
-        {
-            @RenderSection("PreFooter")
-        }
+
         <footer>
             <div class="row">
                 <div class="col-12 text-sm-right">
@@ -156,6 +153,10 @@
             </div>
         </footer>
     </div>
+    @if (IsSectionDefined("PreFooter"))
+    {
+        @RenderSection("PreFooter")
+    }
 
     <environment include="Development">
         <script src="~/vendor/jquery/jquery.js"></script>
