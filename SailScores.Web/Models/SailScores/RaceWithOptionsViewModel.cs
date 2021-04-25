@@ -13,6 +13,7 @@ namespace SailScores.Web.Models.SailScores
         internal bool ClubHasCompetitors;
 
         public string ClubInitials { get; set; }
+        public bool UseAdvancedFeatures { get; set; }
         public IList<Fleet> FleetOptions { get; set; }
         public IList<Series> SeriesOptions { get; set; }
         public IList<ScoreCode> ScoreCodeOptions { get; set; }
@@ -34,6 +35,7 @@ namespace SailScores.Web.Models.SailScores
         public IList<AdminToDoViewModel> Tips { get; set; }
         // help the client keep track of whether they might need to change the date.
         public bool? NeedsLocalDate { get; set; }
+
     }
 #pragma warning restore CA2227 // Collection properties should be read only
 }

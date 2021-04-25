@@ -189,7 +189,13 @@ function addNewCompetitor(competitor) {
         deleteButtons[i].setAttribute("data-competitorId", competitor.id.toString());
     }
     compListItem.style.display = "";
-    resultDiv.appendChild(compListItem);
+    // in testing, due to delay in speech recog, could add twice. Trying to reduce that here.
+    if (!competitorIsInResults(competitor)) {
+        resultDiv.appendChild(compListItem);
+    }
+    else {
+        return;
+    }
     calculatePlaces();
     $('html, body').animate({
         scrollTop: $(compListItem).offset().top - 150
@@ -458,6 +464,247 @@ function populateEmptyWeatherFields() {
         if (data.cloudCoverPercent && $("#cloudCover").val(null)) {
             $("#cloudCover").val(data.cloudCoverPercent);
         }
+    });
+}
+function RequestAuthorizationToken(continuation) {
+    var prep = function (xhr) {
+        xhr.setRequestHeader("Accept", "application/json");
+    };
+    $.ajax({
+        type: "GET",
+        url: window.speechInfoUrl,
+        dataType: "json",
+        beforeSend: prep,
+        success: function (data) {
+            failureCount = 0;
+            authorizationToken = data.token;
+            region = data.region;
+            language = data.userLanguage;
+            timeOfLastToken = Date.now();
+            if (continuation) {
+                continuation();
+            }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            failureCount++;
+            if (failureCount < 3) {
+                $.ajax(this);
+                return;
+            }
+        }
+    });
+}
+function InitializeSpeech(onComplete) {
+    if (!!window.SpeechSDK) {
+        document.getElementById('speechwarning').style.display = 'none';
+        onComplete(window.SpeechSDK);
+    }
+}
+var language;
+var region;
+var authorizationToken;
+var timeOfLastToken;
+var timeOfLastRecognized;
+var failureCount = 0;
+var SpeechSDK;
+var phraseDiv;
+var scenarioStartButton, scenarioStopButton;
+var reco;
+function resetUiForScenarioStart() {
+    phraseDiv.innerHTML = "";
+}
+document.addEventListener("DOMContentLoaded", function () {
+    scenarioStartButton = document.getElementById('scenarioStartButton');
+    scenarioStopButton = document.getElementById('scenarioStopButton');
+    phraseDiv = document.getElementById("phraseDiv");
+    // if the buttons aren't there, don't enable.
+    if (!!scenarioStopButton) {
+        scenarioStopButton.addEventListener("click", stopContinuousRecognition);
+    }
+    if (!!scenarioStartButton) {
+        scenarioStartButton.addEventListener("click", doContinuousRecognition);
+        InitializeSpeech(function (speechSdk) {
+            SpeechSDK = speechSdk;
+            RequestAuthorizationToken(null);
+        });
+    }
+});
+function getAudioConfig() {
+    // Used to have options to choose other microphones.
+    return SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+}
+function getSpeechConfig(sdkConfigType) {
+    var speechConfig;
+    if (authorizationToken) {
+        speechConfig = sdkConfigType.fromAuthorizationToken(authorizationToken, region);
+    }
+    // Setting the result output format to Detailed will request that the underlying
+    // result JSON include alternates, confidence scores, lexical forms, and other
+    // advanced information.
+    //speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
+    speechConfig.setProperty(SpeechSDK.SpeechServiceConnection_EndSilenceTimeoutMs, 1000);
+    speechConfig.speechRecognitionLanguage = language;
+    return speechConfig;
+}
+function onRecognized(sender, recognitionEventArgs) {
+    onRecognizedResult(recognitionEventArgs.result);
+}
+function onRecognizedResult(result) {
+    console.debug(`(recognized)  Reason: ${SpeechSDK.ResultReason[result.reason]}`);
+    switch (result.reason) {
+        case SpeechSDK.ResultReason.NoMatch:
+            var noMatchDetail = SpeechSDK.NoMatchDetails.fromResult(result);
+            console.debug(` NoMatchReason: ${SpeechSDK.NoMatchReason[noMatchDetail.reason]}\r\n`);
+            stopIfTimedOut();
+            break;
+        case SpeechSDK.ResultReason.Canceled:
+            var cancelDetails = SpeechSDK.CancellationDetails.fromResult(result);
+            console.debug(` CancellationReason: ${SpeechSDK.CancellationReason[cancelDetails.reason]}`);
+            console.debug(cancelDetails.reason === SpeechSDK.CancellationReason.Error
+                ? `: ${cancelDetails.errorDetails}` : ``);
+            stopIfTimedOut();
+            break;
+        case SpeechSDK.ResultReason.RecognizedSpeech:
+            //var detailedResultJson = JSON.parse(result.json);
+            //// Detailed result JSON includes substantial extra information:
+            ////  detailedResultJson['NBest'] is an array of recognition alternates
+            ////  detailedResultJson['NBest'][0] is the highest-confidence alternate
+            ////  ...['Confidence'] is the raw confidence score of an alternate
+            ////  ...['Lexical'] and others provide different result forms
+            //var displayText = detailedResultJson['DisplayText'];
+            //phraseDiv.innerHTML += `Detailed result for "${displayText}":\r\n`
+            //    + `${JSON.stringify(detailedResultJson, null, 2)}\r\n`;
+            if (result.text) {
+                phraseDiv.innerHTML = result.text;
+            }
+            if (!!result.text) {
+                addPotentialMatches(normalizeText(result.text) + " ");
+            }
+            break;
+    }
+}
+function addPotentialMatches(result) {
+    console.debug(result);
+    let comp;
+    var matchString;
+    var newResultString;
+    comp =
+        allCompetitors.find(c => c.sailNumber && result.startsWith(normalizeText(c.sailNumber) + " "));
+    if (comp) {
+        matchString = normalizeText(comp.sailNumber);
+    }
+    if (!comp) {
+        comp = allCompetitors.find(c => c.alternativeSailNumber && result.startsWith(normalizeText(c.alternativeSailNumber) + " "));
+        if (comp) {
+            matchString = normalizeText(comp.alternativeSailNumber);
+        }
+    }
+    if (!comp) {
+        comp =
+            allCompetitors.find(c => c.name && result.startsWith(normalizeText(c.name) + " "));
+        if (comp) {
+            matchString = normalizeText(comp.name);
+        }
+    }
+    if (comp) {
+        addNewCompetitor(comp);
+        timeOfLastRecognized = Date.now();
+        newResultString = result.substr(matchString.length + 1).trimLeft();
+    }
+    else {
+        //didn't find anything, trim a word off and try again.
+        if (!newResultString && (result.indexOf(" ") > -1)) {
+            newResultString = result.substr(result.indexOf(" ") + 1).trimLeft();
+        }
+    }
+    if (newResultString.length > 0) {
+        addPotentialMatches(newResultString);
+    }
+    stopIfTimedOut();
+}
+function normalizeText(fullText) {
+    if (!!fullText) {
+        return fullText.replace(/[.?,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toUpperCase();
+    }
+    return null;
+}
+function onSessionStarted(sender, sessionEventArgs) {
+    console.debug(`(sessionStarted)`);
+    scenarioStartButton.style.display = "none";
+    scenarioStopButton.style.display = "block";
+    phraseDiv.innerHTML = "Ready";
+}
+function onSessionStopped(sender, sessionEventArgs) {
+    console.debug(`(sessionStopped)`);
+    phraseDiv.innerHTML = "";
+    scenarioStartButton.style.display = "block";
+    scenarioStopButton.style.display = "none";
+}
+function onCanceled(sender, cancellationEventArgs) {
+    window.console.log(cancellationEventArgs);
+    console.debug("(cancel) Reason: " + SpeechSDK.CancellationReason[cancellationEventArgs.reason]);
+    if (cancellationEventArgs.reason === SpeechSDK.CancellationReason.Error) {
+        console.debug(": " + cancellationEventArgs.errorDetails);
+    }
+    stopIfTimedOut();
+}
+function applyCommonConfigurationTo(recognizer) {
+    recognizer.recognized = onRecognized;
+    // The 'canceled' event signals that the service has stopped processing speech.
+    // https://docs.microsoft.com/javascript/api/microsoft-cognitiveservices-speech-sdk/speechrecognitioncanceledeventargs?view=azure-node-latest
+    // This can happen for two broad classes of reasons:
+    // 1. An error was encountered.
+    //    In this case, the .errorDetails property will contain a textual representation of the error.
+    // 2. No additional audio is available.
+    //    This is caused by the input stream being closed or reaching the end of an audio file.
+    recognizer.canceled = onCanceled;
+    reco.sessionStarted = onSessionStarted;
+    reco.sessionStopped = onSessionStopped;
+    // PhraseListGrammar allows for the customization of recognizer vocabulary.
+    // See https://docs.microsoft.com/azure/cognitive-services/speech-service/get-started-speech-to-text#improve-recognition-accuracy
+    if (competitorSuggestions) {
+        var phraseListGrammar = SpeechSDK.PhraseListGrammar.fromRecognizer(reco);
+        for (var index = 0; index < allCompetitors.length; index++) {
+            if (allCompetitors[index].sailNumber) {
+                phraseListGrammar.addPhrase(allCompetitors[index].sailNumber);
+            }
+            if (allCompetitors[index].alternativeSailNumber) {
+                phraseListGrammar.addPhrase(allCompetitors[index].alternativeSailNumber);
+            }
+            if (allCompetitors[index].name) {
+                phraseListGrammar.addPhrase(allCompetitors[index].name);
+            }
+        }
+    }
+}
+function stopIfTimedOut() {
+    if (timeOfLastRecognized < Date.now() - (30000)) {
+        stopContinuousRecognition();
+    }
+}
+function doContinuousRecognition() {
+    resetUiForScenarioStart();
+    timeOfLastRecognized = Date.now();
+    if (timeOfLastToken < Date.now() - (5 * 60000)) {
+        RequestAuthorizationToken(doContinuousRecognition);
+        return;
+    }
+    var audioConfig = getAudioConfig();
+    var speechConfig = getSpeechConfig(SpeechSDK.SpeechConfig);
+    if (!speechConfig)
+        return;
+    // Create the SpeechRecognizer and set up common event handlers and PhraseList data
+    reco = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    applyCommonConfigurationTo(reco);
+    reco.startContinuousRecognitionAsync();
+}
+function stopContinuousRecognition() {
+    reco.stopContinuousRecognitionAsync(function () {
+        reco.close();
+        reco = undefined;
+    }, function (err) {
+        reco.close();
+        reco = undefined;
     });
 }
 initialize();

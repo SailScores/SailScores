@@ -162,7 +162,7 @@
                 <ul class="list-group" id="results">
                     @await Html.PartialAsync("_scoreEntryPartial", Model)
                     @foreach (var score in (Model.Scores ??
-                  new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
+             new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
                     {
                         <li id="@score.CompetitorId" class="list-group-item"
                             data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
@@ -212,9 +212,33 @@
         <div class="row">
             <div class="col-12 col-lg-4 mb-3">
                 <div class="form-group">
-                    <label class="contorl-label h4">Add result:</label>
-                    <input id="newCompetitor" type="text" class="form-control" />
+                    <label class="control-label h4">Add result:</label>
+                    <div class="input-group">
+                        <input id="newCompetitor" type="text" class="form-control" />
+                        @if (Model.UseAdvancedFeatures)
+                        {
+                            <div class="input-group-btn">
+                                <button class="btn btn-outline-success" id="scenarioStartButton" type="button">
+                                    <span class="fas fa-microphone"></span>
+                                </button>
+                                <button class="btn btn-outline-danger" id="scenarioStopButton" type="button"
+                                        style="display: none;">
+                                    <span class="fas fa-microphone-slash"></span>
+                                </button>
+                            </div>
+                        }
+                    </div>
                 </div>
+                @if (Model.UseAdvancedFeatures)
+                {
+                    <span id="speechwarning"
+                          style="font-italic">
+                        Error loading Speech Recognition.
+                    </span>
+                    <span id="phraseDiv"
+                          class="font-italic">
+                    </span>
+                }
             </div>
             <div class="d-none d-lg-inline-block col-lg-2"></div>
             <div class="col-12 col-lg-3">
@@ -247,6 +271,8 @@
     </form>
     <hr />
 </div>
+
+
 
 <div class="modal fade" id="deleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -296,8 +322,14 @@
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
     <script>
-    var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
+        var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
+        var speechInfoUrl =
+            '@Url.Action("SpeechInfo", "Race")';
     </script>
     <script src="~/js/raceEditor.min.js" asp-append-version="true"></script>
+    @if (Model.UseAdvancedFeatures)
+    {
+        <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+    }
 
 }

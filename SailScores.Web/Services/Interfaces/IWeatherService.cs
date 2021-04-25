@@ -15,5 +15,6 @@ namespace SailScores.Web.Services
         Weather GetStandardWeather(WeatherViewModel weather);
         IList<string> GetSpeedUnitOptions();
         IList<string> GetTemperatureUnitOptions();
+        Task<WeatherViewModel> GetCurrentWeatherForClubAsync(Club club);
     }
 }

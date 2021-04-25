@@ -61,7 +61,11 @@ namespace SailScores.Web.Services
         public async Task<WeatherViewModel> GetCurrentWeatherForClubAsync(Guid clubId)
         {
             var club = await _coreClubService.GetMinimalClub(clubId);
+            return await GetCurrentWeatherForClubAsync(club);
+        }
 
+        public async Task<WeatherViewModel> GetCurrentWeatherForClubAsync(Club club)
+        {
             Weather currentWeather = null;
             if (club.WeatherSettings?.Latitude != null && club.WeatherSettings?.Longitude != null)
             {

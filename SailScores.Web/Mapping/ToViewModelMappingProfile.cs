@@ -135,6 +135,7 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore())
                 .ForMember(d => d.NeedsLocalDate, o => o.Ignore())
                 .ForMember(d => d.ClubInitials, o => o.Ignore())
+                .ForMember(d => d.UseAdvancedFeatures, o => o.Ignore())
                 .ReverseMap();
             CreateMap<RaceWithOptionsViewModel, Model.Race>()
                 .ForMember(d => d.Weather, o => o.Ignore());
