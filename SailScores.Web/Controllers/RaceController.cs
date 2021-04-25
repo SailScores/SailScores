@@ -143,6 +143,7 @@ namespace SailScores.Web.Controllers
                 race.CompetitorOptions = raceOptions.CompetitorOptions;
                 race.SeriesOptions = raceOptions.SeriesOptions;
                 race.WeatherIconOptions = raceOptions.WeatherIconOptions;
+                race.UseAdvancedFeatures = raceOptions.UseAdvancedFeatures;
                 return View(race);
             }
             var clubId = await _clubService.GetClubId(clubInitials);
@@ -175,8 +176,8 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             ViewData["ClubInitials"] = clubInitials;
-            var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            if (!await _authService.CanUserEdit(User, club.Id))
             {
                 return Unauthorized();
             }
@@ -185,7 +186,7 @@ namespace SailScores.Web.Controllers
             {
                 return NotFound();
             }
-            if (race.ClubId != clubId)
+            if (race.ClubId != club.Id)
             {
                 return Unauthorized();
             }
@@ -193,6 +194,7 @@ namespace SailScores.Web.Controllers
             var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
             await _raceService.AddOptionsToRace(raceWithOptions);
+            raceWithOptions.UseAdvancedFeatures = club.UseAdvancedFeatures ?? false;
 
             return View(raceWithOptions);
         }
