@@ -35,7 +35,15 @@
         </div>
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label asp-for="FleetId" class="control-label">Fleet<em>&ensp;Controls the list of available competitors</em></label>
+                <label asp-for="FleetId" class="control-label">Fleet</label>
+                <a class="text-primary"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus hover"
+                    data-content="Controls the list of available competitors.">
+                    <span class="far fa-question-circle"></span>
+                </a>
                 <select id="fleetId" asp-for="FleetId" class="form-control">
                     <option selected="selected">Select a fleet...</option>
                     @foreach (var fleet in Model.FleetOptions)
@@ -75,7 +83,7 @@
                         <div class="row">
                             <div class="form-group col-6">
                                 <div class="form-row">
-                                    <label asp-for="State" class="control-label col-form-label col-4"></label>
+                                    <label class="control-label col-form-label col-4"></label>
                                     <select id="raceState" asp-for="State" class="form-control col-8"
                                             asp-items="@(Html.GetEnumSelectList<SailScores.Api.Enumerations.RaceState>())"></select>
                                     <span asp-validation-for="State" class="text-danger"></span>
@@ -318,6 +326,12 @@
 }
 
 @section Scripts {
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>

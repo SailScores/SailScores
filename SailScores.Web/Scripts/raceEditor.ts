@@ -230,7 +230,8 @@ function addNewCompetitor(competitor: competitorDto) {
     }
 
     compListItem.style.display = "";
-    // in testing, due to delay in speech recog, could add twice. Trying to reduce that here.
+    // in testing, due to delay in speech recog, could add competitor
+    // twice.Trying to reduce that here.
     if (!competitorIsInResults(competitor)) {
         resultDiv.appendChild(compListItem);
     } else {

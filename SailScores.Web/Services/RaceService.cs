@@ -115,6 +115,10 @@ namespace SailScores.Web.Services
             {
                 returnRace = await CreateClubRaceAsync(clubInitials);
             }
+            if ((returnRace.FleetOptions?.Count ?? 0) == 1)
+            {
+                returnRace.FleetId = returnRace.FleetOptions.First().Id;
+            }
             returnRace.ClubInitials = clubInitials;
             return returnRace;
 
@@ -145,6 +149,7 @@ namespace SailScores.Web.Services
                 NeedsLocalDate = true,
                 UseAdvancedFeatures = club.UseAdvancedFeatures ?? false
             };
+
             return model;
         }
 
