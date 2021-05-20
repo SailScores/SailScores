@@ -51,6 +51,8 @@ export function initialize() {
     calculatePlaces();
     $("#submitButton").prop("disabled", false);
     $("#submitDisabledMessage").prop("hidden", true);
+
+    RequestAuthorizationToken(null);
 }
 
 export function loadSeriesOptions() {
@@ -626,7 +628,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         InitializeSpeech(function (speechSdk: any) {
             SpeechSDK = speechSdk;
-            RequestAuthorizationToken(null);
         });
     }
 });
@@ -750,7 +751,7 @@ function onSessionStarted(sender: any, sessionEventArgs: any) {
     scenarioStartButton.style.display = "none";
     scenarioStopButton.style.display = "block";
 
-    phraseDiv.innerHTML = "Ready";
+    phraseDiv.innerHTML = "Listening";
 }
 
 function onSessionStopped(sender: any, sessionEventArgs: any) {
