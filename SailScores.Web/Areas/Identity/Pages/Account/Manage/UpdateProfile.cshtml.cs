@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using SailScores.Identity.Entities;
 
@@ -30,6 +32,16 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
         [TempData]
         public string StatusMessage { get; set; }
 
+        [BindProperty]
+        public List<SelectListItem> SpeechRecognitionLanguageOptions { get; set; } = new
+            List<SelectListItem>
+                {
+                    new SelectListItem( "English - AU", "en-AU"),
+                    new SelectListItem( "English - US", "en-US"),
+                    new SelectListItem( "Finnish - FI", "fi-FI"),
+                    new SelectListItem( "Swedish - SE", "sv-SE")
+                };
+
         public class InputModel
         {
 
@@ -45,6 +57,9 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "Enable Browser Analytics")]
             public bool EnableAppInsights { get; set; }
+
+            [Display(Name = "Speech Recognition Language")]
+            public string SpeechRecognitionLanguage { get; set; }
 
         }
 
@@ -62,6 +77,7 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
             Input.FirstName = user.FirstName;
             Input.LastName = user.LastName;
             Input.EnableAppInsights = user.EnableAppInsights ?? false;
+            Input.SpeechRecognitionLanguage = user.SpeechRecognitionLanguage ?? "en-US";
 
             return Page();
         }
@@ -82,6 +98,7 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
             user.FirstName = Input.FirstName;
             user.LastName = Input.LastName;
             user.EnableAppInsights = Input.EnableAppInsights;
+            user.SpeechRecognitionLanguage = Input.SpeechRecognitionLanguage;
 
             var updateUserResult = await _userManager.UpdateAsync(user);
             if (!updateUserResult.Succeeded)

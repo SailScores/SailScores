@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SailScores.Identity.Entities;
+using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers
 {
@@ -18,6 +19,7 @@ namespace SailScores.Web.Controllers
         private readonly Services.IAuthorizationService _authService;
         private readonly Services.IAdminTipService _adminTipService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ISpeechService _speechService;
         private readonly IMapper _mapper;
 
         public RaceController(
@@ -26,6 +28,7 @@ namespace SailScores.Web.Controllers
             Services.IAuthorizationService authService,
             Services.IAdminTipService adminTipService,
             UserManager<ApplicationUser> userManager,
+            Services.ISpeechService speechService,
             IMapper mapper)
         {
             _clubService = clubService;
@@ -33,6 +36,7 @@ namespace SailScores.Web.Controllers
             _authService = authService;
             _adminTipService = adminTipService;
             _userManager = userManager;
+            _speechService = speechService;
             _mapper = mapper;
         }
 
@@ -139,6 +143,7 @@ namespace SailScores.Web.Controllers
                 race.CompetitorOptions = raceOptions.CompetitorOptions;
                 race.SeriesOptions = raceOptions.SeriesOptions;
                 race.WeatherIconOptions = raceOptions.WeatherIconOptions;
+                race.UseAdvancedFeatures = raceOptions.UseAdvancedFeatures;
                 return View(race);
             }
             var clubId = await _clubService.GetClubId(clubInitials);
@@ -171,8 +176,8 @@ namespace SailScores.Web.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             ViewData["ClubInitials"] = clubInitials;
-            var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            if (!await _authService.CanUserEdit(User, club.Id))
             {
                 return Unauthorized();
             }
@@ -181,7 +186,7 @@ namespace SailScores.Web.Controllers
             {
                 return NotFound();
             }
-            if (race.ClubId != clubId)
+            if (race.ClubId != club.Id)
             {
                 return Unauthorized();
             }
@@ -189,6 +194,7 @@ namespace SailScores.Web.Controllers
             var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
             await _raceService.AddOptionsToRace(raceWithOptions);
+            raceWithOptions.UseAdvancedFeatures = club.UseAdvancedFeatures ?? false;
 
             return View(raceWithOptions);
         }
@@ -221,6 +227,7 @@ namespace SailScores.Web.Controllers
                 race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
                 race.CompetitorOptions = raceOptions.CompetitorOptions;
                 race.SeriesOptions = raceOptions.SeriesOptions;
+                race.UseAdvancedFeatures = raceOptions.UseAdvancedFeatures;
                 foreach (var score in race.Scores)
                 {
                     score.Competitor = raceOptions.CompetitorOptions.First(c => c.Id == score.CompetitorId);
@@ -278,6 +285,22 @@ namespace SailScores.Web.Controllers
                 return View();
             }
         }
+
+
+        [Authorize]
+        [HttpGet]
+        [ActionName("SpeechInfo")]
+        public async Task<SpeechInfo> GetSpeechInfo()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return new SpeechInfo
+            {
+                Token = await _speechService.GetToken(),
+                Region = _speechService.GetRegion(),
+                UserLanguage = user.SpeechRecognitionLanguage ?? "en-US"
+            };
+        }
+
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

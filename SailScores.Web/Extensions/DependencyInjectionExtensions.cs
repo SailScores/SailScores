@@ -25,6 +25,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<ITemplateHelper, TemplateHelper>();
             services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<ISpeechService, SpeechService>();
 
             services.AddSingleton<AppVersionInfo>();
             services.AddSingleton<AppSettingsService>();

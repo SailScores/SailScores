@@ -23,6 +23,8 @@ namespace SailScores.Database.Entities
         [StringLength(30)]
         public String Locale { get; set; }
 
+        public bool? UseAdvancedFeatures { get; set; }
+
         public String StatisticsDescription { get; set; }
         public WeatherSettings WeatherSettings { get; set; }
 

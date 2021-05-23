@@ -19,6 +19,7 @@ namespace SailScores.Core.Model
         public bool IsHidden { get; set; }
         public bool? ShowClubInResults { get; set; }
         public String Url { get; set; }
+        public bool? UseAdvancedFeatures { get; set; }
 
         public WeatherSettings WeatherSettings { get; set; }
 

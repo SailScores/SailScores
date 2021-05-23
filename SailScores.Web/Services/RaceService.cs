@@ -21,6 +21,8 @@ namespace SailScores.Web.Services
         private readonly Core.Services.IRegattaService _coreRegattaService;
         private readonly Core.Services.ISeasonService _coreSeasonService;
         private readonly IWeatherService _weatherService;
+        private readonly ISpeechService _speechService;
+
         private readonly IMapper _mapper;
         private readonly ILogger<RaceService> _logger;
 
@@ -33,6 +35,7 @@ namespace SailScores.Web.Services
             Core.Services.ISeasonService coreSeasonService,
 
             IWeatherService weatherService,
+            ISpeechService speechService,
             IMapper mapper,
             ILogger<RaceService> logger)
         {
@@ -43,6 +46,7 @@ namespace SailScores.Web.Services
             _coreRegattaService = coreRegattaService;
             _coreSeasonService = coreSeasonService;
             _weatherService = weatherService;
+            _speechService = speechService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -111,6 +115,10 @@ namespace SailScores.Web.Services
             {
                 returnRace = await CreateClubRaceAsync(clubInitials);
             }
+            if ((returnRace.FleetOptions?.Count ?? 0) == 1)
+            {
+                returnRace.FleetId = returnRace.FleetOptions.First().Id;
+            }
             returnRace.ClubInitials = clubInitials;
             return returnRace;
 
@@ -121,28 +129,27 @@ namespace SailScores.Web.Services
             return _weatherService.GetWeatherIconOptions();
         }
 
-        private async Task<WeatherViewModel> GetCurrentWeatherAsync(Guid clubId)
-        {
-            return await _weatherService.GetCurrentWeatherForClubAsync(clubId);
-        }
         private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(string clubInitials)
         {
-            var clubId = await _coreClubService.GetClubId(clubInitials);
+
+            var club = await _coreClubService.GetMinimalClub(clubInitials);
             var model = new RaceWithOptionsViewModel
             {
-                ClubId = clubId,
-                FleetOptions = await _coreClubService.GetActiveFleets(clubId),
-                SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(clubId, DateTime.Today, false),
-                ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(clubId))
+                ClubId = club.Id,
+                FleetOptions = await _coreClubService.GetActiveFleets(club.Id),
+                SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(club.Id, DateTime.Today, false),
+                ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
                     .OrderBy(s => s.Name).ToList(),
                 CompetitorOptions = new List<Competitor>(),
-                CompetitorBoatClassOptions = (await _coreClubService.GetAllBoatClasses(clubId)).OrderBy(c => c.Name),
+                CompetitorBoatClassOptions = (await _coreClubService.GetAllBoatClasses(club.Id)).OrderBy(c => c.Name),
                 Date = DateTime.Today,
-                Weather = (await GetCurrentWeatherAsync(clubId)),
+                Weather = await _weatherService.GetCurrentWeatherForClubAsync(club),
                 WeatherIconOptions = GetWeatherIconOptions(),
-                ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(clubId),
-                NeedsLocalDate = true
+                ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(club.Id),
+                NeedsLocalDate = true,
+                UseAdvancedFeatures = club.UseAdvancedFeatures ?? false
             };
+
             return model;
         }
 
@@ -251,6 +258,7 @@ namespace SailScores.Web.Services
             raceWithOptions.CompetitorBoatClassOptions =
                 (await _coreClubService.GetAllBoatClasses(raceWithOptions.ClubId)).OrderBy(c => c.Name);
             raceWithOptions.WeatherIconOptions = _weatherService.GetWeatherIconOptions();
+
         }
 
         public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)

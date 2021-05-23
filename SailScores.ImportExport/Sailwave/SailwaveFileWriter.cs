@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using CsvHelper;
+using CsvHelper.Configuration;
 using SailScores.ImportExport.Sailwave.Csv;
 using SailScores.ImportExport.Sailwave.Elements;
 using SailScores.ImportExport.Sailwave.Interfaces;
@@ -18,10 +19,13 @@ namespace SailScores.ImportExport.Sailwave
         {
             using (var writer = new StreamWriter(filePath))
             {
-                var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                csv.Configuration.RegisterClassMap<ColumnMapToCsv>();
-                csv.Configuration.HasHeaderRecord = false;
-                csv.Configuration.ShouldQuote = (s, c) => true;
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = false,
+                    ShouldQuote = (s) => true
+                };
+                var csv = new CsvWriter(writer, config);
+                csv.Context.RegisterClassMap<ColumnMapToCsv>();
                 csv.WriteRecords(await Writers.SeriesWriter.WriteSeries(series));
             }
         }

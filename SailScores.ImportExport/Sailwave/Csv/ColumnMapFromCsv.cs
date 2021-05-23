@@ -14,7 +14,7 @@ namespace SailScores.ImportExport.Sailwave.Csv
             Map(c => c.CompetitorOrScoringSystemId).Index(2);
             Map(c => c.RaceId).Index(3);
             Map(c => c.RowType)
-                .ConvertUsing(row => GetRowType(row));
+                .Convert(row => GetRowType(row.Row));
         }
 
         private static RowType GetRowType(IReaderRow row)

@@ -23,6 +23,14 @@
                 <span asp-validation-for="Input.LastName" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
+                <label asp-for="Input.SpeechRecognitionLanguage" class="form-check-label"></label>
+                <select asp-for="Input.SpeechRecognitionLanguage"
+                        asp-items="@Model.SpeechRecognitionLanguageOptions"
+                        class="custom-select">
+                </select>
+                <span asp-validation-for="Input.SpeechRecognitionLanguage" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
                 <input asp-for="Input.EnableAppInsights" class="form-check-input" />
                 <label asp-for="Input.EnableAppInsights" class="form-check-label"></label>
                 <span asp-validation-for="Input.EnableAppInsights" class="text-danger"></span>

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using CsvHelper;
+using CsvHelper.Configuration;
 using SailScores.ImportExport.Sailwave.Csv;
 using SailScores.ImportExport.Sailwave.Elements;
 using SailScores.ImportExport.Sailwave.Elements.File;
@@ -13,9 +14,13 @@ namespace SailScores.ImportExport.Sailwave.Parsers
     {
         public static Series GetSeries(StreamReader reader)
         {
-            var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Configuration.RegisterClassMap<ColumnMapFromCsv>();
-            csv.Configuration.HasHeaderRecord = false;
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = false
+            };
+
+            var csv = new CsvReader(reader, config);
+            csv.Context.RegisterClassMap<ColumnMapFromCsv>();
             var rows = csv.GetRecords<FileRow>().ToList();
             return GetSeries(rows);
         }
