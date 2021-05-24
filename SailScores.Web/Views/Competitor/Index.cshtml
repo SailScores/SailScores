@@ -12,7 +12,7 @@
     ViewBag.Title = Model.ClubInitials + " " + localizer["Competitors"];
     Layout = "_ClubLayout";
 }
-<div class="container">
+<div class="container px-0 px-sm-2">
     <div class="row">
         <div class="col-12">
             <h1>@Model.ClubInitials @localizer["Competitors"]</h1>
@@ -21,17 +21,17 @@
     @if (Model.CanEdit)
     {
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col-3">
                 <a class="btn btn-primary" asp-action="CreateMultiple" asp-controller="Competitor">
                     Create
                 </a>
             </div>
-            <div class="col-sm-3">
+            <div class="col-6 col-sm-4 col-md-3">
                 <a class="btn btn-warning" asp-action="Options" asp-controller="MergeCompetitor">
                     Merge Competitors
                 </a>
             </div>
-            <div class="col-sm-3">
+            <div class="col-3">
                 <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
                     Club Admin
                 </a>
@@ -42,42 +42,44 @@
     @foreach (var item in Model.List.OrderBy(c => c.Name).ThenBy(c => c.SailNumber))
     {
 <div class="row border-bottom mb-1 pb-1">
-    <div class="col-6 col-sm-4 col-lg-3">
-        @if (Model.CanEdit)
-        {
-            <a class="btn btn-sm btn-outline-danger"
+    @if (Model.CanEdit)
+    {
+        <div class="col col-2 pr-1">
+            <a class="btn btn-sm btn-outline-danger mr-2 mb-3"
                asp-action="Delete"
                asp-controller="Competitor"
                asp-route-id="@item.Id"
                title="Delete">
                 <span class="fas fa-trash"></span>
-            </a> @:&nbsp;
-            <a class="btn btn-sm btn-outline-primary"
+            </a><span class="d-none d-sm-inline"> </span><a class="btn btn-sm btn-outline-primary mb-3"
                asp-action="Edit"
                asp-controller="Competitor"
                asp-route-id="@item.Id"
                title="Edit">
                 <span class="fas fa-pen"></span>
-            </a> @:&nbsp;
-        }
-        <a asp-route="Competitor"
-           asp-route-clubInitials="@Model.ClubInitials"
-           asp-route-sailNumber="@item.SailNumber">
-            <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
-        </a>
+            </a>
+        </div>
+            }
+        <div class="col col-10">
+            <div class="row">
+                <div class="col col-6 col-sm-4 col-lg-3">
+                    <a asp-route="Competitor"
+                       asp-route-clubInitials="@Model.ClubInitials"
+                       asp-route-sailNumber="@item.SailNumber">
+                        <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
+                    </a>
+                </div>
+                <div class="col col-6 col-sm-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
+                <div class="col col-6 col-sm-4 col-lg-3 small order-sm-12">
+                    @Html.DisplayFor(modelItem => item.BoatClass.Name)
+                    <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
+                </div>
+                <div class="col col-6 col-sm-3 col-md-4 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
+                <div class="col-12 order-last">
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-6 col-sm-4 col-lg-3 small">
-        @Html.DisplayFor(modelItem => item.BoatClass.Name)
-        <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
-    </div>
-    <div class="col-6 col-sm-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
-    <div class="d-none d-sm-inline d-lg-none col-sm-4 ">
-    </div>
-    <div class="col-6 col-sm-3 col-md-4 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
-
-    <div class="col-12">
-        @Html.DisplayFor(modelItem => item.Notes)
-    </div>
-</div>
     }
     </div>
