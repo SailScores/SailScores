@@ -15,7 +15,7 @@
 <div class="container px-0 px-sm-2">
  <div class="row">
   <div class="col-12">
-   <h1>@Model.ClubInitials @localizer["Competitors"]</h1>
+   <h1>@localizer["Competitors"]</h1>
   </div>
  </div>
 	@if (Model.CanEdit)
@@ -39,28 +39,30 @@
 	 </div>
 	}
  <div class="row">
-  <div class="col-lg-3 col-6">
-   <label  class="control-label"
-	for="sort-order">Sort:</label>
-   <select id="sort-order"
-   class="form-control"
-   onchange="sortCompetitors()">
-	<option value="name">Name</option>
-	<option value="sail">Sail Number</option>
-   </select>
-  </div>
 		@if (Model.CanEdit)
 		{
-	  <div class="col-lg-3 col-6">
+	  <div class="col-6 px-5 pt-2">
 	   <input type="checkbox" id="show-inactive" name="show-inactive"
 	   class="form-check-input"
 	   value="show-inactive"
 	   checked
 	   onchange="changeVisibility()">
 	   <label for="show-inactive"
-		class="form-check-label"> Show inactive competitors</label>
+		class="form-check-label"> Show inactive</label>
 	  </div>
 		}
+		<div class="col-6 py-2">
+            <div class="form-row">
+   <label  class="control-label col-form-label col-4"
+	for="sort-order">Sort </label>
+   <select id="sort-order"
+   class="form-control col-8"
+   onchange="sortCompetitors()">
+	<option value="name">Name</option>
+	<option value="sail">Sail Number</option>
+   </select>
+   </div>
+  </div>
  </div>
  <br />
 
