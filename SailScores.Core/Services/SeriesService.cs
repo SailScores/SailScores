@@ -85,7 +85,27 @@ namespace SailScores.Core.Services
                 }
                 fullSeries.FlatResults = flatResults;
             }
+            if(await IsPartOfRegatta(seriesDb.Id))
+            {
+                fullSeries.PreferAlternativeSailNumbers = await DoesRegattaPrefersAltSailNumbers(seriesDb.Id);
+                fullSeries.ShowCompetitorClub = true;
+            }
             return fullSeries;
+        }
+
+        private async Task<bool> IsPartOfRegatta(Guid seriesId)
+        {
+            return await _dbContext.Regattas
+                .SelectMany(r => r.RegattaSeries)
+                .AnyAsync(rs => rs.SeriesId == seriesId);
+        }
+
+        private async Task<bool> DoesRegattaPrefersAltSailNumbers(Guid seriesId)
+        {
+            return await _dbContext.Regattas
+                .Where(r => r.RegattaSeries.Any( rs => rs.SeriesId == seriesId))
+                .Select(r => r.PreferAlternateSailNumbers)
+                .FirstOrDefaultAsync() ?? false;
         }
 
         public async Task UpdateSeriesResults(
