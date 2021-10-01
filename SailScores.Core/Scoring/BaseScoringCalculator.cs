@@ -321,11 +321,26 @@ namespace SailScores.Core.Scoring
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)
         {
+            // first pass to make sure series based DNC's are filled in.
             foreach (var race in resultsWorkInProgress.SailedRaces)
             {
                 var score = compResults.CalculatedScores[race];
                 var scoreCode = GetScoreCode(score.RawScore);
-                if (IsSeriesBasedScore(scoreCode))
+                if (IsSeriesBasedScore(scoreCode) && !IsAverage(score.RawScore.Code))
+                {
+                    score.ScoreValue = CalculateSeriesBasedValue(
+                        resultsWorkInProgress,
+                        compResults,
+                        race);
+                }
+            }
+
+            // second pass to get averages.
+            foreach (var race in resultsWorkInProgress.SailedRaces)
+            {
+                var score = compResults.CalculatedScores[race];
+                var scoreCode = GetScoreCode(score.RawScore);
+                if (IsSeriesBasedScore(scoreCode) && IsAverage(score.RawScore.Code))
                 {
                     score.ScoreValue = CalculateSeriesBasedValue(
                         resultsWorkInProgress,
