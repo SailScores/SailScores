@@ -42,7 +42,7 @@ namespace SailScores.Web.Controllers
         }
 
         // GET: Series
-        [ResponseCache(Duration = 3600)]
+        [ResponseCache(Duration = 900)]
         public async Task<ActionResult> Index(string clubInitials)
         {
             ViewData["ClubInitials"] = clubInitials.ToUpperInvariant();

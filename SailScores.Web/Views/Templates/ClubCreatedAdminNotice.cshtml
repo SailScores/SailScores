@@ -1,0 +1,51 @@
+﻿@using Microsoft.Extensions.Configuration
+@model SailScores.Web.Models.SailScores.ClubRequestViewModel
+
+@inject IConfiguration _config;
+@{
+    var preferredhost = _config["PreferredHost"];
+    string baseUrl = $"https://{preferredhost}";
+    var clubUrl = $"{baseUrl}/{Model.ClubInitials + ((Model.ForTesting ?? false) ? "TEST" : "")}";
+    var accountUrl = $"{baseUrl}/Account/Register";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: "Open Sans", "Segoe UI", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <a href="@clubUrl">
+            @Model.ClubInitials - @Model.ClubName
+        </a>
+    </div>
+    <div>
+        <p>Requested by @Model.ContactName - @Model.ContactEmail</p>
+    </div>
+    <p>
+        A club has been set up for @Model.ClubName at: <br />
+        <a href="@clubUrl">@clubUrl</a>
+    </p>
+    <p>Admin page:
+        <a href="@clubUrl/admin/">@clubUrl/admin/</a>
+    </p>
+    <p>
+        Check the discard pattern and boat types:
+    </p>
+
+<p>
+    @Model.TypicalDiscardRules
+</p>
+<p>
+    @Model.Classes
+</p>
+<p>
+    @Model.Comments
+</p>
+</body>
+</html>
