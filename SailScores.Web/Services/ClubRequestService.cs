@@ -188,9 +188,9 @@ namespace SailScores.Web.Services
         {
             try
             {
+                var emailBody = await _emailSender.GetHtmlFromView("Templates/ClubCreatedAdminNotice", request);
                 var notificationEmail = _configuration["NotificationEmail"];
-                await _emailSender.SendEmailAsync(notificationEmail, "SailScores - Club created",
-                    $"A club has been created for {request.ClubName} by {request.ContactEmail}.");
+                await _emailSender.SendEmailAsync(notificationEmail, $"SailScores Club Created {request.ContactEmail}", emailBody);
             }
             catch (Exception)
             {

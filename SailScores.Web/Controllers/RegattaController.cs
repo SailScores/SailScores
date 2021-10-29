@@ -27,7 +27,7 @@ namespace SailScores.Web.Controllers
             _mapper = mapper;
         }
 
-        [ResponseCache(Duration = 3600)]
+        [ResponseCache(Duration = 900)]
         public async Task<ActionResult> Index(string clubInitials)
         {
             ViewData["ClubInitials"] = clubInitials;
