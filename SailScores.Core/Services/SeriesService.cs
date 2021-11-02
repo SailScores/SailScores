@@ -56,8 +56,11 @@ namespace SailScores.Core.Services
                 .Include(s => s.Season)
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
+                    .ThenInclude(r => r.Fleet)
                 .Where(s => includeRegattaSeries || !regattaSeriesId.Contains(s.Id))
-                .OrderBy(s => s.Name).ToListAsync().ConfigureAwait(false);
+                .OrderBy(s => s.Name)
+                .AsSplitQuery()
+                .ToListAsync().ConfigureAwait(false);
 
             var returnObj = _mapper.Map<List<Series>>(series);
             return returnObj;

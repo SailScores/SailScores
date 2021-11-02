@@ -54,7 +54,9 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Regatta, o => o.Ignore())
                 .ForMember(d => d.RegattaId, o => o.Ignore());
 
-            CreateMap<Model.Series, SeriesSummary>();
+            CreateMap<Model.Series, SeriesSummary>()
+                .ForMember(d => d.FleetName, o => o.MapFrom(s =>
+                    GetFleetsString(s.Races)));
             CreateMap<Model.Series, SeriesWithOptionsViewModel>()
                 .ForMember(d => d.SeasonOptions, o => o.Ignore())
                 .ForMember(d => d.SeasonId, o => o.MapFrom(s =>
@@ -117,6 +119,21 @@ namespace SailScores.Web.Mapping
             CreateMap<Db.SiteStats, AllClubStatsViewModel>();
 
             MapRegattaObjects();
+        }
+
+        private String GetFleetsString(IList<Race> races)
+        {
+            var fleetNames = races.Select(r => r.Fleet).Where(f => f != null)
+                .Select(f => f.Name).Distinct();
+            switch (fleetNames.Count())
+            {
+                case 0:
+                    return "No Fleet";
+                case 1:
+                    return fleetNames.First();
+                default:
+                    return "Multiple Fleets";
+            }
         }
 
         private void MapRaceObjects()

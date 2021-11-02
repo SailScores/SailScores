@@ -17,6 +17,8 @@ namespace SailScores.Web.Models.SailScores
         public IList<Race> Races { get; set; }
         public Season Season { get; set; }
 
+        public String FleetName { get; set; }
+
         public bool? IsImportantSeries { get; set; }
 
         public bool? ResultsLocked { get; set; }

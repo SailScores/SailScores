@@ -78,11 +78,12 @@ namespace SailScores.Web.Services
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);
             var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
-            var orderedSeries =
-                coreObject
-                .OrderByDescending(s => s.Season.Start)
+
+            var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(coreObject);
+
+            return seriesSummaries.OrderByDescending(s => s.Season.Start)
+                .ThenBy( s => s.FleetName)
                 .ThenBy(s => s.Name);
-            return _mapper.Map<IList<SeriesSummary>>(orderedSeries);
         }
 
         public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesUrlName)
