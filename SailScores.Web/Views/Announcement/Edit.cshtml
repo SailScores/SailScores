@@ -1,0 +1,43 @@
+﻿@model SailScores.Core.Model.Announcement
+
+@{
+    ViewData["Title"] = "Edit Notice";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Edit Notice</h2>
+<hr />
+<div class="row">
+    <div class="col-lg-4 col-md-8">
+        <form asp-action="Edit"
+              asp-route-returnurl="@ViewData["ReturnUrl"]">
+            <input type="hidden" id="regattaId" asp-for="RegattaId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                
+                <textarea asp-for="Content" class="form-control" ></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+                {
+                    <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">Cancel</a>
+                } else
+                {
+                    <a href="@ViewData["ReturnUrl"]"
+                   class="btn btn-outline-primary">Cancel</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+
+}

@@ -27,6 +27,7 @@ namespace SailScores.Database
         public DbSet<Race> Races { get; set; }
         public DbSet<Score> Scores { get; set; }
         public DbSet<Regatta> Regattas { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
 
         public DbSet<ScoreCode> ScoreCodes { get; set; }
 
@@ -227,6 +228,8 @@ namespace SailScores.Database
                 .HasConversion(
                     v => v.ToString(),
                     v => (TrendOption)Enum.Parse(typeof(TrendOption), v));
+
+            modelBuilder.Entity<Announcement>().HasQueryFilter(p => !p.IsDeleted);
 
             modelBuilder.Entity<CompetitorStatsSummary>(
                 cs =>

@@ -20,6 +20,7 @@ namespace SailScores.Database
         DbSet<Score> Scores { get; set; }
 
         DbSet<Regatta> Regattas { get; set; }
+        DbSet<Announcement> Announcements { get; set; }
 
         DbSet<ScoreCode> ScoreCodes { get; set; }
 

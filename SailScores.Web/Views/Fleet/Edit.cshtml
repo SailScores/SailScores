@@ -99,10 +99,17 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="fleets"
-                   class="btn btn-outline-primary">Cancel</a>
+                @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+                {
+                    <a asp-controller="Admin"
+                       asp-action="Index"
+                       asp-fragment="fleets"
+                       class="btn btn-outline-primary">Cancel</a>
+                } else
+                {
+                    <a href="@ViewData["ReturnUrl"]"
+                       class="btn btn-outline-primary">Cancel</a>
+                }
             </div>
         </form>
     </div>

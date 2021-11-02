@@ -285,6 +285,16 @@
                         * @localizer["Rank change from"] @localizer[EnumHelper<TrendOption>.GetDisplayValue(Model.TrendOption.Value)]
                     </span>
                 }
+            @if (Model.UpdatedDate.HasValue)
+            {
+                <span class="small font-italic">
+                    @localizer["Updated"] @(Model.UpdatedDate.Value.ToString("f")) UTC
+                    @if (!String.IsNullOrWhiteSpace(Model.FlatResults.UpdatedBy))
+                    {
+                        @:by @Model.FlatResults.UpdatedBy
+                    }
+                </span>
+            }
             </div>
             <div class="col-md-3 text-right">
                 @if (!((bool?)ViewData["IsExport"] ?? false))

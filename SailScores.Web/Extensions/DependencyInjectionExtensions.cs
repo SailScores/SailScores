@@ -16,6 +16,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IAuthorizationService, AuthorizationService>();
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<ISeasonService, SeasonService>();
+            services.AddScoped<IAnnouncementService, AnnouncementService>();
             services.AddScoped<IRegattaService, RegattaService>();
             services.AddScoped<IAdminTipService, AdminTipService>();
             services.AddScoped<ICsvService, CsvService>();

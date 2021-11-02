@@ -71,6 +71,7 @@ namespace SailScores.Core.Services
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
                 .Include(r => r.Season)
+                .Include(r => r.Announcements)
                 .AsSplitQuery()
                 .SingleAsync()
                 .ConfigureAwait(false);
