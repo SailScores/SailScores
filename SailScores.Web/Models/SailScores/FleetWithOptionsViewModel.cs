@@ -1,6 +1,7 @@
 ﻿using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SailScores.Web.Models.SailScores
 {
@@ -11,6 +12,8 @@ namespace SailScores.Web.Models.SailScores
 
         public IEnumerable<Competitor> CompetitorOptions { get; set; }
         public IEnumerable<Guid> CompetitorIds { get; set; }
+
+        public IOrderedEnumerable<BoatClass> CompetitorBoatClassOptions { get; set; }
 
         public RegattaSummaryViewModel Regatta { get; set; }
 

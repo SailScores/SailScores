@@ -22,5 +22,22 @@ namespace SailScores.Web.Models.SailScores
 
         public String ClubInitials { get; set; }
         public String ClubName { get; set; }
+
+        public String FleetCountString
+        {
+            get
+            {
+                var count = this.Fleets?.Count ?? 0;
+                switch (count)
+                {
+                    case 0:
+                        return "No fleets";
+                    case 1:
+                        return "1 fleet";
+                    default:
+                        return $"{count} fleets";
+                }
+            }
+        }
     }
 }

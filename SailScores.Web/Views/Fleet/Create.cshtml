@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.FleetWithOptionsViewModel
+@model SailScores.Web.Models.SailScores.FleetWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,9 +10,10 @@
 <h4>Fleet@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
 <hr />
 <div class="row">
-    <div class="col-lg-4 col-md-8">
+    <div class="col-lg-6 col-md-8">
         <form asp-action="Create"
               asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <input type="hidden" id="clubId" asp-for="ClubId" />
             <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -100,16 +101,27 @@
                 </select>
                 <span asp-validation-for="CompetitorIds" class="text-danger"></span>
             </div>
+            <div id="compCreateGroup" class="form-group">
+                <input id="createCompButton" type="button" value="Create New Competitor" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#createCompetitor" />
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+                {
                 <a asp-controller="Admin"
                    asp-action="Index"
                    asp-fragment="fleets"
                    class="btn btn-outline-primary">Cancel</a>
+                } else
+                {
+                    <a href="@ViewData["ReturnUrl"]"
+                       class="btn btn-outline-primary">Cancel</a>
+                }
             </div>
         </form>
     </div>
 </div>
+@await Html.PartialAsync("_competitorCreate", Model)
 
 @section Scripts {
     <script type="text/javascript">
@@ -123,18 +135,22 @@
             }
             if (fType.indexOf('Selected Boats') > -1) {
                 document.getElementById('boatSelectGroup').style.display = 'block';
+                document.getElementById('compCreateGroup').style.display = 'block';
             } else {
                 document.getElementById('boatSelectGroup').style.display = 'none';
+                document.getElementById('compCreateGroup').style.display = 'none';
             }
         };
         checkVisibility();
-
+        
     </script>
+    
+    <script src="~/js/fleetEditor.min.js" asp-append-version="true"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script>
         $(function () {
-            $('[data-toggle="popover"]').popover()
+            $('[data-toggle="popover"]').popover();
         })
     </script>
 }

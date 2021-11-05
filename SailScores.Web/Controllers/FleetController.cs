@@ -96,6 +96,7 @@ namespace SailScores.Web.Controllers
                         model.RegattaId);
                     model.BoatClassOptions = vmOptions.BoatClassOptions;
                     model.CompetitorOptions = vmOptions.CompetitorOptions;
+                    model.CompetitorBoatClassOptions = vmOptions.CompetitorBoatClassOptions;
 
                     return View(model);
                 }
@@ -137,6 +138,8 @@ namespace SailScores.Web.Controllers
                 var vm = _mapper.Map<FleetWithOptionsViewModel>(fleet);
                 vm.BoatClassOptions = vmOptions.BoatClassOptions;
                 vm.CompetitorOptions = vmOptions.CompetitorOptions;
+                vm.CompetitorBoatClassOptions = vmOptions.CompetitorBoatClassOptions;
+
                 return View(vm);
             }
             catch
@@ -167,6 +170,7 @@ namespace SailScores.Web.Controllers
                         model.RegattaId);
                     model.BoatClassOptions = vmOptions.BoatClassOptions;
                     model.CompetitorOptions = vmOptions.CompetitorOptions;
+                    model.CompetitorBoatClassOptions = vmOptions.CompetitorBoatClassOptions;
 
                     return View(model);
                 }

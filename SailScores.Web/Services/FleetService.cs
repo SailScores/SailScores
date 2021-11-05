@@ -115,7 +115,9 @@ namespace SailScores.Web.Services
         {
             var clubId = await _coreClubService.GetClubId(clubInitials);
             var vm = new FleetWithOptionsViewModel();
+            vm.ClubId = clubId;
             vm.BoatClassOptions = await _coreClubService.GetAllBoatClasses(clubId);
+            vm.CompetitorBoatClassOptions = vm.BoatClassOptions.OrderBy(c => c.Name);
             vm.CompetitorOptions =
                 await _coreCompetitorService.GetCompetitorsAsync(clubId, null, true);
 

@@ -18,6 +18,7 @@
   "files": [
     "./guid.ts",
     "./raceEditor.ts",
+    "./fleetEditor.ts",
     "./interfaces/CompetitorDto.cs.d.ts"
   ],
   "compileOnSave": true

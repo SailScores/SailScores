@@ -35,11 +35,11 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="Humanizer" Version="2.10.1" />
+    <PackageReference Include="Humanizer" Version="2.11.10" />
     <PackageReference Include="Markdig" Version="0.24.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.17.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.18.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.5" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.9.0" />
@@ -54,7 +54,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.5" />
     <PackageReference Include="Microsoft.OpenApi" Version="1.2.3" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.2.4">
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.4.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
