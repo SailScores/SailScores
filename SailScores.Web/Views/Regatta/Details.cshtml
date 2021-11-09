@@ -122,6 +122,7 @@
                         }
                         <span class="small font-italic">Posted by @announcement.CreatedBy at @announcement.CreatedLocalDate.ToString("f"):</span>
                         @Html.Raw(Markdig.Markdown.ToHtml(announcement.Content))
+                        <br/>
                     }
                 </div>
             }
