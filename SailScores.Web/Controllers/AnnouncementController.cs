@@ -8,6 +8,7 @@ using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using System;
 using System.Threading.Tasks;
+using Ganss.XSS;
 using CoreServices = SailScores.Core.Services;
 
 namespace SailScores.Web.Controllers
@@ -21,18 +22,21 @@ namespace SailScores.Web.Controllers
         private readonly Services.IAuthorizationService _authService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly IHtmlSanitizer _sanitizer;
 
         public AnnouncementController(
                 CoreServices.IClubService clubService,
                 IAnnouncementService announcementService,
                 Services.IAuthorizationService authService,
                 UserManager<ApplicationUser> userManager,
+                IHtmlSanitizer sanitizer,
                 IMapper mapper)
         {
             _clubService = clubService;
             _announcementService = announcementService;
             _authService = authService;
             _userManager = userManager;
+            _sanitizer = sanitizer;
             _mapper = mapper;
         }
 
@@ -71,6 +75,7 @@ namespace SailScores.Web.Controllers
                     return View(model);
                 }
 
+                model.Content = _sanitizer.Sanitize(model.Content);
                 model.CreatedBy = await GetUserStringAsync();
                 model.CreatedDate = DateTime.UtcNow;
                 model.CreatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
@@ -83,14 +88,14 @@ namespace SailScores.Web.Controllers
             }
             catch
             {
-                Announcement vm;
+                AnnouncementWithOptions vm;
                 if (model.RegattaId.HasValue)
                 {
                     vm = await _announcementService.GetBlankAnnouncementForRegatta(
                        clubInitials,
                        model.RegattaId.Value);
                 
-            } else
+                } else
                 {
                     vm = model;
                 }
@@ -140,6 +145,7 @@ namespace SailScores.Web.Controllers
                     return View(model);
                 }
 
+                model.Content = _sanitizer.Sanitize(model.Content);
                 model.UpdatedBy = await GetUserStringAsync();
                 model.UpdatedDate = DateTime.UtcNow;
                 model.UpdatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
