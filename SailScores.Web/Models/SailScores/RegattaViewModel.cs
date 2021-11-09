@@ -1,25 +1,22 @@
-﻿using System;
+﻿namespace SailScores.Web.Models.SailScores;
 
-namespace SailScores.Web.Models.SailScores
+public class RegattaViewModel : Core.Model.Regatta
 {
-    public class RegattaViewModel : Core.Model.Regatta
+    private Guid _seasonId;
+    public Guid SeasonId
     {
-        private Guid _seasonId;
-        public Guid SeasonId
+        get
         {
-            get
+            if (this.Season != null)
             {
-                if (this.Season != null)
-                {
-                    return this.Season.Id;
-                }
-                return _seasonId;
+                return this.Season.Id;
             }
-            set
-            {
-                _seasonId = value;
-            }
-
+            return _seasonId;
         }
+        set
+        {
+            _seasonId = value;
+        }
+
     }
 }

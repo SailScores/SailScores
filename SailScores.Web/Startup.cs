@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,14 +21,11 @@ using SailScores.Web.Data;
 using SailScores.Web.Extensions;
 using SailScores.Web.Mapping;
 using SailScores.Web.Services;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using SailScores.Web.Services.Interfaces;
 using WebMarkupMin.AspNetCore3;
 
 namespace SailScores.Web

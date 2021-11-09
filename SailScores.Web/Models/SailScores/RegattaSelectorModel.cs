@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
+﻿namespace SailScores.Web.Models.SailScores;
 
-namespace SailScores.Web.Models.SailScores
+public class RegattaSelectorModel
 {
-    public class RegattaSelectorModel
-    {
-        public List<RegattaSummaryViewModel> Regattas { get; set; }
-        public string SelectedRegattaName { get; set; }
-    }
+    public List<RegattaSummaryViewModel> Regattas { get; set; }
+    public string SelectedRegattaName { get; set; }
 }

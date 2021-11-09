@@ -121,6 +121,7 @@ namespace SailScores.Test.Unit.Utilities
                 Id = Guid.NewGuid(),
                 Name = "Appendix A Low Point For Series",
                 ClubId = null,
+                IsSiteDefault = true,
                 ScoreCodes = new List<ScoreCode>
                 {
                     new Database.Entities.ScoreCode
@@ -176,6 +177,7 @@ namespace SailScores.Test.Unit.Utilities
             {
                 ClubId = club.Id,
                 Season = season,
+                Name = "Test Regatta",
                 RegattaFleet = new List<RegattaFleet>
                 { new RegattaFleet
                     {

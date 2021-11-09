@@ -7,6 +7,7 @@ using SailScores.Web.Services;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using SailScores.Web.Services.Interfaces;
 using Xunit;
 
 namespace SailScores.Test.Unit.Web.Controllers

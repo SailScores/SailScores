@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace SailScores.Web.Models.SailScores;
 
-namespace SailScores.Web.Models.SailScores
+public class ClubRequestWithOptionsViewModel : ClubRequestViewModel
 {
-    public class ClubRequestWithOptionsViewModel : ClubRequestViewModel
-    {
-        public IList<ClubSummaryViewModel> ClubOptions { get; set; }
-    }
+    public IList<ClubSummaryViewModel> ClubOptions { get; set; }
 }

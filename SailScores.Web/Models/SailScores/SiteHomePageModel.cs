@@ -1,10 +1,9 @@
-﻿namespace SailScores.Web.Models.SailScores
+﻿namespace SailScores.Web.Models.SailScores;
+
+public class SiteHomePageModel
 {
-    public class SiteHomePageModel
-    {
-        public ClubSelectorModel ClubSelectorModel { get; set; }
+    public ClubSelectorModel ClubSelectorModel { get; set; }
 
-        public RegattaSelectorModel RegattaSelectorModel { get; set; }
+    public RegattaSelectorModel RegattaSelectorModel { get; set; }
 
-    }
 }

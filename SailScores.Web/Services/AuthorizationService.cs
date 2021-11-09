@@ -1,77 +1,72 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using SailScores.Web.Services.Interfaces;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Services;
+
+public class AuthorizationService : IAuthorizationService
 {
-    public class AuthorizationService : IAuthorizationService
+    private readonly Core.Services.IUserService _userService;
+
+    public AuthorizationService(
+        Core.Services.IUserService userService
+    )
     {
-        private readonly Core.Services.IUserService _userService;
+        _userService = userService;
+    }
 
-        public AuthorizationService(
-            Core.Services.IUserService userService
-            )
+    public async Task<bool> CanUserEdit(
+        ClaimsPrincipal claimsPrincipal,
+        string clubInitials)
+    {
+        var email = claimsPrincipal?.FindFirst("sub")?.Value;
+        if (String.IsNullOrWhiteSpace(email))
         {
-            _userService = userService;
+            email = claimsPrincipal?.Identity?.Name;
         }
 
-        public async Task<bool> CanUserEdit(
-            ClaimsPrincipal claimsPrincipal,
-            string clubInitials)
+        if (string.IsNullOrWhiteSpace(email))
         {
-            var email = claimsPrincipal?.FindFirst("sub")?.Value;
-            if (String.IsNullOrWhiteSpace(email))
-            {
-                email = claimsPrincipal?.Identity?.Name;
-            }
+            return false;
+        }
+        return await _userService.IsUserAllowedToEdit(
+            email,
+            clubInitials);
+    }
 
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return false;
-            }
-            return await _userService.IsUserAllowedToEdit(
-                email,
-                clubInitials);
+    public async Task<bool> CanUserEdit(
+        ClaimsPrincipal claimsPrincipal,
+        Guid clubId)
+    {
+        var email = claimsPrincipal.FindFirst("sub")?.Value;
+        if (String.IsNullOrWhiteSpace(email))
+        {
+            email = claimsPrincipal.Identity.Name;
+        }
+        return await _userService.IsUserAllowedToEdit(
+            email,
+            clubId);
+    }
+
+    public async Task<bool> IsUserFullAdmin(ClaimsPrincipal user)
+    {
+        var email = user.FindFirst("sub")?.Value;
+        if (String.IsNullOrWhiteSpace(email))
+        {
+            email = user.Identity.Name;
+        }
+        return await _userService.IsUserFullAdmin(
+            email);
+    }
+
+    public async Task<string> GetHomeClub(string email)
+    {
+        var clubInitials = await _userService.GetClubInitials(email);
+
+        if (clubInitials.Count() <= 1)
+        {
+            return clubInitials.FirstOrDefault();
         }
 
-        public async Task<bool> CanUserEdit(
-            ClaimsPrincipal claimsPrincipal,
-            Guid clubId)
-        {
-            var email = claimsPrincipal.FindFirst("sub")?.Value;
-            if (String.IsNullOrWhiteSpace(email))
-            {
-                email = claimsPrincipal.Identity.Name;
-            }
-            return await _userService.IsUserAllowedToEdit(
-                email,
-                clubId);
-        }
-
-        public async Task<bool> IsUserFullAdmin(ClaimsPrincipal user)
-        {
-            var email = user.FindFirst("sub")?.Value;
-            if (String.IsNullOrWhiteSpace(email))
-            {
-                email = user.Identity.Name;
-            }
-            return await _userService.IsUserFullAdmin(
-                email);
-        }
-
-        public async Task<string> GetHomeClub(string email)
-        {
-            var clubInitials = await _userService.GetClubInitials(email);
-
-            if (clubInitials.Count() <= 1)
-            {
-                return clubInitials.FirstOrDefault();
-            }
-
-            return String.Empty;
-        }
+        return String.Empty;
     }
 }

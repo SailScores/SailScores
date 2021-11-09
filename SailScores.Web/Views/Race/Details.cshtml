@@ -1,6 +1,7 @@
 ﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Services.Interfaces
 @model ClubItemViewModel<RaceViewModel>
-@inject SailScores.Web.Services.IWeatherService  weatherService
+@inject IWeatherService  weatherService
 
 @{
     ViewBag.Title = Model.ClubInitials + " " + Model.Item.DisplayName;

@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace SailScores.Web.Models.SailScores;
 
-namespace SailScores.Web.Models.SailScores
+public class ClubCollectionViewModel<T> : ClubBaseViewModel
 {
-    public class ClubCollectionViewModel<T> : ClubBaseViewModel
-    {
-        public IEnumerable<T> List { get; set; }
-    }
+    public IEnumerable<T> List { get; set; }
 }

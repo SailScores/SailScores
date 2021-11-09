@@ -1,13 +1,10 @@
-﻿using System;
+﻿namespace SailScores.Database.Entities;
 
-namespace SailScores.Database.Entities
+public class FleetBoatClass
 {
-    public class FleetBoatClass
-    {
-        public Guid FleetId { get; set; }
-        public Fleet Fleet { get; set; }
+    public Guid FleetId { get; set; }
+    public Fleet Fleet { get; set; }
 
-        public Guid BoatClassId { get; set; }
-        public BoatClass BoatClass { get; set; }
-    }
+    public Guid BoatClassId { get; set; }
+    public BoatClass BoatClass { get; set; }
 }

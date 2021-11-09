@@ -4,29 +4,27 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using SailScores.Web.Extensions;
 using System.Threading.Tasks;
 
-namespace SailScores.Web.TagHelpers
+namespace SailScores.Web.TagHelpers;
+// from https://stackoverflow.com/questions/50728261/
+
+[HtmlTargetElement("label", Attributes = ForAttributeName)]
+public class LabelRequiredTagHelper : LabelTagHelper
 {
-    // from https://stackoverflow.com/questions/50728261/
+    private const string ForAttributeName = "asp-for";
+    private const string RequiredCssClass = "required";
 
-    [HtmlTargetElement("label", Attributes = ForAttributeName)]
-    public class LabelRequiredTagHelper : LabelTagHelper
+    public LabelRequiredTagHelper(IHtmlGenerator generator) : base(generator)
     {
-        private const string ForAttributeName = "asp-for";
-        private const string RequiredCssClass = "required";
+    }
+    public override async Task ProcessAsync(
+        TagHelperContext context,
+        TagHelperOutput output)
+    {
+        await base.ProcessAsync(context, output);
 
-        public LabelRequiredTagHelper(IHtmlGenerator generator) : base(generator)
+        if (For.Metadata.IsRequired && For.Metadata.ModelType != typeof(bool))
         {
-        }
-        public override async Task ProcessAsync(
-            TagHelperContext context,
-            TagHelperOutput output)
-        {
-            await base.ProcessAsync(context, output);
-
-            if (For.Metadata.IsRequired && For.Metadata.ModelType != typeof(bool))
-            {
-                output.Attributes.AddCssClass(RequiredCssClass);
-            }
+            output.Attributes.AddCssClass(RequiredCssClass);
         }
     }
 }

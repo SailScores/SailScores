@@ -1,54 +1,52 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using System;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Services;
+
+public class AppSettingsService
 {
-    public class AppSettingsService
+    private readonly IConfiguration _config;
+
+    public AppSettingsService(
+        IConfiguration config)
     {
-        private readonly IConfiguration _config;
+        _config = config;
+    }
 
-        public AppSettingsService(
-            IConfiguration config)
+    public string GetPreferredUri(HttpRequest request)
+    {
+        var preferredhost = _config["PreferredHost"];
+        if (!String.IsNullOrWhiteSpace(preferredhost))
         {
-            _config = config;
+            request.Host = new HostString(preferredhost);
         }
 
-        public string GetPreferredUri(HttpRequest request)
+        var absoluteUri = string.Concat(
+            request.Scheme,
+            "://",
+            request.Host.ToUriComponent(),
+            request.PathBase.ToUriComponent(),
+            request.Path.ToUriComponent(),
+            request.QueryString.ToUriComponent());
+
+        return absoluteUri;
+    }
+
+
+    public string GetPreferredBase(HttpRequest request)
+    {
+        var preferredhost = _config["PreferredHost"];
+        if (!String.IsNullOrWhiteSpace(preferredhost))
         {
-            var preferredhost = _config["PreferredHost"];
-            if (!String.IsNullOrWhiteSpace(preferredhost))
-            {
-                request.Host = new HostString(preferredhost);
-            }
-
-            var absoluteUri = string.Concat(
-                        request.Scheme,
-                        "://",
-                        request.Host.ToUriComponent(),
-                        request.PathBase.ToUriComponent(),
-                        request.Path.ToUriComponent(),
-                        request.QueryString.ToUriComponent());
-
-            return absoluteUri;
+            request.Host = new HostString(preferredhost);
         }
 
+        var absoluteUri = string.Concat(
+            request.Scheme,
+            "://",
+            request.Host.ToUriComponent(),
+            request.PathBase.ToUriComponent());
 
-        public string GetPreferredBase(HttpRequest request)
-        {
-            var preferredhost = _config["PreferredHost"];
-            if (!String.IsNullOrWhiteSpace(preferredhost))
-            {
-                request.Host = new HostString(preferredhost);
-            }
-
-            var absoluteUri = string.Concat(
-                        request.Scheme,
-                        "://",
-                        request.Host.ToUriComponent(),
-                        request.PathBase.ToUriComponent());
-
-            return absoluteUri;
-        }
+        return absoluteUri;
     }
 }

@@ -1,55 +1,51 @@
 ﻿using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SailScores.Web.Services.Interfaces;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Services;
+
+public class AnnouncementService : IAnnouncementService
 {
-    public class AnnouncementService : IAnnouncementService
+    private Core.Services.IAnnouncementService _coreAnnouncementService;
+
+    public AnnouncementService(
+        Core.Services.IAnnouncementService announcementService
+    )
     {
-        private Core.Services.IAnnouncementService _coreAnnouncementService;
+        _coreAnnouncementService = announcementService;
+    }
 
-        public AnnouncementService(
-            Core.Services.IAnnouncementService announcementService
-            )
+    public async Task Delete(Guid announcementId)
+    {
+        await _coreAnnouncementService.Delete(announcementId);
+    }
+
+    public async Task<Announcement> GetAnnouncement(Guid announcementId)
+    {
+        return await _coreAnnouncementService.Get(announcementId);
+    }
+
+    public async Task<AnnouncementWithOptions> GetBlankAnnouncementForRegatta(string clubInitials, Guid regattaId)
+    {
+        return new AnnouncementWithOptions
         {
-            _coreAnnouncementService = announcementService;
-        }
+            RegattaId = regattaId
+        };
+    }
 
-        public async Task Delete(Guid announcementId)
-        {
-            await _coreAnnouncementService.Delete(announcementId);
-        }
+    public Task<IEnumerable<Announcement>> GetRegattaAnnouncements(Guid regattaId)
+    {
+        throw new NotImplementedException();
+    }
 
-        public async Task<Announcement> GetAnnouncement(Guid announcementId)
-        {
-            return await _coreAnnouncementService.Get(announcementId);
-        }
+    public async Task SaveNew(Announcement announcement)
+    {
 
-        public async Task<AnnouncementWithOptions> GetBlankAnnouncementForRegatta(string clubInitials, Guid regattaId)
-        {
-            return new AnnouncementWithOptions
-            {
-                RegattaId = regattaId
-            };
-        }
+        await _coreAnnouncementService.SaveNew(announcement);
+    }
 
-        public Task<IEnumerable<Announcement>> GetRegattaAnnouncements(Guid regattaId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SaveNew(Announcement announcement)
-        {
-
-            await _coreAnnouncementService.SaveNew(announcement);
-        }
-
-        public async Task Update(Announcement announcement)
-        {
-            await _coreAnnouncementService.Update(announcement);
-        }
+    public async Task Update(Announcement announcement)
+    {
+        await _coreAnnouncementService.Update(announcement);
     }
 }

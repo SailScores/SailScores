@@ -1,11 +1,8 @@
-﻿using System;
+﻿namespace SailScores.Web.Models.SailScores;
 
-namespace SailScores.Web.Models.SailScores
+public class ToDoLinkViewModel
 {
-    public class ToDoLinkViewModel
-    {
-        public String Controller { get; set; }
-        public String Action { get; set; }
+    public String Controller { get; set; }
+    public String Action { get; set; }
 
-    }
 }

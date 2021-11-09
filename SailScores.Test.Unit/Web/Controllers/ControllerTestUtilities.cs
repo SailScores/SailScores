@@ -3,6 +3,7 @@ using SailScores.Web.Services;
 using System;
 using System.Collections.Generic;
 using SailScores.Core.Model;
+using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {
