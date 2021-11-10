@@ -27,7 +27,7 @@ namespace SailScores.Web
                 {
                     logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
                     logging.AddConsole();
-                    logging.AddDebug();
+                    //logging.AddDebug();
                     logging.AddAzureWebAppDiagnostics();
                 })
             .UseStartup<Startup>();
