@@ -281,3 +281,7 @@ SailScores\.Web/wwwroot/css/custom\.css
 \.sonarqube/
 
 .sonarlint/
+
+*.pubxml
+
+SailScores.Web/Properties/ServiceDependencies/sailscorestest - Web Deploy/
