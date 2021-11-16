@@ -6,11 +6,11 @@
     "noEmitOnError": true,
     "removeComments": false,
     "sourceMap": true,
-    "module": "es2015",
-    "target": "es2015",
+    "module": "es2020",
+    "target": "es2020",
     "baseUrl": "scripts",
     "lib": [
-      "es2015",
+      "ES2020",
       "es5",
       "dom"
     ]

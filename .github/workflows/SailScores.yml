@@ -1,12 +1,12 @@
-name: Build and deploy .NET Core app to Linux WebApp sailscorestest
+name: Build and deploy .NET Core app to Linux WebApp SailScores
 on:
   push:
     branches:
-    - feature/dotnet6
+    - main
 env:
-  AZURE_WEBAPP_NAME: sailscorestest
+  AZURE_WEBAPP_NAME: SailScores
   AZURE_WEBAPP_PACKAGE_PATH: SailScores.Web/publish
-  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.sailscorestest_4616 }}
+  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.SailScores_0946 }}
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: SailScores.Web
@@ -20,7 +20,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Restore
-      run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
+      run: dotnet restore "${{ env.WORKING_DIRECTORY }}"      
     - name: Restore npm
       working-directory: "${{ env.WORKING_DIRECTORY }}"
       run: npm install
