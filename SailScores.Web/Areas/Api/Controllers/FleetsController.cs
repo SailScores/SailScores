@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
+using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -17,13 +12,13 @@ namespace SailScores.Web.Areas.Api.Controllers
     [ApiController]
     public class FleetsController : ControllerBase
     {
-        private readonly IClubService _clubService;
-        private readonly Services.IAuthorizationService _authService;
+        private readonly CoreServices.IClubService _clubService;
+        private readonly IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public FleetsController(
-            IClubService clubService,
-            Services.IAuthorizationService authService,
+            CoreServices.IClubService clubService,
+            IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;

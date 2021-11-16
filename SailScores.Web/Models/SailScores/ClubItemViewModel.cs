@@ -1,7 +1,6 @@
-﻿namespace SailScores.Web.Models.SailScores
+﻿namespace SailScores.Web.Models.SailScores;
+
+public class ClubItemViewModel<T> : ClubBaseViewModel
 {
-    public class ClubItemViewModel<T> : ClubBaseViewModel
-    {
-        public T Item { get; set; }
-    }
+    public T Item { get; set; }
 }

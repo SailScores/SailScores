@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Api.Dtos;
-using SailScores.Core.Services;
+using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -17,13 +12,13 @@ namespace SailScores.Web.Areas.Api.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CompetitorsController : ControllerBase
     {
-        private readonly ICompetitorService _service;
-        private readonly Services.IAuthorizationService _authService;
+        private readonly CoreServices.ICompetitorService _service;
+        private readonly IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public CompetitorsController(
-            ICompetitorService service,
-            Services.IAuthorizationService authService,
+            CoreServices.ICompetitorService service,
+            IAuthorizationService authService,
             IMapper mapper)
         {
             _service = service;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -13,66 +9,65 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using SailScores.Web.Services.Interfaces;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Services;
+
+public class TemplateHelper : ITemplateHelper
 {
-    public class TemplateHelper : ITemplateHelper
+    private IRazorViewEngine _razorViewEngine;
+    private IServiceProvider _serviceProvider;
+    private ITempDataProvider _tempDataProvider;
+
+    public TemplateHelper(
+        IRazorViewEngine engine,
+        IServiceProvider serviceProvider,
+        ITempDataProvider tempDataProvider)
     {
-        private IRazorViewEngine _razorViewEngine;
-        private IServiceProvider _serviceProvider;
-        private ITempDataProvider _tempDataProvider;
+        this._razorViewEngine = engine;
+        this._serviceProvider = serviceProvider;
+        this._tempDataProvider = tempDataProvider;
+    }
 
-        public TemplateHelper(
-            IRazorViewEngine engine,
-            IServiceProvider serviceProvider,
-            ITempDataProvider tempDataProvider)
+    public async Task<string> GetTemplateHtmlAsStringAsync<T>(
+        string viewName, T model)
+    {
+        var httpContext = new DefaultHttpContext()
         {
-            this._razorViewEngine = engine;
-            this._serviceProvider = serviceProvider;
-            this._tempDataProvider = tempDataProvider;
-        }
+            RequestServices = _serviceProvider
+        };
+        var actionContext = new ActionContext(
+            httpContext, new RouteData(), new ActionDescriptor());
 
-        public async Task<string> GetTemplateHtmlAsStringAsync<T>(
-            string viewName, T model)
+        using (StringWriter sw = new StringWriter())
         {
-            var httpContext = new DefaultHttpContext()
+            var viewResult = _razorViewEngine.FindView(
+                actionContext, viewName, false);
+
+            if (viewResult.View == null)
             {
-                RequestServices = _serviceProvider
-            };
-            var actionContext = new ActionContext(
-                httpContext, new RouteData(), new ActionDescriptor());
-
-            using (StringWriter sw = new StringWriter())
-            {
-                var viewResult = _razorViewEngine.FindView(
-                    actionContext, viewName, false);
-
-                if (viewResult.View == null)
-                {
-                    return string.Empty;
-                }
-
-                var viewDataDictionary = new ViewDataDictionary(
-                    new EmptyModelMetadataProvider(),
-                    new ModelStateDictionary()
-                )
-                {
-                    Model = model
-                };
-
-                var viewContext = new ViewContext(
-                    actionContext,
-                    viewResult.View,
-                    viewDataDictionary,
-                    new TempDataDictionary(
-                        actionContext.HttpContext, _tempDataProvider),
-                    sw,
-                    new HtmlHelperOptions()
-                );
-
-                await viewResult.View.RenderAsync(viewContext);
-
-                return sw.ToString();
+                return string.Empty;
             }
+
+            var viewDataDictionary = new ViewDataDictionary(
+                new EmptyModelMetadataProvider(),
+                new ModelStateDictionary()
+            )
+            {
+                Model = model
+            };
+
+            var viewContext = new ViewContext(
+                actionContext,
+                viewResult.View,
+                viewDataDictionary,
+                new TempDataDictionary(
+                    actionContext.HttpContext, _tempDataProvider),
+                sw,
+                new HtmlHelperOptions()
+            );
+
+            await viewResult.View.RenderAsync(viewContext);
+
+            return sw.ToString();
         }
     }
 }

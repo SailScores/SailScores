@@ -77,18 +77,6 @@
 
 @await Html.PartialAsync("_CodeGlossary", Model.Item)
 
-@if (Model.Item.UpdatedDate.HasValue)
-{
-    <br />
-    <span class="font-italic">
-        @localizer["Updated"] @(Model.Item.UpdatedDate.Value.ToString("f")) UTC
-        @if (!String.IsNullOrWhiteSpace(Model.Item.FlatResults.UpdatedBy))
-        {
-            @:by @Model.Item.FlatResults.UpdatedBy
-        }
-    </span>
-}
-
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
     <script src="~/js/seriesChart.js"></script>

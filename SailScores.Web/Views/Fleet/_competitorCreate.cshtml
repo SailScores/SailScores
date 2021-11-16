@@ -1,0 +1,55 @@
+﻿@model SailScores.Web.Models.SailScores.FleetWithOptionsViewModel
+
+<div class="modal fade" id="createCompetitor" tabindex="-1" role="dialog" aria-labelledby="createCompetitorLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCompetitorLabel">Create competitor?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="compCreateAlert" class="alert alert-danger alert-dismissible collapse" role="alert">
+                <strong>Oops.</strong> Creating the competitor failed. Are the fields all filled in?
+                <button type="button" id="closebutton" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="compform" class="col-12"
+                  data-submit-url="@Url.Action("Create", "Competitor")">
+                <div class="modal-body">
+                    <input type="text" name="IsActive" value="true" hidden />
+                    <div class="form-group">
+                        <label class="control-label">Name <em>Required</em></label>
+                        <input name="name" type="text" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label name="sailNumber" class="control-label">Sail Number <em>Required</em></label>
+                        <input name="SailNumber" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label name="BoatClassId" class="control-label">Class <em>Required</em></label>
+                        <select id="createCompBoatClassSelect" name="BoatClassId" class="form-control">
+                            <option selected="selected">Select a class...</option>
+                            @foreach (var boatclass in Model.CompetitorBoatClassOptions)
+                            {
+                                <option value="@boatclass.Id">
+                                    @boatclass.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="submitNewComp" type="submit" class="btn btn-primary">
+                        <span class="spinner-border spinner-border-sm" id="compLoading" role="status" aria-hidden="true" style="display:none;">
+                            <span class="sr-only">Loading...</span>
+                        </span>
+                        Add
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

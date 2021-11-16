@@ -43,5 +43,7 @@ namespace SailScores.Core.Model
         public ScoringSystem ScoringSystem { get; set; }
 
         public bool PreferAlternateSailNumbers { get; set; }
+
+        public IList<Announcement> Announcements { get; set; }
     }
 }

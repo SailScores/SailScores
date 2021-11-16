@@ -15,9 +15,64 @@ namespace SailScores.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.1");
+                .HasAnnotation("ProductVersion", "5.0.5")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("SailScores.Database.Entities.Announcement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ArchiveAfter")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDateUtc");
+
+                    b.Property<DateTime>("CreatedLocalDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDateLocal");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("PreviousVersion")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RegattaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDateUtc");
+
+                    b.Property<DateTime?>("UpdatedLocalDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDateLocal");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RegattaId");
+
+                    b.ToTable("Announcements");
+                });
 
             modelBuilder.Entity("SailScores.Database.Entities.BoatClass", b =>
                 {
@@ -959,6 +1014,13 @@ namespace SailScores.Database.Migrations
                     b.ToTable("WeatherSettings");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.Announcement", b =>
+                {
+                    b.HasOne("SailScores.Database.Entities.Regatta", null)
+                        .WithMany("Announcements")
+                        .HasForeignKey("RegattaId");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.BoatClass", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Club", null)
@@ -1285,6 +1347,8 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.Regatta", b =>
                 {
+                    b.Navigation("Announcements");
+
                     b.Navigation("RegattaFleet");
 
                     b.Navigation("RegattaSeries");

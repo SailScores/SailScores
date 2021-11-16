@@ -9,11 +9,12 @@
 <h4>Fleet</h4>
 <hr />
 <div class="row">
-    <div class="col-lg-4 col-md-8">
+    <div class="col-lg-6 col-md-8">
         <form asp-action="Edit"
               asp-route-returnurl="@ViewData["ReturnUrl"]">
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="ClubId" />
+            <input type="hidden" id="clubId" asp-for="ClubId" />            
+            <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ShortName" class="control-label"></label>
@@ -87,26 +88,41 @@
             </div>
             <div id="boatSelectGroup" class="form-group">
                 <label asp-for="CompetitorIds" class="control-label">Competitors</label>
-                <select multiple asp-for="CompetitorIds" class="form-control selectpicker">
-                    @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber))
+                <select multiple asp-for="CompetitorIds" class="form-control custom-select selectpicker">
+                    @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber)
+                    .ThenBy(c => c.AlternativeSailNumber)
+                    .ThenBy(c => c.Name))
                     {
                         <option value="@competitor.Id" selected="@(Model.CompetitorIds.Contains(competitor.Id))">
-                            @competitor.SailNumber - @competitor.Name
+                            @competitor.SailNumber - @competitor.Name (@competitor.BoatClass.Name)
                         </option>
                     }
                 </select>
                 <span asp-validation-for="CompetitorIds" class="text-danger"></span>
+            </div>            
+            <div id="compCreateGroup" class="form-group">
+                <input id="createCompButton" type="button" value="Create New Competitor" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#createCompetitor" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="fleets"
-                   class="btn btn-outline-primary">Cancel</a>
+                @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+                {
+                    <a asp-controller="Admin"
+                       asp-action="Index"
+                       asp-fragment="fleets"
+                       class="btn btn-outline-primary">Cancel</a>
+                } else
+                {
+                    <a href="@ViewData["ReturnUrl"]"
+                       class="btn btn-outline-primary">Cancel</a>
+                }
             </div>
         </form>
     </div>
 </div>
+
+@await Html.PartialAsync("_competitorCreate", Model)
+@section Scripts {
 
 <script type="text/javascript">
     function checkVisibility() {
@@ -119,14 +135,16 @@
         }
         if (fType.indexOf('Selected Boats') > -1) {
             document.getElementById('boatSelectGroup').style.display = 'block';
+            document.getElementById('compCreateGroup').style.display = 'block';
         } else {
             document.getElementById('boatSelectGroup').style.display = 'none';
+            document.getElementById('compCreateGroup').style.display = 'none';
         }
     };
     checkVisibility();
 </script>
-
-@section Scripts {
+    
+    <script src="~/js/fleetEditor.min.js" asp-append-version="true"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script>

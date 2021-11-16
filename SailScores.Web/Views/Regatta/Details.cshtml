@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Localization;
+@using SailScores.Core.Model
 @using SailScores.Web.Resources;
 @using SailScores.Web.Services;
 
@@ -20,6 +21,7 @@
             @Model.Item.Name
             @if (!String.IsNullOrWhiteSpace(Model.Item.Url))
             {
+                <br class="d-md-none">
                 <span class="h5">
                     <a href="@Model.Item.Url" target="_blank">
                         <span class="fas fa-external-link-alt"></span> @localizer["Regatta Web Site"]
@@ -40,60 +42,101 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6">
-        @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
-        {
-            @Html.Raw(Markdig.Markdown.ToHtml(Model.Item.Description))
-        }
-        else
-        {
-            @:&nbsp;
-        }
-    </div>
-
-    <div class="col-md-6">
+    <div class="col-md-6 order-md-12">
         @if (Model.CanEdit)
         {
             <br class="d-md-none" />
             <hr class="d-md-none" />
             <div class="row bg-almost">
                 <div class="col-sm-4 my-2">
-                    <a asp-controller="Fleet"
-                       asp-action="Create"
-                       asp-route-regattaId="@Model.Item.Id"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">@localizer["New Fleet"]</a>
+                    
+                    <a asp-controller="Announcement"
+                   asp-action="Create"
+                   asp-route-regattaId="@Model.Item.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   class="btn btn-outline-primary">@localizer["New Announcement"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
-                    <a asp-controller="Competitor"
-                       asp-action="Create"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">@localizer["New Competitor"]</a>
+                    <a asp-controller="Fleet"
+                   asp-action="Create"
+                   asp-route-regattaId="@Model.Item.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   class="btn btn-outline-primary">@localizer["New Fleet"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Race"
-                       asp-action="Create"
-                       asp-route-regattaId="@Model.Item.Id"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">@localizer["New Race"]</a>
+                   asp-action="Create"
+                   asp-route-regattaId="@Model.Item.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
             </div>
             <div class="row bg-almost">
-                <div class="col-sm-4 my-2">
+                <div class="col-sm-4">
                     <a asp-controller="Regatta"
-                       asp-action="Edit"
-                       asp-route-Id="@Model.Item.Id"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">@localizer["Edit Regatta"]</a>
+                   asp-action="Edit"
+                   asp-route-Id="@Model.Item.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   class="btn btn-outline-primary">@localizer["Edit Regatta"]</a>
                 </div>
-                <div class="col-sm-4">&nbsp;</div>
+                <div class="col-sm-4 my-2">
+                    &nbsp;
+                </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Admin"
-                       asp-action="Index"
-                       class="btn btn-outline-primary">@localizer["Club Admin"]</a>
+                   asp-action="Index"
+                   class="btn btn-outline-primary">@localizer["Club Admin"]</a>
                 </div>
             </div>
         }
+    </div>
+    <div class="col-md-6">
+        <div class="row m-0 p-0">
+            @if (Model.Item.Announcements != null && Model.Item.Announcements.Count > 0)
+            {
+                <div class="col-12 m-0 p-0">
+
+                    <h3>Notices</h3>
+                    @foreach (var announcement in Model.Item.Announcements)
+                    {
+                        @if (Model.CanEdit)
+                        {
+                            <a class="btn btn-sm btn-outline-danger"
+                   asp-action="Delete"
+                   asp-controller="Announcement"
+                   asp-route-id="@announcement.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   title="Delete">
+                                <span class="fas fa-trash"></span>
+                            </a>@:&nbsp;
+<a class="btn btn-sm btn-outline-primary"
+                   asp-action="Edit"
+                   asp-controller="Announcement"
+                   asp-route-id="@announcement.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   title="Edit">
+                                <span class="fas fa-pen"></span>
+                            </a>@:&nbsp;
+                        }
+                        <span class="small font-italic">Posted by @announcement.CreatedBy at @announcement.CreatedLocalDate.ToString("f"):</span>
+                        @Html.Raw(Markdig.Markdown.ToHtml(announcement.Content))
+                        <br/>
+                    }
+                </div>
+            }
+        </div>
+        <div class="row">
+            <div class="col-12 m-0 p-0">
+                @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
+                {
+                    @Html.Raw(Markdig.Markdown.ToHtml(Model.Item.Description))
+                }
+                else
+                {
+                    @:&nbsp;
+                }
+            </div>
+        </div>
     </div>
 </div>
 @foreach (var fleet in Model.Item.Fleets.OrderBy(f => f.NickName))
@@ -104,39 +147,39 @@
         <ul class="nav nav-tabs" id="@($"Tab{fleet.ShortName}")" role="tablist">
             <li class="nav-item">
                 <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{fleet.ShortName}-tab")" data-toggle="tab"
-                   href="@($"#Competitors{fleet.ShortName}")" role="tab"
-                   aria-controls="@($"Competitors{fleet.ShortName}")" aria-selected="true">
+               href="@($"#Competitors{fleet.ShortName}")" role="tab"
+               aria-controls="@($"Competitors{fleet.ShortName}")" aria-selected="true">
                     @localizer["CapCompetitors"]
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(fleetHasResults ? "active" : "")" id="@($"Results{fleet.ShortName}-tab")" data-toggle="tab"
-                   href="@($"#Results{fleet.ShortName}")" role="tab"
-                   aria-controls="@($"Results{fleet.ShortName}")" aria-selected="false">
+               href="@($"#Results{fleet.ShortName}")" role="tab"
+               aria-controls="@($"Results{fleet.ShortName}")" aria-selected="false">
                     @localizer["Results"]
                 </a>
             </li>
             <li class="nav-item d-none d-sm-inline-flex">
                 <a class="nav-link" id="@($"Chart{fleet.ShortName}-tab")" data-toggle="tab"
-                   href="@($"#Chart{fleet.ShortName}")" role="tab"
-                   aria-controls="@($"Chart{fleet.ShortName}")" aria-selected="false">
+               href="@($"#Chart{fleet.ShortName}")" role="tab"
+               aria-controls="@($"Chart{fleet.ShortName}")" aria-selected="false">
                     @localizer["Chart"]
                 </a>
             </li>
         </ul>
         <div class="tab-content" id="@($"Tab{fleet.ShortName}Content")">
             <div class="tab-pane fade @(fleetHasResults ? "" : "show active")" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
-                 aria-labelledby="@($"Competitors{fleet.ShortName}-tab")">
+             aria-labelledby="@($"Competitors{fleet.ShortName}-tab")">
                 @if (Model.CanEdit)
                 {
-                <div class="py-2">
-                    <a asp-controller="Fleet"
-                       asp-action="Edit"
-                       asp-route-id="@fleet.Id"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       title="Add existing competitors"
-                       class="btn btn-outline-primary">Edit Fleet</a>
-                </div>
+                    <div class="py-2">
+                        <a asp-controller="Fleet"
+                   asp-action="Edit"
+                   asp-route-id="@fleet.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   title="Add existing competitors"
+                   class="btn btn-outline-primary">Edit Fleet</a>
+                    </div>
                 }
                 <table class="table table-hover table-sm">
                     <thead>
@@ -149,8 +192,8 @@
                     </thead>
                     <tbody>
                         @foreach (var comp in fleet.Competitors.OrderBy(
-                    c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
-                    .ThenBy(c => c.Name))
+                       c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
+                       .ThenBy(c => c.Name))
                         {
                             <tr>
                                 <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
@@ -163,23 +206,19 @@
                 </table>
             </div>
             <div class="tab-pane fade @(fleetHasResults ? "show active" : "")" id="@($"Results{fleet.ShortName}")" role="tabpanel"
-                 aria-labelledby="@($"Results{fleet.ShortName}-tab")">
-                @{ var currentSeries = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id);}
+             aria-labelledby="@($"Results{fleet.ShortName}-tab")">
+                @{
+                    var currentSeries = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id);
+                }
                 @if (currentSeries != null && currentSeries.FlatResults != null)
                 {
-                    @await Html.PartialAsync("_ResultsTable", currentSeries,
-                        new ViewDataDictionary(this.ViewData) { { "ExcludeCompetitorLinks", true } })
-                    @if (currentSeries.UpdatedDate.HasValue)
-                    {
-                        <br />
-                        <span class="font-italic">
-                            @localizer["Updated"] @(currentSeries.UpdatedDate.Value.ToString("f")) UTC
-                        @if (!String.IsNullOrWhiteSpace(currentSeries.FlatResults.UpdatedBy))
+                    @await Html.PartialAsync("_ResultsTable",
+                        currentSeries,
+                        new ViewDataDictionary(this.ViewData)
                         {
-                            @:by @currentSeries.FlatResults.UpdatedBy
-                        }
-                    </span>
-                }   
+                            { "ExcludeCompetitorLinks", true }
+                        })
+                    
                 }
                 else
                 {
@@ -199,11 +238,13 @@
                     <span>@localizer["No Results posted"]</span>
                 }
             </div>
+            
+            <br/>
         </div>
     </div>
 }
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
-    <script src="~/js/seriesChart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
+<script src="~/js/seriesChart.js"></script>
 }

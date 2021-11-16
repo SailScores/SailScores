@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Ganss.XSS;
+using Microsoft.Extensions.DependencyInjection;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 
@@ -16,6 +17,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IAuthorizationService, AuthorizationService>();
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<ISeasonService, SeasonService>();
+            services.AddScoped<IAnnouncementService, AnnouncementService>();
             services.AddScoped<IRegattaService, RegattaService>();
             services.AddScoped<IAdminTipService, AdminTipService>();
             services.AddScoped<ICsvService, CsvService>();
@@ -26,6 +28,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<ITemplateHelper, TemplateHelper>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<ISpeechService, SpeechService>();
+            services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
 
             services.AddSingleton<AppVersionInfo>();
             services.AddSingleton<AppSettingsService>();

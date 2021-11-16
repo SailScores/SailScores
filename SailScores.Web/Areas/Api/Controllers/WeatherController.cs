@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -17,10 +16,10 @@ namespace SailScores.Web.Areas.Api.Controllers
             CookieAuthenticationDefaults.AuthenticationScheme + "," +
             JwtBearerDefaults.AuthenticationScheme;
 
-        private readonly Services.IWeatherService _service;
+        private readonly IWeatherService _service;
 
         public WeatherController(
-            Services.IWeatherService service)
+            IWeatherService service)
         {
             _service = service;
         }

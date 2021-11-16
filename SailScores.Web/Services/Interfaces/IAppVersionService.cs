@@ -1,8 +1,7 @@
-﻿namespace SailScores.Web.Services
+﻿namespace SailScores.Web.Services.Interfaces;
+
+public interface IAppVersionService
 {
-    public interface IAppVersionService
-    {
-        string Version { get; }
-        string InformationalVersion { get; }
-    }
+    string Version { get; }
+    string InformationalVersion { get; }
 }

@@ -1,13 +1,10 @@
-﻿using System;
+﻿namespace SailScores.Database.Entities;
 
-namespace SailScores.Database.Entities
+public class File
 {
-    public class File
-    {
-        public Guid Id { get; set; }
-        public byte[] FileContents { get; set; }
-        public DateTime Created { get; set; }
+    public Guid Id { get; set; }
+    public byte[] FileContents { get; set; }
+    public DateTime Created { get; set; }
 
-        public DateTime? ImportedTime { get; set; }
-    }
+    public DateTime? ImportedTime { get; set; }
 }

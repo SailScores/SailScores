@@ -30,8 +30,8 @@
     </nav>
 }
 
-<div class="container">
-    <h1 class="h2">Series by Season</h1>
+<div class="container p-0 p-md-2">
+    <h1 class="h1">Series</h1>
     @if (Model.CanEdit)
     {
         <div class="row bg-almost">
@@ -47,31 +47,39 @@
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
     {
         <div class="row">
-            <div class="col-12" id="@item.FirstOrDefault()?.Season?.UrlName">
-                <h2>@item.Key</h2>
+            <div class="col-12 mx-n2" id="@item.FirstOrDefault()?.Season?.UrlName">
+                <h2>@item.Key<small> season</small></h2>
             </div>
         </div>
-        foreach (var series in item)
+        @foreach (var fleetGroup in item.GroupBy(s => s.FleetName, s => s))
         {
-            <div class="row border-bottom mb-1 pb-1">
-                <div class="col-md-5">
-                    <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
-                    <span class="avoidwrap">(@(series.Races?.Count.ToString() ?? "No") @localizer["Races"])</span>
-                </div>
-
-                <div class="col-md-4">
-                    <span class="small-on-small">@series.DateString</span>
-                </div>
-                <div class="col-md-3">
-                    @if (series.UpdatedDate.HasValue)
-                    {
-                        <span class="d-none d-md-table-cell updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
-                    }
-                </div>
-                <div class="col-12 ml-3">
-                    @Html.DisplayFor(modelItem => series.Description)
+            <div class="row">
+                <div class="col-12">
+                    <h3>@fleetGroup.Key</h3>
                 </div>
             </div>
+            foreach (var series in fleetGroup)
+            {
+                <div class="row border-bottom mb-1 pb-1 mx-2">
+                    <div class="col-md-5">
+                        <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
+                        <span class="avoidwrap">(@(series.Races?.Count.ToString() ?? "No") @localizer["Races"])</span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <span class="small-on-small">@series.DateString</span>
+                    </div>
+                    <div class="col-md-3">
+                        @if (series.UpdatedDate.HasValue)
+                        {
+                            <span class="d-none d-md-table-cell updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
+                        }
+                    </div>
+                    <div class="col-12 ml-3">
+                        @Html.DisplayFor(modelItem => series.Description)
+                    </div>
+                </div>
+            }
         }
     }
 </div>

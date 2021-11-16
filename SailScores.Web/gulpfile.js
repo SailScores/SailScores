@@ -55,7 +55,8 @@ gulp.task("min:js", function () {
                 "jquery": "jQuery",
                 "bootstrap": "bootstrap",
                 "bootstrap-select": 'window["bootstrap-select"]',
-                "d3": "d3"
+                "d3": "d3",
+                "summernote": "summernote"
             }
         }))
         .pipe(rename({ suffix: '.min' }))

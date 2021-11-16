@@ -1,128 +1,106 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services.Interfaces;
+using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
-namespace SailScores.Web.Controllers
+namespace SailScores.Web.Controllers;
+
+public class RegattaController : Controller
 {
-    public class RegattaController : Controller
+
+    private readonly IRegattaService _regattaService;
+    private readonly Core.Services.IClubService _clubService;
+    private readonly IAuthorizationService _authService;
+    private readonly IMapper _mapper;
+
+    public RegattaController(
+        IRegattaService regattaService,
+        Core.Services.IClubService clubService,
+        IAuthorizationService authService,
+        IMapper mapper)
     {
+        _regattaService = regattaService;
+        _clubService = clubService;
+        _authService = authService;
+        _mapper = mapper;
+    }
 
-        private readonly Web.Services.IRegattaService _regattaService;
-        private readonly Core.Services.IClubService _clubService;
-        private readonly Services.IAuthorizationService _authService;
-        private readonly IMapper _mapper;
+    [ResponseCache(Duration = 900)]
+    public async Task<ActionResult> Index(string clubInitials)
+    {
+        ViewData["ClubInitials"] = clubInitials;
 
-        public RegattaController(
-            Web.Services.IRegattaService regattaService,
-            Core.Services.IClubService clubService,
-            Services.IAuthorizationService authService,
-            IMapper mapper)
+        var regattas = await _regattaService.GetAllRegattaSummaryAsync(clubInitials);
+        var clubName = await _clubService.GetClubName(clubInitials);
+
+        return View(new ClubCollectionViewModel<RegattaSummaryViewModel>
         {
-            _regattaService = regattaService;
-            _clubService = clubService;
-            _authService = authService;
-            _mapper = mapper;
+            List = regattas,
+            ClubInitials = clubInitials,
+            ClubName = clubName,
+            CanEdit = await _authService.CanUserEdit(User, clubInitials)
+        });
+    }
+
+    public async Task<ActionResult> Details(
+        string clubInitials,
+        string season,
+        string regattaName)
+    {
+        ViewData["ClubInitials"] = clubInitials;
+
+        var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
+        if (regatta == null)
+        {
+            return new NotFoundResult();
         }
 
-        [ResponseCache(Duration = 900)]
-        public async Task<ActionResult> Index(string clubInitials)
+        var canEdit = false;
+        if (User != null && (User.Identity?.IsAuthenticated ?? false))
         {
-            ViewData["ClubInitials"] = clubInitials;
-
-            var regattas = await _regattaService.GetAllRegattaSummaryAsync(clubInitials);
-            var clubName = await _clubService.GetClubName(clubInitials);
-
-            return View(new ClubCollectionViewModel<RegattaSummaryViewModel>
-            {
-                List = regattas,
-                ClubInitials = clubInitials,
-                ClubName = clubName,
-                CanEdit = await _authService.CanUserEdit(User, clubInitials)
-            });
+            canEdit = await _authService.CanUserEdit(User, clubInitials);
         }
 
-        public async Task<ActionResult> Details(
-            string clubInitials,
-            string season,
-            string regattaName)
+        return View(new ClubItemViewModel<RegattaViewModel>
         {
-            ViewData["ClubInitials"] = clubInitials;
+            Item = _mapper.Map<RegattaViewModel>(regatta),
+            ClubInitials = clubInitials,
+            CanEdit = canEdit
+        });
+    }
 
-            var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
-            if (regatta == null)
-            {
-                return new NotFoundResult();
-            }
-
-            var canEdit = false;
-            if (User != null && (User.Identity?.IsAuthenticated ?? false))
-            {
-                canEdit = await _authService.CanUserEdit(User, clubInitials);
-            }
-
-            return View(new ClubItemViewModel<RegattaViewModel>
-            {
-                Item = _mapper.Map<RegattaViewModel>(regatta),
-                ClubInitials = clubInitials,
-                CanEdit = canEdit
-            });
+    [Authorize]
+    public async Task<ActionResult> Create(string clubInitials)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
         }
 
-        [Authorize]
-        public async Task<ActionResult> Create(string clubInitials)
+        var vm = await _regattaService.GetBlankRegattaWithOptions(clubId);
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<ActionResult> Create(
+        string clubInitials,
+        RegattaWithOptionsViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        try
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
             if (!await _authService.CanUserEdit(User, clubId))
             {
                 return Unauthorized();
             }
-
-            var vm = await _regattaService.GetBlankRegattaWithOptions(clubId);
-
-            return View(vm);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<ActionResult> Create(
-            string clubInitials,
-            RegattaWithOptionsViewModel model)
-        {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            try
+            model.ClubId = clubId;
+            if (!ModelState.IsValid)
             {
-                if (!await _authService.CanUserEdit(User, clubId))
-                {
-                    return Unauthorized();
-                }
-                model.ClubId = clubId;
-                if (!ModelState.IsValid)
-                {
-                    var blank = await _regattaService.GetBlankRegattaWithOptions(clubId);
-
-                    model.SeasonOptions = blank.SeasonOptions;
-                    model.ScoringSystemOptions = blank.ScoringSystemOptions;
-                    model.FleetOptions = blank.FleetOptions;
-
-                    return View(model);
-                }
-
-                var regattaId = await _regattaService.SaveNewAsync(model);
-                var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
-                return RedirectToAction("Details", new
-                {
-                    clubInitials,
-                    season = savedRegatta.Season.UrlName,
-                    regattaName = savedRegatta.UrlName
-                });
-            }
-            catch
-            {
-
                 var blank = await _regattaService.GetBlankRegattaWithOptions(clubId);
 
                 model.SeasonOptions = blank.SeasonOptions;
@@ -131,111 +109,131 @@ namespace SailScores.Web.Controllers
 
                 return View(model);
             }
+
+            var regattaId = await _regattaService.SaveNewAsync(model);
+            var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
+            return RedirectToAction("Details", new
+            {
+                clubInitials,
+                season = savedRegatta.Season.UrlName,
+                regattaName = savedRegatta.UrlName
+            });
+        }
+        catch
+        {
+
+            var blank = await _regattaService.GetBlankRegattaWithOptions(clubId);
+
+            model.SeasonOptions = blank.SeasonOptions;
+            model.ScoringSystemOptions = blank.ScoringSystemOptions;
+            model.FleetOptions = blank.FleetOptions;
+
+            return View(model);
+        }
+    }
+
+    [Authorize]
+    public async Task<ActionResult> Edit(
+        string clubInitials,
+        Guid id)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+        var regatta = await _regattaService.GetRegattaAsync(id);
+        if (regatta == null)
+        {
+            return NotFound();
         }
 
-        [Authorize]
-        public async Task<ActionResult> Edit(
-            string clubInitials,
-            Guid id)
+        var blankVm = await _regattaService.GetBlankRegattaWithOptions(clubId);
+        var vm = _mapper.Map<RegattaWithOptionsViewModel>(regatta);
+        vm.SeasonOptions = blankVm.SeasonOptions;
+        vm.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+        vm.FleetOptions = blankVm.FleetOptions;
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<ActionResult> Edit(
+        string clubInitials,
+        RegattaWithOptionsViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        try
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
+            var regatta = await _regattaService.GetRegattaAsync(model.Id);
+            if (!await _authService.CanUserEdit(User, clubId)
+                || regatta.ClubId != clubId)
             {
                 return Unauthorized();
             }
-            var regatta = await _regattaService.GetRegattaAsync(id);
-            if (regatta == null)
+
+            if (!ModelState.IsValid)
             {
-                return NotFound();
-            }
-
-            var blankVm = await _regattaService.GetBlankRegattaWithOptions(clubId);
-            var vm = _mapper.Map<RegattaWithOptionsViewModel>(regatta);
-            vm.SeasonOptions = blankVm.SeasonOptions;
-            vm.ScoringSystemOptions = blankVm.ScoringSystemOptions;
-            vm.FleetOptions = blankVm.FleetOptions;
-            return View(vm);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<ActionResult> Edit(
-            string clubInitials,
-            RegattaWithOptionsViewModel model)
-        {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            try
-            {
-                var regatta = await _regattaService.GetRegattaAsync(model.Id);
-                if (!await _authService.CanUserEdit(User, clubId)
-                    || regatta.ClubId != clubId)
-                {
-                    return Unauthorized();
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    var blankVm = await _regattaService.GetBlankRegattaWithOptions(clubId);
-                    model.SeasonOptions = blankVm.SeasonOptions;
-                    model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
-                    model.FleetOptions = blankVm.FleetOptions;
-                    return View(model);
-                }
-
-                var regattaId = await _regattaService.UpdateAsync(model);
-                var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
-                return RedirectToAction("Details", new
-                {
-                    clubInitials,
-                    season = savedRegatta.Season.UrlName,
-                    regattaName = savedRegatta.UrlName
-                });
-            }
-            catch
-            {
+                var blankVm = await _regattaService.GetBlankRegattaWithOptions(clubId);
+                model.SeasonOptions = blankVm.SeasonOptions;
+                model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+                model.FleetOptions = blankVm.FleetOptions;
                 return View(model);
             }
+
+            var regattaId = await _regattaService.UpdateAsync(model);
+            var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
+            return RedirectToAction("Details", new
+            {
+                clubInitials,
+                season = savedRegatta.Season.UrlName,
+                regattaName = savedRegatta.UrlName
+            });
+        }
+        catch
+        {
+            return View(model);
+        }
+    }
+
+    [Authorize]
+    public async Task<ActionResult> Delete(string clubInitials, Guid id)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var regatta = await _regattaService.GetRegattaAsync(id);
+        if (!await _authService.CanUserEdit(User, clubId)
+            || regatta?.ClubId != clubId)
+        {
+            return Unauthorized();
         }
 
-        [Authorize]
-        public async Task<ActionResult> Delete(string clubInitials, Guid id)
-        {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            var regatta = await _regattaService.GetRegattaAsync(id);
-            if (!await _authService.CanUserEdit(User, clubId)
-                || regatta?.ClubId != clubId)
-            {
-                return Unauthorized();
-            }
+        return View(regatta);
+    }
 
+    [HttpPost]
+    [ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var regatta = await _regattaService.GetRegattaAsync(id);
+        if (!await _authService.CanUserEdit(User, clubId)
+            || regatta?.ClubId != clubId)
+        {
+            return Unauthorized();
+        }
+        try
+        {
+            await _regattaService.DeleteAsync(id);
+
+            return RedirectToAction("Index", "Admin");
+        }
+        catch
+        {
+            ModelState.AddModelError("Exception", "A problem occured while deleting.");
             return View(regatta);
-        }
-
-        [HttpPost]
-        [ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
-        {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            var regatta = await _regattaService.GetRegattaAsync(id);
-            if (!await _authService.CanUserEdit(User, clubId)
-                || regatta?.ClubId != clubId)
-            {
-                return Unauthorized();
-            }
-            try
-            {
-                await _regattaService.DeleteAsync(id);
-
-                return RedirectToAction("Index", "Admin");
-            }
-            catch
-            {
-                ModelState.AddModelError("Exception", "A problem occured while deleting.");
-                return View(regatta);
-            }
         }
     }
 }

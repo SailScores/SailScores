@@ -1,13 +1,11 @@
 ﻿using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
-using System.Threading.Tasks;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Services.Interfaces;
+
+public interface IAdminService
 {
-    public interface IAdminService
-    {
-        Task<AdminViewModel> GetClubForEdit(string clubInitials);
-        Task<AdminViewModel> GetClub(string clubInitials);
-        Task UpdateClub(Club clubObject);
-    }
+    Task<AdminViewModel> GetClubForEdit(string clubInitials);
+    Task<AdminViewModel> GetClub(string clubInitials);
+    Task UpdateClub(Club clubObject);
 }

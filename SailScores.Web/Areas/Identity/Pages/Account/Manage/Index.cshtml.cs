@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SailScores.Identity.Entities;
 using SailScores.Web.Services;
+using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
 {

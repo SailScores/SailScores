@@ -175,7 +175,7 @@ namespace SailScores.Core.Scoring
                     newSeries.Races = RemoveLastWeeksRaces(series.Races);
                     break;
             }
-            if (!newSeries.Races.Where(r => r.State == RaceState.Raced).Any())
+            if (!newSeries.Races.Where(r => (r.State == RaceState.Raced || r.State == null)).Any())
             {
                 return;
             }

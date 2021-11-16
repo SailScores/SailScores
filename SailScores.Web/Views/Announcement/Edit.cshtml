@@ -1,0 +1,59 @@
+﻿@model SailScores.Core.Model.Announcement
+
+@{
+    ViewData["Title"] = "Edit Notice";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Edit Notice</h2>
+<hr />
+<div class="row">
+    <div class="col-lg-6 col-md-8">
+        <form asp-action="Edit"
+              asp-route-returnurl="@ViewData["ReturnUrl"]">
+            <input type="hidden" id="regattaId" asp-for="RegattaId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+
+                <textarea asp-for="Content" class="form-control" id="summernote" rows="4"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+                {
+                    <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">Cancel</a>
+                } else
+                {
+                    <a href="@ViewData["ReturnUrl"]"
+                   class="btn btn-outline-primary">Cancel</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture']],
+                    ['view', ['codeview', 'help']],
+                ]
+            });
+        });
+    </script>
+}

@@ -1,10 +1,9 @@
-﻿using SailScores.Core.Model;
-using System.IO;
+﻿using System.IO;
+using SailScores.Core.Model;
 
-namespace SailScores.Web.Services
+namespace SailScores.Web.Services.Interfaces;
+
+public interface ICsvService
 {
-    public interface ICsvService
-    {
-        Stream GetCsv(Series series);
-    }
+    Stream GetCsv(Series series);
 }

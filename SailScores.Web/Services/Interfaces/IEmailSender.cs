@@ -1,13 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿namespace SailScores.Web.Services.Interfaces;
 
-namespace SailScores.Web.Services
+public interface IEmailSender
 {
-    public interface IEmailSender
-    {
-        Task SendEmailAsync(string email, string subject, string message);
+    Task SendEmailAsync(string email, string subject, string message);
 
-        Task<string> GetHtmlFromView<T>(
-            string viewName,
-            T model);
-    }
+    Task<string> GetHtmlFromView<T>(
+        string viewName,
+        T model);
 }

@@ -1,20 +1,17 @@
 ﻿using SailScores.Core.Model;
-using System;
-using System.Collections.Generic;
 
-namespace SailScores.Web.Models.SailScores
+namespace SailScores.Web.Models.SailScores;
+
+public class FleetSummary
 {
-    public class FleetSummary
-    {
 
-        public Guid Id { get; set; }
-        public String ShortName { get; set; }
-        public String Name { get; set; }
-        public String Description { get; set; }
+    public Guid Id { get; set; }
+    public String ShortName { get; set; }
+    public String Name { get; set; }
+    public String Description { get; set; }
 
-        public bool? IsActive { get; set; }
-        public IList<Series> Series { get; set; }
-        // todo public IList<Season> Seasons { get; set; }
-        //todo: competitor lists, hopefully with seasons active.
-    }
+    public bool? IsActive { get; set; }
+    public IList<Series> Series { get; set; }
+    // todo public IList<Season> Seasons { get; set; }
+    //todo: competitor lists, hopefully with seasons active.
 }

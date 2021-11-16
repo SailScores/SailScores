@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using SailScores.Core.Mapping;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services.Interfaces;
 using Xunit;
-using ICompetitorService = SailScores.Web.Services.ICompetitorService;
+using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {

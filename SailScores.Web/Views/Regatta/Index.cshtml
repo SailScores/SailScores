@@ -59,7 +59,7 @@
                 <div class="col-sm-4 col-lg-3">
                     <a id="regattalink_@regatta.Id"
                        href="~/@Model.ClubInitials/Regatta/@regatta.Season.UrlName/@regatta.UrlName">@Html.DisplayFor(modelItem => regatta.Name)</a>
-                    (@(regatta.Fleets?.Count.ToString() ?? "No") Fleets)
+                    (@(regatta.FleetCountString))
                 </div>
                 <div class="col-sm-4 col-lg-3">
                     @regatta.StartDate?.ToString("d") -

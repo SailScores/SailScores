@@ -1,6 +1,7 @@
 using SailScores.Web.Services;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Extensions
 {
