@@ -371,5 +371,10 @@ namespace SailScores.Core.Services
             return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
         }
+
+        public async Task<IList<Db.DeletableInfo>> GetDeletableInfo(Guid clubId)
+        {
+            return await _dbContext.GetDeletableInfoForCompetitorsAsync(clubId);
+        }
     }
 }

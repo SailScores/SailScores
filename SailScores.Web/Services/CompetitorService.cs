@@ -158,15 +158,42 @@ public class CompetitorService : ICompetitorService
     public async Task<IList<Competitor>> GetCompetitorsAsync(Guid clubId, bool includeInactive)
     {
         var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null, includeInactive);
-
+        
         return comps;
     }
 
     public async Task<IList<Competitor>> GetCompetitorsAsync(string clubInitials, bool includeInactive)
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
-
         return await GetCompetitorsAsync(clubId, includeInactive);
+
+    }
+
+
+    public async Task<IList<CompetitorIndexViewModel>> GetCompetitorsWithDeletableInfoAsync(String clubInitials, bool includeInactive)
+    {
+        var clubId = await _coreClubService.GetClubId(clubInitials);
+        var list = await GetCompetitorsAsync(clubId, includeInactive);
+        var vmList = _mapper.Map<IList<CompetitorIndexViewModel>>(list);
+        if (includeInactive)
+        {
+            await PopulateDeletableFields(clubId, vmList);
+        }
+        return vmList;
+    }
+
+    private async Task PopulateDeletableFields(Guid clubId, IEnumerable<CompetitorIndexViewModel> vmList)
+    {
+        var deletableReasons = await _coreCompetitorService.GetDeletableInfo(clubId);
+
+        foreach (var info in deletableReasons)
+        {
+            var curComp = vmList.SingleOrDefault(c => c.Id == info.Id);
+            if (curComp != null) { }
+                curComp.IsDeletable = info.IsDeletable;
+                curComp.PreventDeleteReason = info.Reason;
+            }
+        }
     }
 
     public async Task<IEnumerable<KeyValuePair<string, string>>> GetSaveErrors(Competitor competitor)

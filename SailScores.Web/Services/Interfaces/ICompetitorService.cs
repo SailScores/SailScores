@@ -24,4 +24,7 @@ public interface ICompetitorService
     Task<IList<Competitor>> GetCompetitorsAsync(Guid clubId, bool includeInactive);
     Task<IList<Competitor>> GetCompetitorsAsync(string clubInitials, bool includeInactive);
     Task<IEnumerable<KeyValuePair<string, string>>> GetSaveErrors(Competitor competitor);
+    Task<IList<CompetitorIndexViewModel>> GetCompetitorsWithDeletableInfoAsync(
+        String clubInitials,
+        bool includeInactive);
 }

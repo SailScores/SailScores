@@ -80,6 +80,11 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Competitor, CompetitorStatsViewModel>()
                 .ForMember(d => d.SeasonStats, o => o.Ignore());
 
+            CreateMap<Model.Competitor, CompetitorIndexViewModel>()
+                .ForMember(d => d.IsDeletable, o => o.Ignore())
+                .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
+
+
             MapRaceObjects();
 
             CreateMap<Model.ScoringSystem, ScoringSystemWithOptionsViewModel>()
