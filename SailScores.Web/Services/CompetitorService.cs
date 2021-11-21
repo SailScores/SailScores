@@ -189,7 +189,7 @@ public class CompetitorService : ICompetitorService
         foreach (var info in deletableReasons)
         {
             var curComp = vmList.SingleOrDefault(c => c.Id == info.Id);
-            if (curComp != null) { }
+            if (curComp != null) {
                 curComp.IsDeletable = info.IsDeletable;
                 curComp.PreventDeleteReason = info.Reason;
             }
