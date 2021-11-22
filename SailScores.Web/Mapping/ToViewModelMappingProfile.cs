@@ -84,6 +84,9 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.IsDeletable, o => o.Ignore())
                 .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
 
+            CreateMap<Model.BoatClass, BoatClassDeleteViewModel>()
+                .ForMember(d => d.IsDeletable, o => o.Ignore())
+                .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
 
             MapRaceObjects();
 

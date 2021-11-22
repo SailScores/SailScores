@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
-    //TODO: include specific endpoints for auth.
     [Authorize]
     [Route("[controller]/[action]")]
     public class AuthController : Controller

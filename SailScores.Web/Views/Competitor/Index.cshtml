@@ -76,13 +76,10 @@
 				@if(!item.IsDeletable)
 				{
 					<button class="btn btn-sm btn-outline-danger mr-2 mb-2 disabled"
-				   asp-action="Delete"
-				   asp-controller="Competitor"
-				   asp-route-id="@item.Id"
-				   disabled="disabled"
-					title="Can not be deleted: @item.PreventDeleteReason">
-			 <span class="fas fa-trash"></span>
-			</button>
+						   disabled="disabled"
+							title="Cannot be deleted: @item.PreventDeleteReason">
+					 <span class="fas fa-trash"></span>
+					</button>
 				} else {
 					<a class="btn btn-sm btn-outline-danger mr-2 mb-2"
 				   asp-action="Delete"

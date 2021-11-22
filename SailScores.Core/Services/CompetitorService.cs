@@ -237,7 +237,6 @@ namespace SailScores.Core.Services
                     });
                 }
 
-                //todo: create new fleets here if needed.
             }
 
             //add built in club fleets

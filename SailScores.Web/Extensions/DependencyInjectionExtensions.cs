@@ -10,12 +10,13 @@ namespace SailScores.Web.Extensions
         public static void RegisterWebSailScoresServices(
             this IServiceCollection services)
         {
+            services.AddScoped<IClubService, ClubService>();
             services.AddScoped<ISeriesService, SeriesService>();
             services.AddScoped<IFleetService, FleetService>();
             services.AddScoped<IRaceService, RaceService>();
             services.AddScoped<ICompetitorService, CompetitorService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
-            services.AddScoped<IClubService, ClubService>();
+            services.AddScoped<IBoatClassService, BoatClassService>();
             services.AddScoped<ISeasonService, SeasonService>();
             services.AddScoped<IAnnouncementService, AnnouncementService>();
             services.AddScoped<IRegattaService, RegattaService>();

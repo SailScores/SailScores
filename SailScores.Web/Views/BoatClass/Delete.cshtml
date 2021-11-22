@@ -1,4 +1,4 @@
-﻿@model SailScores.Core.Model.BoatClass
+﻿@model SailScores.Web.Models.SailScores.BoatClassDeleteViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -7,6 +7,7 @@
 
 <h2>Delete</h2>
 
+@if(Model.IsDeletable){
 <h3>Are you sure you want to delete this class?</h3>
 <div class="alert alert-warning">Removing this class will delete any competitors associated with this class of boat!</div>
 <div>
@@ -36,3 +37,29 @@
            class="btn btn-outline-primary">Cancel</a>
     </form>
 </div>
+} else {
+<h3>This class cannot be deleted: @(Model.PreventDeleteReason)</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+    </dl>
+    
+    <a asp-controller="Admin"
+        asp-action="Index"
+        asp-fragment="classes"
+        class="btn btn-outline-primary">Back</a>
+</div>
+
+}

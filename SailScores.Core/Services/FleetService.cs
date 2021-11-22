@@ -63,7 +63,6 @@ namespace SailScores.Core.Services
             }
             _dbContext.Fleets.Add(dbFleet);
 
-            //todo: save classes.
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
             return dbFleet.Id;

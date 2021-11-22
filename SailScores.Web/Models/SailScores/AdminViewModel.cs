@@ -24,7 +24,7 @@ public class AdminViewModel
 
     public IList<Fleet> Fleets { get; set; }
     public IList<Competitor> Competitors { get; set; }
-    public IList<BoatClass> BoatClasses { get; set; }
+    public IList<BoatClassDeleteViewModel> BoatClasses { get; set; }
     public IList<Season> Seasons { get; set; }
     public IList<Series> Series { get; set; }
     public IList<Regatta> Regattas { get; set; }
