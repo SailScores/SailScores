@@ -22,10 +22,9 @@ public class AdminViewModel
 
     public String Url { get; set; }
 
-    public IList<Fleet> Fleets { get; set; }
-    public IList<Competitor> Competitors { get; set; }
+    public IList<FleetDeleteViewModel> Fleets { get; set; }
     public IList<BoatClassDeleteViewModel> BoatClasses { get; set; }
-    public IList<Season> Seasons { get; set; }
+    public IList<SeasonDeleteViewModel> Seasons { get; set; }
     public IList<Series> Series { get; set; }
     public IList<Regatta> Regattas { get; set; }
     public IList<UserViewModel> Users { get; set; }
@@ -33,7 +32,7 @@ public class AdminViewModel
     public string DefaultScoringSystemName { get; set; }
     public Guid? DefaultScoringSystemId { get; set; }
 
-    public IList<ScoringSystem> ScoringSystems { get; set; }
+    public IList<ScoringSystemDeleteViewModel> ScoringSystems { get; set; }
 
     public IList<ScoringSystem> ScoringSystemOptions { get; set; }
 
