@@ -4,5 +4,6 @@ namespace SailScores.Web.Models.SailScores;
 
 public class ScoringSystemDeleteViewModel : ScoringSystem
 {
-    public bool InUse { get; set; }
+    public bool IsDeletable { get; set; }
+    public string PreventDeleteReason { get; set; }
 }

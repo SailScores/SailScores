@@ -100,5 +100,27 @@ namespace SailScores.Core.Services
             }
             return errors;
         }
+
+        public async Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId)
+        {
+            var seriesSeasons = await _dbContext.Series
+                .Where(s => s.ClubId == clubId)
+                .Select(s => s.Season.Id).ToListAsync();
+            var regattaSeasons = await _dbContext.Regattas
+                .Where(s => s.ClubId == clubId)
+                .Select(s => s.Season.Id).ToListAsync();
+            var info = _dbContext.Seasons
+                .Where(s => s.ClubId == clubId)
+                .Select(s => new DeletableInfo
+                {
+                    Id = s.Id,
+                    IsDeletable = !seriesSeasons.Any(ss => ss == s.Id)
+                        && !regattaSeasons.Any(rs => rs == s.Id),
+                    Reason = !seriesSeasons.Any(ss => ss == s.Id)
+                        && !regattaSeasons.Any(rs => rs == s.Id) ?
+                String.Empty : "Season contains series."
+                });
+            return info;
+        }
     }
 }

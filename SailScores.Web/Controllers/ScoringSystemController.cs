@@ -137,7 +137,7 @@ public class ScoringSystemController : Controller
         }
 
         var vm = _mapper.Map<ScoringSystemDeleteViewModel>(scoringSystem);
-        vm.InUse = await _scoringService.IsScoringSystemInUseAsync(vm.Id);
+        vm.IsDeletable = !(await _scoringService.IsScoringSystemInUseAsync(vm.Id));
 
         return View(vm);
     }

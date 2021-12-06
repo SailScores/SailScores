@@ -6,7 +6,7 @@
 }
 
 <h2>Delete</h2>
-@if (Model.InUse)
+@if (Model.IsDeletable)
 {
     <h3>This scoring system is currently in use and cannot be deleted.</h3>
     <h4>@Model.Name</h4>

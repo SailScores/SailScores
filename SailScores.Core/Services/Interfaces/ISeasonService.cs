@@ -12,5 +12,6 @@ namespace SailScores.Core.Services
         Task Update(Season season);
         Task<IList<Season>> GetSeasons(Guid clubId);
         Task<IList<String>> GetSavingSeasonErrors(Season season);
+        Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId);
     }
 }

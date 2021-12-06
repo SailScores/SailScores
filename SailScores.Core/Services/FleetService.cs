@@ -213,5 +213,16 @@ namespace SailScores.Core.Services
                 existingFleet.CompetitorFleets.Add(addCompetitor);
             }
         }
+
+        public async Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId)
+        {
+            var usedFleets = _dbContext.Races.Select(r => r.Fleet.Id).Distinct();
+            return _dbContext.Fleets.Where(f => f.ClubId == clubId)
+                .Select(f => new DeletableInfo
+                {
+                    Id = f.Id,
+                    IsDeletable = !usedFleets.Contains(f.Id)   
+                });
+        }
     }
 }

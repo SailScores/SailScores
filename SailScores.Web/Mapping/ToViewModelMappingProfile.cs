@@ -54,6 +54,10 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Regatta, o => o.Ignore())
                 .ForMember(d => d.RegattaId, o => o.Ignore())
                 .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore());
+            CreateMap<Model.Fleet, FleetDeleteViewModel>()
+                .ForMember(d => d.IsDeletable, o => o.Ignore())
+                .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
+
 
             CreateMap<Model.Series, SeriesSummary>()
                 .ForMember(d => d.FleetName, o => o.MapFrom(s =>
@@ -94,7 +98,8 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.ScoreCodeOptions, o => o.Ignore())
                 .ForMember(d => d.ParentSystemOptions, o => o.Ignore());
             CreateMap<Model.ScoringSystem, ScoringSystemDeleteViewModel>()
-                .ForMember(d => d.InUse, o => o.Ignore());
+                .ForMember(d => d.IsDeletable, o => o.Ignore())
+                .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
             CreateMap<Model.ScoreCode, ScoreCodeWithOptionsViewModel>()
                 .ForMember(d => d.FormulaOptions, o => o.Ignore());
 
@@ -122,6 +127,11 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Password, o => o.Ignore())
                 .ForMember(d => d.EnableAppInsights, o => o.Ignore())
                 .ReverseMap();
+
+
+            CreateMap<Model.Season, SeasonDeleteViewModel>()
+                .ForMember(d => d.IsDeletable, o => o.Ignore())
+                .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
 
 
             CreateMap<Db.ClubSeasonStats, ClubSeasonStatsViewModel>();
