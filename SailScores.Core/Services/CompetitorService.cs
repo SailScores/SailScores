@@ -237,7 +237,6 @@ namespace SailScores.Core.Services
                     });
                 }
 
-                //todo: create new fleets here if needed.
             }
 
             //add built in club fleets
@@ -370,6 +369,11 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             return _mapper.Map<IList<PlaceCount>>(ranks
                 .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
+        }
+
+        public async Task<IList<Db.DeletableInfo>> GetDeletableInfo(Guid clubId)
+        {
+            return await _dbContext.GetDeletableInfoForCompetitorsAsync(clubId);
         }
     }
 }

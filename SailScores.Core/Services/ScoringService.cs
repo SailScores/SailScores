@@ -255,5 +255,42 @@ namespace SailScores.Core.Services
             }
 
         }
+
+        public async Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId)
+        {
+
+            var systemId= _dbContext.ScoringSystems
+                .Where(ss => ss.ClubId == clubId)
+                .Select(ss => ss.Id);
+            var seriesIdsInUser = await _dbContext.Series
+                .Where(s => s.ClubId == clubId
+                && s.ScoringSystemId != null)
+                .Select(s => s.ScoringSystemId).ToListAsync();
+            var regattaIdsInUse = await _dbContext.Regattas
+                .Where(r => r.ClubId == clubId
+                && r.ScoringSystemId != null)
+                .Select(r => r.ScoringSystemId).ToListAsync();
+            var clubScoring = await _dbContext.Clubs
+                .Where(c => c.Id == clubId)
+                .Select(s => s.DefaultScoringSystemId).ToListAsync();
+            var parents = await _dbContext.ScoringSystems
+                .Where(s => s.ClubId == clubId)
+                .Select(s => s.ParentSystemId).ToListAsync();
+            var inUse  = systemId.Select(s => new
+            {
+                Id = s,
+                InUse =
+                seriesIdsInUser.Contains(s) || clubScoring.Contains(s)
+                || parents.Contains(s) || regattaIdsInUse.Contains(s)
+            });
+
+            return inUse.Select(s => new DeletableInfo
+            {
+                Id = s.Id,
+                IsDeletable = !s.InUse,
+                Reason = !s.InUse ? String.Empty
+                    : "Scoring System is in use."
+            });
+        }
     }
 }

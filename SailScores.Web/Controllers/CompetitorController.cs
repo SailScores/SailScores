@@ -37,8 +37,9 @@ public class CompetitorController : Controller
     public async Task<ActionResult> Index(string clubInitials)
     {
         var canEdit = await _authService.CanUserEdit(User, clubInitials);
-        var competitors = await _competitorService.GetCompetitorsAsync(clubInitials, canEdit);
-        var vm = new ClubCollectionViewModel<Competitor>
+        var competitors = await _competitorService
+            .GetCompetitorsWithDeletableInfoAsync(clubInitials, canEdit);
+        var vm = new ClubCollectionViewModel<CompetitorIndexViewModel>
         {
             ClubInitials = clubInitials,
             List = competitors,

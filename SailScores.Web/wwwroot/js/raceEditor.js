@@ -610,9 +610,16 @@ function addPotentialMatches(result) {
     if (comp) {
         addNewCompetitor(comp);
         timeOfLastRecognized = Date.now();
-        newResultString = result.substr(matchString.length + 1).trimLeft();
+        newResultString = result.substr(matchString.length).trimLeft();
     }
     else {
+        // look for scorecode
+        var scoreCode = scoreCodes.find(sc => result.startsWith(normalizeText(sc.name) + " "));
+        setLastCompCode(scoreCode.name);
+        matchString = normalizeText(scoreCode.name);
+        newResultString = result.substr(matchString.length).trimLeft();
+    }
+    if (!comp && !scoreCode) {
         //didn't find anything, trim a word off and try again.
         if (!newResultString && (result.indexOf(" ") > -1)) {
             newResultString = result.substr(result.indexOf(" ") + 1).trimLeft();
@@ -676,6 +683,9 @@ function applyCommonConfigurationTo(recognizer) {
                 phraseListGrammar.addPhrase(allCompetitors[index].name);
             }
         }
+        for (var index = 0; index < scoreCodes.length; index++) {
+            phraseListGrammar.addPhrase(scoreCodes[index].name);
+        }
     }
 }
 function stopIfTimedOut() {
@@ -707,6 +717,9 @@ function stopContinuousRecognition() {
         reco.close();
         reco = undefined;
     });
+}
+function setLastCompCode(scoreCode) {
+    $(".select-code").last().val(scoreCode);
 }
 initialize();
 //# sourceMappingURL=raceEditor.js.map

@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
+using SailScores.Web.Services;
+using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
@@ -10,12 +11,12 @@ namespace SailScores.Web.Controllers;
 public class BoatClassController : Controller
 {
 
-    private readonly IClubService _clubService;
+    private readonly CoreServices.IClubService _clubService;
     private readonly IBoatClassService _classService;
     private readonly IAuthorizationService _authService;
 
     public BoatClassController(
-        IClubService clubService,
+        CoreServices.IClubService clubService,
         IBoatClassService classService,
         IAuthorizationService authService)
     {
@@ -102,13 +103,12 @@ public class BoatClassController : Controller
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        var boatClass = await _classService.GetClass(id);
+        var boatClass = await _classService.GetClassDeleteViewModel(id);
         if (!await _authService.CanUserEdit(User, clubId)
             || boatClass.ClubId != clubId)
         {
             return Unauthorized();
         }
-        //todo: add blocker if class contains boats. (or way to move boats.)
         return View(boatClass);
     }
 
@@ -118,9 +118,10 @@ public class BoatClassController : Controller
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        var boatClass = await _classService.GetClass(id);
+        var boatClass = await _classService.GetClassDeleteViewModel(id);
         if (!await _authService.CanUserEdit(User, clubId)
-            || boatClass.ClubId != clubId)
+            || boatClass.ClubId != clubId
+            || !boatClass.IsDeletable)
         {
             return Unauthorized();
         }

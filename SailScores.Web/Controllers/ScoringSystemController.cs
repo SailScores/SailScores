@@ -136,8 +136,8 @@ public class ScoringSystemController : Controller
             return Unauthorized();
         }
 
-        var vm = _mapper.Map<ScoringSystemCanBeDeletedViewModel>(scoringSystem);
-        vm.InUse = await _scoringService.IsScoringSystemInUseAsync(vm.Id);
+        var vm = _mapper.Map<ScoringSystemDeleteViewModel>(scoringSystem);
+        vm.IsDeletable = !(await _scoringService.IsScoringSystemInUseAsync(vm.Id));
 
         return View(vm);
     }

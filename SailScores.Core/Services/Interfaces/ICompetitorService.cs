@@ -18,5 +18,6 @@ namespace SailScores.Core.Services
 #pragma warning disable CA1054 // Uri parameters should not be strings
         Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonUrlName);
 #pragma warning restore CA1054 // Uri parameters should not be strings
+        Task<IList<Database.Entities.DeletableInfo>> GetDeletableInfo(Guid clubId);
     }
 }

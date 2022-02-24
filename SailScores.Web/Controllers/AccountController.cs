@@ -18,7 +18,6 @@ using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationS
 namespace SailScores.Web.Controllers;
 
 // this keeps the controller out of swagger.
-//TODO: include specific endpoints for auth.
 [ApiExplorerSettings(IgnoreApi = true)]
 [Authorize]
 [Route("[controller]/[action]")]

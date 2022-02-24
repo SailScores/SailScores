@@ -130,7 +130,7 @@ public class SeasonController : Controller
         {
             return NotFound();
         }
-        //todo: add blocker if class contains boats. (or way to move boats.)
+        //todo: add blocker if season has series or regattas
         return View(season);
     }
 

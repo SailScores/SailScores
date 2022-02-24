@@ -725,8 +725,16 @@ function addPotentialMatches(result: string) {
     if (comp) {
         addNewCompetitor(comp);
         timeOfLastRecognized = Date.now();
-        newResultString = result.substr(matchString.length + 1).trimLeft();
+        newResultString = result.substr(matchString.length).trimLeft();
     } else {
+        // look for scorecode
+        var scoreCode = scoreCodes.find(sc => result.startsWith(normalizeText(sc.name) + " "));
+        setLastCompCode(scoreCode.name);
+        matchString = normalizeText(scoreCode.name);
+        newResultString = result.substr(matchString.length).trimLeft();
+    }
+
+    if (!comp && !scoreCode) {
         //didn't find anything, trim a word off and try again.
         if (!newResultString && (result.indexOf(" ") > -1)) {
             newResultString = result.substr(result.indexOf(" ") + 1).trimLeft();
@@ -802,6 +810,9 @@ function applyCommonConfigurationTo(recognizer: any) {
                 phraseListGrammar.addPhrase(allCompetitors[index].name);
             }
         }
+        for (var index = 0; index < scoreCodes.length; index++) {
+            phraseListGrammar.addPhrase(scoreCodes[index].name);
+        }
     }
 }
 
@@ -841,6 +852,10 @@ function stopContinuousRecognition() {
             reco = undefined;
         }
     );
+}
+
+function setLastCompCode(scoreCode: string) {
+    $(".select-code").last().val(scoreCode);
 }
 
 initialize();

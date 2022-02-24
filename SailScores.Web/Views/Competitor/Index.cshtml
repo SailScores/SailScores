@@ -6,7 +6,7 @@
 @inject IStringLocalizer<SharedResource> localizer
 @inject AppSettingsService settingsService
 
-@model ClubCollectionViewModel<SailScores.Core.Model.Competitor>
+@model ClubCollectionViewModel<CompetitorIndexViewModel>
 
 @{
 	ViewBag.Title = Model.ClubInitials + " " + localizer["Competitors"];
@@ -73,13 +73,23 @@
 				@if (Model.CanEdit)
 				{
 		   <div class="col col-2 pr-1">
-			<a class="btn btn-sm btn-outline-danger mr-2 mb-2"
+				@if(!item.IsDeletable)
+				{
+					<button class="btn btn-sm btn-outline-danger mr-2 mb-2 disabled"
+						   disabled="disabled"
+							title="Cannot be deleted: @item.PreventDeleteReason">
+					 <span class="fas fa-trash"></span>
+					</button>
+				} else {
+					<a class="btn btn-sm btn-outline-danger mr-2 mb-2"
 				   asp-action="Delete"
 				   asp-controller="Competitor"
 				   asp-route-id="@item.Id"
-				   title="Delete">
+					title = "Delete">
 			 <span class="fas fa-trash"></span>
-			</a><span class="d-none d-sm-inline"> </span><a class="btn btn-sm btn-outline-primary mb-2"
+			</a>
+				}
+<span class="d-none d-sm-inline"> </span><a class="btn btn-sm btn-outline-primary mb-2"
 													asp-action="Edit"
 													asp-controller="Competitor"
 													asp-route-id="@item.Id"

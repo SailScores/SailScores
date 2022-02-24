@@ -13,5 +13,6 @@ namespace SailScores.Core.Services
         Task<Fleet> Get(Guid fleetId);
         Task<IEnumerable<Fleet>> GetAllFleetsForClub(Guid clubId);
         Task<IEnumerable<Series>> GetSeriesForFleet(Guid fleetId);
+        Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId);
     }
 }

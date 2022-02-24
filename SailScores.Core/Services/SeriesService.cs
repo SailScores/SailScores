@@ -590,11 +590,21 @@ namespace SailScores.Core.Services
             }
             fullSeries.Races = copyOfRaces;
             fullSeries.Competitors = copyOfCompetitors;
+
+            var scoringSystem= fullSeries.ScoringSystem;
+            while(scoringSystem?.ParentSystem != null)
+            {
+                scoringSystem = scoringSystem.ParentSystem;
+            }
+            var isLowPoint =
+                !scoringSystem?.Name?.Contains("high ", StringComparison.InvariantCultureIgnoreCase)
+                ?? true;
+
             return new FlatChartData
             {
                 Races = FlattenRaces(fullSeries),
                 Competitors = FlattenCompetitors(fullSeries),
-                IsLowPoints = true, //todo: figure out if it's really low points
+                IsLowPoints = isLowPoint,
                 Entries = entries
             };
         }

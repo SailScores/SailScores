@@ -18,5 +18,6 @@ namespace SailScores.Core.Services
         Task<bool> IsScoringSystemInUseAsync(Guid scoringSystemId);
         Task DeleteScoringSystemAsync(Guid systemId);
         Task<ScoringSystem> GetSiteDefaultSystemAsync();
+        Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId);
     }
 }

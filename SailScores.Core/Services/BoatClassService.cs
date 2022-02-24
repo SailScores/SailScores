@@ -92,5 +92,16 @@ namespace SailScores.Core.Services
 
             return _mapper.Map<BoatClass>(dbClass);
         }
+
+        public async Task<DeletableInfo> GetDeletableInfo(Guid id)
+        {
+            var boatCount = await _dbContext.Competitors.CountAsync(c => c.BoatClassId == id);
+
+            return new DeletableInfo
+            {
+                IsDeletable = boatCount == 0,
+                Reason = boatCount != 0 ? $"{boatCount} boats in this class" : ""
+            };
+        }
     }
 }

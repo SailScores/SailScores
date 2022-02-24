@@ -16,7 +16,7 @@ namespace SailScores.Test.Unit.Web.Controllers
     {
         private readonly Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
         private readonly Mock<IAuthorizationService> _authServiceMock;
-        private readonly Mock<IBoatClassService> _classServiceMock;
+        private readonly Mock<SailScores.Web.Services.Interfaces.IBoatClassService> _classServiceMock;
         private readonly BoatClassController _controller;
 
         private readonly string _clubInitials = "LHYC";
@@ -26,7 +26,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             _clubServiceMock = ControllerTestUtilities.MakeCoreClubServiceMock();
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
 
-            _classServiceMock = new Mock<IBoatClassService>();
+            _classServiceMock = new Mock<SailScores.Web.Services.Interfaces.IBoatClassService>();
 
             _controller = new BoatClassController(
                 _clubServiceMock.Object,

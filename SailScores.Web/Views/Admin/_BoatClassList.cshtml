@@ -1,4 +1,4 @@
-@model IEnumerable<SailScores.Core.Model.BoatClass>
+@model IEnumerable<SailScores.Web.Models.SailScores.BoatClassDeleteViewModel>
 
 <div id="classesdiv">
     <div class="row">
@@ -31,13 +31,22 @@
     {
         <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
             <div class="col-12 col-md-6 col-lg-4">
-                <a class="btn btn-sm btn-outline-danger"
-                    asp-action="Delete"
-                    asp-controller="BoatClass"
-                    asp-route-id="@item.Id"
-                    title="Delete">
-                    <span class="fas fa-trash"></span>
-                </a> &nbsp;
+                @if(!item.IsDeletable)
+				{
+					<button class="btn btn-sm btn-outline-danger disabled"
+				       disabled="disabled"
+					   title="Cannot be deleted: @item.PreventDeleteReason">
+			         <span class="fas fa-trash"></span>
+			        </button>
+				} else {
+				    <a class="btn btn-sm btn-outline-danger"
+				       asp-action="Delete"
+				       asp-controller="BoatClass"
+				       asp-route-id="@item.Id"
+					    title = "Delete">
+			        <span class="fas fa-trash"></span>
+			        </a>
+				}&nbsp;
                 <a class="btn btn-sm btn-outline-primary"
                     asp-action="Edit"
                     asp-controller="BoatClass"
