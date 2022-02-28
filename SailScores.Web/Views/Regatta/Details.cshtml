@@ -55,7 +55,14 @@
                    asp-route-regattaId="@Model.Item.Id"
                    asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                    class="btn btn-outline-primary">@localizer["New Announcement"]</a>
+                   
+                    <a asp-controller="Document"
+                   asp-action="Create"
+                   asp-route-regattaId="@Model.Item.Id"
+                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                   class="btn btn-outline-primary">@localizer["New Document"]</a>
                 </div>
+
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Fleet"
                    asp-action="Create"

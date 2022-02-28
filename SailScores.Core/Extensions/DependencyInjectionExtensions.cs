@@ -27,6 +27,7 @@ namespace SailScores.Core.Extensions
             services.AddScoped<IMergeService, MergeService>();
             services.AddScoped<IWeatherService, WeatherService>();
             services.AddScoped<IConversionService, ConversionService>();
+            services.AddScoped<IDocumentService, DocumentService>();
 
         }
     }

@@ -4,7 +4,6 @@
     <UserSecretsId>aspnet-SailScores.Web-1636F29D-5777-44E4-B779-CDF0FA03E330</UserSecretsId>
     <TypeScriptToolsVersion>3.6</TypeScriptToolsVersion>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
-
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

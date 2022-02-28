@@ -27,6 +27,8 @@ namespace SailScores.Database
         DbSet<UserClubPermission> UserPermissions { get; set; }
 
         DbSet<File> Files { get; set; }
+
+        DbSet<Document> Documents { get; set; }
         DbSet<ScoringSystem> ScoringSystems { get; set; }
 
         DbSet<HistoricalResults> HistoricalResults { get; set; }

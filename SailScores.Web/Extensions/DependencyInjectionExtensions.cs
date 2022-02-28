@@ -19,6 +19,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IBoatClassService, BoatClassService>();
             services.AddScoped<ISeasonService, SeasonService>();
             services.AddScoped<IAnnouncementService, AnnouncementService>();
+            services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IRegattaService, RegattaService>();
             services.AddScoped<IAdminTipService, AdminTipService>();
             services.AddScoped<ICsvService, CsvService>();
