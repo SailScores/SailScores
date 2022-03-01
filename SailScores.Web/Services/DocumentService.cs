@@ -21,7 +21,7 @@ public class DocumentService : Interfaces.IDocumentService
 
     public Task Delete(Guid id)
     {
-        throw new NotImplementedException();
+        return _coreService.DeleteDocument(id);
     }
 
     public Task<Document> GetDocument(Guid id)

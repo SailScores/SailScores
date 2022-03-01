@@ -23,6 +23,11 @@ public class DocumentService : IDocumentService
         _mapper = mapper;
     }
 
+    public Task DeleteDocument(Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Document> GetDocument(Guid id)
     {
         var doc = await _dbContext.Documents.SingleAsync(d => d.Id == id);

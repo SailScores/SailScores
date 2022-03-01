@@ -99,9 +99,9 @@ public class DocumentController : Controller
         }
     }
 
-    public async Task<FileStreamResult> GetDocument(Guid documentId)
+    public async Task<FileStreamResult> GetDocument(Guid id)
     {
-        var doc = await _documentService.GetDocument(documentId);
+        var doc = await _documentService.GetDocument(id);
 
         var stream = new MemoryStream();
         stream.Write(doc.FileContents, 0, doc.FileContents.Length);
