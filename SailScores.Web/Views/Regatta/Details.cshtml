@@ -55,7 +55,6 @@
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["Upload Document"]</a>
                 </div>
-
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Fleet"
                        asp-action="Create"
@@ -72,7 +71,7 @@
                 </div>
             </div>
             <div class="row bg-almost">
-                <div class="col-sm-4">
+                <div class="col-sm-4 my-2">
                     <a asp-controller="Regatta"
                        asp-action="Edit"
                        asp-route-Id="@Model.Item.Id"
@@ -84,7 +83,7 @@
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">@localizer["New Announcement"]</a>
+                       class="btn btn-outline-primary">@localizer["New Notice"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Admin"
@@ -99,10 +98,11 @@
             @if(Model.Item.Documents != null && Model.Item.Documents.Count > 0)
             {
                 <div class="col-12 m-0 p-0 pb-5">
-                    <h3>Regatta Documents</h3>
+                    <h3>Documents</h3>
                     @foreach (var document in Model.Item.Documents)
                     {
-                        @if (Model.CanEdit)
+                        
+                        <h4>@if (Model.CanEdit)
                         {
                             <a class="btn btn-sm btn-outline-danger"
                                asp-action="Delete"
@@ -112,13 +112,20 @@
                                title="Delete">
                                 <span class="fas fa-trash"></span>
                             </a>@:&nbsp;
-                        }
-                        <h4><a target="_blank" asp-action="GetDocument"
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="Update"
+                               asp-controller="Document"
+                               asp-route-id="@document.Id"
+                               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                               title="Update">
+                                <span class="fas fa-file-import"></span>
+                            </a>
+                        }<a target="_blank" asp-action="GetDocument"
                            asp-controller="Document"
                            asp-route-id="@document.Id"
                            asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                         >@document.Name</a></h4>
-                        <span class="small font-italic">Posted by @document.CreatedBy at @document.CreatedLocalDate.ToString("f")</span>
+                        <span class="small font-italic">Posted by @document.CreatedBy on @document.CreatedLocalDate.ToString("f")</span>
                     }
                 </div>                
             }
@@ -148,7 +155,7 @@
                                 <span class="fas fa-pen"></span>
                             </a>@:&nbsp;
                         }
-                        <span class="small font-italic">Posted by @announcement.CreatedBy at @announcement.CreatedLocalDate.ToString("f"):</span>
+                        <span class="small font-italic">Posted by @announcement.CreatedBy on @announcement.CreatedLocalDate.ToString("f"):</span>
                         @Html.Raw(Markdig.Markdown.ToHtml(announcement.Content))
                         <br/>
                     }

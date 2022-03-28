@@ -7,6 +7,7 @@ using Ganss.XSS;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 using System.IO;
+using MimeTypes;
 
 namespace SailScores.Web.Controllers;
 
@@ -37,6 +38,7 @@ public class DocumentController : Controller
         _mapper = mapper;
     }
 
+    [Authorize]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid regattaId,
@@ -52,6 +54,7 @@ public class DocumentController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Create(
         string clubInitials,
@@ -84,6 +87,7 @@ public class DocumentController : Controller
         }
         catch
         {
+            // todo: include error message in vm to indicate not saved.
             DocumentWithOptions vm;
             if (model.RegattaId.HasValue)
             {
@@ -106,32 +110,82 @@ public class DocumentController : Controller
         var stream = new MemoryStream();
         stream.Write(doc.FileContents, 0, doc.FileContents.Length);
         stream.Position = 0;
+
+        var extension = MimeTypeMap.GetExtension(doc.ContentType);
+        if (!doc.Name.EndsWith(extension))
+        {
+            doc.Name = doc.Name + extension;
+        }
+        System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+        {
+            FileName = doc.Name,
+            Inline = true
+        };
+        Response.Headers.Add("Content-Disposition", cd.ToString());
         return new FileStreamResult(stream, doc.ContentType);
     }
 
-    // Replace
-    //[Authorize]
-    //public async Task<ActionResult> Edit(
-    //    string clubInitials,
-    //    Guid id,
-    //    string returnUrl = null)
-    //{
-    //    try
-    //    {
-    //        ViewData["ReturnUrl"] = returnUrl;
-    //        if (!await _authService.CanUserEdit(User, clubInitials))
-    //        {
-    //            return Unauthorized();
-    //        }
-    //        var announcement =
-    //            await _regattaDocumentService.GetDocument(id);
-    //        return View(announcement);
-    //    }
-    //    catch
-    //    {
-    //        return RedirectToAction("Index", "Admin");
-    //    }
-    //}
+    [Authorize]
+    public async Task<ActionResult> Update(
+        string clubInitials,
+        Guid id,
+        string returnUrl = null)
+    {
+        try
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            
+            if (!await _authService.CanUserEdit(User, clubInitials))
+            {
+                return Unauthorized();
+            }
+            var doc =
+                await _documentService.GetSkinnyDocument(id);
+            return View(_mapper.Map<DocumentWithOptions>(doc));
+        }
+        catch
+        {
+            // todo: add error message to vm.
+            return RedirectToAction("Index", "Admin");
+        }
+    }
+
+
+    [Authorize]
+    [HttpPost]
+    [ActionName("Update")]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> PostUpdate(
+        string clubInitials,
+        DocumentWithOptions model,
+        string returnUrl = null)
+    {
+        try
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+
+            model.CreatedBy = await GetUserStringAsync();
+            model.CreatedDate = DateTime.UtcNow;
+            model.CreatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
+            if (!await _authService.CanUserEdit(User, clubInitials))
+            {
+                return Unauthorized();
+            }
+            await _documentService.UpdateDocument(model);
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Index", "Admin");
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+            // todo: add error message to vm.
+            return View(model);
+        }
+    }
 
 
     [Authorize]
@@ -145,8 +199,8 @@ public class DocumentController : Controller
         {
             return Unauthorized();
         }
-        var announcement = await _documentService.GetDocument(id);
-        return View(announcement);
+        var document = await _documentService.GetSkinnyDocument(id);
+        return View(document);
     }
 
     [Authorize]

@@ -34,9 +34,9 @@ public class DocumentService : Interfaces.IDocumentService
         return new DocumentWithOptions();
     }
 
-    public Task<IEnumerable<Document>> GetRegattaDocuments(Guid regattaId)
+    public Task<Document> GetSkinnyDocument(Guid id)
     {
-        throw new NotImplementedException();
+        return _coreService.GetSkinnyDocument(id);
     }
 
     public async Task SaveNew(DocumentWithOptions model)
@@ -56,9 +56,33 @@ public class DocumentService : Interfaces.IDocumentService
             }
             else
             {
-                //ModelState.AddModelError("File", "The file is too large.");
+                throw new ArgumentException("File is too large.");
             }
         }
     }
 
+    public async Task UpdateDocument(DocumentWithOptions model)
+    {
+        using (var memoryStream = new MemoryStream())
+        {
+            if (model.File != null)
+            {
+
+                await model.File.CopyToAsync(memoryStream);
+
+                // Upload the file if less than 2 MB
+                if (memoryStream.Length < 2097152)
+                {
+                    model.FileContents = memoryStream.ToArray();
+                    model.ContentType = model.File.ContentType;
+                }
+                else
+                {
+                    throw new ArgumentException("File is too large.");
+                }
+            }
+            await _coreService.Save(model);
+        }
+
+    }
 }

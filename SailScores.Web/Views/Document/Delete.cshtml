@@ -1,0 +1,39 @@
+﻿@model SailScores.Core.Model.Document
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete the document?</h3>
+<div>
+    <h4>Regatta</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete" 
+        asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+        {
+            <a asp-controller="Admin"
+                asp-action="Index"            
+                asp-fragment="regatta"
+                class="btn btn-outline-primary">Cancel</a>
+        } else
+        {
+            <a href="@ViewData["ReturnUrl"]"
+            class="btn btn-outline-primary">Cancel</a>
+        }
+    </form>
+</div>

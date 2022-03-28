@@ -23,9 +23,14 @@ public class DocumentService : IDocumentService
         _mapper = mapper;
     }
 
-    public Task DeleteDocument(Guid id)
+    public async Task DeleteDocument(Guid id)
     {
-        throw new NotImplementedException();
+        var doc = new Db.Document
+        {
+            Id = id
+        };
+        _dbContext.Documents.Remove(doc);
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<Document> GetDocument(Guid id)
@@ -35,9 +40,44 @@ public class DocumentService : IDocumentService
         return _mapper.Map<Document>(doc);
     }
 
+    public async Task<Document> GetSkinnyDocument(Guid id)
+    {
+
+        var dbDoc = await _dbContext.Documents.Where(
+            d => d.Id == id)
+            .Select(d => new Document
+            {
+                Id = d.Id,
+                RegattaId = d.RegattaId,
+                ClubId = d.ClubId,
+                Name = d.Name,
+                CreatedDate = d.CreatedDate,
+                CreatedLocalDate = d.CreatedLocalDate,
+                CreatedBy = d.CreatedBy
+            }).SingleAsync();
+        return _mapper.Map<Document>(dbDoc);
+    }
+
     public async Task Save(Document file)
     {
-        _dbContext.Documents.Add(_mapper.Map<Db.Document>(file));
+        if (file.Id == default)
+        {
+            _dbContext.Documents.Add(_mapper.Map<Db.Document>(file));
+        } else
+        {
+            var dbDoc = await _dbContext.Documents
+                .SingleOrDefaultAsync(
+                d => d.Id == file.Id);
+            dbDoc.CreatedDate = file.CreatedDate;
+            dbDoc.CreatedLocalDate = file.CreatedLocalDate;
+            dbDoc.CreatedBy = file.CreatedBy;
+            dbDoc.Name = file.Name;
+            if(file.FileContents != null)
+            {
+                dbDoc.FileContents = file.FileContents;
+                dbDoc.ContentType = file.ContentType;
+            }
+        }
 
         await _dbContext.SaveChangesAsync();
     }

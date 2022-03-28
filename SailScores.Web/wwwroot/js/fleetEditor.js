@@ -1,7 +1,7 @@
 /// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
 /// <reference types="jquery" />
 ///
-import $ from "jquery";
+import "jquery";
 import "bootstrap";
 import "bootstrap-select";
 export function initialize() {

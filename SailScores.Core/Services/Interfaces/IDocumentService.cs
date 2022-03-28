@@ -9,4 +9,5 @@ public interface IDocumentService
     Task Save(Document file);
     Task<Document> GetDocument(Guid id);
     Task DeleteDocument(Guid id);
+    Task<Document> GetSkinnyDocument(Guid id);
 }

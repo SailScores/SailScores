@@ -14,7 +14,6 @@
         drawChart(charts[i].dataset.seriesId, "#"+charts[i].id)
     }
 
-
     function drawChart(seriesId, elementId) {
         //var chartElementId = elementId;
 

@@ -137,6 +137,11 @@ namespace SailScores.Web.Mapping
             CreateMap<Db.ClubSeasonStats, ClubSeasonStatsViewModel>();
             CreateMap<Db.SiteStats, AllClubStatsViewModel>();
 
+
+            CreateMap<Model.Document, DocumentWithOptions>()
+                .ForMember( d => d.TimeOffset, o => o.Ignore())
+                .ForMember( d => d.File, o => o.Ignore());
+
             MapRegattaObjects();
         }
 
