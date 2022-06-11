@@ -472,7 +472,7 @@ namespace SailScores.Core.Scoring
             return (scoreCode.Formula.ToUpperInvariant()) switch
             {
                 FINISHERSPLUS_FORMULANAME =>
-                    race.Scores.Count(s => CountsAsStarted(s)) +
+                    race.Scores.Count(s => CountsAsFinished(s)) +
                         scoreCode.FormulaValue,
                 CAMETOSTARTPLUS_FORMULANAME =>
                     race.Scores.Count(s => CameToStart(s)) +
@@ -628,6 +628,21 @@ namespace SailScores.Core.Scoring
             }
             var scoreCode = GetScoreCode(code);
             return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE);
+        }
+
+        protected bool CountsAsFinished(Score s)
+        {
+            if (s == null)
+            {
+                return false;
+            }
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            var scoreCode = GetScoreCode(s);
+            return scoreCode.Finished ?? false;
         }
 
         protected bool CountsAsStarted(Score s)
