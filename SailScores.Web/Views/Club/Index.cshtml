@@ -90,64 +90,64 @@
             </ul>
         </div>
     }
-    @if (Model.RecentSeries.Any())
+    @if (Model.UpcomingRaces.Count() > 0)
     {
-        <div class="col-sm-6 col-md-3">
-            <h4>@localizer["Recent Series"]</h4>
-            <ul class="list-unstyled">
-                @foreach (var series in Model.RecentSeries)
-                {
-                <li>
-                    <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
-                    @if (series.UpdatedDate.HasValue)
-                    {
-                        <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
-                    }
-                </li>
-                }
-            </ul>
-        </div>
-    }
-    else if (Model.RecentRaces.Count() > 0)
-    {
-        <div class="col-sm-6 col-md-3">
-            <h4>@localizer["Recent Races"]</h4>
-            <ul class="list-unstyled">
-                @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
-                {
-                    <li>
-                        @item.Key
-                        <ul>
-                            @foreach (var race in item)
-                            {
-                                <li>
-                                    <a asp-controller="Race"
-                                       asp-action="Details"
-                                       asp-route-clubInitials="@Model.Initials"
-                                       asp-route-id="@race.Id">@race.CalculatedName</a>
-                                </li>
-                            }
-                        </ul>
-                    </li>
-                }
-            </ul>
-        </div>
-    }
-    else
-    {
-        <div class="col-sm-6 col-md-3">
-            <p><em>@localizer["No recent series found."]</em></p>
-            <p>
-                <a asp-controller="Series"
-                   asp-route-clubInitials="@Model.Initials">
-                    @localizer["All Series"]
-                </a>
-            </p>
-        </div>
-    }
-    <div class="col-sm-6 col-md-3">
-        @if (Model.UpcomingRaces.Count() > 0)
+        @if (Model.RecentSeries.Any())
         {
+            <div class="col-sm-6 col-md-3">
+                <h4>@localizer["Recent Series"]</h4>
+                <ul class="list-unstyled">
+                    @foreach (var series in Model.RecentSeries)
+                    {
+                        <li>
+                            <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
+                            @if (series.UpdatedDate.HasValue)
+                            {
+                                <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+        else if (Model.RecentRaces.Count() > 0)
+        {
+            <div class="col-sm-6 col-md-3">
+                <h4>@localizer["Recent Races"]</h4>
+                <ul class="list-unstyled">
+                    @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
+                    {
+                        <li>
+                            @item.Key
+                            <ul>
+                                @foreach (var race in item)
+                                {
+                                    <li>
+                                        <a asp-controller="Race"
+                                           asp-action="Details"
+                                           asp-route-clubInitials="@Model.Initials"
+                                           asp-route-id="@race.Id">@race.CalculatedName</a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-6 col-md-3">
+                <p><em>@localizer["No recent series found."]</em></p>
+                <p>
+                    <a asp-controller="Series"
+                       asp-route-clubInitials="@Model.Initials">
+                        @localizer["All Series"]
+                    </a>
+                </p>
+            </div>
+        }
+        <div class="col-sm-6 col-md-3">
             <h4>@localizer["Upcoming Races"]</h4>
             <ul class="list-unstyled">
                 @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
@@ -168,8 +168,66 @@
                     </li>
                 }
             </ul>
+        </div>
+    }
+    else // no upcoming races
+    {
+        @if (Model.RecentSeries.Any())
+        {
+            <div class="col-sm-6">
+                <h4>@localizer["Recent Series"]</h4>
+                <ul class="list-unstyled">
+                    @foreach (var series in Model.RecentSeries)
+                    {
+                        <li>
+                            <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
+                            @if (series.UpdatedDate.HasValue)
+                            {
+                                <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
         }
-    </div>
+        else if (Model.RecentRaces.Any())
+        {
+            <div class="col-sm-6">
+                <h4>@localizer["Recent Races"]</h4>
+                <ul class="list-unstyled">
+                    @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
+                    {
+                        <li>
+                            @item.Key
+                            <ul>
+                                @foreach (var race in item)
+                                {
+                                    <li>
+                                        <a asp-controller="Race"
+                           asp-action="Details"
+                           asp-route-clubInitials="@Model.Initials"
+                           asp-route-id="@race.Id">@race.CalculatedName</a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-6">
+                <p><em>@localizer["No recent series found."]</em></p>
+                <p>
+                    <a asp-controller="Series"
+               asp-route-clubInitials="@Model.Initials">
+                        @localizer["All Series"]
+                    </a>
+                </p>
+            </div>
+        }
+    }
 </div>
 @if (Model.CanEdit)
 {
