@@ -98,7 +98,7 @@ public class FleetService : IFleetService
                  && fleet.CompetitorIds != null)
         {
             coreModel.Competitors =
-                (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null, false))
+                (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null, true))
                 .Where(c => fleet.CompetitorIds.Contains(c.Id))
                 .ToList();
         }

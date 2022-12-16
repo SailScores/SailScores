@@ -25,7 +25,7 @@
     "bootstrap": "4.5.3",
     "bootstrap-select": "1.13.12",
     "jquery": "3.6.0",
-    "jquery-validation": "1.19.4",
+    "jquery-validation": "1.19.5",
     "jquery-validation-unobtrusive": "3.2.11",
     "jquery-ajax-unobtrusive": "3.2.6",
     "popper.js": "1.16.1",
