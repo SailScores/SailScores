@@ -16,10 +16,10 @@
     "gulp-sass": "5.1.0",
     "sass": "1.49.9",
     "merge-stream": "2.0.0",
-    "ts-loader": "6.2.1",
+    "ts-loader": "9.4.2",
     "typescript": "3.7.4",
     "vinyl-named": "1.1.0",
-    "webpack-stream": "6.1.2"
+    "webpack-stream": "7.0.0"
   },
   "dependencies": {
     "bootstrap": "4.5.3",
