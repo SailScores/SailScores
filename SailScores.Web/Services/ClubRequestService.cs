@@ -186,7 +186,7 @@ public class ClubRequestService : IClubRequestService
         {
             var emailBody = await _emailSender.GetHtmlFromView("Templates/ClubCreatedAdminNotice", request);
             var notificationEmail = _configuration["NotificationEmail"];
-            await _emailSender.SendEmailAsync(notificationEmail, $"SailScores Club Created {request.ContactEmail}", emailBody);
+            await _emailSender.SendEmailAsync(notificationEmail, "ADMIN: SailScores Club Created", emailBody);
         }
         catch (Exception)
         {

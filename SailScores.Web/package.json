@@ -16,22 +16,22 @@
     "gulp-sass": "5.1.0",
     "sass": "1.49.9",
     "merge-stream": "2.0.0",
-    "ts-loader": "6.2.1",
+    "ts-loader": "9.4.2",
     "typescript": "3.7.4",
     "vinyl-named": "1.1.0",
-    "webpack-stream": "6.1.2"
+    "webpack-stream": "7.0.0"
   },
   "dependencies": {
     "bootstrap": "4.5.3",
     "bootstrap-select": "1.13.12",
     "jquery": "3.6.0",
-    "jquery-validation": "1.19.4",
+    "jquery-validation": "1.19.5",
     "jquery-validation-unobtrusive": "3.2.11",
     "jquery-ajax-unobtrusive": "3.2.6",
     "popper.js": "1.16.1",
     "dragula": "3.7.2",
     "devbridge-autocomplete": "1.4.11",
-    "d3": "5.12.0",
+    "d3": "7.6.1",
     "summernote": "0.8.20"
   }
 }
