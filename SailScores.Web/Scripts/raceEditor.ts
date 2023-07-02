@@ -45,6 +45,7 @@ export function initialize() {
     $("#raceform").submit(function (e) {
         var form = document.getElementById("raceform") as HTMLFormElement;
         addScoresFieldsToForm(form);
+        $('#submitButton').attr('disabled', 'disabled');
     });
     loadFleet();
     loadSeriesOptions();
