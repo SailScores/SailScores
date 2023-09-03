@@ -30,14 +30,18 @@
             }
         </h1>
         <h5 class="d-none d-md-inline">
-            @Model.Item.StartDate?.ToString("D") -
-            @Model.Item.EndDate?.ToString("D")
+            @Model.Item.StartDate?.ToString("D")
+            @if (Model.Item.StartDate != Model.Item.EndDate) {
+                @:- @Model.Item.EndDate?.ToString("D"))
+            }
             <br />
             <br />
         </h5>
         <span class="d-md-none">
-            @Model.Item.StartDate?.ToString("d") -
-            @Model.Item.EndDate?.ToString("d")
+            @Model.Item.StartDate?.ToString("d")            
+            @if (Model.Item.StartDate != Model.Item.EndDate) {
+                @:- @Model.Item.EndDate?.ToString("d")
+            }
         </span>
     </div>
 </div>
