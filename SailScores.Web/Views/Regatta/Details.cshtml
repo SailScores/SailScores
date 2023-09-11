@@ -145,6 +145,7 @@
 </div>
 @foreach (var fleet in Model.Item.Fleets.OrderBy(f => f.NickName))
 {
+    var counter = 1;
     var fleetHasResults = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id)?.FlatResults?.NumberOfSailedRaces > 0;
     <div id="@fleet.ShortName">
         <h3>@fleet.NickName</h3>
@@ -188,6 +189,7 @@
                 <table class="table table-hover table-sm">
                     <thead>
                         <tr>
+                            <th></th>
                             <th scope="col">@localizer["Sail Number"]</th>
                             <th scope="col">@localizer["Name"]</th>
                             <th scope="col">@localizer["Boat"]</th>
@@ -200,6 +202,7 @@
                        .ThenBy(c => c.Name))
                         {
                             <tr>
+                                <td><small>@(counter++)</small></td>
                                 <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
                                 <td>@comp.Name</td>
                                 <td>@comp.BoatName</td>
