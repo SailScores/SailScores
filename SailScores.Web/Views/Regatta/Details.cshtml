@@ -143,12 +143,12 @@
         </div>
     </div>
 </div>
-@foreach (var fleet in Model.Item.Fleets.OrderBy(f => f.NickName))
+@foreach (var fleet in Model.Item.Fleets.OrderBy(f => f.NickName ?? f.Name ?? f.ShortName))
 {
     var counter = 1;
     var fleetHasResults = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id)?.FlatResults?.NumberOfSailedRaces > 0;
     <div id="@fleet.ShortName">
-        <h3>@fleet.NickName</h3>
+        <h3>@(fleet.NickName??fleet.Name??fleet.ShortName)</h3>
         <ul class="nav nav-tabs" id="@($"Tab{fleet.ShortName}")" role="tablist">
             <li class="nav-item">
                 <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{fleet.ShortName}-tab")" data-toggle="tab"
@@ -217,7 +217,7 @@
                 @{
                     var currentSeries = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id);
                 }
-                @if (currentSeries != null && currentSeries.FlatResults != null)
+                @if (currentSeries != null && currentSeries.FlatResults != null && currentSeries.FlatResults.Races.Count() > 0)
                 {
                     @await Html.PartialAsync("_ResultsTable",
                         currentSeries,
