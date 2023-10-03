@@ -5,9 +5,9 @@
 @if (Model != null && Model.Result != null )
 {
     <td class="text-center
-        @(Model.Result.ScoreValue == 1 ? "finish-first ": "")
-        @(Model.Result.ScoreValue == 2 ? "finish-second " : "")
-        @(Model.Result.ScoreValue == 3 ? "finish-third " : "") ">
+        @(Model.Result.ScoreValue == 1 && String.IsNullOrEmpty(Model.Result.Code) ? "finish-first ": "")
+        @(Model.Result.ScoreValue == 2 && String.IsNullOrEmpty(Model.Result.Code) ? "finish-second " : "")
+        @(Model.Result.ScoreValue == 3 && String.IsNullOrEmpty(Model.Result.Code) ? "finish-third " : "") ">
         <span class="@(Model.Result.Discard ? "text-muted" : "")">
             @if (Model.Result.Discard)
             {
