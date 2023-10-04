@@ -1,5 +1,6 @@
 ﻿using Ganss.XSS;
 using Microsoft.Extensions.DependencyInjection;
+using SailScores.Web.Resources;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 
@@ -30,6 +31,7 @@ namespace SailScores.Web.Extensions
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<ISpeechService, SpeechService>();
             services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
+            services.AddScoped<ILocalizerService, LocalizerService>();
 
             services.AddSingleton<AppVersionInfo>();
             services.AddSingleton<AppSettingsService>();

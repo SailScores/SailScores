@@ -33,6 +33,8 @@ namespace SailScores.Web.Mapping
                     s.WeatherSettings != null ? s.WeatherSettings.WindSpeedUnits : null))
                 .ForMember(d => d.SpeedUnitOptions, o => o.Ignore())
                 .ForMember(d => d.TemperatureUnitOptions, o => o.Ignore())
+                .ForMember(d => d.LocaleOptions, o => o.Ignore())
+                .ForMember(d => d.Locale, o => o.Ignore())
                 .ForMember(d => d.Tips, o => o.Ignore())
                 .ForMember(d => d.DefaultScoringSystemName, o => o.MapFrom(s => s.DefaultScoringSystem.Name))
                 .ForMember(d => d.ShowClubInResults, o => o.MapFrom(s => s.ShowClubInResults ?? false))

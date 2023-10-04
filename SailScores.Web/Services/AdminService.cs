@@ -1,5 +1,7 @@
-﻿using SailScores.Core.Model;
+﻿using Newtonsoft.Json.Linq;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Resources;
 using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Services;
@@ -14,6 +16,7 @@ public class AdminService : IAdminService
     private readonly CoreServices.ISeasonService _coreSeasonService;
     private readonly IWeatherService _weatherService;
     private readonly IPermissionService _permissionService;
+    private readonly ILocalizerService _localizerService;
     private readonly IMapper _mapper;
 
     public AdminService(
@@ -25,6 +28,7 @@ public class AdminService : IAdminService
         CoreServices.ISeasonService seasonService,
         IWeatherService weatherService,
         IPermissionService permissionService,
+        ILocalizerService localizerService,
         IMapper mapper)
     {
         _coreClubService = clubService;
@@ -35,6 +39,7 @@ public class AdminService : IAdminService
         _coreSeasonService = seasonService;
         _weatherService = weatherService;
         _permissionService = permissionService;
+        _localizerService = localizerService;
         _mapper = mapper;
     }
 
@@ -48,7 +53,30 @@ public class AdminService : IAdminService
         vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);
         vm.SpeedUnitOptions = _weatherService.GetSpeedUnitOptions();
         vm.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
+        vm.LocaleOptions = GetLocaleLongNames();
+        vm.Locale = GetLocaleLongName(club.Locale);
         return vm;
+
+    }
+
+    private string GetLocaleLongName(string locale)
+    {
+        var returnValue = _localizerService.SupportedLocalizations[locale];
+
+        return returnValue ?? _localizerService.SupportedLocalizations[_localizerService.DefaultLocalization]; 
+
+    }
+
+    private IList<string> GetLocaleLongNames()
+    {
+        return _localizerService.SupportedLocalizations.Values.ToList();
+    }
+
+    public string GetLocaleShortName(string locale)
+    {
+        var returnValue = _localizerService.SupportedLocalizations.FirstOrDefault( l => l.Value == locale).Key;
+
+        return returnValue ?? _localizerService.SupportedLocalizations[_localizerService.DefaultLocalization];
 
     }
 
