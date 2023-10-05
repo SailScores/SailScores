@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.AspNetCore.Localization;
+using Newtonsoft.Json.Linq;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Resources;
@@ -131,6 +132,7 @@ public class AdminService : IAdminService
 
     public async Task UpdateClub(Club clubObject)
     {
+        await _localizerService.UpdateCulture(clubObject.Initials, clubObject.Locale);
         await _coreClubService.UpdateClub(clubObject);
     }
 }

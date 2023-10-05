@@ -77,6 +77,7 @@ public class AdminController : Controller
                 clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
                 clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
                 clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
+                clubAdmin.LocaleOptions = club.LocaleOptions;
                 return View(clubAdmin);
             }
 
@@ -91,6 +92,7 @@ public class AdminController : Controller
                 WindSpeedUnits = clubAdmin.SpeedUnits
             };
             clubObject.Locale = _adminService.GetLocaleShortName(clubAdmin.Locale);
+            clubObject.Initials = clubInitials;
 
             await _adminService.UpdateClub(clubObject);
 
