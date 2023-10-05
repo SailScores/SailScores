@@ -158,12 +158,14 @@
   </data>
   <data name="No recent races found." xml:space="preserve">
     <value>No recent races found</value>
+    <comment>needed</comment>
   </data>
   <data name="No recent series found." xml:space="preserve">
     <value>Ei tuoreita tuloksia</value>
   </data>
   <data name="No scheduled races found." xml:space="preserve">
     <value>No scheduled races found.</value>
+    <comment>needed</comment>
   </data>
   <data name="Place" xml:space="preserve">
     <value>Sijoitus</value>
@@ -188,6 +190,7 @@
   </data>
   <data name="Seasons" xml:space="preserve">
     <value>Seasons</value>
+    <comment>needed</comment>
   </data>
   <data name="Series" xml:space="preserve">
     <value>Sarjat</value>
@@ -209,6 +212,7 @@
   </data>
   <data name="No seasons are set up." xml:space="preserve">
     <value>No seasons are set up.</value>
+    <comment>needed</comment>
   </data>
   <data name="Scores" xml:space="preserve">
     <value>Tulokset</value>
@@ -218,6 +222,7 @@
   </data>
   <data name="Regattas" xml:space="preserve">
     <value>Regattas</value>
+    <comment>needed</comment>
   </data>
   <data name="CapCompetitors" xml:space="preserve">
     <value>Kilpailijat</value>
@@ -245,5 +250,84 @@
   </data>
   <data name="Updated" xml:space="preserve">
     <value>Päivitetty</value>
+  </data>
+  <data name="Abandoned" xml:space="preserve">
+    <value>Abandoned</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
+    <comment>needed</comment>
+  </data>
+  <data name="All Boats" xml:space="preserve">
+    <value>All Boats</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Boats Raced" xml:space="preserve">
+    <value>Boats Raced</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Classes" xml:space="preserve">
+    <value>Classes</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Club Admin" xml:space="preserve">
+    <value>Club Admin</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Club Stats" xml:space="preserve">
+    <value>Club Stats</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Default Scoring" xml:space="preserve">
+    <value>Default Scoring</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Edit Club Info" xml:space="preserve">
+    <value>Edit Club Info</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Fleets" xml:space="preserve">
+    <value>Fleets</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Inactive</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Manage Competitors" xml:space="preserve">
+    <value>Manage Competitors</value>
+    <comment>needed</comment>
+  </data>
+  <data name="New C;lass" xml:space="preserve">
+    <value>New Class</value>
+    <comment>needed</comment>
+  </data>
+  <data name="New Fleet" xml:space="preserve">
+    <value>New Fleet</value>
+    <comment>needed</comment>
+  </data>
+  <data name="New Season" xml:space="preserve">
+    <value>New Season</value>
+    <comment>needed</comment>
+  </data>
+  <data name="New Series" xml:space="preserve">
+    <value>Uusi Sarjat</value>
+  </data>
+  <data name="Scorekeepers" xml:space="preserve">
+    <value>Scorekeepers</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Scoring Systems" xml:space="preserve">
+    <value>Scoring Systems</value>
+    <comment>needed</comment>
+  </data>
+  <data name="Top Series" xml:space="preserve">
+    <value>Top Series</value>
+    <comment>needed</comment>
   </data>
 </root>
