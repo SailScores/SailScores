@@ -164,8 +164,7 @@
     <value>Ei tuoreita tuloksia</value>
   </data>
   <data name="No scheduled races found." xml:space="preserve">
-    <value>No scheduled races found.</value>
-    <comment>needed</comment>
+    <value>Suunniteltuja purjehdukset ei löytynyt.</value>
   </data>
   <data name="Place" xml:space="preserve">
     <value>Sijoitus</value>
@@ -221,14 +220,13 @@
     <value>Kirjaudu ulos</value>
   </data>
   <data name="Regattas" xml:space="preserve">
-    <value>Regattas</value>
-    <comment>needed</comment>
+    <value>Regatat</value>
   </data>
   <data name="CapCompetitors" xml:space="preserve">
     <value>Kilpailijat</value>
   </data>
   <data name="Results" xml:space="preserve">
-    <value>Tulokset</value>
+    <value>Tuloksia</value>
   </data>
   <data name="No results posted" xml:space="preserve">
     <value>Ei tuoreita tuloksia</value>
@@ -252,20 +250,17 @@
     <value>Päivitetty</value>
   </data>
   <data name="Abandoned" xml:space="preserve">
-    <value>Abandoned</value>
-    <comment>needed</comment>
+    <value>Hylätty</value>
   </data>
   <data name="Admin" xml:space="preserve">
     <value>Admin</value>
     <comment>needed</comment>
   </data>
   <data name="All Boats" xml:space="preserve">
-    <value>All Boats</value>
-    <comment>needed</comment>
+    <value>kaikki veneet</value>
   </data>
   <data name="Boats Raced" xml:space="preserve">
-    <value>Boats Raced</value>
-    <comment>needed</comment>
+    <value>Veneet kilpailivat</value>
   </data>
   <data name="Classes" xml:space="preserve">
     <value>Classes</value>
@@ -284,8 +279,7 @@
     <comment>needed</comment>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Description</value>
-    <comment>needed</comment>
+    <value>Kuvaus</value>
   </data>
   <data name="Edit Club Info" xml:space="preserve">
     <value>Edit Club Info</value>
@@ -296,12 +290,10 @@
     <comment>needed</comment>
   </data>
   <data name="Inactive" xml:space="preserve">
-    <value>Inactive</value>
-    <comment>needed</comment>
+    <value>Toimimaton</value>
   </data>
   <data name="Manage Competitors" xml:space="preserve">
-    <value>Manage Competitors</value>
-    <comment>needed</comment>
+    <value>Muokkaa Kilpailijoita</value>
   </data>
   <data name="New C;lass" xml:space="preserve">
     <value>New Class</value>
@@ -327,7 +319,6 @@
     <comment>needed</comment>
   </data>
   <data name="Top Series" xml:space="preserve">
-    <value>Top Series</value>
-    <comment>needed</comment>
+    <value>Huippusarja</value>
   </data>
 </root>

@@ -163,7 +163,7 @@
     <value>Inga färska resultat</value>
   </data>
   <data name="No scheduled races found." xml:space="preserve">
-    <value />
+    <value>Inga segling lopp hittades.</value>
   </data>
   <data name="Place" xml:space="preserve">
     <value>Placering</value>
@@ -172,7 +172,7 @@
     <value>Seglingar</value>
   </data>
   <data name="races sailed with" xml:space="preserve">
-    <value>Starter seglade med</value>
+    <value>starter seglade med</value>
   </data>
   <data name="Recent Races" xml:space="preserve">
     <value>Senaste tävlingar</value>
