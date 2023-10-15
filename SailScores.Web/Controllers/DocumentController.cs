@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Identity.Entities;
 using SailScores.Web.Models.SailScores;
-using Ganss.XSS;
+using Ganss.Xss;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 using System.IO;

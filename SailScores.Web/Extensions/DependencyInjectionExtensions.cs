@@ -1,4 +1,4 @@
-﻿using Ganss.XSS;
+﻿using Ganss.Xss;
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
