@@ -44,6 +44,9 @@ public class AdminViewModel
     public IList<string> SpeedUnitOptions { get; set; }
     public IList<string> TemperatureUnitOptions { get; set; }
 
+    public string Locale { get; set; }
+    public IList<string> LocaleOptions { get; set; }
+
     public bool HasRaces { get; set; }
     public bool HasCompetitors { get; internal set; }
 

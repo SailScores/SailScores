@@ -23,6 +23,8 @@ namespace SailScores.Core.Model
 
         public WeatherSettings WeatherSettings { get; set; }
 
+        public String Locale { get; set; }
+
         public IList<Fleet> Fleets { get; set; }
         public IList<Competitor> Competitors { get; set; }
         public IList<BoatClass> BoatClasses { get; set; }

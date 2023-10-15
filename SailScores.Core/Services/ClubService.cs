@@ -382,6 +382,7 @@ namespace SailScores.Core.Services
             dbClub.Description = club.Description;
             dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
             dbClub.ShowClubInResults = club.ShowClubInResults;
+            dbClub.Locale = club.Locale;
 
             if (dbClub.WeatherSettings == null)
             {
