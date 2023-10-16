@@ -205,6 +205,7 @@ public class CompetitorService : ICompetitorService
         var otherCompetitors = existingCompetitors.Where(c => c.Id != competitor.Id);
 
         if(otherCompetitors.Any(c => c.SailNumber == competitor.SailNumber
+                                    // tempted to remove the following line, not care about altsailnumbers on duplicate check.
                                      && c.AlternativeSailNumber == competitor.AlternativeSailNumber
                                      && c.Name == competitor.Name
                                      && c.BoatClassId == competitor.BoatClassId

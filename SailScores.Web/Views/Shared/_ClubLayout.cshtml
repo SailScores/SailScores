@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Localization
 @using Microsoft.AspNetCore.Routing
 @using SailScores.Web.Resources
 @using System.Globalization;
@@ -213,7 +213,9 @@
         //Date dd/MM/yyyy
         $.validator.methods.date = function (value, element) {
             var date = value.split("/");
-            return this.optional(element) || !/Invalid|NaN/.test(new Date(date[2], date[1], date[0]).toString());
+            var date2 = value.split("-");
+            return this.optional(element) || !/Invalid|NaN/.test(new Date(date[2], date[1], date[0]).toString())
+                || !/Invalid|NaN/.test(new Date(date2[0], date2[1], date2[2]).toString());
         }
     </script>
 </body>
