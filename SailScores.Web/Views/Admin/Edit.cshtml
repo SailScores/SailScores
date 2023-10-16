@@ -128,6 +128,16 @@
                     <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
                 </div>
             </div>
+            <div class="form-group col-sm-6">
+                <div class="form-row">
+                    <label class="col-6 col-form-label control-label"
+                           asp-for="Locale">Localization</label>
+                    <select id="locale" asp-for="Locale"
+                            class="form-control col-6"
+                            asp-items="new SelectList(Model.LocaleOptions)"></select>
+                    <span asp-validation-for="Locale" class="text-danger"></span>
+                </div>
+            </div>
         </div>
         <div class="form-group">
             <input type="submit" value="Save" class="btn btn-primary" />

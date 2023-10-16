@@ -15,6 +15,7 @@ namespace SailScores.Core.Model
         public String Name { get; set; }
 
         [Required]
+        [DisplayName("Discard Pattern")]
         public String DiscardPattern { get; set; }
 
         public IList<ScoreCode> ScoreCodes { get; set; }

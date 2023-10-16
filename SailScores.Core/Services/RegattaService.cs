@@ -78,6 +78,19 @@ namespace SailScores.Core.Services
 
             var fullRegatta = _mapper.Map<Regatta>(regattaDb);
 
+            fullRegatta.Documents = await _dbContext.Documents.Where(
+                d => d.RegattaId == regattaId)
+                .Select(d => new Document
+                {
+                    Id = d.Id,
+                    RegattaId = d.RegattaId,
+                    ClubId = d.ClubId,
+                    Name = d.Name,
+                    CreatedDate = d.CreatedDate,
+                    CreatedLocalDate = d.CreatedLocalDate,
+                    CreatedBy = d.CreatedBy
+                }).ToListAsync();
+
             foreach (var series in fullRegatta.Series)
             {
                 series.FlatResults = await _seriesService.GetHistoricalResults(series)

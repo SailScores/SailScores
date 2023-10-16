@@ -1,0 +1,79 @@
+﻿@model SailScores.Web.Models.SailScores.DocumentWithOptions
+
+@{
+    ViewData["Title"] = "Update Document";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Update a Document</h2>
+<hr />
+<div class="row">
+    <div class="col-lg-6 col-md-8">
+        <form asp-action="Update"
+              asp-route-returnurl="@ViewData["ReturnUrl"]"
+              enctype="multipart/form-data" >
+            <input type="hidden" id="regattaId" asp-for="RegattaId" />
+            <input type="hidden" id="timeOffset" asp-for="TimeOffset" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+             <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="input-group mb-3">
+                    <div class="custom-file">
+                        <input type="file" asp-for="File" class="custom-file-input"/>
+                        <label class="custom-file-label" for="File">Choose file</label>
+                    </div>
+                </div>
+                <span asp-validation-for="File" class="text-danger"></span>
+            </div>
+      
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary" />
+                @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+                {
+                    <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">Cancel</a>
+                } else
+                {
+                    <a href="@ViewData["ReturnUrl"]"
+                   class="btn btn-outline-primary">Cancel</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script>
+        document.getElementById("timeOffset").value = (new Date()).getTimezoneOffset();
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture']],
+                    ['view', ['codeview', 'help']],
+                ]
+            });
+        });
+    </script>
+    <script>
+        $('#File').on('change',function(){
+            //get the file name
+            var fileName = $(this).val();
+            //replace the "Choose a file" label
+            $(this).next('.custom-file-label').html(fileName.replace('C:\\fakepath\\', ''));
+        })
+    </script>
+
+}

@@ -6,36 +6,38 @@ using SailScores.Web.Models.SailScores;
 using Ganss.Xss;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
+using System.IO;
 
 namespace SailScores.Web.Controllers;
 
-public class AnnouncementController : Controller
+public class DocumentController : Controller
 {
 
 
     private readonly CoreServices.IClubService _clubService;
-    private readonly IAnnouncementService _announcementService;
+    private readonly IDocumentService _documentService;
     private readonly IAuthorizationService _authService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
     private readonly IHtmlSanitizer _sanitizer;
 
-    public AnnouncementController(
+    public DocumentController(
         CoreServices.IClubService clubService,
-        IAnnouncementService announcementService,
+        IDocumentService regattaDocumentService,
         IAuthorizationService authService,
         UserManager<ApplicationUser> userManager,
         IHtmlSanitizer sanitizer,
         IMapper mapper)
     {
         _clubService = clubService;
-        _announcementService = announcementService;
+        _documentService = regattaDocumentService;
         _authService = authService;
         _userManager = userManager;
         _sanitizer = sanitizer;
         _mapper = mapper;
     }
 
+    [Authorize]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid regattaId,
@@ -43,7 +45,7 @@ public class AnnouncementController : Controller
     {
 
         ViewData["ReturnUrl"] = returnUrl;
-        var vm = await _announcementService.GetBlankAnnouncementForRegatta(
+        var vm = await _documentService.GetDocumentUploadForRegatta(
             clubInitials,
             regattaId);
 
@@ -51,10 +53,11 @@ public class AnnouncementController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Create(
         string clubInitials,
-        AnnouncementWithOptions model,
+        DocumentWithOptions model,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -71,11 +74,10 @@ public class AnnouncementController : Controller
                 return View(model);
             }
 
-            model.Content = _sanitizer.Sanitize(model.Content);
             model.CreatedBy = await GetUserStringAsync();
             model.CreatedDate = DateTime.UtcNow;
             model.CreatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
-            await _announcementService.SaveNew(model);
+            await _documentService.SaveNew(model);
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
                 return Redirect(returnUrl);
@@ -84,10 +86,11 @@ public class AnnouncementController : Controller
         }
         catch
         {
-            AnnouncementWithOptions vm;
+            // todo: include error message in vm to indicate not saved.
+            DocumentWithOptions vm;
             if (model.RegattaId.HasValue)
             {
-                vm = await _announcementService.GetBlankAnnouncementForRegatta(
+                vm = await _documentService.GetDocumentUploadForRegatta(
                     clubInitials,
                     model.RegattaId.Value);
                 
@@ -99,8 +102,30 @@ public class AnnouncementController : Controller
         }
     }
 
+    public async Task<FileStreamResult> GetDocument(Guid id)
+    {
+        var doc = await _documentService.GetDocument(id);
+
+        var stream = new MemoryStream();
+        stream.Write(doc.FileContents, 0, doc.FileContents.Length);
+        stream.Position = 0;
+
+        var extension = MimeTypes.GetMimeTypeExtensions(doc.ContentType).FirstOrDefault();
+        if (!String.IsNullOrWhiteSpace(extension) && !doc.Name.EndsWith(extension))
+        {
+            doc.Name = doc.Name + extension;
+        }
+        System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+        {
+            FileName = doc.Name,
+            Inline = true
+        };
+        Response.Headers.Add("Content-Disposition", cd.ToString());
+        return new FileStreamResult(stream, doc.ContentType);
+    }
+
     [Authorize]
-    public async Task<ActionResult> Edit(
+    public async Task<ActionResult> Update(
         string clubInitials,
         Guid id,
         string returnUrl = null)
@@ -108,44 +133,44 @@ public class AnnouncementController : Controller
         try
         {
             ViewData["ReturnUrl"] = returnUrl;
+            
             if (!await _authService.CanUserEdit(User, clubInitials))
             {
                 return Unauthorized();
             }
-            var announcement =
-                await _announcementService.GetAnnouncement(id);
-            return View(announcement);
+            var doc =
+                await _documentService.GetSkinnyDocument(id);
+            return View(_mapper.Map<DocumentWithOptions>(doc));
         }
         catch
         {
+            // todo: add error message to vm.
             return RedirectToAction("Index", "Admin");
         }
     }
 
+
     [Authorize]
     [HttpPost]
+    [ActionName("Update")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit(
+    public async Task<ActionResult> PostUpdate(
         string clubInitials,
-        AnnouncementWithOptions model,
+        DocumentWithOptions model,
         string returnUrl = null)
     {
         try
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
+            model.CreatedBy = await GetUserStringAsync();
+            model.CreatedDate = DateTime.UtcNow;
+            model.CreatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
             if (!await _authService.CanUserEdit(User, clubInitials))
             {
                 return Unauthorized();
             }
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            model.Content = _sanitizer.Sanitize(model.Content);
-            model.UpdatedBy = await GetUserStringAsync();
-            model.UpdatedDate = DateTime.UtcNow;
-            model.UpdatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
-            await _announcementService.Update(model);
+            await _documentService.UpdateDocument(model);
 
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -153,11 +178,14 @@ public class AnnouncementController : Controller
             }
             return RedirectToAction("Index", "Admin");
         }
-        catch
+        catch (Exception ex)
         {
+            ModelState.AddModelError("", ex.Message);
+            // todo: add error message to vm.
             return View(model);
         }
     }
+
 
     [Authorize]
     public async Task<ActionResult> Delete(
@@ -170,8 +198,8 @@ public class AnnouncementController : Controller
         {
             return Unauthorized();
         }
-        var announcement = await _announcementService.GetAnnouncement(id);
-        return View(announcement);
+        var document = await _documentService.GetSkinnyDocument(id);
+        return View(document);
     }
 
     [Authorize]
@@ -189,7 +217,7 @@ public class AnnouncementController : Controller
         }
         try
         {
-            await _announcementService.Delete(id);
+            await _documentService.Delete(id);
 
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -199,7 +227,7 @@ public class AnnouncementController : Controller
         }
         catch
         {
-            var fleet = await _announcementService.GetAnnouncement(id);
+            var fleet = await _documentService.GetDocument(id);
             return View(fleet);
         }
     }

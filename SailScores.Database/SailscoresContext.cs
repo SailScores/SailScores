@@ -34,6 +34,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<UserClubPermission> UserPermissions { get; set; }
 
     public DbSet<File> Files { get; set; }
+    public DbSet<Document> Documents { get; set; }
 
     public DbSet<HistoricalResults> HistoricalResults { get; set; }
     public DbSet<SeriesChartResults> SeriesChartResults { get; set; }

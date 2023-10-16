@@ -45,5 +45,7 @@ namespace SailScores.Core.Model
         public bool PreferAlternateSailNumbers { get; set; }
 
         public IList<Announcement> Announcements { get; set; }
+
+        public IList<Document> Documents { get; set; }
     }
 }
