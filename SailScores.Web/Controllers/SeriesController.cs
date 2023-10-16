@@ -88,8 +88,14 @@ public class SeriesController : Controller
     public async Task<ActionResult> ExportCsv(
         string id)
     {
-
-        var series = await _seriesService.GetSeriesAsync(new Guid(id));
+        Core.Model.Series series = null;
+        try
+        {
+            series = await _seriesService.GetSeriesAsync(new Guid(id));
+        } catch (InvalidOperationException ex)
+        {
+            series = null;
+        }
         if (series == null)
         {
             return new NotFoundResult();

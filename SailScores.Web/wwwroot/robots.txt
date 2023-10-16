@@ -1,0 +1,4 @@
+User-agent: *
+Sitemap: https://www.sailscores.com/sitemap.xml
+Disallow: /Account/
+Disallow: /TEST/
