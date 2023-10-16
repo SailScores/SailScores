@@ -201,24 +201,8 @@ public class CompetitorService : ICompetitorService
         //These errors will prevent the competitor from being saved.
         var errors = new List<KeyValuePair<string, string>>();
         var existingCompetitors = await GetCompetitorsAsync(competitor.ClubId, true);
-        var existingThisCompetitor = existingCompetitors.SingleOrDefault(c => c.Id == competitor.Id);
+//        var existingThisCompetitor = existingCompetitors.SingleOrDefault(c => c.Id == competitor.Id);
         var otherCompetitors = existingCompetitors.Where(c => c.Id != competitor.Id);
-
-        // If this competitor is active, they can't have a non-empty primary
-        // sail number that matches another in the same class.
-        // but we allow it if the sailnumber is not changing.
-        if (!string.IsNullOrWhiteSpace(competitor.SailNumber)
-            && competitor.IsActive)
-        {
-            if (otherCompetitors.Any(c => c.SailNumber == competitor.SailNumber
-                                          && c.BoatClassId == competitor.BoatClassId
-                                          && c.IsActive)
-                && competitor.SailNumber != existingThisCompetitor.SailNumber)
-            {
-                errors.Add(new KeyValuePair<string, string>("SailNumber",
-                    "Sail number is already assigned to an active competitor in this class."));
-            }
-        }
 
         if(otherCompetitors.Any(c => c.SailNumber == competitor.SailNumber
                                      && c.AlternativeSailNumber == competitor.AlternativeSailNumber
