@@ -4,6 +4,7 @@ using SsObjects = SailScores.Core.Model;
 using System.Collections.Generic;
 using SailScores.Core.Services;
 using System.Linq;
+using SailScores.Core.Model.Summary;
 
 
 namespace SailScores.Utility
@@ -162,7 +163,7 @@ namespace SailScores.Utility
 
         private SsObjects.Club GetClub()
         {
-            IList<SsObjects.Club> existingClubs = GetExistingClubs();
+            IList<ClubSummary> existingClubs = GetExistingClubs().ToList();
             Console.WriteLine($"There are {existingClubs.Count} clubs already in the database.");
             Console.Write("Would you like to use one of those? (Y / N)");
             var result = Console.ReadLine();
@@ -233,7 +234,7 @@ namespace SailScores.Utility
         }
 
 
-        private IList<SsObjects.Club> GetExistingClubs()
+        private IEnumerable<ClubSummary> GetExistingClubs()
         {
             var clubTask = _coreClubService.GetClubs(true);
             return clubTask.Result;
@@ -242,7 +243,7 @@ namespace SailScores.Utility
         private SsObjects.Club SelectExistingClub()
         {
             var clubs = GetExistingClubs();
-            var clubDict = new Dictionary<int, SsObjects.Club>();
+            var clubDict = new Dictionary<int, ClubSummary>();
             int i = 1;
             foreach (var club in clubs)
             {
@@ -260,7 +261,7 @@ namespace SailScores.Utility
                 Int32.TryParse(input, out result);
             }
 
-            return clubDict[result];
+            return _coreClubService.GetFullClubExceptScores(clubDict[result].Id).Result;
         }
 
         private SsObjects.Club MakeNewClub()
