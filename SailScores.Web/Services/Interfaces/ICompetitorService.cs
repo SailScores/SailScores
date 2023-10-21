@@ -27,4 +27,6 @@ public interface ICompetitorService
     Task<IList<CompetitorIndexViewModel>> GetCompetitorsWithDeletableInfoAsync(
         String clubInitials,
         bool includeInactive);
+    Task ClearAltNumbers(Guid clubId);
+    Task InactivateSince(Guid clubId, DateTime sinceDate);
 }

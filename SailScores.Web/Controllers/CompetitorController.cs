@@ -400,4 +400,84 @@ public class CompetitorController : Controller
             return View(competitor);
         }
     }
+
+    [HttpGet]
+    // GET: Competitor/InactivateMultiple
+    public async Task<ActionResult> InactivateMultiple(string clubInitials)
+    {
+        if (!await _authService.CanUserEdit(User, clubInitials))
+        {
+            return Unauthorized();
+        }
+        return View();
+    }
+
+    // POST: Competitor/InactivateAll
+    [HttpPost]
+    [ActionName("InactivateAll")]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> PostInactivateMultiple(
+        string clubInitials,
+        [FromForm] DateTime sinceDate)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+        await _competitorService.InactivateSince(clubId, sinceDate);
+
+        return RedirectToAction("Index", "Competitor");
+    }
+
+	[HttpGet]
+	// GET: Competitor/ClearAltNumbers
+	public async Task<ActionResult> ClearAltNumbers(string clubInitials)
+	{
+		if (!await _authService.CanUserEdit(User, clubInitials))
+		{
+			return Unauthorized();
+		}
+		return View();
+	}
+
+	// POST: Competitor/ClearAltNumbers
+	[HttpPost]
+	[ActionName("ClearAltNumbers")]
+	[ValidateAntiForgeryToken]
+	public async Task<ActionResult> PostClearAltNumbers(string clubInitials)
+	{
+
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+		{
+			return Unauthorized();
+		}
+        await _competitorService.ClearAltNumbers(clubId);
+
+		return RedirectToAction("Index", "Competitor");
+	}
+
+	[HttpGet]
+    public async Task<ActionResult> Utilities(
+        		string clubInitials,
+                		string returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+		var clubId = await _clubService.GetClubId(clubInitials);
+		if (!await _authService.CanUserEdit(User, clubId))
+        {
+			return Unauthorized();
+		}
+		var competitors = await _competitorService
+			.GetCompetitorsAsync(clubInitials, true);
+        var compVm = _mapper.Map<List<CompetitorIndexViewModel>>(competitors);
+		var vm = new ClubCollectionViewModel<CompetitorIndexViewModel>
+        {
+			ClubInitials = clubInitials,
+			List = compVm,
+			CanEdit = await _authService.CanUserEdit(User, clubInitials)
+		};
+		return View(vm);
+	}
 }

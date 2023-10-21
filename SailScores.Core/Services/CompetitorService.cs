@@ -375,5 +375,17 @@ namespace SailScores.Core.Services
         {
             return await _dbContext.GetDeletableInfoForCompetitorsAsync(clubId);
         }
+
+        public Task<Dictionary<Guid, DateTime?>> GetLastActiveDates(Guid clubId)
+        {
+            var returnValue = _dbContext.Competitors
+                .Include(c => c.Scores)
+                .ThenInclude(s => s.Race)
+                .Where(c => c.ClubId == clubId)
+                .ToDictionaryAsync(
+                    c => c.Id,
+                    c => c.Scores.Max(s => s.Race.Date));
+            return returnValue;
+        }
     }
 }
