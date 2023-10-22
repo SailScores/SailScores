@@ -62,6 +62,10 @@ public class AdminService : IAdminService
 
     private string GetLocaleLongName(string locale)
     {
+        if(String.IsNullOrWhiteSpace(locale))
+        {
+            return _localizerService.SupportedLocalizations[_localizerService.DefaultLocalization];
+        }
         var returnValue = _localizerService.SupportedLocalizations[locale];
 
         return returnValue ?? _localizerService.SupportedLocalizations[_localizerService.DefaultLocalization]; 
