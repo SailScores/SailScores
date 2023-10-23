@@ -15,6 +15,7 @@
         <a asp-controller="Series" asp-action="Create">series</a> which usually occur over
         multiple weeks with varying competitors. Regattas will be shared on the front page
         of SailScores for a week before and after their scheduled dates.</p>
+        <p>A single regatta can include multiple fleets.</p>
     </div>
 </div>
 
@@ -34,7 +35,7 @@
                    data-toggle="popover"
                    data-placement="top"
                    data-trigger="focus hover"
-                   data-content="If there is another site with regatta information, enter the URL here.">
+                   data-content="If there is another site with regatta information, enter the URL here. Include the leading 'https:\\'">
                     <span class="far fa-question-circle"></span>
                 </a>
                 <input asp-for="Url" class="form-control" />
@@ -62,9 +63,14 @@
                    data-toggle="popover"
                    data-placement="top"
                    data-trigger="focus hover"
-                   data-content="If regatta fleets have not been created, leave this blank. You may also create fleets from the regatta score page.">
+                   data-content="Not required. May be created later.">
                     <span class="far fa-question-circle"></span>
-                </a><small>Each fleet will be scored separately.</small>
+                </a>
+                <p><small>If regatta fleets have not been created, <strong>do not</strong> select
+                    fleets here. Create fleets after creating the regatta. (Each
+                    fleet will be scored separately.)
+                    </small>
+                </p>
                 <select multiple asp-for="FleetIds" class="form-control custom-select selectpicker">
                     @foreach (var fleet in Model.FleetOptions.OrderBy(c => c.Name))
                     {
@@ -89,7 +95,15 @@
                         <div class="card-body">
 
                             <div class="form-group">
-                                <label asp-for="ScoringSystemId">Default Scoring System</label>
+                                <label asp-for="ScoringSystemId">Default Scoring System</label><a
+                                    class="text-primary"
+                                    data-container="body"
+                                    data-toggle="popover"
+                                    data-placement="top"
+                                    data-trigger="focus hover"
+                                    data-content="May be changed later.>
+                                    <span class="far fa-question-circle"></span>
+                                </a>
                                 <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-control">
                                     @foreach (var scoringSystem in Model.ScoringSystemOptions)
                                     {

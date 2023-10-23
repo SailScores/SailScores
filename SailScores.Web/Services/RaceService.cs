@@ -187,6 +187,7 @@ public class RaceService : IRaceService
         else if (regatta.StartDate.HasValue)
         {
             model.Date = regatta.StartDate.Value;
+            model.NeedsLocalDate = false;
         }
         else
         {
@@ -294,7 +295,7 @@ public class RaceService : IRaceService
     {
         await EnsureSeasonExists(race.ClubId, race.Date);
         var fleets = await _coreClubService.GetAllFleets(race.ClubId);
-        var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, DateTime.Today, false);
+        var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, race.Date, false);
 
         // fill in series and fleets
         if (race.SeriesIds != null)

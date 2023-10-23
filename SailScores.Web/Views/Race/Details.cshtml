@@ -1,4 +1,4 @@
-@using SailScores.Web.Models.SailScores;
+﻿@using SailScores.Web.Models.SailScores;
 @using SailScores.Web.Services.Interfaces
 @model ClubItemViewModel<RaceViewModel>
 @inject IWeatherService  weatherService
@@ -29,6 +29,11 @@
                    asp-action="Delete"
                    asp-route-id="@Model.Item.Id">Delete</a>
             }
+            @if (Model.Item.Regatta != null)
+            {
+                var regatta = Model.Item.Regatta;
+                        <h4><a href="~/@Model.ClubInitials/Regatta/@regatta.Season.UrlName/@regatta.UrlName">@regatta.Season.Name @regatta.Name</a></h4>
+            }
             <h4>
                 @Model.Item.Fleet?.Name
             </h4>
@@ -56,11 +61,12 @@
                 <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.TemperatureUnits">@Model.Item.Weather.Temperature°</span>
             }
         </div>
-    </div>
+        </div>
         @if(Model.Item.Regatta == null)
         {
-    <ul>
-        @foreach (var series in @Model.Item.Series)
+
+            <ul>
+            @foreach (var series in @Model.Item.Series)
         {
             <li>
                 <a href="~/@Model.ClubInitials/@Model.Item.Season.UrlName/@series.UrlName">

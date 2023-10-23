@@ -4,6 +4,7 @@ namespace SailScores.Web.Models.SailScores;
 
 public class FleetWithOptionsViewModel : Core.Model.Fleet
 {
+    public String SuggestedFullName { get; set; }
     public IEnumerable<BoatClass> BoatClassOptions { get; set; }
     public IEnumerable<Guid> BoatClassIds { get; set; }
 
