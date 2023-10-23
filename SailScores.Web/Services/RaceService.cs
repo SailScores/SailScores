@@ -327,6 +327,15 @@ public class RaceService : IRaceService
             {
                 race.Order = race.InitialOrder.Value;
             }
+            // if a regatta race and no order set, set to order # after other races in this series.
+            else if (race.RegattaId.HasValue)
+            {
+                int count = await _coreRegattaService.GetMaxFleetRaceNumberAsync(race.RegattaId.Value,
+                    race.FleetId);
+
+
+                race.Order = count + 1;
+            }
             else
             {
                 int existingRaceCount = await _coreRaceService.GetRaceCountAsync(
