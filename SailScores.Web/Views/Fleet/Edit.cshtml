@@ -17,19 +17,6 @@
             <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="ShortName" class="control-label"></label>
-                <a class="text-primary"
-                   data-container="body"
-                   data-toggle="popover"
-                   data-placement="top"
-                   data-trigger="focus hover"
-                   data-content="Used to create URLs; avoid spaces. Should be unique for this club, e.g. 2019DieHardMCs">
-                    <span class="far fa-question-circle"></span>
-                </a>
-                <input asp-for="ShortName" class="form-control" />
-                <span asp-validation-for="ShortName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <a class="text-primary"
                    data-container="body"
@@ -41,6 +28,19 @@
                 </a>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShortName" class="control-label"></label>
+                <a class="text-primary"
+                   data-container="body"
+                   data-toggle="popover"
+                   data-placement="top"
+                   data-trigger="focus hover"
+                   data-content="Used to create URLs; avoid spaces. Should be unique for this club, e.g. 2019DieHardMCs">
+                    <span class="far fa-question-circle"></span>
+                </a>
+                <input asp-for="ShortName" class="form-control" />
+                <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="NickName" class="control-label"></label>

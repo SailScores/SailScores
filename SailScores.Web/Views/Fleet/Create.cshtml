@@ -28,9 +28,7 @@
                 </a>
                 @if (Model.SuggestedFullName != null)
                 {
-                    <p>
-                        <small>Suggested Name: @Model.SuggestedFullName</small>
-                    </p>
+                    <small>Suggested: @Model.SuggestedFullName</small>
                 }
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -55,7 +53,7 @@
                    data-toggle="popover"
                    data-placement="top"
                    data-trigger="focus hover"
-                   data-content="Used as a display name, this does not need to be unique, e.g. MC Scows">
+                   data-content="Used as a display name, does not need to be unique, e.g. MC Scows">
                     <span class="far fa-question-circle"></span>
                 </a>
                 <input asp-for="NickName" class="form-control" />
@@ -74,6 +72,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="FleetType" class="control-label"></label>
+                @if (Model.Regatta != null)
+                {
+                        <small>For a regatta, usually set to 'Selected Boats'.</small>
+                }
                 <select id="fleetType" asp-for="FleetType" class="form-control"
                         asp-items="(Html.GetEnumSelectList<SailScores.Api.Enumerations.FleetType>())"
                         onChange="checkFleetOptionVisibility()">

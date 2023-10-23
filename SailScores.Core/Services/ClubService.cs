@@ -185,9 +185,9 @@ namespace SailScores.Core.Services
                 .ToList();
             retClub.BoatClasses = retClub.BoatClasses
                 .OrderBy(c => c.Name).ToList();
+            retClub.Regattas = retClub.Regattas
+                .OrderByDescending(r => r.StartDate ?? DateTime.MinValue).ThenBy(r => r.Name).ToList();
             return retClub;
-
-
         }
 
         public async Task<Model.Club> GetFullClubExceptScores(string id)
