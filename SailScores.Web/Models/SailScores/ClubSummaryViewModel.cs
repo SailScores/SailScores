@@ -1,6 +1,7 @@
 ﻿using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 using SailScores.Api.Enumerations;
+using System.Text;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -61,7 +62,7 @@ public class ClubSummaryViewModel
     public IEnumerable<SeriesSummary> ImportantSeries => Series
         ?.Where(s =>
             s.IsImportantSeries ?? false)
-        .OrderBy(s => s.Season.Name)
+        .OrderByDescending(s => s.Season.Name)
         .ThenBy(s => s.Name);
 
     public IEnumerable<RegattaSummaryViewModel> CurrentRegattas => Regattas
@@ -70,5 +71,41 @@ public class ClubSummaryViewModel
             &&
             (r.StartDate.HasValue && r.StartDate.Value < DateTime.Today.AddDays(14)))
         .OrderBy(r => r.Name);
+
+    // aiming for a description with series names, but hopefully less than 200 characters.
+    public String LongDescription
+    {
+        get
+        {
+            var longDescription = new StringBuilder();
+            longDescription.Append($"Scores for {Name} ({Initials})");
+
+            var recentSeries = Series.Where(s => (s.UpdatedDate > (DateTime.Now.AddYears(-6)) && (s.IsImportantSeries ?? false)) ||
+                s.UpdatedDate > (DateTime.Now.AddDays(-14)))
+                .OrderBy( s => s.IsImportantSeries??false? 0:1).ThenByDescending(s => s.UpdatedDate);
+            if (recentSeries.Any())
+            {
+                longDescription.Append(" including:");
+
+                var lastSeasonName = "";
+                foreach(var series in recentSeries)
+                {
+                    if (lastSeasonName != series.Season.Name)
+                    {
+                        lastSeasonName = series.Season.Name;
+                        longDescription.Append($" ({series.Season.Name})");
+                    }
+                    longDescription.Append($" {series.Name},");
+                    if (longDescription.Length > 170)
+                    {
+                        break;
+                    }
+                }
+                longDescription.Remove(longDescription.Length - 1, 1);
+                longDescription.Append(".");
+            }
+            return longDescription.ToString();
+        }
+    }
 }
 #pragma warning restore CA2227 // Collection properties should be read only
