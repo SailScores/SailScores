@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 using SailScores.Api.Enumerations;
 using System.Text;
@@ -93,7 +93,7 @@ public class ClubSummaryViewModel
                     if (lastSeasonName != series.Season.Name)
                     {
                         lastSeasonName = series.Season.Name;
-                        longDescription.Append($" ({series.Season.Name})");
+                        longDescription.Append($" {series.Season.Name}:");
                     }
                     longDescription.Append($" {series.Name},");
                     if (longDescription.Length > 170)
