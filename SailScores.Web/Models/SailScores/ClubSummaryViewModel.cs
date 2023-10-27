@@ -78,14 +78,14 @@ public class ClubSummaryViewModel
         get
         {
             var longDescription = new StringBuilder();
-            longDescription.Append($"Scores for {Name} ({Initials})");
+            longDescription.Append($"Results for {Name} ({Initials})");
 
             var recentSeries = Series.Where(s => (s.UpdatedDate > (DateTime.Now.AddYears(-6)) && (s.IsImportantSeries ?? false)) ||
                 s.UpdatedDate > (DateTime.Now.AddDays(-14)))
                 .OrderBy( s => s.IsImportantSeries??false? 0:1).ThenByDescending(s => s.UpdatedDate);
             if (recentSeries.Any())
             {
-                longDescription.Append(" including:");
+                longDescription.Append(" including");
 
                 var lastSeasonName = "";
                 foreach(var series in recentSeries)
