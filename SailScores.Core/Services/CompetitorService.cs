@@ -60,12 +60,14 @@ namespace SailScores.Core.Services
             }
 
             var list = await dbObjects
-                .OrderBy(c => c.SailNumber)
-                .ThenBy(c => c.Name)
+                //.OrderBy(c => c.SailNumber)
+                //.ThenBy(c => c.Name)
                 .Include(c => c.BoatClass)
                 .ToListAsync()
                 .ConfigureAwait(false);
-            return _mapper.Map<List<Model.Competitor>>(list);
+            var modelList = _mapper.Map<List<Model.Competitor>>(list);
+            modelList.Sort();
+            return modelList;
         }
 
         public async Task<Model.Competitor> GetCompetitorAsync(Guid id)

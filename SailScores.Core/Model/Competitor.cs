@@ -1,3 +1,4 @@
+using SailScores.Core.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -6,7 +7,7 @@ namespace SailScores.Core.Model
 {
 
 #pragma warning disable CA2227 // Collection properties should be read only
-    public class Competitor : IValidatableObject
+    public class Competitor : IValidatableObject, IComparable<Competitor>
     {
         public Guid Id { get; set; }
         public Guid ClubId { get; set; }
@@ -40,6 +41,26 @@ namespace SailScores.Core.Model
         public BoatClass BoatClass { get; set; }
         public IList<Fleet> Fleets { get; set; }
 
+        public int CompareTo(Competitor other)
+        {
+            var sailNumberComparison = AlphaNumericComparer.Compare(SailNumber, other.SailNumber);
+            if (sailNumberComparison != 0)
+            {
+                return sailNumberComparison;
+            }
+            var nameComparison = AlphaNumericComparer.Compare(Name, other.Name);
+            if (nameComparison != 0)
+            {
+                return nameComparison;
+            }
+            var boatNameComparison = AlphaNumericComparer.Compare(BoatName, other.BoatName);
+            if (boatNameComparison != 0)
+            {
+                return boatNameComparison;
+            }
+            return Id.CompareTo(other.Id);
+        }
+
         public override string ToString()
         {
             return BoatName + " : " + Name + " : " + SailNumber + " : " + Id;
@@ -54,6 +75,9 @@ namespace SailScores.Core.Model
                     new string[] { "SailNumber", "Name" });
             }
         }
+
+        private static readonly AlphaNumericComparer AlphaNumericComparer = new AlphaNumericComparer();
+
     }
 
 #pragma warning restore CA2227 // Collection properties should be read only
