@@ -1,4 +1,4 @@
-﻿@using Humanizer
+@using Humanizer
 
 @model SailScores.Web.Models.SailScores.ScoreCellViewModel
 
@@ -13,7 +13,7 @@
             {
                 @Html.Raw("<s>")
             }
-            @if (Model.Result.Code != null
+            @if(Model.Result.Code != null
                && Model.ScoreCodesUsed != null
                && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
             {
@@ -25,10 +25,11 @@
                && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
             {
                 @Html.Raw("</span>")
-            } @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
-            @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
+            } @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
             {
-                <span class="small">(@Model.Result.Place.Value.Ordinalize())</span>
+                <span title="@Model.Result.Place.Value.Ordinalize()">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
+            } else {
+                @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
             }
             @if (Model.Result.Discard)
             {

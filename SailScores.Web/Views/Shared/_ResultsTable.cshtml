@@ -201,16 +201,14 @@
                     }
                     <td scope="row" class="text-center">
                         <strong>
-                            @String.Format("{0:0.##}", results.GetScore(comp)?.TotalScore)
-
                             @if (results.IsPercentSystem &&
               results.GetScore(comp)?.TotalScore != null)
                             {
-                                <br />
-                                <span class="small">
-                                    (@results.GetScore(comp).PointsEarned /
-                                    @results.GetScore(comp).PointsPossible.Value.ToString("N0"))
+                                <span data-toggle="tooltip" title="@results.GetScore(comp).PointsEarned / @results.GetScore(comp).PointsPossible.Value.ToString("N0")" >
+                                        @String.Format("{0:0.##}", results.GetScore(comp)?.TotalScore)
                                 </span>
+                            } else {
+                                    @String.Format("{0:0.##}", results.GetScore(comp)?.TotalScore)
                             }
                         </strong>
                     </td>

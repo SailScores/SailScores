@@ -55,7 +55,7 @@ namespace SailScores.Core.Scoring
         /// The series score for each boat will be a percentage calculated as
         /// follows: divide the sum of her race scores by the sum of the points
         /// she would have scored if she had placed first in every race in
-        /// which she competed; multiply the result by 100.2 The qualified boat
+        /// which she competed; multiply the result by 100. The qualified boat
         /// with the highest series score is the winner, and others are ranked
         /// accordingly.
         protected override void CalculateTotals(
@@ -77,9 +77,11 @@ namespace SailScores.Core.Scoring
                 }
                 else
                 {
+                    // racesToExclude should include discards and DNCs
                     var racesToExclude = currentCompResults
                         .CalculatedScores
-                        .Where(s => s.Value.Discard)
+                        .Where(s => s.Value.Discard ||
+                        ( !String.IsNullOrEmpty(s.Value.RawScore.Code) && !(GetScoreCode(s.Value.RawScore.Code).CameToStart ?? false)))
                         .Select(s => s.Key.Id);
                     var perfectScore = scores.Where(s => !racesToExclude.Contains(s.RaceId))
                         .Count(s => CameToStart(s));
