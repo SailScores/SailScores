@@ -32,7 +32,7 @@
         {
             @:&ndash; @results.ScoringSystemName
         }
-        @if (results.IsPercentSystem && results.PercentRequired.HasValue)
+        @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
         {
             @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
         }

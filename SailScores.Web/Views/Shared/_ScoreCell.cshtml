@@ -1,19 +1,23 @@
-﻿@using Humanizer
+@using Humanizer
 
 @model SailScores.Web.Models.SailScores.ScoreCellViewModel
 
 @if (Model != null && Model.Result != null )
 {
     <td class="text-center
-        @(Model.Result.ScoreValue == 1 && String.IsNullOrEmpty(Model.Result.Code) ? "finish-first ": "")
-        @(Model.Result.ScoreValue == 2 && String.IsNullOrEmpty(Model.Result.Code) ? "finish-second " : "")
-        @(Model.Result.ScoreValue == 3 && String.IsNullOrEmpty(Model.Result.Code) ? "finish-third " : "") ">
+        @(Model.Result.ScoreValue == 1 && !Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) ? "finish-first ": "")
+        @(Model.Result.ScoreValue == 2 && !Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) ? "finish-second " : "")
+        @(Model.Result.ScoreValue == 3 && !Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) ? "finish-third " : "")
+        @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 1 ? "finish-first" : "")
+        @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 2 ? "finish-second " : "")
+        @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 3 ? "finish-third " : "")
+        ">
         <span class="@(Model.Result.Discard ? "text-muted" : "")">
             @if (Model.Result.Discard)
             {
                 @Html.Raw("<s>")
             }
-            @if (Model.Result.Code != null
+            @if(Model.Result.Code != null
                && Model.ScoreCodesUsed != null
                && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
             {
@@ -25,10 +29,11 @@
                && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
             {
                 @Html.Raw("</span>")
-            } @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
-            @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
+            } @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
             {
-                <span class="small">(@Model.Result.Place.Value.Ordinalize())</span>
+                <span title="@Model.Result.Place.Value.Ordinalize()">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
+            } else {
+                @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
             }
             @if (Model.Result.Discard)
             {

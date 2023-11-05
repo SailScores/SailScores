@@ -27,9 +27,23 @@
 	   </a>
 	  </div>
 	  <div class="col-6 col-sm-4 col-md-3">
-	   <a class="btn btn-warning" asp-action="Options" asp-controller="MergeCompetitor">
-		Merge Competitors
-	   </a>
+		<div class="btn-group">
+			<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Utilities
+			</button>
+			<div class="dropdown-menu">
+				<a class="dropdown-item" asp-action="Options" asp-controller="MergeCompetitor">
+					Merge Two Competitors
+				</a>
+				<a class="dropdown-item" asp-action="ClearAltNumbers" asp-controller="Competitor">
+				Clear Alt Sail Numbers
+				</a>
+				@* 				<div class="dropdown-divider"></div> *@
+				<a class="dropdown-item" asp-action="InactivateMultiple" asp-controller="Competitor">
+					Bulk Inactivate
+				</a>
+			</div>
+		</div>
 	  </div>
 	  <div class="col-3">
 	   <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">

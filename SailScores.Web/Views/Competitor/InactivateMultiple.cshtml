@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Inactivate Competitors";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Inactivate Competitors</h2>
+
+<h3>The Active checkbox will be cleared</h3>
+<p>This will not delete any results but will prevent competitors
+    from being added to new races.</p>
+<p>This feature can be used to inactivate all competitors for a new
+    season or to remove sailors that haven't
+    raced in some time. Edit individual
+    competitors to return them to active status.</p>
+<p>Provide a date to inactivate only competitors that have <strong>not</strong>
+    participated in races since the given date.</p>
+<p>To set all competitors as inactive, select a date after your most recent race.</p>
+<form asp-action="InactivateAll">
+    <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="sinceDate" class="col-form-label">Affect competitors with no results after:</label>
+        <input class="form-control" type="date" id="sinceDate"
+            name="sinceDate" required />
+            </div>
+    </div>
+    <input type="submit" value="Inactivate" class="btn btn-danger" />
+    <a asp-controller="Competitor"
+       asp-action="Index"
+       class="btn btn-outline-primary">Cancel</a>
+</form>

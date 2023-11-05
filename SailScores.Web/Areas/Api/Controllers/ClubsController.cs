@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
+using SailScores.Core.Model.Summary;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Areas.Api.Controllers
@@ -29,7 +30,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         /// <summary>
         /// Get summary list of clubs: some properties may be empty.
         /// </summary>
-        /// <returns>Array of Model.Club</returns>
+        /// <returns>Array of ClubDto</returns>
         // GET: api/Clubs
 
         [HttpGet]
@@ -37,7 +38,7 @@ namespace SailScores.Web.Areas.Api.Controllers
         {
             var clubs = await _clubService.GetClubs(true);
 
-            var filteredClubs = new List<Club>();
+            var filteredClubs = new List<ClubSummary>();
             foreach (var club in clubs)
             {
                 if (await _authService.CanUserEdit(User, club.Id))

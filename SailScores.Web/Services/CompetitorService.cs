@@ -205,6 +205,7 @@ public class CompetitorService : ICompetitorService
         var otherCompetitors = existingCompetitors.Where(c => c.Id != competitor.Id);
 
         if(otherCompetitors.Any(c => c.SailNumber == competitor.SailNumber
+                                    // tempted to remove the following line, not care about altsailnumbers on duplicate check.
                                      && c.AlternativeSailNumber == competitor.AlternativeSailNumber
                                      && c.Name == competitor.Name
                                      && c.BoatClassId == competitor.BoatClassId
@@ -217,5 +218,37 @@ public class CompetitorService : ICompetitorService
         }
 
         return errors;
+    }
+
+    public async Task ClearAltNumbers(Guid clubId)
+    {
+        var competitors = await GetCompetitorsAsync(clubId, true);
+
+        foreach (var competitor in competitors
+            .Where(c => !String.IsNullOrWhiteSpace(c.AlternativeSailNumber)))
+        {
+            // need to get full competitor to preserve fleet memberships.
+            var fullCompetitor = await _coreCompetitorService.GetCompetitorAsync(competitor.Id);
+            fullCompetitor.AlternativeSailNumber = null;
+
+            await _coreCompetitorService.SaveAsync(fullCompetitor);
+        }
+    }
+
+    public async Task InactivateSince(Guid clubId, DateTime sinceDate)
+    {
+        var competitors = await _coreCompetitorService.GetCompetitorsAsync(clubId, null, true);
+        var lastActive = await _coreCompetitorService.GetLastActiveDates(clubId);
+        foreach (var competitor in competitors.Where(c => c.IsActive))
+        {
+            if (lastActive[competitor.Id] == null ||
+                lastActive[competitor.Id] < sinceDate)
+            {
+                // need to get full competitor to preserve fleet memberships.
+                var fullCompetitor = await _coreCompetitorService.GetCompetitorAsync(competitor.Id);
+                fullCompetitor.IsActive = false;
+                await _coreCompetitorService.SaveAsync(fullCompetitor);
+            }
+        }
     }
 }

@@ -60,12 +60,14 @@ namespace SailScores.Core.Services
             }
 
             var list = await dbObjects
-                .OrderBy(c => c.SailNumber)
-                .ThenBy(c => c.Name)
+                //.OrderBy(c => c.SailNumber)
+                //.ThenBy(c => c.Name)
                 .Include(c => c.BoatClass)
                 .ToListAsync()
                 .ConfigureAwait(false);
-            return _mapper.Map<List<Model.Competitor>>(list);
+            var modelList = _mapper.Map<List<Model.Competitor>>(list);
+            modelList.Sort();
+            return modelList;
         }
 
         public async Task<Model.Competitor> GetCompetitorAsync(Guid id)
@@ -374,6 +376,18 @@ namespace SailScores.Core.Services
         public async Task<IList<Db.DeletableInfo>> GetDeletableInfo(Guid clubId)
         {
             return await _dbContext.GetDeletableInfoForCompetitorsAsync(clubId);
+        }
+
+        public Task<Dictionary<Guid, DateTime?>> GetLastActiveDates(Guid clubId)
+        {
+            var returnValue = _dbContext.Competitors
+                .Include(c => c.Scores)
+                .ThenInclude(s => s.Race)
+                .Where(c => c.ClubId == clubId)
+                .ToDictionaryAsync(
+                    c => c.Id,
+                    c => c.Scores.Max(s => s.Race.Date));
+            return returnValue;
         }
     }
 }

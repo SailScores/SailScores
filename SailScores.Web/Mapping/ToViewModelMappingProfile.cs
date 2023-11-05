@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SailScores.Api.Dtos;
 using SailScores.Web.Models.SailScores;
 using System;
@@ -55,7 +55,8 @@ namespace SailScores.Web.Mapping
                     s.Competitors.Select(c => c.Id)))
                 .ForMember(d => d.Regatta, o => o.Ignore())
                 .ForMember(d => d.RegattaId, o => o.Ignore())
-                .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore());
+                .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore())
+                .ForMember(d => d.SuggestedFullName, o => o.Ignore());
             CreateMap<Model.Fleet, FleetDeleteViewModel>()
                 .ForMember(d => d.IsDeletable, o => o.Ignore())
                 .ForMember(d => d.PreventDeleteReason, o => o.Ignore());

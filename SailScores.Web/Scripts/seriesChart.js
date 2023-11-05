@@ -38,6 +38,7 @@
         }
 
         function getY(result, allData) {
+
             var maxScore = Math.max(...allData.entries
                 .filter(e => e.raceId === result.raceId)
                 .map(e => e.seriesPoints));
@@ -46,6 +47,9 @@
                     && e.seriesPoints !== 0)
                 .map(e => e.seriesPoints));
             var ratio = (result.seriesPoints - minScore) / (maxScore - minScore);
+            if (!allData.isLowPoints) {
+                ratio = 1.0 - ratio;
+            }
             if (isNaN(ratio)) {
                 ratio = 0;
             }
@@ -110,6 +114,7 @@
                 .attr("height", chartOverallHeight)
                 .call(responsivefy);
 
+
             function getRaceName(raceId) {
                 return data.races.find(r => r.id === raceId).shortName;
             }
@@ -156,13 +161,13 @@
                     .append("tspan")
                     .attr("x", 5)
                     .attr("y", (legendLineHeight * 2) - 5)
-                    .text("Place: " + d.racePlace);
+                    .text("Race Score: " + d.racePlace);
                 tooltipGroup
                     .select("text")
                     .append("tspan")
                     .attr("x", 5)
                     .attr("y", (legendLineHeight * 3) - 5)
-                    .text("Series points: " + d.seriesPoints);
+                    .text("Series Score: " + d.seriesPoints);
                 onMouseOver(d);
 
             }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
+using SailScores.Core.Model.Summary;
 
 namespace SailScores.Core.Services
 {
@@ -114,14 +115,12 @@ namespace SailScores.Core.Services
             return bizObj;
         }
 
-        public async Task<IList<Model.Club>> GetClubs(bool includeHidden)
+        public async Task<IEnumerable<ClubSummary>> GetClubs(bool includeHidden)
         {
-            var dbObjects = await _dbContext
+            var dbObjects = _dbContext
                 .Clubs
-                .Where(c => includeHidden || !c.IsHidden)
-                .ToListAsync()
-                .ConfigureAwait(false);
-            return _mapper.Map<List<Model.Club>>(dbObjects);
+                .Where(c => includeHidden || !c.IsHidden);
+            return _mapper.ProjectTo<ClubSummary>(dbObjects);
         }
 
         public async Task<Guid> GetClubId(string initials)
@@ -186,9 +185,9 @@ namespace SailScores.Core.Services
                 .ToList();
             retClub.BoatClasses = retClub.BoatClasses
                 .OrderBy(c => c.Name).ToList();
+            retClub.Regattas = retClub.Regattas
+                .OrderByDescending(r => r.StartDate ?? DateTime.MinValue).ThenBy(r => r.Name).ToList();
             return retClub;
-
-
         }
 
         public async Task<Model.Club> GetFullClubExceptScores(string id)

@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Clear Alternative Sail Numbers";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Clear Alternative Sail Numbers</h2>
+
+<h3>Are you sure you want to clear alternative sail numbers for all competitors?</h3>
+<p>Alternative sail numbers are sometimes used for a particular event, such as a
+    regatta.
+</p>
+
+<div>
+    <form asp-action="ClearAltNumbers">
+        <input type="submit" value="Clear Alt Numbers" class="btn btn-danger" />
+        <a asp-controller="Competitor"
+           asp-action="Index"
+           class="btn btn-outline-primary">Cancel</a>
+    </form>
+</div>

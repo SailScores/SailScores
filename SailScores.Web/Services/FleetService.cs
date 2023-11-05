@@ -119,10 +119,12 @@ public class FleetService : IFleetService
 
         vm.RegattaId = regattaId;
         vm.IsActive = true;
+
         if (regattaId.HasValue)
         {
             var regatta = await _regattaService.GetRegattaAsync(regattaId.Value);
             vm.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
+            vm.SuggestedFullName = $"{regatta.Season.Name} {regatta.Name} <Class Name>";
         }
         return vm;
     }

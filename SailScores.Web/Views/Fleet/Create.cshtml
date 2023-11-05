@@ -17,30 +17,34 @@
             <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="ShortName" class="control-label"></label>
-                <a class="text-primary"
-                   data-container="body"
-                   data-toggle="popover"
-                   data-placement="top"
-                   data-trigger="focus hover"
-                   data-content="Used to create URLs; avoid spaces. Should be unique in the club, e.g. 2019DieHardMCs">
-                    <span class="far fa-question-circle"></span>
-                </a>
-                <input asp-for="ShortName" class="form-control" />
-                <span asp-validation-for="ShortName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <a class="text-primary"
                    data-container="body"
                    data-toggle="popover"
                    data-placement="top"
                    data-trigger="focus hover"
-                   data-content="Full name including spaces such as: 2019 Die Hard MC Scows">
+                   data-content="Full name including spaces such as: '2024 Die Hard MC Scows'">
                     <span class="far fa-question-circle"></span>
                 </a>
+                @if (Model.SuggestedFullName != null)
+                {
+                    <small>Suggested: @Model.SuggestedFullName</small>
+                }
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShortName" class="control-label"></label>
+                <a class="text-primary"
+                   data-container="body"
+                   data-toggle="popover"
+                   data-placement="top"
+                   data-trigger="focus hover"
+                   data-content="Used to create links; avoid spaces. Should be unique in the club, e.g. 2024DieHardMCs">
+                    <span class="far fa-question-circle"></span>
+                </a>
+                <input asp-for="ShortName" class="form-control" />
+                <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="NickName" class="control-label"></label>
@@ -49,7 +53,7 @@
                    data-toggle="popover"
                    data-placement="top"
                    data-trigger="focus hover"
-                   data-content="Used as a display name, this does not need to be unique, e.g. MC Scows">
+                   data-content="Used as a display name, does not need to be unique, e.g. MC Scows">
                     <span class="far fa-question-circle"></span>
                 </a>
                 <input asp-for="NickName" class="form-control" />
@@ -68,9 +72,13 @@
             </div>
             <div class="form-group">
                 <label asp-for="FleetType" class="control-label"></label>
+                @if (Model.Regatta != null)
+                {
+                        <small>For a regatta, usually set to 'Selected Boats'.</small>
+                }
                 <select id="fleetType" asp-for="FleetType" class="form-control"
                         asp-items="(Html.GetEnumSelectList<SailScores.Api.Enumerations.FleetType>())"
-                        onchange="checkVisibility()">
+                        onChange="checkFleetOptionVisibility()">
                     <option selected="selected" value="">Select the type of Fleet</option>
                 </select>
                 <span asp-validation-for="FleetType" class="text-danger"></span>
@@ -125,7 +133,7 @@
 
 @section Scripts {
     <script type="text/javascript">
-        function checkVisibility() {
+        function checkFleetOptionVisibility() {
             var f = document.getElementById('fleetType');
             var fType = f.options[f.selectedIndex].text;
             if (fType.indexOf('Class') > -1) {
@@ -141,7 +149,7 @@
                 document.getElementById('compCreateGroup').style.display = 'none';
             }
         };
-        checkVisibility();
+        checkFleetOptionVisibility();
         
     </script>
     

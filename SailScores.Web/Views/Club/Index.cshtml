@@ -10,7 +10,9 @@
 @{
     ViewBag.Title = Model.Name + " " + localizer["Scores"];
     Layout = "_ClubLayout";
-    ViewData["MetaDescription"] = $"Sailing results and scores for racing at {Model.Name} ({Model.Initials})";
+    ViewData["MetaDescription"] = $"Scores for {Model.Name} ({Model.Initials})";
+    ViewData["ogTitle"] = Model.Name + " " + localizer["Scores"];
+    ViewData["ogDescription"] = Model.LongDescription;
 }
 <div class="row">
     <div class="col-12">
