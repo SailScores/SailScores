@@ -9,7 +9,7 @@
 @{
     ViewBag.Title = Model.Item.SailNumber + " " + (!String.IsNullOrWhiteSpace(Model.Item.Name) ? Model.Item.Name : "") + " Stats";
     Layout = "_ClubLayout";
-    ViewData["MetaDescription"] = $"Competitor Statisticss for {Model.Item.SailNumber} : {Model.Item.Name} with {Model.ClubName}";
+    ViewData["MetaDescription"] = $"Competitor Statistics for {Model.Item.SailNumber} : {Model.Item.Name} with {Model.ClubName}";
     ViewData["ogTitle"] = ViewBag.Title;
     ViewData["ogDescription"] = ViewData["MetaDescription"];
 }
