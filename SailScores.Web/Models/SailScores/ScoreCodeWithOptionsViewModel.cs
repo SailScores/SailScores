@@ -14,7 +14,8 @@ public class ScoreCodeWithOptionsViewModel : ScoreCodeViewModel
         new SelectListItem("AVE P - Average of previous results", "AVE P" ),
         new SelectListItem("AVE ND - Average of all non-discarded races", "AVE ND"),
         new SelectListItem("PLC% - Place + xx% of DNF score (xx = Formula Value)", "PLC%"),
-        new SelectListItem("MAN - allow scorer to enter score manually", "MAN"),
-        new SelectListItem("TIE - Tied with previous finisher", "TIE" )
+        new SelectListItem("MAN - Allow scorer to enter score manually", "MAN"),
+        new SelectListItem("TIE - Tied with previous finisher", "TIE" ),
+        new SelectListItem("FIX - Fixed value = Formula Value", "FIX" ),
     };
 }
