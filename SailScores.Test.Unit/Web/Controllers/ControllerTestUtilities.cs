@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using SailScores.Core.Model;
 using SailScores.Web.Services.Interfaces;
+using IForwarderService = SailScores.Core.Services.IForwarderService;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {
@@ -36,6 +37,10 @@ namespace SailScores.Test.Unit.Web.Controllers
         internal static Mock<IAdminTipService> MakeAdminTipServiceMock()
         {
             return new Mock<IAdminTipService>();
+        }
+        internal static Mock<IForwarderService> MakeForwarderServiceMock()
+        {
+            return new Mock<IForwarderService>();
         }
     }
 }

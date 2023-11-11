@@ -1,7 +1,9 @@
 ﻿@using SailScores.Web.Models.SailScores;
 @using Microsoft.Extensions.Localization
+@using SailScores.Core.Services
 @using SailScores.Web.Services
 @using SailScores.Web.Resources
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 
 @inject IStringLocalizer<SharedResource> localizer
 @inject AppSettingsService settingsService
@@ -38,7 +40,7 @@
 				<a class="dropdown-item" asp-action="ClearAltNumbers" asp-controller="Competitor">
 				Clear Alt Sail Numbers
 				</a>
-				@* 				<div class="dropdown-divider"></div> *@
+				@* <div class="dropdown-divider"></div> *@
 				<a class="dropdown-item" asp-action="InactivateMultiple" asp-controller="Competitor">
 					Bulk Inactivate
 				</a>
@@ -117,7 +119,7 @@
 		 <div class="col col-6 col-sm-4 col-lg-3">
 		  <a asp-route="Competitor"
 						   asp-route-clubInitials="@Model.ClubInitials"
-						   asp-route-sailNumber="@item.SailNumber">
+						   asp-route-sailNumber="@UrlUtility.GetUrlName(item.SailNumber)">
 		   <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
 		  </a>
 		 </div>

@@ -11,6 +11,7 @@ using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using Xunit;
 using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService;
+using SailScores.Core.Services;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {
@@ -22,6 +23,7 @@ namespace SailScores.Test.Unit.Web.Controllers
         private readonly Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
         private readonly Mock<IAuthorizationService> _authServiceMock;
         private readonly Mock<ICompetitorService> _competitorServiceMock;
+        private readonly Mock<IForwarderService> _forwarderServiceMock;
         private readonly Mock<IAdminTipService> _adminTipServiceMock;
 
 
@@ -38,6 +40,7 @@ namespace SailScores.Test.Unit.Web.Controllers
 
             _clubServiceMock = ControllerTestUtilities.MakeCoreClubServiceMock();
             _competitorServiceMock = ControllerTestUtilities.MakeWebCompetitorServiceMock();
+            _forwarderServiceMock = ControllerTestUtilities.MakeForwarderServiceMock();
             _adminTipServiceMock = ControllerTestUtilities.MakeAdminTipServiceMock();
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
 
@@ -45,6 +48,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             _controller = new CompetitorController(
                 _clubServiceMock.Object,
                 _competitorServiceMock.Object,
+                _forwarderServiceMock.Object,
                 _authServiceMock.Object,
                 _adminTipServiceMock.Object,
                 _mapper);
