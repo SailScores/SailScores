@@ -68,6 +68,7 @@ public class SeriesController : Controller
         var series = await _seriesService.GetSeriesAsync(clubInitials, season, seriesName);
         if (series == null)
         {
+            // need to check forwarder service
             return new NotFoundResult();
         }
         var canEdit = false;
