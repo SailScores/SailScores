@@ -3,6 +3,7 @@ using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 
 namespace SailScores.Core.Scoring
 {
@@ -10,54 +11,63 @@ namespace SailScores.Core.Scoring
     // Scoring system based on
     // https://www.ussailing.org/competition/rules-officiating/racing-rules/scoring-a-long-series/
 
-    public class HighPointPercentageCalculator : BaseScoringCalculator
+    public class CoxSpragueCalculator : BaseScoringCalculator
     {
-        public HighPointPercentageCalculator(ScoringSystem scoringSystem) : base(scoringSystem)
+        public CoxSpragueCalculator(ScoringSystem scoringSystem) : base(scoringSystem)
         {
-            CompetitorComparer = new HighPointSeriesCompComparer();
+            CompetitorComparer = new CoxSpragueCompComparer();
         }
 
         protected override decimal? GetBasicScore(IEnumerable<Score> allScores, Score currentScore)
         {
-            int competitorsInRace = allScores.Count(s =>
+            int starters = allScores.Count(s =>
                 s.Race == currentScore.Race
-                 && CameToStart(s));
+                 && CountsAsStarted(s));
 
 
-            decimal? baseScore =
-                Convert.ToDecimal(allScores
+            int baseScore =
+                allScores
                     .Count(s =>
                         currentScore.Place.HasValue
                         && s.Race == currentScore.Race
-                        && s.Place < currentScore.Place
+                        && s.Place <= currentScore.Place
                         && !ShouldAdjustOtherScores(s)
-                        ));
+                        );
 
-            // if this is one, no tie. (if zero Place doesn't have a value (= coded.))
-            int numTied = allScores.Count(s =>
-                currentScore.Place.HasValue
-                && s.Race == currentScore.Race
-                && s.Place == currentScore.Place
-                && !ShouldAdjustOtherScores(s));
-            if (numTied > 1)
-            {
-                int total = 0;
-                for (int i = 0; i < numTied; i++)
-                {
-                    total += ((int)currentScore.Place + i);
-                }
-                baseScore = ((decimal)total / (decimal)numTied) - 1;
-            }
+            // removed code to handle race result ties: this should treat both as the same place.
 
-            return competitorsInRace - baseScore;
+            return CoxSpragueTable.GetScore( baseScore, starters);
         }
 
-        /// The series score for each boat will be a percentage calculated as
-        /// follows: divide the sum of her race scores by the sum of the points
+        // for Cox-Sprague this is most coded results: they depend on number of starters
+        protected override void CalculateRaceDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
+        {
+            
+            foreach (var race in resultsWorkInProgress.SailedRaces)
+            {
+                var score = compResults.CalculatedScores[race];
+                var scoreCode = GetScoreCode(score.RawScore);
+                if (scoreCode != null && CameToStart(score.RawScore)
+                    && scoreCode.Formula != TIE_FORMULANAME)
+                {
+                    var starters = race.Scores.Count(s => CountsAsStarted(s));
+                    score.ScoreValue = CoxSpragueTable.GetScore(starters + 1, starters);
+                    //if (IsTrivialCalculation(scoreCode))
+                    //{
+                    //    score.ScoreValue = GetTrivialScoreValue(score);
+                    //}
+                    //else if (IsRaceBasedValue(scoreCode))
+                    //{
+                    //    score.ScoreValue = CalculateRaceBasedValue(score, race);
+                    //}
+                }
+            }
+        }
+
+        /// The series score for each boat:
+        /// divide the sum of her race scores by the sum of the points
         /// she would have scored if she had placed first in every race in
-        /// which she competed; multiply the result by 100. The qualified boat
-        /// with the highest series score is the winner, and others are ranked
-        /// accordingly.
+        /// which she competed
         protected override void CalculateTotals(
             SeriesResults results,
             IEnumerable<Score> scores)
@@ -67,6 +77,12 @@ namespace SailScores.Core.Scoring
             var raceCount = results.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                 || r.State == RaceState.Preliminary).Count();
             var requiredRaces = raceCount * ((ScoringSystem.ParticipationPercent ?? 0) / 100m);
+
+            Dictionary<Guid, int> starterCounts = new Dictionary<Guid, int>();
+            foreach (Race r in results.SailedRaces)
+            {
+                starterCounts[r.Id] = r.Scores.Count(s => CountsAsStarted(s));
+            }
             foreach (var comp in results.Competitors)
             {
                 var currentCompResults = results.Results[comp];
@@ -83,21 +99,31 @@ namespace SailScores.Core.Scoring
                         .Where(s => s.Value.Discard ||
                         ( !String.IsNullOrEmpty(s.Value.RawScore.Code) && !(GetScoreCode(s.Value.RawScore.Code).CameToStart ?? false)))
                         .Select(s => s.Key.Id);
-                    var perfectScore = scores.Where(s => !racesToExclude.Contains(s.RaceId))
-                        .Count(s => CameToStart(s));
+
+                    int perfectScore = 0;
+                    foreach (Race r in results.SailedRaces)
+                    {
+                        if (racesToExclude.Contains(r.Id))
+                        {
+                            continue;
+                        }
+
+                        perfectScore += CoxSpragueTable.GetScore(1, starterCounts[r.Id]);
+                    }
+
                     var compTotal = currentCompResults
                         .CalculatedScores.Values
                         .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
 
                     currentCompResults.PointsEarned = compTotal;
                     currentCompResults.PointsPossible = perfectScore;
-                    if (perfectScore > 0)
+                    if (perfectScore == 0)
                     {
-                        currentCompResults.TotalScore = compTotal * 100 / perfectScore;
+                        currentCompResults.TotalScore = 0;
                     }
                     else
                     {
-                        currentCompResults.TotalScore = 0;
+                        currentCompResults.TotalScore = compTotal * 100 / perfectScore;
                     }
                 }
             }

@@ -612,9 +612,10 @@ namespace SailScores.Core.Services
             {
                 scoringSystem = scoringSystem.ParentSystem;
             }
+
             var isLowPoint =
-                !scoringSystem?.Name?.Contains("high ", StringComparison.InvariantCultureIgnoreCase)
-                ?? true;
+                !((scoringSystem?.Name?.Contains("high ", StringComparison.InvariantCultureIgnoreCase) ?? false)
+                  || (scoringSystem?.Name?.Contains("cox-", StringComparison.InvariantCultureIgnoreCase) ?? false));
 
             return new FlatChartData
             {
