@@ -13,21 +13,25 @@ namespace SailScores.Core.Services
     public class RegattaService : IRegattaService
     {
         private readonly ISeriesService _seriesService;
+        private readonly IForwarderService _forwarderService;
         private readonly ISailScoresContext _dbContext;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly IMapper _mapper;
 
         public RegattaService(
             ISeriesService seriesService,
+            IForwarderService forwarderService,
             ISailScoresContext dbContext,
             IDbObjectBuilder dbObjBuilder,
             IMapper mapper)
         {
             _seriesService = seriesService;
+            _forwarderService = forwarderService;
             _dbContext = dbContext;
             _dbObjectBuilder = dbObjBuilder;
             _mapper = mapper;
         }
+
         public async Task<IList<Regatta>> GetAllRegattasAsync(Guid clubId)
         {
             var regattaDb = await _dbContext
@@ -195,7 +199,14 @@ namespace SailScores.Core.Services
                 .SingleAsync(c => c.Id == model.Id)
                 .ConfigureAwait(false);
 
+            if(!DoIdentifiersMatch(model, existingRegatta))
+            {
+                await _forwarderService.CreateRegattaForwarder(model, existingRegatta);
+            }
+
             existingRegatta.Name = model.Name;
+            // Now that forwarders are in place, we can update the url name.
+            existingRegatta.UrlName = UrlUtility.GetUrlName(model.Name);
             existingRegatta.Url = model.Url;
             existingRegatta.Description = model.Description;
             existingRegatta.StartDate = model.StartDate;
@@ -217,6 +228,13 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             return existingRegatta.Id;
+        }
+
+        private bool DoIdentifiersMatch(Regatta model, dbObj.Regatta existingRegatta)
+        {
+            return model.Season.Id == existingRegatta.Season.Id
+                && model.ClubId == existingRegatta.ClubId
+                && model.Name == existingRegatta.Name;
         }
 
         private static void CleanupFleets(Regatta model, dbObj.Regatta existingRegatta)

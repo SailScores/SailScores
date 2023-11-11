@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
+using IForwarderService = SailScores.Core.Services.IForwarderService;
 
 namespace SailScores.Web.Controllers;
 
@@ -13,15 +15,18 @@ public class RegattaController : Controller
     private readonly Core.Services.IClubService _clubService;
     private readonly IAuthorizationService _authService;
     private readonly IMapper _mapper;
+    private readonly IForwarderService _forwarderService;
 
     public RegattaController(
         IRegattaService regattaService,
         Core.Services.IClubService clubService,
+        Core.Services.IForwarderService forwarderService,
         IAuthorizationService authService,
         IMapper mapper)
     {
         _regattaService = regattaService;
         _clubService = clubService;
+        _forwarderService = forwarderService;
         _authService = authService;
         _mapper = mapper;
     }
@@ -53,7 +58,13 @@ public class RegattaController : Controller
         var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
         if (regatta == null)
         {
-            return new NotFoundResult();
+            var forward = await _forwarderService.GetRegattaForwarding(clubInitials, season, regattaName);
+            if (forward != null)
+            {
+                return Redirect($"/{forward.NewClubInitials}/Regatta/" +
+                    $"{forward.NewSeasonUrlName}/{forward.NewRegattaUrlName}");
+            }
+            return NotFound();
         }
 
         var canEdit = false;
@@ -112,12 +123,7 @@ public class RegattaController : Controller
 
             var regattaId = await _regattaService.SaveNewAsync(model);
             var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
-            return RedirectToAction("Details", new
-            {
-                clubInitials,
-                season = savedRegatta.Season.UrlName,
-                regattaName = savedRegatta.UrlName
-            });
+            return Redirect(GetRegattaUrlPath(clubInitials, savedRegatta));
         }
         catch
         {
@@ -130,6 +136,11 @@ public class RegattaController : Controller
 
             return View(model);
         }
+    }
+
+    private string GetRegattaUrlPath(string clubInitials, Regatta regatta)
+    {
+        return $"/{clubInitials}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}";
     }
 
     [Authorize]
@@ -184,12 +195,8 @@ public class RegattaController : Controller
 
             var regattaId = await _regattaService.UpdateAsync(model);
             var savedRegatta = await _regattaService.GetRegattaAsync(regattaId);
-            return RedirectToAction("Details", new
-            {
-                clubInitials,
-                season = savedRegatta.Season.UrlName,
-                regattaName = savedRegatta.UrlName
-            });
+
+            return Redirect(GetRegattaUrlPath(clubInitials, savedRegatta));
         }
         catch
         {

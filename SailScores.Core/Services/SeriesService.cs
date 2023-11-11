@@ -18,6 +18,7 @@ namespace SailScores.Core.Services
         private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
         private readonly IScoringService _scoringService;
         private readonly IConversionService _converter;
+        private readonly IForwarderService _forwarderService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly ISailScoresContext _dbContext;
         private readonly IMapper _mapper;
@@ -25,6 +26,7 @@ namespace SailScores.Core.Services
         public SeriesService(
             IScoringCalculatorFactory scoringCalculatorFactory,
             IScoringService scoringService,
+            IForwarderService forwarderService,
             IConversionService converter,
             IDbObjectBuilder dbObjBuilder,
             ISailScoresContext dbContext,
@@ -32,6 +34,7 @@ namespace SailScores.Core.Services
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
             _scoringService = scoringService;
+            _forwarderService = forwarderService;
             _converter = converter;
             _dbObjectBuilder = dbObjBuilder;
             _dbContext = dbContext;
@@ -460,8 +463,14 @@ namespace SailScores.Core.Services
                 .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId)
                 .ConfigureAwait(false);
 
+            if (!DoIdentifiersMatch(model, existingSeries))
+            {
+                await _forwarderService.CreateSeriesForwarder(model, existingSeries);
+            }
+
             existingSeries.Name = model.Name;
-            // Don't update UrlName here: keep links to this series unchanged.
+            // Now that forwarders are in place, we can change the url name.
+            existingSeries.UrlName = UrlUtility.GetUrlName(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
             existingSeries.ResultsLocked = model.ResultsLocked;
@@ -510,6 +519,13 @@ namespace SailScores.Core.Services
                 await UpdateSeriesResults(existingSeries.Id, existingSeries.UpdatedBy)
                     .ConfigureAwait(false);
             }
+        }
+
+        private bool DoIdentifiersMatch(Series model, dbObj.Series existingSeries)
+        {
+            return model.Name == existingSeries.Name
+                   && model.ClubId == existingSeries.ClubId
+                   && model.Season.Id == existingSeries.Season.Id;
         }
 
         public async Task Delete(Guid seriesId)

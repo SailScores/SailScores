@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 using IClubService = SailScores.Core.Services.IClubService;
+using IForwarderService = SailScores.Core.Services.IForwarderService;
 using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService;
 
 namespace SailScores.Web.Controllers;
@@ -17,16 +19,19 @@ public class CompetitorController : Controller
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authService;
     private readonly IAdminTipService _adminTipService;
+    private readonly IForwarderService _forwarderService;
 
     public CompetitorController(
         IClubService clubService,
         ICompetitorService competitorService,
+        IForwarderService forwarderService,
         IAuthorizationService authService,
         IAdminTipService adminTipService,
         IMapper mapper)
     {
         _clubService = clubService;
         _competitorService = competitorService;
+        _forwarderService = forwarderService;
         _authService = authService;
         _adminTipService = adminTipService;
         _mapper = mapper;
@@ -56,9 +61,15 @@ public class CompetitorController : Controller
         var competitorStats = await _competitorService.GetCompetitorStatsAsync(
             clubInitials,
             sailNumber);
+
         if (competitorStats == null)
         {
-            return new NotFoundResult();
+            var forward = await _forwarderService.GetCompetitorForwarding(clubInitials, sailNumber);
+            if (forward != null)
+            {
+                return Redirect($"/{forward.NewClubInitials}/Competitor/{forward.NewSailNumber}");
+            }
+            return NotFound();
         }
         var vm = new ClubItemViewModel<CompetitorStatsViewModel>
         {

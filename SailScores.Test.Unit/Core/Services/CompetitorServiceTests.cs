@@ -20,6 +20,7 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly CompetitorService _service;
         private readonly Mock<IScoringCalculator> _mockCalculator;
         private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
+        private readonly Mock<IForwarderService> _mockForwarder;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _context;
         private readonly Guid _clubId;
@@ -31,6 +32,7 @@ namespace SailScores.Test.Unit.Core.Services
             _mockScoringCalculatorFactory = new Mock<IScoringCalculatorFactory>();
             _mockScoringCalculatorFactory.Setup(f => f.CreateScoringCalculatorAsync(It.IsAny<SailScores.Core.Model.ScoringSystem>()))
                 .ReturnsAsync(_mockCalculator.Object);
+            _mockForwarder = new Mock<IForwarderService>();
 
             _context = Utilities.InMemoryContextBuilder.GetContext();
             _clubId = _context.Clubs.First().Id;
@@ -38,6 +40,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             _service = new SailScores.Core.Services.CompetitorService(
                 _context,
+                _mockForwarder.Object,
                 _mapper
                 );
         }

@@ -43,22 +43,11 @@ public class CompetitorService : ICompetitorService
         string clubInitials,
         string sailor)
     {
-        // sailor will usually be sailNumber but falls back to name if no number.
-        var clubId = await _coreClubService.GetClubId(clubInitials);
-        var comps = await _coreCompetitorService.GetCompetitorsAsync(clubId, null, true);
-        IList<Competitor> inactiveCompetitors;
 
-        var comp = comps.Where(c => c.IsActive)
-            .FirstOrDefault(c => String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
-        if (comp == null)
-        {
-            // check for inactive.
-            comp = comps.Where(c => !c.IsActive)
-                .FirstOrDefault(c =>
-                    String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
-        }
-        comp ??= comps.FirstOrDefault(c =>
-            String.Equals(UrlUtility.GetUrlName(c.Name), sailor, StringComparison.OrdinalIgnoreCase));
+        var clubId = await _coreClubService.GetClubId(clubInitials);
+        // sailor will usually be sailNumber but falls back to name if no number.
+                var comp = await _coreCompetitorService.GetCompetitorAsync(clubId, sailor);
+
         if (comp == null)
         {
             return null;

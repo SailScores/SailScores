@@ -188,9 +188,8 @@
                         }
                         else
                         {
-
                             <a asp-route="Competitor"
-                                   asp-route-sailNumber="@(comp.CurrentSailNumber ?? SailScores.Core.Services.UrlUtility.GetUrlName(comp.Name))"
+                                   asp-route-sailNumber="@(SailScores.Core.Services.UrlUtility.GetUrlName(comp.CurrentSailNumber ?? comp.Name))"
                                asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]">@comp.Name</a>
                         }
                     </th>

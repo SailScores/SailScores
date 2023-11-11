@@ -3,11 +3,13 @@ using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Services;
 using SailScores.Identity.Entities;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
+using ISeriesService = SailScores.Web.Services.Interfaces.ISeriesService;
 
 namespace SailScores.Web.Controllers;
 
@@ -21,6 +23,7 @@ public class SeriesController : Controller
     private readonly ICsvService _csvService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
+    private readonly IForwarderService _forwarderService;
 
     public SeriesController(
         ISeriesService seriesService,
@@ -28,6 +31,7 @@ public class SeriesController : Controller
         IAuthorizationService authService,
         IAdminTipService adminTipService,
         ICsvService csvService,
+        IForwarderService forwarderService,
         UserManager<ApplicationUser> userManager,
         IMapper mapper)
     {
@@ -36,6 +40,7 @@ public class SeriesController : Controller
         _authService = authService;
         _adminTipService = adminTipService;
         _csvService = csvService;
+        _forwarderService = forwarderService;
         _userManager = userManager;
         _mapper = mapper;
     }
@@ -68,8 +73,16 @@ public class SeriesController : Controller
         var series = await _seriesService.GetSeriesAsync(clubInitials, season, seriesName);
         if (series == null)
         {
-            // need to check forwarder service
-            return new NotFoundResult();
+            var forward = await _forwarderService.GetSeriesForwarding(clubInitials, season, seriesName);
+            if (forward != null)
+            {
+                return Redirect($"/{forward.NewClubInitials}/" +
+                    $"{forward.NewSeasonUrlName}/{forward.NewSeriesUrlName}");
+            }
+            else
+            {
+                return NotFound();
+            }
         }
         var canEdit = false;
         if (User != null && (User.Identity?.IsAuthenticated ?? false))

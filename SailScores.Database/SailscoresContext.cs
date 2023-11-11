@@ -38,6 +38,9 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     public DbSet<HistoricalResults> HistoricalResults { get; set; }
     public DbSet<SeriesChartResults> SeriesChartResults { get; set; }
+    public DbSet<SeriesForwarder> SeriesForwarders { get; set; }
+    public DbSet<RegattaForwarder> RegattaForwarders { get; set; }
+    public DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
 
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
@@ -224,6 +227,16 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasDefaultValueSql("getdate()");
 
         modelBuilder.Entity<SeriesChartResults>()
+            .Property(b => b.Created)
+            .HasDefaultValueSql("getdate()");
+
+        modelBuilder.Entity<SeriesForwarder>()
+            .Property(b => b.Created)
+            .HasDefaultValueSql("getdate()");
+        modelBuilder.Entity<RegattaForwarder>()
+            .Property(b => b.Created)
+            .HasDefaultValueSql("getdate()");
+        modelBuilder.Entity<CompetitorForwarder>()
             .Property(b => b.Created)
             .HasDefaultValueSql("getdate()");
 
