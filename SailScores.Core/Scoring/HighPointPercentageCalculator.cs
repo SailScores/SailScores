@@ -52,6 +52,14 @@ namespace SailScores.Core.Scoring
             return competitorsInRace - baseScore;
         }
 
+        protected override decimal? GetPerfectScore(IEnumerable<Score> allScores, Score currentScore)
+        {
+            int competitorsInRace = allScores.Count(s =>
+                s.Race == currentScore.Race
+                 && CameToStart(s));
+            return competitorsInRace;
+        }
+
         /// The series score for each boat will be a percentage calculated as
         /// follows: divide the sum of her race scores by the sum of the points
         /// she would have scored if she had placed first in every race in
@@ -70,7 +78,9 @@ namespace SailScores.Core.Scoring
             foreach (var comp in results.Competitors)
             {
                 var currentCompResults = results.Results[comp];
-                if (currentCompResults.CalculatedScores.Where(s => s.Value.RawScore.Code != DEFAULT_CODE).Count()
+                if (currentCompResults.CalculatedScores
+                    .Where(s => CountsAsStarted(s.Value.RawScore) ||
+                        CountsAsParticipation(s.Value.RawScore)).Count()
                     < requiredRaces)
                 {
                     currentCompResults.TotalScore = null;

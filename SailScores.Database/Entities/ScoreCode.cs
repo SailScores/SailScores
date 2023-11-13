@@ -19,5 +19,7 @@ public class ScoreCode
     public bool? PreserveResult { get; set; }
     // Should scoring of other following competitors use this as a finisher ahead? 
     public bool? AdjustOtherScores { get; set; }
+    // high point: count as participation even if not CameToStart
+    public bool? CountAsParticipation { get; set; }
 
 }

@@ -48,4 +48,9 @@ public class ScoreCodeViewModel
     [Display(Name = "Adjust other competitors finishing after this score")]
     public bool AdjustOtherScores { get; set; }
 
+    // For High Point scoring, even if not "Came To Start" count this as a race
+    // towards participation
+    [Display(Name = "Count as Participation (For codes not set as \"Came To Start\")")]
+    public bool CountAsParticipation { get; set; }
+
 }

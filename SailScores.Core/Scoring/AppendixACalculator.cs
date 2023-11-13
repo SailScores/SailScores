@@ -35,6 +35,11 @@ namespace SailScores.Core.Scoring
             return returnScore;
         }
 
+        protected override decimal? GetPerfectScore(IEnumerable<Score> allScores, Score currentScore)
+        {
+            return 1;
+        }
+
         // There are two scenarios to handle for ties:
         // 1. Place: 2 code: null & Place: 2 code: "TIE"
         // 2. Place: 2 code: null & Place: 3 code: "TIE"

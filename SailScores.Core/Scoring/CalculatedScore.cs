@@ -11,6 +11,8 @@ namespace SailScores.Core.Scoring
         // a raw score is per competitor and race, regardless of series.
         public Score RawScore { get; set; }
         public Decimal? ScoreValue { get; set; }
+        // for Cox-Sprague: the score value of first place
+        public Decimal? PerfectScoreValue { get; set; }
         public bool Discard { get; set; }
 
         public override string ToString()

@@ -94,10 +94,10 @@ namespace SailScores.Core.Scoring
                 returnResults.CalculatedScores[score.Race] = new CalculatedScore
                 {
                     Discard = false,
-                    RawScore = score
+                    RawScore = score,
+                    ScoreValue = GetBasicScore(scores, score),
+                    PerfectScoreValue = GetPerfectScore(scores, score)
                 };
-                returnResults.CalculatedScores[score.Race].ScoreValue =
-                    GetBasicScore(scores, score);
 
             }
 
@@ -291,6 +291,21 @@ namespace SailScores.Core.Scoring
             return scoreCode.Started ?? false;
         }
 
+        protected bool CountsAsParticipation(Score s)
+        {
+            if (s == null)
+            {
+                return false;
+            }
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            var scoreCode = GetScoreCode(s);
+            return scoreCode.CountAsParticipation ?? false;
+        }
+
         protected bool CameToStart(Score s)
         {
             if (String.IsNullOrWhiteSpace(s.Code) &&
@@ -375,13 +390,16 @@ namespace SailScores.Core.Scoring
         protected abstract Decimal? GetBasicScore(
             IEnumerable<Score> allScores,
             Score currentScore);
+        
+        protected abstract Decimal? GetPerfectScore(
+            IEnumerable<Score> allScores,
+            Score currentScore);
 
         protected bool ShouldAdjustOtherScores(Score score)
         {
             return !String.IsNullOrWhiteSpace(score.Code)
             && (GetScoreCode(score)?.AdjustOtherScores ?? true);
         }
-
 
 
         protected bool ShouldPreserveScore(Score score)
