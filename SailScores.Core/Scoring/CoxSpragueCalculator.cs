@@ -130,18 +130,37 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        // Discords for Cox-Sprague are not straight forward.
+        // Discards for Cox-Sprague are not straight forward.
         protected override void DiscardScores(
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)
         {
-            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress);
+            // Don't use the BaseScoringCalculator's GetNumberOfDiscards method:
+            // it gives the number of discards based total races. Cox-Sprague discards
+            // based on the number of races the current competitor has sailed.
+            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress, compResults);
 
             for (int i = 0; i < numOfDiscards; i++)
             {
                 var race = GetNextRaceToDiscard(resultsWorkInProgress, compResults);
-                compResults.CalculatedScores[race].Discard = true;
+                if (race != null)
+                {
+                    compResults.CalculatedScores[race].Discard = true;
+                }
+                else
+                {
+                    break;
+                }
             }
+        }
+
+        // Not in Base: That one doesn't need competitor info to determine number of discards
+        private int GetNumberOfDiscards(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
+        {
+            var numOfRaces = compResults.CalculatedScores
+                    .Where(s => CountsAsStarted(s.Value.RawScore) ||
+                        CountsAsParticipation(s.Value.RawScore)).Count();
+            return GetNumberOfDiscards(numOfRaces);
         }
 
         // compare, for all races:
@@ -157,20 +176,25 @@ namespace SailScores.Core.Scoring
 
             // calculate Perfect Score for all non discards
             decimal perfectTotal = compResults.CalculatedScores.Values
-                .Where(s => !s.Discard).Sum(s => s.PerfectScoreValue ?? 0);
+                .Where(s => !s.Discard && CameToStart(s.RawScore)).Sum(s => s.PerfectScoreValue ?? 0);
             decimal compScore = compResults.CalculatedScores.Values
-                .Where(s => !s.Discard).Sum(s => s.ScoreValue ?? 0);
+                .Where(s => !s.Discard && CameToStart(s.RawScore)).Sum(s => s.ScoreValue ?? 0);
+
+            // filter to candidate races to be discarded
+            var raceIdsThatMightBeDiscarded = compResults.CalculatedScores.Values.Where(s => !s.Discard
+            && CameToStart(s.RawScore)).Select(s => s.RawScore.RaceId);
+            var racesThatMightBeDiscards = resultsWorkInProgress.Races.Where(
+                r => raceIdsThatMightBeDiscarded.Any(i => i == r.Id));
 
             Race raceToDiscard = null;
             decimal discardQuotient = 0;
 
-            foreach(var race in resultsWorkInProgress.Races)
+            foreach(var race in racesThatMightBeDiscards)
             {
                 decimal thisRacePerfectScore = compResults.CalculatedScores[race].PerfectScoreValue ?? 0;
                 decimal thisRaceScore = compResults.CalculatedScores[race].ScoreValue ?? 0;
 
-                decimal thisRaceQuotient = (compScore / (compScore - thisRaceScore)) -
-                    ((perfectTotal-compScore) / (perfectTotal - compScore - thisRacePerfectScore + thisRaceScore));
+                decimal thisRaceQuotient = thisRaceScore - (thisRacePerfectScore * compScore / perfectTotal);
                 if(thisRaceQuotient < discardQuotient)
                 {
                     raceToDiscard = race;

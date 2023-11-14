@@ -343,6 +343,7 @@ namespace SailScores.Core.Services
                     Place = s.Value.RawScore.Place,
                     Code = s.Value.RawScore.Code,
                     ScoreValue = s.Value.ScoreValue,
+                    PerfectScoreValue = s.Value.PerfectScoreValue,
                     Discard = s.Value.Discard
                 });
         }
