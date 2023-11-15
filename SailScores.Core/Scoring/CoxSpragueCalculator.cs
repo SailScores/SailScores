@@ -8,7 +8,7 @@ namespace SailScores.Core.Scoring
 {
 
     // Scoring system based on
-    // https://www.ussailing.org/competition/rules-officiating/racing-rules/scoring-a-long-series/
+    // https://www.hryra.org/wp-content/uploads/2015/06/Cox-Sprague-Scoring-System.pdf
 
     public class CoxSpragueCalculator : BaseScoringCalculator
     {

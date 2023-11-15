@@ -117,16 +117,25 @@ namespace SailScores.Core.Scoring
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)
         {
-            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress);
+            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress, compResults);
 
-            var compResultsOrdered = compResults.CalculatedScores.Values.OrderBy(s => s.ScoreValue)
+            var compResultsOrdered = compResults.CalculatedScores.Values.OrderBy(s => s.ScoreValue / s.PerfectScoreValue)
                 .ThenBy(s => s.RawScore.Race.Date)
                 .ThenBy(s => s.RawScore.Race.Order)
-                .Where(s => GetScoreCode(s.RawScore)?.Discardable ?? true);
+                .Where(s => CameToStart(s.RawScore) && ( GetScoreCode(s.RawScore)?.Discardable ?? true));
             foreach (var score in compResultsOrdered.Take(numOfDiscards))
             {
                 score.Discard = true;
             }
+        }
+
+        // Not in Base: That one doesn't need competitor info to determine number of discards
+        private int GetNumberOfDiscards(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
+        {
+            var numOfRaces = compResults.CalculatedScores
+                    .Where(s => CountsAsStarted(s.Value.RawScore) ||
+                        CountsAsParticipation(s.Value.RawScore)).Count();
+            return GetNumberOfDiscards(numOfRaces);
         }
 
         protected override void CalculateOverrides(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
