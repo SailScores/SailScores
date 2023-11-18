@@ -19,6 +19,7 @@ namespace SailScores.Core.Scoring
         protected const string PLACEPLUSPERCENT_FORMULANAME = "PLC%";
         protected const string CAMETOSTARTPLUS_FORMULANAME = "CTS+";
         protected const string FIXED_FORMULANAME = "FIX";
+        protected const string TIE_FORMULANAME = "TIE";
 
         protected const string DNF_SCORENAME = "DNF";
 
@@ -49,12 +50,417 @@ namespace SailScores.Core.Scoring
             return returnResults;
         }
 
+
+        // This is the method that calls subclass methods for different types of scoring.
+        // In other words, this is the heart of a scoring method.
+        protected void SetScores(SeriesResults resultsWorkInProgress, IEnumerable<Score> scores)
+        {
+            ValidateSeries(resultsWorkInProgress, scores);
+            ClearRawScores(scores);
+            foreach (var comp in resultsWorkInProgress.Competitors)
+            {
+                // virtual and calls abstract GetBasicScore
+                SeriesCompetitorResults compResults = CalculateSimpleScores(comp, scores);
+                // the next three are private, so in BaseScoringCalculator
+                AddDefaultScores(resultsWorkInProgress, compResults);
+                CalculateRaceDependentScores(resultsWorkInProgress, compResults);
+                CalculateSeriesDependentScores(resultsWorkInProgress, compResults);
+
+                // these are virtual
+                CalculateOverrides(resultsWorkInProgress, compResults);
+                DiscardScores(resultsWorkInProgress, compResults);
+                resultsWorkInProgress.Results[comp] = compResults;
+            }
+            // Next two are virtual
+            CalculateTotals(resultsWorkInProgress, scores);
+            CalculateRanks(resultsWorkInProgress);
+            resultsWorkInProgress.Competitors = ReorderCompetitors(resultsWorkInProgress);
+        }
+        
+        protected virtual SeriesCompetitorResults CalculateSimpleScores(Competitor comp, IEnumerable<Score> scores)
+        {
+            var returnResults = new SeriesCompetitorResults
+            {
+                Competitor = comp,
+                CalculatedScores = new Dictionary<Race, CalculatedScore>()
+            };
+            foreach (var score in scores.Where(s => s.Competitor == comp))
+            {
+                if ((score.Race?.State ?? RaceState.Raced) != RaceState.Raced
+                    && score.Race?.State != RaceState.Preliminary)
+                {
+                    continue;
+                }
+                returnResults.CalculatedScores[score.Race] = new CalculatedScore
+                {
+                    Discard = false,
+                    RawScore = score,
+                    ScoreValue = GetBasicScore(scores, score),
+                    PerfectScoreValue = GetPerfectScore(scores, score)
+                };
+
+            }
+
+            return returnResults;
+        }
+
+        protected virtual void CalculateOverrides(
+            SeriesResults resultsWorkInProgress,
+            SeriesCompetitorResults compResults)
+        {
+            foreach (var race in resultsWorkInProgress.SailedRaces)
+            {
+                var score = compResults.CalculatedScores[race];
+                var defaultScore = GetDefaultScore(race, resultsWorkInProgress);
+                if (score?.ScoreValue != null && score.ScoreValue > defaultScore)
+                {
+                    score.ScoreValue = defaultScore;
+                }
+            }
+        }
+
+        protected virtual void DiscardScores(
+            SeriesResults resultsWorkInProgress,
+            SeriesCompetitorResults compResults)
+        {
+            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress);
+
+            var compResultsOrdered = compResults.CalculatedScores.Values.OrderByDescending(s => s.ScoreValue)
+                .ThenBy(s => s.RawScore.Race.Date)
+                .ThenBy(s => s.RawScore.Race.Order)
+                .Where(s => GetScoreCode(s.RawScore)?.Discardable ?? true);
+            foreach (var score in compResultsOrdered.Take(numOfDiscards))
+            {
+                score.Discard = true;
+            }
+        }
+
+        protected virtual void CalculateTotals(
+            SeriesResults results,
+            IEnumerable<Score> scores)
+        {
+            foreach (var comp in results.Competitors)
+            {
+                var compResults = results.Results[comp];
+
+                compResults.TotalScore = compResults
+                    .CalculatedScores.Values
+                    .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
+            }
+        }
+
+        protected virtual void CalculateRanks(SeriesResults resultsWorkInProgress)
+        {
+            var orderedComps = resultsWorkInProgress.Results.Values
+                .OrderBy(s => s, CompetitorComparer);
+
+            int i = 1;
+            SeriesCompetitorResults prevComp = null;
+            foreach (var comp in orderedComps)
+            {
+                if (comp.TotalScore == null)
+                {
+                    comp.Rank = null;
+                }
+                else if (prevComp != null && CompetitorComparer.Compare(comp, prevComp) == 0)
+                {
+                    comp.Rank = prevComp.Rank;
+                }
+                else
+                {
+                    comp.Rank = i;
+                }
+                i++;
+                prevComp = comp;
+            }
+        }
+
+        protected static int GetNumberOfCompetitors(SeriesResults seriesResults)
+        {
+            return seriesResults.Competitors.Count;
+        }
+
+        protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+        {
+            var dnfScore = GetDnfScore(race) ?? 1;
+            var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
+            var percent = Math.Round(dnfScore * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
+
+            return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
+        }
+
+        protected decimal? GetDnfScore(Race race)
+        {
+            var dnfCode = GetScoreCode(DNF_SCORENAME);
+            if (IsTrivialCalculation(dnfCode))
+            {
+                return GetTrivialScoreValue(new CalculatedScore
+                {
+                    RawScore = new Score { Code = dnfCode.Name }
+                });
+            }
+            if (IsRaceBasedValue(dnfCode))
+            {
+                return CalculateRaceBasedValue(new CalculatedScore
+                {
+                    RawScore = new Score { Code = dnfCode.Name }
+                }, race);
+            }
+
+            return race.Scores
+                       .Count(s => CountsAsStarted(s)) +
+                        dnfCode.FormulaValue;
+        }
+
+        protected virtual decimal? GetDefaultScore(Race race, SeriesResults resultsWorkInProgress)
+        {
+            var defaultCode = GetScoreCode(DEFAULT_CODE);
+            if (IsTrivialCalculation(defaultCode))
+            {
+                return GetTrivialScoreValue(new CalculatedScore
+                {
+                    RawScore = new Score { Code = defaultCode.Name }
+                });
+            }
+            if (IsRaceBasedValue(defaultCode))
+            {
+                return CalculateRaceBasedValue(new CalculatedScore
+                {
+                    RawScore = new Score { Code = defaultCode.Name }
+                }, race);
+            }
+            if (IsSeriesBasedScore(defaultCode))
+            {
+                //Assume it's competitors plus for now. I suppose the default could be
+                // the competitors average, but that would create all sort of problems, I think.
+                return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0);
+            }
+            return race.Scores.Count(s => CountsAsStarted(s)) +
+                        defaultCode.FormulaValue;
+        }
+
+        protected bool IsAverage(string code)
+        {
+            if (String.IsNullOrWhiteSpace(code))
+            {
+                return false;
+            }
+            var scoreCode = GetScoreCode(code);
+            return scoreCode.Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
+        }
+
+        protected bool IsNonDiscardAverage(string code)
+        {
+            if (String.IsNullOrWhiteSpace(code))
+            {
+                return false;
+            }
+            var scoreCode = GetScoreCode(code);
+            return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE);
+        }
+
+        protected bool CountsAsFinished(Score s)
+        {
+            if (s == null)
+            {
+                return false;
+            }
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            var scoreCode = GetScoreCode(s);
+            return scoreCode.Finished ?? false;
+        }
+
+        protected bool CountsAsStarted(Score s)
+        {
+            if (s == null)
+            {
+                return false;
+            }
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            var scoreCode = GetScoreCode(s);
+            return scoreCode.Started ?? false;
+        }
+
+        protected bool CountsAsParticipation(Score s)
+        {
+            if (s == null)
+            {
+                return false;
+            }
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            var scoreCode = GetScoreCode(s);
+            return scoreCode.CountAsParticipation ?? false;
+        }
+
+        protected bool CameToStart(Score s)
+        {
+            if (String.IsNullOrWhiteSpace(s.Code) &&
+                (s.Place ?? 0) != 0)
+            {
+                return true;
+            }
+            var scoreCode = GetScoreCode(s);
+            return scoreCode.CameToStart ?? false;
+        }
+
+
+        protected int GetNumberOfDiscards(SeriesResults resultsWorkInProgress)
+        {
+            return GetNumberOfDiscards(resultsWorkInProgress.GetSailedRaceCount());
+        }
+
+        protected int GetNumberOfDiscards(int numberOfRaces)
+        {
+            if (numberOfRaces == 0)
+            {
+                return 0;
+            }
+            string[] discardStrings;
+            if (String.IsNullOrWhiteSpace(ScoringSystem?.DiscardPattern))
+            {
+                discardStrings = new string[] { "0" };
+            }
+            else
+            {
+                discardStrings = ScoringSystem.DiscardPattern.Split(',');
+            }
+            string selectedString;
+            if (numberOfRaces > discardStrings.Length)
+            {
+                selectedString = discardStrings[^1];
+            }
+            else
+            {
+                selectedString = discardStrings[numberOfRaces - 1];
+            }
+
+            if (int.TryParse(selectedString, out int returnValue))
+            {
+                return returnValue;
+            }
+
+            if (numberOfRaces == 1)
+            {
+                return 0;
+            }
+            return GetNumberOfDiscards(numberOfRaces - 1);
+
+        }
+
+        // Ensure consistency of submitted results for calculations.
+        protected void ValidateSeries(SeriesResults results, IEnumerable<Score> scores)
+        {
+            bool allRacesFound = scores.All(s => results.Races.Any(
+                r => r.Id == s.RaceId
+                    || r == s.Race));
+            bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
+                c => c.Id == s.CompetitorId
+                    || c == s.Competitor));
+
+            //Used to check and make sure all score codes were found. but no more.
+
+            if (!allRacesFound)
+            {
+                throw new InvalidOperationException(
+                    "A score for a race that is not in the series was provided to SeriesCalculator");
+            }
+
+            if (!allCompetitorsFound)
+            {
+                throw new InvalidOperationException(
+                    "A score for a competitor that is not in the series was provided to SeriesCalculator");
+            }
+        }
+
+
+        protected abstract Decimal? GetBasicScore(
+            IEnumerable<Score> allScores,
+            Score currentScore);
+        
+        protected abstract Decimal? GetPerfectScore(
+            IEnumerable<Score> allScores,
+            Score currentScore);
+
+        protected bool ShouldAdjustOtherScores(Score score)
+        {
+            return !String.IsNullOrWhiteSpace(score.Code)
+            && (GetScoreCode(score)?.AdjustOtherScores ?? true);
+        }
+
+
+        protected bool ShouldPreserveScore(Score score)
+        {
+            return String.IsNullOrWhiteSpace(score.Code)
+                || (GetScoreCode(score)?.PreserveResult ?? true);
+        }
+
+        protected ScoreCode GetScoreCode(Score score)
+        {
+            return GetScoreCode(score.Code);
+        }
+
+        protected ScoreCode GetScoreCode(string scoreCodeName)
+        {
+            if (String.IsNullOrWhiteSpace(scoreCodeName))
+            {
+                return null;
+            }
+            var returnScoreCode = ScoringSystem.ScoreCodes
+                    .SingleOrDefault(c =>
+                        c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
+
+            if (returnScoreCode == null)
+            {
+                returnScoreCode = ScoringSystem.InheritedScoreCodes
+                    ?.SingleOrDefault(c =>
+                        c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
+            }
+
+            if (returnScoreCode == null)
+            {
+                returnScoreCode = GetScoreCode(DEFAULT_CODE);
+                if (returnScoreCode == null)
+                {
+                    returnScoreCode = new ScoreCode
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Default",
+                        Formula = "FIN+",
+                        FormulaValue = 2,
+                        CameToStart = false,
+                        Finished = false,
+                        Discardable = true
+                    };
+                }
+            }
+            return returnScoreCode;
+        }
+
+        private static IList<Competitor> ReorderCompetitors(SeriesResults results)
+        {
+            return results.Competitors.OrderBy(c => results.Results[c].Rank ?? int.MaxValue).ToList();
+        }
+
         private void AddCodesUsed(SeriesResults results)
         {
             var scoreCodes = new Dictionary<string, ScoreCodeSummary>();
 
-            foreach(var comp in results.Competitors)
-                foreach(var race in results.SailedRaces)
+            foreach (var comp in results.Competitors)
+                foreach (var race in results.SailedRaces)
                 {
                     var curScore = results.Results[comp].CalculatedScores[race];
                     if (!String.IsNullOrWhiteSpace(curScore.RawScore.Code)
@@ -133,7 +539,7 @@ namespace SailScores.Core.Scoring
 
         private string GetNumberIfExists(ScoreCode codeDef)
         {
-            
+
             if ((codeDef.FormulaValue ?? 0) == 0)
             {
                 return string.Empty;
@@ -254,25 +660,6 @@ namespace SailScores.Core.Scoring
             return returnResults;
         }
 
-        protected void SetScores(SeriesResults resultsWorkInProgress, IEnumerable<Score> scores)
-        {
-            ValidateSeries(resultsWorkInProgress, scores);
-            ClearRawScores(scores);
-            foreach (var comp in resultsWorkInProgress.Competitors)
-            {
-                SeriesCompetitorResults compResults = CalculateSimpleScores(comp, scores);
-                AddDefaultScores(resultsWorkInProgress, compResults);
-                CalculateRaceDependentScores(resultsWorkInProgress, compResults);
-                CalculateSeriesDependentScores(resultsWorkInProgress, compResults);
-                CalculateOverrides(resultsWorkInProgress, compResults);
-                DiscardScores(resultsWorkInProgress, compResults);
-                resultsWorkInProgress.Results[comp] = compResults;
-            }
-            CalculateTotals(resultsWorkInProgress, scores);
-            CalculateRanks(resultsWorkInProgress);
-            resultsWorkInProgress.Competitors = ReorderCompetitors(resultsWorkInProgress);
-        }
-
         private void AddDefaultScores(
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)
@@ -296,7 +683,7 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        private void CalculateRaceDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
+        protected virtual void CalculateRaceDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
         {
             //calculate non-average codes first
             foreach (var race in resultsWorkInProgress.SailedRaces)
@@ -379,66 +766,13 @@ namespace SailScores.Core.Scoring
             return average || seriesCompPlus;
         }
 
-        protected virtual void CalculateOverrides(
-            SeriesResults resultsWorkInProgress,
-            SeriesCompetitorResults compResults)
-        {
-            foreach (var race in resultsWorkInProgress.SailedRaces)
-            {
-                var score = compResults.CalculatedScores[race];
-                var defaultScore = GetDefaultScore(race, resultsWorkInProgress);
-                if (score?.ScoreValue != null && score.ScoreValue > defaultScore)
-                {
-                    score.ScoreValue = defaultScore;
-                }
-            }
-        }
-
-
-        protected virtual void CalculateRanks(SeriesResults resultsWorkInProgress)
-        {
-            var orderedComps = resultsWorkInProgress.Results.Values
-                .OrderBy(s => s, CompetitorComparer);
-
-            int i = 1;
-            SeriesCompetitorResults prevComp = null;
-            foreach (var comp in orderedComps)
-            {
-                if (comp.TotalScore == null)
-                {
-                    comp.Rank = null;
-                }
-                else if (prevComp != null && CompetitorComparer.Compare(comp, prevComp) == 0)
-                {
-                    comp.Rank = prevComp.Rank;
-                }
-                else
-                {
-                    comp.Rank = i;
-                }
-                i++;
-                prevComp = comp;
-            }
-        }
-
-        private static IList<Competitor> ReorderCompetitors(SeriesResults results)
-        {
-            return results.Competitors.OrderBy(c => results.Results[c].Rank ?? int.MaxValue).ToList();
-        }
-
-        protected static int GetNumberOfCompetitors(SeriesResults seriesResults)
-        {
-            return seriesResults.Competitors.Count;
-        }
-
-
-        private static bool IsTrivialCalculation(ScoreCode scoreCode)
+        protected static bool IsTrivialCalculation(ScoreCode scoreCode)
         {
             return scoreCode.Formula.Equals(MANUAL_FORMULANAME, CASE_INSENSITIVE)
                 || scoreCode.Formula.Equals(FIXED_FORMULANAME, CASE_INSENSITIVE);
         }
 
-        private decimal? GetTrivialScoreValue(CalculatedScore score)
+        protected decimal? GetTrivialScoreValue(CalculatedScore score)
         {
             var scoreCode = GetScoreCode(score.RawScore);
             switch (scoreCode.Formula)
@@ -485,65 +819,17 @@ namespace SailScores.Core.Scoring
             };
         }
 
-        protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+        private void ClearRawScores(IEnumerable<Score> scores)
         {
-            var dnfScore = GetDnfScore(race) ?? 1;
-            var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
-            var percent = Math.Round(dnfScore * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
-
-            return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
+            foreach (var score in scores)
+            {
+                if (!ShouldPreserveScore(score))
+                {
+                    score.Place = null;
+                }
+            }
         }
 
-        protected decimal? GetDnfScore(Race race)
-        {
-            var dnfCode = GetScoreCode(DNF_SCORENAME);
-            if (IsTrivialCalculation(dnfCode))
-            {
-                return GetTrivialScoreValue(new CalculatedScore
-                {
-                    RawScore = new Score { Code = dnfCode.Name }
-                });
-            }
-            if (IsRaceBasedValue(dnfCode))
-            {
-                return CalculateRaceBasedValue(new CalculatedScore
-                {
-                    RawScore = new Score { Code = dnfCode.Name }
-                }, race);
-            }
-
-            return race.Scores
-                       .Count(s => CountsAsStarted(s)) +
-                        dnfCode.FormulaValue;
-        }
-
-
-        protected virtual decimal? GetDefaultScore(Race race, SeriesResults resultsWorkInProgress)
-        {
-            var defaultCode = GetScoreCode(DEFAULT_CODE);
-            if (IsTrivialCalculation(defaultCode))
-            {
-                return GetTrivialScoreValue(new CalculatedScore
-                {
-                    RawScore = new Score { Code = defaultCode.Name }
-                });
-            }
-            if (IsRaceBasedValue(defaultCode))
-            {
-                return CalculateRaceBasedValue(new CalculatedScore
-                {
-                    RawScore = new Score { Code = defaultCode.Name }
-                }, race);
-            }
-            if (IsSeriesBasedScore(defaultCode))
-            {
-                //Assume it's competitors plus for now. I suppose the default could be
-                // the competitors average, but that would create all sort of problems, I think.
-                return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0);
-            }
-            return race.Scores.Count(s => CountsAsStarted(s)) +
-                        defaultCode.FormulaValue;
-        }
 
         private decimal? CalculateAverage(
             SeriesCompetitorResults compResults)
@@ -606,263 +892,6 @@ namespace SailScores.Core.Scoring
 
             return Math.Round(average, 1, MidpointRounding.AwayFromZero);
 
-        }
-
-        protected bool IsAverage(string code)
-        {
-            if (String.IsNullOrWhiteSpace(code))
-            {
-                return false;
-            }
-            var scoreCode = GetScoreCode(code);
-            return scoreCode.Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
-        }
-
-        protected bool IsNonDiscardAverage(string code)
-        {
-            if (String.IsNullOrWhiteSpace(code))
-            {
-                return false;
-            }
-            var scoreCode = GetScoreCode(code);
-            return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE);
-        }
-
-        protected bool CountsAsFinished(Score s)
-        {
-            if (s == null)
-            {
-                return false;
-            }
-            if (String.IsNullOrWhiteSpace(s.Code) &&
-                (s.Place ?? 0) != 0)
-            {
-                return true;
-            }
-            var scoreCode = GetScoreCode(s);
-            return scoreCode.Finished ?? false;
-        }
-
-        protected bool CountsAsStarted(Score s)
-        {
-            if (s == null)
-            {
-                return false;
-            }
-            if (String.IsNullOrWhiteSpace(s.Code) &&
-                (s.Place ?? 0) != 0)
-            {
-                return true;
-            }
-            var scoreCode = GetScoreCode(s);
-            return scoreCode.Started ?? false;
-        }
-
-        protected bool CameToStart(Score s)
-        {
-            if (String.IsNullOrWhiteSpace(s.Code) &&
-                (s.Place ?? 0) != 0)
-            {
-                return true;
-            }
-            var scoreCode = GetScoreCode(s);
-            return scoreCode.CameToStart ?? false;
-        }
-
-        protected virtual void CalculateTotals(
-            SeriesResults results,
-            IEnumerable<Score> scores)
-        {
-            foreach (var comp in results.Competitors)
-            {
-                var compResults = results.Results[comp];
-
-                compResults.TotalScore = compResults
-                    .CalculatedScores.Values
-                    .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
-            }
-        }
-
-        protected virtual void DiscardScores(
-            SeriesResults resultsWorkInProgress,
-            SeriesCompetitorResults compResults)
-        {
-            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress);
-
-            var compResultsOrdered = compResults.CalculatedScores.Values.OrderByDescending(s => s.ScoreValue)
-                .ThenBy(s => s.RawScore.Race.Date)
-                .ThenBy(s => s.RawScore.Race.Order)
-                .Where(s => GetScoreCode(s.RawScore)?.Discardable ?? true);
-            foreach (var score in compResultsOrdered.Take(numOfDiscards))
-            {
-                score.Discard = true;
-            }
-        }
-
-        protected int GetNumberOfDiscards(SeriesResults resultsWorkInProgress)
-        {
-            return GetNumberOfDiscards(resultsWorkInProgress.GetSailedRaceCount());
-        }
-
-        protected int GetNumberOfDiscards(int numberOfRaces)
-        {
-            if (numberOfRaces == 0)
-            {
-                return 0;
-            }
-            string[] discardStrings;
-            if (String.IsNullOrWhiteSpace(ScoringSystem?.DiscardPattern))
-            {
-                discardStrings = new string[] { "0" };
-            }
-            else
-            {
-                discardStrings = ScoringSystem.DiscardPattern.Split(',');
-            }
-            string selectedString;
-            if (numberOfRaces > discardStrings.Length)
-            {
-                selectedString = discardStrings[^1];
-            }
-            else
-            {
-                selectedString = discardStrings[numberOfRaces - 1];
-            }
-
-            if (int.TryParse(selectedString, out int returnValue))
-            {
-                return returnValue;
-            }
-
-            if (numberOfRaces == 1)
-            {
-                return 0;
-            }
-            return GetNumberOfDiscards(numberOfRaces - 1);
-
-        }
-
-
-        protected void ValidateSeries(SeriesResults results, IEnumerable<Score> scores)
-        {
-            bool allRacesFound = scores.All(s => results.Races.Any(
-                r => r.Id == s.RaceId
-                    || r == s.Race));
-            bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
-                c => c.Id == s.CompetitorId
-                    || c == s.Competitor));
-
-            //Used to check and make sure all score codes were found. but no more.
-
-            if (!allRacesFound)
-            {
-                throw new InvalidOperationException(
-                    "A score for a race that is not in the series was provided to SeriesCalculator");
-            }
-
-            if (!allCompetitorsFound)
-            {
-                throw new InvalidOperationException(
-                    "A score for a competitor that is not in the series was provided to SeriesCalculator");
-            }
-        }
-
-        protected virtual SeriesCompetitorResults CalculateSimpleScores(Competitor comp, IEnumerable<Score> scores)
-        {
-            var returnResults = new SeriesCompetitorResults
-            {
-                Competitor = comp,
-                CalculatedScores = new Dictionary<Race, CalculatedScore>()
-            };
-            foreach (var score in scores.Where(s => s.Competitor == comp))
-            {
-                if ((score.Race?.State ?? RaceState.Raced) != RaceState.Raced
-                    && score.Race?.State != RaceState.Preliminary)
-                {
-                    continue;
-                }
-                returnResults.CalculatedScores[score.Race] = new CalculatedScore
-                {
-                    Discard = false,
-                    RawScore = score
-                };
-                returnResults.CalculatedScores[score.Race].ScoreValue =
-                    GetBasicScore(scores, score);
-
-            }
-
-            return returnResults;
-        }
-
-        protected abstract Decimal? GetBasicScore(
-            IEnumerable<Score> allScores,
-            Score currentScore);
-
-        protected bool ShouldAdjustOtherScores(Score score)
-        {
-            return !String.IsNullOrWhiteSpace(score.Code)
-            && (GetScoreCode(score)?.AdjustOtherScores ?? true);
-        }
-
-        private void ClearRawScores(IEnumerable<Score> scores)
-        {
-            foreach (var score in scores)
-            {
-                if (!ShouldPreserveScore(score))
-                {
-                    score.Place = null;
-                }
-            }
-        }
-
-        protected bool ShouldPreserveScore(Score score)
-        {
-            return String.IsNullOrWhiteSpace(score.Code)
-                || (GetScoreCode(score)?.PreserveResult ?? true);
-        }
-
-        protected ScoreCode GetScoreCode(Score score)
-        {
-            return GetScoreCode(score.Code);
-        }
-
-        protected ScoreCode GetScoreCode(string scoreCodeName)
-        {
-            if (String.IsNullOrWhiteSpace(scoreCodeName))
-            {
-                return null;
-            }
-            var returnScoreCode = ScoringSystem.ScoreCodes
-                    .SingleOrDefault(c =>
-                        c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
-
-            if (returnScoreCode == null)
-            {
-                returnScoreCode = ScoringSystem.InheritedScoreCodes
-                    ?.SingleOrDefault(c =>
-                        c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
-            }
-
-            if (returnScoreCode == null)
-            {
-                returnScoreCode = GetScoreCode(DEFAULT_CODE);
-                if (returnScoreCode == null)
-                {
-                    returnScoreCode = new ScoreCode
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "Default",
-                        Formula = "FIN+",
-                        FormulaValue = 2,
-                        CameToStart = false,
-                        Finished = false,
-                        Discardable = true
-                    };
-                }
-            }
-            return returnScoreCode;
         }
     }
 

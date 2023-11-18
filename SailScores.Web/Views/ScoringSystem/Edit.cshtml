@@ -55,16 +55,17 @@
                     </dd>
                     <dt class="col-sm-3">0,0,1,1,1,2,2,2,3,3,3,4</dt>
                     <dd class="col-sm-9">
-                        One
-                        discard for every three races, up to 12 races. More
+                        One discard for every three races, up to 12 races. More
                         than 12 races will have four discards.
                     </dd>
                 </dl>
+                <p>For High Point Percentage systems, including Cox-Sprague, discards are awarded
+                    for the number of races that an individual competitor has sailed.</p>
             </div>
 
             <div class="form-group">
                 <label asp-for="ParticipationPercent" class="control-label"></label>
-                <span class="small"><em>&ensp;Used for High Score Percent systems</em></span>
+                <span class="small"><em>&ensp;Used for High Score Percent systems (including Cox-Sprague)</em></span>
                 <input asp-for="ParticipationPercent" class="form-control" type="number" />
                 <span asp-validation-for="ParticipationPercent" class="text-danger"></span>
             </div>
@@ -98,12 +99,13 @@
                         <th scope="col"></th>
                         <th scope="col"></th>
                         <th scope="col">Formula</th>
-                        <th scope="col">Can be Discarded</th>
+                        <th scope="col">Can Be Discarded</th>
                         <th scope="col">Came To Start</th>
                         <th scope="col">Started</th>
                         <th scope="col">Finished</th>
                         <th scope="col">Keep Result</th>
                         <th scope="col">Adjust other scores</th>
+                        <th scope="col">Participation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,10 +141,11 @@
                             <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
                             <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
                             <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.CountAsParticipation ?? false) ? "Yes" : "No")</td>
                         </tr>
                     }
                     <tr>
-                        <td colspan="9">
+                        <td colspan="11">
                             <h4>Inherited codes</h4>
                         </td>
                     </tr>
@@ -165,6 +168,7 @@
                             <td>@((code.Finished ?? false) ? "Yes" : "No")</td>
                             <td>@((code.PreserveResult ?? false) ? "Yes" : "No")</td>
                             <td>@((code.AdjustOtherScores ?? false) ? "Yes" : "No")</td>
+                            <td>@((code.CountAsParticipation ?? false) ? "Yes" : "No")</td>
                         </tr>
                     }
                 </tbody>

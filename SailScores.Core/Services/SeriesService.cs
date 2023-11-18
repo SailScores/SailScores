@@ -343,6 +343,7 @@ namespace SailScores.Core.Services
                     Place = s.Value.RawScore.Place,
                     Code = s.Value.RawScore.Code,
                     ScoreValue = s.Value.ScoreValue,
+                    PerfectScoreValue = s.Value.PerfectScoreValue,
                     Discard = s.Value.Discard
                 });
         }
@@ -612,9 +613,10 @@ namespace SailScores.Core.Services
             {
                 scoringSystem = scoringSystem.ParentSystem;
             }
+
             var isLowPoint =
-                !scoringSystem?.Name?.Contains("high ", StringComparison.InvariantCultureIgnoreCase)
-                ?? true;
+                !((scoringSystem?.Name?.Contains("high ", StringComparison.InvariantCultureIgnoreCase) ?? false)
+                  || (scoringSystem?.Name?.Contains("cox-", StringComparison.InvariantCultureIgnoreCase) ?? false));
 
             return new FlatChartData
             {

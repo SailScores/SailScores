@@ -23,6 +23,9 @@ namespace SailScores.Core.Scoring
             if (baseSystemName.Contains("High Point"))
             {
                 return new HighPointPercentageCalculator(scoringSystem);
+            } else if (baseSystemName.Contains("Cox-Sprague"))
+            {
+                return new CoxSpragueCalculator(scoringSystem);
             }
             else
             {

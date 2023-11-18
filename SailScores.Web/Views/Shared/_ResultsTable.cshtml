@@ -204,10 +204,10 @@
               results.GetScore(comp)?.TotalScore != null)
                             {
                                     <span data-toggle="tooltip" title="@results.GetScore(comp).PointsEarned / @results.GetScore(comp).PointsPossible">
-                                        @String.Format("{0:0.##}", results.GetScore(comp)?.TotalScore)
+                                        @String.Format("{0:0.###}", results.GetScore(comp)?.TotalScore)
                                 </span>
                             } else {
-                                    @String.Format("{0:0.##}", results.GetScore(comp)?.TotalScore)
+                                    @String.Format("{0:0.###}", results.GetScore(comp)?.TotalScore)
                             }
                         </strong>
                     </td>
@@ -252,11 +252,11 @@
                             var result = results.GetScore(comp, race);
 
                             @await Html.PartialAsync("_ScoreCell", new ScoreCellViewModel
-                       {
-                           Result = result,
-                           IsPercentSystem = results.IsPercentSystem,
-                           ScoreCodesUsed = results.ScoreCodesUsed
-                       })
+                               {
+                                   Result = result,
+                                   IsPercentSystem = results.IsPercentSystem,
+                                   ScoreCodesUsed = results.ScoreCodesUsed
+                               })
                         }
                         prevRaceDate = race.Date;
                     }

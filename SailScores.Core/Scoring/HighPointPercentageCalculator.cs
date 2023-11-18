@@ -52,6 +52,14 @@ namespace SailScores.Core.Scoring
             return competitorsInRace - baseScore;
         }
 
+        protected override decimal? GetPerfectScore(IEnumerable<Score> allScores, Score currentScore)
+        {
+            int competitorsInRace = allScores.Count(s =>
+                s.Race == currentScore.Race
+                 && CameToStart(s));
+            return competitorsInRace;
+        }
+
         /// The series score for each boat will be a percentage calculated as
         /// follows: divide the sum of her race scores by the sum of the points
         /// she would have scored if she had placed first in every race in
@@ -70,7 +78,9 @@ namespace SailScores.Core.Scoring
             foreach (var comp in results.Competitors)
             {
                 var currentCompResults = results.Results[comp];
-                if (currentCompResults.CalculatedScores.Where(s => s.Value.RawScore.Code != DEFAULT_CODE).Count()
+                if (currentCompResults.CalculatedScores
+                    .Where(s => CountsAsStarted(s.Value.RawScore) ||
+                        CountsAsParticipation(s.Value.RawScore)).Count()
                     < requiredRaces)
                 {
                     currentCompResults.TotalScore = null;
@@ -91,7 +101,14 @@ namespace SailScores.Core.Scoring
 
                     currentCompResults.PointsEarned = compTotal;
                     currentCompResults.PointsPossible = perfectScore;
-                    currentCompResults.TotalScore = compTotal * 100 / perfectScore;
+                    if (perfectScore > 0)
+                    {
+                        currentCompResults.TotalScore = compTotal * 100 / perfectScore;
+                    }
+                    else
+                    {
+                        currentCompResults.TotalScore = 0;
+                    }
                 }
             }
         }
@@ -100,16 +117,25 @@ namespace SailScores.Core.Scoring
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)
         {
-            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress);
+            int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress, compResults);
 
-            var compResultsOrdered = compResults.CalculatedScores.Values.OrderBy(s => s.ScoreValue)
+            var compResultsOrdered = compResults.CalculatedScores.Values.OrderBy(s => s.ScoreValue / s.PerfectScoreValue)
                 .ThenBy(s => s.RawScore.Race.Date)
                 .ThenBy(s => s.RawScore.Race.Order)
-                .Where(s => GetScoreCode(s.RawScore)?.Discardable ?? true);
+                .Where(s => CameToStart(s.RawScore) && ( GetScoreCode(s.RawScore)?.Discardable ?? true));
             foreach (var score in compResultsOrdered.Take(numOfDiscards))
             {
                 score.Discard = true;
             }
+        }
+
+        // Not in Base: That one doesn't need competitor info to determine number of discards
+        private int GetNumberOfDiscards(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
+        {
+            var numOfRaces = compResults.CalculatedScores
+                    .Where(s => CountsAsStarted(s.Value.RawScore) ||
+                        CountsAsParticipation(s.Value.RawScore)).Count();
+            return GetNumberOfDiscards(numOfRaces);
         }
 
         protected override void CalculateOverrides(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)

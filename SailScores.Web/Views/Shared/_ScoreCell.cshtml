@@ -31,7 +31,11 @@
                 @Html.Raw("</span>")
             } @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
             {
-                <span title="@Model.Result.Place.Value.Ordinalize()">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
+                var tooltipText = Model.Result.PerfectScoreValue == null ?
+                    Model.Result.Place.Value.Ordinalize() :
+                $"of {Model.Result.PerfectScoreValue.Value}&#010;{Model.Result.Place.Value.Ordinalize()}";
+                
+                <span data-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
             } else {
                 @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
             }

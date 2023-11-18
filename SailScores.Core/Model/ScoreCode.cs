@@ -35,6 +35,7 @@ namespace SailScores.Core.Model
         public bool? PreserveResult { get; set; }
         // Should scoring of other following competitors use this as a finisher ahead? 
         public bool? AdjustOtherScores { get; set; }
+        public bool? CountAsParticipation { get; set; }
 
     }
 }
