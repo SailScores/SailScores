@@ -98,7 +98,31 @@ public class ClubRequestService : IClubRequestService
         {
             "TEST",
             "HOME",
-            "ACCOUNT"
+            "ACCOUNT",
+            "CLIENT",
+            "API",
+            "APIV2",
+            "APIV3",
+
+            "CSS",
+            "VENDOR",
+            "FONTS",
+            "JS",
+            "LIB",
+            "FAVICON",
+            "IMAGES",
+            "IMAGE",
+            "CONTENT",
+            "SCRIPTS",
+            "STATS",
+            "SAILSCORES",
+
+            "CLUB",
+            "CLUBS",
+            "TEAM",
+            "REGATTA",
+            "SERIES",
+            "RACE",
             // Should obscenities be added here?
         };
 

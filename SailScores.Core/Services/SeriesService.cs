@@ -212,13 +212,13 @@ namespace SailScores.Core.Services
             fullSeries.FlatResults = flatResults;
 
             // get the current version of the competitors, so we can get current sail number.
+            var competitorSailNumbersById = await _dbContext.Competitors
+                .Where(c => c.ClubId == clubId)
+                .ToDictionaryAsync(c => c.Id, c => c.SailNumber)
+                .ConfigureAwait(false);
             foreach (var comp in fullSeries.FlatResults.Competitors)
             {
-                comp.CurrentSailNumber = await _dbContext.Competitors
-                    .Where(c => c.Id == comp.Id)
-                    .Select(c => c.SailNumber)
-                    .FirstOrDefaultAsync()
-                    .ConfigureAwait(false);
+                comp.CurrentSailNumber = competitorSailNumbersById[comp.Id];
             }
             return fullSeries;
         }

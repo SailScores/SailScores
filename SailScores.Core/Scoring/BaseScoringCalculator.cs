@@ -273,7 +273,12 @@ namespace SailScores.Core.Scoring
                 return true;
             }
             var scoreCode = GetScoreCode(s);
-            return scoreCode.Finished ?? false;
+            return CountsAsFinished(scoreCode);
+        }
+
+        protected bool CountsAsFinished(ScoreCode s)
+        {
+            return s.Finished ?? false;
         }
 
         protected bool CountsAsStarted(Score s)
@@ -288,7 +293,12 @@ namespace SailScores.Core.Scoring
                 return true;
             }
             var scoreCode = GetScoreCode(s);
-            return scoreCode.Started ?? false;
+            return CountsAsStarted(scoreCode);
+        }
+
+        protected bool CountsAsStarted(ScoreCode s)
+        {
+            return s.Started ?? false;
         }
 
         protected bool CountsAsParticipation(Score s)
@@ -303,7 +313,12 @@ namespace SailScores.Core.Scoring
                 return true;
             }
             var scoreCode = GetScoreCode(s);
-            return scoreCode.CountAsParticipation ?? false;
+            return CountsAsParticipation(scoreCode);
+        }
+
+        protected bool CountsAsParticipation(ScoreCode s)
+        {
+            return (s.CameToStart ?? false) || (s.CountAsParticipation ?? false);
         }
 
         protected bool CameToStart(Score s)
@@ -314,7 +329,12 @@ namespace SailScores.Core.Scoring
                 return true;
             }
             var scoreCode = GetScoreCode(s);
-            return scoreCode.CameToStart ?? false;
+            return CameToStart(scoreCode);
+        }
+
+        protected bool CameToStart(ScoreCode s)
+        {
+            return s.CameToStart ?? false;
         }
 
 
@@ -474,7 +494,7 @@ namespace SailScores.Core.Scoring
             results.ScoreCodesUsed = scoreCodes;
         }
 
-        private ScoreCodeSummary GetScoreCodeSummary(string code)
+        protected virtual ScoreCodeSummary GetScoreCodeSummary(string code)
         {
             var codeDef = GetScoreCode(code);
 
