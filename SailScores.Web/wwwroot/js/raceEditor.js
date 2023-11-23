@@ -100,7 +100,7 @@ export function compCreateSubmit(e) {
         type: "POST",
         url: url,
         beforeSend: prep,
-        data: form.serialize(),
+        data: form.serialize(), // serializes the form's elements.
         success: completeCompCreate,
         error: completeCompCreateFailed
     });
