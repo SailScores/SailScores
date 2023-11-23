@@ -105,6 +105,11 @@ public class ClubRequestService : IClubRequestService
             "APIV3",
 
             "CSS",
+            "VENDOR",
+            "FONTS",
+            "JS",
+            "LIB",
+            "FAVICON",
             "IMAGES",
             "IMAGE",
             "CONTENT",

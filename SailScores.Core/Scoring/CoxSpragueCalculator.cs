@@ -228,5 +228,35 @@ namespace SailScores.Core.Scoring
             return Math.Max(dnfScore, (score.ScoreValue ?? 0) - percent);
         }
 
+        protected override ScoreCodeSummary GetScoreCodeSummary(string code)
+        {
+            var codeDef = GetScoreCode(code);
+
+            string possibleFormula;
+
+            if (CountsAsParticipation(codeDef) && !CameToStart(codeDef))
+            {
+                possibleFormula = "Participation but not scored.";
+            }
+            else if (!CameToStart(codeDef))
+            {
+                possibleFormula = "No participation, no score."; 
+            } else
+            {
+                possibleFormula = base.GetScoreCodeSummary(code).Formula;
+            }
+            if (possibleFormula.Contains("Fixed") && possibleFormula.Contains("0"))
+            {
+                possibleFormula = "One greater than # came to start.";
+            }
+
+            return new ScoreCodeSummary
+            {
+                Name = codeDef.Name,
+                Description = codeDef.Description,
+                Formula = possibleFormula
+            };
+
+        }
     }
 }
