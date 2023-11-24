@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using SailScores.Core.Mapping;
 using SailScores.Core.Model;
@@ -28,6 +29,7 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Mock<IScoringService> _mockScoringService;
         private readonly Mock<IForwarderService> _mockForwarderService;
         private readonly Mock<IConversionService> _mockConversionService;
+        private readonly Mock<IMemoryCache> _mockCache;
 
         public SeriesServiceTests()
         {
@@ -42,6 +44,7 @@ namespace SailScores.Test.Unit.Core.Services
             _mockScoringService = new Mock<IScoringService>();
             _mockForwarderService = new Mock<IForwarderService>();
             _mockConversionService = new Mock<IConversionService>();
+            _mockCache = new Mock<IMemoryCache>();
 
             _context = Utilities.InMemoryContextBuilder.GetContext();
             _clubInitials = _context.Clubs.First().Initials;
@@ -69,9 +72,9 @@ namespace SailScores.Test.Unit.Core.Services
                 _mockConversionService.Object,
                 _dbObjectBuilder,
                 _context,
+                _mockCache.Object,
                 _mapper
                 );
-
 
         }
 

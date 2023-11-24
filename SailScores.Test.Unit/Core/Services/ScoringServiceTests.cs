@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
 using Xunit;
+using Microsoft.Extensions.Caching.Memory;
+using Moq;
 
 namespace SailScores.Test.Unit.Core.Services
 {
@@ -16,14 +18,21 @@ namespace SailScores.Test.Unit.Core.Services
         ScoringService _service;
 
         private readonly ISailScoresContext _context;
+        private readonly Mock<IMemoryCache> _cache;
         private readonly IMapper _mapper;
 
         public ScoringServiceTests()
         {
             _context = InMemoryContextBuilder.GetContext();
+            _cache = new Mock<IMemoryCache>();
+            var cacheEntry = Mock.Of<ICacheEntry>();
+
+            _cache.Setup(x => x.CreateEntry(It.IsAny<object>())).Returns(cacheEntry);
+
             _mapper = MapperBuilder.GetSailScoresMapper();
             _service = new ScoringService(
                 _context,
+                _cache.Object,
                 _mapper);
         }
 

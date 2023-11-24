@@ -7,19 +7,23 @@ using System.Threading.Tasks;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SailScores.Core.Services
 {
     public class ScoringService : IScoringService
     {
         private readonly ISailScoresContext _dbContext;
+        private readonly IMemoryCache _cache;
         private readonly IMapper _mapper;
 
         public ScoringService(
             ISailScoresContext dbContext,
+            IMemoryCache cache,
             IMapper mapper)
         {
             _dbContext = dbContext;
+            _cache = cache;
             _mapper = mapper;
         }
 
@@ -65,8 +69,22 @@ namespace SailScores.Core.Services
 
         // This is a big one: returns a scoring system, including inherited ScoreCodes.
         // So all score codes that will work in this scoring system will be returned.
-        public async Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId)
+        public Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId)
         {
+            return GetScoringSystemAsync(scoringSystemId, true);
+        }
+
+        public async Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId,
+            bool skipCache)
+        {
+            var cacheKey = $"ScoringSystem-{scoringSystemId}";
+            if (!skipCache)
+            {
+                if (_cache.TryGetValue(cacheKey, out ScoringSystem cachedSystem))
+                {
+                    return cachedSystem;
+                }
+            }
             var requestedDbSystem = await _dbContext
                 .ScoringSystems
                 .Include(s => s.ScoreCodes)
@@ -83,12 +101,18 @@ namespace SailScores.Core.Services
             requestedSystem.InheritedScoreCodes = allInheritedCodes
                 .Where(c => !requestedSystem.ScoreCodes.Any(ec => ec.Name == c.Name));
 
+            _cache.Set(cacheKey, requestedSystem, TimeSpan.FromMinutes(2));
+
             return requestedSystem;
 
         }
 
-        public async Task<ScoringSystem> GetScoringSystemAsync(Series series)
+        public async Task<ScoringSystem> GetScoringSystemFromCacheAsync(Series series)
         {
+            if (_cache.TryGetValue($"ScoringSystem-{series.Id}", out ScoringSystem cachedSystem))
+            {
+                return cachedSystem;
+            }
             Guid? scoringSystemId = series.ScoringSystemId;
             var regatta = await _dbContext.Regattas
                 .FirstOrDefaultAsync(r =>
@@ -105,8 +129,10 @@ namespace SailScores.Core.Services
             {
                 throw new InvalidOperationException("Scoring system for series not found and club default scoring system not found.");
             }
-            return await GetScoringSystemAsync(scoringSystemId.Value)
+            var system = await GetScoringSystemAsync(scoringSystemId.Value, false)
                 .ConfigureAwait(false);
+            _cache.Set($"ScoringSystem-{series.Id}", system, TimeSpan.FromMinutes(2));
+            return system;
         }
 
         public async Task SaveScoringSystemAsync(ScoringSystem scoringSystem)

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Core.FlatModel;
 using SailScores.Api.Enumerations;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SailScores.Core.Services
 {
@@ -21,6 +22,7 @@ namespace SailScores.Core.Services
         private readonly IForwarderService _forwarderService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly ISailScoresContext _dbContext;
+        private readonly IMemoryCache _cache;
         private readonly IMapper _mapper;
 
         public SeriesService(
@@ -30,6 +32,7 @@ namespace SailScores.Core.Services
             IConversionService converter,
             IDbObjectBuilder dbObjBuilder,
             ISailScoresContext dbContext,
+            IMemoryCache cache,
             IMapper mapper)
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
@@ -38,6 +41,7 @@ namespace SailScores.Core.Services
             _converter = converter;
             _dbObjectBuilder = dbObjBuilder;
             _dbContext = dbContext;
+            _cache = cache;
             _mapper = mapper;
         }
 
@@ -129,7 +133,6 @@ namespace SailScores.Core.Services
                     .Include(s => s.Season)
                     .AsSplitQuery()
                 .SingleAsync(s => s.Id == seriesId)
-                
                 .ConfigureAwait(false);
 
             if (dbSeries.ResultsLocked ?? false)
@@ -151,7 +154,7 @@ namespace SailScores.Core.Services
 
         private async Task CalculateScoresAsync(Series fullSeries)
         {
-            var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
+            var dbScoringSystem = await _scoringService.GetScoringSystemFromCacheAsync(
                 fullSeries)
                 .ConfigureAwait(false);
 
@@ -392,9 +395,22 @@ namespace SailScores.Core.Services
                 .Where(r => r != null)
                 .SelectMany(r => r.Scores)
                 .Select(s => s.CompetitorId);
-            var dbCompetitors = await _dbContext.Competitors
-                .Where(c => compIds.Contains(c.Id)).ToListAsync()
-                .ConfigureAwait(false);
+
+            List<dbObj.Competitor> dbCompetitors;
+            if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out dbCompetitors))
+            {
+                dbCompetitors = await _dbContext.Competitors
+                    .Where(c => compIds.Contains(c.Id)).ToListAsync()
+                    .ConfigureAwait(false);
+
+                _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+            } else
+            {
+                // this method is called with series that may be missing races (creating
+                // historical results for charts)
+                // so we need to refilter the competitors.
+                dbCompetitors = dbCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
+            }
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
 
@@ -551,13 +567,8 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             var oldCharts = await _dbContext
                 .SeriesChartResults
-                .Where(r => r.SeriesId == fullSeries.Id).ToListAsync()
+                .Where(r => r.SeriesId == fullSeries.Id).ExecuteDeleteAsync()
                 .ConfigureAwait(false);
-
-            foreach (var chart in oldCharts.ToList())
-            {
-                _dbContext.SeriesChartResults.Remove(chart);
-            }
 
             if (chartData != null)
             {

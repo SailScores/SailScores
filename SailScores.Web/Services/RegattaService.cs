@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Model;
+﻿using Microsoft.Extensions.Caching.Memory;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 
@@ -11,7 +12,7 @@ public class RegattaService : IRegattaService
     private readonly Core.Services.IScoringService _coreScoringService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly Core.Services.IFleetService _coreFleetService;
-
+    private readonly IMemoryCache _cache;
     private readonly IMapper _mapper;
 
     public RegattaService(
@@ -20,6 +21,7 @@ public class RegattaService : IRegattaService
         Core.Services.IScoringService coreScoringService,
         Core.Services.ISeasonService coreSeasonService,
         Core.Services.IFleetService coreFleetService,
+        IMemoryCache cache,
         IMapper mapper)
     {
         _clubService = clubService;
@@ -27,6 +29,7 @@ public class RegattaService : IRegattaService
         _coreScoringService = coreScoringService;
         _coreSeasonService = coreSeasonService;
         _coreFleetService = coreFleetService;
+        _cache = cache;
         _mapper = mapper;
     }
 
@@ -43,6 +46,10 @@ public class RegattaService : IRegattaService
 
     public async Task<IEnumerable<RegattaSummaryViewModel>> GetCurrentRegattas()
     {
+        if (_cache.TryGetValue("CurrentRegattas", out IEnumerable<RegattaSummaryViewModel> cachedRegattas))
+        {
+            return cachedRegattas;
+        }
         var start = DateTime.Today.AddDays(-7);
         var end = DateTime.Today.AddDays(7);
 
@@ -63,7 +70,9 @@ public class RegattaService : IRegattaService
             regatta.ClubInitials = club.Initials;
             regatta.ClubName = club.Name;
         }
-        return vm.Except(regattasToRemove);
+        var returnObject = vm.Except(regattasToRemove);
+        _cache.Set("CurrentRegattas", returnObject, TimeSpan.FromMinutes(5));
+        return returnObject;
     }
 
     public async Task<Regatta> GetRegattaAsync(Guid regattaId)
