@@ -4,17 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SailScores.Core.Services
 {
     public class UserService : IUserService
     {
         private readonly ISailScoresContext _dbContext;
+        private readonly IMemoryCache _cache;
 
         public UserService(
-            ISailScoresContext dbContext)
+            ISailScoresContext dbContext,
+            IMemoryCache cache)
         {
             _dbContext = dbContext;
+            _cache = cache;
         }
 
         public async Task AddPermission(
@@ -83,12 +87,19 @@ namespace SailScores.Core.Services
 
         public async Task<bool> IsUserAllowedToEdit(string email, string clubInitials)
         {
-            var clubId = await _dbContext.Clubs
-                .Where(c => c.Initials == clubInitials)
-                .Select(c => c.Id)
-                .SingleOrDefaultAsync()
-                .ConfigureAwait(false);
-            return await IsUserAllowedToEdit(email, clubId)
+            var clubGuid = Guid.Empty;
+
+            if (!_cache.TryGetValue($"ClubId_{clubInitials}", out clubGuid))
+            {
+                clubGuid = await _dbContext.Clubs
+                    .Where(c => c.Initials == clubInitials)
+                    .Select(c => c.Id)
+                    .SingleOrDefaultAsync()
+                    .ConfigureAwait(false);
+                _cache.Set($"ClubId_{clubInitials}", clubGuid, TimeSpan.FromMinutes(10));
+            }
+
+            return await IsUserAllowedToEdit(email, clubGuid)
                 .ConfigureAwait(false);
 
         }
