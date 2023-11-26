@@ -175,6 +175,26 @@ form label.required:not(.custom-control-label)::after {
     color: theme-color('danger');
 }
 
+.waitingModal {
+    position: fixed;
+    z-index: 9999;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: none;
+    text-align: center;
+    transition: all ease .4s;
+}
+
+.waitingModal span {
+    padding: 25px 5px 5px 5px;
+    margin-top: 15px;
+    position: relative;
+    top: 35%;
+}
+
 .dropdown-item .wi {
     font-size: 1.4rem;
 }
@@ -300,5 +320,9 @@ form label.required:not(.custom-control-label)::after {
     input:-internal-autofill-selected,
     input:-webkit-autofill {
         -webkit-box-shadow: 0 0 0 30px #3b3b3b inset !important;
+    }
+
+    .waitingModal {
+        background-color: rgba(0, 0, 0, 0.6);
     }
 }

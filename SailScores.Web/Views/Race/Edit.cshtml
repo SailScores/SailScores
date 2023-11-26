@@ -280,8 +280,6 @@
     <hr />
 </div>
 
-
-
 <div class="modal fade" id="deleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -308,6 +306,11 @@
     </div>
 </div>
 
+<div id="ssWaitingModal" class="waitingModal">
+    <span><div class="spinner-border" role="status"></div><br/>
+        <h3>Updating...</h3></span>
+</div>
+
 @await Html.PartialAsync("_competitorCreate", Model)
 
 @section PreFooter {
@@ -329,8 +332,7 @@
     <script>
         $(function () {
             $('[data-toggle="popover"]').popover()
-        })
-
+        });
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
@@ -345,5 +347,4 @@
     {
         <script src="~/js/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
     }
-
 }

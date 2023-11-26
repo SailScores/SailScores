@@ -5,7 +5,10 @@ DECLARE @NewClubId UNIQUEIDENTIFIER
 SET @NewClubId = NEWID()
 
 DECLARE @FromInitials NVARCHAR(20)
-SET @FromInitials = 'AWRYTEST'
+SET @FromInitials = 'TYC'
+
+DECLARE @ToInitials NVARCHAR(20)
+SET @ToInitials = 'TYC2'
 
 -- Select * from Clubs
 -- where Initials = @FromInitials
@@ -32,7 +35,7 @@ INSERT INTO Clubs
 SELECT
     @NewClubId,
     Name,
-    'AWRY',
+    @ToInitials,
     Description,
     1,
     url,
@@ -53,7 +56,6 @@ FROM UserPermissions
 WHERE ClubId = @FromClubId
 
 
-PRINT N'Club created. Copying weather settings'
 CREATE TABLE #IdTranslation
 (
     FromId UNIQUEIDENTIFIER,
@@ -61,6 +63,7 @@ CREATE TABLE #IdTranslation
     ConvertHistoricalJson BIT NULL
 )
 
+PRINT N'Club created. Copying weather settings'
 INSERT INTO #IdTranslation
     (FromId, ToId)
 SELECT Id, NEWID()
@@ -68,6 +71,7 @@ FROM WeatherSettings
 WHERE Id = (SELECT WeatherSettingsId
 FROM Clubs
 WHERE Id = @FromClubId)
+
 
 INSERT INTO WeatherSettings
     (Id, Latitude, Longitude, TemperatureUnits, WindSpeedUnits)

@@ -329,7 +329,9 @@ namespace SailScores.Core.Services
 
             foreach (var seriesId in seriesIdsToUpdate)
             {
-                AddUpdateSeriesJob(seriesId, race.UpdatedBy);
+                await _seriesService.UpdateSeriesResults(seriesId, race.UpdatedBy);
+                // background processing after returning response used to be:
+                // AddUpdateSeriesJob(seriesId, race.UpdatedBy);
             }
 
             return dbRace.Id;

@@ -32,9 +32,14 @@ export function initialize() {
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
+        var waiting = $('#ssWaitingModal');
+        if (!!waiting) {
+            waiting.show();
+        }
+        $('#submitButton').attr('value', 'Please wait...');
         var form = document.getElementById("raceform");
-        addScoresFieldsToForm(form);
         $('#submitButton').attr('disabled', 'disabled');
+        addScoresFieldsToForm(form);
     });
     loadFleet();
     loadSeriesOptions();

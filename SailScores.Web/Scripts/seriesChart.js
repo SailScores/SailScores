@@ -46,7 +46,15 @@
                 .filter(e => e.raceId === result.raceId
                     && e.seriesPoints !== 0)
                 .map(e => e.seriesPoints));
-            var ratio = (result.seriesPoints - minScore) / (maxScore - minScore);
+            var minNonnullScore = Math.min(...allData.entries
+                .filter(e => e.raceId === result.raceId
+                    && e.seriesPoints !== 0
+                    && e.seriesPoints !== null)
+                .map(e => e.seriesPoints));
+
+            // This gives a better bottom of chart than 0 for Cox-Sprague
+            minScore = Math.max(minScore, minNonnullScore - 10)
+            var ratio = (Math.max(result.seriesPoints - minScore, 0 )) / (maxScore - minScore);
             if (!allData.isLowPoints) {
                 ratio = 1.0 - ratio;
             }
