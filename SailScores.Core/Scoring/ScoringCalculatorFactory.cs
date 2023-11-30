@@ -26,6 +26,9 @@ namespace SailScores.Core.Scoring
             } else if (baseSystemName.Contains("Cox-Sprague"))
             {
                 return new CoxSpragueCalculator(scoringSystem);
+            } else if (baseSystemName.Contains("Low Point Average"))
+            {
+                return new LowPointAverageCalculator(scoringSystem);
             }
             else
             {
