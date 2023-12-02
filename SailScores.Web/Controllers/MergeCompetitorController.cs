@@ -47,6 +47,7 @@ public class MergeCompetitorController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<ActionResult> Options(
         string clubInitials,
         MergeCompetitorViewModel vm)
@@ -62,6 +63,7 @@ public class MergeCompetitorController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<ActionResult> Verify(
         string clubInitials,
         MergeCompetitorViewModel vm)
@@ -89,6 +91,7 @@ public class MergeCompetitorController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<ActionResult> Merge(
         string clubInitials,
         MergeCompetitorViewModel vm)

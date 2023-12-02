@@ -168,6 +168,57 @@ namespace SailScores.Core.Services
             fullSeries.Results = results;
         }
 
+        public async Task<Series> CalculateWhatIfScoresAsync(
+            Guid seriesId,
+            Guid scoringSystemId,
+            int discards,
+            Decimal? participationPercent)
+        {
+            var dbSeries = await _dbContext
+                .Series
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Weather)
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Scores)
+                    .Include(s => s.Season)
+                    .AsSplitQuery()
+                .SingleAsync(s => s.Id == seriesId)
+
+                .ConfigureAwait(false);
+
+            var fullSeries = _mapper.Map<Series>(dbSeries);
+            // if a non-default scoring system is specified, use it.
+            fullSeries.ScoringSystemId = scoringSystemId != default ? scoringSystemId : fullSeries.ScoringSystemId;
+            var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
+                fullSeries)
+                .ConfigureAwait(false);
+
+            fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
+            var sb = new System.Text.StringBuilder();
+            for(int i = 0; i <= discards; i++)
+            {
+                sb.Append(i);
+                sb.Append(",");
+            }
+            fullSeries.ScoringSystem.DiscardPattern = sb.ToString();
+            fullSeries.ScoringSystem.ParticipationPercent = participationPercent ??
+                fullSeries.ScoringSystem.ParticipationPercent;
+            var calculator = await _scoringCalculatorFactory
+                .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
+                .ConfigureAwait(false);
+
+            fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
+            await PopulateCompetitorsAsync(fullSeries)
+                .ConfigureAwait(false);
+
+            var results = calculator.CalculateResults(fullSeries);
+            fullSeries.Results = results;
+            fullSeries.FlatResults = FlattenResults(fullSeries);
+            return fullSeries;
+        }
+
         public async Task<Series> GetSeriesDetailsAsync(
             string clubInitials,
             string seasonName,

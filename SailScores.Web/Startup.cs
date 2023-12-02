@@ -299,6 +299,11 @@ namespace SailScores.Web
                     defaults: new { controller = "Race", action = "Index" },
                     constraints: new { clubInitials = clubRouteConstraint });
                 endpoints.MapControllerRoute(
+                    name: "WhatIf",
+                    pattern: "{clubInitials}/Series/WhatIf/{action}/",
+                    defaults: new { controller = "WhatIf" },
+                    constraints: new { clubInitials = clubRouteConstraint });
+                endpoints.MapControllerRoute(
                     name: "Series",
                     pattern: "{clubInitials}/{season}/{seriesName}",
                     defaults: new { controller = "Series", action = "Details" },

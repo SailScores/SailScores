@@ -55,6 +55,14 @@
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
+                <div class="col-sm-4 my-2">
+                    <a asp-route="WhatIf"
+                       asp-route-action="options"
+                       asp-route-seriesId="@Model.Item.Id"
+                       asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]"
+                       class="btn btn-outline-primary"
+                       title="Test scoring changes">@localizer["What If?"]</a>
+                </div>
             </div>
         }
     </div>
