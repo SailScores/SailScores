@@ -1,7 +1,11 @@
 ﻿@model SailScores.Web.Models.SailScores.WhatIfResultsViewModel
+@inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
 
 @{
+    var results = Model.Series.FlatResults;
     ViewData["Title"] = "What If results";
+    ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
@@ -9,49 +13,47 @@
 <p class="bd-lead">
 Check how the series results would change if scored with different options.
 </p>
-<h4>Source (will be removed)</h4>
+<h4>Blah</h4>
 <hr />
-<div class="row">
-    <div class="col-12">
-        <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Step 2 of 4</div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12">
-        <br />
-        Choose the source competitor for the merge. The race results of this competitor will be added to the 
-        target competitor. Then this source competitor will be removed.
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Verify">
-            <input type="hidden" id="SeriesId" asp-for="SeriesId" />
-            <div class="form-group">
-                @* <label asp-for="SourceCompetitorId" class="control-label">Competitor <em>Required</em></label>
-                <select asp-for="SourceCompetitorId" class="form-control">
-                    <option selected="selected">Select a racer...</option>
-                    @foreach (var comp in Model.SourceCompetitorOptions)
-                    {
-                <option value="@comp.Id">
-                    @comp.Name - @comp.SailNumber @(comp.BoatClass != null ? $"( {comp.BoatClass.Name} )" : "")
-                </option>
-                    }
-                </select>
-                <span asp-validation-for="SourceCompetitorId" class="text-danger"></span> *@
-            </div>
 
-            <div class="form-group">
-                <input type="submit" value="Confirm Merge" class="btn btn-primary my-2" />
-                <a asp-controller="Competitor"
-                   asp-action="Index"
-                   class="btn btn-outline-primary">Cancel</a>
-            </div>
-        </form>
+<div class="row">
+    <div class="col-md-6">
+        <h1 class="h2">@Model.Series.Name</h1>
+        @if (!String.IsNullOrWhiteSpace(Model.Series.Description))
+        {
+            <h5>@Model.Series.Description</h5>
+        }
+        @results.NumberOfSailedRaces @localizer["races sailed with"] @results.NumberOfDiscards
+        @localizer["discards"],
+        @results.Competitors.Count() @localizer["competitors"]
+        @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
+        {
+            @:&ndash; @results.ScoringSystemName
+        }
+        @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
+        {
+            @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
+        }
+        @if (Model.Series.ExcludeFromCompetitorStats)
+        {
+            <br />
+
+            @:<small>This series is excluded from competitor stats.</small>
+        }
     </div>
+
 </div>
+@await Html.PartialAsync("_ResultsTable", Model.Series,
+                            new ViewDataDictionary(this.ViewData) {
+                                { "ExcludeCompetitorLinks", true },
+                            //    { "AlternateResults", false }
+                            })
+
+@await Html.PartialAsync("_ResultsTable", Model.Series,
+                                new ViewDataDictionary(this.ViewData) {
+                                { "ExcludeCompetitorLinks", true },
+                                { "AlternateResults", Model.AlternateResults }})
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

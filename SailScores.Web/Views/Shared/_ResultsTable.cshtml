@@ -13,6 +13,9 @@
 @{
     bool NoCompetitors = false;
     var results = Model.FlatResults;
+    if (ViewData["AlternateResults"] != null){
+        results = (FlatResults)ViewData["AlternateResults"];
+    }
 }
 
 @if (Model != null)
