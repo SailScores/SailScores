@@ -1,0 +1,61 @@
+﻿@model SailScores.Web.Models.SailScores.WhatIfViewModel
+
+@{
+    ViewData["Title"] = "What If (1/xx)";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Series Scoring "What If"</h2>
+<p class="bd-lead">
+Check how series results would change if scored with different options.
+</p>
+<h4>Series: @Model.Series.Season?.Name @Model.Series.Name</h4>
+<p>@Model.Series.FlatResults.NumberOfSailedRaces sailed races</p>
+<hr />
+<div class="row">
+    <div class="col-12">
+        Select a scoring system and a number of discards to preview how this series&rsquo; results might change.
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Show">
+            <input type="hidden" id="SeriesId" asp-for="Series.Id" />
+            <div>
+                <label asp-for="SelectedScoringSystemId">Scoring System</label>
+                <select class="form-control" id="ScoringSystemId" asp-for="SelectedScoringSystemId">
+                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                    {
+                        <!option value="@scoringSystem.Id" @(scoringSystem.Id == Model.Series.ScoringSystemId ? "selected" : "") >@scoringSystem.Name</!option>
+                    }
+                </select>
+            </div>
+            <br />
+            <div class="form-group">
+                <label asp-for="Discards">Discards</label>
+                <select class="form-control" id="Discards" asp-for="Discards">
+                    @for(int i = 0; i < Model.Series.FlatResults.NumberOfSailedRaces; i++)
+                    {
+                        <!option value="@i" @(i == Model.Series.FlatResults.NumberOfDiscards ? "selected" : "") >@i</!option>
+                    })
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ParticipationPercent" class="control-label"></label>
+                <span class="small"><em>&ensp;Used for High Score Percent systems (including Cox-Sprague)</em></span>
+                <input asp-for="ParticipationPercent" class="form-control" type="number" />
+                <span asp-validation-for="ParticipationPercent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Calculate Results" class="btn btn-primary my-2" />
+                <a url="/"
+                   class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+}

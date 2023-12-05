@@ -23,5 +23,10 @@ namespace SailScores.Core.Services
         Task UpdateSeriesResults(Guid seriesId, string updatedBy);
         Task<FlatModel.FlatResults> GetHistoricalResults(Series series);
         Task<FlatModel.FlatChartData> GetChartData(Guid seriesId);
+        Task<Model.Series> CalculateWhatIfScoresAsync(
+            Guid seriesId,
+            Guid scoringSystemId,
+            int discards,
+            decimal? participationPercent);
     }
 }
