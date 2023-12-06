@@ -5,11 +5,15 @@
         allCompDiv.onpaste = function (event) {
 
             var clipText = event.clipboardData.getData('text/plain');
-            var clipRows = clipText.split(String.fromCharCode(13));
+            if (!clipText) {
+                clipText = window.clipboardData.getData('Text');
+            }
+            var clipRows = clipText.split(/\r?\n/);
             for (var i = 0; i < clipRows.length; i++) {
                 clipRows[i] = clipRows[i].split(String.fromCharCode(9));
             }
             if (clipRows.length === 1 && clipRows[0].length === 1) {
+                // only one item, not a tab delimited list, so let default paste happen
                 return;
             }
 
@@ -28,7 +32,6 @@
             }
 
             event.stopPropagation();
-            event.preventDefault();
         };
     };
     var closeBox = document.getElementById("closebutton");
