@@ -180,8 +180,7 @@ public class DocumentController : Controller
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError("", ex.Message);
-            // todo: add error message to vm.
+            ModelState.AddModelError(String.Empty, "Problems updating the document.");
             return View(model);
         }
     }

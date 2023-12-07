@@ -134,6 +134,11 @@ public class RegattaController : Controller
             model.ScoringSystemOptions = blank.ScoringSystemOptions;
             model.FleetOptions = blank.FleetOptions;
 
+            ModelState.AddModelError(String.Empty,
+                "A problem occurred creating this regatta. Does a " +
+                "season exist for these dates or does a regatta " +
+                "already exist with this name for this season?");
+
             return View(model);
         }
     }
@@ -239,7 +244,7 @@ public class RegattaController : Controller
         }
         catch
         {
-            ModelState.AddModelError("Exception", "A problem occured while deleting.");
+            ModelState.AddModelError(String.Empty,"A problem occurred while deleting.");
             return View(regatta);
         }
     }

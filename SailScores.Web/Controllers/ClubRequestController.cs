@@ -94,7 +94,7 @@ public class ClubRequestController : Controller
                 if (e.Description.Contains("Username") &&
                     e.Description.Contains("already taken"))
                 {
-                    ModelState.AddModelError("", "This account already exists. Please " +
+                    ModelState.AddModelError(String.Empty, "This account already exists. Please " +
                                                  "sign in and then start club creation.");
                 }
                 else if (e.Description.Contains("Username"))
@@ -102,7 +102,7 @@ public class ClubRequestController : Controller
                     ModelState.AddModelError("ContactEmail", e.Description);
                 } else
                 {
-                    ModelState.AddModelError("", e.Description);
+                    ModelState.AddModelError(String.Empty, e.Description);
                 }
             }
             return View(request);
