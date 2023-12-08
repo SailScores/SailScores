@@ -205,12 +205,12 @@ public class SailScoresContext : DbContext, ISailScoresContext
         modelBuilder.Entity<Regatta>()
             .HasMany(f => f.RegattaFleet)
             .WithOne(c => c.Regatta)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Regatta>()
             .HasMany(f => f.RegattaSeries)
             .WithOne(c => c.Regatta)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Regatta>()
             .HasOne(f => f.Season)
