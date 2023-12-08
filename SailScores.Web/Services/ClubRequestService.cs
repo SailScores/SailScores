@@ -173,7 +173,8 @@ public class ClubRequestService : IClubRequestService
                 Url = request.ClubWebsite,
                 DefaultScoringSystem = newScoringSystem,
                 Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_" + request.ClubLocation + "_"),
-                ScoringSystems = new List<ScoringSystem> { newScoringSystem }
+                ScoringSystems = new List<ScoringSystem> { newScoringSystem },
+                Locale = "en-US"
             };
 
             newClubId = await _coreClubService.SaveNewClub(club);
