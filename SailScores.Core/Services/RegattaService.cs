@@ -274,13 +274,9 @@ namespace SailScores.Core.Services
         public async Task DeleteAsync(Guid regattaId)
         {
             var dbRegatta = await _dbContext.Regattas
-                .Include(r => r.RegattaFleet)
-                .Include(r => r.RegattaSeries)
                 .SingleAsync(c => c.Id == regattaId)
                 .ConfigureAwait(false);
 
-            dbRegatta.RegattaFleet.Clear();
-            dbRegatta.RegattaSeries.Clear();
             _dbContext.Regattas.Remove(dbRegatta);
 
             await _dbContext.SaveChangesAsync()

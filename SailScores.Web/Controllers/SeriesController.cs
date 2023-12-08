@@ -297,6 +297,8 @@ public class SeriesController : Controller
         }
         catch
         {
+            ModelState.AddModelError(String.Empty,
+                "A problem occurred deleting this series.");
             var series = await _seriesService.GetSeriesAsync(id);
             return View(series);
         }
