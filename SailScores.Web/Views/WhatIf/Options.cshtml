@@ -1,20 +1,22 @@
 ﻿@model SailScores.Web.Models.SailScores.WhatIfViewModel
 
 @{
-    ViewData["Title"] = "What If (1/xx)";
+    ViewData["Title"] = "What If: Test Scoring";
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Series Scoring "What If"</h2>
+<h2>Scoring "What If"</h2>
 <p class="bd-lead">
-Check how series results would change if scored with different options.
+Check how series results change if scored with different options.
 </p>
-<h4>Series: @Model.Series.Season?.Name @Model.Series.Name</h4>
-<p>@Model.Series.FlatResults.NumberOfSailedRaces sailed races</p>
+<h4>@Model.Series.Season?.Name @Model.Series.Name</h4>
+<p>Currently scored with @Model.Series.FlatResults.ScoringSystemName &ndash;
+    @Model.Series.FlatResults.NumberOfSailedRaces sailed races and
+    @Model.Series.FlatResults.NumberOfDiscards discard(s).</p>
 <hr />
 <div class="row">
     <div class="col-12">
-        Select a scoring system and a number of discards to preview how this series&rsquo; results might change.
+        Select a scoring system and a number of discards to try:
     </div>
 </div>
 <div class="row">

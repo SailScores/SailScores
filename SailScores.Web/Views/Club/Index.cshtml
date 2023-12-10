@@ -236,23 +236,23 @@
     <br />
     <hr />
     <div class="row bg-almost">
-        <div class="col-sm-3 my-2">
+        <div class="col-sm-3 my-2 text-center">
             <a asp-controller="Admin"
                class="btn btn-outline-primary">@localizer["Admin Page"]</a>
         </div>
-        <div class="col-sm-3 my-2">
+        <div class="col-sm-3 my-2 text-center">
             <a asp-controller="Competitor"
                asp-action="Index"
                asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                class="btn btn-outline-primary">@localizer["Manage Competitors"]</a>
         </div>
-        <div class="col-sm-3 my-2">
+        <div class="col-sm-3 my-2 text-center">
             <a asp-controller="Race"
                asp-action="Create"
                asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                class="btn btn-outline-primary">@localizer["New Race"]</a>
         </div>
-        <div class="col-sm-3 my-2 d-none d-md-block">
+        <div class="col-sm-3 my-2 d-none d-md-block text-center">
             <a asp-controller="Club"
                asp-action="Stats"
                class="btn btn-outline-primary">@localizer["Club Stats"]</a>

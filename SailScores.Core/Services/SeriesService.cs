@@ -94,6 +94,13 @@ namespace SailScores.Core.Services
                         .ConfigureAwait(false);
                 }
                 fullSeries.FlatResults = flatResults;
+
+                if (flatResults.NumberOfSailedRaces == 0)
+                {
+                    flatResults.NumberOfSailedRaces = flatResults.Races
+                        .Count(r => (r.State ?? RaceState.Raced) == RaceState.Raced
+                                     || r.State == RaceState.Preliminary);
+                }
             }
             if(await IsPartOfRegatta(seriesDb.Id))
             {
@@ -233,37 +240,24 @@ namespace SailScores.Core.Services
                 ).SingleAsync()
                 .ConfigureAwait(false);
             var clubId = club.Id;
-            var seriesDb = await _dbContext
+            var seriesId = await _dbContext
                 .Series
-                .Include(s => s.Season)
                 .Where(s =>
-                    s.ClubId == clubId)
-                .SingleOrDefaultAsync(s => s.UrlName == seriesUrlName
-                                  && s.Season.UrlName == seasonName)
+                    s.ClubId == clubId
+                        && s.UrlName == seriesUrlName
+                        && s.Season.UrlName == seasonName)
+                .Select(s => s.Id)
+                .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
-            if(seriesDb == null)
+            if(seriesId == default)
             {
                 return null;
             }
-            var fullSeries = _mapper.Map<Series>(seriesDb);
-            fullSeries.ShowCompetitorClub = club.ShowClubInResults;
-            var flatResults = await GetHistoricalResults(fullSeries)
-                .ConfigureAwait(false);
-            if (flatResults == null)
-            {
-                await UpdateSeriesResults(seriesDb.Id, seriesDb.UpdatedBy)
-                    .ConfigureAwait(false);
-                flatResults = await GetHistoricalResults(fullSeries)
-                    .ConfigureAwait(false);
-            }
 
-            if (flatResults.NumberOfSailedRaces == 0)
-            {
-                flatResults.NumberOfSailedRaces = flatResults.Races
-                    .Count(r => (r.State ?? RaceState.Raced) == RaceState.Raced
-                                 || r.State == RaceState.Preliminary);
-            }
-            fullSeries.FlatResults = flatResults;
+            var fullSeries = await GetOneSeriesAsync(seriesId)
+                .ConfigureAwait(false);
+
+            fullSeries.ShowCompetitorClub = club.ShowClubInResults;
 
             // get the current version of the competitors, so we can get current sail number.
             var competitorSailNumbersById = await _dbContext.Competitors
@@ -272,7 +266,7 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             foreach (var comp in fullSeries.FlatResults.Competitors)
             {
-                comp.CurrentSailNumber = competitorSailNumbersById[comp.Id];
+                comp.CurrentSailNumber = competitorSailNumbersById.ContainsKey(comp.Id) ? competitorSailNumbersById[comp.Id] : String.Empty;
             }
             return fullSeries;
         }

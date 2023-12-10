@@ -80,11 +80,4 @@ public class WhatIfController : Controller
         return View("Results", vm);
     }
 
-    private async Task<string> GetUserStringAsync()
-    {
-        var user = await _userManager.GetUserAsync(User);
-        return user.GetDisplayName();
-    }
-
-
 }

@@ -5,35 +5,11 @@
     Layout = "_ClubLayout";
 }
 
-@section Sidebar {
-    <nav class="col-md-2 d-none d-md-block bg-almost sidebar">
-        <div class="sidebar-sticky sticky-top">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="#classes">Classes</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#fleets">Fleets</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#seasons">Seasons</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#series">Series</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#competitors">Competitors</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-}
-
 <h2>@Model.Name</h2>
 <h3>Basic Club Information</h3>
 <hr />
 <div class="row">
+    <div class="col-12 col-6-md">
     <form asp-action="Edit">
         <input hidden asp-for="Id" class="form-control" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -146,6 +122,7 @@
                class="btn btn-outline-primary">Cancel</a>
         </div>
     </form>
+    </div>
 </div>
 
 @section Scripts {
