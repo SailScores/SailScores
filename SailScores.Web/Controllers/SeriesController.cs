@@ -209,8 +209,12 @@ public class SeriesController : Controller
     }
 
     [Authorize]
-    public async Task<ActionResult> Edit(string clubInitials, Guid id)
+    public async Task<ActionResult> Edit(
+        string clubInitials,
+        Guid id,
+        string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
         if (!await _authService.CanUserEdit(User, clubId))
         {
@@ -232,10 +236,14 @@ public class SeriesController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize]
-    public async Task<ActionResult> Edit(string clubInitials, SeriesWithOptionsViewModel model)
+    public async Task<ActionResult> Edit(
+        string clubInitials,
+        SeriesWithOptionsViewModel model,
+        string returnUrl = null)
     {
         try
         {
+            ViewData["ReturnUrl"] = returnUrl;
             var clubId = await _clubService.GetClubId(clubInitials);
             if (!await _authService.CanUserEdit(User, clubId))
             {
@@ -254,6 +262,10 @@ public class SeriesController : Controller
             model.UpdatedBy = await GetUserStringAsync();
             await _seriesService.Update(model);
 
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
             return RedirectToAction("Index", "Admin");
         }
         catch

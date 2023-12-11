@@ -44,6 +44,7 @@ public class WhatIfService : IWhatIfService
             options.Discards, 
             options.ParticipationPercent);
         
+        FillInChanges(newSeries, series);
 
         var vm = new WhatIfResultsViewModel
         {
@@ -52,5 +53,23 @@ public class WhatIfService : IWhatIfService
             AlternateResults = newSeries.FlatResults,
         };
         return vm;
+    }
+
+    private void FillInChanges(Core.Model.Series newSeries, Core.Model.Series series)
+    {
+        newSeries.FlatResults.CalculatedScores = newSeries.FlatResults.CalculatedScores.ToList();
+        foreach (var competitor in newSeries.FlatResults.Competitors)
+        {
+            var oldRank = series.FlatResults.GetScore(competitor)?.Rank;
+            var newRank = newSeries.FlatResults.GetScore(competitor)?.Rank;
+            if (oldRank == null || newRank == null)
+            {
+                continue;
+            }
+            var score = newSeries.FlatResults .CalculatedScores.FirstOrDefault(s => s.CompetitorId == competitor.Id);
+            if (score != default) {
+                score.Trend = oldRank - newRank;
+            }
+        }
     }
 }

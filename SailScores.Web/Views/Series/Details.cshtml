@@ -19,7 +19,7 @@
 }
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <h1 class="h2">
             @Model.Item.Name
             @if(Model.CanEdit)
@@ -28,6 +28,7 @@
                     asp-action="Edit"
                     asp-controller="Series"
                     asp-route-id="@Model.Item.Id"
+                    asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                     title="Edit">
                     <span class="fas fa-pen"></span>
                 </a>
@@ -54,7 +55,7 @@
         }
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-4">
         @if (Model.CanEdit)
         {
             <br class="d-md-none" />

@@ -16,6 +16,12 @@
     if (ViewData["AlternateResults"] != null){
         results = (FlatResults)ViewData["AlternateResults"];
     }
+    bool showTrend = (Model.TrendOption ?? TrendOption.None) != TrendOption.None
+                    && (results?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
+                        > DateTime.Today.AddMonths(-1)
+                    && !((bool?)ViewData["IsExport"] ?? false);
+
+    showTrend = showTrend || ViewData["AlternateResults"] != null;
 }
 
 @if (Model != null)
@@ -29,10 +35,7 @@
             <thead>
                 <tr>
                     <th scope="col">@localizer["Place"]</th>
-                    @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
-                      && (results?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
-                          > DateTime.Today.AddMonths(-1)
-                      && !((bool?)ViewData["IsExport"] ?? false))
+                    @if (showTrend)
                     {
                         <th scope="col" class="d-none d-sm-table-cell">@localizer["Change"]*</th>
                     }
@@ -149,10 +152,7 @@
                     colCount = 0;
                 <tr>
                     <th scope="row">@results.GetScore(comp)?.Rank</th>
-                    @if ((Model.TrendOption ?? TrendOption.None) != TrendOption.None
-                    && (results?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
-                        > DateTime.Today.AddMonths(-1)
-                    && !((bool?)ViewData["IsExport"] ?? false))
+                    @if (showTrend)
                     {
                         <th scope="row" class="d-none d-sm-table-cell">
                             @if (results.GetScore(comp)?.Trend > 0)

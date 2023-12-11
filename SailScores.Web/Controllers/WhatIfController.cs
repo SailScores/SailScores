@@ -2,16 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Database.Entities;
 using SailScores.Identity.Entities;
 using SailScores.Web.Models.SailScores;
-using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 using ISeriesService = SailScores.Web.Services.Interfaces.ISeriesService;
 
 namespace SailScores.Web.Controllers;
-
 
 [Authorize]
 public class WhatIfController : Controller
@@ -21,7 +18,6 @@ public class WhatIfController : Controller
     private readonly IWhatIfService _whatIfService;
     private readonly Core.Services.IClubService _clubService;
     private readonly IAuthorizationService _authService;
-    private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
 
     public WhatIfController(
@@ -36,14 +32,15 @@ public class WhatIfController : Controller
         _whatIfService = whatIfService;
         _clubService = clubService;
         _authService = authService;
-        _userManager = userManager;
         _mapper = mapper;
     }
 
     public async Task<ActionResult> Options(
         string clubInitials,
-        Guid seriesId)
+        Guid seriesId,
+        string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
         if (!await _authService.CanUserEdit(User, clubId))
         {
@@ -68,8 +65,10 @@ public class WhatIfController : Controller
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Show(
         string clubInitials,
-        WhatIfViewModel options)
+        WhatIfViewModel options,
+        string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
         if (!await _authService.CanUserEdit(User, clubId))
         {
@@ -79,5 +78,4 @@ public class WhatIfController : Controller
         var vm = await _whatIfService.GetResults(options);
         return View("Results", vm);
     }
-
 }

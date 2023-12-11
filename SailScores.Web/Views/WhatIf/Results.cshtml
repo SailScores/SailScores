@@ -10,49 +10,50 @@
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Scores</h2>
-<p class="bd-lead">
-Immediately below is the preview scoring. After that are the currently shared results.
-</p>
+<a class="btn btn-sm btn-outline-primary"
+   asp-action="Edit"
+   asp-controller="Series"
+   asp-route-id="@Model.SeriesId"
+   asp-route-returnUrl="@ViewData["ReturnUrl"]"
+   class="btn btn-outline-primary">Back to Series admin</a>
 <hr />
 
-<div class="row">
-    <div class="col-md-6">
-        <h4>
-        @alternateResults.NumberOfSailedRaces @localizer["races sailed with"] @alternateResults.NumberOfDiscards
-        @localizer["discards"],
-        @alternateResults.Competitors.Count() @localizer["competitors"]
-        @if (!String.IsNullOrWhiteSpace(@alternateResults.ScoringSystemName))
-        {
-            @:&ndash; @alternateResults.ScoringSystemName
-        }
-        @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
-        {
-            @:&ndash; @alternateResults.PercentRequired.Value.ToString("G5")% participation required for ranking
-        } </h4>
-    </div>
-</div>
+<h3>
+    <span class="text-muted">Preview</span>
+    @if (!String.IsNullOrWhiteSpace(@alternateResults.ScoringSystemName))
+    {
+        @alternateResults.ScoringSystemName
+    }
+    &ndash; @alternateResults.NumberOfDiscards @localizer["discards"]
+</h3>
+<p class="lead">
+    @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
+    {
+        @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
+    }
+</p>
 @await Html.PartialAsync("_ResultsTable", Model.Series,
                                 new ViewDataDictionary(this.ViewData) {
                                 { "ExcludeCompetitorLinks", true },
                                 { "AlternateResults", Model.AlternateResults }})
-<div class="row">
-    <div class="col-md-6">
-        <h4>
-        @results.NumberOfSailedRaces @localizer["races sailed with"] @results.NumberOfDiscards
-        @localizer["discards"],
-        @results.Competitors.Count() @localizer["competitors"]
-        @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
-        {
-            @:&ndash; @results.ScoringSystemName
-        }
-        @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
-        {
-            @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
-        }
-        </h4>
-    </div>
-</div>
+
+<hr />
+<h3>
+    <span class="text-muted">Currently shared</span>
+    @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
+    {
+        @results.ScoringSystemName
+    }
+    &ndash; @results.NumberOfDiscards @localizer["discards"]
+</h3>
+<p class="lead">
+    @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
+    {
+        @results.PercentRequired.Value.ToString("G5")
+
+        @:% participation required for ranking
+    }
+</p>
 @await Html.PartialAsync("_ResultsTable", Model.Series,
                                 new ViewDataDictionary(this.ViewData) {
                                 { "ExcludeCompetitorLinks", true }
