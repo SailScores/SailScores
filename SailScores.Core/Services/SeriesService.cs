@@ -329,6 +329,7 @@ namespace SailScores.Core.Services
                     TotalScore = kvp.Value.TotalScore,
                     PointsEarned = kvp.Value.PointsEarned,
                     PointsPossible = kvp.Value.PointsPossible,
+                    ParticipationPercent = kvp.Value.ParticipationPercent,
                     Scores = FlattenScores(kvp.Value),
                     Trend = kvp.Value.Trend
                 });
