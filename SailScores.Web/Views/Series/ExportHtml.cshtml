@@ -1,4 +1,5 @@
-﻿@using SailScores.Core.Model
+﻿@using SailScores.Api.Enumerations
+@using SailScores.Core.Model
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Extensions
 @using SailScores.Web.Resources
@@ -56,9 +57,28 @@
                     }
                 </div>
             </div>
-            @{ ViewData["IsExport"] = true; }
+            @{
+                ViewData["IsExport"] = true;
+                string trendLegend = localizer["Rank change from"] + " " +
+                    localizer[EnumHelper<TrendOption>
+                    .GetDisplayValue(Model.TrendOption.Value)];
+                var tableModel = new ResultsTableViewModel
+                {
+                    SeriesId = Model.Id,
+                    Results = Model.FlatResults,
+                    ShowTrend = false,
+                    ShowCompetitorClub = Model.ShowCompetitorClub ?? false,
+                    IsExport = true,
+                    ShowExportButtons = false,
+                    ExcludeCompetitorLinks = true,
+                    PreferAlternativeSailNumbers = Model.PreferAlternativeSailNumbers ?? false,
+                    TrendLegend = trendLegend,
+                    UpdatedDate = Model.UpdatedDate
+                };
 
-            @await Html.PartialAsync("_ResultsTable", Model)
+                }
+
+            @await Html.PartialAsync("_ResultsTable", tableModel)
 
             @await Html.PartialAsync("_CodeGlossary", Model)
             <br />

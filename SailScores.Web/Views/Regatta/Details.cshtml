@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Localization;
+@using SailScores.Api.Enumerations
 @using SailScores.Core.Model
 @using SailScores.Web.Resources;
 @using SailScores.Web.Services;
@@ -259,12 +260,27 @@
                 }
                 @if (currentSeries != null && currentSeries.FlatResults != null && currentSeries.FlatResults.Races.Count() > 0)
                 {
-                    @await Html.PartialAsync("_ResultsTable",
-                        currentSeries,
-                        new ViewDataDictionary(this.ViewData)
+                    bool showTrend = (currentSeries.TrendOption ?? TrendOption.None) != TrendOption.None
+                        && (currentSeries.FlatResults?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
+                        > DateTime.Today.AddMonths(-1)
+                        && !((bool?)ViewData["IsExport"] ?? false);
+                    string trendLegend = localizer["Rank change from"] + " " +
+                        localizer[EnumHelper<TrendOption>.GetDisplayValue(currentSeries.TrendOption.Value)];
+                    var tableModel = new ResultsTableViewModel
                         {
-                            { "ExcludeCompetitorLinks", true }
-                        })
+                            SeriesId = currentSeries.Id,
+                            Results = currentSeries.FlatResults,
+                            ShowTrend = showTrend,
+                            ShowCompetitorClub = currentSeries.ShowCompetitorClub ?? false,
+                            IsExport = false,
+                            ShowExportButtons = true,
+                            ExcludeCompetitorLinks = true,
+                            PreferAlternativeSailNumbers = currentSeries.PreferAlternativeSailNumbers ?? false,
+                            TrendLegend = trendLegend,
+                            UpdatedDate = currentSeries.UpdatedDate
+                        };
+
+                    @await Html.PartialAsync("_ResultsTable", tableModel)
                     
                 }
                 else

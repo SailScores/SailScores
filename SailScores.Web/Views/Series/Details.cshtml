@@ -1,3 +1,4 @@
+@using SailScores.Api.Enumerations
 @using SailScores.Web.Models.SailScores
 @using SailScores.Core.Model
 @using Microsoft.Extensions.Localization
@@ -72,9 +73,30 @@
         }
     </div>
 </div>
+@{
+    bool showTrend = (Model.Item.TrendOption ?? TrendOption.None) != TrendOption.None
+        && (Model.Item.FlatResults?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
+        > DateTime.Today.AddMonths(-1)
+        && !((bool?)ViewData["IsExport"] ?? false);
+    string trendLegend = localizer["Rank change from"] + " " +
+        localizer[EnumHelper<TrendOption>
+        .GetDisplayValue(Model.Item.TrendOption.Value)];
+    var tableModel = new ResultsTableViewModel
+    {
+        SeriesId = Model.Item.Id,
+        Results = Model.Item.FlatResults,
+        ShowTrend = showTrend,
+        ShowCompetitorClub = Model.Item.ShowCompetitorClub ?? false,
+        IsExport = false,
+        ShowExportButtons = true,
+        ExcludeCompetitorLinks = false,
+        PreferAlternativeSailNumbers = Model.Item.PreferAlternativeSailNumbers ?? false,
+        TrendLegend = trendLegend,
+        UpdatedDate = Model.Item.UpdatedDate
+    };
+}
 
-@await Html.PartialAsync("_ResultsTable", Model.Item,
-                        new ViewDataDictionary(this.ViewData) { { "ExcludeCompetitorLinks", Model.Item.ExcludeFromCompetitorStats } })
+@await Html.PartialAsync("_ResultsTable", tableModel)
 
 @if (results.NumberOfSailedRaces > 2)
 {

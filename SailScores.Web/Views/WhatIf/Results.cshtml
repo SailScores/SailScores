@@ -32,10 +32,23 @@
         @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
     }
 </p>
-@await Html.PartialAsync("_ResultsTable", Model.Series,
-                                new ViewDataDictionary(this.ViewData) {
-                                { "ExcludeCompetitorLinks", true },
-                                { "AlternateResults", Model.AlternateResults }})
+@{
+    var previewModel = new ResultsTableViewModel
+        {
+            SeriesId = Model.Series.Id,
+            Results = alternateResults,
+            ShowTrend = true,
+            ShowTrendOnAllDevices = true,
+            ShowCompetitorClub = false,
+            IsExport = false,
+            ShowExportButtons = false,
+            ExcludeCompetitorLinks = true,
+            PreferAlternativeSailNumbers = Model.Series.PreferAlternativeSailNumbers ?? false,
+            TrendLegend = "Rank change from existing scoring method.",
+            UpdatedDate = null
+        };
+}
+@await Html.PartialAsync("_ResultsTable", previewModel)
 
 <hr />
 <h3>
@@ -54,10 +67,22 @@
         @:% participation required for ranking
     }
 </p>
-@await Html.PartialAsync("_ResultsTable", Model.Series,
-                                new ViewDataDictionary(this.ViewData) {
-                                { "ExcludeCompetitorLinks", true }
-                            })
+@{
+    var currentResults = new ResultsTableViewModel
+        {
+            SeriesId = Model.Series.Id,
+            Results = Model.Series.FlatResults,
+            ShowTrend = false,
+            ShowCompetitorClub = false,
+            IsExport = false,
+            ShowExportButtons = false,
+            ExcludeCompetitorLinks = true,
+            PreferAlternativeSailNumbers = Model.Series.PreferAlternativeSailNumbers ?? false,
+            TrendLegend = String.Empty,
+            UpdatedDate = null
+        };
+}
+@await Html.PartialAsync("_ResultsTable", currentResults)
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
