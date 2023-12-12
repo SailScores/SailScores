@@ -196,7 +196,13 @@
                                 @if (Model.Results.IsPercentSystem &&
                                Model.Results.GetScore(comp)?.TotalScore != null)
                             {
-                                    <span data-toggle="tooltip" title="@Model.Results.GetScore(comp).PointsEarned / @Model.Results.GetScore(comp).PointsPossible">
+                                    <span data-toggle="tooltip" title="@results.GetScore(comp).PointsEarned / @results.GetScore(comp).PointsPossible">
+                                    if(Model.Results.GetScore(comp).ParticipationPercent.HasValue){
+                                        {
+                                            tooltipText = tooltipText + "&#010; Participation: " + @String.Format("{0:0.#}%", Model.Results.GetScore(comp)?.ParticipationPercent);
+                                        }
+                                    }
+                                    <span data-toggle="tooltip" title="@Html.Raw(tooltipText)">
                                         @String.Format("{0:0.###}", Model.Results.GetScore(comp)?.TotalScore)
                                 </span>
                             } else {

@@ -14,6 +14,7 @@ namespace SailScores.Core.Scoring
         // for Cox-Sprague: the score value of first place
         public Decimal? PerfectScoreValue { get; set; }
         public bool Discard { get; set; }
+        public bool? CountsAsParticipation { get; set; }
 
         public override string ToString()
         {

@@ -13,6 +13,7 @@ namespace SailScores.Core.Scoring
         public int? Rank { get; set; }
         public int? Trend { get; set; }
         public Decimal? TotalScore { get; set; }
+        public Decimal? ParticipationPercent { get; set; }
 
         public Decimal? PointsEarned { get; set; }
         public Decimal? PointsPossible { get; set; }
