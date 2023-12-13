@@ -40,7 +40,7 @@ namespace SailScores.Core.Scoring
             var yParticipation = y.CalculatedScores.Count(s =>
                 (s.Value.RawScore?.Place.HasValue ?? false)
                 || (s.Value.CountsAsParticipation ?? false));
-            return xParticipation.CompareTo(yParticipation);
+            return yParticipation.CompareTo(xParticipation);
         }
 
         private static int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)

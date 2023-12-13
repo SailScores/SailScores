@@ -141,23 +141,24 @@
                 @foreach (var comp in compList)
                 {
                     colCount = 0;
+                    var compScore = Model.Results.GetScore(comp);
                 <tr>
-                        <th scope="row">@Model.Results.GetScore(comp)?.Rank</th>
+                        <th scope="row">@compScore?.Rank</th>
                     @if (Model.ShowTrend)
                     {
                         <th scope="row" class="d-none d-sm-table-cell">
-                                @if (Model.Results.GetScore(comp)?.Trend > 0)
-                            {
+                                @if (compScore?.Trend > 0)
+                                {
                                 <span class="text-success">
                                     <span class="fas fa-arrow-up"></span>
-                                        @Model.Results.GetScore(comp).Trend.Value
+                                        @compScore.Trend.Value
                                 </span>
                             }
-                                else if (Model.Results.GetScore(comp)?.Trend < 0)
-                            {
+                                else if (compScore?.Trend < 0)
+                                {
                                 <span class="text-danger">
                                     <span class="fas fa-arrow-down"></span>
-                                        @Math.Abs(Model.Results.GetScore(comp).Trend.Value)
+                                        @Math.Abs(compScore.Trend.Value)
                                 </span>
                             }
 
@@ -193,20 +194,28 @@
                     }
                     <td scope="row" class="text-center">
                         <strong>
-                                @if (Model.Results.IsPercentSystem &&
-                               Model.Results.GetScore(comp)?.TotalScore != null)
+                            @if (Model.Results.IsPercentSystem)
                             {
-                                    <span data-toggle="tooltip" title="@results.GetScore(comp).PointsEarned / @results.GetScore(comp).PointsPossible">
-                                    if(Model.Results.GetScore(comp).ParticipationPercent.HasValue){
-                                        {
-                                            tooltipText = tooltipText + "&#010; Participation: " + @String.Format("{0:0.#}%", Model.Results.GetScore(comp)?.ParticipationPercent);
-                                        }
-                                    }
-                                    <span data-toggle="tooltip" title="@Html.Raw(tooltipText)">
-                                        @String.Format("{0:0.###}", Model.Results.GetScore(comp)?.TotalScore)
+                                string tooltipText = String.Empty;
+                                if (compScore.TotalScore.HasValue)
+                                {
+                                    tooltipText = compScore?.PointsEarned + " / " + compScore?.PointsPossible;
+                                }
+                                if (tooltipText != String.Empty && (compScore?.ParticipationPercent.HasValue ?? false))
+                                {
+                                    tooltipText = tooltipText + "&#010;";
+                                }
+                                if (compScore?.ParticipationPercent.HasValue ?? false)
+                                {
+                                        tooltipText = tooltipText + "Participation: " + @String.Format("{0:0.#}%", compScore?.ParticipationPercent);
+                                }
+                                <span data-toggle="tooltip" title="@Html.Raw(tooltipText)">
+                                        @(compScore?.TotalScore != null
+                                            ? String.Format("{0:0.###}", compScore?.TotalScore)
+                                        : Html.Raw("&mdash;"))
                                 </span>
                             } else {
-                                    @String.Format("{0:0.###}", Model.Results.GetScore(comp)?.TotalScore)
+                                    @String.Format("{0:0.###}", compScore?.TotalScore)
                             }
                         </strong>
                     </td>

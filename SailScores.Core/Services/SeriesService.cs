@@ -341,6 +341,9 @@ namespace SailScores.Core.Services
                     series.Competitors.OrderBy(c => series.Results.Results.Keys.Contains(c) ?
                         (series.Results.Results[c].Rank ?? int.MaxValue)
                         : (int.MaxValue))
+                    .ThenByDescending(c => series.Results.Results.Keys.Contains(c) ?
+                                           (series.Results.Results[c].ParticipationPercent ?? 0m)
+                                                                  : 0m)
                     .ToList();
 
             }

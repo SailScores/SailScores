@@ -88,13 +88,14 @@ namespace SailScores.Core.Scoring
                 var racesParticipated = currentCompResults.CalculatedScores
                     .Where(s => CountsAsStarted(s.Value.RawScore) ||
                            CountsAsParticipation(s.Value.RawScore)).Count();
+                currentCompResults.ParticipationPercent = racesParticipated * 100.0m / raceCount; 
+                
                 if (racesParticipated < requiredRaces)
                 {
                     currentCompResults.TotalScore = null;
                 }
                 else
                 {
-                    currentCompResults.ParticipationPercent = racesParticipated * 100.0m / raceCount;
                     // racesToExclude should include discards and DNCs
                     var racesToExclude = currentCompResults
                         .CalculatedScores
