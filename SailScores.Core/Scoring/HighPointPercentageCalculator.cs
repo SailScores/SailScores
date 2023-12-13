@@ -78,10 +78,11 @@ namespace SailScores.Core.Scoring
             foreach (var comp in results.Competitors)
             {
                 var currentCompResults = results.Results[comp];
-                if (currentCompResults.CalculatedScores
+                var racesParticipated = currentCompResults.CalculatedScores
                     .Where(s => CountsAsStarted(s.Value.RawScore) ||
-                        CountsAsParticipation(s.Value.RawScore)).Count()
-                    < requiredRaces)
+                                CountsAsParticipation(s.Value.RawScore)).Count();
+                currentCompResults.ParticipationPercent = racesParticipated * 100m / raceCount;
+                if (racesParticipated < requiredRaces)
                 {
                     currentCompResults.TotalScore = null;
                 }
