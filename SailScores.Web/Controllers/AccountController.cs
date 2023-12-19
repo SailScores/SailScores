@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using SailScores.Identity.Entities;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
+using MailChimp.Net.Interfaces;
 
 namespace SailScores.Web.Controllers;
 
@@ -27,6 +28,7 @@ public class AccountController : Controller
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IEmailSender _emailSender;
     private readonly IAuthorizationService _authService;
+    private readonly IMailChimpManager _mailchimpManager;
     private readonly ILogger _logger;
     private readonly IConfiguration _configuration;
 
@@ -35,6 +37,7 @@ public class AccountController : Controller
         SignInManager<ApplicationUser> signInManager,
         IEmailSender emailSender,
         IAuthorizationService authService,
+        IMailChimpManager mailChimpManager,
         ILogger<AccountController> logger,
         IConfiguration configuration)
     {
@@ -42,6 +45,7 @@ public class AccountController : Controller
         _signInManager = signInManager;
         _emailSender = emailSender;
         _authService = authService;
+        _mailchimpManager = mailChimpManager;
         _logger = logger;
         _configuration = configuration;
     }
@@ -269,6 +273,17 @@ public class AccountController : Controller
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 _logger.LogInformation("User created a new account with password.");
+
+                if (model.NewsletterSubscribe)
+                {
+                    var member = new MailChimp.Net.Models.Member
+                    {
+                        EmailAddress = model.Email,
+                        StatusIfNew = MailChimp.Net.Models.Status.Subscribed,
+                    };
+                    await _mailchimpManager.Members.AddOrUpdateAsync(_configuration["MailchimpAudienceId"], member);
+                }
+
                 return RedirectToLocal(returnUrl);
             }
             AddErrors(result);

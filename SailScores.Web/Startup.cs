@@ -28,6 +28,8 @@ using System.Text;
 using SailScores.Web.Services.Interfaces;
 using WebMarkupMin.AspNetCore3;
 using Microsoft.Extensions.Hosting;
+using MailChimp.Net.Interfaces;
+using MailChimp.Net;
 
 namespace SailScores.Web;
 
@@ -161,6 +163,9 @@ public class Startup
             {
                 option.Filters.Add(new ResponseCacheAttribute() { NoStore = true, Location = ResponseCacheLocation.None });
             });
+
+        var mailchimpManager = new MailChimpManager(Configuration["MailchimpApiKey"]);
+        services.AddSingleton<IMailChimpManager>(mailchimpManager);
 
         services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
         services.AddTransient<IEmailSender, EmailSender>();
