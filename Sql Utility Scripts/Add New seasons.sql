@@ -1,20 +1,22 @@
 
 
-; WITH newestSeason AS (
 Select 
-Clubs.Id, Clubs.Name,
-MAX(Seasons.[End]) as SeasonEnd
-, (Select Id from Seasons s2 where s2.ClubId = Clubs.Id and s2.[End] = MAX(Seasons.[End])) as SeasonId
+Clubs.Id, Clubs.Name
+, DATEADD(year, 1, (Select Start from Seasons s2 where s2.ClubId = Clubs.Id and s2.[End] = MAX(Seasons.[End]))) as SeasonStart
+,DATEADD(year, 1,MAX(Seasons.[End])) as SeasonEnd
+--, (Select Id from Seasons s2 where s2.ClubId = Clubs.Id and s2.[End] = MAX(Seasons.[End])) as SeasonId
  from
 Clubs
 inner JOIN
 Seasons
 on Clubs.Id = Seasons.ClubId
-where Seasons.[End] > '2022-02-01'
+where Seasons.[End] > '2023-10-01'
 group BY
 Clubs.Id, Clubs.Name
-having MAX(Seasons.[End]) < GetDATE()
-)
+having MONTH(MAX(Seasons.[End])) = 12
+AND MAX(Seasons.[End]) < GETDATE() + 10
+
+
 
 -- Insert into Seasons
 -- (
@@ -28,12 +30,19 @@ having MAX(Seasons.[End]) < GetDATE()
 
 SELECT
 NewId(),
-ClubId,
- DATEADD(year, 1, [Start]),
- DATEADD(year, 1, [End]),
- '2023' as Name,
- '2023' as UrlName
-from Seasons
-where Id in (Select SeasonId from newestSeason)
-AND [Start] = '2022-01-01 00:00:00.0000000'
-AND [End] = '2022-12-31 00:00:00.0000000'
+Clubs.Id,
+ DATEADD(year, 1, (Select Start from Seasons s2 where s2.ClubId = Clubs.Id and s2.[End] = MAX(Seasons.[End]))),
+ DATEADD(year, 1,MAX(Seasons.[End])),
+ '2024' as Name,
+ '2024' as UrlName
+FROM
+Clubs
+inner JOIN
+Seasons
+on Clubs.Id = Seasons.ClubId
+where Seasons.[End] > '2023-10-01'
+group BY
+Clubs.Id, Clubs.Name
+having MONTH(MAX(Seasons.[End])) = 12
+AND MAX(Seasons.[End]) < GETDATE() + 10
+AND MAX(Seasons.[End]) > GETDATE() - 30

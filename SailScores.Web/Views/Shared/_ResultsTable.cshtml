@@ -31,7 +31,7 @@
                     }
                     @if (Model.ShowTrendOnAllDevices)
                     {
-                        <th scope="col">@localizer["Change"]*</th>
+                        <th scope="col" class="d-table-cell">@localizer["Change"]*</th>
                     }
                     <th scope="col">@localizer["Sail"]</th>
                     <th scope="col">@localizer["Helm"]</th>
@@ -144,25 +144,43 @@
                     var compScore = Model.Results.GetScore(comp);
                 <tr>
                         <th scope="row">@compScore?.Rank</th>
-                    @if (Model.ShowTrend)
+                    @if (Model.ShowTrend && !Model.ShowTrendOnAllDevices)
                     {
                         <th scope="row" class="d-none d-sm-table-cell">
-                                @if (compScore?.Trend > 0)
-                                {
-                                <span class="text-success">
-                                    <span class="fas fa-arrow-up"></span>
-                                        @compScore.Trend.Value
-                                </span>
+                            @if (compScore?.Trend > 0)
+                            {
+                            <span class="text-success">
+                                <span class="fas fa-arrow-up"></span>
+                                    @compScore.Trend.Value
+                            </span>
                             }
-                                else if (compScore?.Trend < 0)
-                                {
+                            else if (compScore?.Trend < 0)
+                            {
                                 <span class="text-danger">
                                     <span class="fas fa-arrow-down"></span>
                                         @Math.Abs(compScore.Trend.Value)
                                 </span>
                             }
-
                         </th>
+                    }
+                    @if (Model.ShowTrendOnAllDevices)
+                    {
+                        <th scope="row" class="d-table-cell">
+                            @if (compScore?.Trend > 0)
+                            {
+                                <span class="text-success">
+                                    <span class="fas fa-arrow-up"></span>
+                                        @compScore.Trend.Value
+                                </span>
+                            }
+                            else if (compScore?.Trend < 0)
+                            {
+                                <span class="text-danger">
+                                    <span class="fas fa-arrow-down"></span>
+                                        @Math.Abs(compScore.Trend.Value)
+                                </span>
+                            }
+                        </th>   
                     }
                     <th scope="row">
                         @if ((Model.PreferAlternativeSailNumbers)

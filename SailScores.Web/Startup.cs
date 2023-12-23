@@ -157,6 +157,7 @@ public class Startup
         services.AddDbContext<SailScoresContext>(options =>
             options.UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection")));
+        services.AddDatabaseDeveloperPageExceptionFilter();
 
         services
             .AddMvc(option =>
@@ -216,7 +217,7 @@ public class Startup
     {
         if (env.IsDevelopment())
         {
-            app.UseDatabaseErrorPage();
+            app.UseDeveloperExceptionPage();
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
