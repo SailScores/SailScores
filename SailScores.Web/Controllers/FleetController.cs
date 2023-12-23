@@ -106,6 +106,8 @@ public class FleetController : Controller
         }
         catch
         {
+            ModelState.AddModelError(String.Empty,
+                "An error occurred creating this fleet. Is the fleet name already in use in the club?");
             var vm = await _fleetService.GetBlankFleetWithOptionsAsync(
                 clubInitials,
                 model.RegattaId);

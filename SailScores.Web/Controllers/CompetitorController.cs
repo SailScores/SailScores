@@ -359,7 +359,17 @@ public class CompetitorController : Controller
         }
         catch
         {
-            return View();
+            ModelState.AddModelError(String.Empty,
+                "An error occurred editing this competitor.");
+            competitor.BoatClassOptions =
+                (await _clubService.GetAllBoatClasses(competitor.ClubId))
+                .OrderBy(c => c.Name);
+                        var fleets =
+                            (await _clubService.GetAllFleets(competitor.ClubId))
+                            .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+                            .OrderBy(f => f.Name);
+                        competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+            return View(competitor);
         }
     }
 
