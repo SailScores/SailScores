@@ -98,13 +98,12 @@
                             </div>
                             <div class="form-group">
                                 <label>Scoring "What If"</label>
-                                <a class="form-control"
+                                <a class="form-control btn btn-secondary"
                                    asp-route="WhatIf"
                                    asp-route-action="options"
                                    asp-route-seriesId="@Model.Id"
                                    asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]"
                                    asp-route-returnUrl="@ViewData["ReturnUrl"]"
-                                   class="btn btn-outline-primary"
                                    title="Test scoring changes">Try Different Scoring</a>
                             </div>
                         </div>

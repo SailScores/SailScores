@@ -279,7 +279,7 @@ public class AccountController : Controller
                     var member = new MailChimp.Net.Models.Member
                     {
                         EmailAddress = model.Email,
-                        StatusIfNew = MailChimp.Net.Models.Status.Subscribed,
+                        StatusIfNew = MailChimp.Net.Models.Status.Pending,
                     };
                     await _mailchimpManager.Members.AddOrUpdateAsync(_configuration["MailchimpAudienceId"], member);
                 }
