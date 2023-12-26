@@ -64,7 +64,7 @@ namespace SailScores.SeleniumTests
         public void AddAndDeleteBoatClass()
         {
             var sectionId = "classes";
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             LoginAndGoToHiddenTestClub(driver);
             driver.WaitUntilClickable(By.LinkText("Admin Page")).Click();
             driver.WaitUntilClickable(By.Id(sectionId)).Click();
@@ -92,7 +92,8 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void AddEditDeleteCompetitor()
         {
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
+            using var driver = new ChromeDriver();
             LoginAndGoToHiddenTestClub(driver);
             driver.FindElement(By.LinkText("Admin Page")).Click();
             
@@ -117,7 +118,7 @@ namespace SailScores.SeleniumTests
 
 
             var editButton = driver.WaitUntilVisible(
-                By.XPath($"//div[. = '{compName}']/..//a[@title = 'Edit']"));
+                By.XPath($"//div[. = '{compName}']/../../..//a[@title = 'Edit']"));
             editButton.Click();
 
             submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
@@ -141,7 +142,7 @@ namespace SailScores.SeleniumTests
         public void AddEditDeleteFleet()
         {
             var sectionName = "fleets";
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             LoginAndGoToHiddenTestClub(driver);
             driver.FindElement(By.LinkText("Admin Page")).Click();
             driver.FindElement(By.Id(sectionName)).Click();
@@ -150,7 +151,6 @@ namespace SailScores.SeleniumTests
             createLink.Click();
             var fleetName = $"AutoTest Fleet {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
             driver.FindElement(By.Id("Name")).SendKeys(fleetName);
-            driver.FindElement(By.Id("ShortName")).SendKeys(fleetName);
             driver.FindElement(By.Id("NickName")).SendKeys(fleetName);
 
             var typeSelector = new SelectElement(driver.FindElement(By.Id("fleetType")));
@@ -192,7 +192,7 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void AddEditDeleteSeason()
         {
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             LoginAndGoToHiddenTestClub(driver);
             driver.FindElement(By.LinkText("Admin Page")).Click();
             var sectionName = "seasons";
@@ -239,7 +239,7 @@ namespace SailScores.SeleniumTests
             var sectionName = "series";
             var seriesName = $"Test Series {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
 
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             LoginAndGoToHiddenTestClub(driver);
             driver.FindElement(By.LinkText("Admin Page")).Click();
             driver.FindElement(By.Id(sectionName)).Click();
@@ -279,7 +279,7 @@ namespace SailScores.SeleniumTests
             var sectionName = "regattas";
             var regattaName = $"Test Regatta {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
 
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             LoginAndGoToHiddenTestClub(driver);
             driver.FindElement(By.LinkText("Admin Page")).Click();
             driver.FindElement(By.Id(sectionName)).Click();
@@ -316,7 +316,8 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void AddRaceAndSeeResults()
         {
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            var year = DateTime.Today.Year;
+            using var driver = new ChromeDriver();
             LoginAndGoToHiddenTestClub(driver);
 
             var serieslink = driver.FindElements(By.LinkText("Series"));
@@ -328,7 +329,7 @@ namespace SailScores.SeleniumTests
             }
             serieslink[0].Click();
 
-            var testSeriesLink = driver.WaitUntilClickable(By.LinkText("Test Series"));
+            var testSeriesLink = driver.WaitUntilClickable(By.LinkText($"{year} Test Series"));
             testSeriesLink.Click();
 
             var headerlinks = driver.FindElements(By.CssSelector("th a"));
@@ -338,15 +339,15 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.LinkText("TEST")).Click();
 
             // click add race button
-            driver.FindElementByLinkText("New Race").Click();
+            driver.FindElement(By.LinkText("New Race")).Click();
 
             // set race fields, saving order for later
             var fleetSelector = new SelectElement(driver.WaitUntilVisible(By.Id("fleetId")));
             fleetSelector.SelectByText("Test Boat Class Fleet");
             var seriesSelector = new SelectElement(driver.FindElement(By.Id("seriesIds")));
-            seriesSelector.SelectByText("Test Series");
+            seriesSelector.SelectByText($"{year} Test Series");
 
-            driver.FindElementByLinkText("Optional Fields").Click();
+            driver.FindElement(By.LinkText("Optional Fields")).Click();
             int order = ++raceCount;
             var orderField = driver.WaitUntilVisible(By.Id("InitialOrder"));
             orderField.SendKeys(order.ToString());
@@ -366,7 +367,7 @@ namespace SailScores.SeleniumTests
 
             // since results are calculated as a background thread, need to pause here:
             Thread.Sleep(1000);
-            driver.WaitUntilVisible(By.LinkText("Test Series")).Click();
+            driver.WaitUntilVisible(By.LinkText($"{year} Test Series")).Click();
 
             // verify series includes race heading
             var linkText = $"{DateTime.Today.ToString("M/d")} R{order}";
@@ -401,8 +402,9 @@ namespace SailScores.SeleniumTests
         {
             return By.XPath(
                 $"//div[@id='{sectionId}div']/" +
-                $".//div[contains(., '{itemInRowText}')]/.//a[@title='{buttonTitle}']");
-            
+                $".//div[. = '{itemInRowText}']/../../..//a[@title = '{buttonTitle}']");
+
+
         }
     }
 }

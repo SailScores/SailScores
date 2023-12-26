@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -331,14 +331,17 @@ namespace SailScores.Core.Services
             {
                 foreach (var system in club.ScoringSystems)
                 {
-                    system.ClubId = club.Id;
+                    if (system.Id != defaultSystem.Id)
+                    {
+                        system.ClubId = club.Id;
+                    }
                 }
             }
 
             var dbClub = _mapper.Map<Db.Club>(club);
-            _dbContext.Clubs.Add(dbClub);
             dbClub.DefaultScoringSystem = null;
             dbClub.DefaultScoringSystemId = null;
+            _dbContext.Clubs.Add(dbClub);
             var dbFleet = new Db.Fleet
             {
                 Id = Guid.NewGuid(),
@@ -351,6 +354,7 @@ namespace SailScores.Core.Services
             _dbContext.Fleets.Add(dbFleet);
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+            // save twice here to avoid circular reference.
             dbClub.DefaultScoringSystemId = defaultSystem.Id;
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
