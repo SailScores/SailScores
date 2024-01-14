@@ -204,8 +204,8 @@ namespace SailScores.SeleniumTests
             var finishDate = DateTime.Today.AddDays(1).AddYears(-5);
             var seasonName = $"Test {startDate.Year}";
             driver.FindElement(By.Id("Name")).SendKeys(seasonName);
-            driver.FindElement(By.Id("Start")).SendKeys(startDate.ToShortDateString());
-            driver.FindElement(By.Id("End")).SendKeys(finishDate.ToShortDateString());
+            driver.FindElement(By.Id("Start")).SendKeys(startDate.ToString("MMDDYYYY"));
+            driver.FindElement(By.Id("End")).SendKeys(finishDate.ToString("MMDDYYYY"));
 
 
             var submitButton = driver.WaitUntilVisible(By.XPath("//input[@value='Create']"));
@@ -249,7 +249,7 @@ namespace SailScores.SeleniumTests
             driver.FindElement(By.Id("Name")).SendKeys(seriesName);
 
             var seasonSelector = new SelectElement(driver.FindElement(By.Id("SeasonId")));
-            seasonSelector.SelectByText("2019");
+            seasonSelector.SelectByText(DateTime.Today.Year.ToString());
 
             var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
             submitButton.Click();
@@ -382,7 +382,7 @@ namespace SailScores.SeleniumTests
             string itemName
             )
         {
-            return driver.WaitUntilVisible(
+            return driver.WaitUntilClickable(
                 GetButtonSelector("Delete", sectionId, itemName));
         }
         private IWebElement GetEditButtonForRow(
@@ -391,7 +391,7 @@ namespace SailScores.SeleniumTests
            string itemName
            )
         {
-            return driver.WaitUntilVisible(
+            return driver.WaitUntilClickable(
                 GetButtonSelector("Edit", sectionId, itemName));
         }
 
@@ -401,9 +401,7 @@ namespace SailScores.SeleniumTests
             string itemInRowText)
         {
             return By.XPath(
-                $"//div[@id='{sectionId}div']/" +
-                $".//div[. = '{itemInRowText}']/../../..//a[@title = '{buttonTitle}']");
-
+                $"//div[@id=\"{sectionId}div\"]//div[contains(string(), \"{itemInRowText}\")]//a[@title=\"{buttonTitle}\"]");
 
         }
     }
