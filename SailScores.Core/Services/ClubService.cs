@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -8,12 +8,14 @@ using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
 using SailScores.Core.Model.Summary;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SailScores.Core.Services
 {
     public class ClubService : IClubService
     {
         private readonly ISailScoresContext _dbContext;
+        private readonly IMemoryCache _cache;
         private readonly IMapper _mapper;
 
         //used for copying club
@@ -21,9 +23,11 @@ namespace SailScores.Core.Services
 
         public ClubService(
             ISailScoresContext dbContext,
+            IMemoryCache cache,
             IMapper mapper)
         {
             _dbContext = dbContext;
+            _cache = cache;
             _mapper = mapper;
         }
 
@@ -128,13 +132,20 @@ namespace SailScores.Core.Services
             Guid clubGuid;
             if (!Guid.TryParse(initials, out clubGuid))
             {
-                clubGuid = await _dbContext.Clubs
-                    .Where(c => c.Initials == initials)
-                    .Select(c => c.Id)
-                    .SingleAsync()
-                    .ConfigureAwait(false);
+                if (_cache.TryGetValue($"ClubId_{initials}", out clubGuid))
+                {
+                    return clubGuid;
+                }
+                if (!Guid.TryParse(initials, out clubGuid))
+                {
+                    clubGuid = await _dbContext.Clubs
+                        .Where(c => c.Initials == initials)
+                        .Select(c => c.Id)
+                        .SingleAsync()
+                        .ConfigureAwait(false);
+                }
+                _cache.Set($"ClubId_{initials}", clubGuid);
             }
-
             return clubGuid;
         }
 
@@ -320,14 +331,17 @@ namespace SailScores.Core.Services
             {
                 foreach (var system in club.ScoringSystems)
                 {
-                    system.ClubId = club.Id;
+                    if (system.Id != defaultSystem.Id)
+                    {
+                        system.ClubId = club.Id;
+                    }
                 }
             }
 
             var dbClub = _mapper.Map<Db.Club>(club);
-            _dbContext.Clubs.Add(dbClub);
             dbClub.DefaultScoringSystem = null;
             dbClub.DefaultScoringSystemId = null;
+            _dbContext.Clubs.Add(dbClub);
             var dbFleet = new Db.Fleet
             {
                 Id = Guid.NewGuid(),
@@ -340,6 +354,7 @@ namespace SailScores.Core.Services
             _dbContext.Fleets.Add(dbFleet);
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+            // save twice here to avoid circular reference.
             dbClub.DefaultScoringSystemId = defaultSystem.Id;
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);

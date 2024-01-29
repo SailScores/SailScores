@@ -36,7 +36,8 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form id="deleteForm" 
+        asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="ClubId" />
         <input type="submit" value="Delete" class="btn btn-danger" />
@@ -46,3 +47,21 @@
            class="btn btn-outline-primary">Cancel</a>
     </form>
 </div>
+
+<div id="ssWaitingModal" class="waitingModal">
+    <span><div class="spinner-border" role="status"></div><br/>
+        <h3>Removing...</h3></span>
+</div>
+
+@section Scripts {
+    <script>
+        $("#deleteForm").submit(function (e) {
+            var waiting = $('#ssWaitingModal');
+            if (!!waiting) {
+                waiting.show();
+            }
+            $('#submitButton').attr('value', 'Please wait...');
+        });
+    </script>
+
+}

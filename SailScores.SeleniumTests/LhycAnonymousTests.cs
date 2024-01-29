@@ -24,12 +24,8 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void LhycSeries()
         {
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             driver.Navigate().GoToUrl(configuration.BaseUrl);
-
-            //if logged in, log out.
-            var logout = driver.FindElementsByLinkText("Log out");
-
 
             var clubSelector = new SelectElement(driver.FindElement(By.Id("clubSelect")));
             //javascript should navigate automatically.
@@ -38,11 +34,11 @@ namespace SailScores.SeleniumTests
             var currentElement = driver.WaitUntilClickable(By.PartialLinkText("LHYC"));
 
             Assert.Equal(configuration.BaseUrl + "/LHYC", driver.Url);
-            Thread.Sleep(300);
+            //Thread.Sleep(300);
 
             currentElement = driver.WaitUntilClickable(By.LinkText("Series"));
             currentElement.Click();
-            Thread.Sleep(300);
+            //Thread.Sleep(300);
 
             currentElement = driver.WaitUntilClickable(By.CssSelector("a[href*='LHYC/2019/MC Season Champ']"));
             currentElement.Click();
@@ -58,11 +54,12 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void LhycRace()
         {
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            // using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             driver.Navigate().GoToUrl(configuration.BaseUrl);
 
             //if logged in, log out.
-            var logout = driver.FindElementsByLinkText("Log out");
+            //var logout = driver.FindElement(By.LinkText("Log out"));
 
 
             var clubSelector = new SelectElement(driver.FindElement(By.Id("clubSelect")));
@@ -77,7 +74,10 @@ namespace SailScores.SeleniumTests
             currentElement = driver.WaitUntilClickable(By.LinkText("Races"));
             currentElement.Click();
 
-            currentElement = driver.FindElementByXPath("//*[@id='racelink_5e191bc2-04aa-4c5a-8a19-76b1484a95bb']");
+            currentElement = driver.WaitUntilClickable(By.LinkText("2020"));
+            currentElement.Click();
+
+            currentElement = driver.FindElement(By.XPath("//*[@id='racelink_5e191bc2-04aa-4c5a-8a19-76b1484a95bb']"));
             currentElement.Click();
 
             // Relying on these to throw exception if not found.
@@ -89,12 +89,8 @@ namespace SailScores.SeleniumTests
         [Fact]
         public void LhycRegatta()
         {
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver();
             driver.Navigate().GoToUrl(configuration.BaseUrl);
-
-            //if logged in, log out.
-            var logout = driver.FindElementsByLinkText("Log out");
-
 
             var clubSelector = new SelectElement(driver.FindElement(By.Id("clubSelect")));
             //javascript should navigate automatically.

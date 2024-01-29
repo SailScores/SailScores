@@ -96,7 +96,8 @@ namespace SailScores.Core.Scoring
                     Discard = false,
                     RawScore = score,
                     ScoreValue = GetBasicScore(scores, score),
-                    PerfectScoreValue = GetPerfectScore(scores, score)
+                    PerfectScoreValue = GetPerfectScore(scores, score),
+                    CountsAsParticipation = CountsAsParticipation(score)
                 };
 
             }

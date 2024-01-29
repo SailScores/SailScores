@@ -346,6 +346,11 @@
     </div>
 </div>
 
+<div id="ssWaitingModal" class="waitingModal">
+    <span><div class="spinner-border" role="status"></div><br/>
+        <h3>Adding...</h3></span>
+</div>
+
 @await Html.PartialAsync("_competitorCreate", Model)
 
 @section PreFooter {

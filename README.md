@@ -23,9 +23,9 @@ software that: 1) has a modern interface, 2) supports mobile devices, 3) is inex
  - Stats for competitors and clubs.
 
 ### Technologies:
- - .NET 6
- - ASP.NET 6
- - Entity Framework Core 6
+ - .NET 8
+ - ASP.NET 8
+ - Entity Framework Core 8
  - MS-SQL
  - Production is running on Azure App Service Linux
 
@@ -49,8 +49,8 @@ Sail fast...
 
 jamie@widernets.com
 
-[1]: https://sailscores.com
-[2]: https://sailscores.com/LHYC/2019/Wednesday%20Evenings
+[1]: https://www.sailscores.com
+[2]: https://www.sailscores.com/LHYC/2019/Wednesday%20Evenings
 [3]: https://www.racingrulesofsailing.org/rules?part_id=53
 [4]: https://www.ussailing.org/competition/rules-officiating/racing-rules/scoring-a-long-series/
 [5]: docs/Development.md

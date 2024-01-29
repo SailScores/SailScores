@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
+using Moq;
 using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Test.Unit.Utilities;
@@ -16,16 +18,19 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly ISailScoresContext _context;
         private readonly Guid _clubId;
         private readonly string _clubInitials;
+        private readonly Mock<IMemoryCache> _mockCache;
 
         public ClubServiceTests()
         {
             _context = Utilities.InMemoryContextBuilder.GetContext();
             _clubId = _context.Clubs.First().Id;
             _clubInitials = _context.Clubs.First().Initials;
+            _mockCache = new Mock<IMemoryCache>();
             _mapper = MapperBuilder.GetSailScoresMapper();
 
             _service = new SailScores.Core.Services.ClubService(
                 _context,
+                _mockCache.Object,
                 _mapper
                 );
         }

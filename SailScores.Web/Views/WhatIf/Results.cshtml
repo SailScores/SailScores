@@ -1,0 +1,90 @@
+﻿@model SailScores.Web.Models.SailScores.WhatIfResultsViewModel
+@inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
+
+@{
+    var results = Model.Series.FlatResults;
+    var alternateResults = Model.AlternateResults;
+    ViewData["Title"] = "What If results";
+    ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<a class="btn btn-sm btn-outline-primary"
+   asp-action="Edit"
+   asp-controller="Series"
+   asp-route-id="@Model.SeriesId"
+   asp-route-returnUrl="@ViewData["ReturnUrl"]"
+   class="btn btn-outline-primary">Back to Series admin</a>
+<hr />
+
+<h3>
+    <span class="text-muted">Preview</span>
+    @if (!String.IsNullOrWhiteSpace(@alternateResults.ScoringSystemName))
+    {
+        @alternateResults.ScoringSystemName
+    }
+    &ndash; @alternateResults.NumberOfDiscards @localizer["discards"]
+</h3>
+<p class="lead">
+    @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
+    {
+        @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
+    }
+</p>
+@{
+    var previewModel = new ResultsTableViewModel
+        {
+            SeriesId = Model.Series.Id,
+            Results = alternateResults,
+            ShowTrend = true,
+            ShowTrendOnAllDevices = true,
+            ShowCompetitorClub = false,
+            IsExport = false,
+            ShowExportButtons = false,
+            ExcludeCompetitorLinks = true,
+            PreferAlternativeSailNumbers = Model.Series.PreferAlternativeSailNumbers ?? false,
+            TrendLegend = "Rank change from existing scoring method.",
+            UpdatedDate = null
+        };
+}
+@await Html.PartialAsync("_ResultsTable", previewModel)
+
+<hr />
+<h3>
+    <span class="text-muted">Currently shared</span>
+    @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
+    {
+        @results.ScoringSystemName
+    }
+    &ndash; @results.NumberOfDiscards @localizer["discards"]
+</h3>
+<p class="lead">
+    @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
+    {
+        @results.PercentRequired.Value.ToString("G5")
+
+        @:% participation required for ranking
+    }
+</p>
+@{
+    var currentResults = new ResultsTableViewModel
+        {
+            SeriesId = Model.Series.Id,
+            Results = Model.Series.FlatResults,
+            ShowTrend = false,
+            ShowCompetitorClub = false,
+            IsExport = false,
+            ShowExportButtons = false,
+            ExcludeCompetitorLinks = true,
+            PreferAlternativeSailNumbers = Model.Series.PreferAlternativeSailNumbers ?? false,
+            TrendLegend = String.Empty,
+            UpdatedDate = null
+        };
+}
+@await Html.PartialAsync("_ResultsTable", currentResults)
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+}

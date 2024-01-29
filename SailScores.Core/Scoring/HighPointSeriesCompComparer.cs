@@ -13,6 +13,11 @@ namespace SailScores.Core.Scoring
             {
                 return totalComparison;
             }
+            var participationComparison = CompareParticipation(x, y);
+            if (participationComparison != 0)
+            {
+                return participationComparison;
+            }
 
             var tiebreakerOne = WhichHasFewerOfPlace(x, y);
             if (tiebreakerOne != 0)
@@ -24,6 +29,17 @@ namespace SailScores.Core.Scoring
 
             return WhichWonLatest(x, y);
 
+        }
+
+        private static int CompareParticipation(SeriesCompetitorResults x, SeriesCompetitorResults y)
+        {
+            var xParticipation = x.CalculatedScores.Count(s =>
+                           (s.Value.RawScore?.Place.HasValue ?? false)
+                                          || (s.Value.CountsAsParticipation ?? false));
+            var yParticipation = y.CalculatedScores.Count(s =>
+                           (s.Value.RawScore?.Place.HasValue ?? false)
+                                          || (s.Value.CountsAsParticipation ?? false));
+            return yParticipation.CompareTo(xParticipation);
         }
 
         private static int CompareTotals(SeriesCompetitorResults x, SeriesCompetitorResults y)

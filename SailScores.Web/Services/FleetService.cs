@@ -59,6 +59,10 @@ public class FleetService : IFleetService
 
     public async Task SaveNew(FleetWithOptionsViewModel fleet)
     {
+        if (String.IsNullOrWhiteSpace(fleet.ShortName))
+        {
+            fleet.ShortName = CoreServices.UrlUtility.GetUrlName(fleet.Name);
+        }
         var coreModel = _mapper.Map<Fleet>(fleet);
         if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
             && fleet.BoatClassIds != null)
@@ -72,7 +76,7 @@ public class FleetService : IFleetService
                  && fleet.CompetitorIds != null)
         {
             coreModel.Competitors =
-                (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null, false))
+                (await _coreCompetitorService.GetCompetitorsAsync(fleet.ClubId, null, true))
                 .Where(c => fleet.CompetitorIds.Contains(c.Id))
                 .ToList();
         }
@@ -85,6 +89,10 @@ public class FleetService : IFleetService
 
     public async Task Update(FleetWithOptionsViewModel fleet)
     {
+        if (String.IsNullOrWhiteSpace(fleet.ShortName))
+        {
+            fleet.ShortName = CoreServices.UrlUtility.GetUrlName(fleet.Name);
+        }
         var coreModel = _mapper.Map<Fleet>(fleet);
         if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
             && fleet.BoatClassIds != null)

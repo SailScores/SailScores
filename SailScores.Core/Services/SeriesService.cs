@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Core.FlatModel;
 using SailScores.Api.Enumerations;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SailScores.Core.Services
 {
@@ -21,6 +22,7 @@ namespace SailScores.Core.Services
         private readonly IForwarderService _forwarderService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly ISailScoresContext _dbContext;
+        private readonly IMemoryCache _cache;
         private readonly IMapper _mapper;
 
         public SeriesService(
@@ -30,6 +32,7 @@ namespace SailScores.Core.Services
             IConversionService converter,
             IDbObjectBuilder dbObjBuilder,
             ISailScoresContext dbContext,
+            IMemoryCache cache,
             IMapper mapper)
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
@@ -38,6 +41,7 @@ namespace SailScores.Core.Services
             _converter = converter;
             _dbObjectBuilder = dbObjBuilder;
             _dbContext = dbContext;
+            _cache = cache;
             _mapper = mapper;
         }
 
@@ -90,6 +94,13 @@ namespace SailScores.Core.Services
                         .ConfigureAwait(false);
                 }
                 fullSeries.FlatResults = flatResults;
+
+                if (flatResults.NumberOfSailedRaces == 0)
+                {
+                    flatResults.NumberOfSailedRaces = flatResults.Races
+                        .Count(r => (r.State ?? RaceState.Raced) == RaceState.Raced
+                                     || r.State == RaceState.Preliminary);
+                }
             }
             if(await IsPartOfRegatta(seriesDb.Id))
             {
@@ -129,7 +140,6 @@ namespace SailScores.Core.Services
                     .Include(s => s.Season)
                     .AsSplitQuery()
                 .SingleAsync(s => s.Id == seriesId)
-                
                 .ConfigureAwait(false);
 
             if (dbSeries.ResultsLocked ?? false)
@@ -151,7 +161,7 @@ namespace SailScores.Core.Services
 
         private async Task CalculateScoresAsync(Series fullSeries)
         {
-            var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
+            var dbScoringSystem = await _scoringService.GetScoringSystemFromCacheAsync(
                 fullSeries)
                 .ConfigureAwait(false);
 
@@ -168,6 +178,57 @@ namespace SailScores.Core.Services
             fullSeries.Results = results;
         }
 
+        public async Task<Series> CalculateWhatIfScoresAsync(
+            Guid seriesId,
+            Guid scoringSystemId,
+            int discards,
+            Decimal? participationPercent)
+        {
+            var dbSeries = await _dbContext
+                .Series
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Weather)
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Scores)
+                    .Include(s => s.Season)
+                    .AsSplitQuery()
+                .SingleAsync(s => s.Id == seriesId)
+
+                .ConfigureAwait(false);
+
+            var fullSeries = _mapper.Map<Series>(dbSeries);
+            // if a non-default scoring system is specified, use it.
+            fullSeries.ScoringSystemId = scoringSystemId != default ? scoringSystemId : fullSeries.ScoringSystemId;
+            var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
+                fullSeries.ScoringSystemId ?? default)
+                .ConfigureAwait(false);
+
+            fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
+            var sb = new System.Text.StringBuilder();
+            for(int i = 0; i <= discards; i++)
+            {
+                sb.Append(i);
+                sb.Append(",");
+            }
+            fullSeries.ScoringSystem.DiscardPattern = sb.ToString();
+            fullSeries.ScoringSystem.ParticipationPercent = participationPercent ??
+                fullSeries.ScoringSystem.ParticipationPercent;
+            var calculator = await _scoringCalculatorFactory
+                .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
+                .ConfigureAwait(false);
+
+            fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
+            await PopulateCompetitorsAsync(fullSeries)
+                .ConfigureAwait(false);
+
+            var results = calculator.CalculateResults(fullSeries);
+            fullSeries.Results = results;
+            fullSeries.FlatResults = FlattenResults(fullSeries);
+            return fullSeries;
+        }
+
         public async Task<Series> GetSeriesDetailsAsync(
             string clubInitials,
             string seasonName,
@@ -179,37 +240,24 @@ namespace SailScores.Core.Services
                 ).SingleAsync()
                 .ConfigureAwait(false);
             var clubId = club.Id;
-            var seriesDb = await _dbContext
+            var seriesId = await _dbContext
                 .Series
-                .Include(s => s.Season)
                 .Where(s =>
-                    s.ClubId == clubId)
-                .SingleOrDefaultAsync(s => s.UrlName == seriesUrlName
-                                  && s.Season.UrlName == seasonName)
+                    s.ClubId == clubId
+                        && s.UrlName == seriesUrlName
+                        && s.Season.UrlName == seasonName)
+                .Select(s => s.Id)
+                .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
-            if(seriesDb == null)
+            if(seriesId == default)
             {
                 return null;
             }
-            var fullSeries = _mapper.Map<Series>(seriesDb);
-            fullSeries.ShowCompetitorClub = club.ShowClubInResults;
-            var flatResults = await GetHistoricalResults(fullSeries)
-                .ConfigureAwait(false);
-            if (flatResults == null)
-            {
-                await UpdateSeriesResults(seriesDb.Id, seriesDb.UpdatedBy)
-                    .ConfigureAwait(false);
-                flatResults = await GetHistoricalResults(fullSeries)
-                    .ConfigureAwait(false);
-            }
 
-            if (flatResults.NumberOfSailedRaces == 0)
-            {
-                flatResults.NumberOfSailedRaces = flatResults.Races
-                    .Count(r => (r.State ?? RaceState.Raced) == RaceState.Raced
-                                 || r.State == RaceState.Preliminary);
-            }
-            fullSeries.FlatResults = flatResults;
+            var fullSeries = await GetOneSeriesAsync(seriesId)
+                .ConfigureAwait(false);
+
+            fullSeries.ShowCompetitorClub = club.ShowClubInResults;
 
             // get the current version of the competitors, so we can get current sail number.
             var competitorSailNumbersById = await _dbContext.Competitors
@@ -218,7 +266,7 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             foreach (var comp in fullSeries.FlatResults.Competitors)
             {
-                comp.CurrentSailNumber = competitorSailNumbersById[comp.Id];
+                comp.CurrentSailNumber = competitorSailNumbersById.ContainsKey(comp.Id) ? competitorSailNumbersById[comp.Id] : String.Empty;
             }
             return fullSeries;
         }
@@ -293,6 +341,9 @@ namespace SailScores.Core.Services
                     series.Competitors.OrderBy(c => series.Results.Results.Keys.Contains(c) ?
                         (series.Results.Results[c].Rank ?? int.MaxValue)
                         : (int.MaxValue))
+                    .ThenByDescending(c => series.Results.Results.Keys.Contains(c) ?
+                                           (series.Results.Results[c].ParticipationPercent ?? 0m)
+                                                                  : 0m)
                     .ToList();
 
             }
@@ -329,6 +380,7 @@ namespace SailScores.Core.Services
                     TotalScore = kvp.Value.TotalScore,
                     PointsEarned = kvp.Value.PointsEarned,
                     PointsPossible = kvp.Value.PointsPossible,
+                    ParticipationPercent = kvp.Value.ParticipationPercent,
                     Scores = FlattenScores(kvp.Value),
                     Trend = kvp.Value.Trend
                 });
@@ -392,9 +444,22 @@ namespace SailScores.Core.Services
                 .Where(r => r != null)
                 .SelectMany(r => r.Scores)
                 .Select(s => s.CompetitorId);
-            var dbCompetitors = await _dbContext.Competitors
-                .Where(c => compIds.Contains(c.Id)).ToListAsync()
-                .ConfigureAwait(false);
+
+            List<dbObj.Competitor> dbCompetitors;
+            if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out dbCompetitors))
+            {
+                dbCompetitors = await _dbContext.Competitors
+                    .Where(c => compIds.Contains(c.Id)).ToListAsync()
+                    .ConfigureAwait(false);
+
+                _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+            } else
+            {
+                // this method is called with series that may be missing races (creating
+                // historical results for charts)
+                // so we need to refilter the competitors.
+                dbCompetitors = dbCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
+            }
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
 
@@ -551,13 +616,8 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             var oldCharts = await _dbContext
                 .SeriesChartResults
-                .Where(r => r.SeriesId == fullSeries.Id).ToListAsync()
+                .Where(r => r.SeriesId == fullSeries.Id).ExecuteDeleteAsync()
                 .ConfigureAwait(false);
-
-            foreach (var chart in oldCharts.ToList())
-            {
-                _dbContext.SeriesChartResults.Remove(chart);
-            }
 
             if (chartData != null)
             {

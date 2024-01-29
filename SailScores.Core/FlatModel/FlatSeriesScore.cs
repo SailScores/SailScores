@@ -11,6 +11,8 @@ namespace SailScores.Core.FlatModel
         public Decimal? TotalScore { get; set; }
         public Decimal? PointsEarned { get; set; }
         public Decimal? PointsPossible { get; set; }
+
+        public Decimal? ParticipationPercent { get; set; }
         public IEnumerable<FlatCalculatedScore> Scores { get; set; }
     }
 }

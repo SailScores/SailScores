@@ -32,9 +32,14 @@ export function initialize() {
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
+        var waiting = $('#ssWaitingModal');
+        if (!!waiting) {
+            waiting.show();
+        }
+        $('#submitButton').attr('value', 'Please wait...');
         var form = document.getElementById("raceform");
-        addScoresFieldsToForm(form);
         $('#submitButton').attr('disabled', 'disabled');
+        addScoresFieldsToForm(form);
     });
     loadFleet();
     loadSeriesOptions();
@@ -100,7 +105,7 @@ export function compCreateSubmit(e) {
         type: "POST",
         url: url,
         beforeSend: prep,
-        data: form.serialize(),
+        data: form.serialize(), // serializes the form's elements.
         success: completeCompCreate,
         error: completeCompCreateFailed
     });
