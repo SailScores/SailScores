@@ -75,12 +75,17 @@
 </div>
 @{
     bool showTrend = (Model.Item.TrendOption ?? TrendOption.None) != TrendOption.None
-        && (Model.Item.FlatResults?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
-        > DateTime.Today.AddMonths(-1)
-        && !((bool?)ViewData["IsExport"] ?? false);
-    string trendLegend = localizer["Rank change from"] + " " +
+                && (Model.Item.FlatResults?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
+                > DateTime.Today.AddMonths(-1)
+                && !((bool?)ViewData["IsExport"] ?? false);
+
+    string trendLegend = string.Empty;
+    if(showTrend)
+    {
+        trendLegend = localizer["Rank change from"] + " " +
         localizer[EnumHelper<TrendOption>
         .GetDisplayValue(Model.Item.TrendOption.Value)];
+    }
     var tableModel = new ResultsTableViewModel
     {
         SeriesId = Model.Item.Id,
