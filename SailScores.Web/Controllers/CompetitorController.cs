@@ -149,6 +149,8 @@ public class CompetitorController : Controller
             if (!ModelState.IsValid)
             {
                 competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+                competitor.BoatClassOptions = (await _clubService.GetAllBoatClasses(clubId))
+                    .OrderBy(c => c.Name);
                 return View(competitor);
             }
 
