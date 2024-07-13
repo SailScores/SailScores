@@ -1,7 +1,9 @@
-﻿using SailScores.Core.FlatModel;
+﻿using Microsoft.EntityFrameworkCore;
+using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Database.Entities;
+using SailScores.Database.Migrations;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 
@@ -39,6 +41,10 @@ public class WhatIfService : IWhatIfService
         Guid seriesId = options.SeriesId ?? options.Series?.Id ?? default;
 
         var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
+        if (options.SelectedScoringSystemId == null || options.SelectedScoringSystemId == Guid.Empty)
+        {
+            options.SelectedScoringSystemId = await _coreScoringService.GetClubDefaultScoringSystemId(series.ClubId);
+        }
         var newSeries = await _coreSeriesService.CalculateWhatIfScoresAsync(seriesId,
             options.SelectedScoringSystemId ?? default,
             options.Discards, 

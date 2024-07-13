@@ -20,5 +20,6 @@ namespace SailScores.Core.Services
         Task<ScoringSystem> GetSiteDefaultSystemAsync();
         Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId);
         Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId, bool skipCache);
+        Task<Guid?> GetClubDefaultScoringSystemId(Guid clubId);
     }
 }

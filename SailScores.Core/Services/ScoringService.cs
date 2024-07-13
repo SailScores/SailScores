@@ -85,6 +85,7 @@ namespace SailScores.Core.Services
                     return cachedSystem;
                 }
             }
+
             var requestedDbSystem = await _dbContext
                 .ScoringSystems
                 .Include(s => s.ScoreCodes)
@@ -317,6 +318,13 @@ namespace SailScores.Core.Services
                 Reason = !s.InUse ? String.Empty
                     : "Scoring System is in use."
             });
+        }
+
+        public async Task<Guid?> GetClubDefaultScoringSystemId(Guid clubId)
+        {
+            return (await _dbContext.Clubs.Where(c => c.Id == clubId)
+                .FirstOrDefaultAsync().ConfigureAwait(false))
+                .DefaultScoringSystemId;
         }
     }
 }

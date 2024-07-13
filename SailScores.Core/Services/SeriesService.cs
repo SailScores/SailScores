@@ -202,7 +202,7 @@ namespace SailScores.Core.Services
             // if a non-default scoring system is specified, use it.
             fullSeries.ScoringSystemId = scoringSystemId != default ? scoringSystemId : fullSeries.ScoringSystemId;
             var dbScoringSystem = await _scoringService.GetScoringSystemAsync(
-                fullSeries.ScoringSystemId ?? default)
+                fullSeries.ScoringSystemId.Value)
                 .ConfigureAwait(false);
 
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);

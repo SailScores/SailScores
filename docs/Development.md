@@ -18,7 +18,7 @@ To run the database in a Docker container:
 1. [Docker](https://www.docker.com/get-started) should be installed and running.
 2. Download and start a SQL Server container:
 
-        docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=P@ssw0rd' --name 'SailScoreSql' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+        docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=P@ssw0rd' --name 'SailScoreSql' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
 
 ## Running the Code
 
@@ -49,7 +49,7 @@ Microsoft provides a [good example](https://docs.microsoft.com/en-us/sql/linux/t
 1. If you haven't already, create a container running SQL server:
 
 
-        docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=P@ssw0rd' --name 'sailscoresDb' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+        docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=P@ssw0rd' --name 'sailscoresDb' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
 
 2. See that the container is running. `docker ps -l` returns the status of the last created container:
 
@@ -58,7 +58,7 @@ Microsoft provides a [good example](https://docs.microsoft.com/en-us/sql/linux/t
    returns output similar to
 
         CONTAINER ID   IMAGE                                        COMMAND                  CREATED         STATUS         PORTS                    NAMES
-        f4111464ef6d   mcr.microsoft.com/mssql/server:2019-latest   "/opt/mssql/bin/perm…"   7 minutes ago   Up 7 minutes   0.0.0.0:1433->1433/tcp   sailscoresDb
+        f4111464ef6d   mcr.microsoft.com/mssql/server:2022-latest   "/opt/mssql/bin/perm…"   7 minutes ago   Up 7 minutes   0.0.0.0:1433->1433/tcp   sailscoresDb
 
 3. Create a backup directory in the container:
 
@@ -76,7 +76,7 @@ Microsoft provides a [good example](https://docs.microsoft.com/en-us/sql/linux/t
 
         docker exec -it sailscoresDb /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "RESTORE FILELISTONLY FROM DISK = '/var/opt/mssql/backup/starter.bak'"
 
-    Buried in the output you'll see a list of files which are used in the next command. The deafults provide below may not need to change.
+    Buried in the output you'll see a list of files which are used in the next command. The defaults provided below may not need to change.
 
 7. Restore the backup using `sqlcmd` within the container:
 
