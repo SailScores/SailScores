@@ -13,10 +13,11 @@
 @{
     var results = Model.Item.FlatResults;
 
-    ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} - {Model.ClubInitials}";
+    ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} Scores - {Model.ClubInitials}";
     Layout = "_ClubLayout";
     ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
-    ViewData["MetaDescription"] = $"Results for {Model.Item.Name} series racing at {Model.ClubInitials}";
+    ViewData["MetaDescription"] = 
+        $"Results for {Model.Item.Season?.Name} {Model.Item.Name} series racing at {Model.ClubName}";
 }
 
 <div class="row">

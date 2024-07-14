@@ -8,7 +8,7 @@
 
 @model ClubCollectionViewModel<SeriesSummary>
 @{
-    ViewBag.Title = Model.ClubInitials + " " + localizer["Series"];
+    ViewBag.Title = Model.ClubInitials + " " + localizer["Series"] + " " + "Scores";
     ViewData["MetaDescription"] = $"{Model.ClubName} {localizer["Series"]} list";
     Layout = "_ClubLayout";
 }

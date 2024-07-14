@@ -1,5 +1,6 @@
 ﻿using Ganss.Xss;
 using Microsoft.Extensions.DependencyInjection;
+using SailScores.Web.IndexNow;
 using SailScores.Web.Resources;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
@@ -34,6 +35,8 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ISpeechService, SpeechService>();
         services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
         services.AddScoped<ILocalizerService, LocalizerService>();
+
+        services.AddScoped<IIndexNowSubmitter, IndexNowSubmitter>();
 
         services.AddSingleton<AppVersionInfo>();
         services.AddSingleton<AppSettingsService>();

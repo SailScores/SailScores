@@ -49,4 +49,28 @@ public class AppSettingsService
 
         return absoluteUri;
     }
+
+    public IndexNow.Configuration GetIndexNowConfig(HttpRequest request)
+    {
+        var baseUrl = GetPreferredBase(request);
+        var token = _config["IndexNow:Token"];
+        var keyLocation = $"{baseUrl}/{token}.txt";
+        string host;
+        var preferredhost = _config["PreferredHost"];
+        if (!String.IsNullOrWhiteSpace(preferredhost))
+        {
+            host = preferredhost;
+        } else
+        {
+            host = request.Host.ToUriComponent();
+        }
+
+        return new IndexNow.Configuration
+        {
+            Host = host,
+            Token = token,
+            KeyLocation = keyLocation,
+            SubmissionUrl = _config["IndexNow:SubmissionUrl"]
+        };
+    }
 }

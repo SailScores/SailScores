@@ -2,8 +2,10 @@ using Microsoft.Extensions.Logging;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using SailScores.Web.IndexNow;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
+using System.ComponentModel;
 using IRaceService = SailScores.Web.Services.Interfaces.IRaceService;
 using IWeatherService = SailScores.Web.Services.Interfaces.IWeatherService;
 
@@ -19,7 +21,7 @@ public class RaceService : IRaceService
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly IWeatherService _weatherService;
     private readonly ISpeechService _speechService;
-
+    private readonly IIndexNowSubmitter _indexNowService;
     private readonly IMapper _mapper;
     private readonly ILogger<RaceService> _logger;
 
@@ -33,6 +35,7 @@ public class RaceService : IRaceService
 
         IWeatherService weatherService,
         ISpeechService speechService,
+        IIndexNowSubmitter indexNowService,
         IMapper mapper,
         ILogger<RaceService> logger)
     {
@@ -44,6 +47,7 @@ public class RaceService : IRaceService
         _coreSeasonService = coreSeasonService;
         _weatherService = weatherService;
         _speechService = speechService;
+        _indexNowService = indexNowService;
         _mapper = mapper;
         _logger = logger;
     }
@@ -376,6 +380,47 @@ public class RaceService : IRaceService
         {
             await _coreRegattaService.AddRaceToRegattaAsync(
                 _mapper.Map<Race>(race), race.RegattaId.Value);
+        }
+        await PublishIndexNow(race );
+    }
+
+    private async Task PublishIndexNow(RaceWithOptionsViewModel race)
+    {
+        var club = await _coreClubService.GetMinimalClub(race.ClubId);
+        if (club.IsHidden)
+        {
+            return;
+        }
+        if (race.SeriesIds?.Count != race.Series?.Count)
+        {
+            // its a regatta series, so go get the regatta to use for index now.
+            // regattaid is only set on initial save, so can't use that all the time.
+            var regatta = await _coreRegattaService.GetRegattaForRace(race.Id);
+            race.Regatta = _mapper.Map<RegattaSummaryViewModel>(regatta);
+        }
+
+        // IndexNow: submit series for usual club race
+        // or a regatta if race is in regatta.
+        List<string> urls = new();
+        if (race.RegattaId.HasValue && race.Regatta == null)
+        {
+            race.Regatta = _mapper.Map<RegattaSummaryViewModel>(
+                await _coreRegattaService.GetRegattaAsync(race.RegattaId.Value));
+        }
+        if (race.Regatta != null)
+        {
+            urls.Add($"/{race.ClubInitials}/{race.Regatta.Season.UrlName}/{race.Regatta.UrlName}");
+        }
+        else
+        {
+            foreach (var eachSeries in race.Series)
+            {
+                urls.Add($"/{race.ClubInitials}/{eachSeries.Season.UrlName}/{eachSeries.UrlName}");
+            }
+        }
+        if (urls?.Count > 0)
+        {
+            _indexNowService.SubmitUrls(urls);
         }
     }
 
