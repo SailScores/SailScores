@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NuGet.Configuration;
 using SailScores.Web.Services;
 
 namespace SailScores.Web.Controllers;
@@ -7,17 +8,18 @@ namespace SailScores.Web.Controllers;
 public class IndexNowController : Controller
 {
     private const string webPathDelimiter = "/";
-    private readonly IndexNow.Configuration _config;
+    private readonly AppSettingsService _settings;
 
     public IndexNowController(
-        AppSettingsService setttngs)
+        AppSettingsService settings)
     {
-        _config = setttngs.GetIndexNowConfig(this.HttpContext.Request);
+        _settings = settings;
     }
 
     [Route("IndexNowKey.txt")]
     public async Task<ActionResult> KeyFileAsync()
     {
-        return Content(_config.Token);
+        var config = _settings.GetIndexNowConfig(base.HttpContext?.Request);
+        return Content(config.Token);
     }
 }

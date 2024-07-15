@@ -75,10 +75,6 @@ WHERE ScoreCodes.ScoringSystemId in (Select Id from ScoringSystems where Scoring
 
 update Clubs set DefaultScoringSystemId = null where Id = @ClubId
 
-PRINT N'Deleting ScoringSystems'
-DELETE
-FROM ScoringSystems
-WHERE ClubId = @ClubId
 
 PRINT N'Deleting SeriesRace'
 DELETE
@@ -104,6 +100,16 @@ DELETE
 FROM Series
 WHERE ClubId = @ClubId
 
+
+PRINT N'Deleting ScoringSystems'
+DELETE
+FROM ScoringSystems
+WHERE ClubId = @ClubId
+
+PRINT N'Deleting Regattas'
+DELETE
+FROM Regattas
+WHERE ClubId = @ClubId
 
 PRINT N'Deleting Seasons'
 DELETE

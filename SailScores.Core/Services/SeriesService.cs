@@ -466,7 +466,18 @@ namespace SailScores.Core.Services
             foreach (var score in series.Races
                 .Where(r => r != null).SelectMany(r => r.Scores))
             {
-                score.Competitor = series.Competitors.First(c => c.Id == score.CompetitorId);
+                var competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
+                if(competitor == null)
+                {
+                    dbCompetitors = await _dbContext.Competitors
+                    .Where(c => compIds.Contains(c.Id)).ToListAsync()
+                    .ConfigureAwait(false);
+
+                    _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+                    series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
+                    competitor = series.Competitors.First(c => c.Id == score.CompetitorId);
+                }
+                score.Competitor = competitor;
             }
         }
 
