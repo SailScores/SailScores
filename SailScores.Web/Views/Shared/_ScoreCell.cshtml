@@ -21,7 +21,8 @@
                && Model.ScoreCodesUsed != null
                && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
             {
-                @Html.Raw($"<span title=\"{ Model.ScoreCodesUsed[Model.Result.Code].Description}\">")
+                var muteText = (Model.IsPercentSystem && Model.Result.Code == "DNC") ? "text-muted" : "";
+                @Html.Raw($"<span title=\"{Model.ScoreCodesUsed[Model.Result.Code].Description}\" class=\"{muteText}\">")
             }
             @Model.Result.Code
             @if (Model.Result.Code != null

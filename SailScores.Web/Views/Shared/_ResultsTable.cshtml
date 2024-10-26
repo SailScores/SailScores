@@ -215,7 +215,7 @@
                             @if (Model.Results.IsPercentSystem)
                             {
                                 string tooltipText = String.Empty;
-                                if (compScore.TotalScore.HasValue)
+                                if (compScore?.TotalScore.HasValue ?? false)
                                 {
                                     tooltipText = compScore?.PointsEarned + " / " + compScore?.PointsPossible;
                                 }

@@ -52,7 +52,7 @@ public class ClubRequestService : IClubRequestService
         await ProcessRequest(id, false, null);
 
         await SendUserNotice(request);
-        await SendAdminNotice(coreRequest);
+        await SendAdminNotice(request);
     }
 
     private async Task SendUserNotice(ClubRequestViewModel request)
@@ -205,7 +205,7 @@ public class ClubRequestService : IClubRequestService
     }
 
 
-    private async Task SendAdminNotice(ClubRequest request)
+    private async Task SendAdminNotice(ClubRequestViewModel request)
     {
         try
         {

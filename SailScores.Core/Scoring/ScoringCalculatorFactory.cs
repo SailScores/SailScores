@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,7 +27,7 @@ namespace SailScores.Core.Scoring
 
             var baseSystemName = await GetBaseScoringSystemNameAsync(scoringSystem).ConfigureAwait(false);
 
-            if (baseSystemName.Contains("High Point"))
+            if (baseSystemName.Contains("High Point Percentage"))
             {
                 return new HighPointPercentageCalculator(scoringSystem);
             } else if (baseSystemName.Contains("Cox-Sprague"))
@@ -35,6 +36,10 @@ namespace SailScores.Core.Scoring
             } else if (baseSystemName.Contains("Low Point Average"))
             {
                 return new LowPointAverageCalculator(scoringSystem);
+            }
+            else if (baseSystemName.Contains("Top X High Point"))
+            { 
+                return new TopXHighPointCalculator(scoringSystem);
             }
             else
             {
