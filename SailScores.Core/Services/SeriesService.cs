@@ -680,14 +680,8 @@ namespace SailScores.Core.Services
             fullSeries.Competitors = copyOfCompetitors;
 
             var scoringSystem= fullSeries.ScoringSystem;
-            while(scoringSystem?.ParentSystem != null)
-            {
-                scoringSystem = scoringSystem.ParentSystem;
-            }
 
-            var isLowPoint =
-                !((scoringSystem?.Name?.Contains("high ", StringComparison.InvariantCultureIgnoreCase) ?? false)
-                  || (scoringSystem?.Name?.Contains("cox-", StringComparison.InvariantCultureIgnoreCase) ?? false));
+            var isLowPoint = !(fullSeries?.Results.IsPercentSystem ?? false);
 
             return new FlatChartData
             {
