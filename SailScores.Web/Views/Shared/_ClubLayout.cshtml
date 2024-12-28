@@ -210,7 +210,7 @@
 @RenderSection("Scripts", required: false)
 
 <script>
-
+   if ($.validator && $.validator.methods) {
         $.validator.methods.range = function (value, element, param) {
             var globalizedValue = value.replace(",", ".");
             return this.optional(element) || (globalizedValue >= param[0] && globalizedValue <= param[1]);
@@ -226,6 +226,7 @@
             return this.optional(element) || !/Invalid|NaN/.test(new Date(date[2], date[1], date[0]).toString())
                 || !/Invalid|NaN/.test(new Date(date2[0], date2[1], date2[2]).toString());
         }
-    </script>
+   }
+  </script>
 </body>
 </html>

@@ -62,7 +62,7 @@
 	   class="form-check-input"
 	   value="show-inactive"
 	   checked
-	   onchange="changeVisibility()">
+	   onchange="changeVisibility(300)">
 	   <label for="show-inactive"
 		class="form-check-label"> Show inactive</label>
 	  </div>
@@ -83,7 +83,7 @@
  <br />
 
  <div id="comp-list">
-		@foreach (var item in Model.List.OrderBy(c => c.Name).ThenBy(c => c.SailNumber))
+		@foreach (var item in Model.List)
 		{
 	  <div class="row border-bottom mb-1 pb-1 comp-row @(item.IsActive ? "" : "comp-inactive") " data-name="@item.Name" data-sail="@item.SailNumber">
 				@if (Model.CanEdit)
@@ -141,26 +141,90 @@
 
 @section Scripts {
 <script>
+
+	function setCookie(name, value, days) {
+		const d = new Date();
+		d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+		const expires = "expires=" + d.toUTCString();
+		document.cookie = name + "=" + value + ";" + expires + ";path=/";
+	}
+
+	function getCookie(name) {
+		const cname = name + "=";
+		const decodedCookie = decodeURIComponent(document.cookie);
+		const ca = decodedCookie.split(';');
+		for (let i = 0; i < ca.length; i++) {
+			let c = ca[i];
+			while (c.charAt(0) == ' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf(cname) == 0) {
+				return c.substring(cname.length, c.length);
+			}
+		}
+		return "";
+	}
+
 	function sortCompetitors() {
 		selectedSort = $('#sort-order').val();
-		 var result = $('.comp-row').sort(function (a, b) {
+		setCookie('competitorSortOrder', selectedSort, 30); // Store the sort order in a cookie for 30 days
+		var result = $('.comp-row').sort(function (a, b) {
 			var contentA = $(a).data((undefined != selectedSort && selectedSort === 'sail') ? 'sail' : 'name');
 			var contentB = $(b).data((undefined != selectedSort && selectedSort === 'sail') ? 'sail' : 'name');
-			return ('' + contentA).localeCompare(contentB);
+			return alphanumericCompare('' + contentA, '' + contentB);
 		});
 		$('#comp-list').empty();
 		$('#comp-list').append(result);
 	};
 
-	function changeVisibility() {
+	function alphanumericCompare(x, y) {
+		// if the first word is numeric on both, compare as numbers
+		if (x && y && x.length > 0 && y.length > 0) {
+			const xWord = x.trim().split(' ')[0];
+			const yWord = y.trim().split(' ')[0];
+			if (xWord.length > 0 && yWord.length > 0 && /^\d+$/.test(xWord) && /^\d+$/.test(yWord)) {
+				return parseInt(xWord, 10) - parseInt(yWord, 10);
+			}
+
+			const firstWordComparison = xWord.localeCompare(yWord);
+			if (firstWordComparison !== 0 || !xWord.trim() || !yWord.trim()) {
+				return firstWordComparison;
+			}
+			return alphanumericCompare(x.substring(xWord.length), y.substring(yWord.length));
+		}
+		return x.localeCompare(y);
+	}
+
+	function changeVisibility(speed) {
+		if (speed == null) {
+			speed = 300;
+		}
+
 		if($('#show-inactive').is(":checked") ) {
-			$('.comp-row').show(300);
+			$('.comp-row').show(speed);
+			setCookie('showInactiveComps', true, 30);
 		} else {
-			$('.comp-inactive').hide(300);
+			$('.comp-inactive').hide(speed);
+			setCookie('showInactiveComps', false, 30);
 		}
 	};
 
+	$(document).ready(function () {
+		const savedSortOrder = getCookie('competitorSortOrder');
+		const showInactiveCompsString = getCookie('showInactiveComps');
+		const showInactiveComps = (showInactiveCompsString === 'true');
+
+		if (savedSortOrder) {
+			$('#sort-order').val(savedSortOrder);
+		}
+		if (!showInactiveComps) {
+			$('#show-inactive').prop('checked', false);
+		} else {
+				console.log("set checkbox true");
+			$('#show-inactive').prop('checked', true);
+		}
 		sortCompetitors();
-		changeVisibility();
+		changeVisibility(0);
+	});
 </script>
 }
