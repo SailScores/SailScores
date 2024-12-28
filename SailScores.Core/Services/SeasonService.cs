@@ -47,6 +47,12 @@ namespace SailScores.Core.Services
 
             dbSeason.Id = Guid.NewGuid();
             dbSeason.UrlName = UrlUtility.GetUrlName(season.Name);
+
+            if (String.IsNullOrEmpty(dbSeason.UrlName))
+            {
+                throw new InvalidOperationException("Season name doesn't create a valid url.");
+            }
+            
             if (_dbContext.Seasons.Any(s =>
                 s.ClubId == season.ClubId
                 && (s.Name == season.Name || s.UrlName == season.UrlName)))
