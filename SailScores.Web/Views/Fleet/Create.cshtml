@@ -83,13 +83,20 @@
                 <span asp-validation-for="BoatClassIds" class="text-danger"></span>
             </div>
             <div id="boatSelectGroup" class="form-group">
-                <label asp-for="CompetitorIds" class="control-label">Competitors</label>
-                <select multiple asp-for="CompetitorIds" class="form-control custom-select selectpicker">
-                    @foreach (var competitor in Model.CompetitorOptions.OrderBy(c => c.SailNumber)
-               .ThenBy(c => c.AlternativeSailNumber)
-               .ThenBy(c => c.Name))
+                <div class="row">
+                    <div class="col-8 col-md-6">
+                        <label asp-for="CompetitorIds" class="control-label">Competitors</label>
+                    </div>
+                    <div class="col-4 col-md-6">
+                        <button type="button" class="btn btn-outline-warning btn-sm" id="inactiveCompButton">
+                            Remove Inactive
+                        </button>
+                    </div>
+                </div>
+                <select multiple asp-for="CompetitorIds" id="competitors" class="form-control custom-select selectpicker">
+                    @foreach (var competitor in Model.CompetitorOptions)
                     {
-                        <option value="@competitor.Id">
+                        <option value="@competitor.Id" data-active="@competitor.IsActive">
                             @competitor.SailNumber - @competitor.Name (@competitor.BoatClass.Name)
                         </option>
                     }
@@ -137,7 +144,11 @@
             }
         };
         checkFleetOptionVisibility();
-        
+        function removeInactiveComps() {
+             $('#competitors option[data-active="False"]').remove();
+             $('#competitors').selectpicker('refresh');
+        }
+        document.getElementById("inactiveCompButton").onclick = removeInactiveComps;
     </script>
     
     <script src="~/js/fleetEditor.min.js" asp-append-version="true"></script>
