@@ -17,23 +17,14 @@ internal class AlphaNumericComparer : IComparer<string>
             {
                 return int.Parse(xWord).CompareTo(int.Parse(yWord));
             }
-            else
-            {
-                var firstWordComparison = string.Compare(xWord, yWord, StringComparison.Ordinal);
-                if (firstWordComparison != 0 || String.IsNullOrWhiteSpace(xWord) || String.IsNullOrWhiteSpace(yWord))
-                {
-                    return firstWordComparison;
-                }
-                else
-                {
-                    return Compare(x.Substring(xWord.Length), y.Substring(yWord.Length));
-                }
-            }
-        }
-        else
-        {
-            return string.Compare(x, y, StringComparison.Ordinal);
-        }
 
+            var firstWordComparison = string.Compare(xWord, yWord, StringComparison.Ordinal);
+            if (firstWordComparison != 0 || String.IsNullOrWhiteSpace(xWord) || String.IsNullOrWhiteSpace(yWord))
+            {
+                return firstWordComparison;
+            }
+            return Compare(x.Substring(xWord.Length), y.Substring(yWord.Length));
+        }
+        return string.Compare(x, y, StringComparison.Ordinal);
     }
 }
