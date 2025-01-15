@@ -37,6 +37,15 @@ namespace SailScores.Core.Scoring
             {
                 return new LowPointAverageCalculator(scoringSystem);
             }
+            else if (baseSystemName.Contains("First = 0"))
+            {
+                return new AppAAltFirstIsZero(scoringSystem);
+            }
+            else if (baseSystemName.Contains("First = ")
+                && baseSystemName.Contains(".7"))
+            {
+                return new AppAAltFirstIsPoint7(scoringSystem);
+            }
             else if (baseSystemName.Contains("Top X High Point"))
             { 
                 return new TopXHighPointCalculator(scoringSystem);
@@ -67,7 +76,7 @@ namespace SailScores.Core.Scoring
                         .ConfigureAwait(false);
                 }
                 baseSystemName = currentSystem.Name;
-                _cache.Set($"ScoringSystemName_{scoringSystem.Id}", baseSystemName, TimeSpan.FromSeconds(30));
+                _cache.Set($"ScoringSystemName_{scoringSystem.Id}", baseSystemName, TimeSpan.FromSeconds(20));
             }
             return baseSystemName;
         }

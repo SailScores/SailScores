@@ -2,12 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SailScores.Core.Scoring;
 
-public class AppendixACalculator : BaseScoringCalculator
+// even though this class inherits from AppendixACalculator,
+// it is still considered a "Base" system: it does not inherit
+// scoring codes from any system.
+
+public class AppAAltFirstIsZero : AppendixACalculator
 {
-    public AppendixACalculator(ScoringSystem scoringSystem) : base(scoringSystem)
+    public AppAAltFirstIsZero(ScoringSystem scoringSystem) : base(scoringSystem)
     {
         CompetitorComparer = new LowPointSeriesCompComparer();
     }
@@ -16,7 +22,7 @@ public class AppendixACalculator : BaseScoringCalculator
         IEnumerable<Score> allScores,
         Score currentScore)
     {
-        if(currentScore == null)
+        if (currentScore == null)
         {
             throw new ArgumentNullException(nameof(currentScore));
         }
@@ -30,14 +36,16 @@ public class AppendixACalculator : BaseScoringCalculator
                     && !ShouldAdjustOtherScores(s)
                     ) + 1);
 
+        // usually if one of these conditions is true, the other is true as well,
+        // but this might catch some edge cases.
+        if (currentScore.Place == 1 && returnScore == 1)
+        {
+            returnScore = 0;
+        }
+
         returnScore = GetTiedScore(allScores, currentScore) ?? returnScore;
 
         return returnScore;
-    }
-
-    protected override decimal? GetPerfectScore(IEnumerable<Score> allScores, Score currentScore)
-    {
-        return 1;
     }
 
     // There are two scenarios to handle for ties:
@@ -94,7 +102,16 @@ public class AppendixACalculator : BaseScoringCalculator
             int total = 0;
             for (int i = 0; i < numTied; i++)
             {
-                total += (tieBase + i);
+                // normally a tie is the average of the scores, but for this method,
+                // need to allow first place to be zero.
+                if (tieBase == 1 && i == 0)
+                {
+                    total += 0;
+                }
+                else
+                {
+                    total += (tieBase + i);
+                }
             }
             return (decimal)total / (decimal)numTied;
         }
@@ -102,18 +119,4 @@ public class AppendixACalculator : BaseScoringCalculator
         return null;
     }
 
-    protected static Score GetNextScore(IEnumerable<Score> allScores, Score currentScore)
-    {
-        return allScores.FirstOrDefault(s =>
-        s.Race == currentScore.Race
-        && s.Place == currentScore.Place + 1);
-    }
-    protected static Score GetPreviousScore(IEnumerable<Score> allScores, Score currentScore)
-    {
-        return allScores.
-            Where(s => s.Race == currentScore.Race
-            && s.Place < currentScore.Place)
-            .OrderByDescending(s => s.Place)
-            .FirstOrDefault();
-    }
 }
