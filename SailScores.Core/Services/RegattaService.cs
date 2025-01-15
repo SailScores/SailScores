@@ -385,6 +385,7 @@ namespace SailScores.Core.Services
                 .Select(rs => rs.Series)
                 .SelectMany(s => s.RaceSeries)
                 .Select(rs => rs.Race)
+                .Where(r => r.Fleet.Id == fleetId)
                 .Max(r => (int?)r.Order) ?? 0;
 
             return max;
