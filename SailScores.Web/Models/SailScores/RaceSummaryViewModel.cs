@@ -51,7 +51,13 @@ public class RaceSummaryViewModel
             {
                 raceWord = "Seglingar";
             }
-            return $"{Date.ToShortString()} {raceWord} {Order}";
+            if (String.IsNullOrEmpty(this.Name))
+            {
+                return $"{Date.ToShortString()} {raceWord} {Order}";
+            } else
+            {
+                return $"{this.Name} ({Date.ToShortString()} {raceWord} {Order})";
+            }
         }
     }
     public string ShortName
