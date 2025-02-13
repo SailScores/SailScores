@@ -185,7 +185,7 @@ namespace SailScores.Core.Scoring
         {
             var dnfScore = GetDnfScore(race) ?? 1;
             var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
-            var percent = Math.Round(dnfScore * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
+            var percent = Math.Round(dnfScore * percentAdjustment / 100m, 1, MidpointRounding.AwayFromZero);
 
             return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
         }

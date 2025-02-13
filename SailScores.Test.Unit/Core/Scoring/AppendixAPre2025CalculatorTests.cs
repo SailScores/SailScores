@@ -8,14 +8,14 @@ using Xunit;
 namespace SailScores.Test.Unit.Core.Scoring
 {
 
-    public class AppendixACalculatorTests
+    public class AppendixAPre2025CalculatorTests
     {
 
-        private AppendixACalculator _defaultCalculator;
+        private AppendixAPre2025Calculator _defaultCalculator;
 
-        public AppendixACalculatorTests()
+        public AppendixAPre2025CalculatorTests()
         {
-            _defaultCalculator = new AppendixACalculator(MakeDefaultScoringSystem());
+            _defaultCalculator = new AppendixAPre2025Calculator(MakeDefaultScoringSystem());
         }
 
         private ScoringSystem MakeDefaultScoringSystem()
@@ -490,9 +490,7 @@ namespace SailScores.Test.Unit.Core.Scoring
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-
-            var expectedScore = Math.Round(3m + (24m * .2m), 1, MidpointRounding.AwayFromZero);
-            Assert.Equal(expectedScore,
+            Assert.Equal(8m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -558,10 +556,7 @@ namespace SailScores.Test.Unit.Core.Scoring
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            var didNotFinish = 24m;
-            var expectedScore = 2m + (didNotFinish * .2m);
-            Assert.Equal(6.8m, expectedScore);
-            Assert.Equal(expectedScore,
+            Assert.Equal(7m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
         }
 
@@ -599,8 +594,7 @@ namespace SailScores.Test.Unit.Core.Scoring
 
             var results = _defaultCalculator.CalculateResults(basicSeries);
 
-            var expectedScore = Math.Round(3m + (24m * .2m), 1, MidpointRounding.AwayFromZero);
-            Assert.Equal(expectedScore,
+            Assert.Equal(8m,
                 results.Results[thirdComp].CalculatedScores.Last().Value.ScoreValue);
         }
 

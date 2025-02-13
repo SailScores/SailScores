@@ -43,7 +43,14 @@ namespace SailScores.Core.FlatModel
                 {
                     raceWord = "Seglingar";
                 }
-                return $"{Date.ToShortString()} {raceWord} {Order}";
+                if (String.IsNullOrEmpty(this.Name))
+                {
+                    return $"{Date.ToShortString()} {raceWord} {Order}";
+                }
+                else
+                {
+                    return $"{this.Name} ({Date.ToShortString()} {raceWord} {Order})";
+                }
             }
         }
         public string ShortName
@@ -60,7 +67,14 @@ namespace SailScores.Core.FlatModel
                 {
                     raceLetter = "S";
                 }
-                return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
+                if (String.IsNullOrEmpty(this.Name))
+                {
+                    return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
+                }
+                else
+                {
+                    return $"{this.Name} ({Date.ToSuperShortString()} {raceLetter}{Order})";
+                }
             }
         }
 

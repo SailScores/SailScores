@@ -95,7 +95,7 @@ public class AdminTipService : IAdminTipService
         {
             return;
         }
-        if ((race.SeriesOptions == null || race.SeriesOptions.Count == 0))
+        if (race.Regatta == null && (race.SeriesOptions == null || race.SeriesOptions.Count == 0))
         {
             race.Tips = new List<AdminToDoViewModel> { new()
             {
@@ -148,6 +148,7 @@ public class AdminTipService : IAdminTipService
             });
         }
         if ((returnList?.Count ?? 0) >= 1
+            && race.Regatta == null
             && (race.SeriesOptions == null || race.SeriesOptions.Count == 0))
         {
             returnList.Add(new AdminToDoViewModel
