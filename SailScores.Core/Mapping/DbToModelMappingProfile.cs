@@ -30,6 +30,7 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.Competitors, o => o.Ignore())
                 .ForMember(d => d.ShowCompetitorClub, o => o.Ignore())
                 .ForMember(d => d.ExcludeFromCompetitorStats, o => o.MapFrom(s => (s.ExcludeFromCompetitorStats ?? false)))
+                .ForMember(d => d.HideDncDiscards, o => o.MapFrom(s => (s.HideDncDiscards ?? false)))
                 .ReverseMap()
                 .ForMember(d => d.RaceSeries, o => o.Ignore());
             CreateMap<Db.Fleet, Model.Fleet>()
