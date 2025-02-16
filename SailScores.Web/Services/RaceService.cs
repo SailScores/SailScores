@@ -171,6 +171,7 @@ public class RaceService : IRaceService
             model.ScoreCodeOptions =
                 scoreSystem.ScoreCodes
                     .Union(scoreSystem.InheritedScoreCodes)
+                    .OrderBy(s => s.Name)
                     .ToList();
         }
         else
@@ -222,6 +223,7 @@ public class RaceService : IRaceService
             model.ScoreCodeOptions =
                 scoreSystem.ScoreCodes
                     .Union(scoreSystem.InheritedScoreCodes)
+                    .OrderBy(s => s.Name)
                     .ToList();
         }
         else
