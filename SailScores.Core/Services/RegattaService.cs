@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Immutable;
 
 namespace SailScores.Core.Services
 {
@@ -94,6 +95,19 @@ namespace SailScores.Core.Services
                     CreatedLocalDate = d.CreatedLocalDate,
                     CreatedBy = d.CreatedBy
                 }).ToListAsync();
+
+            foreach (var fleet in fullRegatta.Fleets)
+            {
+                // sort each fleet but allow for alternate sail numbers in sort
+                if (fullRegatta.PreferAlternateSailNumbers)
+                {
+                    fleet.Competitors = fleet.Competitors.OrderBy(c => c.AlternativeSailNumber).ThenBy(c => c).ToImmutableList();
+                }
+                else
+                {
+                    fleet.Competitors = fleet.Competitors.OrderBy(c => c).ToList();
+                }
+            }
 
             foreach (var series in fullRegatta.Series)
             {

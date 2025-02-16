@@ -238,9 +238,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var comp in fleet.Competitors.OrderBy(
-                       c => Model.Item.PreferAlternateSailNumbers ? (c.AlternativeSailNumber ?? c.SailNumber) : c.SailNumber)
-                       .ThenBy(c => c.Name))
+                        @foreach (var comp in fleet.Competitors)
                         {
                             <tr>
                                 <td><small>@(counter++)</small></td>
