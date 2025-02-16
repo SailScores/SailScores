@@ -139,12 +139,16 @@ export function moveDown() {
     calculatePlaces();
 }
 export function deleteResult() {
+    // fix aria incompatibility.
+    const buttonElement = document.activeElement;
+    buttonElement.blur();
     var modal = $("#deleteConfirm");
     var compId = modal.find("#compIdToDelete").val();
     var resultList = $("#results");
     var resultItem = resultList.find(`[data-competitorid='${compId}']`);
     resultItem.remove();
     calculatePlaces();
+    initializeAutoComplete();
     updateButtonFooter();
     modal.modal("hide");
 }
