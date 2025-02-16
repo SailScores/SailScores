@@ -73,7 +73,7 @@ namespace SailScores.Core.FlatModel
                 }
                 else
                 {
-                    return $"{this.Name} ({Date.ToSuperShortString()} {raceLetter}{Order})";
+                    return $"{this.Name} ({Date.ToSuperShortString()})";
                 }
             }
         }

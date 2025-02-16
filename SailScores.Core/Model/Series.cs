@@ -57,6 +57,8 @@ namespace SailScores.Core.Model
 
         public bool? ShowCompetitorClub { get; internal set; }
 
+        public bool HideDncDiscards { get; set; }
+
         // If set, any races assigned to this series will not be
         // used in the competitor summary statistics.
         public bool ExcludeFromCompetitorStats { get; set; }

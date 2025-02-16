@@ -554,6 +554,7 @@ namespace SailScores.Core.Services
             existingSeries.ScoringSystemId = model.ScoringSystemId;
             existingSeries.TrendOption = model.TrendOption;
             existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
+            existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
 
             if (model.Season != null

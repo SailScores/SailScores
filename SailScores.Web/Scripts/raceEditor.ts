@@ -172,17 +172,23 @@ export function moveDown() {
 }
 
 export function deleteResult() {
+    // fix aria incompatibility.
+    const buttonElement = document.activeElement as HTMLElement;
+    buttonElement.blur();
+
     var modal = $("#deleteConfirm");
     var compId = modal.find("#compIdToDelete").val();
     var resultList = $("#results");
     var resultItem = resultList.find(`[data-competitorid='${compId}']`);
     resultItem.remove();
     calculatePlaces();
+    initializeAutoComplete();
     updateButtonFooter();
     (<any>modal).modal("hide");
 }
 
 export function confirmDelete() {
+
     var btn = <Node>event.target;
     var resultItem = $(btn).closest("li");
     var compId = resultItem.data('competitorid');

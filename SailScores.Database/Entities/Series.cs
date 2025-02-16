@@ -42,4 +42,5 @@ public class Series
     public bool? PreferAlternativeSailNumbers { get; set; }
 
     public bool? ExcludeFromCompetitorStats { get; set; }
+    public bool? HideDncDiscards { get; set; }
 }

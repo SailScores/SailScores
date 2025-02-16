@@ -11,38 +11,43 @@
         @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 1 ? "finish-first" : "")
         @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 2 ? "finish-second " : "")
         @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 3 ? "finish-third " : "")
-        ">
+    ">
         <span class="@(Model.Result.Discard ? "text-muted" : "")">
-            @if (Model.Result.Discard)
+            @* hide all cell contents if DNC, discarded, and series setting. *@
+            @if (!(Model.HideDncDiscards && Model.Result.Code == "DNC" &&
+                (Model.Result.Discard || Model.IsPercentSystem )))
             {
-                @Html.Raw("<s>")
-            }
-            @if(Model.Result.Code != null
-               && Model.ScoreCodesUsed != null
-               && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
-            {
-                var muteText = (Model.IsPercentSystem && Model.Result.Code == "DNC") ? "text-muted" : "";
-                @Html.Raw($"<span title=\"{Model.ScoreCodesUsed[Model.Result.Code].Description}\" class=\"{muteText}\">")
-            }
-            @Model.Result.Code
-            @if (Model.Result.Code != null
-               && Model.ScoreCodesUsed != null
-               && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
-            {
-                @Html.Raw("</span>")
-            } @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
-            {
-                var tooltipText = Model.Result.PerfectScoreValue == null ?
-                    Model.Result.Place.Value.Ordinalize() :
-                $"of {Model.Result.PerfectScoreValue.Value}&#010;{Model.Result.Place.Value.Ordinalize()}";
+                @if (Model.Result.Discard)
+                {
+                    @Html.Raw("<s>")
+                }
+                @if(Model.Result.Code != null
+                   && Model.ScoreCodesUsed != null
+                   && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
+                {
+                    var muteText = (Model.IsPercentSystem && Model.Result.Code == "DNC") ? "text-muted" : "";
+                    @Html.Raw($"<span title=\"{Model.ScoreCodesUsed[Model.Result.Code].Description}\" class=\"{muteText}\">")
+                }
+                @Model.Result.Code
+                @if (Model.Result.Code != null
+                   && Model.ScoreCodesUsed != null
+                   && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
+                {
+                    @Html.Raw("</span>")
+                } @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
+                {
+                    var tooltipText = Model.Result.PerfectScoreValue == null ?
+                        Model.Result.Place.Value.Ordinalize() :
+                    $"of {Model.Result.PerfectScoreValue.Value}&#010;{Model.Result.Place.Value.Ordinalize()}";
                 
-                <span data-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
-            } else {
-                @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
-            }
-            @if (Model.Result.Discard)
-            {
-                @Html.Raw("</s>")
+                    <span data-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
+                } else {
+                    @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
+                }
+                @if (Model.Result.Discard)
+                {
+                    @Html.Raw("</s>")
+                }
             }
         </span>
 </td>

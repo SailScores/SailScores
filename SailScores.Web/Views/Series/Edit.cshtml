@@ -85,6 +85,12 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="HideDncDiscards" />
+                                    <label class="form-check-label"> Hide discarded DNC scores (Show as blank.)</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label asp-for="ScoringSystemId">Scoring System</label>
                                 <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-control">
                                     @foreach (var scoringSystem in Model.ScoringSystemOptions)
