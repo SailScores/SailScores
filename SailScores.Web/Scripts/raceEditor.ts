@@ -439,11 +439,11 @@ function initializeAutoComplete() {
 
 function initializeButtonFooter() {
     $('#scoreButtonDiv').empty();
-    if (allCompetitors && allCompetitors.length && allCompetitors.length < 21) {
+    //if (allCompetitors && allCompetitors.length && allCompetitors.length < 21) {
         $('#scoreButtonFooter').show();
-    } else {
-        $('#scoreButtonFooter').hide();
-    }
+    //} else {
+    //    $('#scoreButtonFooter').hide();
+    //}
     allCompetitors.forEach(c => {
         let style = 'btn ';
         if (!competitorIsInResults(c)) {

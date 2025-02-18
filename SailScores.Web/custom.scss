@@ -136,6 +136,8 @@ span.avoidwrap {
 }
 
 .score-entry {
+    max-height: 45%;
+    overflow-y: auto;
     position: fixed;
     padding-bottom: 10px;
     bottom: 0;
@@ -153,6 +155,7 @@ span.avoidwrap {
 button.close {
     padding-right: 10px;
     padding-left: 10px;
+    font-size: 2rem;
 }
 
 svg text {
