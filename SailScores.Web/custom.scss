@@ -148,6 +148,12 @@ span.avoidwrap {
     z-index: 1;
 }
 
+@include media-breakpoint-up(sm) {
+    .score-entry {
+        max-height: 25%;
+    }
+}
+
 .footer-header {
     height: 20px;
 }
