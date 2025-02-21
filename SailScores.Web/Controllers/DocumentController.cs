@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Ganss.Xss;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Identity.Entities;
 using SailScores.Web.Models.SailScores;
-using Ganss.Xss;
 using SailScores.Web.Services.Interfaces;
-using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 using System.IO;
+using System.Text;
+using System.Web;
+using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
 
@@ -111,17 +114,39 @@ public class DocumentController : Controller
         stream.Position = 0;
 
         var extension = MimeTypes.GetMimeTypeExtensions(doc.ContentType).FirstOrDefault();
+        if(extension == "jpe")
+        {
+            extension = "jpg";
+        }
         if (!String.IsNullOrWhiteSpace(extension) && !doc.Name.EndsWith(extension))
         {
-            doc.Name = doc.Name + extension;
+            doc.Name = doc.Name + "." +extension;
         }
-        System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+        Response.Headers.Append("Content-Disposition", InlineAndEncodeFileNameRFC2231(doc.Name));
+        return new FileStreamResult(stream, doc.ContentType);        
+    }
+    private string InlineAndEncodeFileNameRFC2231(string fileName)
+    {
+        if(String.IsNullOrWhiteSpace(fileName))
         {
-            FileName = doc.Name,
-            Inline = true
-        };
-        Response.Headers.Add("Content-Disposition", cd.ToString());
-        return new FileStreamResult(stream, doc.ContentType);
+            return $"inline=true";
+        }
+        StringBuilder encodedFilename = new StringBuilder();
+        byte[] bytes = Encoding.UTF8.GetBytes(fileName);
+
+        foreach (byte b in bytes)
+        {
+            if (b > 127 || b == ' ' || b == '%' || b == '"' || b == ';' || b == '\\')
+            {
+                encodedFilename.AppendFormat("%{0:X2}", b);
+            }
+            else
+            {
+                encodedFilename.Append((char)b);
+            }
+        }
+
+        return $"inline=true;filename*=UTF-8''{encodedFilename}";
     }
 
     [Authorize]
