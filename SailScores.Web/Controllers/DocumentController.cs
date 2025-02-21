@@ -125,13 +125,13 @@ public class DocumentController : Controller
         Response.Headers.Append("Content-Disposition", InlineAndEncodeFileNameRFC2231(doc.Name));
         return new FileStreamResult(stream, doc.ContentType);        
     }
-    private string InlineAndEncodeFileNameRFC2231(string fileName)
+    private static string InlineAndEncodeFileNameRFC2231(string fileName)
     {
         if(String.IsNullOrWhiteSpace(fileName))
         {
             return $"inline=true";
         }
-        StringBuilder encodedFilename = new StringBuilder();
+        StringBuilder encodedFilename = new ();
         byte[] bytes = Encoding.UTF8.GetBytes(fileName);
 
         foreach (byte b in bytes)
@@ -203,7 +203,7 @@ public class DocumentController : Controller
             }
             return RedirectToAction("Index", "Admin");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             ModelState.AddModelError(String.Empty, "Problems updating the document.");
             return View(model);

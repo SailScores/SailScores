@@ -1,38 +1,37 @@
 ﻿using System.Linq;
 using Xunit;
 
-namespace SailScores.ImportExport.Sailwave.Tests.Integration
+namespace SailScores.ImportExport.Sailwave.Test.Integration;
+
+public class ReadFileTests
 {
-    public class ReadFileTests
+    private readonly string _simpleFilePath = @"../../../SailwaveFiles/SimpleSeries.blw";
+    private readonly string _lhycFilePath = @"../../../SailwaveFiles/LHYCSeries.blw";
+
+    [Fact]
+    public void BasicReadFile()
     {
-        private string _simpleFilePath = @"../../../SailwaveFiles/SimpleSeries.blw";
-        private string _lhycFilePath = @"../../../SailwaveFiles/LHYCSeries.blw";
+        var reader = new SailwaveFileReader(_simpleFilePath);
 
-        [Fact]
-        public void BasicReadFile()
-        {
-            var reader = new SailwaveFileReader(_simpleFilePath);
-
-            Assert.NotNull(reader.Series);
-        }
+        Assert.NotNull(reader.Series);
+    }
 
 
 
-        [Fact]
-        public void SimpleFile_HasTwoCompetitors()
-        {
-            var reader = new SailwaveFileReader(_simpleFilePath);
+    [Fact]
+    public void SimpleFile_HasTwoCompetitors()
+    {
+        var reader = new SailwaveFileReader(_simpleFilePath);
 
-            Assert.Equal(2, reader.Series.Competitors.Count);
-            Assert.Single(reader.Series.Competitors.Where(c => c.Id == 3));
-        }
+        Assert.Equal(2, reader.Series.Competitors.Count);
+        Assert.Single(reader.Series.Competitors, c => c.Id == 3);
+    }
 
-        [Fact]
-        public void LhycFile_HasManyCompetitors()
-        {
-            var reader = new SailwaveFileReader(_lhycFilePath);
+    [Fact]
+    public void LhycFile_HasManyCompetitors()
+    {
+        var reader = new SailwaveFileReader(_lhycFilePath);
 
-            Assert.True(reader.Series.Competitors.Count > 40);
-        }
+        Assert.True(reader.Series.Competitors.Count > 40);
     }
 }

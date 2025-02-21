@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SailScores.Database.Migrations
 {
-    public partial class forwardertables : Migration
+    public partial class ForwarderTables : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

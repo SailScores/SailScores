@@ -129,8 +129,7 @@ namespace SailScores.Core.Services
 
         public async Task<Guid> GetClubId(string initials)
         {
-            Guid clubGuid;
-            if (!Guid.TryParse(initials, out clubGuid))
+            if (!Guid.TryParse(initials, out Guid clubGuid))
             {
                 if (_cache.TryGetValue($"ClubId_{initials}", out clubGuid))
                 {
@@ -318,10 +317,7 @@ namespace SailScores.Core.Services
             }
             if (defaultSystem != null)
             {
-                if (club.ScoringSystems == null)
-                {
-                    club.ScoringSystems = new List<ScoringSystem>();
-                }
+                club.ScoringSystems ??= new List<ScoringSystem>();
                 if (!club.ScoringSystems.Any(ss => ss == defaultSystem))
                 {
                     club.ScoringSystems.Add(defaultSystem);
@@ -398,10 +394,7 @@ namespace SailScores.Core.Services
             dbClub.ShowClubInResults = club.ShowClubInResults;
             dbClub.Locale = club.Locale;
 
-            if (dbClub.WeatherSettings == null)
-            {
-                dbClub.WeatherSettings = new Database.Entities.WeatherSettings();
-            }
+            dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings.Latitude;
             dbClub.WeatherSettings.Longitude = club.WeatherSettings.Longitude;
             dbClub.WeatherSettings.TemperatureUnits = club.WeatherSettings.TemperatureUnits;
@@ -542,15 +535,13 @@ namespace SailScores.Core.Services
 
         private Guid GetNewGuid(Guid oldGuid)
         {
-            if (guidMapper == null)
+            guidMapper ??= new Dictionary<Guid, Guid>();
+            if (!guidMapper.TryGetValue(oldGuid, out Guid value))
             {
-                guidMapper = new Dictionary<Guid, Guid>();
+                value = Guid.NewGuid();
+                guidMapper.Add(oldGuid, value);
             }
-            if (!guidMapper.ContainsKey(oldGuid))
-            {
-                guidMapper.Add(oldGuid, Guid.NewGuid());
-            }
-            return guidMapper[oldGuid];
+            return value;
         }
 
         private Guid? GetNewGuidIfSet(Guid? oldGuid)
@@ -559,13 +550,10 @@ namespace SailScores.Core.Services
             {
                 return null;
             }
-            if (guidMapper == null)
+            guidMapper ??= new Dictionary<Guid, Guid>();
+            if (guidMapper.TryGetValue(oldGuid.Value, out Guid value))
             {
-                guidMapper = new Dictionary<Guid, Guid>();
-            }
-            if (guidMapper.ContainsKey(oldGuid.Value))
-            {
-                return guidMapper[oldGuid.Value];
+                return value;
             }
             return oldGuid;
         }

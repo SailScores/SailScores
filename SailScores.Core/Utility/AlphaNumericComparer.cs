@@ -6,7 +6,7 @@ namespace SailScores.Core.Utility;
 
 internal class AlphaNumericComparer : IComparer<string>
 {
-    public int Compare(string? x, string? y)
+    public int Compare(string x, string y)
     {
         // if the first word is numeric on both, compare as numbers
         if (x != null && y != null && x.Length > 0 && y.Length > 0)
