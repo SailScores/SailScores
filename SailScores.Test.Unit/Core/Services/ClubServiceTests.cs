@@ -54,8 +54,8 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task GetMinimalForSelectedBoatsFleets_OnlyReturnsSelectedBoatFleets()
         {
             var result = await _service.GetMinimalForSelectedBoatsFleets(_clubId);
-            Assert.Empty(result.Where(f => f.FleetType != Api.Enumerations.FleetType.SelectedBoats));
-            Assert.NotEmpty(result.Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats));
+            Assert.DoesNotContain(result, f => f.FleetType != Api.Enumerations.FleetType.SelectedBoats);
+            Assert.Contains(result, f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats);
 
         }
 
@@ -72,7 +72,7 @@ namespace SailScores.Test.Unit.Core.Services
         {
             var result = await _service.GetClubs(false);
             Assert.NotEmpty(result);
-            Assert.Empty(result.Where(c => c.IsHidden));
+            Assert.DoesNotContain(result, c => c.IsHidden);
         }
 
         [Fact]

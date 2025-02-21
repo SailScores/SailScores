@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>SailScores.Web.xml</DocumentationFile>
-    <NoWarn>1701;1702;1591;CA2007;CS1591</NoWarn>
+    <NoWarn>CS1591;CS1998;</NoWarn>
     <CodeAnalysisRuleSet>SailScores.Web.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>

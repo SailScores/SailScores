@@ -1,6 +1,7 @@
 using System.Text;
 using System.Web;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Services;
@@ -102,11 +103,11 @@ public class SeriesController : Controller
     public async Task<ActionResult> ExportCsv(
         string id)
     {
-        Core.Model.Series series = null;
+        Core.Model.Series series;
         try
         {
             series = await _seriesService.GetSeriesAsync(new Guid(id));
-        } catch (InvalidOperationException ex)
+        } catch (InvalidOperationException)
         {
             series = null;
         }
@@ -134,7 +135,7 @@ public class SeriesController : Controller
         filename = HttpUtility.UrlEncode(filename + ".html", Encoding.UTF8);
         filename = filename.Replace("+", " ");
         var disposition = $"attachment; filename=\"{filename}\"; filename*=UTF-8''{filename}";
-        Response.Headers.Add("content-disposition", disposition);
+        Response.Headers.Append("content-disposition", disposition);
 
         return View(series);
     }

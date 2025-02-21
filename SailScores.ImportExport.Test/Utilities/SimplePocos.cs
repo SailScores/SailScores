@@ -1,14 +1,13 @@
 ﻿using SailScores.ImportExport.Sailwave.Elements;
 using SailScores.ImportExport.Sailwave.Parsers;
 
-namespace SailScores.ImportExport.Sailwave.Tests.Utilities
-{
-    public class SimplePocos
-    {
+namespace SailScores.ImportExport.Sailwave.Test.Utilities;
 
-        public static Series GetSeries()
-        {
-            return SeriesParser.GetSeries(SimpleFile.GetStream());
-        }
+public class SimplePocos
+{
+
+    public static Series GetSeries()
+    {
+        return SeriesParser.GetSeries(SimpleFile.GetStream());
     }
 }

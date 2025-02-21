@@ -70,7 +70,7 @@ namespace SailScores.Test.Unit.Core.Services
         {
             var result = await _service.GetPendingRequests();
 
-            Assert.Equal(1, result.Count);
+            Assert.Single(result);
         }
 
         [Fact]

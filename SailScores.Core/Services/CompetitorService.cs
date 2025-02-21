@@ -89,7 +89,6 @@ public class CompetitorService : ICompetitorService
     public async Task<Competitor> GetCompetitorAsync(Guid clubId, string sailor)
     {
         var comps = await GetCompetitorsAsync(clubId, null, true);
-        IList<Competitor> inactiveCompetitors;
 
         var comp = comps.Where(c => c.IsActive)
             .FirstOrDefault(c =>
@@ -121,20 +120,14 @@ public class CompetitorService : ICompetitorService
 
     public Task SaveAsync(Model.Competitor comp)
     {
-        if (comp == null)
-        {
-            throw new ArgumentNullException(nameof(comp));
-        }
+        ArgumentNullException.ThrowIfNull(comp);
 
         return SaveInternalAsync(comp);
     }
 
     public Task SaveAsync(CompetitorDto comp)
     {
-        if (comp == null)
-        {
-            throw new ArgumentNullException(nameof(comp));
-        }
+        ArgumentNullException.ThrowIfNull(comp);
 
         return SaveInternalAsync(_mapper.Map<Model.Competitor>(comp));
     }
@@ -184,7 +177,7 @@ public class CompetitorService : ICompetitorService
 
     }
 
-    private bool DoIdentifiersMatch(Competitor comp, Db.Competitor dbObject)
+    private static bool DoIdentifiersMatch(Competitor comp, Db.Competitor dbObject)
     {
         var compAId = String.IsNullOrEmpty(comp.SailNumber) ? comp.Name : comp.SailNumber;
         var compBId = String.IsNullOrEmpty(dbObject.SailNumber) ? dbObject.Name : dbObject.SailNumber;

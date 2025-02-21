@@ -13,7 +13,7 @@ namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
     [Migration("20231107031901_forwardertables")]
-    partial class forwardertables
+    partial class ForwarderTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
