@@ -59,9 +59,11 @@
             </div>
             @{
                 ViewData["IsExport"] = true;
-                string trendLegend = localizer["Rank change from"] + " " +
+                string trendLegend = Model.TrendOption.HasValue ? 
+                    localizer["Rank change from"] + " " +
                     localizer[EnumHelper<TrendOption>
-                    .GetDisplayValue(Model.TrendOption.Value)];
+                    .GetDisplayValue(Model.TrendOption.Value)]
+                    : "";
                 var tableModel = new ResultsTableViewModel
                 {
                     SeriesId = Model.Id,
