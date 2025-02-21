@@ -78,7 +78,7 @@ namespace SailScores.Core.Services
             var seriesDb = await _dbContext
                 .Series
                 .Include(s => s.Season)
-                .FirstAsync(c => c.Id == seriesId)
+                .FirstOrDefaultAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
 
             var fullSeries = _mapper.Map<Series>(seriesDb);
@@ -101,11 +101,12 @@ namespace SailScores.Core.Services
                         .Count(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                                      || r.State == RaceState.Preliminary);
                 }
-            }
-            if(await IsPartOfRegatta(seriesDb.Id))
-            {
-                fullSeries.PreferAlternativeSailNumbers = await DoesRegattaPrefersAltSailNumbers(seriesDb.Id);
-                fullSeries.ShowCompetitorClub = true;
+
+                if (await IsPartOfRegatta(seriesDb.Id))
+                {
+                    fullSeries.PreferAlternativeSailNumbers = await DoesRegattaPrefersAltSailNumbers(seriesDb.Id);
+                    fullSeries.ShowCompetitorClub = true;
+                }
             }
             return fullSeries;
         }
