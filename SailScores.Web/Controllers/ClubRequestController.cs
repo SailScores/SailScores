@@ -110,7 +110,7 @@ public class ClubRequestController : Controller
         }
         if (result.Succeeded)
         {
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             _logger.LogInformation("User created a new account with password during club request.");

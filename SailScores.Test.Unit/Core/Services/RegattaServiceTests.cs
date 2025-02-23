@@ -63,7 +63,7 @@ namespace SailScores.Test.Unit.Core.Services
         {
             var result = await _service.GetAllRegattasAsync(_clubId);
 
-            Assert.Equal(1, result.Count);
+            Assert.Single(result);
         }
 
 
@@ -72,7 +72,7 @@ namespace SailScores.Test.Unit.Core.Services
         {
             var result = await _service.GetRegattasDuringSpanAsync(DateTime.Today.AddDays(1), DateTime.Today.AddYears(3));
 
-            Assert.Equal(0, result.Count);
+            Assert.Empty(result);
         }
 
         [Fact]

@@ -6,10 +6,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CodeAnalysisRuleSet>SailScores.Database.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1701;1702;</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CodeAnalysisRuleSet>SailScores.Database.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1701;1702;</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

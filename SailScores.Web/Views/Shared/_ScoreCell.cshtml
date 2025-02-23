@@ -33,8 +33,9 @@
                    && Model.ScoreCodesUsed != null
                    && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
                 {
-                    @Html.Raw("</span>")
-                } @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
+                    @Html.Raw("</span> ")
+                }
+                @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
                 {
                     var tooltipText = Model.Result.PerfectScoreValue == null ?
                         Model.Result.Place.Value.Ordinalize() :
