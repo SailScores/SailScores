@@ -27,6 +27,7 @@
                 <a class="btn btn-outline-danger btn-sm"
                    asp-area=""
                    asp-action="Delete"
+                   asp-route-returnUrl="@Context.Request.Path"
                    asp-route-id="@Model.Item.Id">Delete</a>
             }
             @if (Model.Item.Regatta != null)

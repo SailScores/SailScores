@@ -377,7 +377,7 @@ function initializeButtonFooter() {
     //    $('#scoreButtonFooter').hide();
     //}
     allCompetitors.forEach(c => {
-        let style = 'btn ';
+        let style = 'btn quick-comp ';
         if (!competitorIsInResults(c)) {
             style += 'btn-outline-primary add-comp-enabled';
         }
@@ -392,7 +392,7 @@ function initializeButtonFooter() {
 function updateButtonFooter() {
     $('#scoreButtonDiv').empty();
     allCompetitors.forEach(c => {
-        let style = 'btn ';
+        let style = 'btn quick-comp ';
         if (!competitorIsInResults(c)) {
             style += 'btn-outline-primary add-comp-enabled';
         }

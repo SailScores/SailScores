@@ -247,8 +247,12 @@ public class RaceController : Controller
 
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult> Delete(string clubInitials, Guid id)
+    public async Task<ActionResult> Delete(
+        string clubInitials,
+        Guid id,
+        string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
         if (!await _authService.CanUserEdit(User, clubId))
         {
