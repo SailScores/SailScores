@@ -44,6 +44,7 @@ public class RaceController : Controller
         bool showScheduled = true,
         bool showAbandoned = true)
     {
+        
         var capInitials = clubInitials.ToUpperInvariant();
         if (String.IsNullOrWhiteSpace(seasonName))
         {
@@ -63,6 +64,11 @@ public class RaceController : Controller
             seasonName,
             showScheduled,
             showAbandoned);
+        
+        if (races == null)
+        {
+            return NotFound();
+        }
 
         return View(new ClubItemViewModel<RaceSummaryListViewModel>
         {
