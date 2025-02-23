@@ -9,7 +9,7 @@ namespace SailScores.Web.TagHelpers;
 
 public class InlineStyleTagHelper : TagHelper
 {
-    public InlineStyleTagHelper(IHostingEnvironment hostingEnvironment, IMemoryCache cache)
+    public InlineStyleTagHelper(IWebHostEnvironment hostingEnvironment, IMemoryCache cache)
     {
         HostingEnvironment = hostingEnvironment;
         Cache = cache;
@@ -18,7 +18,7 @@ public class InlineStyleTagHelper : TagHelper
     [HtmlAttributeName("href")]
     public string Href { get; set; }
 
-    private IHostingEnvironment HostingEnvironment { get; }
+    private IWebHostEnvironment HostingEnvironment { get; }
     private IMemoryCache Cache { get; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
@@ -54,10 +54,8 @@ public class InlineStyleTagHelper : TagHelper
 
     private static async Task<string> ReadFileContent(IFileInfo file)
     {
-        using (var stream = file.CreateReadStream())
-        using (var textReader = new StreamReader(stream))
-        {
-            return await textReader.ReadToEndAsync();
-        }
+        using var stream = file.CreateReadStream();
+        using var textReader = new StreamReader(stream);
+        return await textReader.ReadToEndAsync();
     }
 }
