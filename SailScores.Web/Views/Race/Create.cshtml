@@ -6,7 +6,7 @@
     Layout = "_ClubLayout";
 }
 
-<div class="container p-0 justify-content-between">
+<div class="container p-0 justify-content-between mb-4">
     <h4>Add a new race@(Model.Regatta != null ? " for " + Model.Regatta.Name : "")</h4>
     <hr />
     @if (Model.Tips != null && Model.Tips.Count != 0)
@@ -319,6 +319,13 @@
         </div>
     </form>
     <hr />
+
+    <!--These empty divs are here to allow the page to scroll up enough so that create buttons are visible when scoreentry buttons take up 45%
+        of screen.
+    -->
+    <div class="container mb-5 mb-sm-0">&nbsp;</div>
+
+    <div class="container mb-5">&nbsp;</div>
 </div>
 
 <div class="modal fade" id="deleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">

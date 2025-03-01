@@ -273,6 +273,7 @@
                 <a asp-controller="Race"
                    asp-action="Delete"
                    asp-route-id="@Model.Id"
+                   asp-route-returnUrl="@Context.Request.Path"
                    class="btn btn-danger btn-block">Delete</a>
             </div>
         </div>

@@ -136,6 +136,8 @@ span.avoidwrap {
 }
 
 .score-entry {
+    max-height: 45%;
+    overflow-y: auto;
     position: fixed;
     padding-bottom: 10px;
     bottom: 0;
@@ -146,6 +148,12 @@ span.avoidwrap {
     z-index: 1;
 }
 
+@include media-breakpoint-up(sm) {
+    .score-entry {
+        max-height: 25%;
+    }
+}
+
 .footer-header {
     height: 20px;
 }
@@ -153,6 +161,11 @@ span.avoidwrap {
 button.close {
     padding-right: 10px;
     padding-left: 10px;
+    font-size: 2rem;
+}
+
+button.quick-comp {
+    margin: 3px;
 }
 
 svg text {

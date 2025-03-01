@@ -439,13 +439,13 @@ function initializeAutoComplete() {
 
 function initializeButtonFooter() {
     $('#scoreButtonDiv').empty();
-    if (allCompetitors && allCompetitors.length && allCompetitors.length < 21) {
+    //if (allCompetitors && allCompetitors.length && allCompetitors.length < 21) {
         $('#scoreButtonFooter').show();
-    } else {
-        $('#scoreButtonFooter').hide();
-    }
+    //} else {
+    //    $('#scoreButtonFooter').hide();
+    //}
     allCompetitors.forEach(c => {
-        let style = 'btn ';
+        let style = 'btn quick-comp ';
         if (!competitorIsInResults(c)) {
             style += 'btn-outline-primary add-comp-enabled';
         } else {
@@ -460,7 +460,7 @@ function initializeButtonFooter() {
 function updateButtonFooter() {
     $('#scoreButtonDiv').empty();
     allCompetitors.forEach(c => {
-        let style = 'btn ';
+        let style = 'btn quick-comp ';
         if (!competitorIsInResults(c)) {
             style += 'btn-outline-primary add-comp-enabled';
         } else {

@@ -44,6 +44,7 @@ public class RaceController : Controller
         bool showScheduled = true,
         bool showAbandoned = true)
     {
+        
         var capInitials = clubInitials.ToUpperInvariant();
         if (String.IsNullOrWhiteSpace(seasonName))
         {
@@ -63,6 +64,11 @@ public class RaceController : Controller
             seasonName,
             showScheduled,
             showAbandoned);
+        
+        if (races == null)
+        {
+            return NotFound();
+        }
 
         return View(new ClubItemViewModel<RaceSummaryListViewModel>
         {
@@ -241,8 +247,12 @@ public class RaceController : Controller
 
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult> Delete(string clubInitials, Guid id)
+    public async Task<ActionResult> Delete(
+        string clubInitials,
+        Guid id,
+        string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
         if (!await _authService.CanUserEdit(User, clubId))
         {

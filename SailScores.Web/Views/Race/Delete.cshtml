@@ -41,10 +41,8 @@
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="ClubId" />
         <input type="submit" value="Delete" class="btn btn-danger" />
-        <a asp-controller="Admin"
-           asp-action="Index"
-           asp-fragment="races"
-           class="btn btn-outline-primary">Cancel</a>
+        <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
+            class="btn btn-outline-primary">Cancel</a>
     </form>
 </div>
 

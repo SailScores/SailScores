@@ -377,7 +377,9 @@ public class CompetitorController : Controller
 
     [HttpGet]
     // GET: Competitor/Delete/5
-    public async Task<ActionResult> Delete(string clubInitials, Guid id)
+    public async Task<ActionResult> Delete(
+        string clubInitials,
+        Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         if (!await _authService.CanUserEdit(User, clubId))
