@@ -61,7 +61,10 @@ public class RaceService : IRaceService
     {
         var club = await _coreClubService.GetMinimalClub(clubInitials);
         var seasons = await _coreSeasonService.GetSeasons(club.Id);
-        var selectedSeason = seasons.FirstOrDefault(s => s.Name == seasonName);
+        var selectedSeason = seasons
+            .FirstOrDefault(s =>
+                s.UrlName == seasonName ||
+                s.Name == seasonName);
         if (selectedSeason == null)
         {
             return default;
