@@ -61,6 +61,11 @@ public class RaceService : IRaceService
     {
         var club = await _coreClubService.GetMinimalClub(clubInitials);
         var seasons = await _coreSeasonService.GetSeasons(club.Id);
+        var selectedSeason = seasons.FirstOrDefault(s => s.Name == seasonName);
+        if (selectedSeason == null)
+        {
+            return default;
+        }
         var races = (await _coreRaceService.GetFullRacesAsync(
                 club.Id,
                 seasonName,
@@ -253,7 +258,7 @@ public class RaceService : IRaceService
 
         raceWithOptions.SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(
             raceWithOptions.ClubId,
-            raceWithOptions.Date.HasValue ? raceWithOptions.Date.Value : DateTime.Today,
+            raceWithOptions.Date ?? DateTime.Today,
             true);
 
         raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(raceWithOptions.ClubId))
