@@ -291,7 +291,7 @@ public class Startup
 
             endpoints.MapControllerRoute(
                 name: "Competitor",
-                pattern: "{clubInitials}/Competitor/{sailNumber}/",
+                pattern: "{clubInitials}/Competitor/{urlName}/",
                 defaults: new { controller = "Competitor", action = "Details" },
                 constraints: new { clubInitials = clubRouteConstraint });
             endpoints.MapControllerRoute(

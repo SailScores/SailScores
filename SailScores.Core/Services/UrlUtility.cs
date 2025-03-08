@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SailScores.Core.Services
 {
@@ -13,24 +16,33 @@ namespace SailScores.Core.Services
                 return null;
             }
 
-            return RemoveWhitespace(RemoveDisallowedCharacters(rawName));
-        }
+            // Normalize the string to decompose characters
+            string normalizedString = rawName.Normalize(NormalizationForm.FormD);
 
-        public static string RemoveWhitespace(string input)
-        {
-            return new string(input.ToCharArray()
-                .Where(c => !Char.IsWhiteSpace(c))
-                .ToArray());
-        }
-
-        public static string RemoveDisallowedCharacters(string str)
-        {
-            var charsToRemove = new string[] { ":", "/", "?", "#", "[", "]", "@", "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
-            foreach (var c in charsToRemove)
+            // Remove diacritics
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (char c in normalizedString)
             {
-                str = str.Replace(c, string.Empty);
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
             }
-            return str;
+
+            // Convert to lowercase
+            string result = stringBuilder.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
+
+            // Replace spaces with hyphens
+            result = Regex.Replace(result, @"\s+", "-");
+
+            // Remove invalid URL characters
+            result = Regex.Replace(result, @"[^a-z0-9\-]", "");
+
+            // Remove multiple hyphens
+            result = Regex.Replace(result, @"-+", "-").Trim('-');
+
+            return result;
         }
+
     }
 }

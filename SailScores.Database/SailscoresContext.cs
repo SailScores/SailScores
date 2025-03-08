@@ -17,6 +17,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     private readonly Assembly _executingAssembly;
 
     public DbSet<Club> Clubs { get; set; }
+    public DbSet<ClubSequence> ClubSequences { get; set; }
     public DbSet<Fleet> Fleets { get; set; }
     public DbSet<BoatClass> BoatClasses { get; set; }
     public DbSet<Competitor> Competitors { get; set; }
@@ -163,6 +164,10 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasOne(c => c.DefaultScoringSystem)
             .WithMany(s => s.DefaultForClubs)
             .HasForeignKey(c => c.DefaultScoringSystemId);
+
+        modelBuilder.Entity<Club>()
+            .HasMany(c => c.ClubSequences)
+            .WithOne(cs => cs.Club);
 
         // Following lines resolve multiple deletion paths to entities.
         modelBuilder.Entity<Club>()

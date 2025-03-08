@@ -96,14 +96,14 @@ public class ForwarderService : IForwarderService
         return null;
     }
 
-    public async Task<CompetitorForwarderResult> GetCompetitorForwarding(string clubInitials, string sailNumber)
+    public async Task<CompetitorForwarderResult> GetCompetitorForwarding(string clubInitials, string urlName)
     {
 
         var result = await _dbContext.CompetitorForwarders
             .Include(rf => rf.NewCompetitor)
             .FirstOrDefaultAsync(rf =>
                    rf.OldClubInitials == clubInitials &&
-                   rf.OldCompetitorUrl == sailNumber);
+                   rf.OldCompetitorUrl == urlName);
 
         if (result == null)
         {
@@ -113,20 +113,19 @@ public class ForwarderService : IForwarderService
         var club = await _dbContext.Clubs.FirstOrDefaultAsync(c => c.Initials == clubInitials);
 
         if (club.Initials.Equals(clubInitials) &&
-            (sailNumber.Equals(UrlUtility.GetUrlName(result.NewCompetitor.SailNumber) , StringComparison.CurrentCultureIgnoreCase)
-            || sailNumber.Equals(UrlUtility.GetUrlName(result.NewCompetitor.Name), StringComparison.CurrentCultureIgnoreCase)))
+            (urlName.Equals(result.NewCompetitor.UrlName, StringComparison.CurrentCultureIgnoreCase)))
         {
             // matches, looks like a loop: get out of it:
             return null;
         }
-        var competitorUrlToUse = UrlUtility.GetUrlName(result.NewCompetitor.SailNumber ?? result.NewCompetitor.Name);
+        var competitorUrlToUse = UrlUtility.GetUrlName(result.NewCompetitor.UrlName ?? result.NewCompetitor.SailNumber);
 
         return new CompetitorForwarderResult
         {
             OldClubInitials = clubInitials,
-            OldSailNumber = UrlUtility.GetUrlName(sailNumber),
+            OldUrlName = UrlUtility.GetUrlName(urlName),
             NewClubInitials = club.Initials,
-            NewSailNumber = competitorUrlToUse
+            NewUrlName = competitorUrlToUse
         };
     }
 
@@ -216,69 +215,49 @@ public class ForwarderService : IForwarderService
 
     public async Task CreateCompetitorForwarder(Competitor newCompetitor, Database.Entities.Competitor oldCompetitor)
     {
-        // first build possible forwarders:
-        var potentialForwarders = new List<CompetitorForwarder>();
-        if (newCompetitor.SailNumber != oldCompetitor.SailNumber)
+        if (newCompetitor == null || oldCompetitor == null)
         {
-            if (String.IsNullOrEmpty(oldCompetitor.SailNumber))
-            {
-                potentialForwarders.Add(new CompetitorForwarder
-                {
-                    Id = Guid.NewGuid(),
-                    OldCompetitorUrl = UrlUtility.GetUrlName(oldCompetitor.Name),
-                    CompetitorId = oldCompetitor.Id,
-                    Created = DateTime.UtcNow
-                });
-            }
-            else // forward from old sail number
-            {
-                potentialForwarders.Add(new CompetitorForwarder
-                {
-                    Id = Guid.NewGuid(),
-                    OldCompetitorUrl = UrlUtility.GetUrlName(oldCompetitor.SailNumber),
-                    CompetitorId = oldCompetitor.Id,
-                    Created = DateTime.UtcNow
-                });
-                // may need a second if urlname is different from sailnumber
-                if (UrlUtility.GetUrlName(oldCompetitor.SailNumber) != oldCompetitor.SailNumber)
-                {
-                    potentialForwarders.Add(new CompetitorForwarder
-                    {
-                        Id = Guid.NewGuid(),
-                        OldCompetitorUrl = oldCompetitor.SailNumber,
-                        CompetitorId = oldCompetitor.Id,
-                        Created = DateTime.UtcNow
-                    });
-                }
-            }
+            return;
         }
+        if (newCompetitor.UrlName == oldCompetitor.UrlName)
+        {
+            return;
+        }
+
+        // first build possible forwarders:
+        var forwarder = new CompetitorForwarder{
+                Id = Guid.NewGuid(),
+                OldCompetitorUrl = oldCompetitor.UrlName,
+                CompetitorId = oldCompetitor.Id,
+                Created = DateTime.UtcNow
+            };
 
         // fill in clubInitials: for now only have new club initials: we won't allow movement between clubs.
         var clubInitials = (await _dbContext.Clubs.SingleAsync(c => c.Id == oldCompetitor.ClubId)).Initials;
 
-        // check the potential forwarders for conflicts with existing forwarders
-        // some inefficiency here, but there will only be a max of two items in this list, so not bad.
-        foreach (var forwarder in potentialForwarders.ToList())
-        {
-            forwarder.OldClubInitials = clubInitials;
-            var matches = _dbContext.CompetitorForwarders.Where(cf =>
-                cf.OldClubInitials == forwarder.OldClubInitials &&
-                cf.OldCompetitorUrl == forwarder.OldCompetitorUrl);
-            foreach(var match in matches.ToList())
-            {
-                if (match.CompetitorId == forwarder.CompetitorId)
-                {
-                    potentialForwarders.Remove(forwarder);
-                    break;
-                }
+        // check the potential forwarder for conflicts with existing forwarders
+        
+        forwarder.OldClubInitials = clubInitials;
+        var matches = _dbContext.CompetitorForwarders.Where(cf =>
+            cf.OldClubInitials == forwarder.OldClubInitials &&
+            cf.OldCompetitorUrl == forwarder.OldCompetitorUrl);
 
-                if (match.CompetitorId != forwarder.CompetitorId)
-                {
-                    _dbContext.CompetitorForwarders.Remove(match);
-                }
+        // really expect max of one, but handle more.
+        foreach(var match in matches.ToList())
+        {
+            if (match.CompetitorId == forwarder.CompetitorId)
+            {
+                // forwarder not needed.
+                // exit this method.
+                return;
             }
-            _dbContext.CompetitorForwarders.Add(forwarder);
+
+            if (match.CompetitorId != forwarder.CompetitorId)
+            {
+                _dbContext.CompetitorForwarders.Remove(match);
+            }
         }
+        _dbContext.CompetitorForwarders.Add(forwarder);
         await _dbContext.SaveChangesAsync();
     }
 

@@ -27,6 +27,14 @@ public class Competitor
     public IList<CompetitorFleet> CompetitorFleets { get; set; }
     public IList<Score> Scores { get; set; }
 
+    [StringLength(20)]
+    public String UrlName { get; set; }
+
+    // A fallback url, used in the event of duplicate sailnumbers, usually.
+    // it should be initialized on competitor create, and not change.
+    [StringLength(20)]
+    public String UrlId { get; set; }
+
     public override string ToString()
     {
         return BoatName + " : " + Name + " : " + SailNumber + " : " + Id;

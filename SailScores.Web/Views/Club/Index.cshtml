@@ -62,7 +62,7 @@
                     @regatta.StartDate?.ToString("D") @:- @regatta.EndDate?.ToString("D")
                 }
                 <h3>
-                    <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.UrlName/@regatta.UrlName">
+                    <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.UrlName/@regatta.UrlName" style="text-wrap: pretty;">
                         @regatta.Season.Name @regatta.Name
                     </a>
                 </h3>
@@ -79,7 +79,7 @@
             <ul class="list-unstyled">
                 @foreach (var series in Model.ImportantSeries)
                 {
-                    <li>
+                    <li style="text-wrap: pretty;">
                         <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">
                             @series.Season.Name @series.Name
                         </a>
@@ -101,7 +101,7 @@
                 <ul class="list-unstyled">
                     @foreach (var series in Model.RecentSeries)
                     {
-                        <li>
+                        <li style="text-wrap: pretty;">
                             <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
                             @if (series.UpdatedDate.HasValue)
                             {
@@ -119,12 +119,12 @@
                 <ul class="list-unstyled">
                     @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                     {
-                        <li>
+                        <li style="text-wrap: pretty;">
                             @item.Key
                             <ul>
                                 @foreach (var race in item)
                                 {
-                                    <li>
+                                    <li style="text-wrap: pretty;">
                                         <a asp-controller="Race"
                                            asp-action="Details"
                                            asp-route-clubInitials="@Model.Initials"
@@ -154,12 +154,12 @@
             <ul class="list-unstyled">
                 @foreach (var item in Model.UpcomingRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                 {
-                    <li>
+                    <li style="text-wrap: pretty;">
                         <strong>@item.Key</strong>
                         <ul class="list-unstyled">
                             @foreach (var race in item)
                             {
-                                <li>
+                                <li style="text-wrap: pretty;">
                                     <a asp-controller="Race"
                                        asp-action="Details"
                                        asp-route-clubInitials="@Model.Initials"
@@ -181,7 +181,7 @@
                 <ul class="list-unstyled">
                     @foreach (var series in Model.RecentSeries)
                     {
-                        <li>
+                        <li style="text-wrap: pretty;">
                             <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
                             @if (series.UpdatedDate.HasValue)
                             {
@@ -199,12 +199,12 @@
                 <ul class="list-unstyled">
                     @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                     {
-                        <li>
+                        <li style="text-wrap: pretty;">
                             @item.Key
                             <ul>
                                 @foreach (var race in item)
                                 {
-                                    <li>
+                                    <li style="text-wrap: pretty;">
                                         <a asp-controller="Race"
                            asp-action="Details"
                            asp-route-clubInitials="@Model.Initials"

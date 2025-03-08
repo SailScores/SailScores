@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
+using SailScores.Core.Utility;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ public class CompetitorService : ICompetitorService
     private readonly ISailScoresContext _dbContext;
     private readonly IForwarderService _forwarderService;
     private readonly IMapper _mapper;
+
+    public string CompetitorSequenceName = "Competitor";
 
     public CompetitorService(
         ISailScoresContext dbContext,
@@ -86,20 +89,16 @@ public class CompetitorService : ICompetitorService
     }
 
 
-    public async Task<Competitor> GetCompetitorAsync(Guid clubId, string sailor)
+    public async Task<Competitor> GetCompetitorByUrlNameAsync(Guid clubId, string urlName)
     {
         var comps = await GetCompetitorsAsync(clubId, null, true);
 
         var comp = comps.Where(c => c.IsActive)
-            .FirstOrDefault(c =>
-                String.Equals(UrlUtility.GetUrlName(c.SailNumber), sailor, StringComparison.OrdinalIgnoreCase));
-        comp ??= comps.Where(c => c.IsActive)
-            .FirstOrDefault(c => String.Equals(c.SailNumber, sailor, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(c => c.UrlName == urlName);
         comp ??= comps.Where(c => !c.IsActive)
-            .FirstOrDefault(c =>
-                String.Equals(UrlUtility.GetUrlName(c.SailNumber), sailor, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(c => c.UrlName == urlName);
         comp ??= comps.FirstOrDefault(c =>
-            String.Equals(UrlUtility.GetUrlName(c.Name), sailor, StringComparison.OrdinalIgnoreCase));
+            String.Equals(UrlUtility.GetUrlName(c.SailNumber), urlName, StringComparison.OrdinalIgnoreCase));
 
         return comp;
     }
@@ -147,6 +146,8 @@ public class CompetitorService : ICompetitorService
             if (comp.Id == Guid.Empty)
             {
                 comp.Id = Guid.NewGuid();
+                comp.UrlId = await GetNextCompetitorSequence(comp.ClubId)
+                    .ConfigureAwait(false);
             }
 
             dbObject = _mapper.Map<Db.Competitor>(comp);
@@ -155,11 +156,6 @@ public class CompetitorService : ICompetitorService
         }
         else
         {
-            // We have the old and the new: do we need to forward old urls?
-            if (!DoIdentifiersMatch(comp, dbObject))
-            {
-                await _forwarderService.CreateCompetitorForwarder(comp, dbObject);
-            }
 
             dbObject.Name = comp.Name;
             dbObject.SailNumber = comp.SailNumber;
@@ -168,7 +164,15 @@ public class CompetitorService : ICompetitorService
             dbObject.Notes = comp.Notes;
             dbObject.IsActive = comp.IsActive;
             dbObject.HomeClubName = comp.HomeClubName;
+            if(dbObject.UrlId == null)
+            {
+                dbObject.UrlId = await GetNextCompetitorSequence(comp.ClubId)
+                   .ConfigureAwait(false);
+            }
         }
+
+        await SetForwardersAndUrlName(dbObject, comp)
+            .ConfigureAwait(false);
 
         AddFleetsToDbObject(comp, dbObject);
 
@@ -177,11 +181,59 @@ public class CompetitorService : ICompetitorService
 
     }
 
-    private static bool DoIdentifiersMatch(Competitor comp, Db.Competitor dbObject)
+    private async Task SetForwardersAndUrlName(Db.Competitor dbObject, Competitor comp)
     {
-        var compAId = String.IsNullOrEmpty(comp.SailNumber) ? comp.Name : comp.SailNumber;
-        var compBId = String.IsNullOrEmpty(dbObject.SailNumber) ? dbObject.Name : dbObject.SailNumber;
-        return compAId == compBId;
+        var proposedIdentifier = String.IsNullOrEmpty(UrlUtility.GetUrlName(comp.SailNumber)) ? comp.Name.Left(20) : comp.SailNumber;
+        proposedIdentifier = UrlUtility.GetUrlName(proposedIdentifier);
+
+        string newId = dbObject.UrlId;
+        if (!String.IsNullOrEmpty(proposedIdentifier))
+        {
+            var duplicateCount = await _dbContext.Competitors
+                .CountAsync(c => c.ClubId == comp.ClubId
+                    && c.UrlName == proposedIdentifier
+                    && c.Id != dbObject.Id)
+                .ConfigureAwait(false);
+            newId = duplicateCount == 0 ? proposedIdentifier : dbObject.UrlId;
+        }
+
+
+        // if urlName is changing, and not newly created, set a forwarder.
+        if(dbObject.UrlName != newId && !String.IsNullOrEmpty(dbObject.UrlName))
+        {
+            comp.UrlName = newId;
+            await _forwarderService.CreateCompetitorForwarder(comp, dbObject)
+                .ConfigureAwait(false);
+        }
+
+        dbObject.UrlName = newId;
+    }
+
+    /// <summary>
+    /// This method is not thread-safe. Could convert to a sql command /transaction for thread safety
+    /// </summary>
+    private async Task<string> GetNextCompetitorSequence(Guid clubId)
+    {
+        var sequence = await _dbContext.ClubSequences
+            .Where(cs => cs.ClubId.Equals(clubId)
+            && cs.SequenceType == CompetitorSequenceName)
+            .FirstOrDefaultAsync();
+        if(sequence == null)
+        {
+            sequence = new Db.ClubSequence
+            {
+                ClubId = clubId,
+                SequenceType = CompetitorSequenceName,
+                SequencePrefix = "id",
+                SequenceSuffix = "",
+                NextValue = 1
+            };
+            _dbContext.ClubSequences.Add(sequence);
+        }
+        var returnValue = $"{sequence.SequencePrefix}{sequence.NextValue}{sequence.SequenceSuffix}";
+        sequence.NextValue++;
+        await _dbContext.SaveChangesAsync();
+        return returnValue;
     }
 
 

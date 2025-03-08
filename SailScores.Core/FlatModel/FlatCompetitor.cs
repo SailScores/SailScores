@@ -11,7 +11,7 @@ namespace SailScores.Core.FlatModel
         public String BoatName { get; set; }
         public String HomeClubName { get; set; }
 
-        public String CurrentSailNumber { get; set; }
+        public String UrlName { get; set; }
 
     }
 }

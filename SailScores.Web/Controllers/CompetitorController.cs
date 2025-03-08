@@ -55,19 +55,19 @@ public class CompetitorController : Controller
 
     [AllowAnonymous]
     [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
-    // {clubInitials}/Competitor/{sailNumber}
-    public async Task<ActionResult> Details(string clubInitials, string sailNumber)
+    // {clubInitials}/Competitor/{urlName}
+    public async Task<ActionResult> Details(string clubInitials, string urlName)
     {
         var competitorStats = await _competitorService.GetCompetitorStatsAsync(
             clubInitials,
-            sailNumber);
+            urlName);
 
         if (competitorStats == null)
         {
-            var forward = await _forwarderService.GetCompetitorForwarding(clubInitials, sailNumber);
+            var forward = await _forwarderService.GetCompetitorForwarding(clubInitials, urlName);
             if (forward != null)
             {
-                return Redirect($"/{forward.NewClubInitials}/Competitor/{forward.NewSailNumber}");
+                return Redirect($"/{forward.NewClubInitials}/Competitor/{forward.NewUrlName}");
             }
             return NotFound();
         }
