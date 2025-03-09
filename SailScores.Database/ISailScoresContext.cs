@@ -38,6 +38,7 @@ namespace SailScores.Database
         DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
 
         DbSet<ClubRequest> ClubRequests { get; set; }
+        DbSet<ClubSequence> ClubSequences { get; set; }
 
         Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId);
 

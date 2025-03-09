@@ -10,7 +10,7 @@ namespace SailScores.Core.Services
     {
         Task<IList<Model.Competitor>> GetCompetitorsAsync(Guid clubId, Guid? fleetId, bool includeInactive);
         Task<Competitor> GetCompetitorAsync(Guid id);
-        Task<Competitor> GetCompetitorAsync(Guid clubId, string sailor);
+        Task<Competitor> GetCompetitorByUrlNameAsync(Guid clubId, string sailor);
         Task<Competitor> GetCompetitorBySailNumberAsync(Guid clubId, String sailNumber);
         Task SaveAsync(Competitor comp);
         Task SaveAsync(CompetitorDto comp);

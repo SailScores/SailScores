@@ -1,3 +1,4 @@
+using Microsoft.Identity.Client;
 using SailScores.Core.Utility;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,9 @@ namespace SailScores.Core.Model
         public Guid BoatClassId { get; set; }
         public BoatClass BoatClass { get; set; }
         public IList<Fleet> Fleets { get; set; }
+
+        public String UrlName { get; set; }
+        public String UrlId { get; set; }
 
         public int CompareTo(Competitor other)
         {

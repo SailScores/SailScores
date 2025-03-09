@@ -36,5 +36,6 @@ public class Club
     public Guid? DefaultScoringSystemId { get; set; }
     public IList<ScoringSystem> ScoringSystems { get; set; }
 
+    public IList<ClubSequence> ClubSequences { get; set; }
 
 }

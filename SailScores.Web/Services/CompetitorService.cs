@@ -41,12 +41,12 @@ public class CompetitorService : ICompetitorService
 
     public async Task<CompetitorStatsViewModel> GetCompetitorStatsAsync(
         string clubInitials,
-        string sailor)
+        string urlName)
     {
 
         var clubId = await _coreClubService.GetClubId(clubInitials);
         // sailor will usually be sailNumber but falls back to name if no number.
-                var comp = await _coreCompetitorService.GetCompetitorAsync(clubId, sailor);
+        var comp = await _coreCompetitorService.GetCompetitorByUrlNameAsync(clubId, urlName);
 
         if (comp == null)
         {
