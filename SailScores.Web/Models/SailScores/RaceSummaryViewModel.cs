@@ -38,6 +38,8 @@ public class RaceSummaryViewModel
 
     public DateTime? UpdatedDate { get; set; }
 
+    public bool ExcludeFromCompStats { get; set; }
+
     public String CalculatedName
     {
         get

@@ -414,5 +414,18 @@ namespace SailScores.Core.Services
                 .CountAsync(r => r.Date == raceDate)
                 .ConfigureAwait(false);
         }
+
+        public async Task<IList<Guid>> GetStatsExcludedRaces(Guid clubId, Guid seasonId)
+        {
+            return await _dbContext.
+                Series.Where(s =>
+                    s.ClubId == clubId
+                    && s.Season.Id == seasonId
+                    && (s.ExcludeFromCompetitorStats ?? false))
+                .SelectMany(s => s.RaceSeries)
+                .Select(sr => sr.RaceId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+        }
     }
 }

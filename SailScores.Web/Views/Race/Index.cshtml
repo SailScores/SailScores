@@ -14,6 +14,7 @@
     ViewBag.Title = $"{Model.Item.CurrentSeason?.Name} {Model.ClubInitials} {localizer["Races"]}";
     ViewData["MetaDescription"] = $"{Model.ClubName} {localizer["Races"]} list";
     Layout = "_ClubLayout";
+    bool hasExcluded = false;
 }
 
 @section Sidebar {
@@ -21,13 +22,13 @@
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
                 @foreach (var item in
-               Model.Item.Seasons)
+            Model.Item.Seasons)
                 {
                     <li class="nav-item">
                         <a asp-route="Race"
-                           asp-route-clubInitials="@Model.ClubInitials"
-                           asp-route-seasonName="@item.UrlName"
-                           class="nav-link active">@item.Name</a>
+                        asp-route-clubInitials="@Model.ClubInitials"
+                        asp-route-seasonName="@item.UrlName"
+                        class="nav-link active">@item.Name</a>
                     </li>
                 }
 
@@ -44,19 +45,19 @@
     @if (Model.CanEdit)
     {
 
-    <div class="row bg-almost">
-        <div class="col-sm-3 my-2">
-            <a asp-controller="Race"
-               asp-action="Create"
-               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-               class="btn btn-outline-primary">@localizer["New Race"]</a>
+        <div class="row bg-almost">
+            <div class="col-sm-3 my-2">
+                <a asp-controller="Race"
+                asp-action="Create"
+                asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                class="btn btn-outline-primary">@localizer["New Race"]</a>
+            </div>
+            <div class="col-sm-3 my-2">
+                <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
+                    Club Admin
+                </a>
+            </div>
         </div>
-        <div class="col-sm-3 my-2">
-            <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
-                Club Admin
-            </a>
-        </div>
-    </div>
         <br />
     }
 
@@ -72,34 +73,34 @@
                 @if (Model.CanEdit)
                 {
                     <a class="btn btn-sm btn-outline-danger"
-                       asp-action="Delete"
-                       asp-controller="Race"
-                       asp-route-id="@race.Id"
-                       title="Delete">
+                    asp-action="Delete"
+                    asp-controller="Race"
+                    asp-route-id="@race.Id"
+                    title="Delete">
                         <span class="fas fa-trash"></span>
                     </a> @:&nbsp;
                     <a class="btn btn-sm btn-outline-primary"
-                       asp-action="Edit"
-                       asp-controller="Race"
-                       asp-route-id="@race.Id"
-                       title="Edit">
+                    asp-action="Edit"
+                    asp-controller="Race"
+                    asp-route-id="@race.Id"
+                    title="Edit">
                         <span class="fas fa-pen"></span>
                     </a> @:&nbsp;
                 }
                 <span class="d-md-none">
                     <a id="smallracelink_@race.Id"
-                       asp-action="Details"
-                       asp-controller="Race"
-                       asp-route-id=@race.Id>
+                    asp-action="Details"
+                    asp-controller="Race"
+                    asp-route-id=@race.Id>
                         @race.FleetName:
                         R@(race.Order) @race.Date.ToShortString()
                     </a>
                 </span>
                 <span class="d-none d-md-inline">
                     <a id="racelink_@race.Id"
-                       asp-action="Details"
-                       asp-controller="Race"
-                       asp-route-id=@race.Id>
+                    asp-action="Details"
+                    asp-controller="Race"
+                    asp-route-id=@race.Id>
                         @race.CalculatedName
                     </a>
                 </span>
@@ -117,13 +118,24 @@
                 @localizer["boats"]
             </div>
             <div class="col-1 d-none d-md-inline">
-                @race.State
+                @if (race.ExcludeFromCompStats)
+                {
+                    @race.State@:&nbsp;<span class="text-warning">*</span>
+                    hasExcluded = true;
+                } else
+                {
+                    @race.State
+                }
             </div>
             <div class="col-12 col-md-10 d-none d-md-inline">
                 @Html.DisplayFor(modelItem => race.Name)
                 @Html.DisplayFor(modelItem => race.Description)
             </div>
         </div>
+    }
+    @if(hasExcluded)
+    {
+        <p class="text-warning">* Excluded from competitor stats.</p>
     }
     <br />
     <div class="row">
