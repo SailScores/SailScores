@@ -24,5 +24,6 @@ namespace SailScores.Core.Services
             Guid fleetId);
         Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId);
         Task<bool> HasRacesAsync(Guid clubId);
+        Task<IList<Guid>> GetStatsExcludedRaces(Guid id1, Guid id2);
     }
 }

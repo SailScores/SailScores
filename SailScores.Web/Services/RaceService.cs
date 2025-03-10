@@ -80,9 +80,15 @@ public class RaceService : IRaceService
 
         // need to get score codes so viewmodel can determine starting boat count.
         var scoreCodes = await _coreScoringService.GetScoreCodesAsync(club.Id);
+
+        var excludedRaces = await _coreRaceService.GetStatsExcludedRaces(club.Id, selectedSeason.Id);
         var racesVm = _mapper.Map<List<RaceSummaryViewModel>>(races);
         foreach (var race in racesVm)
         {
+            if (excludedRaces.Contains(race.Id))
+            {
+                race.ExcludeFromCompStats = true;
+            }
             foreach (var score in race.Scores)
             {
                 score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
