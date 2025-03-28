@@ -1,13 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
+using System.Text;
+using System.Web;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 using IClubService = SailScores.Core.Services.IClubService;
-using IForwarderService = SailScores.Core.Services.IForwarderService;
 using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService;
+using IForwarderService = SailScores.Core.Services.IForwarderService;
 
 namespace SailScores.Web.Controllers;
 
@@ -18,6 +22,7 @@ public class CompetitorController : Controller
     private readonly ICompetitorService _competitorService;
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authService;
+    private readonly ICsvService _csvService;
     private readonly IAdminTipService _adminTipService;
     private readonly IForwarderService _forwarderService;
 
@@ -26,6 +31,7 @@ public class CompetitorController : Controller
         ICompetitorService competitorService,
         IForwarderService forwarderService,
         IAuthorizationService authService,
+        ICsvService csvService,
         IAdminTipService adminTipService,
         IMapper mapper)
     {
@@ -33,6 +39,7 @@ public class CompetitorController : Controller
         _competitorService = competitorService;
         _forwarderService = forwarderService;
         _authService = authService;
+        _csvService = csvService;
         _adminTipService = adminTipService;
         _mapper = mapper;
     }
@@ -128,7 +135,6 @@ public class CompetitorController : Controller
     public async Task<ActionResult> Create(
         string clubInitials,
         CompetitorWithOptionsViewModel competitor,
-#pragma warning disable CA1054 // Uri parameters should not be strings
         string returnUrl = null)
 #pragma warning restore CA1054 // Uri parameters should not be strings
     {
@@ -188,7 +194,6 @@ public class CompetitorController : Controller
     // GET: Competitor/CreateMultiple
     public async Task<ActionResult> CreateMultiple(
         string clubInitials,
-#pragma warning disable CA1054 // Uri parameters should not be strings
         string returnUrl = null)
 #pragma warning restore CA1054 // Uri parameters should not be strings
     {
@@ -505,4 +510,72 @@ public class CompetitorController : Controller
 		};
 		return View(vm);
 	}
+
+    public async Task<ActionResult> ExportCsv(
+        string clubInitials,
+        string fleetId = default,
+        string regattaId = default)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        IDictionary<string, IEnumerable<Competitor>> competitors = null;
+        try
+        {
+            if (fleetId != default)
+            {
+                competitors = await _competitorService.GetCompetitorsForFleetAsync(clubId, new Guid(fleetId));
+            }
+            else if (regattaId != default)
+            {
+                competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId));
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            competitors = null;
+        }
+        if (competitors == null)
+        {
+            return new NotFoundResult();
+        }
+
+        var filename = competitors.Count != 1 ? "competitors.csv" : $"{competitors.First().Key}.csv";
+        var csv = _csvService.GetCsv(competitors);
+
+        return File(csv, "text/csv", filename);
+    }
+
+    public async Task<ActionResult> ExportHtml(
+        string clubInitials,
+        string fleetId = default,
+        string regattaId = default)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        IDictionary<string, IEnumerable<Competitor>> competitors = null;
+        try
+        {
+            if (fleetId != default)
+            {
+                competitors = await _competitorService.GetCompetitorsForFleetAsync(clubId, new Guid(fleetId));
+            }
+            else if (regattaId != default)
+            {
+                competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId));
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            competitors = null;
+        }
+        if (competitors == null)
+        {
+            return new NotFoundResult();
+        }
+
+        var filename = competitors.Count != 1 ? "competitors.html" : $"{competitors.First().Key}.html";
+        var disposition = $"attachment; filename=\"{filename}\"; filename*=UTF-8''{filename}";
+        Response.Headers.Append("content-disposition", disposition);
+
+        return View(competitors);
+    }
+
 }

@@ -6,6 +6,7 @@ using SailScores.Core.Utility;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Db = SailScores.Database.Entities;
@@ -429,4 +430,42 @@ public class CompetitorService : ICompetitorService
         return returnValue;
     }
 
+    public async Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId)
+    {
+        var fleetName = await _dbContext.Fleets
+            .Where(f => f.Id == fleetId)
+            .Select(f => f.Name)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
+        var comps = await GetCompetitorsAsync(clubId, fleetId, true);
+
+        return new Dictionary<string, IEnumerable<Competitor>>
+        {
+            { fleetName, comps }
+        };
+    }
+
+    public async Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId)
+    {
+        var dbComps = await _dbContext.Regattas
+        .Where(r => r.Id == regattaId)
+        .SelectMany(r => r.RegattaFleet)
+        .Include(rf => rf.Fleet)
+        .ThenInclude(f => f.CompetitorFleets)
+        .ThenInclude(cf => cf.Competitor)
+        .ThenInclude(c => c.BoatClass)
+        .Select(rf => rf.Fleet)
+        .ToDictionaryAsync(
+            f => f.NickName ?? f.ShortName ?? f.Name,
+            f => f.CompetitorFleets?.Select(cf => cf.Competitor));
+
+        var modelList = _mapper.Map<Dictionary<String, IEnumerable<Model.Competitor>>>(dbComps);
+        foreach(var key in modelList.Keys)
+        {
+            var list = modelList[key].ToList();
+            list.Sort();
+            modelList[key] = list;
+        }
+        return modelList;
+    }
 }

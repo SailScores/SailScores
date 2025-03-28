@@ -21,5 +21,7 @@ namespace SailScores.Core.Services
 #pragma warning restore CA1054 // Uri parameters should not be strings
         Task<IList<Database.Entities.DeletableInfo>> GetDeletableInfo(Guid clubId);
         Task<Dictionary<Guid, DateTime?>> GetLastActiveDates(Guid clubId);
+        Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId);
+        Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId);
     }
 }

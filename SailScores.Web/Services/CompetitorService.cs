@@ -1,6 +1,5 @@
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
-using SailScores.Core.Services;
 using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService;
 
 namespace SailScores.Web.Services;
@@ -9,15 +8,18 @@ public class CompetitorService : ICompetitorService
 {
     private readonly Core.Services.IClubService _coreClubService;
     private readonly Core.Services.ICompetitorService _coreCompetitorService;
+    private readonly Core.Services.IFleetService _coreFleetService;
     private readonly IMapper _mapper;
 
     public CompetitorService(
         Core.Services.IClubService clubService,
         Core.Services.ICompetitorService competitorService,
+        Core.Services.IFleetService fleetService,
         IMapper mapper)
     {
         _coreClubService = clubService;
         _coreCompetitorService = competitorService;
+        _coreFleetService = fleetService;
         _mapper = mapper;
     }
 
@@ -239,5 +241,19 @@ public class CompetitorService : ICompetitorService
                 await _coreCompetitorService.SaveAsync(fullCompetitor);
             }
         }
+    }
+
+    public async Task<IDictionary<string, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId)
+    {
+        var comps = await _coreCompetitorService.GetCompetitorsForFleetAsync(clubId, fleetId);
+
+        return comps;
+    }
+
+    public async Task<IDictionary<string, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId)
+    {
+        var comps = await _coreCompetitorService.GetCompetitorsForRegattaAsync(clubId, regattaId);
+
+        return comps;
     }
 }
