@@ -29,4 +29,6 @@ public interface ICompetitorService
         bool includeInactive);
     Task ClearAltNumbers(Guid clubId);
     Task InactivateSince(Guid clubId, DateTime sinceDate);
+    Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId);
+    Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId);
 }

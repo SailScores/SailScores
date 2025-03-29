@@ -132,6 +132,80 @@ public class CsvService : ICsvService, IDisposable
         return sb.ToString();
     }
 
+
+    public Stream GetCsv(IDictionary<string, IEnumerable<Competitor>> competitors)
+    {
+        if (stream != null)
+        {
+            stream.Dispose();
+        }
+        stream = new MemoryStream();
+        if (streamWriter != null)
+        {
+            streamWriter.Dispose();
+        }
+        streamWriter = new StreamWriter(stream, System.Text.Encoding.UTF8);
+
+        streamWriter.WriteLine(GetCompetitorHeaders());
+
+        foreach (var fleet in competitors)
+        {
+            foreach (var comp in fleet.Value)
+            {
+                streamWriter.WriteLine(GetScratchSheetInfo(fleet.Key, comp));
+            }
+        }
+
+        streamWriter.Flush();
+        stream.Position = 0;
+
+        return stream;
+    }
+
+
+
+    private string GetCompetitorHeaders()
+    {
+        var sb = new StringBuilder();
+        sb.Append(GetEscapedLocalizedValue("Fleet"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Sail"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Alt Sail"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Sailor(s)"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Boat"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Club"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Class"));
+
+        return sb.ToString();
+    }
+
+    private string GetScratchSheetInfo(String group, Competitor comp)
+    {
+        var sb = new StringBuilder();
+        sb.Append(GetEscapedValue(group));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.SailNumber));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.AlternativeSailNumber));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.Name));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.BoatName));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.HomeClubName));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.BoatClass?.Name));
+
+        return sb.ToString();
+    }
+
+
+
     private string GetEscapedLocalizedValue(string s)
     {
         return GetEscapedValue(_localizer[s]);

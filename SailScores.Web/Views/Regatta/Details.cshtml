@@ -67,13 +67,6 @@
             <hr class="d-md-none" />
             <div class="row bg-almost">
                 <div class="col-sm-4 my-2">
-                    <a asp-controller="Document"
-                       asp-action="Create"
-                       asp-route-regattaId="@Model.Item.Id"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">@localizer["Upload Document"]</a>
-                </div>
-                <div class="col-sm-4 my-2">
                     <a asp-controller="Fleet"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
@@ -87,6 +80,13 @@
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Announcement"
+                       asp-action="Create"
+                       asp-route-regattaId="@Model.Item.Id"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                       class="btn btn-outline-primary">@localizer["New Notice"]</a>
+                </div>
             </div>
             <div class="row bg-almost">
                 <div class="col-sm-4 my-2">
@@ -97,16 +97,41 @@
                        class="btn btn-outline-primary">@localizer["Edit Regatta"]</a>
                 </div>
                 <div class="col-sm-4 my-2">
-                    <a asp-controller="Announcement"
-                       asp-action="Create"
-                       asp-route-regattaId="@Model.Item.Id"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">@localizer["New Notice"]</a>
-                </div>
-                <div class="col-sm-4 my-2">
                     <a asp-controller="Admin"
                        asp-action="Index"
                        class="btn btn-outline-primary">@localizer["Club Admin"]</a>
+                </div>
+                <div class="col-sm-4 my-2">
+                    <a asp-controller="Document"
+                       asp-action="Create"
+                       asp-route-regattaId="@Model.Item.Id"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                       class="btn btn-outline-primary">@localizer["Upload Document"]</a>
+                </div>
+            </div>
+            <div class="row bg-almost">
+                <div class="col-sm-4 my-2">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Export Scratch Sheet
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item"
+                                asp-action="ExportCsv"
+                                asp-controller="Competitor"
+                                asp-route-regattaId="@Model.Item.Id"
+                                title="Export as CSV">
+                                CSV (Excel)
+                            </a>                        
+                            <a class="dropdown-item"
+                                asp-action="ExportHtml"
+                                asp-controller="Competitor"
+                                asp-route-regattaId="@Model.Item.Id"
+                                title="Export as HTML">
+                                HTML
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         }

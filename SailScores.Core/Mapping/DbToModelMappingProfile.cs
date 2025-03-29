@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Db = SailScores.Database.Entities;
 
@@ -19,6 +21,10 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.Fleets, o => o.MapFrom(s => s.CompetitorFleets.Select(f => f.Fleet)))
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive ?? true))
                 .ReverseMap();
+
+            CreateMap<KeyValuePair<String, Db.Competitor>, KeyValuePair<string, Model.Competitor>>();
+
+
 
             CreateMap<Db.BoatClass, Model.BoatClass>()
                 .ForMember(d => d.Club, o => o.Ignore())

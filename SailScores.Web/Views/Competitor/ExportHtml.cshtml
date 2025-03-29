@@ -1,0 +1,71 @@
+﻿@using SailScores.Api.Enumerations
+@using SailScores.Core.Model
+@using Microsoft.Extensions.Localization
+@using SailScores.Web.Extensions
+@using SailScores.Web.Resources
+
+@inject IStringLocalizer<SharedResource> localizer
+
+@model IDictionary<string, IEnumerable<Competitor>>
+
+@{
+    ViewBag.Title = 
+        (Model.Count == 1 ? 
+        Model.First().Key + " " : "") + "Competitor List - SailScores";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>@ViewBag.Title</title>
+    @await Html.EmbedCss($"css{System.IO.Path.DirectorySeparatorChar}site.min.css")
+    @*<inline-style href="css/site.min.css" />*@
+    <meta name="robots" content="noindex">
+</head>
+<body>
+    <div class="body-content">
+        <main class="col-12 col-lg-9 py-md-3 pl-md-5 bd-content" role="main">
+            <div class="row">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">@localizer["Sail Number"]</th>
+                            <th scope="col">@localizer["Alt Sail Number"]</th>
+                            <th scope="col">@localizer["Name"]</th>
+                            <th scope="col">@localizer["Boat"]</th>
+                            <th scope="col">@localizer["Club"]</th>
+                            <th scope="col">@localizer["Class"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var boatGroup in Model)
+                        {
+                            <tr>
+                                <th colspan="6" class="text-center">@boatGroup.Key</th>
+                            </tr>
+
+                            @foreach (var comp in boatGroup.Value)
+                            {
+                                <tr>
+                                    <td>@comp.SailNumber</td>
+                                    <td>@comp.AlternativeSailNumber</td>
+                                    <td>@comp.Name</td>
+                                    <td>@comp.BoatName</td>
+                                    <td>@comp.HomeClubName</td>
+                                    <td>@comp.BoatClass?.Name</td>
+                            </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+        </main>
+    </div>
+</body>
+</html>
+
+
