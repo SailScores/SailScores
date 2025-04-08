@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Immutable;
+using SailScores.Core.Utility;
 
 namespace SailScores.Core.Services
 {
@@ -157,6 +158,7 @@ namespace SailScores.Core.Services
                 await _dbObjectBuilder.BuildDbRegattaAsync(regatta)
                 .ConfigureAwait(false);
             dbRegatta.UrlName = UrlUtility.GetUrlName(dbRegatta.Name);
+            dbRegatta.Url = UrlUtility.EnsureHttpPrefix(dbRegatta.Url);
             dbRegatta.UpdatedDate = DateTime.UtcNow;
             if (dbRegatta.Season == null
                 && regatta.Season.Id != Guid.Empty

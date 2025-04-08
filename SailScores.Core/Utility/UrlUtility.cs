@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SailScores.Core.Services
+namespace SailScores.Core.Utility
 {
     public static class UrlUtility
     {
-
         public static string GetUrlName(string rawName)
         {
-            if (String.IsNullOrWhiteSpace(rawName))
+            if (string.IsNullOrWhiteSpace(rawName))
             {
                 return null;
             }
@@ -44,5 +43,21 @@ namespace SailScores.Core.Services
             return result;
         }
 
+        public static string EnsureHttpPrefix(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return null;
+            }
+
+            // Check if the URL already starts with http:// or https://
+            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                return "http://" + url;
+            }
+
+            return url;
+        }
     }
 }

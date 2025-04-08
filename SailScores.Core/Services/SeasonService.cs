@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
+using SailScores.Core.Utility;
 
 namespace SailScores.Core.Services
 {

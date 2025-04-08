@@ -9,6 +9,7 @@ using SailScores.Database.Entities;
 using Competitor = SailScores.Core.Model.Competitor;
 using System.ComponentModel.Design;
 using System.Linq;
+using SailScores.Core.Utility;
 
 namespace SailScores.Core.Services;
 
