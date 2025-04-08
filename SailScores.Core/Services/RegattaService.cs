@@ -392,17 +392,5 @@ namespace SailScores.Core.Services
             return _mapper.Map<Regatta>(r);
         }
 
-        public async Task<int> GetMaxFleetRaceNumberAsync(Guid regattaId, Guid fleetId)
-        {
-            var max = _dbContext.Regattas.Where(r => r.Id == regattaId)
-                .SelectMany(r => r.RegattaSeries)
-                .Select(rs => rs.Series)
-                .SelectMany(s => s.RaceSeries)
-                .Select(rs => rs.Race)
-                .Where(r => r.Fleet.Id == fleetId)
-                .Max(r => (int?)r.Order) ?? 0;
-
-            return max;
-        }
     }
 }

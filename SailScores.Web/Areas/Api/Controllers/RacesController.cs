@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
+using SailScores.Web.Models.SailScores;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Areas.Api.Controllers
@@ -50,5 +51,27 @@ namespace SailScores.Web.Areas.Api.Controllers
             return Ok(await _service.SaveAsync(race));
         }
 
+
+        [AllowAnonymous]
+        [HttpGet("racenumber")]
+        public async Task<RaceNumberViewModel> GetRaceNumber(
+            Guid clubId,
+            Guid fleetId,
+            DateTime raceDate,
+            Guid? regattaId = null)
+        {
+            int raceNumber = await _service.GetNewRaceNumberAsync(
+                clubId,
+                fleetId,
+                raceDate,
+                regattaId);
+
+            return new RaceNumberViewModel
+            {
+                Order = raceNumber,
+                Date = raceDate,
+                Fleet = fleetId
+            };
+        }
     }
 }
