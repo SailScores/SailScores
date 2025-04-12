@@ -45,9 +45,13 @@ namespace SailScores.Core.Utility
 
         public static string EnsureHttpPrefix(string url)
         {
-            if (string.IsNullOrWhiteSpace(url))
+            if (url == null)
             {
                 return null;
+            }
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return String.Empty;
             }
 
             // Check if the URL already starts with http:// or https://
