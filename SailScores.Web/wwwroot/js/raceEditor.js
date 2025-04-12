@@ -41,12 +41,14 @@ export function initialize() {
         $('#submitButton').attr('disabled', 'disabled');
         addScoresFieldsToForm(form);
     });
-    loadFleet();
-    loadSeriesOptions();
-    calculatePlaces();
     $("#submitButton").prop("disabled", false);
     $("#submitDisabledMessage").prop("hidden", true);
     RequestAuthorizationToken(null);
+    window.onload = function () {
+        loadFleet();
+        loadSeriesOptions();
+        calculatePlaces();
+    };
 }
 export function loadSeriesOptions() {
     let clubId = $("#clubId").val();
@@ -70,14 +72,16 @@ export function loadFleet() {
     }
     $("#createCompFleetId").val(fleetId);
     getCompetitors(clubId, fleetId);
+    displayRaceNumber();
 }
 export function dateChanged() {
-    console.log("dateChanged");
+    //console.log("dateChanged");
     loadSeriesOptions();
     if ($("#defaultWeather").val() === "true") {
         console.log("defaultWeather was true");
         clearWeatherFields();
     }
+    displayRaceNumber();
 }
 export function weatherChanged() {
     $("#defaultWeather").val("false");
@@ -323,6 +327,27 @@ function getCompetitors(clubId, fleetId) {
             allCompetitors = data;
             initializeAutoComplete();
             initializeButtonFooter();
+        });
+    }
+}
+function displayRaceNumber() {
+    let clubId = $("#clubId").val();
+    let fleetId = $("#fleetId").val();
+    let regattaId = $("#regattaId").val();
+    let raceDate = $("#date").val();
+    if ($ && clubId && fleetId && raceDate) {
+        $.getJSON("/api/Races/RaceNumber", {
+            clubId: clubId,
+            fleetId: fleetId,
+            raceDate: raceDate,
+            regattaId: regattaId
+        }, function (data) {
+            if (data && data.order) {
+                document.getElementById('raceNumber').textContent = data.order.toString();
+            }
+            else {
+                document.getElementById('raceNumber').textContent = "";
+            }
         });
     }
 }

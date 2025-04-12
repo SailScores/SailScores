@@ -427,5 +427,27 @@ namespace SailScores.Core.Services
                 .ToListAsync()
                 .ConfigureAwait(false);
         }
+
+        public async Task<int> GetNewRaceNumberAsync(Guid clubId, Guid fleetId, DateTime? date, Guid? regattaId)
+        {
+            if (regattaId.HasValue)
+            {
+                 int maxOrder = _dbContext.Regattas.Where(r => r.Id == regattaId)
+                    .SelectMany(r => r.RegattaSeries)
+                    .Select(rs => rs.Series)
+                    .SelectMany(s => s.RaceSeries)
+                    .Select(rs => rs.Race)
+                    .Where(r => r.Fleet.Id == fleetId)
+                    .Max(r => (int?)r.Order) ?? 0;
+
+                return maxOrder + 1;
+            }
+            int existingRaceCount = await GetRaceCountAsync(
+                clubId,
+                date,
+                fleetId);
+
+            return existingRaceCount + 1;
+        }
     }
 }

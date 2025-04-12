@@ -8,6 +8,7 @@ using System.Linq;
 using Model = SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
 using SailScores.Core.Model;
+using SailScores.Core.Model.Summary;
 
 namespace SailScores.Web.Mapping
 {
@@ -22,6 +23,8 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.ImportantSeries, o => o.Ignore())
                 .ForMember(d => d.UpcomingRaces, o => o.Ignore())
                 .ForMember(d => d.CurrentRegattas, o => o.Ignore());
+
+            CreateMap<ClubSummary, ClubSummaryViewModel>();
 
             CreateMap<Model.Club, AdminViewModel>()
                 .ForMember(d => d.ScoringSystemOptions, o => o.Ignore())

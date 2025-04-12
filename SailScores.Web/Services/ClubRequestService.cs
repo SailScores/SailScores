@@ -164,6 +164,9 @@ public class ClubRequestService : IClubRequestService
             };
 
             var initialsToUse = request.ClubInitials + (test ? "TEST" : "");
+
+            var url = request.ClubWebsite;
+            url = Core.Utility.UrlUtility.EnsureHttpPrefix(url);
             var club = new Core.Model.Club
             {
                 Id = Guid.Empty,

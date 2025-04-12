@@ -66,42 +66,47 @@
             <br class="d-md-none" />
             <hr class="d-md-none" />
             <div class="row bg-almost">
-                <div class="col-sm-4 my-2">
+                <div class="col-12">
+                    <p class="lead">
+                        Create Fleets and Races from this page to associate them with this regatta.
+                    </p>
+                </div>
+            </div>
+            <div class="row bg-almost">
+                <div class="col-6 col-sm-4 my-2">
                     <a asp-controller="Fleet"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Fleet"]</a>
                 </div>
-                <div class="col-sm-4 my-2">
+                <div class="col-6 col-sm-4 my-2">
                     <a asp-controller="Race"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
-                <div class="col-sm-4 my-2">
+                <div class="col-6 col-sm-4 my-2">
                     <a asp-controller="Announcement"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Notice"]</a>
                 </div>
-            </div>
-            <div class="row bg-almost">
-                <div class="col-sm-4 my-2">
+                <div class="col-6 col-sm-4 my-2">
                     <a asp-controller="Regatta"
                        asp-action="Edit"
                        asp-route-Id="@Model.Item.Id"
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["Edit Regatta"]</a>
                 </div>
-                <div class="col-sm-4 my-2">
+                <div class="col-6 col-sm-4 my-2">
                     <a asp-controller="Admin"
                        asp-action="Index"
                        class="btn btn-outline-primary">@localizer["Club Admin"]</a>
                 </div>
-                <div class="col-sm-4 my-2">
+                <div class="col-6 col-sm-4 my-2">
                     <a asp-controller="Document"
                        asp-action="Create"
                        asp-route-regattaId="@Model.Item.Id"
