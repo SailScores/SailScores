@@ -120,8 +120,8 @@
                     @foreach (var item in Model.RecentRaces.GroupBy(s => s.FleetName ?? String.Empty, r => r))
                     {
                         <li style="text-wrap: pretty;">
-                            @item.Key
-                            <ul>
+                            <strong>@item.Key</strong>
+                            <ul class="list-unstyled">
                                 @foreach (var race in item)
                                 {
                                     <li style="text-wrap: pretty;">
