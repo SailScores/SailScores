@@ -394,5 +394,14 @@ namespace SailScores.Core.Services
             return _mapper.Map<Regatta>(r);
         }
 
+        public async Task<Regatta> GetRegattaForFleet(Guid fleetId)
+        {
+            var regatta = await _dbContext.Regattas
+                .Include(r => r.Season)
+                .Where(r => r.RegattaFleet.Any(rf => rf.FleetId == fleetId))
+                .FirstOrDefaultAsync();
+
+            return _mapper.Map<Regatta>(regatta);
+        }
     }
 }

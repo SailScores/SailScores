@@ -150,4 +150,9 @@ public class RegattaService : IRegattaService
         return vm;
 
     }
+
+    public async Task<Regatta> GetRegattaForFleet(Guid fleetId)
+    {
+        return await _coreRegattaService.GetRegattaForFleet(fleetId);
+    }
 }

@@ -32,7 +32,7 @@
     @foreach (var item in Model)
     {
         <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
-            <div class="col-sm-8 col-md-4">
+            <div class="col-12 col-sm-8 col-md-6">
                 <a class="btn btn-sm btn-outline-danger"
                     asp-action="Delete"
                     asp-controller="Regatta"
@@ -49,10 +49,10 @@
                 </a> &nbsp;
                 @Html.DisplayFor(modelItem => item.Name)
             </div>
-            <div class="col-6 col-sm-4 col-md-3">
+            <div class="col-6 col-sm-4 col-md-2">
                 @item.Series.Sum(s => s.Races.Count()) Races
             </div>
-            <div class="col-6 col-sm-6col-md-3">
+            <div class="col-6 col-sm-6 col-md-4">
                 <span class="d-none d-md-inline">@item.StartDate?.ToString("D")</span>
                 <span class="d-md-none">@item.StartDate?.ToString("d")</span>
             </div>

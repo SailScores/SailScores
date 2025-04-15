@@ -15,4 +15,5 @@ public interface IRegattaService
     Task<IEnumerable<RegattaSummaryViewModel>> GetCurrentRegattas();
     Task AddFleetToRegattaAsync(Guid fleetId, Guid regattaId);
     Task<RegattaWithOptionsViewModel> GetBlankRegattaWithOptions(Guid clubId);
+    Task<Regatta> GetRegattaForFleet(Guid fleetId);
 }
