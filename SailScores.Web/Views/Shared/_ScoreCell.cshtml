@@ -1,17 +1,51 @@
 @using Humanizer
 
 @model SailScores.Web.Models.SailScores.ScoreCellViewModel
+@{
+    var classSb = new System.Text.StringBuilder();
+    string cellFinishClasses = "";
+    var place = Model.Result?.Place;
+    var scoreValue = Model.Result?.ScoreValue;
+    var hasCode = !String.IsNullOrEmpty(Model.Result?.Code);
+    var isTie = Model.Result?.Code == "TIE";
+    if ((place == 1 || scoreValue == 1m) && !hasCode && (scoreValue == 1m || scoreValue == 1.5m || scoreValue == 2.0m || Model.IsPercentSystem))
+    {
+        classSb.Append("finish-first ");
+    }
+    else if ((place == 2 || place == 3) && isTie && (scoreValue == 1.5m || scoreValue == 2.0m))
+    {
+        classSb.Append("finish-first ");
+    }
+    else if ((place == 2 || scoreValue == 2m) && !hasCode && (scoreValue == 2m || scoreValue == 2.5m || scoreValue == 3.0m || Model.IsPercentSystem))
+    {
+        classSb.Append("finish-second ");
+    }
+    else if ((place == 3 || place == 4) && isTie && (scoreValue == 2.5m || scoreValue == 3.0m))
+    {
+        classSb.Append("finish-second ");
+    }
+    else if ((place == 3 || scoreValue == 3m) && !hasCode && (scoreValue == 3m || scoreValue == 3.5m || scoreValue == 4.0m || Model.IsPercentSystem))
+    {
+        classSb.Append("finish-third ");
+    }
+    else if ((place == 4 || place == 5) && isTie && (scoreValue == 3.5m || scoreValue == 4.0m))
+    {
+        classSb.Append("finish-third ");
+    }
+
+    if ((Model.Result != null && Model.Result.Discard)
+       || (Model.IsPercentSystem && Model.Result != null && Model.Result.Code == "DNC"))
+    {
+        classSb.Append("text-muted ");
+    }
+
+    cellFinishClasses = classSb.ToString();
+}
+
 
 @if (Model != null && Model.Result != null )
 {
-    <td class="text-center
-        @(Model.Result.Place == 1 && !Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) ? "finish-first ": "")
-        @(Model.Result.ScoreValue == 2 && !Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) ? "finish-second " : "")
-        @(Model.Result.ScoreValue == 3 && !Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) ? "finish-third " : "")
-        @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 1 ? "finish-first" : "")
-        @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 2 ? "finish-second " : "")
-        @(Model.IsPercentSystem && String.IsNullOrEmpty(Model.Result.Code) && Model.Result.Place == 3 ? "finish-third " : "")
-    ">
+    <td class="text-center @cellFinishClasses ">
         <span class="@(Model.Result.Discard ? "text-muted" : "")">
             @* hide all cell contents if DNC, discarded, and series setting. *@
             @if (!(Model.HideDncDiscards && Model.Result.Code == "DNC" &&

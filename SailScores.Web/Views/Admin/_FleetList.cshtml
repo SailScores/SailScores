@@ -29,7 +29,7 @@
     @foreach (var item in Model.OrderBy(f => f.Name))
     {
         <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
-            <div class="col-12 col-sm-6 col-md-4">
+            <div class="col-12 col-sm-6 col-md-6">
 
                 @if(!item.IsDeletable)
 				{
@@ -61,6 +61,7 @@
             </div>
             <div class="col-12 col-sm-6 col-md-3">
                 @Html.DisplayFor(modelItem => item.Description)
+                <em class="text-info">@(item.IsRegattaFleet ? "Regatta fleet" : "")</em>
                 <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
             </div>
         </div>

@@ -56,8 +56,6 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.CompetitorOptions, o => o.Ignore())
                 .ForMember(d => d.CompetitorIds, o => o.MapFrom(s =>
                     s.Competitors.Select(c => c.Id)))
-                .ForMember(d => d.Regatta, o => o.Ignore())
-                .ForMember(d => d.RegattaId, o => o.Ignore())
                 .ForMember(d => d.CompetitorBoatClassOptions, o => o.Ignore())
                 .ForMember(d => d.SuggestedFullName, o => o.Ignore())
                 .ReverseMap();

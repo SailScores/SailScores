@@ -142,7 +142,7 @@
                 {
                     colCount = 0;
                     var compScore = Model.Results.GetScore(comp);
-                <tr>
+                    <tr>
                         <th scope="row">@compScore?.Rank</th>
                     @if (Model.ShowTrend && !Model.ShowTrendOnAllDevices)
                     {
@@ -275,7 +275,7 @@
                         }
                         else
                         {
-                                var result = Model.Results.GetScore(comp, race);
+                            var result = Model.Results.GetScore(comp, race);
 
                             @await Html.PartialAsync("_ScoreCell", new ScoreCellViewModel
                                {
@@ -287,11 +287,11 @@
                         }
                         prevRaceDate = race.Date;
                     }
-                        @if ((Model.Results.NumberOfSailedRaces) > 4)
+                    @if ((Model.Results.NumberOfSailedRaces) > 4)
                     {
-                            <th class="d-table-cell @(( Model.Results.NumberOfSailedRaces < 25)?"d-md-none":"")"
-                            scope="row">@comp.Name</th>
-                        }
+                        <th class="d-table-cell @(( Model.Results.NumberOfSailedRaces < 25)?"d-md-none":"")"
+                        scope="row">@comp.Name</th>
+                    }
                     @{
                         firstRow = false;
                     }

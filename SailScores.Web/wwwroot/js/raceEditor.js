@@ -331,6 +331,10 @@ function getCompetitors(clubId, fleetId) {
     }
 }
 function displayRaceNumber() {
+    let raceNumElement = document.getElementById('raceNumber');
+    if (raceNumElement == null) {
+        return;
+    }
     let clubId = $("#clubId").val();
     let fleetId = $("#fleetId").val();
     let regattaId = $("#regattaId").val();
@@ -343,10 +347,10 @@ function displayRaceNumber() {
             regattaId: regattaId
         }, function (data) {
             if (data && data.order) {
-                document.getElementById('raceNumber').textContent = data.order.toString();
+                raceNumElement.textContent = data.order.toString();
             }
             else {
-                document.getElementById('raceNumber').textContent = "";
+                raceNumElement.textContent = "";
             }
         });
     }

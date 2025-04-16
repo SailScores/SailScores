@@ -132,8 +132,8 @@ namespace SailScores.Core.Services
                 .AsSplitQuery()
                 .SingleAsync(c => c.Id == fleetId)
                 .ConfigureAwait(false);
-            return _mapper.Map<Fleet>(dbFleet);
 
+            return _mapper.Map<Fleet>(dbFleet);
         }
 
         public async Task<IEnumerable<Fleet>> GetAllFleetsForClub(Guid clubId)
@@ -223,6 +223,25 @@ namespace SailScores.Core.Services
                     Id = f.Id,
                     IsDeletable = !usedFleets.Contains(f.Id)   
                 });
+        }
+
+        public async Task<IDictionary<Guid, IEnumerable<Guid>>> GetClubRegattaFleets(Guid clubId)
+        {
+            // build a dictionary of fleet Ids to regatta Ids
+            // where the fleet is in the regatta
+            // and the regatta is in the club
+
+            var regattaFleets = _dbContext.Regattas
+                .Where(r => r.ClubId == clubId)
+                .SelectMany(r => r.RegattaFleet);
+            return await regattaFleets
+                .GroupBy(r => r.FleetId)
+                .Select(g => new
+                {
+                    FleetId = g.Key,
+                    RegattaIds = g.Select(r => r.RegattaId)
+                })
+                .ToDictionaryAsync(g => g.FleetId, g => g.RegattaIds);
         }
     }
 }

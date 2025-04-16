@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Localization;
 using Newtonsoft.Json.Linq;
 using SailScores.Core.Model;
+using SailScores.Database.Migrations;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Resources;
 using SailScores.Web.Services.Interfaces;
@@ -98,12 +99,14 @@ public class AdminService : IAdminService
         }
 
         var fleetDeleteInfo = await _coreFleetService.GetDeletableInfo(club.Id);
+        var fleetRegattaInfo = await _coreFleetService.GetClubRegattaFleets(club.Id);
         foreach (var fleet in vm.Fleets)
         {
             var delInfo = fleetDeleteInfo.FirstOrDefault(fdi => fdi.Id == fleet.Id);
             fleet.IsDeletable = delInfo.IsDeletable;
             fleet.PreventDeleteReason = delInfo.IsDeletable ?
                 String.Empty : "Fleet has races assigned.";
+            fleet.IsRegattaFleet = fleetRegattaInfo.Any(f => f.Key == fleet.Id);
         }
 
         var seasonDeleteInfo = await _coreSeasonService.GetDeletableInfo(club.Id);

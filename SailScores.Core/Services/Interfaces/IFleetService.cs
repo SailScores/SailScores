@@ -14,5 +14,6 @@ namespace SailScores.Core.Services
         Task<IEnumerable<Fleet>> GetAllFleetsForClub(Guid clubId);
         Task<IEnumerable<Series>> GetSeriesForFleet(Guid fleetId);
         Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId);
+        Task<IDictionary<Guid, IEnumerable<Guid>>> GetClubRegattaFleets(Guid clubId);
     }
 }

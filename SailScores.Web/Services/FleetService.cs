@@ -50,6 +50,11 @@ public class FleetService : IFleetService
     public async Task<Fleet> GetFleet(Guid fleetId)
     {
         var coreObject = await _coreFleetService.Get(fleetId);
+        var regatta = await _regattaService.GetRegattaForFleet(fleetId);
+
+        coreObject.Regatta = regatta;
+        coreObject.RegattaId = regatta?.Id;
+
         return coreObject;
     }
 

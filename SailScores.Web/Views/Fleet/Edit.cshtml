@@ -5,8 +5,15 @@
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Edit</h2>
-<h4>Fleet</h4>
+<h4>Edit Fleet
+@if(Model.Regatta != null)
+    {
+        <small>for regatta: <span class="text-info">@Model.Regatta.Season.Name @Model.Regatta.Name</span></small>
+    } else if(Model.RegattaId != null)
+    {
+        <small class="="text-muted">(a regatta fleet)</small>
+    }
+</h4>
 <hr />
 <div class="row">
     <div class="col-lg-6 col-md-8">
