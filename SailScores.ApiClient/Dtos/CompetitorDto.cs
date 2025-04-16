@@ -27,6 +27,8 @@ namespace SailScores.Api.Dtos
 
         public IList<Guid> FleetIds { get; set; }
 
+        public DateTime? Created { get; set; }
+
         public override string ToString()
         {
             return BoatName + " : " + Name + " : " + SailNumber + " : " + Id;

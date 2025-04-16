@@ -35,6 +35,8 @@ public class Competitor
     [StringLength(20)]
     public String UrlId { get; set; }
 
+    public DateTime? Created { get; set; }
+
     public override string ToString()
     {
         return BoatName + " : " + Name + " : " + SailNumber + " : " + Id;

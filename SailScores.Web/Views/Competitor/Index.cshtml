@@ -89,7 +89,7 @@
 	  <div class="row border-bottom mb-1 pb-1 comp-row @(item.IsActive ? "" : "comp-inactive") " data-name="@item.Name" data-sail="@item.SailNumber">
 				@if (Model.CanEdit)
 				{
-		   <div class="col col-2 pr-1">
+		   <div class="col col-2 col-sm-1 pr-1">
 				@if(!item.IsDeletable)
 				{
 					<button class="btn btn-sm btn-outline-danger mr-2 mb-2 disabled"
@@ -115,21 +115,27 @@
 			</a>
 		   </div>
 				}
-	   <div class="col col-10">
+	   <div class="col col-10 col-sm-11">
 		<div class="row">
-		 <div class="col col-6 col-sm-4 col-lg-3">
+		 <div class="col col-4 col-sm-4 col-lg-2">
 		  <a asp-route="Competitor"
 						   asp-route-clubInitials="@Model.ClubInitials"
 						   asp-route-sailNumber="@UrlUtility.GetUrlName(item.SailNumber)">
 		   <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
 		  </a>
 		 </div>
-		 <div class="col col-6 col-sm-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
-		 <div class="col col-6 col-sm-4 col-lg-3 small order-sm-12">
+		 <div class="col col-8 col-sm-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
+		 <div class="col col-4 col-sm-4 col-lg-2 small order-sm-12">
 							@Html.DisplayFor(modelItem => item.BoatClass.Name)
 		  <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
 		 </div>
-		 <div class="col col-6 col-sm-3 col-md-4 col-lg-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
+		 <div class="col col-8 col-sm-4 col-md-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
+						<div class="d-none d-md-block col col-2 small text-muted">
+								@if (item.Created.HasValue)
+								{
+									@item.Created.Value.ToString("d")
+								}
+						</div>
 		 <div class="col-12 order-last">
 			@Html.DisplayFor(modelItem => item.Notes)
 		 </div>

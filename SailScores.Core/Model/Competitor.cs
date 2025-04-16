@@ -45,6 +45,8 @@ namespace SailScores.Core.Model
         public String UrlName { get; set; }
         public String UrlId { get; set; }
 
+        public DateTime? Created { get; set; }
+
         public int CompareTo(Competitor other)
         {
             var sailNumberComparison = AlphaNumericComparer.Compare(SailNumber, other.SailNumber);

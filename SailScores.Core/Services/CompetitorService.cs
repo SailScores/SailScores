@@ -149,6 +149,7 @@ public class CompetitorService : ICompetitorService
                 comp.Id = Guid.NewGuid();
                 comp.UrlId = await GetNextCompetitorSequence(comp.ClubId)
                     .ConfigureAwait(false);
+                comp.Created = DateTime.UtcNow;
             }
 
             dbObject = _mapper.Map<Db.Competitor>(comp);

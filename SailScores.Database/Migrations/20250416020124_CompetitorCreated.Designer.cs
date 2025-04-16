@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
@@ -11,9 +12,11 @@ using SailScores.Database;
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20250416020124_CompetitorCreated")]
+    partial class CompetitorCreated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,49 +227,7 @@ namespace SailScores.Database.Migrations
                     b.ToTable("ClubRequests");
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.ClubSeasonStats", b =>
-                {
-                    b.Property<decimal?>("AverageCompetitorsPerRace")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("ClassName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClubInitials")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClubName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CompetitorsStarted")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DistinctCompetitorsStarted")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DistinctDaysRaced")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("FirstRace")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastRace")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("RaceCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SeasonName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("SeasonStart")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SeasonUrlName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("ClubSeasonStats");
-                });
+            
 
             modelBuilder.Entity("SailScores.Database.Entities.ClubSequence", b =>
                 {
@@ -398,77 +359,7 @@ namespace SailScores.Database.Migrations
                     b.ToTable("CompetitorForwarders");
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.CompetitorRankStats", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Place")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SeasonName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("SeasonStart")
-                        .HasColumnType("datetime2");
-
-                    b.ToTable("CompetitorRankStats");
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.CompetitorStatsSummary", b =>
-                {
-                    b.Property<double?>("AverageFinishRank")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("BoatsBeat")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BoatsRacedAgainst")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DaysRaced")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastRacedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RaceCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SeasonEnd")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SeasonName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("SeasonStart")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SeasonUrlName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("CompetitorStatsSummary");
-                });
-
-            modelBuilder.Entity("SailScores.Database.Entities.DeletableInfo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeletable")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CompetitorDeletableInfo");
-                });
+            
 
             modelBuilder.Entity("SailScores.Database.Entities.Document", b =>
                 {
@@ -1005,32 +896,6 @@ namespace SailScores.Database.Migrations
                     b.ToTable("Series");
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.SeriesChartResults", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<bool>("IsCurrent")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Results")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SeriesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SeriesId");
-
-                    b.ToTable("SeriesChartResults");
-                });
 
             modelBuilder.Entity("SailScores.Database.Entities.SeriesForwarder", b =>
                 {
@@ -1077,28 +942,6 @@ namespace SailScores.Database.Migrations
                     b.ToTable("SeriesRace");
                 });
 
-            modelBuilder.Entity("SailScores.Database.Entities.SiteStats", b =>
-                {
-                    b.Property<string>("ClubInitials")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClubName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastRaceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastRaceUpdate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("RaceCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ScoreCount")
-                        .HasColumnType("int");
-
-                    b.ToTable("SiteStats");
-                });
 
             modelBuilder.Entity("SailScores.Database.Entities.UserClubPermission", b =>
                 {
