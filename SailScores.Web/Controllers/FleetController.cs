@@ -42,11 +42,11 @@ public class FleetController : Controller
 
     public async Task<ActionResult> Details(
         string clubInitials,
-        string fleetShortName)
+        string id)
     {
         ViewData["ClubInitials"] = clubInitials;
 
-        var fleet = await _fleetService.GetFleet(clubInitials, fleetShortName);
+        var fleet = await _fleetService.GetFleet(clubInitials, id); //id is fleet short name
 
         return View(new ClubItemViewModel<FleetSummary>
         {

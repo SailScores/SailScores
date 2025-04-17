@@ -1,4 +1,4 @@
-﻿@using SailScores.Api.Enumerations
+@using SailScores.Api.Enumerations
 @using SailScores.Core.Model
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Extensions
@@ -36,7 +36,7 @@
 </head>
 <body>
     <div class="body-content">
-        <main class="col-12 col-lg-9 py-md-3 pl-md-5 bd-content" role="main">
+        <main class="col-12 col-lg-9 py-md-3 ps-md-5 bd-content" role="main">
             <div class="row">
                 <div class="col-12">
                     <h2>@Model.Name</h2>
@@ -89,7 +89,7 @@
                 @if (Model.UpdatedDate.HasValue)
                 {
                     <div class="col-md-6">
-                        <span class="font-italic">@localizer["Updated"] @(Model.UpdatedDate.Value.ToString("f")) UTC</span>
+                        <span class="fst-italic">@localizer["Updated"] @(Model.UpdatedDate.Value.ToString("f")) UTC</span>
                     </div>
                 }
                 <div class="col-md-6">

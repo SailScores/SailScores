@@ -1,4 +1,4 @@
-﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Models.SailScores;
 @using SailScores.Core.Extensions;
 @using SailScores.Web.Resources
 @using Microsoft.Extensions.Localization
@@ -68,68 +68,74 @@
     </div>
     @foreach (var race in Model.Item.Races)
     {
-        <div class="row border-bottom mb-1 pb-1">
-            <div class="col-6 col-md-4">
-                @if (Model.CanEdit)
-                {
+
+        <div class="row border-bottom">
+            @if (Model.CanEdit)
+            {
+                <div class="col-2 col-md-2 col-xl-1 px-0">
                     <a class="btn btn-sm btn-outline-danger"
                     asp-action="Delete"
                     asp-controller="Race"
                     asp-route-id="@race.Id"
-                    title="Delete">
-                        <span class="fas fa-trash"></span>
-                    </a> @:&nbsp;
+                    title="Delete"><span class="fas fa-trash"></span></a>
+                    &nbsp;
                     <a class="btn btn-sm btn-outline-primary"
                     asp-action="Edit"
                     asp-controller="Race"
                     asp-route-id="@race.Id"
                     title="Edit">
                         <span class="fas fa-pen"></span>
-                    </a> @:&nbsp;
-                }
-                <span class="d-md-none">
-                    <a id="smallracelink_@race.Id"
-                    asp-action="Details"
-                    asp-controller="Race"
-                    asp-route-id=@race.Id>
-                        @race.FleetName:
-                        R@(race.Order) @race.Date.ToShortString()
-                    </a>
-                </span>
-                <span class="d-none d-md-inline">
-                    <a id="racelink_@race.Id"
-                    asp-action="Details"
-                    asp-controller="Race"
-                    asp-route-id=@race.Id>
-                        @race.CalculatedName
-                    </a>
-                </span>
-            </div>
-            <div class="col-3 small">
-                @{ var lastSeries = race.SeriesUrlAndNames.LastOrDefault(); }
-                @foreach (var seriesUrlAndName in race.SeriesUrlAndNames)
-                {
-                    var separator = seriesUrlAndName.Key != lastSeries.Key ? $", " : "";
-                    <a href="~/@Model.ClubInitials/@race.Season.UrlName/@seriesUrlAndName.Key">@seriesUrlAndName.Value</a>@separator
-                }
-            </div>
-            <div class="col-2">
-                @Html.DisplayFor(modelItem => race.CompetitorCount)
-                @localizer["boats"]
-            </div>
-            <div class="col-1 d-none d-md-inline">
-                @if (race.ExcludeFromCompStats)
-                {
-                    @race.State@:&nbsp;<span class="text-warning">*</span>
-                    hasExcluded = true;
-                } else
-                {
-                    @race.State
-                }
-            </div>
-            <div class="col-12 col-md-10 d-none d-md-inline">
-                @Html.DisplayFor(modelItem => race.Name)
-                @Html.DisplayFor(modelItem => race.Description)
+                    </a>&nbsp;
+                </div>
+            }
+            <div class="@(Model.CanEdit? "col-9" : "col-12") col-md-10">
+                <div class="row mb-1 pb-1">
+                    <div class="col-6 col-md-3">
+                        <span class="d-md-none">
+                            <a id="smallracelink_@race.Id"
+                            asp-action="Details"
+                            asp-controller="Race"
+                            asp-route-id=@race.Id>
+                                @race.FleetName:
+                                R@(race.Order) @race.Date.ToShortString()
+                            </a>
+                        </span>
+                        <span class="d-none d-md-inline">
+                            <a id="racelink_@race.Id"
+                            asp-action="Details"
+                            asp-controller="Race"
+                            asp-route-id=@race.Id>
+                                @race.CalculatedName
+                            </a>
+                        </span>
+                    </div>
+                    <div class="col-3 small">
+                        @{ var lastSeries = race.SeriesUrlAndNames.LastOrDefault(); }
+                        @foreach (var seriesUrlAndName in race.SeriesUrlAndNames)
+                        {
+                            var separator = seriesUrlAndName.Key != lastSeries.Key ? $", " : "";
+                            <a href="~/@Model.ClubInitials/@race.Season.UrlName/@seriesUrlAndName.Key">@seriesUrlAndName.Value</a>@separator
+                        }
+                    </div>
+                    <div class="col-2">
+                        @Html.DisplayFor(modelItem => race.CompetitorCount)
+                        @localizer["boats"]
+                    </div>
+                    <div class="col-1 d-none d-md-inline">
+                        @if (race.ExcludeFromCompStats)
+                        {
+                            @race.State@:&nbsp;<span class="text-warning">*</span>
+                            hasExcluded = true;
+                        } else
+                        {
+                            @race.State
+                        }
+                    </div>
+                    <div class="col-12 col-md-10 d-none d-md-inline">
+                        @Html.DisplayFor(modelItem => race.Name)
+                        @Html.DisplayFor(modelItem => race.Description)
+                    </div>
+                </div>
             </div>
         </div>
     }

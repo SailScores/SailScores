@@ -356,6 +356,23 @@ namespace SailScores.Database.Migrations
                     b.ToTable("Competitors");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.CompetitorActiveDates", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EarliestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LatestDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompetitorActiveDates");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.CompetitorFleet", b =>
                 {
                     b.Property<Guid>("CompetitorId")

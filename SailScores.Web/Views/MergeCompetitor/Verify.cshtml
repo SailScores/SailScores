@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
 
 @inject IStringLocalizer<SharedResource> localizer
@@ -68,11 +68,11 @@
             <form asp-action="Merge">
                 <input type="hidden" asp-for="TargetCompetitorId" />
                 <input type="hidden" asp-for="SourceCompetitorId" />
-                <div class="form-group">
+                <div class="mb-3">
 
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input type="submit" value="Merge" class="btn btn-primary my-2" />
                     <a asp-controller="Competitor"
                        asp-action="Index"

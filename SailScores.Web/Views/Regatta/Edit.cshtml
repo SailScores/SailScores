@@ -1,13 +1,11 @@
-﻿@model SailScores.Web.Models.SailScores.RegattaWithOptionsViewModel
+@model SailScores.Web.Models.SailScores.RegattaWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Edit " + Model.Name;
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Edit</h2>
-
-<h4>@Model.Name</h4>
+<h4>Edit @Model.Name</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -25,35 +23,35 @@
             <input type="hidden" id="clubId" asp-for="ClubId" />
             <input type="hidden" id="Id" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Url" class="control-label"></label>
                 <input asp-for="Url" class="form-control" />
                 <span asp-validation-for="Url" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Description" class="control-label"></label>
                 <textarea asp-for="Description" class="form-control" cols="60" rows="6"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="StartDate" class="control-label"></label>
                 <input asp-for="StartDate" class="form-control" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="EndDate" class="control-label"></label>
                 <input asp-for="EndDate" class="form-control" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
-            <div id="fleets" class="form-group">
+            <div id="fleets" class="mb-3">
                 <label asp-for="FleetIds" class="control-label">Fleets</label>
                 <small>Each fleet will be scored separately.</small>
-                <select multiple asp-for="FleetIds" class="form-control custom-select selectpicker">
+                <select multiple asp-for="FleetIds" class="form-select">
                     @foreach (var fleet in Model.FleetOptions.OrderBy(c => c.Name))
                     {
                         <option value="@fleet.Id">
@@ -67,7 +65,7 @@
                 <div class="card">
                     <div class="card-header" role="tab" id="advancedHeading">
                         <h5 class="mb-0">
-                            <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                            <a class="collapsed" data-bs-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
                                 Additional Settings
                             </a> <span class="small"><em>&ensp;Optional</em></span>
                         </h5>
@@ -76,9 +74,9 @@
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
 
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label asp-for="ScoringSystemId">Default Scoring System</label>
-                                <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-control">
+                                <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
                                     @foreach (var scoringSystem in Model.ScoringSystemOptions)
                                     {
                                         <option value="@scoringSystem.Id">
@@ -88,7 +86,7 @@
                                 </select>
                                 <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <div class="checkbox">
                                     <label>
                                         <input asp-for="PreferAlternateSailNumbers" /> Prefer Alternate Sail Numbers
@@ -100,12 +98,19 @@
                 </div>
             </div>
             <br />
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="series"
-                   class="btn btn-outline-primary">Cancel</a>
+                @if (!String.IsNullOrWhiteSpace(ViewData["ReturnUrl"]?.ToString()))
+                {
+                    <a href="@(ViewData["ReturnUrl"])"
+                       class="btn btn-outline-primary">Cancel</a>
+                } else
+                {
+                    <a asp-action="Index"
+                       asp-controller="Admin"
+                       asp-fragment="regattas"
+                       class="btn btn-outline-primary">Cancel</a>
+                }
             </div>
         </form>
     </div>

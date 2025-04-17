@@ -1,10 +1,10 @@
-﻿@using SailScores.Web.Extensions
+@using SailScores.Web.Extensions
 @model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 
 <li class="list-group-item" id="competitorTemplate" style="display: none;">
     <div class="d-flex w-100 flex-wrap">
         <div>
-            <span class="badge badge-secondary badge-pill race-place"></span>
+            <span class="badge text-bg-secondary rounded-pill race-place"></span>
         </div>
         <div>
             <span class="sail-number"></span><span class="alt-sail-number" style="display: none"></span>
@@ -12,9 +12,9 @@
         <div>
             <span class="competitor-name h5"></span>
         </div>
-        <div class="float-right ml-auto d-flex">
+        <div class="float-end ms-auto d-flex">
             <div>
-                <select class="select-code form-control form-control-sm">
+                <select class="select-code form-select form-select-sm">
                     <option value="No Code">No Code</option>
                     @foreach (var code in Model.ScoreCodeOptions)
                     {
@@ -29,8 +29,8 @@
             <button class="btn btn-light move-up" type="button"><span class="fa fa-angle-up"></span></button>
             <button class="btn btn-light move-down" type="button"><span class="fa fa-angle-down"></span></button>
             &ensp;
-            <button class="btn btn-light delete-button" type="button" data-toggle="modal"
-                    data-target="#deleteConfirm">
+            <button class="btn btn-light delete-button" type="button" data-bs-toggle="modal"
+                    data-bs-target="#deleteConfirm">
                 <span class="far fa-trash-alt text-danger"></span>
             </button>
         </div>

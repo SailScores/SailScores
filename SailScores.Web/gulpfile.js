@@ -76,7 +76,7 @@ gulp.task("copyJs", function () {
 });
 
 gulp.task("sass", function () {
-    return gulp.src('custom.scss')
+    return gulp.src('scss/custom.scss')
         .pipe(sass())
         .pipe(gulp.dest('wwwroot/css'));
 });

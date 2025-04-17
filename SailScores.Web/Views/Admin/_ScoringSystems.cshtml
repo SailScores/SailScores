@@ -1,8 +1,8 @@
-﻿@model IEnumerable<SailScores.Web.Models.SailScores.ScoringSystemDeleteViewModel>
+@model IEnumerable<SailScores.Web.Models.SailScores.ScoringSystemDeleteViewModel>
 <div id="scoringdiv">
 <div class="row">
     <div class="col-10 col-sm-8 col-md-5 col-lg-4">
-        <h3 class="float-left">
+        <h3 class="float-start">
             <a id="scoring">Scoring Systems</a><br />
             <span class="text-danger"><span class="small"><em>Advanced</em></span></span>
         </h3>
@@ -20,15 +20,18 @@
     </div>
     @foreach (var item in Model)
     {
-    <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+    <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
     <div class="col-12">
         @if(!item.IsDeletable)
 		{
-			<button class="btn btn-sm btn-outline-danger disabled"
-				disabled="disabled"
-				title="Cannot be deleted: @item.PreventDeleteReason">
-			    <span class="fas fa-trash"></span>
-			</button>
+            <span data-bs-toggle="tooltip"
+                    title="Cannot be deleted: @item.PreventDeleteReason">
+	            <button class="btn btn-sm btn-outline-danger disabled"
+		            disabled="disabled"
+                    type="button">
+		            <span class="fas fa-trash"></span>
+	            </button>
+            </span>
 		} else {
             <a class="btn btn-sm btn-outline-danger"
                 asp-action="Delete"

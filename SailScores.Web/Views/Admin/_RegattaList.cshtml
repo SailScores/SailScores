@@ -1,17 +1,17 @@
-﻿@model IEnumerable<SailScores.Core.Model.Regatta>
+@model IEnumerable<SailScores.Core.Model.Regatta>
 <div id="regattasdiv">
     <div class="row">
         <div class="col-10 col-sm-8 col-md-5 col-lg-4">
-            <h3 class="float-left">
+            <h3 class="float-start">
                 <a id="regattas">
                     Regattas
                 </a>
                 <a class="text-primary"
-                    data-container="body"
-                    data-toggle="popover"
-                    data-placement="top"
-                    data-trigger="focus hover"
-                    data-content="
+                    data-bs-container="body"
+                    data-bs-toggle="popover"
+                    data-bs-placement="top"
+                    data-bs-trigger="focus hover"
+                    data-bs-content="
             Regattas are an event over one or a few days. A regatta
             can involve multiple fleets.">
                     <span class="far fa-question-circle"></span>
@@ -31,7 +31,7 @@
     </div>
     @foreach (var item in Model)
     {
-        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
             <div class="col-12 col-sm-8 col-md-6">
                 <a class="btn btn-sm btn-outline-danger"
                     asp-action="Delete"

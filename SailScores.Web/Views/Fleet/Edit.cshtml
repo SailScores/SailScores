@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.FleetWithOptionsViewModel
+@model SailScores.Web.Models.SailScores.FleetWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -23,67 +23,67 @@
             <input type="hidden" id="clubId" asp-for="ClubId" />            
             <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <a class="text-primary"
-                   data-container="body"
-                   data-toggle="popover"
-                   data-placement="top"
-                   data-trigger="focus hover"
-                   data-content="Full name including spaces such as: 2019 Die Hard MC Scows">
+                   data-bs-container="body"
+                   data-bs-toggle="popover"
+                   data-bs-placement="top"
+                   data-bs-trigger="focus hover"
+                   data-bs-content="Full name including spaces such as: 2019 Die Hard MC Scows">
                     <span class="far fa-question-circle"></span>
                 </a>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="ShortName" class="control-label"></label>
                 <a class="text-primary"
-                   data-container="body"
-                   data-toggle="popover"
-                   data-placement="top"
-                   data-trigger="focus hover"
-                   data-content="Used to create URLs; avoid spaces. Should be unique for this club, e.g. 2019DieHardMCs">
+                   data-bs-container="body"
+                   data-bs-toggle="popover"
+                   data-bs-placement="top"
+                   data-bs-trigger="focus hover"
+                   data-bs-content="Used to create URLs; avoid spaces. Should be unique for this club, e.g. 2019DieHardMCs">
                     <span class="far fa-question-circle"></span>
                 </a>
                 <input asp-for="ShortName" class="form-control" />
                 <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="NickName" class="control-label"></label>
                 <a class="text-primary"
-                   data-container="body"
-                   data-toggle="popover"
-                   data-placement="top"
-                   data-trigger="focus hover"
-                   data-content="Used as a display name, this does not need to be unique, e.g. MC Scows">
+                   data-bs-container="body"
+                   data-bs-toggle="popover"
+                   data-bs-placement="top"
+                   data-bs-trigger="focus hover"
+                   data-bs-content="Used as a display name, this does not need to be unique, e.g. MC Scows">
                     <span class="far fa-question-circle"></span>
                 </a>
                 <input asp-for="NickName" class="form-control" />
                 <span asp-validation-for="NickName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <div class="form-check">
                     <input class="form-check-input" asp-for="IsActive" />
                     <label class="form-check-label"> Is an Active Fleet</label>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="FleetType" class="control-label"></label>
-                <select id="fleetType" asp-for="FleetType" class="form-control"
+                <select id="fleetType" asp-for="FleetType" class="form-select"
                         asp-items="(Html.GetEnumSelectList<SailScores.Api.Enumerations.FleetType>())"
                         onChange="checkFleetOptionVisibility()">
                 </select>
                 <span asp-validation-for="FleetType" class="text-danger"></span>
             </div>
-            <div id="classSelectGroup" class="form-group">
+            <div id="classSelectGroup" class="mb-3">
                 <label asp-for="BoatClassIds" class="control-label">Class</label>
-                <select multiple asp-for="BoatClassIds" class="form-control selectpicker">
+                <select multiple asp-for="BoatClassIds" class="form-select">
                     @foreach (var boatclass in Model.BoatClassOptions)
                     {
                         <option value="@boatclass.Id">
@@ -93,7 +93,7 @@
                 </select>
                 <span asp-validation-for="BoatClassIds" class="text-danger"></span>
             </div>
-            <div id="boatSelectGroup" class="form-group">
+            <div id="boatSelectGroup" class="mb-3">
                 <div class="row">
                     <div class="col-8 col-md-6">
                         <label asp-for="CompetitorIds" class="control-label">Competitors</label>
@@ -104,7 +104,7 @@
                         </button>
                     </div>
                 </div>
-                <select multiple asp-for="CompetitorIds" id="competitors" class="form-control custom-select selectpicker">
+                <select multiple asp-for="CompetitorIds" id="competitorIds" class="form-select form-select">
                     @foreach (var competitor in Model.CompetitorOptions)
                     {
                         <option value="@competitor.Id"
@@ -116,10 +116,10 @@
                 </select>
                 <span asp-validation-for="CompetitorIds" class="text-danger"></span>
             </div>
-            <div id="compCreateGroup" class="form-group">
-                <input id="createCompButton" type="button" value="Create New Competitor" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#createCompetitor" />
+            <div id="compCreateGroup" class="mb-3">
+                <input id="createCompButton" type="button" value="Create New Competitor" class="btn btn-outline-primary btn-block" data-bs-toggle="modal" data-bs-target="#createCompetitor" />
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
                 {
@@ -159,7 +159,7 @@
         checkFleetOptionVisibility();
         function removeInactiveComps() {
                 $('#competitors option[data-active="False"]').remove();
-                $('#competitors').selectpicker('refresh');
+                // $('#competitors').selectpicker('refresh');
         }
         document.getElementById("inactiveCompButton").onclick = removeInactiveComps;
     </script>
@@ -169,7 +169,12 @@
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script>
         $(function () {
-            $('[data-toggle="popover"]').popover()
+            $('[data-bs-toggle="popover"]').popover()
         })
+
+        $("select").on('select2:unselecting', event => {
+            if (!event.params.args.originalEvent) return;
+            event.params.args.originalEvent.stopPropagation();
+        });
     </script>
 }

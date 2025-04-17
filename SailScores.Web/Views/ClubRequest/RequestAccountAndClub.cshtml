@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.AccountAndClubRequestViewModel
+@model SailScores.Web.Models.SailScores.AccountAndClubRequestViewModel
 
 @{
     ViewData["Title"] = "SailScores Sign up";
@@ -31,21 +31,22 @@
             <div class="row">
                 <div class="col-12">
                     Set up your account. You can add other administrators after the club is created.<br/>
-                    (Already have a SailScores account?
+                    <span class="text-small">Already have a SailScores account?
                     <a asp-area="" asp-controller="Account" asp-action="Login"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">Sign in</a> before creating a club.)
+                           asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">Sign in</a> before creating a club.
+                    </span>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ContactFirstName"></label>
                         <input asp-for="ContactFirstName" class="form-control" />
                         <span asp-validation-for="ContactFirstName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ContactLastName"></label>
                         <input asp-for="ContactLastName" class="form-control" />
                         <span asp-validation-for="ContactLastName" class="text-danger"></span>
@@ -53,7 +54,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ContactEmail" class="control-label"></label>
                         <input asp-for="ContactEmail" class="form-control" />
                         <span asp-validation-for="ContactEmail" class="text-danger"></span>
@@ -61,7 +62,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="Password"></label>
                         <input asp-for="Password" class="form-control" />
                         <span asp-validation-for="Password" class="text-danger"></span>
@@ -69,7 +70,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ConfirmPassword"></label>
                         <input asp-for="ConfirmPassword" class="form-control" />
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
@@ -84,14 +85,14 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubName" class="control-label"></label>
                         <input asp-for="ClubName" class="form-control" autocomplete="off" />
                         <span asp-validation-for="ClubName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubInitials" class="control-label"></label>
                         <input asp-for="ClubInitials" class="form-control" autocomplete="off" />
                         <span asp-validation-for="ClubInitials" class="text-danger"></span>
@@ -100,14 +101,14 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubLocation" class="control-label"></label>
                         <input asp-for="ClubLocation" class="form-control" />
                         <span asp-validation-for="ClubLocation" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubWebsite" class="control-label"></label>
                         <input asp-for="ClubWebsite" class="form-control" />
                         <span asp-validation-for="ClubWebsite" class="text-danger"></span>
@@ -116,7 +117,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="Classes" class="control-label mb-0"></label>
                         <span asp-description-for="Classes" class="mt-0 form-text small" />
                         <input asp-for="Classes" class="form-control" />
@@ -126,7 +127,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="TypicalDiscardRules" class="control-label mb-0"></label>
                         <span asp-description-for="TypicalDiscardRules" class="mt-0 form-text small" />
                         <input asp-for="TypicalDiscardRules" class="form-control input-large" aria-describedby="TypicalDiscardRules-description" />
@@ -136,7 +137,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="Comments" class="control-label"></label>
                         <textarea asp-for="Comments" class="form-control" cols="60" rows="6"></textarea>
                         <span asp-validation-for="Comments" class="text-danger"></span>
@@ -144,12 +145,12 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3">
-                    <input type="submit" value="Submit" class="btn btn-success btn-block" />
+                <div class="d-grid gap-2 col-md-3">
+                    <button type="submit" class="btn btn-success">Submit</button>
                 </div>
-                <div class="col-md-3">
+                <div class="d-grid gap-2 col-md-3">
                     <a asp-controller="Home" asp-action="Index"
-                       class="btn btn-outline-primary btn-block">Cancel</a>
+                       class="btn btn-outline-primary">Cancel</a>
                 </div>
             </div>
         </form>

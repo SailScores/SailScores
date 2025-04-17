@@ -1,18 +1,18 @@
-﻿@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
+@model SailScores.Web.Models.SailScores.RaceWithOptionsViewModel
 
 <div class="modal fade" id="createCompetitor" tabindex="-1" role="dialog" aria-labelledby="createCompetitorLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createCompetitorLabel">Create competitor?</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    
                 </button>
             </div>
             <div id="compCreateAlert" class="alert alert-danger alert-dismissible collapse" role="alert">
                 <strong>Oops.</strong> Creating the competitor failed. Are the fields all filled in?
-                <button type="button" id="closebutton" class="close" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" id="closebutton" class="btn-close" aria-label="Close">
+                    
                 </button>
             </div>
             <form id="compform" class="col-12"
@@ -21,17 +21,17 @@
 
                     <input type="text" name="IsActive" value="true" hidden />
                     <input type="text" id="createCompFleetId" name="fleetIds[0]" hidden />
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label class="control-label">Name <em>Required</em></label>
                         <input name="name" type="text" class="form-control" />
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label name="sailNumber" class="control-label">Sail Number <em>Required</em></label>
                         <input name="SailNumber" class="form-control" />
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label name="BoatClassId" class="control-label">Class <em>Required</em></label>
-                        <select id="createCompBoatClassSelect" name="BoatClassId" class="form-control">
+                        <select id="createCompBoatClassSelect" name="BoatClassId" class="form-select">
                             <option selected="selected">Select a class...</option>
                             @foreach (var boatclass in Model.CompetitorBoatClassOptions)
                             {
@@ -43,10 +43,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
                     <button id="submitNewComp" type="submit" class="btn btn-primary">
                         <span class="spinner-border spinner-border-sm" id="compLoading" role="status" aria-hidden="true" style="display:none;">
-                            <span class="sr-only">Loading...</span>
+                            <span class="visually-hidden">Loading...</span>
                         </span>
                         Add
                     </button>

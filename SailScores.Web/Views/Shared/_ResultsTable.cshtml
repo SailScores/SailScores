@@ -1,4 +1,4 @@
-﻿@using SailScores.Core.Model
+@using SailScores.Core.Model
 @using SailScores.Core.FlatModel
 @using SailScores.Api.Enumerations
 @using Microsoft.Extensions.Localization
@@ -73,10 +73,15 @@
                                     <div class="weather">
                                         @if (race.WindDirectionDegrees.HasValue)
                                         {
-                                            <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
+                                            <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-bs-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
                                         }
                                         @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
-                                        {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
+                                        {<span data-bs-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
+                                        @if (((race.WindDirectionDegrees.HasValue) || (!string.IsNullOrWhiteSpace(race.WindSpeed)))
+                                                               && !string.IsNullOrWhiteSpace(race.WeatherIcon))
+                                        {
+                                            <br />
+                                        }
                                         @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
                                         {
                                             <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
@@ -103,13 +108,13 @@
                                     <div class="weather">
                                         @if (race.WindDirectionDegrees.HasValue)
                                         {
-                                            <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
+                                            <span class="wi wi-wind from-@race.WindDirectionDegrees?.ToString("N0")-deg ss-wi" data-bs-toggle="tooltip" title="@race.WindDirectionDegrees?.ToString("N0")°"></span>
                                         }
                                         @if (!string.IsNullOrWhiteSpace(race.WindSpeed))
-                                        {<span data-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
+                                        {<span data-bs-toggle="tooltip" title="@race.WindSpeedUnits">@race.WindSpeed</span>}
                                         @if (!string.IsNullOrWhiteSpace(race.WeatherIcon))
                                         {
-                                            <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
+                                            <br /><span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
                                         }
                                     </div>
                                 }
@@ -227,7 +232,7 @@
                                 {
                                         tooltipText = tooltipText + "Participation: " + @String.Format("{0:0.#}%", compScore?.ParticipationPercent);
                                 }
-                                <span data-toggle="tooltip" title="@Html.Raw(tooltipText)">
+                                <span data-bs-toggle="tooltip" title="@Html.Raw(tooltipText)">
                                         @(compScore?.TotalScore != null
                                             ? String.Format("{0:0.###}", compScore?.TotalScore)
                                         : Html.Raw("&mdash;"))
@@ -315,7 +320,7 @@
                 }
             @if (Model.UpdatedDate.HasValue)
             {
-                <span class="small font-italic">
+                <span class="small fst-italic">
                     @localizer["Updated"] @(Model.UpdatedDate.Value.ToString("f")) UTC
                     @if (!String.IsNullOrWhiteSpace(Model.Results.UpdatedBy))
                     {
@@ -324,7 +329,7 @@
                 </span>
             }
             </div>
-            <div class="col-md-3 text-right">
+            <div class="col-md-3 text-end">
                 @if (Model.ShowExportButtons)
                 {
                     <a class="btn btn-outline-secondary btn-sm"

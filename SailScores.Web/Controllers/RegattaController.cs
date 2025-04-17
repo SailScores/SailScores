@@ -151,13 +151,16 @@ public class RegattaController : Controller
     [Authorize]
     public async Task<ActionResult> Edit(
         string clubInitials,
-        Guid id)
+        Guid id,
+        String returnUrl = null
+        )
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         if (!await _authService.CanUserEdit(User, clubId))
         {
             return Unauthorized();
         }
+        ViewData["ReturnUrl"] = returnUrl;
         var regatta = await _regattaService.GetRegattaAsync(id);
         if (regatta == null)
         {

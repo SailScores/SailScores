@@ -1,4 +1,4 @@
-﻿@using SailScores.Web.Models.AccountViewModels
+@using SailScores.Web.Models.AccountViewModels
 @model LoginWith2faViewModel
 @{
     ViewData["Title"] = "Two-factor authentication";
@@ -16,12 +16,12 @@
         <form method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
             <input asp-for="RememberMe" type="hidden" />
             <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="TwoFactorCode"></label>
                 <input asp-for="TwoFactorCode" class="form-control" autocomplete="off" />
                 <span asp-validation-for="TwoFactorCode" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <div class="checkbox">
                     <label asp-for="RememberMachine">
                         <input asp-for="RememberMachine" />
@@ -29,7 +29,7 @@
                     </label>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <button type="submit" class="btn btn-primary">Log in</button>
             </div>
         </form>

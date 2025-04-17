@@ -55,7 +55,9 @@ namespace SailScores.Core.Services
 
             var seasons = _dbContext.Seasons
                 .Where(s => s.ClubId == clubId)
-                .Where(s => raceDates.Any(r => r.HasValue && r.Value > s.Start && r.Value <= s.End));
+                .Where(s => raceDates.Any(r => r.HasValue && r.Value > s.Start && r.Value <= s.End))
+                .OrderBy(s => s.Start);
+
             return _mapper.Map<IList<Season>>(await seasons.ToListAsync()
                 .ConfigureAwait(false));
         }

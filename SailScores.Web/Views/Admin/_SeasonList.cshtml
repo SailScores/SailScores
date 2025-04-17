@@ -1,15 +1,15 @@
-﻿@model IEnumerable<SailScores.Web.Models.SailScores.SeasonDeleteViewModel>
+@model IEnumerable<SailScores.Web.Models.SailScores.SeasonDeleteViewModel>
 <div id="seasonsdiv">
 <div class="row">
     <div class="col-10 col-sm-8 col-md-5 col-lg-4">
-        <h3 class="float-left">
+        <h3 class="float-start">
             <a id="seasons">Seasons</a>
             <a class="text-primary"
-                data-container="body"
-                data-toggle="popover"
-                data-placement="top"
-                data-trigger="focus hover"
-                data-content="Seasons typically repeat each year. Every series must belong to a season. They help with links and statistics.">
+                data-bs-container="body"
+                data-bs-toggle="popover"
+                data-bs-placement="top"
+                data-bs-trigger="focus hover"
+                data-bs-content="Seasons typically repeat each year. Every series must belong to a season. They help with links and statistics.">
                 <span class="far fa-question-circle"></span>
             </a>
         </h3>
@@ -27,15 +27,18 @@
 </div>
 @foreach (var item in Model)
 {
-    <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+    <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
         <div class="col-12 col-sm-6 col-md-6">
             @if(!item.IsDeletable)
 			{
+                <span data-bs-toggle="tooltip"
+					title="Cannot be deleted: @item.PreventDeleteReason">
 				<button class="btn btn-sm btn-outline-danger disabled"
 				    disabled="disabled"
-					title="Cannot be deleted: @item.PreventDeleteReason">
+                    type="button">
 			        <span class="fas fa-trash"></span>
 			    </button>
+                </span>
 			} else {
                 <a class="btn btn-sm btn-outline-danger"
                     asp-action="Delete"

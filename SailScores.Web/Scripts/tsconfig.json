@@ -7,6 +7,7 @@
     "removeComments": false,
     "sourceMap": true,
     "module": "es2020",
+    "moduleResolution": "node",
     "target": "es2020",
     "baseUrl": "scripts",
     "lib": [

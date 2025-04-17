@@ -3,7 +3,6 @@
 ///
 import $ from "jquery";
 import "bootstrap";
-import "bootstrap-select";
 export function initialize() {
     $('#compform').submit(compCreateSubmit);
     $("#submitButton").prop("disabled", false);
@@ -58,7 +57,7 @@ function addMissingToCompetitorList() {
     var oldOptions = $("#CompetitorIds>option");
     var oldIds = oldOptions.map((i, e) => e.value);
     var missing = allCompetitors.filter(c => $.inArray('' + c.id, oldIds) === -1);
-    var compSelect = document.getElementById("CompetitorIds");
+    var compSelect = document.getElementById("competitorIds");
     var classSelection = document.getElementById("createCompBoatClassSelect");
     var className = classSelection.options[classSelection.selectedIndex].text;
     for (let j = 0; j < missing.length; j++) {
@@ -72,7 +71,7 @@ function addMissingToCompetitorList() {
         }
         compSelect.options.add(new Option(newText, "" + missing[j].id), compSelect.options[beforeIndex]);
     }
-    $("#CompetitorIds").selectpicker("refresh");
+    //$("#CompetitorIds").selectpicker("refresh");
     var modal = $("#createCompetitor");
     modal.modal("hide");
     $("#compLoading").hide();

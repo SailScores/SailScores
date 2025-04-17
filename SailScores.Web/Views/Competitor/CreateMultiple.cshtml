@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
 @using Microsoft.AspNetCore.Mvc.ModelBinding
 @inject IStringLocalizer<SharedResource> localizer
@@ -6,15 +6,14 @@
 @model SailScores.Web.Models.SailScores.MultipleCompetitorsWithOptionsViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Competitors";
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
 <div class="container">
-    <h2>Create</h2>
-
-    <h4>Multiple Competitors</h4>
+    <h2>Create Competitors</h2>
     <hr />
+    <br class="d-none d-md-block" />
 
     <form asp-action="CreateMultiple"
           asp-route-returnurl="@ViewData["ReturnUrl"]">
@@ -22,9 +21,9 @@
             <div class="col-md-4">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="BoatClassId" class="control-label">Class <em>Required</em></label>
-                    <select asp-for="BoatClassId" class="form-control">
+                    <select asp-for="BoatClassId" class="form-select">
                         <option selected="selected">Select a class...</option>
                         @foreach (var boatclass in Model.BoatClassOptions)
                         {
@@ -35,9 +34,9 @@
                     </select>
                     <span asp-validation-for="BoatClassId" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="FleetIds" class="control-label">Fleets <span class="small muted"><em>Optional</em> If in doubt, leave empty.</span></label>
-                    <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
+                    <select id="seriesIds" asp-for="FleetIds" class="form-select" multiple>
                         @foreach (var fleet in Model.FleetOptions)
                         {
                             <option value="@fleet.Id">
@@ -54,22 +53,22 @@
                 <div id="allCompetitors">
                     <div class="row d-none d-md-flex">
                         <div class="col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 @localizer["Sail"]
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 @localizer["Helm"]
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 @localizer["Boat Name"]
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 Home Club <span class="small muted"><em>Optional - for regattas</em></span>
                             </div>
                         </div>
@@ -79,7 +78,7 @@
                             @localizer["Sail"]
                         </div>
                         <div class="col-9 col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <input type="text" name="template.SailNumber" class="form-control" />
                             </div>
                         </div>
@@ -87,7 +86,7 @@
                             @localizer["Helm"]
                         </div>
                         <div class="col-9 col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <input type="text" name="template.Name" class="form-control" />
                             </div>
                         </div>
@@ -95,7 +94,7 @@
                             @localizer["Boat"]
                         </div>
                         <div class="col-9 col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <input type="text" name="template.BoatName" class="form-control" />
                             </div>
                         </div>
@@ -103,7 +102,7 @@
                             Home Club
                         </div>
                         <div class="col-9 col-md-3">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <input type="text" name="template.HomeClubName" class="form-control" />
                             </div>
                         </div>
@@ -120,7 +119,7 @@
                                     @localizer["Sail"]
                                 </div>
                                 <div class="col-9 col-md-3">
-                                    <div class="form-group">
+                                    <div class="mb-3">
                                         <input type="text" name="competitors[@i].SailNumber" class="form-control
                                                @(ViewData.ModelState[$"competitors[{i}].SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
                                                data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber" />
@@ -131,7 +130,7 @@
                                     @localizer["Helm"]
                                 </div>
                                 <div class="col-9 col-md-3">
-                                    <div class="form-group">
+                                    <div class="mb-3">
                                         <input type="text" name="competitors[@i].Name" class="form-control"
                                                data-column="1" data-row="@i" value="@Model.Competitors[i].Name" />
                                     </div>
@@ -140,7 +139,7 @@
                                     @localizer["Boat"]
                                 </div>
                                 <div class="col-9 col-md-3">
-                                    <div class="form-group">
+                                    <div class="mb-3">
                                         <input type="text" name="competitors[@i].BoatName" class="form-control"
                                                data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName" />
                                     </div>
@@ -149,7 +148,7 @@
                                     Home Club
                                 </div>
                                 <div class="col-9 col-md-3">
-                                    <div class="form-group">
+                                    <div class="mb-3">
                                         <input type="text" name="competitors[@i].HomeClubName" class="form-control"
                                                data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName" />
                                     </div>
@@ -167,7 +166,7 @@
                                 @localizer["Sail"]
                             </div>
                             <div class="col-9 col-md-3">
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <input type="text" name="competitors[0].SailNumber" class="form-control"
                                            data-column="0" data-row="0" />
                                 </div>
@@ -176,7 +175,7 @@
                                 @localizer["Helm"]
                             </div>
                             <div class="col-9 col-md-3">
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <input type="text" name="competitors[0].Name" class="form-control"
                                            data-column="1" data-row="0" />
                                 </div>
@@ -185,7 +184,7 @@
                                 @localizer["Boat"]
                             </div>
                             <div class="col-9 col-md-3">
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <input type="text" name="competitors[0].BoatName" class="form-control"
                                            data-column="2" data-row="0" />
                                 </div>
@@ -194,7 +193,7 @@
                                 Home Club
                             </div>
                             <div class="col-9 col-md-3">
-                                <div class="form-group">
+                                <div class="mb-3">
                                     <input type="text" name="competitors[0].HomeClubName" class="form-control"
                                            data-column="3" data-row="0" />
                                 </div>
@@ -219,12 +218,18 @@
             </div>
         </div>
         <div class="row">
+
             <div class="col-md-3">
-                <input type="submit" value="Create" class="btn btn-primary btn-block my-2" />
+                <div class="d-grid gap-2">
+                    <input type="submit" value="Create" class="btn btn-primary btn-block my-2" />
+                </div>
             </div>
             <div class="col-md-3">
-                <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Competitor"))"
-                   class="btn btn-outline-primary btn-block my-2">Cancel</a>
+                <div class="d-grid gap-2">
+                    <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Competitor"))"
+                       class="btn btn-outline-primary btn-block my-2">Cancel</a>
+                </div>
+
             </div>
         </div>
     </form>

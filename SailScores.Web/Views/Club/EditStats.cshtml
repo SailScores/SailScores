@@ -22,7 +22,7 @@
     <form asp-action="Stats">
         <input hidden asp-for="Id" class="form-control" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
+        <div class="mb-3">
             <label asp-for="StatisticsDescription" class="control-label">@localizer["Stats Notes"]</label>
             <a target="_blank" href="https://www.markdownguide.org/">
                 <span title="Supports MarkDown formatting" class="fab fa-markdown"></span>
@@ -30,7 +30,7 @@
             <textarea asp-for="StatisticsDescription" class="form-control" cols="60" rows="6"></textarea>
             <span asp-validation-for="StatisticsDescription" class="text-danger"></span>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <input type="submit" value="Save" class="btn btn-primary" />
         </div>
     </form>

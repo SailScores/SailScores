@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -52,6 +52,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     private DbSet<ClubSeasonStats> ClubSeasonStats { get; set; }
     private DbSet<SiteStats> SiteStats { get; set; }
     private DbSet<DeletableInfo> CompetitorDeletableInfo { get; set; }
+    private DbSet<CompetitorActiveDates> CompetitorActiveDates { get; set; }
 
     public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId)
     {
@@ -115,6 +116,16 @@ public class SailScoresContext : DbContext, ISailScoresContext
         var query = await GetSqlQuery("DeletableCompetitors");
         var clubParam = new SqlParameter("ClubId", clubId); 
         var result = await this.CompetitorDeletableInfo
+            .FromSqlRaw(query, clubParam)
+            .ToListAsync();
+        return result;
+    }
+
+    public async Task<IList<CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId)
+    {
+        var query = await GetSqlQuery("CompetitorActiveDates");
+        var clubParam = new SqlParameter("ClubId", clubId);
+        var result = await this.CompetitorActiveDates
             .FromSqlRaw(query, clubParam)
             .ToListAsync();
         return result;

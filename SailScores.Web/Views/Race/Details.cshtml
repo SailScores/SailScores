@@ -1,4 +1,4 @@
-﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Models.SailScores;
 @using SailScores.Web.Services.Interfaces
 @model ClubItemViewModel<RaceViewModel>
 @inject IWeatherService  weatherService
@@ -39,12 +39,12 @@
                 @Model.Item.Fleet?.Name
             </h4>
         </div>
-        <div class="col-sm-2 text-sm-right weather">
+        <div class="col-sm-2 text-sm-end weather">
             @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindDirection))
             {
-                <span class="wi wi-wind from-@Model.Item.Weather.WindDirection-deg ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather.WindDirection°"></span>
+                <span class="wi wi-wind from-@Model.Item.Weather.WindDirection-deg ss-wi-large" data-bs-toggle="tooltip" title="@Model.Item.Weather.WindDirection°"></span>
             }
-            <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.WindSpeedUnits">
+            <span class="h3" data-bs-toggle="tooltip" title="@Model.Item.Weather?.WindSpeedUnits">
                 @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindSpeed))
                 {
                     //This is hideous, but the easiest way to avoid a space between the two elements.
@@ -55,11 +55,11 @@
             </span>
             @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Icon))
             {
-                <span class="wi @weatherService.GetIconCharacter(Model.Item.Weather?.Icon) ss-wi-large" data-toggle="tooltip" title="@Model.Item.Weather?.Description"></span>
+                <span class="wi @weatherService.GetIconCharacter(Model.Item.Weather?.Icon) ss-wi-large" data-bs-toggle="tooltip" title="@Model.Item.Weather?.Description"></span>
             }
             @if (!string.IsNullOrWhiteSpace(Model.Item.Weather?.Temperature))
             {
-                <span class="h3" data-toggle="tooltip" title="@Model.Item.Weather?.TemperatureUnits">@Model.Item.Weather.Temperature°</span>
+                <span class="h3" data-bs-toggle="tooltip" title="@Model.Item.Weather?.TemperatureUnits">@Model.Item.Weather.Temperature°</span>
             }
         </div>
         </div>
@@ -126,7 +126,7 @@
     </table>
     @if (!String.IsNullOrWhiteSpace(Model.Item.UpdatedBy))
     {
-        <span class="text-right"><small><em>Updated by @Model.Item.UpdatedBy</em></small></span><br/>
+        <span class="text-end"><small><em>Updated by @Model.Item.UpdatedBy</em></small></span><br/>
     }
 
         </div>
@@ -137,7 +137,7 @@
 @section Scripts {
     <script>
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+            $('[data-bs-toggle="tooltip"]').tooltip()
         })
     </script>
 }

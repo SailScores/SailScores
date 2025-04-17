@@ -1,10 +1,10 @@
 /// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
 /// <reference types="jquery" />
-///
+/// <reference types="select2" />
+
 
 import $ from "jquery";
 import "bootstrap";
-import "bootstrap-select";
 
 import { competitorDto, scoreCodeDto, seriesDto, speechInfo } from "./interfaces/server";
 
@@ -401,7 +401,7 @@ function displayRaceNumber() {
     let fleetId = ($("#fleetId").val() as string);
     let regattaId = ($("#regattaId").val() as string);
     let raceDate = $("#date").val() as string;
-    if ($ && clubId && fleetId && raceDate) {
+    if ($ && clubId && fleetId && raceDate && fleetId.length >= 32) {
         $.getJSON("/api/Races/RaceNumber",
         {
             clubId: clubId,
@@ -446,10 +446,10 @@ function setSeries() {
         seriesSelect.append($("<option></option>")
             .attr("value", series.id.toString()).text(series.name));
     });
-    seriesSelect.selectpicker('destroy');
-    seriesSelect.selectpicker();
-    seriesSelect.val(selectedSeriesValues);
-    seriesSelect.selectpicker('refresh');
+
+    seriesSelect.select2();
+    seriesSelect.val(selectedSeriesValues).trigger('change');
+
 }
 
 var autoCompleteSetup: boolean = false;
@@ -549,7 +549,7 @@ function shouldHaveManualEntry(compListItem: HTMLLIElement): boolean {
 
 function clearWeatherFields() {
     $("#weatherIcon").val("Select...");
-    $("#weatherIcon").selectpicker("refresh");
+    //$("#weatherIcon").selectpicker("refresh");
     $("#weatherDescription").val(null);
     $("#windSpeed").val(null);
     $("#windGust").val(null);
@@ -567,7 +567,7 @@ function populateEmptyWeatherFields() {
             if (data.icon && $("#weatherIcon").val(null)) {
                 $("#weatherIcon").val(data.icon);
 
-                $("#weatherIcon").selectpicker("refresh");
+                //$("#weatherIcon").selectpicker("refresh");
             }
             if (data.description && $("#weatherDescription").val(null)) {
                 $("#weatherDescription").val(data.description);

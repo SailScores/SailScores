@@ -60,7 +60,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6 order-md-12">
+    <div class="col-md-6 order-md-last">
         @if (Model.CanEdit)
         {
             <br class="d-md-none" />
@@ -117,7 +117,7 @@
             <div class="row bg-almost">
                 <div class="col-sm-4 my-2">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Export Scratch Sheet
                         </button>
                         <div class="dropdown-menu">
@@ -172,7 +172,7 @@
 
                             @:&nbsp;
                         }
-                        <span class="small font-italic">Posted by @announcement.CreatedBy on @announcement.CreatedLocalDate.ToString("f"):</span>
+                        <span class="small fst-italic">Posted by @announcement.CreatedBy on @announcement.CreatedLocalDate.ToString("f"):</span>
                         @Html.Raw(Markdig.Markdown.ToHtml(announcement.Content))
                         <br />
                     }
@@ -207,7 +207,7 @@
                            asp-route-id="@document.Id"
                            asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                         >@document.Name</a></h4>
-                        <span class="small font-italic">Posted by @document.CreatedBy on @document.CreatedLocalDate.ToString("f")</span>
+                        <span class="small fst-italic">Posted by @document.CreatedBy on @document.CreatedLocalDate.ToString("f")</span>
                     }
                 </div>                
             }
@@ -222,21 +222,21 @@
         <h3>@(fleet.NickName??fleet.Name??fleet.ShortName)</h3>
         <ul class="nav nav-tabs" id="@($"Tab{fleet.ShortName}")" role="tablist">
             <li class="nav-item">
-                <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{fleet.ShortName}-tab")" data-toggle="tab"
+                <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{fleet.ShortName}-tab")" data-bs-toggle="tab"
                href="@($"#Competitors{fleet.ShortName}")" role="tab"
                aria-controls="@($"Competitors{fleet.ShortName}")" aria-selected="true">
                     @localizer["CapCompetitors"]
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @(fleetHasResults ? "active" : "")" id="@($"Results{fleet.ShortName}-tab")" data-toggle="tab"
+                <a class="nav-link @(fleetHasResults ? "active" : "")" id="@($"Results{fleet.ShortName}-tab")" data-bs-toggle="tab"
                href="@($"#Results{fleet.ShortName}")" role="tab"
                aria-controls="@($"Results{fleet.ShortName}")" aria-selected="false">
                     @localizer["Results"]
                 </a>
             </li>
             <li class="nav-item d-none d-sm-inline-flex">
-                <a class="nav-link" id="@($"Chart{fleet.ShortName}-tab")" data-toggle="tab"
+                <a class="nav-link" id="@($"Chart{fleet.ShortName}-tab")" data-bs-toggle="tab"
                href="@($"#Chart{fleet.ShortName}")" role="tab"
                aria-controls="@($"Chart{fleet.ShortName}")" aria-selected="false">
                     @localizer["Chart"]

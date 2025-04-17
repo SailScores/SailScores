@@ -1,4 +1,4 @@
-﻿@model SailScores.Core.Model.Announcement
+@model SailScores.Core.Model.Announcement
 
 @{
     ViewData["Title"] = "Edit Notice";
@@ -13,13 +13,11 @@
               asp-route-returnurl="@ViewData["ReturnUrl"]">
             <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-
+            <div class="mb-3">
                 <textarea asp-for="Content" class="form-control" id="summernote" rows="4"></textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
                 {

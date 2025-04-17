@@ -1,5 +1,5 @@
-﻿@model SailScores.Web.Models.SailScores.RegattaSelectorModel
-    <select id="regattaSelect" hidden asp-for="SelectedRegattaName" class="form-control"
+@model SailScores.Web.Models.SailScores.RegattaSelectorModel
+    <select id="regattaSelect" hidden asp-for="SelectedRegattaName" class="form-select"
         aria-label="Select Regatta"
         onchange="window.location.href = '/' + this.value;"
         autocomplete="off">

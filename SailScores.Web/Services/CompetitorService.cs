@@ -168,21 +168,35 @@ public class CompetitorService : ICompetitorService
         var vmList = _mapper.Map<IList<CompetitorIndexViewModel>>(list);
         if (includeInactive)
         {
-            await PopulateDeletableFields(clubId, vmList);
+            await PopulateDeleteableAndDateFields(clubId, vmList);
         }
         return vmList;
     }
 
-    private async Task PopulateDeletableFields(Guid clubId, IEnumerable<CompetitorIndexViewModel> vmList)
+    private async Task PopulateDeleteableAndDateFields(Guid clubId, IEnumerable<CompetitorIndexViewModel> vmList)
     {
-        var deletableReasons = await _coreCompetitorService.GetDeletableInfo(clubId);
-
-        foreach (var info in deletableReasons)
+        var dates = await _coreCompetitorService.GetCompetitorActiveDates(clubId);
+        foreach (var info in dates)
         {
             var curComp = vmList.SingleOrDefault(c => c.Id == info.Id);
-            if (curComp != null) {
-                curComp.IsDeletable = info.IsDeletable;
-                curComp.PreventDeleteReason = info.Reason;
+            if (curComp != null)
+            {
+                if (info.EarliestDate == null || info.LatestDate == null)
+                {
+                    // this is a competitor that has never raced.
+                    curComp.IsDeletable = true;
+                    continue;
+                }
+                else
+                {
+
+                    curComp.EarliestRacedDate = info.EarliestDate;
+                    curComp.LatestRacedDate = info.LatestDate;
+
+                    curComp.IsDeletable = false;
+                    curComp.PreventDeleteReason =
+                        $"Raced {info.EarliestDate?.ToString("MMM d yyyy")} - {info.LatestDate?.ToString("MMM d yyyy")}";
+                }
             }
         }
     }
@@ -255,5 +269,10 @@ public class CompetitorService : ICompetitorService
         var comps = await _coreCompetitorService.GetCompetitorsForRegattaAsync(clubId, regattaId);
 
         return comps;
+    }
+
+    public async Task SetCompetitorActive(Guid clubId, Guid competitorId, bool active)
+    {
+        await _coreCompetitorService.SetCompetitorActive(clubId, competitorId, active);
     }
 }

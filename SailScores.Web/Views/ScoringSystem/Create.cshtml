@@ -1,23 +1,22 @@
-﻿@model SailScores.Web.Models.SailScores.ScoringSystemWithOptionsViewModel
+@model SailScores.Web.Models.SailScores.ScoringSystemWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h2>Create</h2>
-<h4>Scoring System</h4>
+<h4>Create a Scoring System</h4>
 <hr />
 <div class="row">
     <div class="col-md-8 col-lg-6">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="DiscardPattern" class="control-label"></label>
                 <input asp-for="DiscardPattern" class="form-control" />
                 <span asp-validation-for="DiscardPattern" class="text-danger"></span>
@@ -39,9 +38,9 @@
                         than 12 races will have four discards.</dd>
                 </dl>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="ParentSystemId">Parent Scoring System</label>
-                <select id="parentSystemId" asp-for="ParentSystemId" class="form-control">
+                <select id="parentSystemId" asp-for="ParentSystemId" class="form-select">
                     @foreach (var scoringSystem in Model.ParentSystemOptions)
                     {
                         <option value="@scoringSystem.Id">
@@ -51,9 +50,11 @@
                 </select>
                 <span asp-validation-for="ParentSystemId" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
-                <a  asp-action="Index" asp-controller="Admin"
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   asp-fragment="scoringsystems"
                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>

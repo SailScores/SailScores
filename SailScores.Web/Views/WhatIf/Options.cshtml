@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.WhatIfViewModel
+@model SailScores.Web.Models.SailScores.WhatIfViewModel
 
 @{
     ViewData["Title"] = "What If: Test Scoring";
@@ -27,7 +27,7 @@ Check how series results change if scored with different options.
             <input type="hidden" id="SeriesId" asp-for="Series.Id" />
             <div>
                 <label asp-for="SelectedScoringSystemId">Scoring System</label>
-                <select class="form-control" id="ScoringSystemId" asp-for="SelectedScoringSystemId">
+                <select class="form-select" id="ScoringSystemId" asp-for="SelectedScoringSystemId">
                     @foreach (var scoringSystem in Model.ScoringSystemOptions)
                     {
                         <!option value="@scoringSystem.Id" @(scoringSystem.Id == Model.Series.ScoringSystemId ? "selected" : "") >@scoringSystem.Name</!option>
@@ -35,22 +35,22 @@ Check how series results change if scored with different options.
                 </select>
             </div>
             <br />
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Discards">Discards</label>
-                <select class="form-control" id="Discards" asp-for="Discards">
+                <select class="form-select" id="Discards" asp-for="Discards">
                     @for(int i = 0; i < Model.Series.FlatResults.NumberOfSailedRaces; i++)
                     {
                         <!option value="@i" @(i == Model.Series.FlatResults.NumberOfDiscards ? "selected" : "") >@i</!option>
                     })
                 </select>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="ParticipationPercent" class="control-label"></label>
                 <span class="small"><em>&ensp;Used for High Score Percent systems (including Cox-Sprague)</em></span>
                 <input asp-for="ParticipationPercent" class="form-control" type="number" />
                 <span asp-validation-for="ParticipationPercent" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <input id="submitButton" type="submit" value="Calculate Results" class="btn btn-primary my-2" />
                 <a class="btn btn-outline-primary"
                     asp-action="Edit"

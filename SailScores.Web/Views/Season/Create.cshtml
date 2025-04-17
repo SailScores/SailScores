@@ -1,4 +1,4 @@
-﻿@model SailScores.Core.Model.Season
+@model SailScores.Core.Model.Season
 
 @{
     ViewData["Title"] = "Create";
@@ -13,30 +13,30 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <a class="text-primary"
-                   data-container="body"
-                   data-toggle="popover"
-                   data-placement="top"
-                   data-trigger="focus hover"
-                   data-content="Usually named after the year, such as @DateTime.UtcNow.Year">
+                   data-bs-container="body"
+                   data-bs-toggle="popover"
+                   data-bs-placement="top"
+                   data-bs-trigger="focus hover"
+                   data-bs-content="Usually named after the year, such as @DateTime.UtcNow.Year">
                     <span class="far fa-question-circle"></span>
                 </a>
                 <input asp-for="Name" class="form-control" autocomplete="off" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Start" class="control-label"></label>
                 <input asp-for="Start" class="form-control" />
                 <span asp-validation-for="Start" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="End" class="control-label"></label>
                 <input asp-for="End" class="form-control" />
                 <span asp-validation-for="End" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
                 <a asp-controller="Admin"
                    asp-action="Index"
@@ -51,7 +51,7 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(function () {
-            $('[data-toggle="popover"]').popover()
+            $('[data-bs-toggle="popover"]').popover()
         })
     </script>
 }

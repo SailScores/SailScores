@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.ClubRequestViewModel
+@model SailScores.Web.Models.SailScores.ClubRequestViewModel
 
 @{
     ViewData["Title"] = "SailScores Sign up";
@@ -25,14 +25,14 @@
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubName" class="control-label"></label>
                         <input asp-for="ClubName" class="form-control" autocomplete="off" />
                         <span asp-validation-for="ClubName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubInitials" class="control-label"></label>
                         <input asp-for="ClubInitials" class="form-control" autocomplete="off" />
                         <span asp-validation-for="ClubInitials" class="text-danger"></span>
@@ -41,14 +41,14 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubLocation" class="control-label"></label>
                         <input asp-for="ClubLocation" class="form-control" />
                         <span asp-validation-for="ClubLocation" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ClubWebsite" class="control-label"></label>
                         <input asp-for="ClubWebsite" class="form-control" />
                         <span asp-validation-for="ClubWebsite" class="text-danger"></span>
@@ -57,7 +57,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="ContactEmail" class="control-label"></label>
 
                         <span class="mt-0 form-text small">You can add other accounts once the SailScores club is created.</span>
@@ -68,7 +68,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="Classes" class="control-label mb-0"></label>
                         <span asp-description-for="Classes" class="mt-0 form-text small" />
                         <input asp-for="Classes" class="form-control" />
@@ -78,7 +78,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="TypicalDiscardRules" class="control-label mb-0"></label>
                         <span asp-description-for="TypicalDiscardRules" class="mt-0 form-text small" />
                         <input asp-for="TypicalDiscardRules" class="form-control input-large" aria-describedby="TypicalDiscardRules-description" />
@@ -88,20 +88,21 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="Comments" class="control-label"></label>
                         <textarea asp-for="Comments" class="form-control" cols="60" rows="6"></textarea>
                         <span asp-validation-for="Comments" class="text-danger"></span>
                     </div>
                 </div>
             </div>
+
             <div class="row">
-                <div class="col-md-3">
-                    <input type="submit" value="Submit" class="btn btn-success btn-block" />
+                <div class="d-grid gap-2 col-md-3">
+                    <button type="submit" class="btn btn-success">Submit</button>
                 </div>
-                <div class="col-md-3">
+                <div class="d-grid gap-2 col-md-3">
                     <a asp-controller="Home" asp-action="Index"
-                        class="btn btn-outline-primary btn-block">Cancel</a>
+                       class="btn btn-outline-primary">Cancel</a>
                 </div>
             </div>
         </form>

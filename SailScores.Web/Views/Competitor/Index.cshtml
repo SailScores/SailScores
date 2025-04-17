@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.Extensions.Localization
 @using SailScores.Core.Services
 @using SailScores.Core.Utility
@@ -12,226 +12,317 @@
 @model ClubCollectionViewModel<CompetitorIndexViewModel>
 
 @{
-	ViewBag.Title = Model.ClubInitials + " " + localizer["Competitors"];
-	Layout = "_ClubLayout";
+    ViewBag.Title = Model.ClubInitials + " " + localizer["Competitors"];
+    Layout = "_ClubLayout";
 }
 <div class="container px-0 px-sm-2">
- <div class="row">
-  <div class="col-12">
-   <h1>@localizer["Competitors"]</h1>
-  </div>
- </div>
-	@if (Model.CanEdit)
-	{
-	 <div class="row">
-	  <div class="col-3">
-	   <a class="btn btn-primary" asp-action="CreateMultiple" asp-controller="Competitor">
-		Create
-	   </a>
-	  </div>
-	  <div class="col-6 col-sm-4 col-md-3">
-		<div class="btn-group">
-			<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				Utilities
-			</button>
-			<div class="dropdown-menu">
-				<a class="dropdown-item" asp-action="Options" asp-controller="MergeCompetitor">
-					Merge Two Competitors
-				</a>
-				<a class="dropdown-item" asp-action="ClearAltNumbers" asp-controller="Competitor">
-				Clear Alt Sail Numbers
-				</a>
-				@* <div class="dropdown-divider"></div> *@
-				<a class="dropdown-item" asp-action="InactivateMultiple" asp-controller="Competitor">
-					Bulk Inactivate
-				</a>
-			</div>
-		</div>
-	  </div>
-	  <div class="col-3">
-	   <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
-		Club Admin
-	   </a>
-	  </div>
-	 </div>
-	}
- <div class="row">
-		@if (Model.CanEdit)
-		{
-	  <div class="col-6 px-5 pt-2">
-	   <input type="checkbox" id="show-inactive" name="show-inactive"
-	   class="form-check-input"
-	   value="show-inactive"
-	   checked
-	   onchange="changeVisibility(300)">
-	   <label for="show-inactive"
-		class="form-check-label"> Show inactive</label>
-	  </div>
-		}
-		<div class="col-6 py-2">
-            <div class="form-row">
-   <label  class="control-label col-form-label col-4"
-	for="sort-order">Sort </label>
-   <select id="sort-order"
-   class="form-control col-8"
-   onchange="sortCompetitors()">
-	<option value="name">Name</option>
-	<option value="sail">Sail Number</option>
-   </select>
-   </div>
-  </div>
- </div>
- <br />
+    <div class="row">
+        <div class="col-12">
+            <h1>@localizer["Competitors"]</h1>
+        </div>
+    </div>
+    @if (Model.CanEdit)
+    {
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <div class="col-3">
+                <a class="btn btn-primary" asp-action="CreateMultiple" asp-controller="Competitor">
+                    Create
+                </a>
+            </div>
+            <div class="col-6 col-sm-4 col-md-3">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Utilities
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" asp-action="Options" asp-controller="MergeCompetitor">
+                            Merge Two Competitors
+                        </a>
+                        <a class="dropdown-item" asp-action="ClearAltNumbers" asp-controller="Competitor">
+                            Clear Alt Sail Numbers
+                        </a>
+                        @* <div class="dropdown-divider"></div> *@
+                        <a class="dropdown-item" asp-action="InactivateMultiple" asp-controller="Competitor">
+                            Bulk Inactivate
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
+                    Club Admin
+                </a>
+            </div>
+        </div>
+    }
+    <div class="row">
+        @if (Model.CanEdit)
+        {
+            <div class="col-6 px-md-5 pt-2">
+                <input type="checkbox" id="show-inactive" name="show-inactive"
+                       class="form-check-input"
+                       value="show-inactive"
+                       checked
+                       onchange="changeVisibility(300)">
+                <label for="show-inactive"
+                       class="form-check-label"> Show inactive</label>
+            </div>
+        }
+        <div class="col-6 py-2">
+            <div class="row">
+                <label class="control-label col-form-label col-4"
+                       for="sort-order">Sort </label>
+                <div class="col-8">
+                    <select id="sort-order"
+                            class="form-select"
+                            onchange="sortCompetitors()">
+                        <option value="name">Name</option>
+                        <option value="sail">Sail Number</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
 
- <div id="comp-list">
-		@foreach (var item in Model.List)
-		{
-	  <div class="row border-bottom mb-1 pb-1 comp-row @(item.IsActive ? "" : "comp-inactive") " data-name="@item.Name" data-sail="@item.SailNumber">
-				@if (Model.CanEdit)
-				{
-		   <div class="col col-2 col-sm-1 pr-1">
-				@if(!item.IsDeletable)
-				{
-					<button class="btn btn-sm btn-outline-danger mr-2 mb-2 disabled"
-						   disabled="disabled"
-							title="Cannot be deleted: @item.PreventDeleteReason">
-					 <span class="fas fa-trash"></span>
-					</button>
-				} else {
-					<a class="btn btn-sm btn-outline-danger mr-2 mb-2"
-				   asp-action="Delete"
-				   asp-controller="Competitor"
-				   asp-route-id="@item.Id"
-					title = "Delete">
-			 <span class="fas fa-trash"></span>
-			</a>
-				}
-<span class="d-none d-sm-inline"> </span><a class="btn btn-sm btn-outline-primary mb-2"
-													asp-action="Edit"
-													asp-controller="Competitor"
-													asp-route-id="@item.Id"
-													title="Edit">
-			 <span class="fas fa-pen"></span>
-			</a>
-		   </div>
-				}
-	   <div class="col col-10 col-sm-11">
-		<div class="row">
-		 <div class="col col-4 col-sm-4 col-lg-2">
-		  <a asp-route="Competitor"
-						   asp-route-clubInitials="@Model.ClubInitials"
-						   asp-route-sailNumber="@UrlUtility.GetUrlName(item.SailNumber)">
-		   <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
-		  </a>
-		 </div>
-		 <div class="col col-8 col-sm-4 col-lg-3">@Html.DisplayFor(modelItem => item.Name)</div>
-		 <div class="col col-4 col-sm-4 col-lg-2 small order-sm-12">
-							@Html.DisplayFor(modelItem => item.BoatClass.Name)
-		  <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
-		 </div>
-		 <div class="col col-8 col-sm-4 col-md-2"><em>@Html.DisplayFor(modelItem => item.BoatName)</em></div>
-						<div class="d-none d-md-block col col-2 small text-muted">
-								@if (item.Created.HasValue)
-								{
-									@item.Created.Value.ToString("d")
-								}
-						</div>
-		 <div class="col-12 order-last">
-			@Html.DisplayFor(modelItem => item.Notes)
-		 </div>
-		</div>
-	   </div>
-	  </div>
-		}
- </div>
+    <div id="comp-list">
+        @foreach (var item in Model.List)
+        {
+            <div class="row border-bottom mb-1 pb-1 comp-row @(item.IsActive ? "" : "comp-inactive") " data-name="@item.Name" data-sail="@item.SailNumber">
+                @if (Model.CanEdit)
+                {
+                    <div class="col-2 pe-1">
+                        @if (!item.IsDeletable)
+                        {
+                            <span data-bs-toggle="tooltip" title="Cannot be deleted: @item.PreventDeleteReason">
+                            <button class="btn btn-sm btn-outline-danger me-2 mb-2 disabled"
+                                    disabled="disabled"
+                                type="button">
+                                <span class="fas fa-trash"></span>
+                            </button>
+                            </span>
+                        }
+                        else
+                        {
+                            <a class="btn btn-sm btn-outline-danger me-2 mb-2"
+                               asp-action="Delete"
+                               asp-controller="Competitor"
+                               asp-route-id="@item.Id"
+                               title="Delete">
+                                <span class="fas fa-trash"></span>
+                            </a>
+                        }
+                        <span class="d-none d-sm-inline"> </span><a class="btn btn-sm btn-outline-primary mb-2"
+                                                                    asp-action="Edit"
+                                                                    asp-controller="Competitor"
+                                                                    asp-route-id="@item.Id"
+                                                                    title="Edit">
+                            <span class="fas fa-pen"></span>
+                        </a>
+                    </div>
+                }
+                <div class="col @(Model.CanEdit ? "col-10" : "col-12")">
+                    <div class="row">
+                        <div class="col-6 col-md-3">
+                            <a asp-route="Competitor"
+                               asp-route-clubInitials="@Model.ClubInitials"
+                               asp-route-urlName="@UrlUtility.GetUrlName(item.UrlName)">
+                                <strong>@Html.DisplayFor(modelItem => item.SailNumber)</strong>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <small>@Html.DisplayFor(modelItem => item.BoatClass.Name)</small>
+                            <em>@Html.DisplayFor(modelItem => item.BoatName)</em>
+                            @if(Model.CanEdit) {
+                            <div class="form-check form-check-inline float-end">
+                                <input class="form-check-input comp-active-switch" type="checkbox"
+                                       @(item.IsActive ? "checked" : "")
+                                       data-ss-competitorid="@item.Id">
+                                <label class="form-check-label" for="switchCheckChecked"><em>Active</em></label>
+                                </div>
+                            } else
+                            {
+                                <em class="text-warning small float-end">@(item.IsActive ? "" : "Inactive")</em>
+                            }
+
+                        </div>
+                            
+                        <div class="d-none d-md-block col-md-12 col-lg-9 ">
+                            @Html.DisplayFor(modelItem => item.Notes)
+                        </div>
+
+                        <div class="d-none d-lg-inline col-3">
+                            <span class="small text-muted float-end">
+                            @if (item.Created.HasValue)
+                            {
+                                @localizer["created"]
+                                @Html.Raw(" ")
+                                @item.Created.Value.ToString("d")
+                                }
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
 
 @section Scripts {
-<script>
+    <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-	function setCookie(name, value, days) {
-		const d = new Date();
-		d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-		const expires = "expires=" + d.toUTCString();
-		document.cookie = name + "=" + value + ";" + expires + ";path=/";
-	}
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
 
-	function getCookie(name) {
-		const cname = name + "=";
-		const decodedCookie = decodeURIComponent(document.cookie);
-		const ca = decodedCookie.split(';');
-		for (let i = 0; i < ca.length; i++) {
-			let c = ca[i];
-			while (c.charAt(0) == ' ') {
-				c = c.substring(1);
-			}
-			if (c.indexOf(cname) == 0) {
-				return c.substring(cname.length, c.length);
-			}
-		}
-		return "";
-	}
+        function getCookie(name) {
+            const cname = name + "=";
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(cname) == 0) {
+                    return c.substring(cname.length, c.length);
+                }
+            }
+            return "";
+        }
 
-	function sortCompetitors() {
-		selectedSort = $('#sort-order').val();
-		setCookie('competitorSortOrder', selectedSort, 30); // Store the sort order in a cookie for 30 days
-		var result = $('.comp-row').sort(function (a, b) {
-			var contentA = $(a).data((undefined != selectedSort && selectedSort === 'sail') ? 'sail' : 'name');
-			var contentB = $(b).data((undefined != selectedSort && selectedSort === 'sail') ? 'sail' : 'name');
-			return alphanumericCompare('' + contentA, '' + contentB);
-		});
-		$('#comp-list').empty();
-		$('#comp-list').append(result);
-	};
+        function sortCompetitors() {
+            selectedSort = $('#sort-order').val();
+            setCookie('competitorSortOrder', selectedSort, 30); // Store the sort order in a cookie for 30 days
+            var result = $('.comp-row').sort(function (a, b) {
+                var contentA = $(a).data((undefined != selectedSort && selectedSort === 'sail') ? 'sail' : 'name');
+                var contentB = $(b).data((undefined != selectedSort && selectedSort === 'sail') ? 'sail' : 'name');
+                return alphanumericCompare('' + contentA, '' + contentB);
+            });
+            $('#comp-list').empty();
+            $('#comp-list').append(result);
+        };
 
-	function alphanumericCompare(x, y) {
-		// if the first word is numeric on both, compare as numbers
-		if (x && y && x.length > 0 && y.length > 0) {
-			const xWord = x.trim().split(' ')[0];
-			const yWord = y.trim().split(' ')[0];
-			if (xWord.length > 0 && yWord.length > 0 && /^\d+$/.test(xWord) && /^\d+$/.test(yWord)) {
-				return parseInt(xWord, 10) - parseInt(yWord, 10);
-			}
+        function alphanumericCompare(x, y) {
+            // if the first word is numeric on both, compare as numbers
+            if (x && y && x.length > 0 && y.length > 0) {
+                const xWord = x.trim().split(' ')[0];
+                const yWord = y.trim().split(' ')[0];
+                if (xWord.length > 0 && yWord.length > 0 && /^\d+$/.test(xWord) && /^\d+$/.test(yWord)) {
+                    return parseInt(xWord, 10) - parseInt(yWord, 10);
+                }
 
-			const firstWordComparison = xWord.localeCompare(yWord);
-			if (firstWordComparison !== 0 || !xWord.trim() || !yWord.trim()) {
-				return firstWordComparison;
-			}
-			return alphanumericCompare(x.substring(xWord.length), y.substring(yWord.length));
-		}
-		return x.localeCompare(y);
-	}
+                const firstWordComparison = xWord.localeCompare(yWord);
+                if (firstWordComparison !== 0 || !xWord.trim() || !yWord.trim()) {
+                    return firstWordComparison;
+                }
+                return alphanumericCompare(x.substring(xWord.length), y.substring(yWord.length));
+            }
+            return x.localeCompare(y);
+        }
 
-	function changeVisibility(speed) {
-		if (speed == null) {
-			speed = 300;
-		}
 
-		if($('#show-inactive').is(":checked") ) {
-			$('.comp-row').show(speed);
-			setCookie('showInactiveComps', true, 30);
-		} else {
-			$('.comp-inactive').hide(speed);
-			setCookie('showInactiveComps', false, 30);
-		}
-	};
 
-	$(document).ready(function () {
-		const savedSortOrder = getCookie('competitorSortOrder');
-		const showInactiveCompsString = getCookie('showInactiveComps');
-		const showInactiveComps = (showInactiveCompsString === 'true');
+        function changeVisibility(speed) {
+            if (speed == null) {
+                speed = 300;
+            }
 
-		if (savedSortOrder) {
-			$('#sort-order').val(savedSortOrder);
-		}
-		if (!showInactiveComps) {
-			$('#show-inactive').prop('checked', false);
-		} else {
-				console.log("set checkbox true");
-			$('#show-inactive').prop('checked', true);
-		}
-		sortCompetitors();
-		changeVisibility(0);
-	});
-</script>
+            if($('#show-inactive').is(":checked") ) {
+                $('.comp-row').show(speed);
+                setCookie('showInactiveComps', true, 30);
+            } else {
+                $('.comp-inactive').hide(speed);
+                setCookie('showInactiveComps', false, 30);
+            }
+        }
+
+        function callAjaxCompActivate(
+                competitorId,
+                active,
+                domElement) {
+                var token = $('input[name="__RequestVerificationToken"]').val();
+        
+                let ajaxUrl = 'competitor/SetCompActive'; // Default relative URL
+                const currentPath = window.location.pathname.toLowerCase(); // Convert to lowercase for case-insensitive comparison
+
+                if (currentPath.endsWith("competitor/")) {
+                    ajaxUrl = 'SetCompActive'; // Adjust the URL for "competitor/"
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: ajaxUrl,
+                    data: { CompetitorId: competitorId, Active: active },
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    dataType: "json"
+                }).done(function (data) {
+                    updateActiveUi(competitorId, active, domElement);
+                }).fail(function () {
+                    $(domElement).prop('checked', !active);
+                });
+        }
+
+        function updateActiveUi(
+            competitorId,
+            active,
+            domElement) {
+                var ancestor = $(domElement).closest(".comp-row")
+                if (active) {
+                    ancestor.removeClass('comp-inactive');
+                } else {
+                    ancestor.addClass('comp-inactive');
+                }
+
+                if($('#show-inactive').is(":checked") ) {
+                    $('.comp-row').show(300);
+                } else {
+                    $('.comp-inactive').hide(300);
+                }
+            }
+
+        function initializeToggles() {
+            $('.comp-active-switch').on('change', function() {
+                let activate = $(this).is(':checked');
+                let compId = $(this).data('ss-competitorid');
+
+                callAjaxCompActivate(
+                    compId,
+                    activate,
+                    this
+                );
+
+            });
+        }
+
+        $(document).ready(function () {
+            const savedSortOrder = getCookie('competitorSortOrder');
+            const showInactiveCompsString = getCookie('showInactiveComps');
+            const showInactiveComps = (showInactiveCompsString === 'true');
+
+            if (savedSortOrder) {
+                $('#sort-order').val(savedSortOrder);
+            }
+            if (!showInactiveComps) {
+                $('#show-inactive').prop('checked', false);
+            } else {
+                    console.log("set checkbox true");
+                $('#show-inactive').prop('checked', true);
+            }
+            sortCompetitors();
+            changeVisibility(0);
+            initializeToggles();
+        });
+    </script>
 }

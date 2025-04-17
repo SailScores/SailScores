@@ -1,15 +1,15 @@
-﻿@model IEnumerable<SailScores.Web.Models.SailScores.FleetDeleteViewModel>
+@model IEnumerable<SailScores.Web.Models.SailScores.FleetDeleteViewModel>
 <div id="fleetsdiv">
     <div class="row">
         <div class="col-10 col-sm-8 col-md-5 col-lg-4">
-            <h3 class="float-left">
+            <h3 class="float-start">
                 <a id="fleets">Fleets</a>
                 <a class="text-primary"
-                    data-container="body"
-                    data-toggle="popover"
-                    data-placement="top"
-                    data-trigger="focus hover"
-                    data-content="Fleets group boats that race against each other. Competitors can belong to
+                    data-bs-container="body"
+                    data-bs-toggle="popover"
+                    data-bs-placement="top"
+                    data-bs-trigger="focus hover"
+                    data-bs-content="Fleets group boats that race against each other. Competitors can belong to
         multiple fleets.">
                     <span class="far fa-question-circle"></span>
                 </a>
@@ -28,16 +28,18 @@
     </div>
     @foreach (var item in Model.OrderBy(f => f.Name))
     {
-        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ml-md-2">
+        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
             <div class="col-12 col-sm-6 col-md-6">
 
                 @if(!item.IsDeletable)
 				{
+                    <span data-bs-toggle="tooltip" title="Cannot be deleted: @item.PreventDeleteReason">
 					<button class="btn btn-sm btn-outline-danger disabled"
 				       disabled="disabled"
-					   title="Cannot be deleted: @item.PreventDeleteReason">
+                        type="button">
 			         <span class="fas fa-trash"></span>
 			        </button>
+                    </span>
 				} else {
 				    <a class="btn btn-sm btn-outline-danger"
 				       asp-action="Delete"
@@ -61,7 +63,7 @@
             </div>
             <div class="col-12 col-sm-6 col-md-3">
                 @Html.DisplayFor(modelItem => item.Description)
-                <em class="text-info">@(item.IsRegattaFleet ? "Regatta fleet" : "")</em>
+                <em class="text-muted">@(item.IsRegattaFleet ? "Regatta fleet" : "")</em>
                 <em class="text-warning">@(item.IsActive ? "" : "Inactive")</em>
             </div>
         </div>

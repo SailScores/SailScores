@@ -414,9 +414,30 @@ public class CompetitorService : ICompetitorService
             .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
     }
 
-    public async Task<IList<Db.DeletableInfo>> GetDeletableInfo(Guid clubId)
+    public async Task<IDictionary<Guid, Tuple<DateTime?, DateTime?>>> GetCompetitorActiveDates2(Guid clubId)
     {
-        return await _dbContext.GetDeletableInfoForCompetitorsAsync(clubId);
+        // get the min and max race dates for each competitor
+        var dates = await _dbContext.Competitors
+                .Where(c => c.ClubId == clubId)
+                .Where(c => c.Scores.Any()) // Ensure competitors have scores
+                .Select(c => new
+                {
+                    CompetitorId = c.Id,
+                    MinRaceDate = c.Scores.Min(s => s.Race.Date),
+                    MaxRaceDate = c.Scores.Max(s => s.Race.Date)
+                })
+                .ToListAsync();
+        // Convert to dictionary
+        var result = dates.ToDictionary(
+            d => d.CompetitorId,
+            d => new Tuple<DateTime?, DateTime?>(d.MinRaceDate, d.MaxRaceDate));
+        return result;
+    }
+
+    public async Task<IList<Database.Entities.CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId)
+    {
+        // get the min and max race dates for each competitor
+        return await _dbContext.GetCompetitorActiveDates(clubId);
     }
 
     public Task<Dictionary<Guid, DateTime?>> GetLastActiveDates(Guid clubId)
@@ -468,5 +489,13 @@ public class CompetitorService : ICompetitorService
             modelList[key] = list;
         }
         return modelList;
+    }
+
+    public async Task SetCompetitorActive(Guid clubId, Guid competitorId, bool active)
+    {
+        var comp = _dbContext.Competitors
+            .Single(c => c.Id == competitorId && c.ClubId == clubId);
+        comp.IsActive = active;
+        await _dbContext.SaveChangesAsync();
     }
 }

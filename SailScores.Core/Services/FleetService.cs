@@ -147,6 +147,9 @@ namespace SailScores.Core.Services
         public async Task<IEnumerable<Series>> GetSeriesForFleet(Guid fleetId)
         {
             var dbSeries = _dbContext.Series
+                .Include(s => s.Season)
+                .Include(s => s.RaceSeries)
+                .ThenInclude(rs => rs.Race)
                 .Where(
                 s => s.RaceSeries.Any(rs => rs.Race.Fleet.Id == fleetId));
             return _mapper.Map<IEnumerable<Series>>(dbSeries);

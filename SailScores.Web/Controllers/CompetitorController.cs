@@ -44,6 +44,10 @@ public class CompetitorController : Controller
     // GET: Competitor
     public async Task<ActionResult> Index(string clubInitials)
     {
+        if (String.IsNullOrWhiteSpace(clubInitials))
+        {
+            return new NotFoundResult();
+        }
         var canEdit = await _authService.CanUserEdit(User, clubInitials);
         var competitors = await _competitorService
             .GetCompetitorsWithDeletableInfoAsync(clubInitials, canEdit);
@@ -170,7 +174,7 @@ public class CompetitorController : Controller
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Admin");
+            return RedirectToAction("Index", "Competitor");
         }
         catch
         {
@@ -483,6 +487,25 @@ public class CompetitorController : Controller
 
 		return RedirectToAction("Index", "Competitor");
 	}
+
+    [HttpPost]
+    [ActionName("SetCompActive")]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> PostCompActive(
+        string clubInitials,
+        CompetitorActivateViewModel compActivate)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+        await _competitorService.SetCompetitorActive(clubId, 
+            compActivate.CompetitorId,
+            compActivate.Active);
+        return new JsonResult(new object()); ;
+
+    }
 
 	[HttpGet]
     public async Task<ActionResult> Utilities(

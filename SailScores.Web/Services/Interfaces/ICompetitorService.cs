@@ -31,4 +31,5 @@ public interface ICompetitorService
     Task InactivateSince(Guid clubId, DateTime sinceDate);
     Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId);
     Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId);
+    Task SetCompetitorActive(Guid clubId, Guid competitorId, bool active);
 }

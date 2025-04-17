@@ -15,13 +15,13 @@
     var displayName = (!String.IsNullOrWhiteSpace(user.FirstName) && !String.IsNullOrWhiteSpace(user.LastName) )
         ? $"{user.FirstName} {user.LastName}"
         : user.Email;
-    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="float-right">
-        <a class="btn btn-link float-right" href="/Identity/Account/Manage/UpdateProfile" title="Update User Info">@displayName</a><br />
-        <button type="submit" class="btn btn-link float-right">@localizer["Log out"]</button>
+    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="float-end">
+        <a class="float-end" href="/Identity/Account/Manage/UpdateProfile" title="Update User Info">@displayName</a><br />
+        <button type="submit" class="btn btn-link float-end" >@localizer["Log out"]</button>
     </form>
 }
 else
 {
-    <a class="nav-link pt-0" asp-area="" asp-controller="Account" asp-action="Login"
+    <a class="float-end" asp-area="" asp-controller="Account" asp-action="Login"
        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">@localizer["Log in"]</a>
 }

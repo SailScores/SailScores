@@ -1,4 +1,4 @@
-﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Models.SailScores;
 @model ClubItemViewModel<FleetSummary>
 
 @{
@@ -9,13 +9,12 @@
 <h2>@Model.Item.Name</h2>
 
 <ul>
-    @foreach (var item in Model.Item.Series.OrderBy(s => s.Name))
+    @foreach (var item in Model.Item.Series.OrderBy(s => s.Season.Name).ThenBy(s => s.Name))
     {
         <li>
             <a href="~/@Model.ClubInitials/@item.Season.UrlName/@item.Name">
-                @Html.DisplayFor(modelItem => item.Name) (@(item.Races?.Count.ToString() ?? "No") Races)
+                @item.Season.Name @Html.DisplayFor(modelItem => item.Name) (@(item.Races?.Count.ToString() ?? "No") Races)
             </a>
-
         </li>
     }
 </ul>

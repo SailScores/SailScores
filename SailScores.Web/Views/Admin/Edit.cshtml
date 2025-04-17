@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.AdminViewModel
+@model SailScores.Web.Models.SailScores.AdminViewModel
 
 @{
     ViewData["Title"] = "Edit " + Model.Name;
@@ -13,20 +13,20 @@
     <form asp-action="Edit">
         <input hidden asp-for="Id" class="form-control" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
+        <div class="mb-3">
             <label asp-for="Name" class="control-label"></label>
             <input asp-for="Name" class="form-control" autocomplete="off"/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label asp-for="Description" class="control-label"></label>
             <a target="_blank" href="https://www.markdownguide.org/">
                 <span title="Supports MarkDown formatting" class="fab fa-markdown"></span></a>
             <textarea asp-for="Description" class="form-control" cols="60" rows="6"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
+        <div class="row">
+            <div class="mb-3 col-md-6">
                 <div class="checkbox">
                     <label>
                         <input asp-for="IsHidden" /> Hidden
@@ -34,7 +34,7 @@
                     <span class="small">Hide this club on the front page list?</span>
                 </div>
             </div>
-            <div class="form-group col-md-6">
+            <div class="mb-3 col-md-6">
                 <div class="checkbox">
                     <label>
                         <input asp-for="ShowClubInResults" /> Show Clubs
@@ -43,15 +43,15 @@
                 </div>
             </div>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label asp-for="Url" class="control-label"></label>
             <span class="small">External website for the club</span>
             <input asp-for="Url" class="form-control" />
             <span asp-validation-for="Url" class="text-danger"></span>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label asp-for="DefaultScoringSystemId">Default Scoring System</label>
-            <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-control">
+            <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-select">
                 @foreach (var scoringSystem in Model.ScoringSystemOptions)
                 {
                     <option value="@scoringSystem.Id">
@@ -62,63 +62,76 @@
             <span asp-validation-for="DefaultScoringSystemId" class="text-danger"></span>
         </div>
         <div class="row">
-            <div class="form-group col-sm-6">
-                <div class="form-row">
+            <div class="mb-3 col-sm-6">
+                <div class="row">
                     <label class="col-6 col-form-label"
                             asp-for="Latitude"></label>
+                    <div class="col-6">
                     <input asp-for="Latitude"
-                            class="form-control col-6"
+                            class="form-control"
                             type="text" pattern="[0-9]+([\.,][0-9]+)?" />
                     <span asp-validation-for="Latitude" class="text-danger"></span>
                         <small id="emailHelp" class="form-text text-muted">Positive numbers are Northern Hemisphere.</small>
+                    </div>
                 </div>
             </div>
-            <div class="form-group col-sm-6">
-                <div class="form-row">
+            <div class="mb-3 col-sm-6">
+                <div class="row">
                     <label class="col-6 col-form-label"
                             asp-for="Longitude"></label>
+
+                        <div class="col-6">
                     <input asp-for="Longitude"
-                            class="form-control col-6"
+                            class="form-control"
                             type="text" pattern="[0-9]+([\.,][0-9]+)?" />
                     <span asp-validation-for="Longitude" class="text-danger"></span>
 
                         <small id="emailHelp" class="form-text text-muted">Negative for Western Hemisphere (including U.S.)</small>
                 </div>
+                </div>
             </div>
         </div>
         <div class="row">
-            <div class="form-group col-sm-6">
-                <div class="form-row">
+            <div class="mb-3 col-sm-6">
+                <div class="row">
                     <label class="col-6 col-form-label control-label"
                             asp-for="SpeedUnits">Wind Speed Units</label>
+
+                        <div class="col-6">
                     <select id="speedUnits" asp-for="SpeedUnits"
-                            class="form-control col-6"
+                            class="form-select"
                             asp-items="new SelectList(Model.SpeedUnitOptions)"></select>
                     <span asp-validation-for="SpeedUnits" class="text-danger"></span>
                 </div>
-            </div>
-            <div class="form-group col-sm-6">
-                <div class="form-row">
-                    <label class="col-6 col-form-label control-label"
-                            asp-for="TemperatureUnits">Temp Units</label>
-                    <select id="temperatureUnits" asp-for="TemperatureUnits"
-                            class="form-control col-6"
-                            asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
-                    <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
                 </div>
             </div>
-            <div class="form-group col-sm-6">
-                <div class="form-row">
+            <div class="mb-3 col-sm-6">
+                <div class="row">
+                    <label class="col-6 col-form-label control-label"
+                            asp-for="TemperatureUnits">Temp Units</label>
+
+                        <div class="col-6">
+                    <select id="temperatureUnits" asp-for="TemperatureUnits"
+                            class="form-select"
+                            asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
+                    <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-6">
+                <div class="row">
                     <label class="col-6 col-form-label control-label"
                            asp-for="Locale">Localization</label>
+                        <div class="col-6">
                     <select id="locale" asp-for="Locale"
-                            class="form-control col-6"
+                            class="form-select col-6"
                             asp-items="new SelectList(Model.LocaleOptions)"></select>
                     <span asp-validation-for="Locale" class="text-danger"></span>
                 </div>
+                </div>
             </div>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <input type="submit" value="Save" class="btn btn-primary" />
             <a asp-controller="Admin"
                asp-action="Index"

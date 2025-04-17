@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sql\CompetitorActiveDates.sql" />
     <EmbeddedResource Include="Sql\DeletableCompetitors.sql" />
     <EmbeddedResource Include="Sql\SiteStats.sql" />
     <EmbeddedResource Include="Sql\ClubStats.sql" />

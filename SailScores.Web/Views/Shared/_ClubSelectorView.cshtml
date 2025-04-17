@@ -1,5 +1,5 @@
-﻿@model SailScores.Web.Models.SailScores.ClubSelectorModel
-<select id="clubSelect" hidden asp-for="SelectedClubInitials" class="form-control"
+@model SailScores.Web.Models.SailScores.ClubSelectorModel
+<select id="clubSelect" hidden asp-for="SelectedClubInitials" class="form-select"
         aria-label="Select Club"
         onchange="window.location.href = '/' + this.value;"
         autocomplete="off"

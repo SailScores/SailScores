@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Inactivate Competitors";
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
@@ -16,8 +16,8 @@
     participated in races since the given date.</p>
 <p>To set all competitors as inactive, select a date after your most recent race.</p>
 <form asp-action="InactivateAll">
-    <div class="form-row">
-        <div class="form-group col-md-6">
+    <div class="row">
+        <div class="mb-3 col-md-6">
           <label for="sinceDate" class="col-form-label">Affect competitors with no results after:</label>
         <input class="form-control" type="date" id="sinceDate"
             name="sinceDate" required />

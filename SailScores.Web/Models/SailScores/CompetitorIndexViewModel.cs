@@ -28,11 +28,15 @@ public class CompetitorIndexViewModel
     [StringLength(2000)]
     public String Notes { get; set; }
 
+    public String UrlName { get; set; }
+
     public DateTime? Created { get; set; }
     public BoatClass BoatClass { get; set; }
 
     public bool IsDeletable { get; internal set; }
     public object PreventDeleteReason { get; internal set; }
+    public DateTime? EarliestRacedDate { get; internal set; }
+    public DateTime? LatestRacedDate { get; internal set; }
 
     public override string ToString()
     {

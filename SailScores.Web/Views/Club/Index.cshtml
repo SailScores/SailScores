@@ -85,7 +85,7 @@
                         </a>
                         @if (series.UpdatedDate.HasValue && series.UpdatedDate > DateTime.Now.AddDays(-15))
                         {
-                            <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
+                            <span class="fst-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
                         }
                     </li>
                 }
@@ -105,7 +105,7 @@
                             <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
                             @if (series.UpdatedDate.HasValue)
                             {
-                                <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
+                                <span class="fst-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
                             }
                         </li>
                     }
@@ -185,7 +185,7 @@
                             <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">@series.Name</a>
                             @if (series.UpdatedDate.HasValue)
                             {
-                                <span class="font-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
+                                <span class="fst-italic small">@localizer["Updated"] @series.UpdatedDate.ToApproxTimeAgoString()</span>
                             }
                         </li>
                     }

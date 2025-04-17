@@ -1,4 +1,4 @@
-﻿@model SailScores.Web.Models.SailScores.AnnouncementWithOptions
+@model SailScores.Web.Models.SailScores.AnnouncementWithOptions
 
 @{
     ViewData["Title"] = "Add Notice";
@@ -14,13 +14,11 @@
             <input type="hidden" id="regattaId" asp-for="RegattaId" />
             <input type="hidden" id="timeOffset" asp-for="TimeOffset" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                
+            <div class="mb-3">
                 <textarea asp-for="Content" class="form-control" id="summernote" rows="4" ></textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
                 @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
                 {

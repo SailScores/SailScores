@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using Microsoft.AspNetCore.Mvc.ModelBinding
 
 @model SailScores.Web.Models.SailScores.CompetitorWithOptionsViewModel
 
@@ -15,26 +15,26 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="Name" class="control-label
                        @(ViewData.ModelState["SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
                        ></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="SailNumber" class="control-label"></label>
                 <input asp-for="SailNumber" class="form-control" />
                 <span asp-validation-for="SailNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="BoatName" class="control-label"></label>
                 <input asp-for="BoatName" class="form-control" />
                 <span asp-validation-for="BoatName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="BoatClassId" class="control-label">Class</label>
-                <select asp-for="BoatClassId" class="form-control">
+                <select asp-for="BoatClassId" class="form-select">
                     <option selected="selected">Select a class...</option>
                     @foreach (var boatclass in Model.BoatClassOptions)
                     {
@@ -49,16 +49,15 @@
                 <div class="card">
                     <div class="card-header" role="tab" id="advancedHeading">
                         <h5 class="mb-0">
-                            <a class="collapsed" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
-                                Additional Settings
-                            </a> <span class="small"><em>&ensp;Optional</em></span>
+                            <a class="collapsed" data-bs-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                Additional Settings<span class="fas fa-chevron-down"></span></a> <span class="small"><em>&ensp;Optional</em></span>
                         </h5>
                     </div>
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label asp-for="FleetIds" class="control-label">Fleets</label>
-                                <select id="seriesIds" asp-for="FleetIds" class="form-control selectpicker" multiple>
+                                <select id="seriesIds" asp-for="FleetIds" class="form-select" multiple>
                                     @foreach (var fleet in Model.FleetOptions)
                                     {
                                     <option value="@fleet.Id">
@@ -68,12 +67,12 @@
                                 </select>
                                 <span asp-validation-for="FleetIds" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label asp-for="HomeClubName" class="control-label"></label>
                                 <input asp-for="HomeClubName" class="form-control" />
                                 <span asp-validation-for="HomeClubName" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label asp-for="AlternativeSailNumber" class="control-label"></label>
                                 <input asp-for="AlternativeSailNumber" class="form-control" />
                                 <span asp-validation-for="AlternativeSailNumber" class="text-danger"></span>
@@ -83,7 +82,7 @@
                                 <label asp-for="IsActive" class="form-check-label"></label>
                                 <span asp-validation-for="IsActive" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label asp-for="Notes" class="control-label"></label>
                                 <input asp-for="Notes" class="form-control" />
                                 <span asp-validation-for="Notes" class="text-danger"></span>
@@ -93,7 +92,7 @@
                 </div>
             </div>
             <br />
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 <a asp-controller="Competitor"
                    asp-action="Index"

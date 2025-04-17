@@ -286,7 +286,7 @@ public class RaceController : Controller
             }
             await _raceService.Delete(id, await GetUserStringAsync());
 
-            return RedirectToAction("Index", "Admin");
+            return RedirectToAction("Index", "Race");
         }
         catch
         {

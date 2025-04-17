@@ -1,4 +1,4 @@
-﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Models.SailScores;
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
 @using SailScores.Web.Services
@@ -31,7 +31,6 @@
 }
 
 <div class="container p-0 p-md-2">
-    <h1 class="h1">Series</h1>
     @if (Model.CanEdit)
     {
         <div class="row bg-almost">
@@ -48,7 +47,7 @@
     {
         <div class="row">
             <div class="col-12 mx-n2" id="@item.FirstOrDefault()?.Season?.UrlName">
-                <h2>@item.Key<small> season</small></h2>
+                <h2 class="h1">@item.Key<small> season</small></h2>
             </div>
         </div>
         @foreach (var fleetGroup in item.GroupBy(s => s.FleetName, s => s))
@@ -75,11 +74,13 @@
                             <span class="d-none d-md-table-cell updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
                         }
                     </div>
-                    <div class="col-12 ml-3">
+                    <div class="col-12 ms-3">
                         @Html.DisplayFor(modelItem => series.Description)
                     </div>
                 </div>
             }
         }
+
+        <br />
     }
 </div>

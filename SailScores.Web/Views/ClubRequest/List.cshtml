@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SailScores.Web.Models.SailScores.ClubRequestViewModel>
+@model IEnumerable<SailScores.Web.Models.SailScores.ClubRequestViewModel>
 
 @{
     ViewData["Title"] = "List";
@@ -27,7 +27,7 @@
             <th scope="col">
                 @Html.DisplayNameFor(model => model.ContactName)
             </th>
-            <th scope="col">
+            <th scope="col" class="d-none d-md-block">
                 @Html.DisplayNameFor(model => model.Comments)
             </th>
             <th scope="col">
@@ -57,7 +57,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.ContactName)
             </td>
-            <td>
+                <td class="d-none d-md-block">
                 @Html.DisplayFor(modelItem => item.Comments)
             </td>
             <td>
@@ -68,8 +68,6 @@
             </td>
             <td>
                 @Html.ActionLink("Details", "Details", new { id = item.Id })
-                |
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id })
             </td>
         </tr>
 }

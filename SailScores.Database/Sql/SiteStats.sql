@@ -8,11 +8,11 @@ SELECT
     (SELECT COUNT(DISTINCT r2.Id)
     FROM
         Races r2
-    WHERE r2.ClubId = c.Id AND r2.Date >= (GETDATE() - 10)) AS RaceCount,
+    WHERE r2.ClubId = c.Id AND r2.Date >= (GETDATE() - 10) AND r2.Date < GETDATE() + 1) AS RaceCount,
     (SELECT COUNT(DISTINCT s2.Id)
     FROM
         Races r2 INNER JOIN Scores s2 ON s2.RaceId = r2.Id
-    WHERE r2.ClubId = c.Id AND r2.Date >= (GETDATE() - 10)) AS ScoreCount
+    WHERE r2.ClubId = c.Id AND r2.Date >= (GETDATE() - 10) AND r2.Date < GETDATE() + 1) AS ScoreCount
 FROM
     Races r
     FULL OUTER JOIN Clubs c

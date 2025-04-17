@@ -1,4 +1,11 @@
-﻿@model SailScores.Web.Models.SailScores.RaceViewModel
+
+
+@{
+    ViewBag.Title = "Delete Race";
+    Layout = "_ClubLayout";
+}
+
+@model SailScores.Web.Models.SailScores.RaceViewModel
 
 <h3>Are you sure you want to delete this race?</h3>
 <div>
@@ -41,8 +48,21 @@
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="ClubId" />
         <input type="submit" value="Delete" class="btn btn-danger" />
-        <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
-            class="btn btn-outline-primary">Cancel</a>
+        @if (!String.IsNullOrEmpty(ViewData["ReturnUrl"]?.ToString()))
+        {
+            <a href="@(ViewData["ReturnUrl"])"
+               class="btn btn-outline-primary">Cancel</a>
+        }
+        else if (!String.IsNullOrEmpty(Model?.Season?.UrlName)){
+            <a asp-controller = "race"
+               asp-action="index"
+               asp-route-seasonName="@Model.Season.UrlName"
+               class="btn btn-outline-primary">Cancel</a>
+        } else {
+            <a asp-controller = "race"
+               asp-action="index"
+               class="btn btn-outline-primary">Cancel</a>
+        }
     </form>
 </div>
 

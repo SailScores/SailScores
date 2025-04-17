@@ -4,7 +4,6 @@
 
 import $ from "jquery";
 import "bootstrap";
-import "bootstrap-select";
 
 import { competitorDto} from "./interfaces/server";
 
@@ -83,7 +82,7 @@ function addMissingToCompetitorList() {
     var oldIds = oldOptions.map((i, e: HTMLOptionElement) => e.value) as unknown as Array<string>;
     var missing = allCompetitors.filter(c => $.inArray('' + c.id, oldIds)=== -1);
 
-    var compSelect = document.getElementById("CompetitorIds") as HTMLSelectElement;
+    var compSelect = document.getElementById("competitorIds") as HTMLSelectElement;
     var classSelection = document.getElementById("createCompBoatClassSelect") as HTMLSelectElement;
     var className = classSelection.options[classSelection.selectedIndex].text;
 
@@ -99,7 +98,7 @@ function addMissingToCompetitorList() {
         }
         compSelect.options.add(new Option(newText, "" + missing[j].id), compSelect.options[beforeIndex]);
     }
-    $("#CompetitorIds").selectpicker("refresh");
+    //$("#CompetitorIds").selectpicker("refresh");
     var modal = $("#createCompetitor");
     (<any>modal).modal("hide");
     $("#compLoading").hide();

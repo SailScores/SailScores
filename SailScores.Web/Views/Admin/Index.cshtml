@@ -71,7 +71,7 @@
     <div class="col-lg-8">
         <div class="row">
             <div class="col-md-2">
-                <span class="font-italic">@Html.DisplayNameFor(model => model.Description)</span>
+                <span class="fst-italic">@Html.DisplayNameFor(model => model.Description)</span>
             </div>
             <div class="col-md-10">
                 @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
@@ -79,7 +79,7 @@
         </div>
         <div class="row">
             <div class="col-4 col-md-2">
-                <span class="font-italic">Default Scoring</span>
+                <span class="fst-italic">Default Scoring</span>
             </div>
             <div class="col-8 col-md-10">
                 @Model.DefaultScoringSystemName
@@ -148,8 +148,16 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        $(function () {
-            $('[data-toggle="popover"]').popover()
+        // $(function () {
+        //     $('[data-bs-toggle="popover"]').popover()
+        // })
+
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+          return new bootstrap.Popover(popoverTriggerEl)
         })
 
     </script>

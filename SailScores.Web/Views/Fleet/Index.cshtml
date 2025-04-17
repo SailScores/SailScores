@@ -1,4 +1,4 @@
-﻿@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Models.SailScores;
 @model ClubCollectionViewModel<FleetSummary>
 
 @{
@@ -12,7 +12,7 @@
     @foreach (var item in Model.List.OrderBy(f => f.Name))
     {
         <li>
-            <a href="~/@Model.ClubInitials/fleet/@item.ShortName">
+            <a href="~/@Model.ClubInitials/Fleet/Details/@item.ShortName">
                 @Html.DisplayFor(modelItem => item.Name)
             </a>
         </li>
