@@ -230,6 +230,7 @@ namespace SailScores.Core.Services
             existingRegatta.UpdatedDate = DateTime.UtcNow;
             existingRegatta.ScoringSystemId = model.ScoringSystemId;
             existingRegatta.PreferAlternateSailNumbers = model.PreferAlternateSailNumbers;
+            existingRegatta.HideFromFrontPage = model.HideFromFrontPage;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty

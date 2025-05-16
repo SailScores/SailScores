@@ -57,6 +57,7 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.Series, o => o.MapFrom(s => s.RegattaSeries.Select(rs => rs.Series).ToList()))
                 .ForMember(d => d.Fleets, o => o.MapFrom(s => s.RegattaFleet.Select(rs => rs.Fleet).ToList()))
                 .ForMember(d => d.PreferAlternateSailNumbers, o => o.MapFrom(s => s.PreferAlternateSailNumbers ?? false))
+                .ForMember(d => d.HideFromFrontPage, o => o.MapFrom(s => s.HideFromFrontPage ?? false))
                 .ForMember(d => d.Documents, o => o.Ignore())
                 .ReverseMap();
             CreateMap<Db.Announcement, Model.Announcement>()

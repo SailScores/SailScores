@@ -86,14 +86,14 @@
                     <div class="card-header" role="tab" id="advancedHeading">
                         <h5 class="mb-0">
                             <a class="collapsed" data-bs-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
-                                Additional Settings
-                            </a> <span class="small"><em>&ensp;Optional</em></span>
+                                Additional Settings <span class="fas fa-chevron-down"></span></a>
+                                <span class="small"><em>&ensp;Optional</em></span>
                         </h5>
                     </div>
 
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
-
+                            <div class="row">
                             <div class="mb-3">
                                 <label asp-for="ScoringSystemId">Default Scoring System</label><a
                                     class="text-primary"
@@ -114,6 +114,15 @@
                                 </select>
                                 <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
                             </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input asp-for="HideFromFrontPage" class="form-check-input" type="checkbox" />
+                                        <label asp-for="HideFromFrontPage" class="form-check-label">Hide From Front Page</label>
+                                    </div>
+                                </div>
+                             </div>
                         </div>
                     </div>
                 </div>

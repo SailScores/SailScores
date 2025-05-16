@@ -56,6 +56,7 @@ public class RegattaService : IRegattaService
         var coreRegattas = await _coreRegattaService.GetRegattasDuringSpanAsync(start, end)
             .ConfigureAwait(false);
         var filteredRegattas = coreRegattas
+            .Where(r => r.HideFromFrontPage == false)
             .OrderBy(s => s.StartDate)
             .ThenBy(s => s.Name);
         var vm = _mapper.Map<IList<RegattaSummaryViewModel>>(filteredRegattas);

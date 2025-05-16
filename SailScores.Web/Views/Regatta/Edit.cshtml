@@ -66,14 +66,14 @@
                     <div class="card-header" role="tab" id="advancedHeading">
                         <h5 class="mb-0">
                             <a class="collapsed" data-bs-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
-                                Additional Settings
-                            </a> <span class="small"><em>&ensp;Optional</em></span>
+                                Additional Settings <span class="fas fa-chevron-down"></span></a>
+                                <span class="small"><em>&ensp;Optional</em></span>
                         </h5>
                     </div>
 
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
-
+                            <div class="row">
                             <div class="mb-3">
                                 <label asp-for="ScoringSystemId">Default Scoring System</label>
                                 <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
@@ -89,8 +89,17 @@
                             <div class="mb-3">
                                 <div class="checkbox">
                                     <label>
-                                        <input asp-for="PreferAlternateSailNumbers" /> Prefer Alternate Sail Numbers
+                                        <input asp-for="PreferAlternateSailNumbers" class="form-check-input" type="checkbox" /> Prefer Alternate Sail Numbers
                                     </label>
+                                </div>
+                            </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input asp-for="HideFromFrontPage" class="form-check-input" type="checkbox" />
+                                        <label asp-for="HideFromFrontPage" class="form-check-label">Hide From Front Page</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>

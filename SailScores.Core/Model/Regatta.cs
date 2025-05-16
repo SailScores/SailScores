@@ -29,6 +29,8 @@ namespace SailScores.Core.Model
 
         public DateTime? UpdatedDate { get; set; }
 
+        public bool HideFromFrontPage { get; set; }
+
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:D}")]
@@ -47,5 +49,6 @@ namespace SailScores.Core.Model
         public IList<Announcement> Announcements { get; set; }
 
         public IList<Document> Documents { get; set; }
+
     }
 }

@@ -35,4 +35,5 @@ public class Regatta
     public bool? PreferAlternateSailNumbers { get; set; }
 
     public IList<Announcement> Announcements { get; set; }
+    public bool? HideFromFrontPage { get; set; }
 }
