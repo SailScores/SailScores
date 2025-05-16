@@ -8,9 +8,10 @@
 <h4>Edit Fleet
 @if(Model.Regatta != null)
     {
-        <small>for regatta: <span class="text-info">@Model.Regatta.Season.Name @Model.Regatta.Name</span></small>
+        <small class="text-body-secondary">@Model.Regatta.Season.Name @Model.Regatta.Name</small>
     } else if(Model.RegattaId != null)
     {
+        <small class="text-body-secondary">(a regatta fleet)</small>
         <small class="="text-muted">(a regatta fleet)</small>
     }
 </h4>
