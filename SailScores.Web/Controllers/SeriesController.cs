@@ -77,7 +77,7 @@ public class SeriesController : Controller
             var forward = await _forwarderService.GetSeriesForwarding(clubInitials, season, seriesName);
             if (forward != null)
             {
-                return Redirect($"/{forward.NewClubInitials}/" +
+                return Redirect($"/{Uri.EscapeDataString(forward.NewClubInitials)}/" +
                     $"{forward.NewSeasonUrlName}/{forward.NewSeriesUrlName}");
             }
             else

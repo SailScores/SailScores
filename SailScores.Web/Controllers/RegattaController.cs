@@ -61,7 +61,7 @@ public class RegattaController : Controller
             var forward = await _forwarderService.GetRegattaForwarding(clubInitials, season, regattaName);
             if (forward != null)
             {
-                return Redirect($"/{forward.NewClubInitials}/Regatta/" +
+                return Redirect($"/{Uri.EscapeDataString(forward.NewClubInitials)}/Regatta/" +
                     $"{forward.NewSeasonUrlName}/{forward.NewRegattaUrlName}");
             }
             return NotFound();
@@ -145,7 +145,7 @@ public class RegattaController : Controller
 
     private string GetRegattaUrlPath(string clubInitials, Regatta regatta)
     {
-        return $"/{clubInitials}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}";
+        return $"/{Uri.EscapeDataString(clubInitials)}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}";
     }
 
     [Authorize]

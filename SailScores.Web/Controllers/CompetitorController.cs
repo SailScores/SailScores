@@ -74,7 +74,7 @@ public class CompetitorController : Controller
             var forward = await _forwarderService.GetCompetitorForwarding(clubInitials, urlName);
             if (forward != null)
             {
-                return Redirect($"/{forward.NewClubInitials}/Competitor/{forward.NewUrlName}");
+                return Redirect($"/{Uri.EscapeDataString(forward.NewClubInitials)}/Competitor/{Uri.EscapeDataString(forward.NewUrlName)}");
             }
             return NotFound();
         }
