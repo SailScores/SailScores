@@ -12,11 +12,18 @@ function checkEnter(e) {
 export function initialize() {
     document.querySelector('form').onkeypress = checkEnter;
     $('#fleetId').change(loadFleet);
-    if ($('#needsLocalDate').val() === "True") {
-        var now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        $('#date').val(now.toISOString().substring(0, 10));
-        $('#needsLocalDate').val('');
+    if ($("#defaultRaceDateOffset").val() == "") {
+        $('#date').val('');
+    }
+    else {
+        if ($('#needsLocalDate').val() === "True") {
+            var now = new Date();
+            const offset = parseInt($("#defaultRaceDateOffset").val(), 10);
+            now.setDate(now.getDate() + offset);
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            $('#date').val(now.toISOString().substring(0, 10));
+            $('#needsLocalDate').val('');
+        }
     }
     $('#date').change(dateChanged);
     $('#raceState').data("previous", $('#raceState').val());

@@ -153,13 +153,32 @@ public class RaceService : IRaceService
                 .OrderBy(s => s.Name).ToList(),
             CompetitorOptions = new List<Competitor>(),
             CompetitorBoatClassOptions = (await _coreClubService.GetAllBoatClasses(club.Id)).OrderBy(c => c.Name),
-            Date = DateTime.Today,
             Weather = await _weatherService.GetCurrentWeatherForClubAsync(club),
             WeatherIconOptions = GetWeatherIconOptions(),
             ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(club.Id),
             NeedsLocalDate = true,
             UseAdvancedFeatures = club.UseAdvancedFeatures ?? false
         };
+
+        switch (club.DefaultRaceDateOffset)
+        {
+            case null:
+                model.Date = null;
+                model.DefaultRaceDateOffset = null;
+                break;
+            case 0:
+                model.Date = DateTime.Today;
+                model.DefaultRaceDateOffset = 0;
+                break;
+            case -1:
+                model.Date = DateTime.Today.AddDays(-1);
+                model.DefaultRaceDateOffset = -1;
+                break;
+            default:
+                model.Date = DateTime.Today.AddDays(club.DefaultRaceDateOffset.Value);
+                model.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
+                break;
+        }
 
         return model;
     }
@@ -207,11 +226,7 @@ public class RaceService : IRaceService
             {
                 model.Weather = default;
             }
-        }
-        else
-        {
-            model.Date = DateTime.Today;
-        }
+        } // otherwise use the default date for typical club races, already filled in. 
         return model;
     }
 

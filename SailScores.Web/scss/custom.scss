@@ -421,6 +421,10 @@ form label.required:not(.custom-control-label)::after {
         }
     }
 
+    header.bg-dark, nav.bg-dark {
+        background-color: $secondary-background !important;
+    }
+
     svg text {
         color: $white;
         fill: $white;

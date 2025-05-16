@@ -31,6 +31,7 @@ public class RaceWithOptionsViewModel : RaceViewModel
     public IList<AdminToDoViewModel> Tips { get; set; }
     // help the client keep track of whether they might need to change the date.
     public bool? NeedsLocalDate { get; set; }
+    public int? DefaultRaceDateOffset { get; set; }
 
 }
 #pragma warning restore CA2227 // Collection properties should be read only

@@ -44,6 +44,8 @@ public class AdminViewModel
     public IList<string> SpeedUnitOptions { get; set; }
     public IList<string> TemperatureUnitOptions { get; set; }
 
+    public int? DefaultRaceDateOffset { get; set; }
+
     public string Locale { get; set; }
     public IList<string> LocaleOptions { get; set; }
 

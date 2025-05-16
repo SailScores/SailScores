@@ -121,15 +121,29 @@
             <div class="mb-3 col-sm-6">
                 <div class="row">
                     <label class="col-6 col-form-label control-label"
-                           asp-for="Locale">Localization</label>
-                        <div class="col-6">
-                    <select id="locale" asp-for="Locale"
-                            class="form-select col-6"
-                            asp-items="new SelectList(Model.LocaleOptions)"></select>
-                    <span asp-validation-for="Locale" class="text-danger"></span>
-                </div>
+                               asp-for="DefaultRaceDateOffset">Default Race Date</label>
+                    <div class="col-6">
+                        <select asp-for="DefaultRaceDateOffset" class="form-select">
+                            <option value="">Empty</option>
+                            <option value="0">Current date</option>
+                            <option value="-1">Previous Day</option>
+                        </select>
+                    <span asp-validation-for="DefaultRaceDateOffset" class="text-danger"></span>
+                    </div>
                 </div>
             </div>
+                <div class="mb-3 col-sm-6">
+                    <div class="row">
+                        <label class="col-6 col-form-label control-label"
+                               asp-for="Locale">Localization</label>
+                        <div class="col-6">
+                            <select id="locale" asp-for="Locale"
+                                    class="form-select col-6"
+                                    asp-items="new SelectList(Model.LocaleOptions)"></select>
+                            <span asp-validation-for="Locale" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
         </div>
         <div class="mb-3">
             <input type="submit" value="Save" class="btn btn-primary" />

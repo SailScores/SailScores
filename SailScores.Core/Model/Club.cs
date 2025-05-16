@@ -21,6 +21,8 @@ namespace SailScores.Core.Model
         public String Url { get; set; }
         public bool? UseAdvancedFeatures { get; set; }
 
+        public int? DefaultRaceDateOffset { get; set; }
+
         public WeatherSettings WeatherSettings { get; set; }
 
         public String Locale { get; set; }

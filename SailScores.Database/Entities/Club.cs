@@ -34,6 +34,7 @@ public class Club
 
     public ScoringSystem DefaultScoringSystem { get; set; }
     public Guid? DefaultScoringSystemId { get; set; }
+    public int? DefaultRaceDateOffset { get; set; }
     public IList<ScoringSystem> ScoringSystems { get; set; }
 
     public IList<ClubSequence> ClubSequences { get; set; }

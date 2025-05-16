@@ -337,6 +337,7 @@ namespace SailScores.Core.Services
             var dbClub = _mapper.Map<Db.Club>(club);
             dbClub.DefaultScoringSystem = null;
             dbClub.DefaultScoringSystemId = null;
+            dbClub.DefaultRaceDateOffset = 0;
             _dbContext.Clubs.Add(dbClub);
             var dbFleet = new Db.Fleet
             {
@@ -393,6 +394,7 @@ namespace SailScores.Core.Services
             dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
             dbClub.ShowClubInResults = club.ShowClubInResults;
             dbClub.Locale = club.Locale;
+            dbClub.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings.Latitude;

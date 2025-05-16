@@ -78,6 +78,7 @@ public class AdminController : Controller
                 clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
                 clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
                 clubAdmin.LocaleOptions = club.LocaleOptions;
+                clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
                 return View(clubAdmin);
             }
 
