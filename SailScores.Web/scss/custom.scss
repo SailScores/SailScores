@@ -7,6 +7,7 @@ $my-link-color: #0063CC;
 $primary: #0063CC;
 
 $body-bg-dark: #222222;
+$my-nav-bg-dark: #051154;
 $bg-darker: #191919;
 $font-family-sans-serif: "Open Sans", "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
@@ -82,6 +83,10 @@ body {
     padding-bottom: 20px;
     /* Margin bottom by footer height */
     margin-bottom: 130px;
+}
+
+header.bg-dark, nav.bg-dark {
+    background-color: $my-nav-bg-dark !important;
 }
 
 .select2-search {
