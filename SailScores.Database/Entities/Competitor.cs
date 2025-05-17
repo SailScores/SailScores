@@ -27,6 +27,8 @@ public class Competitor
     public IList<CompetitorFleet> CompetitorFleets { get; set; }
     public IList<Score> Scores { get; set; }
 
+    public IList<CompetitorHistory> History { get; set; }
+
     [StringLength(20)]
     public String UrlName { get; set; }
 
