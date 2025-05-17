@@ -40,6 +40,9 @@ namespace SailScores.Database
         DbSet<ClubRequest> ClubRequests { get; set; }
         DbSet<ClubSequence> ClubSequences { get; set; }
 
+        DbSet<ChangeType> ChangeTypes { get; set; }
+        DbSet<CompetitorChange> CompetitorChanges { get; set; }
+
         Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId);
 
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber);

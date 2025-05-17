@@ -53,6 +53,8 @@ public class SailScoresContext : DbContext, ISailScoresContext
     private DbSet<SiteStats> SiteStats { get; set; }
     private DbSet<DeletableInfo> CompetitorDeletableInfo { get; set; }
     private DbSet<CompetitorActiveDates> CompetitorActiveDates { get; set; }
+    public DbSet<ChangeType> ChangeTypes { get; set; }
+    public DbSet<CompetitorChange> CompetitorChanges { get; set; }
 
     public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId)
     {
@@ -294,6 +296,13 @@ public class SailScoresContext : DbContext, ISailScoresContext
             {
                 cs.HasNoKey();
             });
+
+        modelBuilder.Entity<ChangeType>().HasData(
+            new ChangeType { Id = ChangeType.CreatedId, Name = "Created" },
+            new ChangeType { Id = ChangeType.DeletedId, Name = "Deleted" },
+            new ChangeType { Id = ChangeType.ActivatedId, Name = "Activated" },
+            new ChangeType { Id = ChangeType.DeactivatedId, Name = "Deactivated" }
+        );
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

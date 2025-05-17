@@ -1,6 +1,6 @@
 ﻿namespace SailScores.Database.Entities;
 
-public class CompetitorHistory
+public class CompetitorChange
 {
     public Guid Id { get; set; }
     public Guid CompetitorId { get; set; }

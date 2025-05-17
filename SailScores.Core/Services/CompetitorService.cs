@@ -83,6 +83,7 @@ public class CompetitorService : ICompetitorService
                 .Competitors
                 .Include(c => c.CompetitorFleets)
                 .ThenInclude(cf => cf.Fleet)
+                .Include(c => c.ChangeHistory)
                 .FirstOrDefaultAsync(c => c.Id == id)
                 .ConfigureAwait(false);
 
@@ -153,6 +154,8 @@ public class CompetitorService : ICompetitorService
             }
 
             dbObject = _mapper.Map<Db.Competitor>(comp);
+            dbObject.ChangeHistory = new List<Db.CompetitorChange>();
+            dbObject.ChangeHistory.Add(GetCompCreatedChange());
             await _dbContext.Competitors.AddAsync(dbObject)
                 .ConfigureAwait(false);
         }
@@ -181,6 +184,18 @@ public class CompetitorService : ICompetitorService
         await _dbContext.SaveChangesAsync()
             .ConfigureAwait(false);
 
+    }
+
+    private Db.CompetitorChange GetCompCreatedChange()
+    {
+        return new Db.CompetitorChange
+        {
+            ChangeTimeStamp = DateTime.UtcNow,
+            ChangeTypeId = Db.ChangeType.CreatedId,
+            ChangedBy = "tester",
+            NewValue = String.Empty,
+            Summary = "Competitor Created"
+        };
     }
 
     private async Task SetForwardersAndUrlName(Db.Competitor dbObject, Competitor comp)
