@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Identity.Entities;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -21,6 +23,7 @@ public class CompetitorController : Controller
     private readonly ICsvService _csvService;
     private readonly IAdminTipService _adminTipService;
     private readonly IForwarderService _forwarderService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public CompetitorController(
         IClubService clubService,
@@ -29,6 +32,7 @@ public class CompetitorController : Controller
         IAuthorizationService authService,
         ICsvService csvService,
         IAdminTipService adminTipService,
+        UserManager<ApplicationUser> userManager,
         IMapper mapper)
     {
         _clubService = clubService;
@@ -37,6 +41,7 @@ public class CompetitorController : Controller
         _authService = authService;
         _csvService = csvService;
         _adminTipService = adminTipService;
+        _userManager = userManager;
         _mapper = mapper;
     }
 
@@ -272,7 +277,8 @@ public class CompetitorController : Controller
                 return Unauthorized();
             }
 
-            await _competitorService.SaveAsync(competitorsVm, clubId);
+            string username = await GetUserStringAsync();
+            await _competitorService.SaveAsync(competitorsVm, clubId, username);
 
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -502,7 +508,8 @@ public class CompetitorController : Controller
         }
         await _competitorService.SetCompetitorActive(clubId, 
             compActivate.CompetitorId,
-            compActivate.Active);
+            compActivate.Active,
+            await GetUserStringAsync());
         return new JsonResult(new object()); ;
 
     }
@@ -595,6 +602,12 @@ public class CompetitorController : Controller
         Response.Headers.Append("content-disposition", disposition);
 
         return View(competitors);
+    }
+
+    private async Task<string> GetUserStringAsync()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        return user.GetDisplayName();
     }
 
 }

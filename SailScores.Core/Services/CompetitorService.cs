@@ -84,6 +84,7 @@ public class CompetitorService : ICompetitorService
                 .Include(c => c.CompetitorFleets)
                 .ThenInclude(cf => cf.Fleet)
                 .Include(c => c.ChangeHistory)
+                .AsSingleQuery()
                 .FirstOrDefaultAsync(c => c.Id == id)
                 .ConfigureAwait(false);
 
@@ -119,21 +120,26 @@ public class CompetitorService : ICompetitorService
         return _mapper.Map<Model.Competitor>(competitor);
     }
 
-    public Task SaveAsync(Model.Competitor comp)
+    public Task SaveAsync(Model.Competitor comp,
+        string userName = "")
     {
         ArgumentNullException.ThrowIfNull(comp);
 
-        return SaveInternalAsync(comp);
+        return SaveInternalAsync(comp, userName);
     }
 
-    public Task SaveAsync(CompetitorDto comp)
+    public Task SaveAsync(
+        CompetitorDto comp,
+        string userName = "")
     {
         ArgumentNullException.ThrowIfNull(comp);
 
-        return SaveInternalAsync(_mapper.Map<Model.Competitor>(comp));
+        return SaveInternalAsync(_mapper.Map<Model.Competitor>(comp), userName);
     }
 
-    private async Task SaveInternalAsync(Model.Competitor comp)
+    private async Task SaveInternalAsync(
+        Model.Competitor comp,
+        string userName = "")
     {
         var dbObject = await _dbContext
             .Competitors
@@ -155,21 +161,93 @@ public class CompetitorService : ICompetitorService
 
             dbObject = _mapper.Map<Db.Competitor>(comp);
             dbObject.ChangeHistory = new List<Db.CompetitorChange>();
-            dbObject.ChangeHistory.Add(GetCompCreatedChange());
+            dbObject.ChangeHistory.Add(GetCompCreatedChange(userName));
             await _dbContext.Competitors.AddAsync(dbObject)
                 .ConfigureAwait(false);
         }
         else
         {
+            if(dbObject.ChangeHistory == null)
+            {
+                dbObject.ChangeHistory = new List<Db.CompetitorChange>();
+            }
+            if (dbObject.Name != comp.Name)
+            {
+                dbObject.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                    ChangedBy = userName,
+                    NewValue = comp.Name,
+                    Summary = "Competitor Name Changed"
+                });
+                dbObject.Name = comp.Name;
+            }
+            if(dbObject.SailNumber != comp.SailNumber)
+            {
+                dbObject.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                    ChangedBy = userName,
+                    NewValue = comp.SailNumber,
+                    Summary = "Sail Number Changed"
+                });
+                dbObject.SailNumber = comp.SailNumber;
+            }
+            if(dbObject.AlternativeSailNumber != comp.AlternativeSailNumber)
+            {
+                dbObject.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                    ChangedBy = userName,
+                    NewValue = comp.AlternativeSailNumber,
+                    Summary = "Alternative Sail Number Changed"
+                });
+                dbObject.AlternativeSailNumber = comp.AlternativeSailNumber;
+            }
+            if(dbObject.BoatName != comp.BoatName)
+            {
+                dbObject.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                    ChangedBy = userName,
+                    NewValue = comp.BoatName,
+                    Summary = "Boat Name Changed"
+                });
+                dbObject.BoatName = comp.BoatName;
+            }
+            if((dbObject.IsActive ?? true) && !comp.IsActive)
+            {
+                dbObject.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.DeactivatedId,
+                    ChangedBy = userName,
+                    NewValue = String.Empty,
+                    Summary = "Competitor Deactivated"
+                });
 
-            dbObject.Name = comp.Name;
-            dbObject.SailNumber = comp.SailNumber;
-            dbObject.AlternativeSailNumber = comp.AlternativeSailNumber;
-            dbObject.BoatName = comp.BoatName;
-            dbObject.Notes = comp.Notes;
-            dbObject.IsActive = comp.IsActive;
+                dbObject.IsActive = comp.IsActive;
+            } else if((dbObject.IsActive == false) && comp.IsActive)
+            {
+                dbObject.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.ActivatedId,
+                    ChangedBy = userName,
+                    NewValue = String.Empty,
+                    Summary = "Competitor Activated"
+                });
+
+                dbObject.IsActive = comp.IsActive;
+            }
+
             dbObject.HomeClubName = comp.HomeClubName;
-            if(dbObject.UrlId == null)
+            dbObject.Notes = comp.Notes;
+            if (dbObject.UrlId == null)
             {
                 dbObject.UrlId = await GetNextCompetitorSequence(comp.ClubId)
                    .ConfigureAwait(false);
@@ -186,15 +264,29 @@ public class CompetitorService : ICompetitorService
 
     }
 
-    private Db.CompetitorChange GetCompCreatedChange()
+    private Db.CompetitorChange GetCompCreatedChange(
+        string userName)
     {
         return new Db.CompetitorChange
         {
             ChangeTimeStamp = DateTime.UtcNow,
             ChangeTypeId = Db.ChangeType.CreatedId,
-            ChangedBy = "tester",
+            ChangedBy = userName,
             NewValue = String.Empty,
             Summary = "Competitor Created"
+        };
+    }
+
+    private Db.CompetitorChange GetCompDeletedChange(
+    string userName)
+    {
+        return new Db.CompetitorChange
+        {
+            ChangeTimeStamp = DateTime.UtcNow,
+            ChangeTypeId = Db.ChangeType.DeletedId,
+            ChangedBy = userName,
+            NewValue = String.Empty,
+            Summary = "Competitor Deleted"
         };
     }
 
@@ -506,10 +598,40 @@ public class CompetitorService : ICompetitorService
         return modelList;
     }
 
-    public async Task SetCompetitorActive(Guid clubId, Guid competitorId, bool active)
+    public async Task SetCompetitorActive(
+        Guid clubId,
+        Guid competitorId,
+        bool active,
+        string userName = null)
     {
         var comp = _dbContext.Competitors
             .Single(c => c.Id == competitorId && c.ClubId == clubId);
+        if(comp.ChangeHistory == null)
+        {
+            comp.ChangeHistory = new List<Db.CompetitorChange>();
+        }
+
+        if((comp.IsActive ?? true) && !active)
+        {
+            comp.ChangeHistory.Add(new Db.CompetitorChange
+            {
+                ChangeTimeStamp = DateTime.UtcNow,
+                ChangeTypeId = Db.ChangeType.ActivatedId,
+                ChangedBy = userName,
+                NewValue = String.Empty,
+                Summary = "Competitor Activated"
+            });
+        } else if((comp.IsActive == false) && active)
+        {
+            comp.ChangeHistory.Add(new Db.CompetitorChange
+            {
+                ChangeTimeStamp = DateTime.UtcNow,
+                ChangeTypeId = Db.ChangeType.DeactivatedId,
+                ChangedBy = userName,
+                NewValue = String.Empty,
+                Summary = "Competitor Deactivated"
+            });
+        }
         comp.IsActive = active;
         await _dbContext.SaveChangesAsync();
     }

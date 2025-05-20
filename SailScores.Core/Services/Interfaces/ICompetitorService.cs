@@ -12,8 +12,8 @@ namespace SailScores.Core.Services
         Task<Competitor> GetCompetitorAsync(Guid id);
         Task<Competitor> GetCompetitorByUrlNameAsync(Guid clubId, string sailor);
         Task<Competitor> GetCompetitorBySailNumberAsync(Guid clubId, String sailNumber);
-        Task SaveAsync(Competitor comp);
-        Task SaveAsync(CompetitorDto comp);
+        Task SaveAsync(Competitor comp, string username = "");
+        Task SaveAsync(CompetitorDto comp, string username = "");
         Task DeleteCompetitorAsync(Guid competitorId);
         Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(Guid clubId, Guid competitorId);
 #pragma warning disable CA1054 // Uri parameters should not be strings
@@ -23,6 +23,10 @@ namespace SailScores.Core.Services
         Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId);
         Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId);
         Task<IList<Database.Entities.CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId);
-        Task SetCompetitorActive(Guid clubId, Guid competitorId, bool active);
+        Task SetCompetitorActive(
+            Guid clubId,
+            Guid competitorId,
+            bool active,
+            string userName = "");
     }
 }

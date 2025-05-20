@@ -10,7 +10,8 @@ public interface ICompetitorService
     Task SaveAsync(CompetitorWithOptionsViewModel competitor);
     Task SaveAsync(
         MultipleCompetitorsWithOptionsViewModel vm,
-        Guid clubId);
+        Guid clubId,
+        string userName = "");
     Task<Competitor> GetCompetitorAsync(
         string clubInitials,
         string sailNumber);
@@ -31,5 +32,9 @@ public interface ICompetitorService
     Task InactivateSince(Guid clubId, DateTime sinceDate);
     Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId);
     Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId);
-    Task SetCompetitorActive(Guid clubId, Guid competitorId, bool active);
+    Task SetCompetitorActive(
+        Guid clubId,
+        Guid competitorId,
+        bool active,
+        string userName = "");
 }

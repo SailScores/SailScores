@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using SailScores.Core.Model;
 using SailScores.Core.Model.Forwarder;
 

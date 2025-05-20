@@ -78,7 +78,8 @@ public class CompetitorService : ICompetitorService
 
     public async Task SaveAsync(
         MultipleCompetitorsWithOptionsViewModel vm,
-        Guid clubId)
+        Guid clubId,
+        String userName = "")
     {
         var coreCompetitors = new List<Core.Model.Competitor>();
         var fleets = (await _coreClubService.GetMinimalForSelectedBoatsFleets(clubId))
@@ -109,7 +110,7 @@ public class CompetitorService : ICompetitorService
 
         foreach (var comp in coreCompetitors)
         {
-            await _coreCompetitorService.SaveAsync(comp);
+            await _coreCompetitorService.SaveAsync(comp, userName);
         }
     }
 
@@ -271,7 +272,11 @@ public class CompetitorService : ICompetitorService
         return comps;
     }
 
-    public async Task SetCompetitorActive(Guid clubId, Guid competitorId, bool active)
+    public async Task SetCompetitorActive(
+        Guid clubId,
+        Guid competitorId,
+        bool active,
+        string userName = "")
     {
         await _coreCompetitorService.SetCompetitorActive(clubId, competitorId, active);
     }

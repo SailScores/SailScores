@@ -12,4 +12,5 @@ public class ChangeType
     public static Guid DeletedId => new("ee49c9c4-d556-4cab-b740-a3baad9c73c9");
     public static Guid ActivatedId => new("153a8b2a-accf-404c-bb39-61db55f5ee1e");
     public static Guid DeactivatedId => new("87533c82-936d-44bb-8055-9292046a7b9e");
+    public static Guid PropertyChangedId => new("f2a0b1d4-3c5e-4f8b-9a7c-6d8e5f2b0c3d");
 }
