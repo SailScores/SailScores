@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
 using System.Threading.Tasks;
@@ -62,6 +62,24 @@ public class ForwarderService : IForwarderService
                 NewSeriesUrlName = result.NewSeries.UrlName
             };
         }
+
+        var seriesResult = await _dbContext.Series
+            .Include(s => s.Season)
+            .FirstOrDefaultAsync(s => s.ClubId == club.Id
+                && s.Season.UrlName == seasonUrlName
+                && s.Name.Replace(" ", "") == seriesUrlName);
+        if(seriesResult != null)
+        {
+            return new SeriesForwarderResult
+            {
+                OldClubInitials = clubInitials,
+                OldSeasonUrlName = seasonUrlName,
+                OldSeriesUrlName = seriesUrlName,
+                NewClubInitials = club.Initials,
+                NewSeasonUrlName = seriesResult.Season.UrlName,
+                NewSeriesUrlName = seriesResult.UrlName
+            };
+        }
         return null;
     }
 
@@ -106,12 +124,29 @@ public class ForwarderService : IForwarderService
                    rf.OldClubInitials == clubInitials &&
                    rf.OldCompetitorUrl == urlName);
 
+
+        var club = await _dbContext.Clubs.FirstOrDefaultAsync(c => c.Initials == clubInitials);
         if (result == null)
         {
+            var competitorResult =
+                await _dbContext.Competitors
+                .Where(c => c.ClubId == club.Id
+                && c.SailNumber.Replace(" ", "") == urlName)
+                .OrderBy( c => (c.IsActive ?? true) ? 1 : 10)
+                .FirstOrDefaultAsync();
+            if(competitorResult != default)
+            {
+                return new CompetitorForwarderResult
+                {
+                    OldClubInitials = clubInitials,
+                    OldUrlName = UrlUtility.GetUrlName(urlName),
+                    NewClubInitials = club.Initials,
+                    NewUrlName = competitorResult.UrlName
+                };
+            }
             return null;
         }
 
-        var club = await _dbContext.Clubs.FirstOrDefaultAsync(c => c.Initials == clubInitials);
 
         if (club.Initials.Equals(clubInitials) &&
             (urlName.Equals(result.NewCompetitor.UrlName, StringComparison.CurrentCultureIgnoreCase)))
