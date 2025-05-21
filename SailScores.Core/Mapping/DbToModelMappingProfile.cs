@@ -21,6 +21,7 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.Fleets, o => o.MapFrom(s => s.CompetitorFleets.Select(f => f.Fleet)))
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive ?? true))
                 .ReverseMap();
+            CreateMap<Db.CompetitorChange, Model.CompetitorChange>();
 
             CreateMap<KeyValuePair<String, Db.Competitor>, KeyValuePair<string, Model.Competitor>>();
 

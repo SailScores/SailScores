@@ -48,6 +48,8 @@ namespace SailScores.Core.Model
 
         public DateTime? Created { get; set; }
 
+        public IList<CompetitorChange> ChangeHistory { get; set; }
+
         public int CompareTo(Competitor other)
         {
             var sailNumberComparison = AlphaNumericComparer.Compare(SailNumber, other.SailNumber);

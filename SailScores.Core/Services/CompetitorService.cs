@@ -602,7 +602,7 @@ public class CompetitorService : ICompetitorService
         Guid clubId,
         Guid competitorId,
         bool active,
-        string userName = null)
+        string userName = "")
     {
         var comp = _dbContext.Competitors
             .Single(c => c.Id == competitorId && c.ClubId == clubId);
@@ -616,20 +616,20 @@ public class CompetitorService : ICompetitorService
             comp.ChangeHistory.Add(new Db.CompetitorChange
             {
                 ChangeTimeStamp = DateTime.UtcNow,
-                ChangeTypeId = Db.ChangeType.ActivatedId,
+                ChangeTypeId = Db.ChangeType.DeactivatedId,
                 ChangedBy = userName,
                 NewValue = String.Empty,
-                Summary = "Competitor Activated"
+                Summary = "Competitor Deactivated"
             });
         } else if((comp.IsActive == false) && active)
         {
             comp.ChangeHistory.Add(new Db.CompetitorChange
             {
                 ChangeTimeStamp = DateTime.UtcNow,
-                ChangeTypeId = Db.ChangeType.DeactivatedId,
+                ChangeTypeId = Db.ChangeType.ActivatedId,
                 ChangedBy = userName,
                 NewValue = String.Empty,
-                Summary = "Competitor Deactivated"
+                Summary = "Competitor Activated"
             });
         }
         comp.IsActive = active;

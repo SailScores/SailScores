@@ -174,7 +174,8 @@ public class CompetitorController : Controller
                     competitor.Fleets.Add(fleet);
                 }
             }
-            await _competitorService.SaveAsync(competitor);
+            await _competitorService.SaveAsync(competitor,
+                await GetUserStringAsync());
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
                 return Redirect(returnUrl);
@@ -366,7 +367,7 @@ public class CompetitorController : Controller
                 competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
                 return View(competitor);
             }
-            await _competitorService.SaveAsync(competitor);
+            await _competitorService.SaveAsync(competitor, await GetUserStringAsync());
 
             return RedirectToAction("Index", "Competitor");
         }

@@ -10,7 +10,7 @@
 <h2>Edit Competitor</h2>
 <hr />
 <div class="row">
-    <div class="col-md-6 col-lg-4">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-4">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
@@ -99,6 +99,29 @@
                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-xl-8">
+        <h4>Competitor History</h4>
+        <em>Experimental</em>
+        <table class="table table-striped table-sm">
+            <tbody>
+                @if(Model.ChangeHistory != null) {
+                @foreach (var history in Model.ChangeHistory) {
+                    <tr>
+                        <td>@history.ChangeTimeStamp</td>
+                        <td>@history.Summary
+                            @if (!String.IsNullOrWhiteSpace(history.NewValue)) {
+                                @(" to " + history.NewValue)
+                            }
+                        </td>
+                        <td>@history.ChangedBy</td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 

@@ -114,7 +114,9 @@ public class CompetitorService : ICompetitorService
         }
     }
 
-    public async Task SaveAsync(CompetitorWithOptionsViewModel competitor)
+    public async Task SaveAsync(
+        CompetitorWithOptionsViewModel competitor,
+        string userName)
     {
 
         if (competitor.Fleets == null)
@@ -138,7 +140,7 @@ public class CompetitorService : ICompetitorService
                 competitor.Fleets.Add(fleet);
             }
         }
-        await _coreCompetitorService.SaveAsync(competitor);
+        await _coreCompetitorService.SaveAsync(competitor, userName);
     }
 
     public async Task<Guid?> GetCompetitorIdForSailnumberAsync(Guid clubId, string sailNumber)
@@ -278,6 +280,6 @@ public class CompetitorService : ICompetitorService
         bool active,
         string userName = "")
     {
-        await _coreCompetitorService.SetCompetitorActive(clubId, competitorId, active);
+        await _coreCompetitorService.SetCompetitorActive(clubId, competitorId, active, userName);
     }
 }
