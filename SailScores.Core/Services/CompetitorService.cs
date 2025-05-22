@@ -662,5 +662,18 @@ public class CompetitorService : ICompetitorService
 
         return participation;
     }
+    public async Task AddHistoryElement(Guid competitorId, string note, string userName)
+    {
+        await _dbContext.CompetitorChanges.AddAsync(new Db.CompetitorChange
+        {
+            CompetitorId = competitorId,
+            ChangeTimeStamp = DateTime.UtcNow,
+            ChangeTypeId = Db.ChangeType.AdminNoteId,
+            ChangedBy = userName,
+            NewValue = String.Empty,
+            Summary = note
+        }).ConfigureAwait(false);
 
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
 }

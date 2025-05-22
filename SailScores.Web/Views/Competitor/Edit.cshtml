@@ -101,10 +101,21 @@
         </form>
     </div>
 </div>
+<hr />
 <div class="row">
     <div class="col-12 col-xl-8">
         <h4>Competitor History</h4>
         <em>Experimental</em>
+        <form asp-action="SaveNote" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div class="mb-3">
+                <label for="NewNote" class="control-label">Add Note to Competitor History</label>
+                <textarea asp-for="NewNote" class="form-control"></textarea>
+                <span asp-validation-for="NewNote" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-secondary">Save Note</button>
+        </form>
+        <br />
         <table class="table table-striped table-sm">
             <tbody>
                 @if(Model.CombinedHistory != null) {
@@ -137,6 +148,7 @@
                 }
             </tbody>
         </table>
+
     </div>
 </div>
 

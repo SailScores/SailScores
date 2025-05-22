@@ -322,4 +322,8 @@ public class CompetitorService : ICompetitorService
 
         return combinedNotes.OrderByDescending(n => n.Date).ToList();
     }
+    public async Task AddCompetitorNote(Guid competitorId, string newNote, string userName)
+    {
+        _coreCompetitorService.AddHistoryElement(competitorId, newNote, userName);
+    }
 }

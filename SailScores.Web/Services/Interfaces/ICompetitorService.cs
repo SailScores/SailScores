@@ -40,4 +40,5 @@ public interface ICompetitorService
         Guid competitorId,
         bool active,
         string userName = "");
+    Task AddCompetitorNote(Guid id, string newNote, string v);
 }

@@ -29,5 +29,6 @@ namespace SailScores.Core.Services
             bool active,
             string userName = "");
         Task<List<HistoricalNote>> GetCompetitorParticipationAsync(Guid competitorId);
+        Task AddHistoryElement(Guid competitorId, string note, string userName);
     }
 }

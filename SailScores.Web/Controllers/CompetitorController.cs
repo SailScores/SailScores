@@ -386,6 +386,23 @@ public class CompetitorController : Controller
         }
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveNote(CompetitorWithOptionsViewModel model)
+    {
+        if (string.IsNullOrWhiteSpace(model.NewNote))
+        {
+            ModelState.AddModelError("NewNote", "Note cannot be empty.");
+            // Reload the edit page with validation error
+            return RedirectToAction("Edit", new { id = model.Id });
+        }
+
+        await _competitorService.AddCompetitorNote(model.Id, model.NewNote, await GetUserStringAsync());
+
+        // Redirect back to the edit page
+        return RedirectToAction("Edit", new { id = model.Id });
+    }
+
     [HttpGet]
     // GET: Competitor/Delete/5
     public async Task<ActionResult> Delete(
