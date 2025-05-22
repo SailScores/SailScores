@@ -302,7 +302,8 @@ public class SailScoresContext : DbContext, ISailScoresContext
             new ChangeType { Id = ChangeType.DeletedId, Name = "Deleted" },
             new ChangeType { Id = ChangeType.ActivatedId, Name = "Activated" },
             new ChangeType { Id = ChangeType.DeactivatedId, Name = "Deactivated" },
-            new ChangeType { Id = ChangeType.PropertyChangedId, Name = "Property Changed" }
+            new ChangeType { Id = ChangeType.PropertyChangedId, Name = "Property Changed" },
+            new ChangeType { Id = ChangeType.AdminNoteId, Name = "Admin Note" }
         );
     }
 
