@@ -28,5 +28,6 @@ namespace SailScores.Core.Services
             Guid competitorId,
             bool active,
             string userName = "");
+        Task<List<HistoricalNote>> GetCompetitorParticipationAsync(Guid competitorId);
     }
 }

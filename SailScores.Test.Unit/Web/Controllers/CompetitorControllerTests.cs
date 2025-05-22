@@ -96,7 +96,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             var vm = new CompetitorWithOptionsViewModel();
             await _controller.Create(_clubInitials, vm);
 
-            _competitorServiceMock.Verify(s => s.SaveAsync(vm), Times.Once);
+            _competitorServiceMock.Verify(s => s.SaveAsync(vm, string.Empty), Times.Once);
 
         }
 
@@ -107,7 +107,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             var vm = new CompetitorWithOptionsViewModel();
             var result = await _controller.Create(_clubInitials, vm);
 
-            _competitorServiceMock.Verify(s => s.SaveAsync(vm), Times.Never);
+            _competitorServiceMock.Verify(s => s.SaveAsync(vm, string.Empty), Times.Never);
             Assert.IsType<UnauthorizedResult>(result);
         }
 
@@ -123,7 +123,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             var result = await _controller.Create(_clubInitials, vm);
 
             // Assert
-            _competitorServiceMock.Verify(s => s.SaveAsync(vm), Times.Never);
+            _competitorServiceMock.Verify(s => s.SaveAsync(vm, string.Empty), Times.Never);
             var viewresult = Assert.IsType<ViewResult>(result);
             Assert.NotNull(viewresult.Model);
             Assert.Equal(vm, viewresult.Model);
@@ -137,7 +137,7 @@ namespace SailScores.Test.Unit.Web.Controllers
 
             var vm = new CompetitorWithOptionsViewModel();
             _competitorServiceMock.Setup(s => s.SaveAsync(
-                It.IsAny<CompetitorWithOptionsViewModel>())).Throws(new InvalidOperationException());
+                It.IsAny<CompetitorWithOptionsViewModel>(), It.IsAny<string>())).Throws(new InvalidOperationException());
 
             // Act
             var result = await _controller.Create(_clubInitials, vm);

@@ -107,15 +107,30 @@
         <em>Experimental</em>
         <table class="table table-striped table-sm">
             <tbody>
-                @if(Model.ChangeHistory != null) {
-                @foreach (var history in Model.ChangeHistory) {
+                @if(Model.CombinedHistory != null) {
+                @foreach (var history in Model.CombinedHistory) {
                     <tr>
-                        <td>@history.ChangeTimeStamp</td>
-                        <td>@history.Summary
-                            @if (!String.IsNullOrWhiteSpace(history.NewValue)) {
-                                @(" to " + history.NewValue)
+                        <td>
+                            @{
+                                // Display date based on aggregation type
+                                switch (history.Aggregation)
+                                {
+                                    case SailScores.Core.Model.HistoricalNoteAggregation.Year:
+                                        @history.Date.ToString("yyyy")
+                                        break;
+                                    case SailScores.Core.Model.HistoricalNoteAggregation.Month:
+                                        @history.Date.ToString("yyyy-MM")
+                                        break;
+                                    case SailScores.Core.Model.HistoricalNoteAggregation.Day:
+                                        @history.Date.ToString("yyyy-MM-dd")
+                                        break;
+                                    default:
+                                        @history.Date.ToString("g")
+                                        break;
+                                }
                             }
                         </td>
+                        <td>@history.Summary</td>
                         <td>@history.ChangedBy</td>
                     </tr>
                     }

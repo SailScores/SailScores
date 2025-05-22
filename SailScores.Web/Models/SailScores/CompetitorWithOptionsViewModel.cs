@@ -9,4 +9,6 @@ public class CompetitorWithOptionsViewModel : Core.Model.Competitor
     public IList<FleetSummary> FleetOptions { get; set; }
 
     public IList<Guid> FleetIds { get; set; }
+
+    public IList<HistoricalNote> CombinedHistory { get; set; }
 }

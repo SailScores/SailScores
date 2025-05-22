@@ -309,16 +309,15 @@ public class CompetitorController : Controller
             return Unauthorized();
         }
 
-        var competitor = await _competitorService.GetCompetitorAsync(id);
-        if (competitor == null)
+        var compWithOptions = await _competitorService.GetCompetitorWithHistoryAsync(id);
+        if (compWithOptions == null)
         {
             return NotFound();
         }
-        if (competitor.ClubId != clubId)
+        if (compWithOptions.ClubId != clubId)
         {
             return Unauthorized();
         }
-        var compWithOptions = _mapper.Map<CompetitorWithOptionsViewModel>(competitor);
 
         compWithOptions.BoatClassOptions =
             (await _clubService.GetAllBoatClasses(clubId))

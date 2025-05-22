@@ -7,6 +7,7 @@ public interface ICompetitorService
 {
     Task DeleteCompetitorAsync(Guid competitorId);
     Task<Competitor> GetCompetitorAsync(Guid competitorId);
+    Task<CompetitorWithOptionsViewModel> GetCompetitorWithHistoryAsync(Guid competitorId);
     Task SaveAsync(
         CompetitorWithOptionsViewModel competitor,
         string userName);

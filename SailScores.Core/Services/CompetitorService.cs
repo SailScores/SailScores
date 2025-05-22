@@ -635,4 +635,32 @@ public class CompetitorService : ICompetitorService
         comp.IsActive = active;
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task<List<HistoricalNote>> GetCompetitorParticipationAsync(Guid competitorId)
+    {
+        var groupedData = await _dbContext.Scores
+            .Where(s => s.CompetitorId == competitorId && s.Race.Date.HasValue)
+            .Select(s => new { s.Race.Date })
+            .Where(x => x.Date.HasValue)
+            .GroupBy(x => new DateTime(x.Date.Value.Year, x.Date.Value.Month, 1))
+            .Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count()
+            })
+            .ToListAsync();
+
+        var participation = groupedData
+            .Select(g => new HistoricalNote
+            {
+                Date = g.Date,
+                Summary = $"Participated in {g.Count} races",
+                Aggregation = HistoricalNoteAggregation.Month
+            })
+            .OrderByDescending(x => x.Date)
+            .ToList();
+
+        return participation;
+    }
+
 }

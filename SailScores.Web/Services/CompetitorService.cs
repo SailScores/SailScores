@@ -282,4 +282,44 @@ public class CompetitorService : ICompetitorService
     {
         await _coreCompetitorService.SetCompetitorActive(clubId, competitorId, active, userName);
     }
+    public async Task<CompetitorWithOptionsViewModel> GetCompetitorWithHistoryAsync(Guid competitorId)
+    {
+        // Assuming _coreCompetitorService has a method to fetch competitor details
+        var competitor = await GetCompetitorAsync(competitorId);
+
+        if (competitor == null)
+        {
+            return null;
+        }
+
+        var competitorWithHistory = _mapper.Map<CompetitorWithOptionsViewModel>(competitor);
+
+        List<Core.Model.HistoricalNote> participationHistory = await _coreCompetitorService.GetCompetitorParticipationAsync(competitorId);
+
+
+        competitorWithHistory.CombinedHistory = Combine(competitor.ChangeHistory, participationHistory);
+
+        return competitorWithHistory;
+    }
+
+    private IList<Models.SailScores.HistoricalNote> Combine(IList<CompetitorChange> changeHistory, List<Core.Model.HistoricalNote> participationHistory)
+    {
+        var combinedNotes = new List<Models.SailScores.HistoricalNote>();
+
+        // Process competitor changes
+        foreach (var change in changeHistory)
+        {
+            // Assuming HistoricalNote has a constructor that takes a CompetitorChange
+            combinedNotes.Add(new Models.SailScores.HistoricalNote(change));
+        }
+
+        // Process participation history
+        foreach (var note in participationHistory)
+        {
+            // Assuming HistoricalNote can be directly added or needs conversion
+            combinedNotes.Add(new Models.SailScores.HistoricalNote(note));
+        }
+
+        return combinedNotes.OrderByDescending(n => n.Date).ToList();
+    }
 }
