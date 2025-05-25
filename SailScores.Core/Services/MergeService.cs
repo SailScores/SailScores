@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using SailScores.Core.Model;
 using Microsoft.Extensions.Logging;
+using SailScores.Database.Entities;
 
 namespace SailScores.Core.Services
 {
@@ -95,6 +96,17 @@ namespace SailScores.Core.Services
 
             await scoresToMove.ForEachAsync(s => s.CompetitorId = targetCompetitorId)
                 .ConfigureAwait(false);
+            var sourceCompetitor = await _dbContext.Competitors
+                .SingleAsync(c => c.Id == sourceCompetitorId)
+                .ConfigureAwait(false);
+            _dbContext.CompetitorChanges.Add(new Database.Entities.CompetitorChange
+            {
+                CompetitorId = targetCompetitorId,
+                ChangeTypeId = ChangeType.MergedId,
+                ChangedBy = mergedBy,
+                ChangeTimeStamp = DateTime.UtcNow,
+                Summary = $"Merged {sourceCompetitor.SailNumber} : {sourceCompetitor.Name} : {sourceCompetitor.BoatName} into this competitor."
+            });
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
 
