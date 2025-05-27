@@ -206,7 +206,8 @@
                            asp-controller="Document"
                            asp-route-id="@document.Id"
                            asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                        >@document.Name</a></h4>
+                            >@(String.IsNullOrEmpty(document.Name) ? "Untitled Document" : document.Name)
+                            </a></h4>
                         <span class="small fst-italic">Posted by @document.CreatedBy on @document.CreatedLocalDate.ToString("f")</span>
                     }
                 </div>                

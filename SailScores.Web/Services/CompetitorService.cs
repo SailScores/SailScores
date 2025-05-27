@@ -294,7 +294,8 @@ public class CompetitorService : ICompetitorService
 
         var competitorWithHistory = _mapper.Map<CompetitorWithOptionsViewModel>(competitor);
 
-        List<Core.Model.HistoricalNote> participationHistory = await _coreCompetitorService.GetCompetitorParticipationAsync(competitorId);
+        List<Core.Model.HistoricalNote> participationHistory =
+            await _coreCompetitorService.GetCompetitorParticipationAsync(competitorId);
 
 
         competitorWithHistory.CombinedHistory = Combine(competitor.ChangeHistory, participationHistory);

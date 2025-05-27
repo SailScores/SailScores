@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using SailScores.Core.Model;
 using Microsoft.Extensions.Logging;
-using SailScores.Database.Entities;
+using Db = SailScores.Database.Entities;
+
 
 namespace SailScores.Core.Services
 {
@@ -102,7 +103,7 @@ namespace SailScores.Core.Services
             _dbContext.CompetitorChanges.Add(new Database.Entities.CompetitorChange
             {
                 CompetitorId = targetCompetitorId,
-                ChangeTypeId = ChangeType.MergedId,
+                ChangeTypeId = Db.ChangeType.MergedId,
                 ChangedBy = mergedBy,
                 ChangeTimeStamp = DateTime.UtcNow,
                 Summary = $"Merged {sourceCompetitor.SailNumber} : {sourceCompetitor.Name} : {sourceCompetitor.BoatName} into this competitor."

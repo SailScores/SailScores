@@ -118,7 +118,9 @@ public class DocumentController : Controller
         {
             extension = "jpg";
         }
-        if (!String.IsNullOrWhiteSpace(extension) && !doc.Name.EndsWith(extension))
+        if (!String.IsNullOrWhiteSpace(extension) &&
+            !String.IsNullOrWhiteSpace(doc.Name) &&
+            !doc.Name.EndsWith(extension))
         {
             doc.Name = doc.Name + "." +extension;
         }

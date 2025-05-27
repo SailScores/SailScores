@@ -130,10 +130,10 @@
                                         @history.Date.ToString("yyyy")
                                         break;
                                     case SailScores.Core.Model.HistoricalNoteAggregation.Month:
-                                        @history.Date.ToString("yyyy-MM")
+                                        @history.Date.ToString("Y")
                                         break;
                                     case SailScores.Core.Model.HistoricalNoteAggregation.Day:
-                                        @history.Date.ToString("yyyy-MM-dd")
+                                        @history.Date.ToString("d")
                                         break;
                                     default:
                                         @history.Date.ToString("g")
