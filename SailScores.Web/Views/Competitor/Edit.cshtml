@@ -104,8 +104,9 @@
 <hr />
 <div class="row">
     <div class="col-12 col-xl-8">
-        <h4>Competitor History</h4>
-        <em>Experimental</em>
+        <h4>History
+            <em class="fs-6">Experimental Feature</em>
+        </h4>
         <form asp-action="SaveNote" method="post">
             <input type="hidden" asp-for="Id" />
             <div class="mb-3">
@@ -113,7 +114,8 @@
                 <textarea asp-for="NewNote" class="form-control"></textarea>
                 <span asp-validation-for="NewNote" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-secondary">Save Note</button>
+            <button type="submit" class="btn btn-secondary mt-2">Save Note</button>
+            <br />
         </form>
         <br />
         <table class="table table-striped table-sm">
