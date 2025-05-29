@@ -64,21 +64,18 @@
                 </select>
                 <span asp-validation-for="FleetId" class="text-danger"></span>
             </div>
-            @if (!Model.RegattaId.HasValue && Model.Regatta == null)
-            {
-                <div class="mb-3 col-md-6">
-                    <label asp-for="SeriesIds" class="control-label">Series</label>
-                    <select id="seriesIds" asp-for="SeriesIds" class="form-select" multiple>
-                        @foreach (var series in Model.SeriesOptions)
-                        {
-                            <option value="@series.Id">
-                                @series.Name (@series.Season.Name)
-                            </option>
-                        }
-                    </select>
-                    <span asp-validation-for="SeriesIds" class="text-danger"></span>
-                </div>
-            }
+            <div class="mb-3 col-md-6">
+                <label asp-for="SeriesIds" class="control-label">Series</label>
+                <select id="seriesIds" asp-for="SeriesIds" class="form-select" multiple>
+                    @foreach (var series in Model.SeriesOptions)
+                    {
+                        <option value="@series.Id">
+                            @series.Name (@series.Season.Name)
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="SeriesIds" class="text-danger"></span>
+            </div>
         </div>
         <div id="advancedFields" role="tablist">
             <div class="card">

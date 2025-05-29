@@ -8,7 +8,8 @@
     var scoreValue = Model.Result?.ScoreValue;
     var hasCode = !String.IsNullOrEmpty(Model.Result?.Code);
     var isTie = Model.Result?.Code == "TIE";
-    if ((place == 1 || scoreValue == 1m) && !hasCode && (scoreValue == 1m || scoreValue == 1.5m || scoreValue == 2.0m || Model.IsPercentSystem))
+    if ((place == 1 || scoreValue == 1m) && !hasCode &&
+        (scoreValue < 1m || scoreValue == 1m || scoreValue == 1.5m || scoreValue == 2.0m || Model.IsPercentSystem))
     {
         classSb.Append("finish-first ");
     }
