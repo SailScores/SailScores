@@ -66,8 +66,6 @@ public class CompetitorService : ICompetitorService
         }
 
         var list = await dbObjects
-            //.OrderBy(c => c.SailNumber)
-            //.ThenBy(c => c.Name)
             .Include(c => c.BoatClass)
             .ToListAsync()
             .ConfigureAwait(false);
@@ -576,20 +574,26 @@ public class CompetitorService : ICompetitorService
 
     public async Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId)
     {
-        var dbComps = await _dbContext.Regattas
-        .Where(r => r.Id == regattaId)
-        .SelectMany(r => r.RegattaFleet)
-        .Include(rf => rf.Fleet)
-        .ThenInclude(f => f.CompetitorFleets)
-        .ThenInclude(cf => cf.Competitor)
-        .ThenInclude(c => c.BoatClass)
-        .Select(rf => rf.Fleet)
-        .ToDictionaryAsync(
-            f => f.NickName ?? f.ShortName ?? f.Name,
-            f => f.CompetitorFleets?.Select(cf => cf.Competitor));
+        var fleets = await _dbContext.Regattas
+            .Where(r => r.Id == regattaId)
+            .SelectMany(r => r.RegattaFleet)
+            .Select(rf => rf.Fleet)
+            .ToListAsync();
 
-        var modelList = _mapper.Map<Dictionary<String, IEnumerable<Model.Competitor>>>(dbComps);
-        foreach(var key in modelList.Keys)
+        var fleetCompList = new Dictionary<string, IEnumerable<Competitor>>();
+
+        foreach (var fleet in fleets)
+        {
+            // get all competitors in the club
+            var comps = await GetCompetitorsAsync(clubId, fleet.Id, false);
+            fleetCompList.Add(fleet.Name ?? fleet.ShortName ?? fleet.NickName, comps);
+
+        }
+
+        var modelList = _mapper.Map<Dictionary<String, IEnumerable<Model.Competitor>>>(fleetCompList);
+
+        //sort the competitors in each fleet
+        foreach (var key in modelList.Keys)
         {
             var list = modelList[key].ToList();
             list.Sort();
