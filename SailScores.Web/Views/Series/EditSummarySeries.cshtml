@@ -1,0 +1,132 @@
+@using SailScores.Web.Services
+@using SailScores.Api.Enumerations
+
+@model SailScores.Web.Models.SailScores.SeriesWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h3>Edit Summary Series Properties</h3>
+<hr />
+<div class="row">
+    <div class="col-lg-6 col-md-8">
+        <form asp-action="Edit"
+              asp-route-returnurl="@ViewData["ReturnUrl"]" >
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ClubId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div id="seasonSelectGroup" class="mb-3">
+                <label asp-for="SeasonId" class="control-label">Season</label>
+                <select asp-for="SeasonId" class="form-select">
+                    <option selected="selected">Select a season...</option>
+                    @foreach (var season in Model.SeasonOptions)
+                    {
+                        <option value="@season.Id">
+                            @season.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="SeasonId" class="text-danger"></span>
+            </div>
+
+            <div id="advancedFields" role="tablist">
+                <div class="card">
+                    <div class="card-header" role="tab" id="advancedHeading">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-bs-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                Additional Settings <span class="fas fa-chevron-down"></span></a>
+                                <span class="small"><em>&ensp;Optional</em></span>
+                        </h5>
+                    </div>
+
+                    <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="IsImportantSeries" />
+                                    <label class="form-check-label"> List as Top Series</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="ResultsLocked" />
+                                    <label> Lock Results</label>
+                                    <span class="small">Prevents scores from recalculating for this series</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="TrendOption">Calculate Rank Trend</label>
+                                <select id="ScoringSystemId" asp-for="TrendOption" class="form-select">
+                                    @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+                                    {
+                                        <option value="@trendOption">
+                                            @(EnumHelper<TrendOption>.GetDisplayValue(trendOption))
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="TrendOption" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="ExcludeFromCompetitorStats" />
+                                    <label class="form-check-label"> Exclude from competitor summary statistics</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="HideDncDiscards" />
+                                    <label class="form-check-label"> Hide discarded DNC scores (Show as blanks)</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ScoringSystemId">Scoring System</label>
+                                <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
+                                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                                    {
+                                        <option value="@scoringSystem.Id">
+                                            @scoringSystem.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label>Scoring "What If"</label>
+                                <a class="form-control btn btn-secondary"
+                                   asp-route="WhatIf"
+                                   asp-route-action="options"
+                                   asp-route-seriesId="@Model.Id"
+                                   asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]"
+                                   asp-route-returnUrl="@ViewData["ReturnUrl"]"
+                                   title="Test scoring changes">Try Different Scoring</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="mb-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a href="@(ViewData["ReturnUrl"] ?? Url.Action("Index", "Admin"))"
+                   class="btn btn-outline-primary">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

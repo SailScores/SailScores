@@ -1,5 +1,6 @@
 using System.Text;
 using System.Web;
+using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -231,6 +232,10 @@ public class SeriesController : Controller
         var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
         seriesWithOptions.SeasonOptions = blankVm.SeasonOptions;
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+        if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
+        {
+            View("EditSummarySeries", seriesWithOptions);
+        }
         return View(seriesWithOptions);
     }
 

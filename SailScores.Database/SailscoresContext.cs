@@ -203,6 +203,13 @@ public class SailScoresContext : DbContext, ISailScoresContext
                 DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) :
                 v);
 
+        modelBuilder.Entity<SeriesToSeriesLink>().HasKey(t => new { t.ParentSeriesId, t.ChildSeriesId }); // composite primary key
+
+        modelBuilder.Entity<Series>()
+            .HasMany(e => e.ChildSeries)
+            .WithMany(e => e.ParentSeries)
+            .UsingEntity<SeriesToSeriesLink>();
+
         modelBuilder.Entity<Regatta>()
             .Property(e => e.UpdatedDate)
             .HasConversion(v => v, v =>
