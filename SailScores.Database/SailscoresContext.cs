@@ -203,12 +203,20 @@ public class SailScoresContext : DbContext, ISailScoresContext
                 DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) :
                 v);
 
-        modelBuilder.Entity<SeriesToSeriesLink>().HasKey(t => new { t.ParentSeriesId, t.ChildSeriesId }); // composite primary key
+        modelBuilder.Entity<SeriesToSeriesLink>()
+            .HasKey(sl => new { sl.ParentSeriesId, sl.ChildSeriesId });
 
-        modelBuilder.Entity<Series>()
-            .HasMany(e => e.ChildSeries)
-            .WithMany(e => e.ParentSeries)
-            .UsingEntity<SeriesToSeriesLink>();
+        modelBuilder.Entity<SeriesToSeriesLink>()
+            .HasOne(sl => sl.ParentSeries)
+            .WithMany(s => s.ChildLinks)
+            .HasForeignKey(sl => sl.ParentSeriesId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<SeriesToSeriesLink>()
+            .HasOne(sl => sl.ChildSeries)
+            .WithMany(s => s.ParentLinks)
+            .HasForeignKey(sl => sl.ChildSeriesId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Regatta>()
             .Property(e => e.UpdatedDate)

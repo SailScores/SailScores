@@ -234,7 +234,7 @@ public class SeriesController : Controller
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
         if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
         {
-            View("EditSummarySeries", seriesWithOptions);
+            return View("EditSummarySeries", seriesWithOptions);
         }
         return View(seriesWithOptions);
     }

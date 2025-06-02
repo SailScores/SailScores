@@ -17,15 +17,13 @@ public class Series
     [StringLength(2000)]
     public String Description { get; set; }
 
-    public SeriesType Type { get; set; }
+    public SeriesType? Type { get; set; }
 
     public IList<SeriesRace> RaceSeries { get; set; }
 
-    [ForeignKey("ChildSeriesId")]
-    public IList<Series> ChildSeries { get; set; }
+    public IList<SeriesToSeriesLink> ChildLinks { get; set; }
 
-    [ForeignKey("ParentSeriesId")]
-    public IList<Series> ParentSeries { get; set; }
+    public IList<SeriesToSeriesLink> ParentLinks { get; set; }
 
     [Required]
     public Season Season { get; set; }
