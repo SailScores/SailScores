@@ -40,6 +40,27 @@
                 </select>
                 <span asp-validation-for="SeasonId" class="text-danger"></span>
             </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="ChildrenSeriesAsSingleRace" />
+                    <label class="form-check-label">
+                        Children series count as a single race</label>
+                    <span class="small">If not checked, all races will be counted in this series as individual races.</span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ChildrenSeriesIds" class="control-label">Children Series</label>
+                <select id="ChildrenSeriesIds" asp-for="ChildrenSeriesIds" class="form-select" multiple>
+                    @foreach (var series in Model.SeriesOptions ?? new List<SeriesSummary>())
+                    {
+                        <option value="@series.Id">
+                            @series.Name (@series.Season.Name)
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="ChildrenSeriesIds" class="text-danger"></span>
+            </div>
+
 
             <div id="advancedFields" role="tablist">
                 <div class="card">

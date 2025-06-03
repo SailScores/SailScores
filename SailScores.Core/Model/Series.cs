@@ -27,6 +27,10 @@ public class Series
     public String Description { get; set; }
 
     public SeriesType Type { get; set; }
+    public bool ChildrenSeriesAsSingleRace { get; set; }
+
+    public IList<Guid> ChildrenSeriesIds { get; set; } = new List<Guid>();
+
     public IList<Race> Races { get; set; }
 
     public Season Season { get; set; }
