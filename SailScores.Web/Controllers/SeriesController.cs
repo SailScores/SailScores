@@ -229,11 +229,16 @@ public class SeriesController : Controller
         }
 
         var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
+
         var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
         seriesWithOptions.SeasonOptions = blankVm.SeasonOptions;
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
         if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
         {
+            seriesWithOptions.SeriesOptions =
+                (await _seriesService.GetChildSeriesSummariesAsync(
+                    clubId,
+                    seriesWithOptions.SeasonId)).ToList();
             return View("EditSummarySeries", seriesWithOptions);
         }
         return View(seriesWithOptions);

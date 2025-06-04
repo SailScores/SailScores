@@ -82,6 +82,22 @@ public class SeriesService : ISeriesService
             .ThenBy(s => s.Name);
     }
 
+    public async Task<IEnumerable<SeriesSummary>> GetChildSeriesSummariesAsync(
+        Guid clubId,
+        Guid seasonId)
+    {
+        var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
+        var eligibleSeries = coreObject
+            .Where(s => (s.Type == default ? SeriesType.Standard : s.Type) == SeriesType.Standard
+                && s.Season.Id == seasonId);
+
+        var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(eligibleSeries);
+
+        return seriesSummaries.OrderByDescending(s => s.Season.Start)
+            .ThenBy(s => s.FleetName)
+            .ThenBy(s => s.Name);
+    }
+
     public async Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesUrlName)
     {
         var series = await _coreSeriesService.GetSeriesDetailsAsync(clubInitials, season, seriesUrlName);

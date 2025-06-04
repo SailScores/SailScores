@@ -79,6 +79,8 @@ namespace SailScores.Core.Services
             var seriesDb = await _dbContext
                 .Series
                 .Include(s => s.Season)
+                .Include(s => s.ChildLinks)
+                .AsSingleQuery()
                 .FirstOrDefaultAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
 
@@ -542,6 +544,8 @@ namespace SailScores.Core.Services
             }
             var existingSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
+                .Include(f => f.ChildLinks)
+                .AsSplitQuery()
                 .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId)
                 .ConfigureAwait(false);
 
@@ -561,6 +565,7 @@ namespace SailScores.Core.Services
             existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
             existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
+            existingSeries.ChildrenSeriesAsSingleRace = model.ChildrenSeriesAsSingleRace;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty
@@ -593,6 +598,46 @@ namespace SailScores.Core.Services
             foreach (var addRace in racesToAdd)
             {
                 existingSeries.RaceSeries.Add(addRace);
+            }
+
+            if(existingSeries.Type == dbObj.SeriesType.Summary)
+            {
+                if(model.ChildrenSeriesIds == null )
+                {
+                    model.ChildrenSeriesIds = new List<Guid>();
+                }
+                if(existingSeries.ChildLinks == null)
+                {
+                    existingSeries.ChildLinks = new List<dbObj.SeriesToSeriesLink>();
+                }
+                var seriesLinksToRemove = new List<dbObj.SeriesToSeriesLink>();
+                var seriesLinksToAdd = new List<dbObj.SeriesToSeriesLink>();
+
+                if (existingSeries.ChildLinks != null && existingSeries.ChildLinks.Count() > 0)
+                {
+                    seriesLinksToRemove = 
+                    existingSeries.ChildLinks
+                        .Where(l => !model.ChildrenSeriesIds.Any(c => c == l.ChildSeriesId))
+                        .ToList();
+                    foreach (var removingLink in seriesLinksToRemove)
+                    {
+                        existingSeries.ChildLinks.Remove(removingLink);
+                    }
+                }
+                seriesLinksToAdd =
+                    model.ChildrenSeriesIds
+                    .Where(c =>
+                        !(existingSeries.ChildLinks.Any(l => c == l.ChildSeriesId)))
+                    .Select(c => new dbObj.SeriesToSeriesLink
+                    {
+                        ChildSeriesId = c,
+                        ParentSeriesId = existingSeries.Id
+                    }).ToList();
+
+                foreach(var addLink in seriesLinksToAdd)
+                {
+                    existingSeries.ChildLinks.Add(addLink);
+                }
             }
 
             await _dbContext.SaveChangesAsync()

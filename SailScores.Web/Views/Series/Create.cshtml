@@ -43,6 +43,14 @@
                 </select>
                 <span asp-validation-for="SeasonId" class="text-danger"></span>
             </div>
+            <div class="mb-3">
+                <label asp-for="Type">Series Type</label>
+                <select id="Type" asp-for="Type" class="form-select">
+                    <option value="1">Standard</option>
+                    <option value="3">Summary Series</option>
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
             <div id="advancedFields" role="tablist">
                 <div class="card">
                     <div class="card-header" role="tab" id="advancedHeading">
