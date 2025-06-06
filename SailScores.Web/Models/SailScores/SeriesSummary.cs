@@ -16,6 +16,8 @@ public class SeriesSummary
 
     public String FleetName { get; set; }
 
+    public SeriesType Type { get; set; } = SeriesType.Standard;
+
     public bool? IsImportantSeries { get; set; }
 
     public bool? ResultsLocked { get; set; }

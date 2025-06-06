@@ -39,6 +39,8 @@ namespace SailScores.Core.Model
         public DateTime? UpdatedDate { get; set; }
         public String UpdatedBy { get; set; }
 
+        public bool IsSeriesSummary { get; set; } = false;
+
         public bool Equals(Race other)
         {
             return this.Id == other.Id

@@ -325,6 +325,6 @@ public class CompetitorService : ICompetitorService
     }
     public async Task AddCompetitorNote(Guid competitorId, string newNote, string userName)
     {
-        _coreCompetitorService.AddHistoryElement(competitorId, newNote, userName);
+        await _coreCompetitorService.AddHistoryElement(competitorId, newNote, userName);
     }
 }

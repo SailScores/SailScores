@@ -1,3 +1,4 @@
+@using SailScores.Core.Model
 @using SailScores.Web.Models.SailScores;
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
@@ -50,7 +51,9 @@
                 <h2 class="h1">@item.Key<small> season</small></h2>
             </div>
         </div>
-        @foreach (var fleetGroup in item.GroupBy(s => s.FleetName, s => s))
+        var fleetList = item.GroupBy(s => s.Type == SeriesType.Summary ? "Summary" : s.FleetName, s => s);
+        fleetList = fleetList.OrderBy(f => f.Key == "Summary" ? "aaaa" : f.Key);
+        @foreach (var fleetGroup in fleetList)
         {
             <div class="row">
                 <div class="col-12">

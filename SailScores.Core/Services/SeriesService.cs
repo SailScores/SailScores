@@ -186,7 +186,14 @@ namespace SailScores.Core.Services
                     foreach (var childLink in fullSeries.ChildrenSeriesIds)
                     {
 
-                        var childSeries = await GetOneSeriesAsync(childLink);
+                        var childSeries = await _dbContext
+                            .Series
+                            .Include(s => s.RaceSeries)
+                                .ThenInclude(rs => rs.Race)
+                                    .ThenInclude(r => r.Scores)
+                            .AsSplitQuery()
+                            .SingleAsync(s => s.Id == childLink)
+                            .ConfigureAwait(false);
                         if (childSeries != null)
                         {
                             tempRaceList.Add(await ConvertSeriesToRace(childSeries));
@@ -206,7 +213,6 @@ namespace SailScores.Core.Services
                             .Include(s => s.RaceSeries)
                                 .ThenInclude(rs => rs.Race)
                                     .ThenInclude(r => r.Scores)
-                            .Include(s => s.Season)
                             .AsSplitQuery()
                             .SingleAsync(s => s.Id == childLink)
                             .ConfigureAwait(false);
@@ -230,6 +236,37 @@ namespace SailScores.Core.Services
             fullSeries.Results = results;
         }
 
+        private async Task<Race> ConvertSeriesToRace(dbObj.Series series)
+        {
+            var racesIn = series.RaceSeries.Select(rs => rs.Race);
+
+            var returnRace = new Race
+            {
+                Id = series.Id,
+                Name = series.Name,
+                Date = racesIn.Min(r => r.Date), // Use the earliest race date
+                Scores = new List<Score>(),
+                State = racesIn.Count(r => r.State == RaceState.Raced) > 0 ?
+                    RaceState.Raced :
+                    RaceState.Scheduled,
+            };
+            var flatResults = await GetHistoricalResults(series.ClubId, series.Id)
+                .ConfigureAwait(false);
+
+            foreach (var result in flatResults?.CalculatedScores ?? Enumerable.Empty<FlatSeriesScore>())
+            {
+
+                returnRace.Scores.Add(new Score
+                {
+                    Place = result.Rank,
+                    CompetitorId = result.CompetitorId,
+                    RaceId = series.Id,
+                    Race = returnRace
+                });
+            }
+            return returnRace;
+        }
+
         private async Task<Race> ConvertSeriesToRace(Series series)
         {
             var returnRace = new Race
@@ -237,7 +274,10 @@ namespace SailScores.Core.Services
                 Id = series.Id,
                 Name = series.Name,
                 Date = series.Races.Min(r => r.Date), // Use the earliest race date
-                Scores = new List<Score>()
+                Scores = new List<Score>(),
+                State = series.Races.Count(r => r.State == RaceState.Raced) > 0 ?
+                    RaceState.Raced :
+                    RaceState.Scheduled
             };
             foreach(var result in series.FlatResults.CalculatedScores)
             {
@@ -246,7 +286,8 @@ namespace SailScores.Core.Services
                 {
                     Place = result.Rank,
                     CompetitorId = result.CompetitorId,
-                    RaceId = series.Id
+                    RaceId = series.Id,
+                    Race = returnRace
                 });
             }
             return returnRace;
@@ -837,9 +878,17 @@ namespace SailScores.Core.Services
 
         public async Task<FlatResults> GetHistoricalResults(Series series)
         {
+            return await GetHistoricalResults(series.ClubId, series.Id)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<FlatResults> GetHistoricalResults(
+            Guid clubId,
+            Guid seriesId)
+        {
             var dbRow = await _dbContext.HistoricalResults
                 .SingleOrDefaultAsync(r =>
-                    r.SeriesId == series.Id
+                    r.SeriesId == seriesId
                     && r.IsCurrent)
                 .ConfigureAwait(false);
 
@@ -849,7 +898,7 @@ namespace SailScores.Core.Services
             }
 
             var flatResults = Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
-            await LocalizeFlatResults(flatResults, series.ClubId)
+            await LocalizeFlatResults(flatResults, clubId)
                 .ConfigureAwait(false);
             return flatResults;
         }
