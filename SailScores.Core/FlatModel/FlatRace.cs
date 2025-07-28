@@ -14,6 +14,12 @@ namespace SailScores.Core.FlatModel
         public int Order { get; set; }
         public String Description { get; set; }
 
+        public bool? IsSeries { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+        public int? TotalChildRaceCount { get; set; } = 0;
+        public string seriesUrlName { get; set; }
+
         public RaceState? State { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
@@ -71,7 +77,12 @@ namespace SailScores.Core.FlatModel
                 {
                     return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
                 }
-                else
+                else if (this.IsSeries ?? false &&
+                    this.StartDate != null
+                    && this.EndDate != null)
+                {
+                    return $"{this.Name} ({this.StartDate.ToSuperShortString()} - {this.EndDate.ToSuperShortString()})";
+                } else
                 {
                     return $"{this.Name} ({Date.ToSuperShortString()})";
                 }

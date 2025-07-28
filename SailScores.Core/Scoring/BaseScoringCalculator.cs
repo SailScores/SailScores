@@ -319,6 +319,7 @@ namespace SailScores.Core.Scoring
 
         protected bool CountsAsParticipation(ScoreCode s)
         {
+            if (s == null) { return false; }
             return (s.CameToStart ?? false) || (s.CountAsParticipation ?? false);
         }
 

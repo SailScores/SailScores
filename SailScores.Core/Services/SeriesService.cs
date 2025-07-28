@@ -167,6 +167,13 @@ namespace SailScores.Core.Services
 
         private async Task CalculateScoresAsync(Series fullSeries)
         {
+            await CalculateScoresAsync(fullSeries, true)
+                .ConfigureAwait(false);
+        }
+
+        private async Task CalculateScoresAsync(Series fullSeries,
+            bool initial)
+        {
             var dbScoringSystem = await _scoringService.GetScoringSystemFromCacheAsync(
                 fullSeries)
                 .ConfigureAwait(false);
@@ -176,58 +183,24 @@ namespace SailScores.Core.Services
                 .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
                 .ConfigureAwait(false);
 
-            
-            if (fullSeries.Type == SeriesType.Summary)
+            if (initial)
             {
-                if (fullSeries.ChildrenSeriesAsSingleRace)
+
+                if (fullSeries.Type == SeriesType.Summary)
                 {
-                    // Get the results of each child series as a race.
-                    var tempRaceList = new List<Race>();
-                    foreach (var childLink in fullSeries.ChildrenSeriesIds)
+                    if (fullSeries.ChildrenSeriesAsSingleRace)
                     {
-
-                        var childSeries = await _dbContext
-                            .Series
-                            .Include(s => s.RaceSeries)
-                                .ThenInclude(rs => rs.Race)
-                                    .ThenInclude(r => r.Scores)
-                            .AsSplitQuery()
-                            .SingleAsync(s => s.Id == childLink)
-                            .ConfigureAwait(false);
-                        if (childSeries != null)
-                        {
-                            tempRaceList.Add(await ConvertSeriesToRace(childSeries));
-                        }
+                        await AddChildSeriesAsRaces(fullSeries).ConfigureAwait(false);
                     }
-
-                    fullSeries.Races = tempRaceList;
+                    else
+                    {
+                        await AddChildSeriesAsSeries(fullSeries).ConfigureAwait(false);
+                    }
                 }
-                else
+                else  // non-summary series.
                 {
-                    // Get all the races in any child series
-                    var tempRaceList = new List<Race>();
-                    foreach (var childLink in fullSeries.ChildrenSeriesIds)
-                    {
-                        var childSeries = await _dbContext
-                            .Series
-                            .Include(s => s.RaceSeries)
-                                .ThenInclude(rs => rs.Race)
-                                    .ThenInclude(r => r.Scores)
-                            .AsSplitQuery()
-                            .SingleAsync(s => s.Id == childLink)
-                            .ConfigureAwait(false);
-
-                        if (childSeries != null)
-                        {
-                            tempRaceList.AddRange(_mapper.Map<List<Race>>(childSeries.RaceSeries.Select(rs => rs.Race)));
-                        }
-                    }
-
-                    fullSeries.Races = tempRaceList;
+                    fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
                 }
-            } else  // non-summary series.
-            {
-                fullSeries.Races = fullSeries.Races.Where(r => r != null).ToList();
             }
             await PopulateCompetitorsAsync(fullSeries)
                 .ConfigureAwait(false);
@@ -236,61 +209,58 @@ namespace SailScores.Core.Services
             fullSeries.Results = results;
         }
 
-        private async Task<Race> ConvertSeriesToRace(dbObj.Series series)
+        private async Task AddChildSeriesAsSeries(Series fullSeries)
         {
-            var racesIn = series.RaceSeries.Select(rs => rs.Race);
-
-            var returnRace = new Race
+            // Get all the races in any child series
+            var tempRaceList = new List<Race>();
+            foreach (var childLink in fullSeries.ChildrenSeriesIds)
             {
-                Id = series.Id,
-                Name = series.Name,
-                Date = racesIn.Min(r => r.Date), // Use the earliest race date
-                Scores = new List<Score>(),
-                State = racesIn.Count(r => r.State == RaceState.Raced) > 0 ?
-                    RaceState.Raced :
-                    RaceState.Scheduled,
-            };
-            var flatResults = await GetHistoricalResults(series.ClubId, series.Id)
-                .ConfigureAwait(false);
+                var childSeries = await _dbContext
+                    .Series
+                    .Include(s => s.RaceSeries)
+                        .ThenInclude(rs => rs.Race)
+                            .ThenInclude(r => r.Scores)
+                    .AsSplitQuery()
+                    .SingleAsync(s => s.Id == childLink)
+                    .ConfigureAwait(false);
 
-            foreach (var result in flatResults?.CalculatedScores ?? Enumerable.Empty<FlatSeriesScore>())
-            {
-
-                returnRace.Scores.Add(new Score
+                if (childSeries != null)
                 {
-                    Place = result.Rank,
-                    CompetitorId = result.CompetitorId,
-                    RaceId = series.Id,
-                    Race = returnRace
-                });
+                    tempRaceList.AddRange(
+                        _mapper.Map<List<Race>>(
+                            childSeries.RaceSeries.Select(rs => rs.Race)));
+                }
             }
-            return returnRace;
+
+            fullSeries.Races = tempRaceList;
         }
 
-        private async Task<Race> ConvertSeriesToRace(Series series)
+        private async Task AddChildSeriesAsRaces(Series fullSeries)
         {
-            var returnRace = new Race
-            {
-                Id = series.Id,
-                Name = series.Name,
-                Date = series.Races.Min(r => r.Date), // Use the earliest race date
-                Scores = new List<Score>(),
-                State = series.Races.Count(r => r.State == RaceState.Raced) > 0 ?
-                    RaceState.Raced :
-                    RaceState.Scheduled
-            };
-            foreach(var result in series.FlatResults.CalculatedScores)
+            // Get the results of each child series as a race.
+            var tempRaceList = new List<Race>();
+            foreach (var childLink in fullSeries.ChildrenSeriesIds)
             {
 
-                returnRace.Scores.Add(new Score
+                var childSeries = await _dbContext
+                    .Series
+                    .Include(s => s.RaceSeries)
+                        .ThenInclude(rs => rs.Race)
+                            .ThenInclude(r => r.Scores)
+                    .AsSplitQuery()
+                    .SingleAsync(s => s.Id == childLink)
+                    .ConfigureAwait(false);
+
+                if (childSeries != null)
                 {
-                    Place = result.Rank,
-                    CompetitorId = result.CompetitorId,
-                    RaceId = series.Id,
-                    Race = returnRace
-                });
+                    var results = await GetHistoricalResults(fullSeries.ClubId, childSeries.Id)
+                        .ConfigureAwait(false);
+                    var domainObject = _mapper.Map<Series>(childSeries);
+                    tempRaceList.Add(new SeriesAsRace(domainObject, results));
+                }
             }
-            return returnRace;
+
+            fullSeries.Races = tempRaceList;
         }
 
         public async Task<Series> CalculateWhatIfScoresAsync(
@@ -520,10 +490,12 @@ namespace SailScores.Core.Services
 
         private IEnumerable<FlatRace> FlattenRaces(Series series)
         {
-            var flatRaces = series.Races
+            var flatRaces = new List<FlatRace>();
+            foreach (var r in series.Races
                 .OrderBy(r => r.Date)
-                .ThenBy(r => r.Order)
-                .Select(r =>
+                .ThenBy(r => r.Order))
+            {
+                var flatRace = 
                     new FlatRace
                     {
                         Id = r.Id,
@@ -531,12 +503,24 @@ namespace SailScores.Core.Services
                         Date = r.Date,
                         Order = r.Order,
                         Description = r.Description,
+                        IsSeries = r.IsSeriesSummary,
                         State = r.State,
                         WeatherIcon = (r.Weather != null ? r.Weather.Icon : null),
                         WindSpeedMeterPerSecond = (r.Weather != null ? r.Weather.WindSpeedMeterPerSecond : null),
                         WindDirectionDegrees = (r.Weather != null ? r.Weather.WindDirectionDegrees : null),
                         WindGustMeterPerSecond = (r.Weather != null ? r.Weather.WindGustMeterPerSecond : null)
-                    });
+                    };
+                if (r is SeriesAsRace)
+                {
+                    var seriesAsRace = (SeriesAsRace)r;
+                    flatRace.IsSeries = true;
+                    flatRace.StartDate = seriesAsRace.StartDate?.ToDateOnly();
+                    flatRace.EndDate = seriesAsRace.EndDate?.ToDateOnly();
+                    flatRace.TotalChildRaceCount = seriesAsRace.TotalChildRaceCount;
+                    flatRace.seriesUrlName = seriesAsRace.SeriesUrl;
+                }
+                flatRaces.Add(flatRace);
+            }
 
             return flatRaces;
         }
@@ -794,6 +778,12 @@ namespace SailScores.Core.Services
 
             if (chartData != null)
             {
+                // order the races:
+                chartData.Races = chartData.Races.OrderBy(r => r.Date).ThenBy(r => r.Order);
+                foreach (var item in chartData.Races)
+                {
+                    
+                }
                 var chartResults = new Database.Entities.SeriesChartResults
                 {
                     Id = Guid.NewGuid(),
@@ -832,7 +822,7 @@ namespace SailScores.Core.Services
                     fullSeries.Races.Remove(race);
                     if (fullSeries.Races.Count > 0)
                     {
-                        await CalculateScoresAsync(fullSeries)
+                        await CalculateScoresAsync(fullSeries, false)
                             .ConfigureAwait(false);
                         entries.AddRange(GetChartDataPoints(fullSeries));
                     }
