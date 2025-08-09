@@ -8,7 +8,7 @@
     var scoreValue = Model.Result?.ScoreValue;
     var hasCode = !String.IsNullOrEmpty(Model.Result?.Code);
     var isTie = Model.Result?.Code == "TIE";
-    if ((place == 1 || scoreValue == 1m) && !hasCode &&
+    if ((place == 1 || (scoreValue == 1m && !Model.IsPercentSystem)) && !hasCode &&
         (scoreValue < 1m || scoreValue == 1m || scoreValue == 1.5m || scoreValue == 2.0m || Model.IsPercentSystem))
     {
         classSb.Append("finish-first ");
@@ -17,7 +17,7 @@
     {
         classSb.Append("finish-first ");
     }
-    else if ((place == 2 || scoreValue == 2m) && !hasCode && (scoreValue == 2m || scoreValue == 2.5m || scoreValue == 3.0m || Model.IsPercentSystem))
+    else if ((place == 2 || (scoreValue == 2m && !Model.IsPercentSystem)) && !hasCode && (scoreValue == 2m || scoreValue == 2.5m || scoreValue == 3.0m || Model.IsPercentSystem))
     {
         classSb.Append("finish-second ");
     }
@@ -25,7 +25,7 @@
     {
         classSb.Append("finish-second ");
     }
-    else if ((place == 3 || scoreValue == 3m) && !hasCode && (scoreValue == 3m || scoreValue == 3.5m || scoreValue == 4.0m || Model.IsPercentSystem))
+    else if ((place == 3 || (scoreValue == 3m && !Model.IsPercentSystem)) && !hasCode && (scoreValue == 3m || scoreValue == 3.5m || scoreValue == 4.0m || Model.IsPercentSystem))
     {
         classSb.Append("finish-third ");
     }

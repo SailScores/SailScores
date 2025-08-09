@@ -274,15 +274,15 @@ public class AccountController : Controller
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 _logger.LogInformation("User created a new account with password.");
 
-                if (model.NewsletterSubscribe)
-                {
-                    var member = new MailChimp.Net.Models.Member
-                    {
-                        EmailAddress = model.Email,
-                        StatusIfNew = MailChimp.Net.Models.Status.Pending,
-                    };
-                    await _mailchimpManager.Members.AddOrUpdateAsync(_configuration["MailchimpAudienceId"], member);
-                }
+                //if (model.NewsletterSubscribe)
+                //{
+                //    var member = new MailChimp.Net.Models.Member
+                //    {
+                //        EmailAddress = model.Email,
+                //        StatusIfNew = MailChimp.Net.Models.Status.Pending,
+                //    };
+                //    await _mailchimpManager.Members.AddOrUpdateAsync(_configuration["MailchimpAudienceId"], member);
+                //}
 
                 return RedirectToLocal(returnUrl);
             }
