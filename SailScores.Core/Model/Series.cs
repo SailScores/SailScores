@@ -33,6 +33,8 @@ public class Series
 
     public IList<Race> Races { get; set; }
 
+    public int? RaceCount { get; set; }
+
     public Season Season { get; set; }
 
     [NotMapped]
@@ -67,6 +69,9 @@ public class Series
     // If set, any races assigned to this series will not be
     // used in the competitor summary statistics.
     public bool ExcludeFromCompetitorStats { get; set; }
+
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
 
     public Series ShallowCopy()
     {

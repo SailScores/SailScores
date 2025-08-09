@@ -51,6 +51,10 @@ public class Series
     public bool? HideDncDiscards { get; set; }
 
     public bool? ChildrenSeriesAsSingleRace { get; set; }
+    public int? RaceCount { get; set; }
+
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
 }
 
 

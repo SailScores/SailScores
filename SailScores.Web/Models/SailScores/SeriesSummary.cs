@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Model;
+﻿using Humanizer;
+using SailScores.Core.Model;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -12,6 +13,10 @@ public class SeriesSummary
 #pragma warning restore CA1056 // Uri properties should not be strings
     public String Description { get; set; }
     public IList<Race> Races { get; set; }
+
+    public int? RaceCount { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
     public Season Season { get; set; }
 
     public String FleetName { get; set; }
@@ -29,6 +34,16 @@ public class SeriesSummary
     {
         get
         {
+            if(StartDate.HasValue && EndDate.HasValue )
+            {
+                if(StartDate == EndDate)
+                {
+                    return StartDate.Value.ToString("M");
+                } else
+                {
+                    return StartDate.Value.ToString("M") + " - " + EndDate.Value.ToString("M");
+                }
+            }
             if (Races?.Count == 0)
             {
                 return "No Races";

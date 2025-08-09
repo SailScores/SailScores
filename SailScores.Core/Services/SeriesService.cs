@@ -1,17 +1,18 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Identity.Client;
+using SailScores.Api.Enumerations;
+using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
+using SailScores.Core.Utility;
 using SailScores.Database;
-using dbObj = SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SailScores.Core.FlatModel;
-using SailScores.Api.Enumerations;
-using Microsoft.Extensions.Caching.Memory;
-using SailScores.Core.Utility;
+using dbObj = SailScores.Database.Entities;
 
 namespace SailScores.Core.Services
 {
@@ -65,6 +66,7 @@ namespace SailScores.Core.Services
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
                     .ThenInclude(r => r.Fleet)
+                 .Include(s => s.ChildLinks)
                 .Where(s => includeRegattaSeries || !regattaSeriesId.Contains(s.Id))
                 .OrderBy(s => s.Name)
                 .AsSplitQuery()
@@ -151,11 +153,14 @@ namespace SailScores.Core.Services
                 return;
             }
 
+            await PopulateSummaryValues(dbSeries);
             var fullSeries = _mapper.Map<Series>(dbSeries);
             fullSeries.UpdatedBy = updatedBy;
             await CalculateScoresAsync(fullSeries)
                 .ConfigureAwait(false);
             dbSeries.UpdatedDate = DateTime.UtcNow;
+
+
             await SaveHistoricalResults(fullSeries)
                 .ConfigureAwait(false);
 
@@ -163,6 +168,56 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             //todo: check for parent series to be updated
+        }
+        private async Task PopulateSummaryValues(
+            dbObj.Series dbSeries,
+            int level = 0)
+        {
+            // three things to populate:
+            // - RaceCount
+            // - StartDate
+            // - EndDate
+
+            //if it's a summary series, we need to calculate these by reviewing child series.
+            if (dbSeries.Type == dbObj.SeriesType.Summary)
+            {
+                var childIds = dbSeries.ChildLinks.Select(l => l.ChildSeriesId).ToList();
+                var allChildSeries = await _dbContext.Series
+                    .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race).Where(s =>
+                    childIds.Contains(s.Id)).ToListAsync();
+
+                foreach ( var childSeries in allChildSeries)
+                {
+                    // limit how deep we look to roll up.
+                    if (childSeries.Type == dbObj.SeriesType.Summary && level <10)
+                    {
+                        await PopulateSummaryValues(childSeries, level + 1);
+                    }
+                    if(childSeries.Type != dbObj.SeriesType.Summary && childSeries.RaceCount == null ||
+                        childSeries.StartDate == null || childSeries.EndDate == null)
+                    {
+                        childSeries.RaceCount = childSeries.RaceSeries.Count();
+                        var minDate = childSeries.RaceSeries.Select(rs => rs.Race).Min(r => r.Date);
+                        var maxDate = childSeries.RaceSeries.Select(rs => rs.Race).Max(r => r.Date);
+                        childSeries.StartDate = minDate.HasValue ? DateOnly.FromDateTime(minDate.Value) : (DateOnly?)null;
+                        childSeries.EndDate = maxDate.HasValue ? DateOnly.FromDateTime(maxDate.Value) : (DateOnly?)null;
+                    }
+                }
+
+                dbSeries.RaceCount = allChildSeries.Sum(s => s.RaceCount);
+                dbSeries.StartDate = allChildSeries.Min(s => s.StartDate);
+                dbSeries.EndDate = allChildSeries.Max(s => s.EndDate);
+            } else
+            {
+                // if it's not a summary series, just set the values.
+                var raceIds = dbSeries.RaceSeries.Select(rs => rs.RaceId);
+                var races = _dbContext.Races
+                    .Where(r => raceIds.Any(r2 => r2 == r.Id));
+                dbSeries.RaceCount = races.Count();
+                dbSeries.StartDate = races.Min(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
+                dbSeries.EndDate = races.Max(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
+            }
         }
 
         private async Task CalculateScoresAsync(Series fullSeries)
@@ -661,6 +716,7 @@ namespace SailScores.Core.Services
             existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
             existingSeries.ChildrenSeriesAsSingleRace = model.ChildrenSeriesAsSingleRace;
+            await PopulateSummaryValues(existingSeries);
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty

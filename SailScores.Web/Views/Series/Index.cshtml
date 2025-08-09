@@ -65,7 +65,9 @@
                 <div class="row border-bottom mb-1 pb-1 mx-2">
                     <div class="col-md-5">
                         <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
-                        <span class="avoidwrap">(@(series.Races?.Count.ToString() ?? "No") @localizer["Races"])</span>
+                        @if(series.RaceCount.HasValue) {
+                            <span class="avoidwrap">(@series.RaceCount @localizer["Races"])</span>
+                        }
                     </div>
 
                     <div class="col-md-4">
