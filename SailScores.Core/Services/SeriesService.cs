@@ -168,6 +168,19 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             //todo: check for parent series to be updated
+            var parentSeries = await _dbContext.Series
+                .Include(s => s.ChildLinks)
+                .Where(s => s.ChildLinks.Any(l => l.ChildSeriesId == dbSeries.Id))
+                .ToListAsync()
+                .ConfigureAwait(false);
+            if (parentSeries != null)
+            {
+                foreach (var parent in parentSeries)
+                {
+                    await UpdateSeriesResults(parent.Id, updatedBy)
+                        .ConfigureAwait(false);
+                }
+            }
         }
         private async Task PopulateSummaryValues(
             dbObj.Series dbSeries,
@@ -181,6 +194,13 @@ namespace SailScores.Core.Services
             //if it's a summary series, we need to calculate these by reviewing child series.
             if (dbSeries.Type == dbObj.SeriesType.Summary)
             {
+                if (dbSeries.ChildLinks == null || dbSeries.ChildLinks.Count() == 0)
+                {
+                    dbSeries.RaceCount = null;
+                    dbSeries.StartDate = null;
+                    dbSeries.EndDate = null;
+                    return;
+                }
                 var childIds = dbSeries.ChildLinks.Select(l => l.ChildSeriesId).ToList();
                 var allChildSeries = await _dbContext.Series
                     .Include(s => s.RaceSeries)
@@ -262,6 +282,8 @@ namespace SailScores.Core.Services
 
             var results = calculator.CalculateResults(fullSeries);
             fullSeries.Results = results;
+
+            // saw one instance when results weren't sorted. Having trouble reproducing that.
         }
 
         private async Task AddChildSeriesAsSeries(Series fullSeries)

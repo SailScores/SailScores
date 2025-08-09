@@ -64,6 +64,14 @@
             <br class="d-md-none" />
             <hr class="d-md-none" />
             <div class="row bg-almost">
+            @if (Model.Item.Type == SeriesType.Summary)
+            {
+                <div class="d-none col-md-12 d-md-block my-2">
+                    <em>Summary Series cannot have races added directly.</em>
+                </div>
+            }
+            else
+            {
                 <div class="col-sm-4 my-2">
                     <a asp-controller="Race"
                        asp-action="Create"
@@ -71,6 +79,7 @@
                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
                        class="btn btn-outline-primary">@localizer["New Race"]</a>
                 </div>
+            }
             </div>
         }
     </div>
