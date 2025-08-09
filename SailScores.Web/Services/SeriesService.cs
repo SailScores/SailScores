@@ -112,7 +112,7 @@ public class SeriesService : ISeriesService
         return series;
     }
 
-    public async Task SaveNew(SeriesWithOptionsViewModel model)
+    public async Task<Guid> SaveNew(SeriesWithOptionsViewModel model)
     {
         var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
         var season = seasons.Single(s => s.Id == model.SeasonId);
@@ -121,7 +121,7 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
-        await _coreSeriesService.SaveNewSeries(model);
+        return await _coreSeriesService.SaveNewSeries(model);
     }
 
     public async Task Update(SeriesWithOptionsViewModel model)

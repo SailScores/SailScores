@@ -660,14 +660,15 @@ namespace SailScores.Core.Services
             }
         }
 
-        public async Task SaveNewSeries(Series series, Club club)
+        public async Task<Guid> SaveNewSeries(Series series, Club club)
         {
             series.ClubId = club.Id;
-            await SaveNewSeries(series)
+            var seriesId = await SaveNewSeries(series)
                 .ConfigureAwait(false);
+            return seriesId;
         }
 
-        public async Task SaveNewSeries(Series series)
+        public async Task<Guid> SaveNewSeries(Series series)
         {
             Database.Entities.Series dbSeries = await
                 _dbObjectBuilder.BuildDbSeriesAsync(series)
@@ -700,6 +701,7 @@ namespace SailScores.Core.Services
 
             await UpdateSeriesResults(dbSeries.Id, series.UpdatedBy)
                 .ConfigureAwait(false);
+            return dbSeries.Id;
         }
 
 

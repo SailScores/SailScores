@@ -51,6 +51,9 @@
                 </select>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
+            <div id="summarySeriesNote" class="alert alert-info" style="display:none;">
+                After saving, you will be redirected to the Edit page where you can select the Children series.
+            </div>
             <div id="advancedFields" role="tablist">
                 <div class="card">
                     <div class="card-header" role="tab" id="advancedHeading">
@@ -123,4 +126,18 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function toggleSummarySeriesNote() {
+            var typeSelect = document.getElementById('Type');
+            var note = document.getElementById('summarySeriesNote');
+            if (typeSelect.value === "3") {
+                note.style.display = 'block';
+            } else {
+                note.style.display = 'none';
+            }
+        }
+        document.getElementById('Type').addEventListener('change', toggleSummarySeriesNote);
+        // Run on page load in case of validation errors
+        toggleSummarySeriesNote();
+    </script>
 }

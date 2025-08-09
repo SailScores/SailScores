@@ -186,7 +186,12 @@ public class SeriesController : Controller
             }
 
             model.UpdatedBy = await GetUserStringAsync();
-            await _seriesService.SaveNew(model);
+            var newSeriesId = await _seriesService.SaveNew(model);
+
+            if (model.Type == Core.Model.SeriesType.Summary)
+            {
+                return RedirectToAction("Edit", new { clubInitials, id = newSeriesId });
+            }
 
             return RedirectToAction("Index", "Admin");
         }
