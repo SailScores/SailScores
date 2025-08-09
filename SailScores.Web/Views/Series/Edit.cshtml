@@ -29,7 +29,7 @@
             </div>
             <div id="seasonSelectGroup" class="mb-3">
                 <label asp-for="SeasonId" class="control-label">Season</label>
-                <select asp-for="SeasonId" class="form-select">
+                <select asp-for="SeasonId" class="form-select" readonly>
                     <option selected="selected">Select a season...</option>
                     @foreach (var season in Model.SeasonOptions)
                     {

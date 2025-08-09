@@ -237,6 +237,17 @@ public class RaceService : IRaceService
     {
         var model = await CreateClubRaceAsync(clubInitials);
         var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
+        if(series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)
+        {
+            if (series.Races.Where(r => r.Date.HasValue).Any())
+            {
+                model.Date = series.Races.Where(r => r.Date.HasValue).Max(r => r.Date);
+            } else // no races, set to start of season.
+            {
+                model.Date = series.Season.Start;
+            }
+        }
+
 
         if (series.Races.Any())
         {

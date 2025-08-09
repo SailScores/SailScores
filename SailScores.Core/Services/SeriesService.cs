@@ -742,12 +742,7 @@ namespace SailScores.Core.Services
             existingSeries.ChildrenSeriesAsSingleRace = model.ChildrenSeriesAsSingleRace;
             await PopulateSummaryValues(existingSeries);
 
-            if (model.Season != null
-                && model.Season.Id != Guid.Empty
-                && existingSeries.Season?.Id != model.Season?.Id)
-            {
-                existingSeries.Season = _dbContext.Seasons.Single(s => s.Id == model.Season.Id);
-            }
+            // no longer allow season to be changed on a series. Create new if needed.
 
             var racesToRemove = new List<dbObj.SeriesRace>();
 
