@@ -374,15 +374,29 @@ function getSeries(clubId, date) {
     }
 }
 function setSeries() {
-    let seriesSelect = $('#seriesIds');
-    var selectedSeriesValues = seriesSelect.val();
+    let seriesSelect = $('#SeriesIds');
+    // Save current selections as an array of strings
+    var selectedSeriesValues = seriesSelect.val() || [];
+    // Destroy existing Select2 instance to avoid duplicates
+    if (seriesSelect.hasClass("select2-hidden-accessible")) {
+        seriesSelect.select2('destroy');
+    }
+    // Remove options
     seriesSelect.empty();
-    $.each(seriesOptions, function (key, value) {
+    // Add options
+    $.each(seriesOptions, function (_key, value) {
         let series = value;
         seriesSelect.append($("<option></option>")
-            .attr("value", series.id.toString()).text(series.name));
+            .attr("value", series.id.toString())
+            .text(series.name));
     });
-    seriesSelect.select2();
+    // Re-initialize Select2 with multi-select enabled
+    seriesSelect.select2({
+        width: '100%',
+        placeholder: "Select Series",
+        allowClear: true
+    });
+    // Restore previous selections (if still present)
     seriesSelect.val(selectedSeriesValues).trigger('change');
 }
 var autoCompleteSetup = false;
