@@ -368,8 +368,15 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
+
+            var discardsToUse = discards > 0 ? discards : 0;
+            // upper bound on discards for safety.
+            discardsToUse = Math.Min(discardsToUse, 100);
+
+            // if down to one race, then no discards.
             var sb = new System.Text.StringBuilder();
-            for(int i = 0; i <= discards; i++)
+            sb.Append("0,");
+            for (int i = 1; i <= discardsToUse; i++)
             {
                 sb.Append(i);
                 sb.Append(",");
