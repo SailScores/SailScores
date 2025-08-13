@@ -36,12 +36,14 @@ public class SeriesService : ISeriesService
     public async Task<SeriesWithOptionsViewModel> GetBlankVmForCreate(string clubInitials)
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
+        var club = await _coreClubService.GetMinimalClub(clubId);
 
         var seasons = await _coreSeasonService.GetSeasons(clubId);
 
         var vm = new SeriesWithOptionsViewModel
         {
-            SeasonOptions = seasons
+            SeasonOptions = seasons,
+            UseExperimentalFeatures = club.UseExperimentalFeatures ?? false
         };
         var selectedSeason = seasons.FirstOrDefault(s =>
             s.Start < DateTime.Now && s.End > DateTime.Now);

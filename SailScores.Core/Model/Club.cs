@@ -20,6 +20,7 @@ namespace SailScores.Core.Model
         public bool? ShowClubInResults { get; set; }
         public String Url { get; set; }
         public bool? UseAdvancedFeatures { get; set; }
+        public bool? UseExperimentalFeatures { get; set; }
 
         public int? DefaultRaceDateOffset { get; set; }
 

@@ -57,7 +57,6 @@ namespace SailScores.Core.Model
 
             foreach (var result in flatResults?.CalculatedScores ?? [])
             {
-                Score score;
                 if (result.Rank != null)
                 {
                     this.Scores.Add(new Score
