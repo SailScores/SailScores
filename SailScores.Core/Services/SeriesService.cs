@@ -167,7 +167,6 @@ namespace SailScores.Core.Services
             await SaveChartData(fullSeries)
                 .ConfigureAwait(false);
 
-            //todo: check for parent series to be updated
             var parentSeries = await _dbContext.Series
                 .Include(s => s.ChildLinks)
                 .Where(s => s.ChildLinks.Any(l => l.ChildSeriesId == dbSeries.Id))
@@ -194,7 +193,7 @@ namespace SailScores.Core.Services
             //if it's a summary series, we need to calculate these by reviewing child series.
             if (dbSeries.Type == dbObj.SeriesType.Summary)
             {
-                if (dbSeries.ChildLinks == null || dbSeries.ChildLinks.Count() == 0)
+                if (dbSeries.ChildLinks == null || !dbSeries.ChildLinks.Any())
                 {
                     dbSeries.RaceCount = null;
                     dbSeries.StartDate = null;
@@ -234,9 +233,9 @@ namespace SailScores.Core.Services
                 var raceIds = dbSeries.RaceSeries.Select(rs => rs.RaceId);
                 var races = _dbContext.Races
                     .Where(r => raceIds.Any(r2 => r2 == r.Id));
-                dbSeries.RaceCount = races.Count();
-                dbSeries.StartDate = races.Min(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
-                dbSeries.EndDate = races.Max(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
+                dbSeries.RaceCount = await races.CountAsync();
+                dbSeries.StartDate = await races.MinAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
+                dbSeries.EndDate = await races.MaxAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
             }
         }
 
@@ -460,13 +459,13 @@ namespace SailScores.Core.Services
                     _converter.Convert(
                      race.WindSpeedMeterPerSecond,
                      _converter.MeterPerSecond,
-                     settings?.WindSpeedUnits)?.ToString("N0");
+                     settings.WindSpeedUnits)?.ToString("N0");
                 race.WindGust =
                      _converter.Convert(
                          race.WindSpeedMeterPerSecond,
                          _converter.MeterPerSecond,
-                         settings?.WindSpeedUnits)?.ToString("N0");
-                race.WindSpeedUnits = settings?.WindSpeedUnits;
+                         settings.WindSpeedUnits)?.ToString("N0");
+                race.WindSpeedUnits = settings.WindSpeedUnits;
             }
         }
 
@@ -572,7 +571,7 @@ namespace SailScores.Core.Services
                 });
         }
 
-        private IEnumerable<FlatRace> FlattenRaces(Series series)
+        private List<FlatRace> FlattenRaces(Series series)
         {
             var flatRaces = new List<FlatRace>();
             foreach (var r in series.Races
@@ -589,10 +588,10 @@ namespace SailScores.Core.Services
                         Description = r.Description,
                         IsSeries = r.IsSeriesSummary,
                         State = r.State,
-                        WeatherIcon = (r.Weather != null ? r.Weather.Icon : null),
-                        WindSpeedMeterPerSecond = (r.Weather != null ? r.Weather.WindSpeedMeterPerSecond : null),
-                        WindDirectionDegrees = (r.Weather != null ? r.Weather.WindDirectionDegrees : null),
-                        WindGustMeterPerSecond = (r.Weather != null ? r.Weather.WindGustMeterPerSecond : null)
+                        WeatherIcon = r.Weather?.Icon,
+                        WindSpeedMeterPerSecond = r.Weather?.WindSpeedMeterPerSecond,
+                        WindDirectionDegrees = r.Weather?.WindDirectionDegrees,
+                        WindGustMeterPerSecond = r.Weather?.WindGustMeterPerSecond
                     };
                 if (r is SeriesAsRace)
                 {
@@ -631,15 +630,15 @@ namespace SailScores.Core.Services
                 .SelectMany(r => r.Scores)
                 .Select(s => s.CompetitorId);
 
-            List<dbObj.Competitor> dbCompetitors;
-            if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out dbCompetitors))
+            if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out List<dbObj.Competitor> dbCompetitors))
             {
                 dbCompetitors = await _dbContext.Competitors
                     .Where(c => compIds.Contains(c.Id)).ToListAsync()
                     .ConfigureAwait(false);
 
                 _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
-            } else
+            }
+            else
             {
                 // this method is called with series that may be missing races (creating
                 // historical results for charts)
@@ -693,7 +692,7 @@ namespace SailScores.Core.Services
                 throw new InvalidOperationException("Could not find or create season for new series.");
             }
 
-            if (_dbContext.Series.Any(s =>
+            if (await _dbContext.Series.AnyAsync(s =>
                 s.Id == series.Id
                 || (s.ClubId == series.ClubId
                     && s.Name == series.Name
@@ -714,7 +713,7 @@ namespace SailScores.Core.Services
 
         public async Task Update(Series model)
         {
-            if (_dbContext.Series.Any(s =>
+            if (await _dbContext.Series.AnyAsync(s =>
                 s.Id != model.Id
                 && s.ClubId == model.ClubId
                 && s.Name == model.Name
@@ -779,16 +778,11 @@ namespace SailScores.Core.Services
 
             if(existingSeries.Type == dbObj.SeriesType.Summary)
             {
-                if(model.ChildrenSeriesIds == null )
-                {
-                    model.ChildrenSeriesIds = new List<Guid>();
-                }
-                if(existingSeries.ChildLinks == null)
-                {
-                    existingSeries.ChildLinks = new List<dbObj.SeriesToSeriesLink>();
-                }
-                var seriesLinksToRemove = new List<dbObj.SeriesToSeriesLink>();
-                var seriesLinksToAdd = new List<dbObj.SeriesToSeriesLink>();
+                model.ChildrenSeriesIds ??= new List<Guid>();
+                existingSeries.ChildLinks ??= new List<dbObj.SeriesToSeriesLink>();
+
+                List<dbObj.SeriesToSeriesLink> seriesLinksToRemove;
+                List<dbObj.SeriesToSeriesLink> seriesLinksToAdd;
 
                 if (existingSeries.ChildLinks != null && existingSeries.ChildLinks.Count() > 0)
                 {
@@ -826,7 +820,7 @@ namespace SailScores.Core.Services
             }
         }
 
-        private bool DoIdentifiersMatch(Series model, dbObj.Series existingSeries)
+        private static bool DoIdentifiersMatch(Series model, dbObj.Series existingSeries)
         {
             return model.Name == existingSeries.Name
                    && model.ClubId == existingSeries.ClubId
@@ -862,10 +856,7 @@ namespace SailScores.Core.Services
             {
                 // order the races:
                 chartData.Races = chartData.Races.OrderBy(r => r.Date).ThenBy(r => r.Order);
-                foreach (var item in chartData.Races)
-                {
-                    
-                }
+
                 var chartResults = new Database.Entities.SeriesChartResults
                 {
                     Id = Guid.NewGuid(),
@@ -913,9 +904,7 @@ namespace SailScores.Core.Services
             fullSeries.Races = copyOfRaces;
             fullSeries.Competitors = copyOfCompetitors;
 
-            var scoringSystem= fullSeries.ScoringSystem;
-
-            var isLowPoint = !(fullSeries?.Results.IsPercentSystem ?? false);
+            var isLowPoint = !(fullSeries.Results.IsPercentSystem);
 
             return new FlatChartData
             {

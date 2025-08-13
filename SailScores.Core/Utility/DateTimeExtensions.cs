@@ -12,5 +12,5 @@ internal static class DateTimeExtensions
         => DateOnly.FromDateTime(datetime);
 
     public static DateTime ToDateTime(this DateOnly dateOnly)
-        => dateOnly.ToDateTime();
+        => dateOnly.ToDateTime(TimeOnly.MinValue);
 }
