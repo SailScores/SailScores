@@ -77,12 +77,13 @@ namespace SailScores.Core.FlatModel
                 {
                     return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
                 }
-                else if (this.IsSeries ?? false &&
-                    this.StartDate != null
-                    && this.EndDate != null)
+                else if ((IsSeries ?? false)
+                    && StartDate != null
+                    && EndDate != null)
                 {
-                    return $"{this.Name} ({this.StartDate.ToSuperShortString()} - {this.EndDate.ToSuperShortString()})";
-                } else
+                    return $"{Name} ({StartDate.ToSuperShortString()} - {EndDate.ToSuperShortString()})";
+                }
+                else
                 {
                     return $"{this.Name} ({Date.ToSuperShortString()})";
                 }
