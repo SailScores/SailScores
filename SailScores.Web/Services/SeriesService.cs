@@ -78,10 +78,31 @@ public class SeriesService : ISeriesService
         var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
 
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(coreObject);
+        foreach(var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
+        {
+            var races = coreObject.Where(s => summaryTypeSeries.ChildrenSeriesIds.Contains(s.Id)).SelectMany(s => s.Races).ToList();
+            seriesSummaries.Single(ss => ss.Id == summaryTypeSeries.Id).FleetName = GetFleetsString(races);
+        }
 
         return seriesSummaries.OrderByDescending(s => s.Season.Start)
             .ThenBy( s => s.FleetName)
             .ThenBy(s => s.Name);
+    }
+
+
+    private String GetFleetsString(IList<Race> races)
+    {
+        var fleetNames = races.Select(r => r.Fleet).Where(f => f != null)
+            .Select(f => f.Name).Distinct();
+        switch (fleetNames.Count())
+        {
+            case 0:
+                return "No Fleet";
+            case 1:
+                return fleetNames.First();
+            default:
+                return "Multiple Fleets";
+        }
     }
 
     public async Task<IEnumerable<SeriesSummary>> GetChildSeriesSummariesAsync(
@@ -128,9 +149,7 @@ public class SeriesService : ISeriesService
 
     public async Task Update(SeriesWithOptionsViewModel model)
     {
-        var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
-        var season = seasons.Single(s => s.Id == model.SeasonId);
-        model.Season = season;
+        // no longer allowing update of season.
         if (model.ScoringSystemId == Guid.Empty)
         {
             model.ScoringSystemId = null;

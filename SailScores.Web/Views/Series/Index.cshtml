@@ -51,8 +51,7 @@
                 <h2 class="h1">@item.Key<small> season</small></h2>
             </div>
         </div>
-        var fleetList = item.GroupBy(s => s.Type == SeriesType.Summary ? "Summary" : s.FleetName, s => s);
-        fleetList = fleetList.OrderBy(f => f.Key == "Summary" ? "aaaa" : f.Key);
+        var fleetList = item.GroupBy(s => s.FleetName, s => s);
         @foreach (var fleetGroup in fleetList)
         {
             <div class="row">

@@ -713,21 +713,23 @@ namespace SailScores.Core.Services
 
         public async Task Update(Series model)
         {
+            var existingSeries = await _dbContext.Series
+                .Include(f => f.RaceSeries)
+                .Include(f => f.ChildLinks)
+                .Include(f => f.Season)
+                .AsSplitQuery()
+                .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId)
+                .ConfigureAwait(false);
+
             if (await _dbContext.Series.AnyAsync(s =>
                 s.Id != model.Id
                 && s.ClubId == model.ClubId
                 && s.Name == model.Name
-                && s.Season.Id == model.Season.Id))
+                && s.Season.Id == existingSeries.Season.Id))
             {
                 throw new InvalidOperationException(
                     "Cannot update series. A series with this name in this season already exists.");
             }
-            var existingSeries = await _dbContext.Series
-                .Include(f => f.RaceSeries)
-                .Include(f => f.ChildLinks)
-                .AsSplitQuery()
-                .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId)
-                .ConfigureAwait(false);
 
             if (!DoIdentifiersMatch(model, existingSeries))
             {
@@ -822,21 +824,34 @@ namespace SailScores.Core.Services
 
         private static bool DoIdentifiersMatch(Series model, dbObj.Series existingSeries)
         {
+            // no longer checking season, as it cannot be changed.
             return model.Name == existingSeries.Name
-                   && model.ClubId == existingSeries.ClubId
-                   && model.Season.Id == existingSeries.Season.Id;
+                   && model.ClubId == existingSeries.ClubId;
         }
 
         public async Task Delete(Guid seriesId)
         {
             var dbSeries = await _dbContext.Series
                 .Include(f => f.RaceSeries)
+                .Include(f => f.ChildLinks)
+                .Include(f => f.ParentLinks)
+                .AsSplitQuery()
                 .SingleAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
             foreach (var link in dbSeries.RaceSeries.ToList())
             {
                 dbSeries.RaceSeries.Remove(link);
             }
+            foreach (var link in dbSeries.ChildLinks.ToList())
+            {
+                dbSeries.ChildLinks.Remove(link);
+            }
+
+            foreach (var link in dbSeries.ParentLinks.ToList())
+            {
+                dbSeries.ParentLinks.Remove(link);
+            }
+
             _dbContext.Series.Remove(dbSeries);
 
             await _dbContext.SaveChangesAsync()

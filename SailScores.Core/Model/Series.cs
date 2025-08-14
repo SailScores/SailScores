@@ -70,8 +70,8 @@ public class Series
     // used in the competitor summary statistics.
     public bool ExcludeFromCompetitorStats { get; set; }
 
-    public DateOnly StartDate { get; set; }
-    public DateOnly EndDate { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
 
     public Series ShallowCopy()
     {
