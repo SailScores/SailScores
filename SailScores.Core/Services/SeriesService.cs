@@ -185,58 +185,68 @@ namespace SailScores.Core.Services
             dbObj.Series dbSeries,
             int level = 0)
         {
-            // three things to populate:
-            // - RaceCount
-            // - StartDate
-            // - EndDate
-
-            //if it's a summary series, we need to calculate these by reviewing child series.
             if (dbSeries.Type == dbObj.SeriesType.Summary)
             {
-                if (dbSeries.ChildLinks == null || !dbSeries.ChildLinks.Any())
-                {
-                    dbSeries.RaceCount = null;
-                    dbSeries.StartDate = null;
-                    dbSeries.EndDate = null;
-                    return;
-                }
-                var childIds = dbSeries.ChildLinks.Select(l => l.ChildSeriesId).ToList();
-                var allChildSeries = await _dbContext.Series
-                    .Include(s => s.RaceSeries)
-                    .ThenInclude(rs => rs.Race).Where(s =>
-                    childIds.Contains(s.Id)).ToListAsync();
-
-                foreach ( var childSeries in allChildSeries)
-                {
-                    // limit how deep we look to roll up.
-                    if (childSeries.Type == dbObj.SeriesType.Summary && level <10)
-                    {
-                        await PopulateSummaryValues(childSeries, level + 1);
-                    }
-                    if(childSeries.Type != dbObj.SeriesType.Summary && childSeries.RaceCount == null ||
-                        childSeries.StartDate == null || childSeries.EndDate == null)
-                    {
-                        childSeries.RaceCount = childSeries.RaceSeries.Count();
-                        var minDate = childSeries.RaceSeries.Select(rs => rs.Race).Min(r => r.Date);
-                        var maxDate = childSeries.RaceSeries.Select(rs => rs.Race).Max(r => r.Date);
-                        childSeries.StartDate = minDate.HasValue ? DateOnly.FromDateTime(minDate.Value) : (DateOnly?)null;
-                        childSeries.EndDate = maxDate.HasValue ? DateOnly.FromDateTime(maxDate.Value) : (DateOnly?)null;
-                    }
-                }
-
-                dbSeries.RaceCount = allChildSeries.Sum(s => s.RaceCount);
-                dbSeries.StartDate = allChildSeries.Min(s => s.StartDate);
-                dbSeries.EndDate = allChildSeries.Max(s => s.EndDate);
-            } else
-            {
-                // if it's not a summary series, just set the values.
-                var raceIds = dbSeries.RaceSeries.Select(rs => rs.RaceId);
-                var races = _dbContext.Races
-                    .Where(r => raceIds.Any(r2 => r2 == r.Id));
-                dbSeries.RaceCount = await races.CountAsync();
-                dbSeries.StartDate = await races.MinAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
-                dbSeries.EndDate = await races.MaxAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null);
+                await PopulateSummaryForSummarySeries(dbSeries, level).ConfigureAwait(false);
             }
+            else
+            {
+                await PopulateSummaryForRegularSeries(dbSeries).ConfigureAwait(false);
+            }
+        }
+
+        private async Task PopulateSummaryForSummarySeries(dbObj.Series dbSeries, int level)
+        {
+            if (dbSeries.ChildLinks == null || !dbSeries.ChildLinks.Any())
+            {
+                dbSeries.RaceCount = null;
+                dbSeries.StartDate = null;
+                dbSeries.EndDate = null;
+                return;
+            }
+
+            var childIds = dbSeries.ChildLinks.Select(l => l.ChildSeriesId).ToList();
+            var allChildSeries = await _dbContext.Series
+                .Include(s => s.RaceSeries)
+                .ThenInclude(rs => rs.Race)
+                .Where(s => childIds.Contains(s.Id))
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            foreach (var childSeries in allChildSeries)
+            {
+                await PopulateChildSummaryValues(childSeries, level).ConfigureAwait(false);
+            }
+
+            dbSeries.RaceCount = allChildSeries.Sum(s => s.RaceCount);
+            dbSeries.StartDate = allChildSeries.Min(s => s.StartDate);
+            dbSeries.EndDate = allChildSeries.Max(s => s.EndDate);
+        }
+
+        private async Task PopulateChildSummaryValues(dbObj.Series childSeries, int level)
+        {
+            if (childSeries.Type == dbObj.SeriesType.Summary && level < 10)
+            {
+                await PopulateSummaryValues(childSeries, level + 1).ConfigureAwait(false);
+            }
+            if (childSeries.Type != dbObj.SeriesType.Summary &&
+                (childSeries.RaceCount == null || childSeries.StartDate == null || childSeries.EndDate == null))
+            {
+                childSeries.RaceCount = childSeries.RaceSeries.Count();
+                var minDate = childSeries.RaceSeries.Select(rs => rs.Race).Min(r => r.Date);
+                var maxDate = childSeries.RaceSeries.Select(rs => rs.Race).Max(r => r.Date);
+                childSeries.StartDate = minDate.HasValue ? DateOnly.FromDateTime(minDate.Value) : (DateOnly?)null;
+                childSeries.EndDate = maxDate.HasValue ? DateOnly.FromDateTime(maxDate.Value) : (DateOnly?)null;
+            }
+        }
+
+        private async Task PopulateSummaryForRegularSeries(dbObj.Series dbSeries)
+        {
+            var raceIds = dbSeries.RaceSeries.Select(rs => rs.RaceId);
+            var races = _dbContext.Races.Where(r => raceIds.Any(r2 => r2 == r.Id));
+            dbSeries.RaceCount = await races.CountAsync().ConfigureAwait(false);
+            dbSeries.StartDate = await races.MinAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null).ConfigureAwait(false);
+            dbSeries.EndDate = await races.MaxAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null).ConfigureAwait(false);
         }
 
         private async Task CalculateScoresAsync(Series fullSeries)
@@ -593,9 +603,8 @@ namespace SailScores.Core.Services
                         WindDirectionDegrees = r.Weather?.WindDirectionDegrees,
                         WindGustMeterPerSecond = r.Weather?.WindGustMeterPerSecond
                     };
-                if (r is SeriesAsRace)
+                if (r is SeriesAsRace seriesAsRace)
                 {
-                    var seriesAsRace = (SeriesAsRace)r;
                     flatRace.IsSeries = true;
                     flatRace.StartDate = seriesAsRace.StartDate?.ToDateOnly();
                     flatRace.EndDate = seriesAsRace.EndDate?.ToDateOnly();
@@ -721,6 +730,33 @@ namespace SailScores.Core.Services
                 .SingleAsync(c => c.Id == model.Id && c.ClubId == model.ClubId)
                 .ConfigureAwait(false);
 
+            await EnsureUniqueSeriesName(model, existingSeries).ConfigureAwait(false);
+
+            if (!DoIdentifiersMatch(model, existingSeries))
+            {
+                await _forwarderService.CreateSeriesForwarder(model, existingSeries);
+            }
+
+            UpdateSeriesProperties(model, existingSeries);
+            await PopulateSummaryValues(existingSeries);
+
+            UpdateSeriesRaces(model, existingSeries);
+
+            if (existingSeries.Type == dbObj.SeriesType.Summary)
+            {
+                UpdateSeriesLinks(model, existingSeries);
+            }
+
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            if (!(existingSeries.ResultsLocked ?? false))
+            {
+                await UpdateSeriesResults(existingSeries.Id, existingSeries.UpdatedBy).ConfigureAwait(false);
+            }
+        }
+
+        private async Task EnsureUniqueSeriesName(Series model, dbObj.Series existingSeries)
+        {
             if (await _dbContext.Series.AnyAsync(s =>
                 s.Id != model.Id
                 && s.ClubId == model.ClubId
@@ -730,14 +766,11 @@ namespace SailScores.Core.Services
                 throw new InvalidOperationException(
                     "Cannot update series. A series with this name in this season already exists.");
             }
+        }
 
-            if (!DoIdentifiersMatch(model, existingSeries))
-            {
-                await _forwarderService.CreateSeriesForwarder(model, existingSeries);
-            }
-
+        private void UpdateSeriesProperties(Series model, dbObj.Series existingSeries)
+        {
             existingSeries.Name = model.Name;
-            // Now that forwarders are in place, we can change the url name.
             existingSeries.UrlName = UrlUtility.GetUrlName(model.Name);
             existingSeries.Description = model.Description;
             existingSeries.IsImportantSeries = model.IsImportantSeries;
@@ -748,24 +781,20 @@ namespace SailScores.Core.Services
             existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
             existingSeries.ChildrenSeriesAsSingleRace = model.ChildrenSeriesAsSingleRace;
-            await PopulateSummaryValues(existingSeries);
+        }
 
-            // no longer allow season to be changed on a series. Create new if needed.
-
+        private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)
+        {
             var racesToRemove = new List<dbObj.SeriesRace>();
-
             if (model.Races != null)
             {
-                racesToRemove =
-                    existingSeries.RaceSeries
+                racesToRemove = existingSeries.RaceSeries
                     .Where(f => !(model.Races.Any(c => c.Id == f.RaceId)))
                     .ToList();
             }
-            var racesToAdd =
-                model.Races != null ?
-                model.Races
-                .Where(c =>
-                    !(existingSeries.RaceSeries.Any(f => c.Id == f.RaceId)))
+            var racesToAdd = model.Races != null
+                ? model.Races
+                    .Where(c => !(existingSeries.RaceSeries.Any(f => c.Id == f.RaceId)))
                     .Select(c => new dbObj.SeriesRace { RaceId = c.Id, SeriesId = existingSeries.Id })
                 : new List<dbObj.SeriesRace>();
 
@@ -777,48 +806,34 @@ namespace SailScores.Core.Services
             {
                 existingSeries.RaceSeries.Add(addRace);
             }
+        }
 
-            if(existingSeries.Type == dbObj.SeriesType.Summary)
+        private void UpdateSeriesLinks(Series model, dbObj.Series existingSeries)
+        {
+            model.ChildrenSeriesIds ??= new List<Guid>();
+            existingSeries.ChildLinks ??= new List<dbObj.SeriesToSeriesLink>();
+
+            if (existingSeries.ChildLinks != null && existingSeries.ChildLinks.Count() > 0)
             {
-                model.ChildrenSeriesIds ??= new List<Guid>();
-                existingSeries.ChildLinks ??= new List<dbObj.SeriesToSeriesLink>();
-
-                List<dbObj.SeriesToSeriesLink> seriesLinksToRemove;
-                List<dbObj.SeriesToSeriesLink> seriesLinksToAdd;
-
-                if (existingSeries.ChildLinks != null && existingSeries.ChildLinks.Count() > 0)
+                var seriesLinksToRemove = existingSeries.ChildLinks
+                    .Where(l => !model.ChildrenSeriesIds.Any(c => c == l.ChildSeriesId))
+                    .ToList();
+                foreach (var removingLink in seriesLinksToRemove)
                 {
-                    seriesLinksToRemove = 
-                    existingSeries.ChildLinks
-                        .Where(l => !model.ChildrenSeriesIds.Any(c => c == l.ChildSeriesId))
-                        .ToList();
-                    foreach (var removingLink in seriesLinksToRemove)
-                    {
-                        existingSeries.ChildLinks.Remove(removingLink);
-                    }
-                }
-                seriesLinksToAdd =
-                    model.ChildrenSeriesIds
-                    .Where(c =>
-                        !(existingSeries.ChildLinks.Any(l => c == l.ChildSeriesId)))
-                    .Select(c => new dbObj.SeriesToSeriesLink
-                    {
-                        ChildSeriesId = c,
-                        ParentSeriesId = existingSeries.Id
-                    }).ToList();
-
-                foreach(var addLink in seriesLinksToAdd)
-                {
-                    existingSeries.ChildLinks.Add(addLink);
+                    existingSeries.ChildLinks.Remove(removingLink);
                 }
             }
+            var seriesLinksToAdd = model.ChildrenSeriesIds
+                .Where(c => !(existingSeries.ChildLinks.Any(l => c == l.ChildSeriesId)))
+                .Select(c => new dbObj.SeriesToSeriesLink
+                {
+                    ChildSeriesId = c,
+                    ParentSeriesId = existingSeries.Id
+                }).ToList();
 
-            await _dbContext.SaveChangesAsync()
-                .ConfigureAwait(false);
-            if (!(existingSeries.ResultsLocked ?? false))
+            foreach (var addLink in seriesLinksToAdd)
             {
-                await UpdateSeriesResults(existingSeries.Id, existingSeries.UpdatedBy)
-                    .ConfigureAwait(false);
+                existingSeries.ChildLinks.Add(addLink);
             }
         }
 

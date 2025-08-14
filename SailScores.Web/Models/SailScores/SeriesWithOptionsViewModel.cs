@@ -31,5 +31,5 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
 
     }
 
-    public bool UseExperimentalFeatures { get; set; }
+    public bool? UseExperimentalFeatures { get; set; }
 }

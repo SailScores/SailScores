@@ -446,7 +446,7 @@ function getSeries(clubId: string, date: string) {
 function setSeries() {
     let seriesSelect = $('#SeriesIds') as JQuery;
     // Save current selections as an array of strings
-    var selectedSeriesValues = seriesSelect.val() as string[] || [];
+    let selectedSeriesValues = seriesSelect.val() as string[] || [];
 
     // Destroy existing Select2 instance to avoid duplicates
     if (seriesSelect.hasClass("select2-hidden-accessible")) {

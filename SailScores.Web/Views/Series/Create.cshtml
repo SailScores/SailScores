@@ -43,7 +43,7 @@
                 </select>
                 <span asp-validation-for="SeasonId" class="text-danger"></span>
             </div>
-            @if (Model.UseExperimentalFeatures)
+            @if (Model.UseExperimentalFeatures ?? false)
             {
                 <div class="mb-3">
                     <label asp-for="Type">Series Type</label>

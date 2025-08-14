@@ -43,7 +43,7 @@
             <div class="mb-3">
                 <div class="form-check">
                     <input class="form-check-input" asp-for="ChildrenSeriesAsSingleRace" />
-                    <label class="form-check-label">
+                    <label class="form-check-label" asp-for="ChildrenSeriesAsSingleRace">
                         Children series each count as a single race</label>
                     <span class="small"><br />If not checked, all races will be counted in this series as individual races.</span>
                 </div>
@@ -77,13 +77,13 @@
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" asp-for="IsImportantSeries" />
-                                    <label class="form-check-label"> List as Top Series</label>
+                                    <label class="form-check-label" asp-for="IsImportantSeries"> List as Top Series</label>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" asp-for="ResultsLocked" />
-                                    <label> Lock Results</label>
+                                    <label asp-for="ResultsLocked"> Lock Results</label>
                                     <span class="small">Prevents scores from recalculating for this series</span>
                                 </div>
                             </div>
@@ -102,13 +102,13 @@
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" asp-for="ExcludeFromCompetitorStats" />
-                                    <label class="form-check-label"> Exclude from competitor summary statistics</label>
+                                    <label class="form-check-label" asp-for="ExcludeFromCompetitorStats"> Exclude from competitor summary statistics</label>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" asp-for="HideDncDiscards" />
-                                    <label class="form-check-label"> Hide discarded DNC scores (Show as blanks)</label>
+                                    <label class="form-check-label" asp-for="HideDncDiscards"> Hide discarded DNC scores (Show as blanks)</label>
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -124,8 +124,9 @@
                                 <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
-                                <label>Scoring "What If"</label>
+                                <label for="whatifanchor">Scoring "What If"</label>
                                 <a class="form-control btn btn-secondary"
+                                   id="whatifanchor"
                                    asp-route="WhatIf"
                                    asp-route-action="options"
                                    asp-route-seriesId="@Model.Id"
