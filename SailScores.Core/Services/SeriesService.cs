@@ -768,7 +768,7 @@ namespace SailScores.Core.Services
             }
         }
 
-        private void UpdateSeriesProperties(Series model, dbObj.Series existingSeries)
+        private static void UpdateSeriesProperties(Series model, dbObj.Series existingSeries)
         {
             existingSeries.Name = model.Name;
             existingSeries.UrlName = UrlUtility.GetUrlName(model.Name);
@@ -813,7 +813,7 @@ namespace SailScores.Core.Services
             model.ChildrenSeriesIds ??= new List<Guid>();
             existingSeries.ChildLinks ??= new List<dbObj.SeriesToSeriesLink>();
 
-            if (existingSeries.ChildLinks != null && existingSeries.ChildLinks.Count() > 0)
+            if (existingSeries.ChildLinks != null && existingSeries.ChildLinks.Any())
             {
                 var seriesLinksToRemove = existingSeries.ChildLinks
                     .Where(l => !model.ChildrenSeriesIds.Any(c => c == l.ChildSeriesId))

@@ -27,11 +27,22 @@ export function initialize() {
     } else {
         if ($('#needsLocalDate').val() === "True") {
             var now = new Date();
-            const offset = parseInt($("#defaultRaceDateOffset").val() as string, 10);
+            const selectedDate: Date | null = new Date( $('#date').val() as string );
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
 
-            now.setDate(now.getDate() + offset);
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            $('#date').val(now.toISOString().substring(0, 10));
+
+            if (selectedDate > yesterday&&
+                selectedDate < tomorrow) {
+
+                const offset = parseInt($("#defaultRaceDateOffset").val() as string, 10);
+
+                now.setDate(now.getDate() + offset);
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                $('#date').val(now.toISOString().substring(0, 10));
+            }
             $('#needsLocalDate').val('');
         }
     }

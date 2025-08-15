@@ -8,6 +8,8 @@ namespace SailScores.Core.Model
 {
     public class SeriesAsRace : Race
     {
+        private const string UrlSeparator = "/";
+
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int TotalChildRaceCount { get; set; } = 0;
@@ -53,7 +55,7 @@ namespace SailScores.Core.Model
             this.StartDate = childSeries.Races.Count > 0 ? childSeries.Races.Min(r => r.Date) : null;
             this.EndDate = childSeries.Races.Count > 0 ? childSeries.Races.Max(r => r.Date) : null;
             this.TotalChildRaceCount = childSeries.Races.Count;
-            this.SeriesUrl = childSeries.Season.UrlName + "/" + childSeries.UrlName;
+            this.SeriesUrl = childSeries.Season.UrlName + UrlSeparator + childSeries.UrlName;
 
             foreach (var result in flatResults?.CalculatedScores ?? [])
             {

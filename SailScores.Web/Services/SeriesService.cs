@@ -90,7 +90,7 @@ public class SeriesService : ISeriesService
     }
 
 
-    private String GetFleetsString(IList<Race> races)
+    private static String GetFleetsString(IList<Race> races)
     {
         var fleetNames = races.Select(r => r.Fleet).Where(f => f != null)
             .Select(f => f.Name).Distinct();
