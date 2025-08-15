@@ -18,6 +18,13 @@ namespace SailScores.Core.Extensions
             pattern = GetShortPatternWithoutYear(pattern);
             return date?.ToString(pattern, CultureInfo.CurrentCulture);
         }
+        public static string ToSuperShortString(this DateOnly? date)
+        {
+
+            string pattern = Thread.CurrentThread.CurrentUICulture.DateTimeFormat.ShortDatePattern;
+            pattern = GetShortPatternWithoutYear(pattern);
+            return date?.ToString(pattern, CultureInfo.CurrentCulture);
+        }
 
         private static string GetShortPatternWithoutYear(string pattern)
         {

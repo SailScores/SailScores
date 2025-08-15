@@ -20,6 +20,7 @@ public class Club
     public String Locale { get; set; }
 
     public bool? UseAdvancedFeatures { get; set; }
+    public bool? UseExperimentalFeatures { get; set; }
 
     public String StatisticsDescription { get; set; }
     public WeatherSettings WeatherSettings { get; set; }

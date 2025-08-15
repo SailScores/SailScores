@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SailScores.Database;
 
@@ -11,9 +12,11 @@ using SailScores.Database;
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    partial class SailScoresContextModelSnapshot : ModelSnapshot
+    [Migration("20250531150550_SeriesOfSeries")]
+    partial class SeriesOfSeries
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,9 +202,6 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<bool?>("UseAdvancedFeatures")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("UseExperimentalFeatures")
                         .HasColumnType("bit");
 
                     b.Property<Guid?>("WeatherSettingsId")
@@ -1070,9 +1070,6 @@ namespace SailScores.Database.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<DateOnly?>("EndDate")
-                        .HasColumnType("date");
-
                     b.Property<bool?>("ExcludeFromCompetitorStats")
                         .HasColumnType("bit");
 
@@ -1093,9 +1090,6 @@ namespace SailScores.Database.Migrations
                     b.Property<bool?>("PreferAlternativeSailNumbers")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("RaceCount")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("ResultsLocked")
                         .HasColumnType("bit");
 
@@ -1105,13 +1099,10 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid>("SeasonId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateOnly?>("StartDate")
-                        .HasColumnType("date");
-
                     b.Property<string>("TrendOption")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Type")
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")

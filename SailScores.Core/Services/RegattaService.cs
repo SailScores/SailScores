@@ -1,14 +1,14 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
+using SailScores.Core.Utility;
 using SailScores.Database;
-using dbObj = SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Immutable;
-using SailScores.Core.Utility;
+using dbObj = SailScores.Database.Entities;
 
 namespace SailScores.Core.Services
 {
@@ -17,6 +17,7 @@ namespace SailScores.Core.Services
         private readonly ISeriesService _seriesService;
         private readonly IForwarderService _forwarderService;
         private readonly ISailScoresContext _dbContext;
+        private readonly ICompetitorService _competitorService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly IMapper _mapper;
 
@@ -24,12 +25,14 @@ namespace SailScores.Core.Services
             ISeriesService seriesService,
             IForwarderService forwarderService,
             ISailScoresContext dbContext,
+            ICompetitorService competitorService,
             IDbObjectBuilder dbObjBuilder,
             IMapper mapper)
         {
             _seriesService = seriesService;
             _forwarderService = forwarderService;
             _dbContext = dbContext;
+            _competitorService = competitorService;
             _dbObjectBuilder = dbObjBuilder;
             _mapper = mapper;
         }
@@ -66,14 +69,15 @@ namespace SailScores.Core.Services
 
         public async Task<Regatta> GetRegattaAsync(Guid regattaId)
         {
+
             var regattaDb = await _dbContext
                 .Regattas
                 .Where(r =>
                     r.Id == regattaId)
                 .Include(r => r.RegattaFleet)
                 .ThenInclude(rf => rf.Fleet)
-                .ThenInclude(f => f.CompetitorFleets)
-                .ThenInclude(cf => cf.Competitor)
+                //.ThenInclude(f => f.CompetitorFleets)
+                //.ThenInclude(cf => cf.Competitor)
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
                 .Include(r => r.Season)
@@ -99,6 +103,9 @@ namespace SailScores.Core.Services
 
             foreach (var fleet in fullRegatta.Fleets)
             {
+
+                fleet.Competitors =
+                    await _competitorService.GetCompetitorsAsync(regattaDb.ClubId, fleet.Id, false);
                 // sort each fleet but allow for alternate sail numbers in sort
                 if (fullRegatta.PreferAlternateSailNumbers)
                 {

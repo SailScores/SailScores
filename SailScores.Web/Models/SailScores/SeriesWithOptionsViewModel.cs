@@ -9,6 +9,8 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
 
     public IList<ScoringSystem> ScoringSystemOptions { get; set; }
 
+    public IList<SeriesSummary> SeriesOptions { get; set; }
+
     private Guid _seasonId;
 
     [Required]
@@ -28,4 +30,6 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
         }
 
     }
+
+    public bool? UseExperimentalFeatures { get; set; }
 }

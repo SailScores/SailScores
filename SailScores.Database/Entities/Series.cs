@@ -17,7 +17,13 @@ public class Series
     [StringLength(2000)]
     public String Description { get; set; }
 
+    public SeriesType? Type { get; set; }
+
     public IList<SeriesRace> RaceSeries { get; set; }
+
+    public IList<SeriesToSeriesLink> ChildLinks { get; set; }
+
+    public IList<SeriesToSeriesLink> ParentLinks { get; set; }
 
     [Required]
     public Season Season { get; set; }
@@ -43,4 +49,19 @@ public class Series
 
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }
+
+    public bool? ChildrenSeriesAsSingleRace { get; set; }
+    public int? RaceCount { get; set; }
+
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+}
+
+
+public enum SeriesType
+{
+    Standard = 1,
+    Regatta = 2,
+    Summary = 3,
+    // future values: Team, Match
 }

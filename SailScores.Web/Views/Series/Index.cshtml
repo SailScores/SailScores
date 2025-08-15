@@ -1,3 +1,4 @@
+@using SailScores.Core.Model
 @using SailScores.Web.Models.SailScores;
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
@@ -50,7 +51,8 @@
                 <h2 class="h1">@item.Key<small> season</small></h2>
             </div>
         </div>
-        @foreach (var fleetGroup in item.GroupBy(s => s.FleetName, s => s))
+        var fleetList = item.GroupBy(s => s.FleetName, s => s);
+        @foreach (var fleetGroup in fleetList)
         {
             <div class="row">
                 <div class="col-12">
@@ -62,7 +64,9 @@
                 <div class="row border-bottom mb-1 pb-1 mx-2">
                     <div class="col-md-5">
                         <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
-                        <span class="avoidwrap">(@(series.Races?.Count.ToString() ?? "No") @localizer["Races"])</span>
+                        @if(series.RaceCount.HasValue) {
+                            <span class="avoidwrap">(@series.RaceCount @localizer["Races"])</span>
+                        }
                     </div>
 
                     <div class="col-md-4">

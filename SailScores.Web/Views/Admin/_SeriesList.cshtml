@@ -60,7 +60,14 @@
                         @Html.DisplayFor(modelItem => item.Name)
                     </div>
                     <div class="d-none d-sm-inline col-sm-4 col-md-2">
-                        @Html.DisplayFor(modelItem => item.Races.Count) Races
+                        @if(item.Type == SailScores.Core.Model.SeriesType.Summary)
+                        {
+                            @:Summary
+                        } else
+                        {
+                            @Html.DisplayFor(modelItem => item.Races.Count)
+                            @:Races
+                        }
                     </div>
                     <div class="d-none d-md-inline col-md-3 col-lg-4">
                         @Html.DisplayFor(modelItem => item.Description)

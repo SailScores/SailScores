@@ -67,9 +67,14 @@
                                 }
                                 else
                                 {
+                                    if(race.IsSeries ?? false)
+                                    {
+                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@race.ShortName</a>
+                                    } else {
                                     @Html.ActionLink(
                                                  @race.ShortName
                                                  , "Details", "Race", new { id = race.Id })
+                                    }
                                     <div class="weather">
                                         @if (race.WindDirectionDegrees.HasValue)
                                         {
@@ -100,10 +105,16 @@
                                 }
                                 else
                                 {
-                                    <a asp-controller="Race"
-                                       asp-action="Details"
-                                       asp-route-id="@race.Id"
-                                       class=" @(race.State == RaceState.Preliminary ? "text-warning" : "")">@race.ShortName</a>
+                                    if (race.IsSeries ?? false)
+                                    {
+                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@race.ShortName</a>
+                                    }
+                                    else
+                                    {
+                                        @Html.ActionLink(
+                                        @race.ShortName
+                                        , "Details", "Race", new { id = race.Id })
+                                    }
                                     <br />
                                     <div class="weather">
                                         @if (race.WindDirectionDegrees.HasValue)

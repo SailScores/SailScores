@@ -27,11 +27,22 @@ export function initialize() {
     } else {
         if ($('#needsLocalDate').val() === "True") {
             var now = new Date();
-            const offset = parseInt($("#defaultRaceDateOffset").val() as string, 10);
+            const selectedDate: Date | null = new Date( $('#date').val() as string );
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
 
-            now.setDate(now.getDate() + offset);
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            $('#date').val(now.toISOString().substring(0, 10));
+
+            if (selectedDate > yesterday&&
+                selectedDate < tomorrow) {
+
+                const offset = parseInt($("#defaultRaceDateOffset").val() as string, 10);
+
+                now.setDate(now.getDate() + offset);
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                $('#date').val(now.toISOString().substring(0, 10));
+            }
             $('#needsLocalDate').val('');
         }
     }
@@ -444,19 +455,35 @@ function getSeries(clubId: string, date: string) {
 }
 
 function setSeries() {
-    let seriesSelect = $('#seriesIds') as JQuery;
-    var selectedSeriesValues = seriesSelect.val();
+    let seriesSelect = $('#SeriesIds') as JQuery;
+    // Save current selections as an array of strings
+    let selectedSeriesValues = seriesSelect.val() as string[] || [];
+
+    // Destroy existing Select2 instance to avoid duplicates
+    if (seriesSelect.hasClass("select2-hidden-accessible")) {
+        seriesSelect.select2('destroy');
+    }
+
+    // Remove options
     seriesSelect.empty();
 
-    $.each(seriesOptions, function (key, value) {
+    // Add options
+    $.each(seriesOptions, function (_key, value) {
         let series = value as seriesDto;
         seriesSelect.append($("<option></option>")
-            .attr("value", series.id.toString()).text(series.name));
+            .attr("value", series.id.toString())
+            .text(series.name));
     });
 
-    seriesSelect.select2();
-    seriesSelect.val(selectedSeriesValues).trigger('change');
+    // Re-initialize Select2 with multi-select enabled
+    seriesSelect.select2({
+        width: '100%',
+        placeholder: "Select Series",
+        allowClear: true
+    });
 
+    // Restore previous selections (if still present)
+    seriesSelect.val(selectedSeriesValues).trigger('change');
 }
 
 var autoCompleteSetup: boolean = false;

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Web;
+using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -185,7 +186,12 @@ public class SeriesController : Controller
             }
 
             model.UpdatedBy = await GetUserStringAsync();
-            await _seriesService.SaveNew(model);
+            var newSeriesId = await _seriesService.SaveNew(model);
+
+            if (model.Type == Core.Model.SeriesType.Summary)
+            {
+                return RedirectToAction("Edit", new { clubInitials, id = newSeriesId });
+            }
 
             return RedirectToAction("Index", "Admin");
         }
@@ -228,9 +234,18 @@ public class SeriesController : Controller
         }
 
         var seriesWithOptions = _mapper.Map<SeriesWithOptionsViewModel>(series);
+
         var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
         seriesWithOptions.SeasonOptions = blankVm.SeasonOptions;
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+        if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
+        {
+            seriesWithOptions.SeriesOptions =
+                (await _seriesService.GetChildSeriesSummariesAsync(
+                    clubId,
+                    seriesWithOptions.SeasonId)).ToList();
+            return View("EditSummarySeries", seriesWithOptions);
+        }
         return View(seriesWithOptions);
     }
 

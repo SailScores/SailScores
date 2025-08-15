@@ -21,6 +21,7 @@ namespace SailScores.Test.Unit.Core.Services
         private readonly Guid _clubId;
         private readonly Mock<ISeriesService> _mockSeriesService;
         private readonly Mock<IForwarderService> _mockForwarderService;
+        private readonly Mock<ICompetitorService> _mockCompetitorService;
         private readonly string _clubInitials;
 
         public RegattaServiceTests()
@@ -34,6 +35,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             _mockSeriesService = new Mock<ISeriesService>();
             _mockForwarderService = new Mock<IForwarderService>();
+            _mockCompetitorService = new Mock<ICompetitorService>();
 
             var config = new MapperConfiguration(opts =>
             {
@@ -51,6 +53,7 @@ namespace SailScores.Test.Unit.Core.Services
                 _mockSeriesService.Object,
                 _mockForwarderService.Object,
                 _context,
+                _mockCompetitorService.Object,
                 _dbObjectBuilder,
                 _mapper
                 );
