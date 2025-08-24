@@ -30,6 +30,7 @@ using WebMarkupMin.AspNetCore3;
 using Microsoft.Extensions.Hosting;
 using MailChimp.Net.Interfaces;
 using MailChimp.Net;
+using SailScores.Web.Resources;
 
 namespace SailScores.Web;
 
@@ -48,23 +49,12 @@ public class Startup
         services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
         services.Configure<RequestLocalizationOptions>(options =>
         {
-            options.SupportedCultures = new List<CultureInfo> {
-                new CultureInfo("en-US"),
-                new CultureInfo("fi-FI"),
-                new CultureInfo("sv-FI"),
-                new CultureInfo("en-AU"),
-                new CultureInfo("en-IE"),
-            };
-            options.SupportedUICultures = new List<CultureInfo> {
-                new CultureInfo("en-US"),
-                new CultureInfo("fi-FI"),
-                new CultureInfo("sv-FI"),
-                new CultureInfo("en-AU"),
-                new CultureInfo("en-IE"),
-            };
+            options.SupportedCultures = LocalizerService.GetSupportedCultures();
+            options.SupportedUICultures = LocalizerService.GetSupportedCultures();
 
             options.RequestCultureProviders = new List<IRequestCultureProvider>
-            { new ClubCultureProvider()
+            {
+                new ClubCultureProvider()
             };
         });
 

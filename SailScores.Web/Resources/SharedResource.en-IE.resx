@@ -231,4 +231,25 @@
   <data name="Updated" xml:space="preserve">
     <value>Updated</value>
   </data>
+  <data name="Change" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="Abandoned" xml:space="preserve">
+    <value>Abandoned</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="All Boats" xml:space="preserve">
+    <value>All Boats</value>
+  </data>
+  <data name="Boats Raced" xml:space="preserve">
+    <value>Boats Raced</value>
+  </data>
+  <data name="Classes" xml:space="preserve">
+    <value>Classes</value>
+  </data>
+  <data name="boats" xml:space="preserve">
+    <value>boats</value>
+  </data>
 </root>

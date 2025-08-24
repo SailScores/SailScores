@@ -92,7 +92,7 @@ public class AdminController : Controller
                 TemperatureUnits = clubAdmin.TemperatureUnits,
                 WindSpeedUnits = clubAdmin.SpeedUnits
             };
-            clubObject.Locale = _adminService.GetLocaleShortName(clubAdmin.Locale);
+            //clubObject.Locale = _adminService.GetLocaleShortName(clubAdmin.Locale);
             clubObject.Initials = clubInitials;
 
             await _adminService.UpdateClub(clubObject);

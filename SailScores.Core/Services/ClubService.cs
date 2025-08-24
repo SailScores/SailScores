@@ -135,6 +135,7 @@ namespace SailScores.Core.Services
                 {
                     return clubGuid;
                 }
+                // Is the check to see if initials are a guid necessary?
                 if (!Guid.TryParse(initials, out clubGuid))
                 {
                     clubGuid = await _dbContext.Clubs

@@ -14,13 +14,17 @@ public class CsvService : ICsvService, IDisposable
 {
     private MemoryStream stream;
     private StreamWriter streamWriter;
-    private IStringLocalizer<SharedResource> _localizer;
+    private IStringLocalizer<SharedResource> _stringLocalizer;
+    private readonly ILocalizerService _sailscoresLocalizer;
     private const string _separator = ",";
     private const string _quote = "\"";
 
-    public CsvService(IStringLocalizer<SharedResource> localizer)
+    public CsvService(
+        IStringLocalizer<SharedResource> localizer,
+        ILocalizerService sailscoresLocalizer)
     {
-        _localizer = localizer;
+        _stringLocalizer = localizer;
+        _sailscoresLocalizer = sailscoresLocalizer;
     }
 
     public Stream GetCsv(Series series)
@@ -64,7 +68,7 @@ public class CsvService : ICsvService, IDisposable
         sb.Append(_separator);
         foreach (var race in series.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())
         {
-            sb.Append(GetEscapedValue(race.ShortName));
+            sb.Append(GetEscapedValue(_sailscoresLocalizer.GetShortName(race)));
             sb.Append(_separator);
         }
 
@@ -123,7 +127,7 @@ public class CsvService : ICsvService, IDisposable
                 if (raceScore.Discard)
                 {
                     sb.Append(" ");
-                    sb.Append(_localizer["Discard"]);
+                    sb.Append(_stringLocalizer["Discard"]);
                 }
             }
             sb.Append(_separator);
@@ -208,7 +212,7 @@ public class CsvService : ICsvService, IDisposable
 
     private string GetEscapedLocalizedValue(string s)
     {
-        return GetEscapedValue(_localizer[s]);
+        return GetEscapedValue(_stringLocalizer[s]);
     }
 
     private static string GetEscapedValue(string s)
