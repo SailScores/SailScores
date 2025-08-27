@@ -20,6 +20,8 @@ public class LocalizerService : ILocalizerService
 
     private readonly string cacheKeyName = "ClubLocaleCache";
 
+    private static bool _includePseudo;
+
     public LocalizerService(
         IStringLocalizerFactory factory,
         ISailScoresContext dbContext,
@@ -136,10 +138,18 @@ public class LocalizerService : ILocalizerService
             { "qps-ploc", "Pseudo-Localized" }
         };
 
+    public static List<CultureInfo> GetSupportedCultures(bool includePseudo)
+    {
+        _includePseudo = includePseudo;
+        var map = new Dictionary<string, string>(_supportedLocalizations);
+        if (includePseudo)
+        {
+            map["qps-ploc"] = "Pseudo-Localized";
+        }
+        return map.Select(l => new CultureInfo(l.Key)).ToList();
+    }
     public static List<CultureInfo> GetSupportedCultures()
     {
-        return _supportedLocalizations
-            .Select(l => new CultureInfo(l.Key))
-            .ToList();
+        return GetSupportedCultures(_includePseudo); 
     }
 }

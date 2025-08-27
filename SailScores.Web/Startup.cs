@@ -47,16 +47,21 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
-        services.Configure<RequestLocalizationOptions>(options =>
-        {
-            options.SupportedCultures = LocalizerService.GetSupportedCultures();
-            options.SupportedUICultures = LocalizerService.GetSupportedCultures();
 
-            options.RequestCultureProviders = new List<IRequestCultureProvider>
+
+        services.AddOptions<RequestLocalizationOptions>()
+            .Configure<IWebHostEnvironment>((options, env) =>
             {
-                new ClubCultureProvider()
-            };
-        });
+                var cultures = LocalizerService.GetSupportedCultures(env.IsDevelopment());
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+                options.SupportedCultures = cultures;
+                options.SupportedUICultures = cultures;
+                options.RequestCultureProviders = new List<IRequestCultureProvider>
+                {
+                    new ClubCultureProvider()
+                };
+            });
+
 
         // Register the Swagger generator, defining 1 or more Swagger documents
         services.AddSwaggerGen(c =>
