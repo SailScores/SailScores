@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -114,9 +114,15 @@ namespace SailScores.Core.Services
             await _competitorService.DeleteCompetitorAsync(sourceCompetitorId)
                 .ConfigureAwait(false);
 
+
             foreach (var seriesId in seriesIds)
             {
-                await _seriesService.UpdateSeriesResults(seriesId, mergedBy)
+                await _seriesService.UpdateSeriesResults(seriesId, mergedBy, false)
+                    .ConfigureAwait(false);
+            }
+            foreach (var seriesId in seriesIds)
+            {
+                await _seriesService.UpdateParentSeriesResults(seriesId, mergedBy)
                     .ConfigureAwait(false);
             }
         }

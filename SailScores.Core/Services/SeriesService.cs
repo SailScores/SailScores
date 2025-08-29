@@ -133,7 +133,8 @@ namespace SailScores.Core.Services
 
         public async Task UpdateSeriesResults(
             Guid seriesId,
-            String updatedBy)
+            String updatedBy,
+            bool calculateParents = true)
         {
             var dbSeries = await _dbContext
                 .Series
@@ -167,9 +168,33 @@ namespace SailScores.Core.Services
             await SaveChartData(fullSeries)
                 .ConfigureAwait(false);
 
+            if(calculateParents)
+            {
+                var parentSeries = await _dbContext.Series
+                    .Include(s => s.ChildLinks)
+                    .Where(s => s.ChildLinks.Any(l => l.ChildSeriesId == dbSeries.Id))
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                if (parentSeries != null)
+                {
+                    foreach (var parent in parentSeries)
+                    {
+                        await UpdateSeriesResults(parent.Id, updatedBy)
+                            .ConfigureAwait(false);
+                    }
+                }
+
+            }
+        }
+
+        public async Task UpdateParentSeriesResults(
+            Guid seriesId,
+            String updatedBy)
+        {
+
             var parentSeries = await _dbContext.Series
                 .Include(s => s.ChildLinks)
-                .Where(s => s.ChildLinks.Any(l => l.ChildSeriesId == dbSeries.Id))
+                .Where(s => s.ChildLinks.Any(l => l.ChildSeriesId == seriesId))
                 .ToListAsync()
                 .ConfigureAwait(false);
             if (parentSeries != null)
@@ -181,6 +206,7 @@ namespace SailScores.Core.Services
                 }
             }
         }
+
         private async Task PopulateSummaryValues(
             dbObj.Series dbSeries,
             int level = 0)
@@ -637,7 +663,8 @@ namespace SailScores.Core.Services
             var compIds = series.Races
                 .Where(r => r != null)
                 .SelectMany(r => r.Scores)
-                .Select(s => s.CompetitorId);
+                .Select(s => s.CompetitorId)
+                .Distinct();
 
             if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out List<dbObj.Competitor> dbCompetitors))
             {
