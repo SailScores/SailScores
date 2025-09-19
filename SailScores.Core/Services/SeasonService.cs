@@ -80,6 +80,15 @@ namespace SailScores.Core.Services
                 .SingleAsync(c => c.Id == season.Id)
                 .ConfigureAwait(false);
 
+            if(String.IsNullOrWhiteSpace(existingSeason.UrlName))
+            {
+                existingSeason.UrlName = UrlUtility.GetUrlName(season.Name);
+                if (String.IsNullOrEmpty(existingSeason.UrlName))
+                {
+                    throw new InvalidOperationException("Season name doesn't create a valid url.");
+                }
+            }
+
             existingSeason.Name = season.Name;
             existingSeason.Start = season.Start;
             existingSeason.End = season.End;
