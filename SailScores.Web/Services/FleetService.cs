@@ -67,7 +67,7 @@ public class FleetService : IFleetService
     {
         if (String.IsNullOrWhiteSpace(fleet.ShortName))
         {
-            fleet.ShortName = UrlUtility.GetUrlName(fleet.Name);
+            fleet.ShortName = UrlUtility.GetUrlName(fleet.Name).Left(30);
         }
         var coreModel = _mapper.Map<Fleet>(fleet);
         if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses
