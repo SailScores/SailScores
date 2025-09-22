@@ -53,6 +53,9 @@ namespace SailScores.Core.Scoring
             else if (baseSystemName.Contains("Appendix A") & baseSystemName.Contains("pre-2025"))
             {
                 return new AppendixAPre2025Calculator(scoringSystem);
+            } else if (baseSystemName.StartsWith("PWA Standard"))
+            {
+                return new PwaStandardCalculator(scoringSystem);
             }
             else
             {
