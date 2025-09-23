@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Linq;
 using SailScores.Core.Model;
 using SailScores.Database.Migrations;
@@ -20,6 +21,7 @@ public class AdminService : IAdminService
     private readonly IPermissionService _permissionService;
     private readonly ILocalizerService _localizerService;
     private readonly IMapper _mapper;
+    private readonly IHostEnvironment _env;
 
     public AdminService(
         CoreServices.IClubService clubService,
@@ -31,7 +33,8 @@ public class AdminService : IAdminService
         IWeatherService weatherService,
         IPermissionService permissionService,
         ILocalizerService localizerService,
-        IMapper mapper)
+        IMapper mapper,
+        IHostEnvironment env)
     {
         _coreClubService = clubService;
         _coreScoringService = scoringService;
@@ -43,6 +46,7 @@ public class AdminService : IAdminService
         _permissionService = permissionService;
         _localizerService = localizerService;
         _mapper = mapper;
+        _env = env;
     }
 
     public async Task<AdminViewModel> GetClubForEdit(string clubInitials)
@@ -70,7 +74,12 @@ public class AdminService : IAdminService
 
     private IList<string> GetLocaleLongNames()
     {
-        return _localizerService.SupportedLocalizations.Values.ToList();
+        var names = _localizerService.SupportedLocalizations.Values.ToList();
+        if (_env.IsDevelopment() && !names.Contains("Pseudo-Localized"))
+        {
+            names.Add("Pseudo-Localized");
+        }
+        return names;
     }
 
     public string GetLocaleShortName(string locale)

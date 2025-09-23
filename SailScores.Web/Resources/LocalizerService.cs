@@ -118,24 +118,26 @@ public class LocalizerService : ILocalizerService
         _cache.Set(cacheKeyName, clubInitialsToLocales, cacheEntryOptions);
     }
 
-    public Dictionary<string, string> SupportedLocalizations => _supportedLocalizations;
+    public Dictionary<string, string> SupportedLocalizations
+    {
+        get { return _supportedLocalizations; }
+    }
 
     public string DefaultLocalization => "en-US";
 
     private static Dictionary<string, string> _supportedLocalizations =
         new Dictionary<string, string> {
             { "en-AU", "English (Australia)" },
-            //{ "en-CA", "English (Canada)" },
-            //{ "en-DE", "English (Germany)" },
-            //{ "en-GB", "English (Great Britain)" },
+            { "en-CA", "English (Canada)" },
+            { "en-DE", "English (Germany)" },
+            { "en-GB", "English (Great Britain)" },
             { "en-IE", "English (Ireland)" },
-            //{ "en-ZA", "English (South Africa)" },
+            { "en-ZA", "English (South Africa)" },
             { "en-US", "English (United States)" },
             { "fi-FI", "Finnish (Finland)" },
-            //{ "sr-Latn-RS", "Serbian Latin (Serbia)" },
-            //{ "es-AR", "Spanish (Argentina)" },
+            { "sr-Latn-RS", "Serbian Latin (Serbia)" },
+            { "es-AR", "Spanish (Argentina)" },
             { "sv-FI", "Swedish (Finland)" },
-            { "qps-ploc", "Pseudo-Localized" }
         };
 
     public static List<CultureInfo> GetSupportedCultures(bool includePseudo)

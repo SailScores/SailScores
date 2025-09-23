@@ -117,20 +117,47 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Race" xml:space="preserve">
+    <value>Race</value>
+  </data>
+  <data name="Scores" xml:space="preserve">
+    <value>Scores</value>
+  </data>
+  <data name="New Race" xml:space="preserve">
+    <value>New Race</value>
+  </data>
+  <data name="Edit Club Info" xml:space="preserve">
+    <value>Edit Club Info</value>
+  </data>
+  <data name="Club Web Site" xml:space="preserve">
+    <value>Club Web Site</value>
+  </data>
+  <data name="Scheduled for" xml:space="preserve">
+    <value>Scheduled for</value>
+  </data>
+  <data name="Abandoned" xml:space="preserve">
+    <value>Abandoned</value>
+  </data>
+  <data name="Helm" xml:space="preserve">
+    <value>Sailor(s)</value>
+  </data>
+  <data name="Sail" xml:space="preserve">
+    <value>Sail</value>
+  </data>
+  <data name="Boat" xml:space="preserve">
+    <value>Boat</value>
+  </data>
+  <data name="Stats" xml:space="preserve">
+    <value>Stats</value>
+  </data>
   <data name="All Races" xml:space="preserve">
     <value>All Races</value>
   </data>
   <data name="All Series" xml:space="preserve">
     <value>All Series</value>
   </data>
-  <data name="Boat" xml:space="preserve">
-    <value>Boat</value>
-  </data>
   <data name="Boat Name" xml:space="preserve">
     <value>Boat Name</value>
-  </data>
-  <data name="Club Web Site" xml:space="preserve">
-    <value>Club Web Site</value>
   </data>
   <data name="Competitor" xml:space="preserve">
     <value>Competitor</value>
@@ -140,9 +167,6 @@
   </data>
   <data name="discards" xml:space="preserve">
     <value>discards</value>
-  </data>
-  <data name="Helm" xml:space="preserve">
-    <value>Sailor(s)</value>
   </data>
   <data name="Log in" xml:space="preserve">
     <value>Log in</value>
@@ -180,9 +204,6 @@
   <data name="Recent Series" xml:space="preserve">
     <value>Recent Series</value>
   </data>
-  <data name="Sail" xml:space="preserve">
-    <value>Sail</value>
-  </data>
   <data name="Sail Number" xml:space="preserve">
     <value>Sail Number</value>
   </data>
@@ -204,14 +225,8 @@
   <data name="New Competitor" xml:space="preserve">
     <value>New Competitor</value>
   </data>
-  <data name="New Race" xml:space="preserve">
-    <value>New Race</value>
-  </data>
   <data name="No seasons are set up." xml:space="preserve">
     <value>No seasons are set up.</value>
-  </data>
-  <data name="Scores" xml:space="preserve">
-    <value>Scores</value>
   </data>
   <data name="CapCompetitors" xml:space="preserve">
     <value>Competitors</value>
@@ -236,9 +251,6 @@
   </data>
   <data name="Change" xml:space="preserve">
     <value>Change</value>
-  </data>
-  <data name="Abandoned" xml:space="preserve">
-    <value>Abandoned</value>
   </data>
   <data name="Admin" xml:space="preserve">
     <value>Admin</value>
@@ -266,5 +278,14 @@
   </data>
   <data name="boats" xml:space="preserve">
     <value>boats</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Log out</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="No results posted" xml:space="preserve">
+    <value>No results posted</value>
   </data>
 </root>
