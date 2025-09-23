@@ -20,7 +20,9 @@ namespace SailScores.Core.Services
         Task<Guid> SaveNewSeries(Series series);
         Task Update(Series model);
         Task Delete(Guid seriesId);
-        Task UpdateSeriesResults(Guid seriesId, string updatedBy);
+        Task UpdateSeriesResults(Guid seriesId, string updatedBy,
+            bool calculateParents = true);
+        Task UpdateParentSeriesResults(Guid seriesId, string updatedBy);
         Task<FlatModel.FlatResults> GetHistoricalResults(Series series);
         Task<FlatModel.FlatChartData> GetChartData(Guid seriesId);
         Task<Model.Series> CalculateWhatIfScoresAsync(

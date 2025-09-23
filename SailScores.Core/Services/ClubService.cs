@@ -1,14 +1,15 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using SailScores.Core.Model;
+using SailScores.Core.Model.Summary;
+using SailScores.Core.Utility;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
-using SailScores.Core.Model;
+using System.Threading.Tasks;
 using Db = SailScores.Database.Entities;
-using SailScores.Core.Model.Summary;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace SailScores.Core.Services
 {
@@ -370,6 +371,10 @@ namespace SailScores.Core.Services
         public async Task SaveNewSeason(Season season)
         {
             var dbSeason = _mapper.Map<Db.Season>(season);
+            if(String.IsNullOrWhiteSpace(dbSeason.UrlName))
+            {
+                dbSeason.UrlName = UrlUtility.GetUrlName(dbSeason.Name);
+            }
             _dbContext.Seasons.Add(dbSeason);
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
