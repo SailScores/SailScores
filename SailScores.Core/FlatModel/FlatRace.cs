@@ -1,7 +1,5 @@
 ﻿using SailScores.Api.Enumerations;
 using System;
-using System.Threading;
-using SailScores.Core.Extensions;
 
 namespace SailScores.Core.FlatModel
 {
@@ -35,60 +33,6 @@ namespace SailScores.Core.FlatModel
         public string WindGust { get; internal set; }
         public string WindSpeedUnits { get; internal set; }
 
-
-        public String CalculatedName
-        {
-            get
-            {
-                var raceWord = "Race";
-                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
-                {
-                    raceWord = "Purjehdukset";
-                }
-                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
-                {
-                    raceWord = "Seglingar";
-                }
-                if (String.IsNullOrEmpty(this.Name))
-                {
-                    return $"{Date.ToShortString()} {raceWord} {Order}";
-                }
-                else
-                {
-                    return $"{this.Name} ({Date.ToShortString()} {raceWord} {Order})";
-                }
-            }
-        }
-        public string ShortName
-        {
-            get
-            {
-
-                var raceLetter = "R";
-                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
-                {
-                    raceLetter = "k";
-                }
-                if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
-                {
-                    raceLetter = "S";
-                }
-                if (String.IsNullOrEmpty(this.Name))
-                {
-                    return $"{Date.ToSuperShortString()} {raceLetter}{Order}";
-                }
-                else if ((IsSeries ?? false)
-                    && StartDate != null
-                    && EndDate != null)
-                {
-                    return $"{Name} ({StartDate.ToSuperShortString()} - {EndDate.ToSuperShortString()})";
-                }
-                else
-                {
-                    return $"{this.Name} ({Date.ToSuperShortString()})";
-                }
-            }
-        }
 
     }
 }

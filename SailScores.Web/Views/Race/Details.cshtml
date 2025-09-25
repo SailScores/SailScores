@@ -2,10 +2,11 @@
 @using SailScores.Web.Services.Interfaces
 @model ClubItemViewModel<RaceViewModel>
 @inject IWeatherService  weatherService
+@inject ILocalizerService localizer
 
 @{
-    ViewBag.Title = Model.ClubInitials + " " + Model.Item.DisplayName;
-    ViewData["MetaDescription"] = $"{Model.ClubInitials} {Model.Item.DisplayName} Race Results";
+    ViewBag.Title = Model.ClubInitials + " " + localizer.GetFullRaceName(Model.Item);
+    ViewData["MetaDescription"] = $"{Model.ClubInitials} {localizer.GetFullRaceName(Model.Item)} Race Results";
     Layout = "_ClubLayout";
 }
 <div class="container">
@@ -15,7 +16,7 @@
     <div class="row">
         <div class="col-sm-10">
             <h1 id="racetitle" class="h2">
-                @Model.Item.DisplayName
+                  @localizer.GetFullRaceName(Model.Item)
             </h1>
             @if (Model.CanEdit)
             {

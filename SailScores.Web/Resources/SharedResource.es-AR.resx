@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  
+  <data name="Race" xml:space="preserve">
+    <value>Prueba</value>
+  </data>
+  <data name="Scores" xml:space="preserve">
+    <value>Puntajes</value>
+  </data>
+  <data name="New Race" xml:space="preserve">
+    <value>Nueva prueba</value>
+  </data>
+  <data name="Edit Club Info" xml:space="preserve">
+    <value>Editar información del club</value>
+  </data>
+  <data name="Club Web Site" xml:space="preserve">
+    <value>Sitio web del club</value>
+  </data>
+  <data name="Scheduled for" xml:space="preserve">
+    <value>Programada para</value>
+  </data>
+  <data name="Abandoned" xml:space="preserve">
+    <value>Abandonada</value>
+  </data>
+  <data name="Helm" xml:space="preserve">
+    <value>Timón</value>
+  </data>
+  <data name="Sail" xml:space="preserve">
+    <value>Vela</value>
+  </data>
+  <data name="Boat" xml:space="preserve">
+    <value>Embarcación</value>
+  </data>
+  <data name="Stats" xml:space="preserve">
+    <value>Estadísticas</value>
+  </data>
+  <data name="All Races" xml:space="preserve">
+    <value>Todas las pruebas</value>
+  </data>
+  <data name="All Series" xml:space="preserve">
+    <value>Todas las series</value>
+  </data>
+  <data name="Boat Name" xml:space="preserve">
+    <value>Nombre de la embarcación</value>
+  </data>
+  <data name="Competitor" xml:space="preserve">
+    <value>Competidor</value>
+  </data>
+  <data name="competitors" xml:space="preserve">
+    <value>competidores</value>
+  </data>
+  <data name="discards" xml:space="preserve">
+    <value>descartes</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="No Competitors" xml:space="preserve">
+    <value>No hay competidores</value>
+  </data>
+  <data name="No races" xml:space="preserve">
+    <value>No hay pruebas</value>
+  </data>
+  <data name="No recent races found." xml:space="preserve">
+    <value>No se encontraron pruebas recientes</value>
+  </data>
+  <data name="No recent series found." xml:space="preserve">
+    <value>No se encontraron series recientes</value>
+  </data>
+  <data name="No scheduled races found." xml:space="preserve">
+    <value>No se encontraron pruebas programadas</value>
+  </data>
+  <data name="Place" xml:space="preserve">
+    <value>Puesto</value>
+  </data>
+  <data name="Races" xml:space="preserve">
+    <value>Pruebas</value>
+  </data>
+  <data name="races sailed with" xml:space="preserve">
+    <value>pruebas navegadas con</value>
+  </data>
+  <data name="Recent Races" xml:space="preserve">
+    <value>Pruebas recientes</value>
+  </data>
+  <data name="Recent Series" xml:space="preserve">
+    <value>Series recientes</value>
+  </data>
+  <data name="Sail Number" xml:space="preserve">
+    <value>Número de vela</value>
+  </data>
+  <data name="Seasons" xml:space="preserve">
+    <value>Temporadas</value>
+  </data>
+  <data name="Series" xml:space="preserve">
+    <value>Series</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Upcoming Races" xml:space="preserve">
+    <value>Próximas pruebas</value>
+  </data>
+  <data name="Admin Page" xml:space="preserve">
+    <value>Página de administración</value>
+  </data>
+  <data name="New Competitor" xml:space="preserve">
+    <value>Nuevo competidor</value>
+  </data>
+  <data name="No seasons are set up." xml:space="preserve">
+    <value>No hay temporadas configuradas</value>
+  </data>
+  <data name="CapCompetitors" xml:space="preserve">
+    <value>Competidores</value>
+  </data>
+  <data name="Previous Day" xml:space="preserve">
+    <value>Día anterior</value>
+  </data>
+  <data name="Previous Race" xml:space="preserve">
+    <value>Prueba anterior</value>
+  </data>
+  <data name="Previous Week" xml:space="preserve">
+    <value>Semana anterior</value>
+  </data>
+  <data name="Rank change from" xml:space="preserve">
+    <value>Cambio de puesto desde</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>Actualizado</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Cambio</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>Administrador</value>
+  </data>
+  <data name="All Boats" xml:space="preserve">
+    <value>Todas las embarcaciones</value>
+  </data>
+  <data name="Boats Raced" xml:space="preserve">
+    <value>Embarcaciones que compitieron</value>
+  </data>
+  <data name="Classes" xml:space="preserve">
+    <value>Clases</value>
+  </data>
+  <data name="boats" xml:space="preserve">
+    <value>embarcaciones</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="Regattas" xml:space="preserve">
+    <value>Regatas</value>
+  </data>
+  <data name="Club Admin" xml:space="preserve">
+    <value>Administrador del club</value>
+  </data>
+  <data name="Club Stats" xml:space="preserve">
+    <value>Estadísticas del club</value>
+  </data>
+  <data name="Default Scoring" xml:space="preserve">
+    <value>Puntaje predeterminado</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descripción</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Resultados</value>
+  </data>
+  <data name="No results posted" xml:space="preserve">
+    <value>No hay resultados publicados</value>
+  </data>
+</root>

@@ -30,6 +30,7 @@ using WebMarkupMin.AspNetCore3;
 using Microsoft.Extensions.Hosting;
 using MailChimp.Net.Interfaces;
 using MailChimp.Net;
+using SailScores.Web.Resources;
 
 namespace SailScores.Web;
 
@@ -46,27 +47,21 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
-        services.Configure<RequestLocalizationOptions>(options =>
-        {
-            options.SupportedCultures = new List<CultureInfo> {
-                new CultureInfo("en-US"),
-                new CultureInfo("fi-FI"),
-                new CultureInfo("sv-FI"),
-                new CultureInfo("en-AU"),
-                new CultureInfo("en-IE"),
-            };
-            options.SupportedUICultures = new List<CultureInfo> {
-                new CultureInfo("en-US"),
-                new CultureInfo("fi-FI"),
-                new CultureInfo("sv-FI"),
-                new CultureInfo("en-AU"),
-                new CultureInfo("en-IE"),
-            };
 
-            options.RequestCultureProviders = new List<IRequestCultureProvider>
-            { new ClubCultureProvider()
-            };
-        });
+
+        services.AddOptions<RequestLocalizationOptions>()
+            .Configure<IWebHostEnvironment>((options, env) =>
+            {
+                var cultures = LocalizerService.GetSupportedCultures(env.IsDevelopment());
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+                options.SupportedCultures = cultures;
+                options.SupportedUICultures = cultures;
+                options.RequestCultureProviders = new List<IRequestCultureProvider>
+                {
+                    new ClubCultureProvider()
+                };
+            });
+
 
         // Register the Swagger generator, defining 1 or more Swagger documents
         services.AddSwaggerGen(c =>
