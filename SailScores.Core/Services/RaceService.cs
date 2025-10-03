@@ -275,6 +275,8 @@ namespace SailScores.Core.Services
             dbRace.TrackingUrl = race.TrackingUrl;
             dbRace.UpdatedDate = DateTime.UtcNow;
             dbRace.UpdatedBy = race.UpdatedBy;
+            dbRace.StartTime = race.StartTime;
+            dbRace.TrackTimes = race.TrackTimes;
 
             PopulateWeather(race, dbRace);
 
@@ -307,7 +309,9 @@ namespace SailScores.Core.Services
                         Race = dbRace,
                         Place = score.Place,
                         Code = score.Code,
-                        CodePoints = score.CodePoints
+                        CodePoints = score.CodePoints,
+                        ElapsedTime = score.ElapsedTime,
+                        FinishTime = score.FinishTime
                     };
 
                     _dbContext.Scores.Add(newScore);

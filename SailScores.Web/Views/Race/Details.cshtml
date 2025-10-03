@@ -38,6 +38,12 @@
             <h4>
                 @Model.Item.Fleet?.Name
             </h4>
+            <div class="mt-2">
+                @if (Model.Item.StartTime.HasValue)
+                {
+                    <span class="fw-bold">Start:</span> @Model.Item.StartTime.Value.ToString("t")
+                }
+            </div>
         </div>
         <div class="col-sm-2 text-sm-end weather">
             @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindDirection))
@@ -97,6 +103,11 @@
             <th scope="col">Sail</th>
             <th scope="col">Sailor(s)</th>
             <th scope="col">Boat</th>
+            @if (Model.Item.TrackTimes)
+            {
+                <th scope="col">Finish Time</th>
+                <th scope="col">Elapsed</th>
+            }
         </tr>
         </thead>
         <tbody>
@@ -120,6 +131,15 @@
                 <td>
                     @score.Competitor.BoatName
                 </td>
+                @if (Model.Item.TrackTimes)
+                {
+                    <td>
+                        @(score.FinishTime.HasValue? score.FinishTime.Value.ToString("HH:mm:ss") : "")
+                    </td>
+                    <td>
+                        @(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString() : "")
+                    </td>
+                }
             </tr>
         }
         </tbody>

@@ -41,6 +41,10 @@ namespace SailScores.Core.Model
 
         public bool IsSeriesSummary { get; set; } = false;
 
+        // New fields for timing
+        public DateTime? StartTime { get; set; }
+        public bool TrackTimes { get; set; } = false;
+
         public bool Equals(Race other)
         {
             return this.Id == other.Id

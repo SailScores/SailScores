@@ -13,5 +13,8 @@ namespace SailScores.Core.Model
         public string Code { get; set; }
         public decimal? CodePoints { get; set; }
 
+        // New fields for timing
+        public DateTime? FinishTime { get; set; }
+        public TimeSpan? ElapsedTime { get; set; }
     }
 }

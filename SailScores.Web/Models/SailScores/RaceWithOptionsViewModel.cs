@@ -33,5 +33,6 @@ public class RaceWithOptionsViewModel : RaceViewModel
     public bool? NeedsLocalDate { get; set; }
     public int? DefaultRaceDateOffset { get; set; }
 
+    // Inherits StartTime and TrackTimes from RaceViewModel
 }
 #pragma warning restore CA2227 // Collection properties should be read only

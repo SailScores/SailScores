@@ -39,6 +39,10 @@ namespace SailScores.Api.Dtos
         public DateTime? UpdatedDate { get; set; }
         public String UpdatedBy { get; set; }
 
+        // New fields
+        public DateTime? StartTime { get; set; }
+        public bool TrackTimes { get; set; }
+
         public bool Equals(RaceDto other)
         {
             return this.Id == other.Id

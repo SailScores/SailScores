@@ -1,4 +1,7 @@
-﻿namespace SailScores.Database.Entities;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace SailScores.Database.Entities;
 
 public class Score
 {
@@ -12,4 +15,8 @@ public class Score
     [StringLength(20)]
     public string Code { get; set; }
     public decimal? CodePoints { get; set; }
+
+    // New fields for timing
+    public DateTime? FinishTime { get; set; }
+    public TimeSpan? ElapsedTime { get; set; }
 }

@@ -12,7 +12,7 @@
         <div>
             <span class="competitor-name h5"></span>
         </div>
-        <div class="float-end ms-auto d-flex">
+        <div class="float-end ms-auto d-flex flex-column flex-md-row align-items-stretch gap-1 gap-md-2">
             <div>
                 <select class="select-code form-select form-select-sm">
                     <option value="No Code">No Code</option>
@@ -26,13 +26,28 @@
                        type="text" pattern="[0-9]+([\.,][0-9]+)?"
                        placeholder="place" />
             </div>
-            <button class="btn btn-light move-up" type="button"><span class="fa fa-angle-up"></span></button>
-            <button class="btn btn-light move-down" type="button"><span class="fa fa-angle-down"></span></button>
-            &ensp;
-            <button class="btn btn-light delete-button" type="button" data-bs-toggle="modal"
-                    data-bs-target="#deleteConfirm">
-                <span class="far fa-trash-alt text-danger"></span>
-            </button>
+            <div class="d-flex flex-row gap-1">
+                <div class="finish-time-div">
+                    <input name="FinishTime" class="form-control form-control-sm finish-time-input" type="time" step="1" />
+                    <span class="text-danger finish-time-error"></span>
+                </div>
+                <div class="elapsed-time-div">
+                    <input name="ElapsedTime"
+                           class="form-control form-control-sm elapsed-time-input"
+                           type="text"
+                           placeholder="hh:mm:ss" />
+                    <span class="text-danger elapsed-time-error"></span>
+                </div>
+            </div>
+            <div class="d-flex flex-row gap-1 ms-auto">
+                <button class="btn btn-light move-up" type="button"><span class="fa fa-angle-up"></span></button>
+                <button class="btn btn-light move-down" type="button"><span class="fa fa-angle-down"></span></button>
+                &ensp;
+                <button class="btn btn-light delete-button" type="button" data-bs-toggle="modal"
+                        data-bs-target="#deleteConfirm">
+                    <span class="far fa-trash-alt text-danger"></span>
+                </button>
+            </div>
         </div>
     </div>
 </li>

@@ -34,6 +34,8 @@ export function initialize() {
         }
     }
     $('#date').change(dateChanged);
+    $('#results input[name="FinishTime"]').change(onFinishTimeChanged);
+    $('#results input[name="ElapsedTime"]').change(onElapsedTimeChanged);
     $('#raceState').data("previous", $('#raceState').val());
     $('#raceState').change(raceStateChanged);
     $('.weather-input').change(weatherChanged);
@@ -63,6 +65,24 @@ export function initialize() {
         loadSeriesOptions();
         calculatePlaces();
     };
+    // TrackTimes dynamic show/hide
+    const trackTimesCheckbox = document.getElementById("trackTimesCheckbox");
+    if (trackTimesCheckbox) {
+        function updateTimingFields() {
+            toggleTimingFields(trackTimesCheckbox.checked);
+            updateAllScoreTimesForStartTimeChange();
+        }
+        trackTimesCheckbox.addEventListener("change", updateTimingFields);
+        // Initial state
+        updateTimingFields();
+    }
+    // Update all score times if race start time changes and TrackTimes is enabled
+    const startTimeInput = document.getElementById('StartTime');
+    if (startTimeInput) {
+        startTimeInput.addEventListener('change', function () {
+            updateAllScoreTimesForStartTimeChange();
+        });
+    }
 }
 export function loadSeriesOptions() {
     let clubId = $("#clubId").val();
@@ -217,6 +237,46 @@ function addNewCompetitor(competitor) {
     for (var i = 0; i < deleteButtons.length; i++) {
         deleteButtons[i].setAttribute("data-competitorId", competitor.id.toString());
     }
+    // Always add timing fields, but set display based on TrackTimes checkbox
+    var trackTimesChecked = document.getElementById("trackTimesCheckbox")?.checked;
+    var finishDiv = compListItem.getElementsByClassName("finish-time-div")[0];
+    var finishInput = compListItem.getElementsByClassName("finish-time-input")[0];
+    finishDiv.style.display = trackTimesChecked ? "" : "none";
+    var elapsedDiv = compListItem.getElementsByClassName("elapsed-time-div")[0];
+    var elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0];
+    elapsedDiv.style.display = trackTimesChecked ? "" : "none";
+    // Set FinishTime and ElapsedTime if race date matches client date
+    const raceDateStr = $("#date").val();
+    const now = new Date();
+    const nowDateStr = now.toISOString().substring(0, 10);
+    if (raceDateStr === nowDateStr) {
+        // Set FinishTime to current time (HH:mm:ss)
+        finishInput.value = now.toTimeString().slice(0, 8);
+        // If StartTime is set, calculate elapsed time
+        const startTimeInput = document.getElementById('StartTime');
+        if (startTimeInput && startTimeInput.value) {
+            const start = parseTimeStringToDate(startTimeInput.value);
+            if (start) {
+                // Use today's date for both start and finish
+                const finish = new Date(now);
+                // If start is after finish (crossed midnight), adjust start to yesterday
+                if (start > finish) {
+                    start.setDate(start.getDate() - 1);
+                }
+                let elapsedMs = finish.getTime() - start.getTime();
+                if (elapsedMs < 0)
+                    elapsedMs += 24 * 3600 * 1000; // handle midnight wrap
+                elapsedInput.value = formatElapsedTime(elapsedMs);
+            }
+        }
+    }
+    // Attach event handlers to new FinishTime and ElapsedTime fields
+    if (finishInput) {
+        $(finishInput).change(onFinishTimeChanged);
+    }
+    if (elapsedInput) {
+        $(elapsedInput).change(onElapsedTimeChanged);
+    }
     compListItem.style.display = "";
     // in testing, due to delay in speech recog, could add competitor
     // twice.Trying to reduce that here.
@@ -263,6 +323,23 @@ function addScoresFieldsToForm(form) {
         input.name = "Scores\[" + listIndex + "\].codePointsString";
         input.value = getCompetitorCodePoints(resultItems[i]);
         form.appendChild(input);
+        // Add FinishTime and ElapsedTime if present
+        var finishInput = resultItems[i].querySelector('input[name="FinishTime"]');
+        if (finishInput && finishInput.value) {
+            input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "Scores\[" + listIndex + "\].FinishTime";
+            input.value = finishInput.value;
+            form.appendChild(input);
+        }
+        var elapsedInput = resultItems[i].querySelector('input[name="ElapsedTime"]');
+        if (elapsedInput && elapsedInput.value) {
+            input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "Scores\[" + listIndex + "\].ElapsedTime";
+            input.value = elapsedInput.value;
+            form.appendChild(input);
+        }
     }
 }
 function removeScoresFieldsFromForm(form) {
@@ -532,6 +609,14 @@ function populateEmptyWeatherFields() {
         }
     });
 }
+function toggleTimingFields(show) {
+    // Show or hide all FinishTime and ElapsedTime fields in the score list
+    const display = show ? "" : "none";
+    $("#results li").each(function () {
+        $(this).find('input[name="FinishTime"]').closest('div').css("display", display);
+        $(this).find('input[name="ElapsedTime"]').closest('div').css("display", display);
+    });
+}
 function RequestAuthorizationToken(continuation) {
     var prep = function (xhr) {
         xhr.setRequestHeader("Accept", "application/json");
@@ -559,6 +644,96 @@ function RequestAuthorizationToken(continuation) {
             }
         }
     });
+}
+function updateAllScoreTimesForStartTimeChange() {
+    const trackTimesCheckbox = document.getElementById("trackTimesCheckbox");
+    if (!trackTimesCheckbox || !trackTimesCheckbox.checked)
+        return;
+    const startTimeInput = document.getElementById('StartTime');
+    if (!startTimeInput || !startTimeInput.value)
+        return;
+    const start = parseTimeStringToDate(startTimeInput.value);
+    if (!start)
+        return;
+    $("#results li").each(function () {
+        const finishInput = $(this).find('input[name="FinishTime"]')[0];
+        const elapsedInput = $(this).find('input[name="ElapsedTime"]')[0];
+        if (!finishInput && !elapsedInput)
+            return;
+        // If elapsed is set, recalc finish; else if finish is set, recalc elapsed
+        if (elapsedInput && elapsedInput.value) {
+            const elapsedMs = parseElapsedTimeString(elapsedInput.value);
+            if (elapsedMs !== null) {
+                let finish = new Date(start.getTime() + elapsedMs);
+                // Always ensure finish is after start (roll to next day if needed)
+                if (finish < start)
+                    finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                finishInput.value = formatTimeForInput(finish);
+            }
+        }
+        else if (finishInput && finishInput.value) {
+            let finish = parseTimeStringToDate(finishInput.value, start);
+            if (finish) {
+                // Always ensure finish is after start (roll to next day if needed)
+                if (finish < start)
+                    finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                const elapsedMs = finish.getTime() - start.getTime();
+                elapsedInput.value = formatElapsedTime(elapsedMs);
+                // Also update finishInput in case we rolled to next day
+                finishInput.value = formatTimeForInput(finish);
+            }
+        }
+    });
+}
+initialize();
+function parseTimeStringToDate(timeString, baseDate) {
+    // timeString: "HH:mm:ss" or "HH:mm" or "hh:mm:ss" or "hh:mm"
+    if (!timeString)
+        return null;
+    const parts = timeString.split(":");
+    if (parts.length < 2)
+        return null;
+    const d = baseDate ? new Date(baseDate) : new Date();
+    d.setSeconds(0, 0);
+    d.setHours(parseInt(parts[0], 10));
+    d.setMinutes(parseInt(parts[1], 10));
+    if (parts.length > 2)
+        d.setSeconds(parseInt(parts[2], 10));
+    return d;
+}
+function formatElapsedTime(ms) {
+    // ms: milliseconds
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+function parseElapsedTimeString(str) {
+    // "hh:mm:ss" or "mm:ss" or "ss"
+    if (!str)
+        return null;
+    const parts = str.split(":").map(Number);
+    if (parts.some(isNaN))
+        return null;
+    let seconds = 0;
+    if (parts.length === 3) {
+        seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+    else if (parts.length === 2) {
+        seconds = parts[0] * 60 + parts[1];
+    }
+    else if (parts.length === 1) {
+        seconds = parts[0];
+    }
+    else {
+        return null;
+    }
+    return seconds * 1000;
+}
+function formatTimeForInput(date) {
+    // Returns "HH:mm:ss" for input[type=time]
+    return date.toTimeString().slice(0, 8);
 }
 function InitializeSpeech(onComplete) {
     if (!!window.SpeechSDK) {
@@ -785,5 +960,35 @@ function stopContinuousRecognition() {
 function setLastCompCode(scoreCode) {
     $(".select-code").last().val(scoreCode);
 }
-initialize();
+function onFinishTimeChanged() {
+    const finishInput = this;
+    const li = $(finishInput).closest('li');
+    const elapsedInput = li.find('input[name="ElapsedTime"]')[0];
+    const startTimeInput = document.getElementById('StartTime');
+    if (!startTimeInput || !startTimeInput.value || !finishInput.value)
+        return;
+    // Parse StartTime and FinishTime
+    const start = parseTimeStringToDate(startTimeInput.value);
+    const finish = parseTimeStringToDate(finishInput.value, start);
+    if (!start || !finish)
+        return;
+    let elapsedMs = finish.getTime() - start.getTime();
+    if (elapsedMs < 0)
+        elapsedMs += 24 * 3600 * 1000; // handle midnight wrap
+    elapsedInput.value = formatElapsedTime(elapsedMs);
+}
+function onElapsedTimeChanged() {
+    const elapsedInput = this;
+    const li = $(elapsedInput).closest('li');
+    const finishInput = li.find('input[name="FinishTime"]')[0];
+    const startTimeInput = document.getElementById('StartTime');
+    if (!startTimeInput || !startTimeInput.value || !elapsedInput.value)
+        return;
+    const start = parseTimeStringToDate(startTimeInput.value);
+    const elapsedMs = parseElapsedTimeString(elapsedInput.value);
+    if (!start || elapsedMs === null)
+        return;
+    const finish = new Date(start.getTime() + elapsedMs);
+    finishInput.value = formatTimeForInput(finish);
+}
 //# sourceMappingURL=raceEditor.js.map

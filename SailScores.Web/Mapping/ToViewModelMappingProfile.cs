@@ -112,8 +112,12 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.ScoreCode, o => o.Ignore())
                 .ForMember(d => d.CodePointsString, o => o.MapFrom(s
                     => s.CodePoints.HasValue ? s.CodePoints.Value.ToString("0.##", CultureInfo.CurrentCulture) : String.Empty))
+                .ForMember(d => d.FinishTime, o => o.MapFrom(s => s.FinishTime))
+                .ForMember(d => d.ElapsedTime, o => o.MapFrom(s => s.ElapsedTime))
                 .ReverseMap()
-                .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)));
+                .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)))
+                .ForMember(d => d.FinishTime, o => o.MapFrom(s => s.FinishTime))
+                .ForMember(d => d.ElapsedTime, o => o.MapFrom(s => s.ElapsedTime));
             CreateMap<ScoreViewModel, ScoreDto>()
                 .ForMember(d => d.CodePoints, o => o.MapFrom(s => ParseDecimal(s.CodePointsString)))
                 .ReverseMap();
@@ -184,7 +188,9 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.UseAdvancedFeatures, o => o.Ignore())
                 .ReverseMap();
             CreateMap<RaceWithOptionsViewModel, Model.Race>()
-                .ForMember(d => d.Weather, o => o.Ignore());
+                .ForMember(d => d.Weather, o => o.Ignore())
+                .ForMember(d => d.StartTime, o => o.MapFrom(s => s.StartTime))
+                .ForMember(d => d.TrackTimes, o => o.MapFrom(s => s.TrackTimes));
             CreateMap<RaceViewModel, RaceDto>()
                 .ForMember(d => d.ScoreIds, o => o.MapFrom(r => r.Scores.Select(s => s.Id)))
                 .ForMember(d => d.RegattaId, o => o.MapFrom(r => r.Regatta.Id))
@@ -195,7 +201,9 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Weather, o => o.Ignore());
             CreateMap<Model.Race, RaceViewModel>()
                 .ForMember(r => r.Regatta, o => o.Ignore())
-                .ForMember(r => r.Weather, o => o.Ignore());
+                .ForMember(r => r.Weather, o => o.Ignore())
+                .ForMember(r => r.StartTime, o => o.MapFrom(s => s.StartTime))
+                .ForMember(r => r.TrackTimes, o => o.MapFrom(s => s.TrackTimes));
 
             CreateMap<Model.Race, RaceSummaryViewModel>()
                 .ForMember(r => r.FleetName, o => o.MapFrom(s => s.Fleet.Name))

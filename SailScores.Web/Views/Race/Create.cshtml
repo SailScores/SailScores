@@ -253,6 +253,24 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="mb-md-3 col-12 col-md-6 px-1">
+                                <div class="row">
+                                    <label asp-for="StartTime" class="control-label col-3 col-md-4 col-form-label text-end">Start Time</label>
+                                    <div class="col-9 col-md-8">
+                                        <input asp-for="StartTime" class="form-control" type="time" step="1" />
+                                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3 d-md-none"></div>
+                            <div class="mb-md-3 col-9 col-md-6 px-1 mt-md-2">
+                                <div class="form-check">
+                                    <input asp-for="TrackTimes" class="form-check-input" type="checkbox" id="trackTimesCheckbox" />
+                                    <label class="form-check-label" asp-for="TrackTimes">Track Finish Times</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -262,8 +280,7 @@
             <div class="col-12 col-lg-10 col-xl-8 pb-3">
                 <ul class="list-group" id="results">
                     @await Html.PartialAsync("_scoreEntryPartial", Model)
-                    @foreach (var score in (Model.Scores ??
-                 new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
+                    @foreach (var score in (Model.Scores ?? new List<SailScores.Web.Models.SailScores.ScoreViewModel>()))
                     {
                         <li id="@score.CompetitorId" class="list-group-item"
                             data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
@@ -296,6 +313,20 @@
                                                placeholder="place"
                                                value="@score.CodePoints?.ToString("0.#")" />
                                     </div>
+                                                                        
+                                    <div class="ms-2">
+                                        <input name="FinishTime" class="form-control form-control-sm finish-time-input" type="time" step="1"
+                                            value="@(score.FinishTime.HasValue ? score.FinishTime.Value.ToString(@"HH\:mm\:ss") : "")"/>
+                                        <span class="text-danger finish-time-error"></span>
+                                    </div>
+                                    <div class="ms-2">
+                                        <input name="ElapsedTime"
+                                            class="form-control form-control-sm elapsed-time-input"
+                                            type="text"
+                                            placeholder="hh:mm:ss"
+                                            value="@(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString(@"hh\:mm\:ss") : "")" />
+                                        <span class="text-danger elapsed-time-error"></span>
+                                    </div>
                                     <button class="btn btn-light move-up" type="button"><span class="fas fa-angle-up"></span></button>
                                     <button class="btn btn-light move-down" type="button"><span class="fas fa-angle-down"></span></button>
                                     &ensp;
@@ -308,6 +339,17 @@
                         </li>
                     }
                 </ul>
+                <div>
+                    @if (ViewData.ModelState["Scores"] != null && ViewData.ModelState["Scores"].Errors.Count > 0)
+                    {
+                        <ul class="text-danger">
+                            @foreach (var error in ViewData.ModelState["Scores"].Errors)
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    }
+                </div>
             </div>
         </div>
         <div class="row">
@@ -458,4 +500,54 @@
     {
         <script src="~/js/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
     }
+    <script>
+    function isValidTimeFormat(time) {
+        // Accepts hh:mm:ss or h:mm:ss, where hh is 0-23, mm and ss are 0-59
+        return /^([0-1]?\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(time);
+    }
+
+    function validateTimes() {
+        let isValid = true;
+
+        // Validate ElapsedTime fields
+        $('.elapsed-time-input').each(function () {
+            const $input = $(this);
+            const value = $input.val().trim();
+            const $error = $input.siblings('.elapsed-time-error');
+            if (value && !isValidTimeFormat(value)) {
+                $error.text('Time must be hh:mm:ss');
+                isValid = false;
+            } else {
+                $error.text('');
+            }
+        });
+
+        // Validate FinishTime fields (if you want to enforce format, though type="time" usually handles this)
+        $('.finish-time-input').each(function () {
+            const $input = $(this);
+            const value = $input.val().trim();
+            const $error = $input.siblings('.finish-time-error');
+            if (value && !isValidTimeFormat(value)) {
+                $error.text('Time must be hh:mm:ss');
+                isValid = false;
+            } else {
+                $error.text('');
+            }
+        });
+
+        return isValid;
+    }
+
+    $(function () {
+        $('#raceform').on('submit', function (e) {
+            if (!validateTimes()) {
+                e.preventDefault();
+            }
+        });
+        
+        $(document).on('blur', '.elapsed-time-input, .finish-time-input', function () {
+            validateTimes();
+        });
+    });
+</script>
 }

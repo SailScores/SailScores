@@ -14,9 +14,13 @@ public interface IRaceService
     Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(
         string clubInitials,
         Guid? regattaId,
-        Guid? seriesId);
+        Guid? seriesId,
+        Guid? fleetId = null);
     Task SaveAsync(RaceWithOptionsViewModel race);
     Task Delete(Guid id, string userName);
     Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions);
     Task<Season> GetCurrentSeasonAsync(string clubInitials);
+    Task<RaceWithOptionsViewModel> FixupRaceWithOptions(
+        string clubInitials,
+        RaceWithOptionsViewModel race);
 }
