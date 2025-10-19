@@ -51,21 +51,25 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 
 ### Database Setup
 
-Run SQL Server in Docker:
+Run SQL Server in Docker (for local development only):
 
 ```bash
 docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=P@ssw0rd' --name 'SailScoreSql' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
+**Security Note**: The password `P@ssw0rd` is for local development only. Production environments should use secure credential management (Azure Key Vault, environment variables, etc.).
+
 ### Connection String
 
-Update `SailScores.Web/appsettings.json` with:
+Update `SailScores.Web/appsettings.json` with (for local development):
 
 ```json
 "ConnectionStrings": {
   "DefaultConnection": "Server=localhost;Database=sailscores;User Id=sa;password=P@ssw0rd;MultipleActiveResultSets=true"
 }
 ```
+
+**Security Note**: Never commit real credentials to source control. This connection string is for local development only. Production uses Azure App Service configuration.
 
 ### First Run
 
