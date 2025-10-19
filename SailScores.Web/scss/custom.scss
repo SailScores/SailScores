@@ -574,3 +574,19 @@ form label.required:not(.custom-control-label)::after {
     padding-right: 0.25rem;
   }
 }
+
+@media (min-width: 576px) {
+    .score-row:not(:last-child) {
+        border-bottom: 1px solid;
+    }
+}
+/* Secondary rows: border except last on xs screens */
+@media (max-width: 575.98px) {
+    .score-row-secondary:not(:last-child) {
+        border-bottom: 1px solid $border-color;
+    }
+
+    .score-row {
+        border-bottom: 1px none $border-color;
+    }
+}

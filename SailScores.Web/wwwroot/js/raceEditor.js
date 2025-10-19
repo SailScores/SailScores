@@ -249,7 +249,7 @@ function addNewCompetitor(competitor) {
     const raceDateStr = $("#date").val();
     const now = new Date();
     const nowDateStr = now.toISOString().substring(0, 10);
-    if (raceDateStr === nowDateStr) {
+    if (raceDateStr === nowDateStr && trackTimesChecked) {
         // Set FinishTime to current time (HH:mm:ss)
         finishInput.value = now.toTimeString().slice(0, 8);
         // If StartTime is set, calculate elapsed time

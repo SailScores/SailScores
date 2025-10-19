@@ -309,7 +309,7 @@ function addNewCompetitor(competitor: competitorDto) {
     const raceDateStr = ($("#date").val() as string);
     const now = new Date();
     const nowDateStr = now.toISOString().substring(0, 10);
-    if (raceDateStr === nowDateStr) {
+    if (raceDateStr === nowDateStr && trackTimesChecked) {
         // Set FinishTime to current time (HH:mm:ss)
         finishInput.value = now.toTimeString().slice(0, 8);
 
@@ -763,8 +763,6 @@ function RequestAuthorizationToken(continuation: () => any) {
         }
     });
 }
-
-
 
 
 function updateAllScoreTimesForStartTimeChange() {
