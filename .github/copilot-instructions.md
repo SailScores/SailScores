@@ -1,0 +1,158 @@
+# SailScores - Copilot Instructions
+
+## Project Overview
+
+SailScores is a free web service for sharing club sailing scores, hosted at [sailscores.com](https://www.sailscores.com). The application provides modern, mobile-friendly score tracking for sailing clubs, supporting both club series scoring and regatta scoring with accurate Appendix A results.
+
+## Tech Stack
+
+- **Framework**: ASP.NET Core 8 MVC
+- **Language**: C# with .NET 8
+- **Database**: Microsoft SQL Server
+- **ORM**: Entity Framework Core 8
+- **Frontend**: Razor views (.cshtml), JavaScript, Bootstrap 5
+- **Hosting**: Azure App Service Linux
+
+## Architecture
+
+SailScores follows an ASP.NET Core MVC pattern with layered architecture:
+
+1. **SailScores.Web**: Main web application with controllers, views, and web-specific services
+2. **SailScores.Core**: Business logic and core services (scoring, database operations)
+3. **SailScores.Database**: Entity Framework database context and models
+4. **SailScores.Identity**: Authentication and identity management
+5. **SailScores.Api**: API client
+6. **SailScores.ImportExport**: Import/export functionality
+7. **SailScores.Utility**: Shared utilities
+
+### Request Flow Pattern
+
+1. Browser → Controller (`SailScores.Web/Controllers/`)
+2. Controller → Web Service (`SailScores.Web/Services/`)
+3. Web Service → Core Service (`SailScores.Core/Services/`)
+4. Core Service → Entity Framework (`SailScoresContext`)
+5. Database ← Entity Framework
+6. Return path: Model → Controller → View (`.cshtml`)
+
+### Key Guidelines
+
+- **All database calls** must go through Core services via `_dbContext`
+- **Core services** contain reusable business logic that could be used by different clients
+- **Web services** contain logic specific to web views and UI concerns
+- **Views** should focus on data presentation, not business logic
+
+## Development Setup
+
+### Prerequisites
+
+- .NET 8 SDK
+- Docker (for SQL Server database)
+- Visual Studio or VS Code (optional but recommended)
+
+### Database Setup
+
+Run SQL Server in Docker:
+
+```bash
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=P@ssw0rd' --name 'SailScoreSql' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+```
+
+### Connection String
+
+Update `SailScores.Web/appsettings.json` with:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=sailscores;User Id=sa;password=P@ssw0rd;MultipleActiveResultSets=true"
+}
+```
+
+### First Run
+
+1. Clone repository
+2. Open `SailScores.sln`
+3. Restore NuGet packages
+4. Run the application
+5. Click "Apply Migrations" button to initialize database
+
+## Build and Test
+
+### Build
+
+```bash
+dotnet build SailScores.sln --configuration Release
+```
+
+### Test
+
+Unit tests:
+```bash
+dotnet test SailScores.Test.Unit/SailScores.Test.Unit.csproj
+```
+
+Integration tests (requires database):
+```bash
+dotnet test SailScores.Test.Integration/SailScores.Test.Integration.csproj
+```
+
+Import/Export tests:
+```bash
+dotnet test SailScores.ImportExport.Test/SailScores.ImportExport.Test.csproj
+```
+
+### Note on libman Errors
+
+The project uses libman for client-side libraries (Bootstrap, jQuery). Build errors related to libman (e.g., `LIB002`) are network-related and can be safely ignored for backend/core changes. The web application will still build successfully.
+
+## Important File Locations
+
+- **Controllers**: `SailScores.Web/Controllers/`
+- **Views**: `SailScores.Web/Views/`
+- **Core Services**: `SailScores.Core/Services/`
+- **Web Services**: `SailScores.Web/Services/`
+- **Database Models**: `SailScores.Database/Entities/`
+- **Database Context**: `SailScores.Database/SailScoresContext.cs`
+- **Migrations**: `SailScores.Database/Migrations/`
+
+## Code Style and Conventions
+
+- Follow standard C# naming conventions (PascalCase for public members, camelCase for private fields)
+- Use dependency injection for services
+- Keep controllers thin - delegate business logic to services
+- Add comments only when necessary to explain complex logic
+- Match the existing code style in each file
+
+## Common Patterns
+
+### Adding a New Feature
+
+1. Create/modify database entities in `SailScores.Database/Entities/`
+2. Add migration: `dotnet ef migrations add MigrationName --project SailScores.Database`
+3. Implement business logic in Core services (`SailScores.Core/Services/`)
+4. Create web-specific logic in Web services (`SailScores.Web/Services/`)
+5. Add controller actions (`SailScores.Web/Controllers/`)
+6. Create/modify views (`SailScores.Web/Views/`)
+7. Add unit tests in `SailScores.Test.Unit/`
+
+### Working with Scores
+
+- Scoring calculations are in `SailScores.Core/Scoring/`
+- Supports Appendix A and High Point Percentage systems
+- Race results include proper rounding and tie-breaking
+
+## Testing Strategy
+
+- Unit tests should mock database context and services
+- Integration tests use actual database connections
+- Test naming: `MethodName_StateUnderTest_ExpectedBehavior`
+- Use xUnit for test framework
+
+## Additional Resources
+
+- Full development guide: `docs/Development.md`
+- API documentation: REST endpoints support public API access
+- Sample database: `Sql Utility Scripts/starter.bak`
+
+## License
+
+Mozilla Public License Version 2.0 - Share source for modifications you distribute.
