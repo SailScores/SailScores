@@ -44,12 +44,29 @@
         </div>
         <br />
     }
+    @{
+        var firstSeason = true;
+    }
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
     {
         <div class="row">
-            <div class="col-12 mx-n2" id="@item.FirstOrDefault()?.Season?.UrlName">
+            <div class="col-12 col-md-8 mx-n2" id="@item.FirstOrDefault()?.Season?.UrlName">
                 <h2 class="h1">@item.Key<small> season</small></h2>
             </div>
+            @if (firstSeason)
+            {
+                <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
+                    <div class="form-row w-100">
+                        <label class="control-label col-form-label col-5 col-md-4 text-md-right" for="sort-order">Sort </label>
+                        <select id="sort-order" class="form-control col-7 col-md-8" onchange="sortSeries()">
+                            <option value="name">Name</option>
+                            <option value="startdate">Start Date</option>
+                            <option value="enddate">End Date</option>
+                        </select>
+                    </div>
+                </div>
+                firstSeason = false;
+            }
         </div>
         var fleetList = item.GroupBy(s => s.FleetName, s => s);
         @foreach (var fleetGroup in fleetList)
@@ -59,9 +76,15 @@
                     <h3>@fleetGroup.Key</h3>
                 </div>
             </div>
-            foreach (var series in fleetGroup)
+            <div class="series-list">
+            @foreach (var series in fleetGroup)
             {
-                <div class="row border-bottom mb-1 pb-1 mx-2">
+                var startDate = series.Races?.Where(r => r.Date.HasValue).Min(r => r.Date);
+                var endDate = series.Races?.Where(r => r.Date.HasValue).Max(r => r.Date);
+                <div class="row border-bottom mb-1 pb-1 mx-2 series-row" 
+                     data-name="@series.Name" 
+                     data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")" 
+                     data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
                     <div class="col-md-5">
                         <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
                         @if(series.RaceCount.HasValue) {
@@ -83,8 +106,85 @@
                     </div>
                 </div>
             }
+            </div>
         }
 
         <br />
     }
 </div>
+
+@section Scripts {
+<script>
+    // Cookie helper functions
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+    
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+    
+    function sortSeries() {
+        var selectedSort = $('#sort-order').val();
+        
+        // Save sort preference to cookie (only if not 'name')
+        if (selectedSort !== 'name') {
+            setCookie('seriesSortPreference', selectedSort, 365);
+        } else {
+            // Remove cookie if sorting by name (default)
+            setCookie('seriesSortPreference', '', -1);
+        }
+        
+        // Sort each series-list container independently
+        $('.series-list').each(function() {
+            var container = $(this);
+            var result = container.find('.series-row').sort(function (a, b) {
+                var contentA, contentB;
+                
+                if (selectedSort === 'startdate' || selectedSort === 'enddate') {
+                    contentA = $(a).data(selectedSort);
+                    contentB = $(b).data(selectedSort);
+                    
+                    // Handle empty dates (series with no races)
+                    if (!contentA && !contentB) return 0;
+                    if (!contentA) return 1;
+                    if (!contentB) return -1;
+                    
+                    // Compare dates as strings in yyyy-MM-dd format
+                    return contentA.localeCompare(contentB);
+                } else {
+                    // Sort by name
+                    contentA = $(a).data('name');
+                    contentB = $(b).data('name');
+                    return String(contentA).localeCompare(contentB);
+                }
+            });
+            
+            container.empty();
+            container.append(result);
+        });
+    }
+    
+    // Load sort preference from cookie
+    var savedSort = getCookie('seriesSortPreference');
+    if (savedSort) {
+        $('#sort-order').val(savedSort);
+    }
+    
+    // Initial sort
+    sortSeries();
+</script>
+}

@@ -14,7 +14,7 @@
                 </a>
             </h3>
         </div>
-        <div class="col-2 col-sm-4">
+        <div class="col-2 col-sm-4 col-md-3 col-lg-2">
             <a class="btn btn-primary"
                 asp-action="Create"
                 asp-controller="Series">
@@ -24,11 +24,24 @@
                 </span>
             </a>
         </div>
+        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end mt-2 mt-md-0">
+            <div class="form-row w-100">
+                <label class="control-label col-form-label col-5 col-md-4 text-md-right" for="admin-sort-order">Sort </label>
+                <select id="admin-sort-order" class="form-control col-7 col-md-8" onchange="sortAdminSeries()">
+                    <option value="name">Name</option>
+                    <option value="startdate">Start Date</option>
+                    <option value="enddate">End Date</option>
+                </select>
+            </div>
+        </div>
     </div>
+    @{
+        var firstSeason = true;
+    }
     @foreach (var seasonGroup in Model.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
     {
         var season = seasonGroup.First().Season;
-        var initCollapsed = season.End >= DateTime.Today.AddYears(-1);
+        var initCollapsed = season.End >= DateTime.Today.AddDays(-30);
         <div class="row">
             <div class="col-12" id="header-@season?.UrlName">
                 <a class="@(initCollapsed ? "" : "collapsed")" data-bs-toggle="collapse" href="#content-@season?.UrlName" role="button"
@@ -39,9 +52,22 @@
             </div>
         </div>
         <div class="collapse @((initCollapsed) ? " show":"")" id="content-@season?.UrlName">
+            <div class="admin-series-list">
             @foreach (var item in seasonGroup)
             {
-                <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
+                // Use Series StartDate/EndDate if available, otherwise calculate from Races
+                // but races will probably be null here: they aren't loaded by default for club
+                // admin.
+                DateTime? startDate = item.StartDate.HasValue 
+                    ? item.StartDate.Value.ToDateTime(TimeOnly.MinValue) 
+                    : item.Races?.Where(r => r != null && r.Date.HasValue).Min(r => r.Date);
+                DateTime? endDate = item.EndDate.HasValue 
+                    ? item.EndDate.Value.ToDateTime(TimeOnly.MinValue) 
+                    : item.Races?.Where(r => r != null && r.Date.HasValue).Max(r => r.Date);
+                <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2 admin-series-row"
+                     data-name="@item.Name"
+                     data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")"
+                     data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
                     <div class="col-md-6 col-lg-5">
                         <a class="btn btn-sm btn-outline-danger"
                             asp-action="Delete"
@@ -71,10 +97,95 @@
                     </div>
                     <div class="d-none d-md-inline col-md-3 col-lg-4">
                         @Html.DisplayFor(modelItem => item.Description)
+                        @if(item.StartDate.HasValue && item.EndDate.HasValue &&
+                        item.StartDate != item.EndDate) {
+                            @:( @item.StartDate - @item.EndDate )
+                        } else if (item.StartDate.HasValue && item.EndDate.HasValue &&
+                            item.StartDate == item.EndDate
+                        ){
+                            @:( @item.StartDate )
+                        }
                     </div>
                 </div>
             }
+            </div>
             <br />
         </div>
     }
 </div>
+
+<script>
+    // Cookie helper functions for admin series sorting
+    function setAdminSeriesCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+    
+    function getAdminSeriesCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+    
+    function sortAdminSeries() {
+        var selectedSort = $('#admin-sort-order').val();
+        
+        // Save sort preference to cookie (only if not 'name')
+        if (selectedSort !== 'name') {
+            setAdminSeriesCookie('adminSeriesSortPreference', selectedSort, 365);
+        } else {
+            // Remove cookie if sorting by name (default)
+            setAdminSeriesCookie('adminSeriesSortPreference', '', -1);
+        }
+        
+        // Sort each admin-series-list container independently
+        $('.admin-series-list').each(function() {
+            var container = $(this);
+            var result = container.find('.admin-series-row').sort(function (a, b) {
+                var contentA, contentB;
+                
+                if (selectedSort === 'startdate' || selectedSort === 'enddate') {
+                    contentA = $(a).data(selectedSort);
+                    contentB = $(b).data(selectedSort);
+                    
+                    // Handle empty dates (series with no races)
+                    if (!contentA && !contentB) return 0;
+                    if (!contentA) return 1;
+                    if (!contentB) return -1;
+                    
+                    // Compare dates as strings in yyyy-MM-dd format
+                    return contentA.localeCompare(contentB);
+                } else {
+                    // Sort by name
+                    contentA = $(a).data('name');
+                    contentB = $(b).data('name');
+                    return String(contentA).localeCompare(contentB);
+                }
+            });
+            
+            container.empty();
+            container.append(result);
+        });
+    }
+    
+    // Load sort preference from cookie and apply on page load
+    document.addEventListener("DOMContentLoaded", function() {
+        var savedSort = getAdminSeriesCookie('adminSeriesSortPreference');
+        if (savedSort) {
+            $('#admin-sort-order').val(savedSort);
+        }
+        
+        // Initial sort
+        sortAdminSeries();
+    });
+</script>
