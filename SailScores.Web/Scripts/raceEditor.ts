@@ -24,27 +24,25 @@ export function initialize() {
     $('#fleetId').change(loadFleet);
     if ($("#defaultRaceDateOffset").val() == "") {
         $('#date').val('');
-    } else {
-        if ($('#needsLocalDate').val() === "True") {
-            var now = new Date();
-            const selectedDate: Date | null = new Date( $('#date').val() as string );
-            const tomorrow = new Date(now);
-            tomorrow.setDate(now.getDate() + 1);
-            const yesterday = new Date(now);
-            yesterday.setDate(now.getDate() - 1);
+    } else if ($('#needsLocalDate').val() === "True") {
+        let now = new Date();
+        const selectedDate: Date | null = new Date( $('#date').val() as string );
+        const tomorrow = new Date(now);
+        tomorrow.setDate(now.getDate() + 1);
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
 
 
-            if (selectedDate > yesterday&&
-                selectedDate < tomorrow) {
+        if (selectedDate > yesterday&&
+            selectedDate < tomorrow) {
 
-                const offset = parseInt($("#defaultRaceDateOffset").val() as string, 10);
+            const offset = Number.parseInt($("#defaultRaceDateOffset").val() as string, 10);
 
-                now.setDate(now.getDate() + offset);
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                $('#date').val(now.toISOString().substring(0, 10));
-            }
-            $('#needsLocalDate').val('');
+            now.setDate(now.getDate() + offset);
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            $('#date').val(now.toISOString().substring(0, 10));
         }
+        $('#needsLocalDate').val('');
     }
 
     $('#date').change(dateChanged);
@@ -137,7 +135,6 @@ export function loadFleet() {
 }
 
 export function dateChanged() {
-    //console.log("dateChanged");
     loadSeriesOptions();
     if ($("#defaultWeather").val() === "true") {
         console.log("defaultWeather was true");
@@ -243,7 +240,7 @@ export function confirmDelete() {
 
     var btn = <Node>event.target;
     var resultItem = $(btn).closest("li");
-    var compId = resultItem.data('competitorid');
+    var compId = resultItem[0].dataset.competitorid;
     var compName = resultItem.find(".competitor-name").text();
     if (!compName) {
         compName = resultItem.find(".sail-number").text();
@@ -262,19 +259,34 @@ export function addNewCompetitorFromButton() {
     if (!(event.target instanceof HTMLButtonElement)) {
         return;
     }
-    var competitorId = event.target.dataset['competitorid'];
-    //var competitorId = $(btn).data('id');
+    let competitorId = event.target.dataset['competitorid'];
     let comp = allCompetitors.find(c => c.id.toString() === competitorId);
     addNewCompetitor(comp);
 }
 
 function addNewCompetitor(competitor: competitorDto) {
-    var c: number = 0;
-    var resultDiv = document.getElementById("results");
-    var compTemplate = document.getElementById("competitorTemplate");
-    var compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
+    let c: number = 0;
+    let resultDiv = document.getElementById("results");
+    let compTemplate = document.getElementById("competitorTemplate");
+    let compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
     compListItem.id = competitor.id.toString();
     compListItem.setAttribute("data-competitorId", competitor.id.toString());
+
+    populateCompetitorInfo(compListItem, competitor, c);
+    setTimingFields(compListItem);
+    attachTimingEventHandlers(compListItem);
+
+    compListItem.style.display = "";
+    if (!competitorIsInResults(competitor)) {
+        resultDiv.appendChild(compListItem);
+    } else {
+        return;
+    }
+
+    finalizeCompetitorAdd(compListItem);
+}
+
+function populateCompetitorInfo(compListItem: HTMLLIElement, competitor: competitorDto, c: number) {
     var span = compListItem.getElementsByClassName("competitor-name")[0] as HTMLElement;
     span.appendChild(document.createTextNode(competitor.name || ""));
 
@@ -291,10 +303,11 @@ function addNewCompetitor(competitor: competitorDto) {
 
     var deleteButtons = compListItem.getElementsByClassName("delete-button");
     for (var i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].setAttribute("data-competitorId", competitor.id.toString());
+        (deleteButtons[i] as HTMLElement).dataset.competitorid = competitor.id.toString();
     }
+}
 
-    // Always add timing fields, but set display based on TrackTimes checkbox
+function setTimingFields(compListItem: HTMLLIElement) {
     var trackTimesChecked = (document.getElementById("trackTimesCheckbox") as HTMLInputElement)?.checked;
     var finishDiv = compListItem.getElementsByClassName("finish-time-div")[0] as HTMLElement;
     var finishInput = compListItem.getElementsByClassName("finish-time-input")[0] as HTMLInputElement;
@@ -302,57 +315,45 @@ function addNewCompetitor(competitor: competitorDto) {
 
     var elapsedDiv = compListItem.getElementsByClassName("elapsed-time-div")[0] as HTMLElement;
     var elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0] as HTMLInputElement;
-
     elapsedDiv.style.display = trackTimesChecked ? "" : "none";
 
-    // Set FinishTime and ElapsedTime if race date matches client date
     const raceDateStr = ($("#date").val() as string);
     const now = new Date();
     const nowDateStr = now.toISOString().substring(0, 10);
     if (raceDateStr === nowDateStr && trackTimesChecked) {
-        // Set FinishTime to current time (HH:mm:ss)
         finishInput.value = now.toTimeString().slice(0, 8);
-
-        // If StartTime is set, calculate elapsed time
         const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
-        if (startTimeInput && startTimeInput.value) {
+        if (startTimeInput?.value) {
             const start = parseTimeStringToDate(startTimeInput.value);
             if (start) {
-                // Use today's date for both start and finish
                 const finish = new Date(now);
-                // If start is after finish (crossed midnight), adjust start to yesterday
                 if (start > finish) {
                     start.setDate(start.getDate() - 1);
                 }
                 let elapsedMs = finish.getTime() - start.getTime();
-                if (elapsedMs < 0) elapsedMs += 24 * 3600 * 1000; // handle midnight wrap
+                if (elapsedMs < 0) elapsedMs += 24 * 3600 * 1000;
                 elapsedInput.value = formatElapsedTime(elapsedMs);
             }
         }
     }
+}
 
-    // Attach event handlers to new FinishTime and ElapsedTime fields
+function attachTimingEventHandlers(compListItem: HTMLLIElement) {
+    var finishInput = compListItem.getElementsByClassName("finish-time-input")[0] as HTMLInputElement;
+    var elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0] as HTMLInputElement;
     if (finishInput) {
-        $(finishInput).change( onFinishTimeChanged );
+        $(finishInput).change(onFinishTimeChanged);
     }
     if (elapsedInput) {
-        $(elapsedInput).change( onElapsedTimeChanged );
+        $(elapsedInput).change(onElapsedTimeChanged);
     }
+}
 
-    compListItem.style.display = "";
-    // in testing, due to delay in speech recog, could add competitor
-    // twice.Trying to reduce that here.
-    if (!competitorIsInResults(competitor)) {
-        resultDiv.appendChild(compListItem);
-    } else {
-        return;
-    }
-
+function finalizeCompetitorAdd(compListItem: HTMLLIElement) {
     calculatePlaces();
     $('html, body').animate({
         scrollTop: $(compListItem).offset().top - 150
     }, 300);
-
     $('#newCompetitor').val("");
     initializeAutoComplete();
     updateButtonFooter();
@@ -368,13 +369,13 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
         const listIndex = (i - 1).toString();
         var input = document.createElement("input");
         input.type = "hidden";
-        input.name = "Scores\[" + listIndex + "\].competitorId";
+        input.name = "Scores[" + listIndex + "].competitorId";
         input.value = resultItems[i].getAttribute("data-competitorId");
         form.appendChild(input);
 
         input = document.createElement("input");
         input.type = "hidden";
-        input.name = "Scores\[" + listIndex + "\].place";
+        input.name = "Scores[" + listIndex + "].place";
         if (shouldCompKeepScore(resultItems[i])) {
             input.value = resultItems[i].getAttribute("data-place");
         }
@@ -382,30 +383,30 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
 
         input = document.createElement("input");
         input.type = "hidden";
-        input.name = "Scores\[" + listIndex + "\].code";
+        input.name = "Scores[" + listIndex + "].code";
         input.value = getCompetitorCode(resultItems[i]);
         form.appendChild(input);
 
         input = document.createElement("input");
         input.type = "hidden";
-        input.name = "Scores\[" + listIndex + "\].codePointsString";
+        input.name = "Scores[" + listIndex + "].codePointsString";
         input.value = getCompetitorCodePoints(resultItems[i]);
         form.appendChild(input);
 
         // Add FinishTime and ElapsedTime if present
         var finishInput = resultItems[i].querySelector('input[name="FinishTime"]') as HTMLInputElement;
-        if (finishInput && finishInput.value) {
+        if (finishInput?.value) {
             input = document.createElement("input");
             input.type = "hidden";
-            input.name = "Scores\[" + listIndex + "\].FinishTime";
+            input.name = "Scores[" + listIndex + "].FinishTime";
             input.value = finishInput.value;
             form.appendChild(input);
         }
-        var elapsedInput = resultItems[i].querySelector('input[name="ElapsedTime"]') as HTMLInputElement;
-        if (elapsedInput && elapsedInput.value) {
+        let elapsedInput = resultItems[i].querySelector('input[name="ElapsedTime"]') as HTMLInputElement;
+        if (elapsedInput?.value) {
             input = document.createElement("input");
             input.type = "hidden";
-            input.name = "Scores\[" + listIndex + "\].ElapsedTime";
+            input.name = "Scores[" + listIndex + "].ElapsedTime";
             input.value = elapsedInput.value;
             form.appendChild(input);
         }
@@ -514,7 +515,7 @@ function displayRaceNumber() {
             regattaId: regattaId
         },
         function (data: any) {
-            if (data && data.order) {
+            if (data?.order) {
                 raceNumElement.textContent = data.order.toString();
             } else {
                 raceNumElement.textContent = "";
@@ -595,11 +596,10 @@ function initializeAutoComplete() {
 
 function initializeButtonFooter() {
     $('#scoreButtonDiv').empty();
-    //if (allCompetitors && allCompetitors.length && allCompetitors.length < 21) {
-        $('#scoreButtonFooter').show();
-    //} else {
-    //    $('#scoreButtonFooter').hide();
-    //}
+    // used to test length of competitor list and
+    // hide if too long.
+    $('#scoreButtonFooter').show();
+
     allCompetitors.forEach(c => {
         let style = 'btn quick-comp ';
         if (!competitorIsInResults(c)) {

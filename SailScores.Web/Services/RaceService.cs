@@ -352,7 +352,7 @@ public class RaceService : IRaceService
         return _mapper.Map<RegattaViewModel>(regatta);
     }
 
-    private void CleanUpRaceTimes(RaceWithOptionsViewModel race)
+    private static void CleanUpRaceTimes(RaceWithOptionsViewModel race)
     {
         // Clean up StartTime to be on the Race Date
         if (race.Date.HasValue && race.StartTime.HasValue)
@@ -368,7 +368,7 @@ public class RaceService : IRaceService
         {
             foreach (var score in race.Scores)
             {
-                if (!race.TrackTimes)
+                if (!(race.TrackTimes ?? false))
                 {
                     score.FinishTime = null;
                     score.ElapsedTime = null;
