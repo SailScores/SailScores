@@ -22,7 +22,7 @@ paths.concatJsDest = paths.webroot + "js/**/*";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.concatTsDest = paths.webroot + "scripts/**.*";
 paths.jsDir = paths.webroot + "js/";
-paths.scripts = ['scripts/*.js', 'scripts/build/*.js'];
+paths.scripts = ['Scripts/*.js', 'Scripts/build/*'];
 
 gulp.task("clean:js", function () {
     return del(paths.concatJsDest);
@@ -44,12 +44,8 @@ gulp.task("min:js", function () {
         .pipe(webpack({
             mode: "production",
             devtool: 'source-map',
-            module: {
-                rules: [
-                    {
-                        exclude: /(node_modules)/,
-                    }
-                ]
+            output: {
+                filename: '[name].min.js'
             },
             externals: {
                 "jquery": "jQuery",
@@ -59,7 +55,6 @@ gulp.task("min:js", function () {
                 "summernote": "summernote"
             }
         }))
-        .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest(paths.jsDir));
 });
 

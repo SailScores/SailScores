@@ -1,4 +1,4 @@
-@using SailScores.Web.Models.SailScores;
+@using SailScores.Web.Models.SailScores
 @using SailScores.Web.Services.Interfaces
 @model ClubItemViewModel<RaceViewModel>
 @inject IWeatherService  weatherService
@@ -38,6 +38,12 @@
             <h4>
                 @Model.Item.Fleet?.Name
             </h4>
+            <div class="mt-2">
+                @if (Model.Item.StartTime.HasValue)
+                {
+                    <span class="fw-bold">Start:</span> @Model.Item.StartTime.Value.ToString("t")
+                }
+            </div>
         </div>
         <div class="col-sm-2 text-sm-end weather">
             @if (!String.IsNullOrWhiteSpace(Model.Item.Weather?.WindDirection))
@@ -68,69 +74,79 @@
 
             <ul>
             @foreach (var series in @Model.Item.Series)
-        {
-            <li>
-                <a href="~/@Model.ClubInitials/@Model.Item.Season.UrlName/@series.UrlName">
-                    @Html.DisplayFor(modelItem => series.Name)
-                </a>
-            </li>
+            {
+                <li>
+                    <a href="~/@Model.ClubInitials/@Model.Item.Season.UrlName/@series.UrlName">
+                        @Html.DisplayFor(modelItem => series.Name)
+                    </a>
+                </li>
+            }
+            </ul>
         }
-    </ul>
-                }
-    @if (Model.Item.State == SailScores.Api.Enumerations.RaceState.Preliminary)
-    {
-        <p class="text-warning"><strong>Preliminary Results</strong></p>
-    }
-    <p>@Model.Item.Description</p>
-    @if (!String.IsNullOrWhiteSpace(Model.Item.TrackingUrl))
-    {
-        <div class="row">
-            <div class="col-12">
-                <p><a href="@Model.Item.TrackingUrl" target="_blank"><span class="fas fa-external-link-alt"></span> Race Tracking</a></p>
+        @if(Model.Item.State == SailScores.Api.Enumerations.RaceState.Preliminary)
+        {
+            <p class="text-warning"><strong>Preliminary Results</strong></p>
+        }
+        <p>@Model.Item.Description</p>
+        @if(!String.IsNullOrWhiteSpace(Model.Item.TrackingUrl))
+        {
+            <div class="row">
+                <div class="col-12">
+                    <p><a href="@Model.Item.TrackingUrl" target="_blank"><span class="fas fa-external-link-alt"></span> Race Tracking</a></p>
+                </div>
             </div>
-        </div>
-    }
-    <table class="table" aria-describedby="racetitle">
-        <thead>
-        <tr>
-            <th scope="col">Place</th>
-            <th scope="col">Sail</th>
-            <th scope="col">Sailor(s)</th>
-            <th scope="col">Boat</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var score in Model.Item.Scores)
-        {
-            <tr>
-                <td>
-                    @((score.Place != null && score.Place != 0) ? score.Place.ToString() : "")
-                    @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")
-                </td>
-                <td>
-                    @score.Competitor.SailNumber
-                    @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
-                    {
-                        @:(@score.Competitor.AlternativeSailNumber)
-                    }
-                </td>
-                <td>
-                    @score.Competitor.Name
-                </td>
-                <td>
-                    @score.Competitor.BoatName
-                </td>
-            </tr>
         }
-        </tbody>
-    </table>
-    @if (!String.IsNullOrWhiteSpace(Model.Item.UpdatedBy))
-    {
-        <span class="text-end"><small><em>Updated by @Model.Item.UpdatedBy</em></small></span><br/>
-    }
+
+        <table class="table table-borderless" aria-describedby="racetitle">
+            <thead>
+            <tr>
+                <th scope="col">Place</th>
+                <th scope="col">Sail</th>
+                <th scope="col">Sailor(s)</th>
+                <th scope="col">Boat</th>
+                @if (Model.Item.TrackTimes ?? false)
+                {
+                    <th scope="col" class="d-none d-sm-table-cell">Finish Time</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Elapsed</th>
+                }
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var score in Model.Item.Scores)
+            {
+                <tr class="score-row d-table-row @((Model.Item.TrackTimes ?? false) ? "" : "score-row-secondary")">
+                    <td>@((score.Place != null && score.Place != 0) ? score.Place.ToString() : "") @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")</td>
+                    <td>@score.Competitor.SailNumber
+                        @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
+                        {
+                            @:(@score.Competitor.AlternativeSailNumber)
+                        }
+                    </td>
+                    <td>@score.Competitor.Name</td>
+                    <td>@score.Competitor.BoatName</td>
+                    @if (Model.Item.TrackTimes ?? false)
+                    {
+                        <td class="d-none d-sm-table-cell">@(score.FinishTime.HasValue? score.FinishTime.Value.ToString("HH:mm:ss") : "")</td>
+                        <td class="d-none d-sm-table-cell">@(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString() : "")</td>
+                    }
+                </tr>
+                @if (Model.Item.TrackTimes ?? false)
+                {
+                    <tr class="score-row-secondary d-table-row d-sm-none">
+                        <td colspan="2"></td>
+                        <td>@(score.FinishTime.HasValue? score.FinishTime.Value.ToString("HH:mm:ss") : "")</td>
+                        <td>@(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString() : "")</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+        @if (!String.IsNullOrWhiteSpace(Model.Item.UpdatedBy))
+        {
+            <span class="text-end"><small><em>Updated by @Model.Item.UpdatedBy</em></small></span><br />
+        }
 
         </div>
-    
     </div>
 </div>
 

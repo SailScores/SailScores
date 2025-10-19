@@ -1,4 +1,6 @@
 using SailScores.Api.Enumerations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Database.Entities;
 
@@ -35,4 +37,8 @@ public class Race
     public String UpdatedBy { get; set; }
 
     public Weather Weather { get; set; }
+
+    // New fields for timing
+    public DateTime? StartTime { get; set; }
+    public bool TrackTimes { get; set; } = false;
 }

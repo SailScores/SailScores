@@ -1,4 +1,5 @@
 ﻿using SailScores.Core.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -23,4 +24,8 @@ public class ScoreViewModel
     public decimal? CodePoints { get; set; }
     // used for parsing CodePoints, can use period or comma as decimal separator
     public string CodePointsString { get; set; }
+
+
+    public DateTime? FinishTime { get; set; }
+    public TimeSpan? ElapsedTime { get; set; }
 }

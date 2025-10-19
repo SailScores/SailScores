@@ -88,8 +88,6 @@
     <None Include="wwwroot\js\build\seriesChart.js" />
     <None Include="wwwroot\js\createMultipleComp.js" />
     <None Include="wwwroot\js\jquery.unobtrusive-ajax.min.js" />
-    <None Include="wwwroot\js\raceEditor.build.js" />
-    <None Include="wwwroot\js\raceEditor.js.map" />
     <None Include="wwwroot\js\seriesChart.build.js" />
     <None Include="wwwroot\js\seriesChart.js" />
     <None Include="wwwroot\js\site.min.js" />

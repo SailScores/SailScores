@@ -136,18 +136,8 @@ public class RaceController : Controller
 
         if (!ModelState.IsValid)
         {
-            RaceWithOptionsViewModel raceOptions =
-                await _raceService.GetBlankRaceWithOptions(
-                    clubInitials,
-                    race.RegattaId,
-                    race.SeriesIds?.FirstOrDefault());
-            race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
-            race.FleetOptions = raceOptions.FleetOptions;
-            race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
-            race.CompetitorOptions = raceOptions.CompetitorOptions;
-            race.SeriesOptions = raceOptions.SeriesOptions;
-            race.WeatherIconOptions = raceOptions.WeatherIconOptions;
-            race.UseAdvancedFeatures = raceOptions.UseAdvancedFeatures;
+            race = await _raceService.FixupRaceWithOptions(clubInitials, race);
+
             return View(race);
         }
         var clubId = await _clubService.GetClubId(clubInitials);
@@ -221,21 +211,8 @@ public class RaceController : Controller
         }
         if (!ModelState.IsValid)
         {
-            RaceWithOptionsViewModel raceOptions =
-                await _raceService.GetBlankRaceWithOptions(
-                    clubInitials,
-                    race.RegattaId,
-                    race.SeriesIds?.FirstOrDefault());
-            race.ScoreCodeOptions = raceOptions.ScoreCodeOptions;
-            race.FleetOptions = raceOptions.FleetOptions;
-            race.CompetitorBoatClassOptions = raceOptions.CompetitorBoatClassOptions;
-            race.CompetitorOptions = raceOptions.CompetitorOptions;
-            race.SeriesOptions = raceOptions.SeriesOptions;
-            race.UseAdvancedFeatures = raceOptions.UseAdvancedFeatures;
-            foreach (var score in race.Scores)
-            {
-                score.Competitor = raceOptions.CompetitorOptions.First(c => c.Id == score.CompetitorId);
-            }
+            race = await _raceService.FixupRaceWithOptions(clubInitials, race);
+
             return View(race);
         }
 

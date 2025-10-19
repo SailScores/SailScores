@@ -1,4 +1,3 @@
-
 @import "../node_modules/bootstrap/scss/functions";
 
 $color-mode-type: media-query;
@@ -566,5 +565,28 @@ form label.required:not(.custom-control-label)::after {
 
     .select2-container--default .select2-dropdown .select2-results__options .select2-results__option[role=group] .select2-results__group {
         color: var(--bs-secondary-color) !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+  .form-control {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+}
+
+@media (min-width: 576px) {
+    .score-row:not(:last-child) {
+        border-bottom: 1px solid;
+    }
+}
+/* Secondary rows: border except last on xs screens */
+@media (max-width: 575.98px) {
+    .score-row-secondary:not(:last-child) {
+        border-bottom: 1px solid $border-color;
+    }
+
+    .score-row {
+        border-bottom: 1px none $border-color;
     }
 }

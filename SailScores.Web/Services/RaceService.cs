@@ -18,6 +18,7 @@ public class RaceService : IRaceService
     private readonly IScoringService _coreScoringService;
     private readonly Core.Services.IRegattaService _coreRegattaService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
+    private readonly CoreServices.ICompetitorService _coreCompetitorService;
     private readonly IWeatherService _weatherService;
     private readonly ISpeechService _speechService;
     private readonly IMapper _mapper;
@@ -30,6 +31,7 @@ public class RaceService : IRaceService
         Core.Services.IScoringService coreScoringService,
         Core.Services.IRegattaService coreRegattaService,
         Core.Services.ISeasonService coreSeasonService,
+        Core.Services.ICompetitorService coreCompetitorService,
 
         IWeatherService weatherService,
         ISpeechService speechService,
@@ -42,6 +44,8 @@ public class RaceService : IRaceService
         _coreScoringService = coreScoringService;
         _coreRegattaService = coreRegattaService;
         _coreSeasonService = coreSeasonService;
+        _coreCompetitorService = coreCompetitorService;
+
         _weatherService = weatherService;
         _speechService = speechService;
         _mapper = mapper;
@@ -111,7 +115,8 @@ public class RaceService : IRaceService
     public async Task<RaceWithOptionsViewModel> GetBlankRaceWithOptions(
         string clubInitials,
         Guid? regattaId,
-        Guid? seriesId)
+        Guid? seriesId,
+        Guid? fleetId = null)
     {
         RaceWithOptionsViewModel returnRace;
         if (regattaId.HasValue)
@@ -121,6 +126,16 @@ public class RaceService : IRaceService
         else if (seriesId.HasValue)
         {
             returnRace = await CreateSeriesRaceAsync(clubInitials, seriesId.Value);
+        }
+        else if (fleetId.HasValue)
+        {
+            returnRace = await CreateClubRaceAsync(clubInitials);
+            if (returnRace.FleetOptions.Any(f => f.Id == fleetId.Value))
+            {
+                returnRace.FleetId = fleetId.Value;
+            }
+
+            returnRace.CompetitorOptions = await _coreCompetitorService.GetCompetitorsAsync(returnRace.ClubId, fleetId, false);
         }
         else
         {
@@ -337,8 +352,54 @@ public class RaceService : IRaceService
         return _mapper.Map<RegattaViewModel>(regatta);
     }
 
+    private static void CleanUpRaceTimes(RaceWithOptionsViewModel race)
+    {
+        // Clean up StartTime to be on the Race Date
+        if (race.Date.HasValue && race.StartTime.HasValue)
+        {
+            var timeOfDay = race.StartTime.Value.TimeOfDay;
+            race.StartTime = race.Date.Value.Date + timeOfDay;
+        }
+
+
+        // Clean up FinishTimes to be in the 24 hours after StartTime
+        // of, if TrackTimes is not set, clear Finish and elapsed times
+        if (race.Scores != null && race.Scores.Count > 0)
+        {
+            foreach (var score in race.Scores)
+            {
+                if (!(race.TrackTimes ?? false))
+                {
+                    score.FinishTime = null;
+                    score.ElapsedTime = null;
+                    continue;
+                }
+                else if (score.FinishTime.HasValue)
+                {
+                    TimeSpan finishTimeOfDay = score.FinishTime.Value.TimeOfDay;
+                    if (race.StartTime.HasValue)
+                    {
+                        var startDate = race.StartTime.Value.Date;
+                        var newFinish = startDate + finishTimeOfDay;
+                        // If finish is before start, assume it's next day
+                        if (newFinish < race.StartTime.Value)
+                        {
+                            newFinish = newFinish.AddDays(1);
+                        }
+                        score.FinishTime = newFinish;
+                    }
+                    else if (race.Date.HasValue)
+                    {
+                        score.FinishTime = race.Date.Value.Date + finishTimeOfDay;
+                    }
+                }
+            }
+        }
+    }
+
     public async Task SaveAsync(RaceWithOptionsViewModel race)
     {
+        CleanUpRaceTimes(race);
         await EnsureSeasonExists(race.ClubId, race.Date);
         var fleets = await _coreClubService.GetAllFleets(race.ClubId);
         var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, race.Date, false);
@@ -519,5 +580,28 @@ public class RaceService : IRaceService
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
         return await _coreRaceService.GetMostRecentRaceSeasonAsync(clubId);
+    }
+
+    public async Task<RaceWithOptionsViewModel> FixupRaceWithOptions(
+        string clubInitials,
+        RaceWithOptionsViewModel race)
+    {
+        var blankRace = await GetBlankRaceWithOptions(
+            clubInitials,
+            race.RegattaId,
+            race.SeriesIds?.FirstOrDefault(),
+            race.FleetId);
+        race.ScoreCodeOptions = blankRace.ScoreCodeOptions;
+        race.FleetOptions = blankRace.FleetOptions;
+        race.CompetitorBoatClassOptions = blankRace.CompetitorBoatClassOptions;
+        race.SeriesOptions = blankRace.SeriesOptions;
+        race.WeatherIconOptions = blankRace.WeatherIconOptions;
+        race.UseAdvancedFeatures = blankRace.UseAdvancedFeatures;
+        foreach (var score in race.Scores)
+        {
+            score.Competitor = race.CompetitorOptions.First(c => c.Id == score.CompetitorId);
+        }
+
+        return race;
     }
 }
