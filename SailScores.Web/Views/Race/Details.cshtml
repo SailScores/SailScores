@@ -104,7 +104,7 @@
                 <th scope="col">Sail</th>
                 <th scope="col">Sailor(s)</th>
                 <th scope="col">Boat</th>
-                @if (Model.Item.TrackTimes ?? false)
+                @if (Model.Item.TrackTimes)
                 {
                     <th scope="col" class="d-none d-sm-table-cell">Finish Time</th>
                     <th scope="col" class="d-none d-sm-table-cell">Elapsed</th>
@@ -114,7 +114,7 @@
             <tbody>
             @foreach (var score in Model.Item.Scores)
             {
-                <tr class="score-row d-table-row @((Model.Item.TrackTimes ?? false) ? "" : "score-row-secondary")">
+                <tr class="score-row d-table-row @(Model.Item.TrackTimes? "" : "score-row-secondary")">
                     <td>@((score.Place != null && score.Place != 0) ? score.Place.ToString() : "") @(!String.IsNullOrWhiteSpace(score.Code) ? $"{score.Code} - {score.ScoreCode.Description}" : "")</td>
                     <td>@score.Competitor.SailNumber
                         @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
@@ -124,13 +124,13 @@
                     </td>
                     <td>@score.Competitor.Name</td>
                     <td>@score.Competitor.BoatName</td>
-                    @if (Model.Item.TrackTimes ?? false)
+                    @if (Model.Item.TrackTimes)
                     {
                         <td class="d-none d-sm-table-cell">@(score.FinishTime.HasValue? score.FinishTime.Value.ToString("HH:mm:ss") : "")</td>
                         <td class="d-none d-sm-table-cell">@(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString() : "")</td>
                     }
                 </tr>
-                @if (Model.Item.TrackTimes ?? false)
+                @if (Model.Item.TrackTimes)
                 {
                     <tr class="score-row-secondary d-table-row d-sm-none">
                         <td colspan="2"></td>

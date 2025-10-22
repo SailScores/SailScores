@@ -368,7 +368,7 @@ public class RaceService : IRaceService
         {
             foreach (var score in race.Scores)
             {
-                if (!(race.TrackTimes ?? false))
+                if (!race.TrackTimes)
                 {
                     score.FinishTime = null;
                     score.ElapsedTime = null;
