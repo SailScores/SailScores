@@ -74,9 +74,6 @@ public class WhatIfController : Controller
         {
             return Unauthorized();
         }
-        //stripping unused user input for safety
-        options.Series = null;
-        options.ScoringSystemOptions = new List<Core.Model.ScoringSystem>();
         var vm = await _whatIfService.GetResults(options);
         return View("Results", vm);
     }
