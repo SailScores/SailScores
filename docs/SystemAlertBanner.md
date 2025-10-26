@@ -25,7 +25,7 @@ To create a new deployment alert, insert a record directly into the `SystemAlert
 INSERT INTO SystemAlerts (Id, Content, ExpiresUtc, CreatedDateUtc, CreatedBy, IsDeleted)
 VALUES (
     NEWID(),
-    'Scheduled maintenance on **[DAY], [DATE]** from **[START_TIME] to [END_TIME] [TIMEZONE]**. The site will be unavailable during this time.',
+    'Scheduled maintenance {{COUNTDOWN}}. The site will be unavailable during this time.',
     '[EXPIRATION_UTC_DATETIME]',  -- Alert expires after deployment completes (e.g., '2025-11-04 03:00:00')
     GETUTCDATE(),
     'admin',
@@ -38,15 +38,16 @@ VALUES (
 The `Content` field supports full Markdown syntax, including:
 
 - **Bold text** using `**text**`
-- *Italic text* using `*text*`
+- *Italic text** using `*text*`
 - Links using `[text](url)`
 - Lists, headers, and more
+- **Special placeholder**: `{{COUNTDOWN}}` - Shows dynamic countdown timer in user's local time
 
 Example with formatting:
 ```markdown
 ⚠️ **Scheduled Deployment**
 
-We will be deploying updates on **[DAY], [DATE]** from **[START_TIME] to [END_TIME] [TIMEZONE]**.
+We will be deploying updates {{COUNTDOWN}}.
 
 During this time:
 - The site will be temporarily unavailable
@@ -55,6 +56,8 @@ During this time:
 
 Thank you for your patience!
 ```
+
+This will display as "We will be deploying updates in ~4 hours" and automatically update.
 
 ### Alert Display Logic
 

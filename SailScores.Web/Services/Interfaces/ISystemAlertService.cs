@@ -1,8 +1,8 @@
-using SailScores.Core.Model;
+using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Services.Interfaces;
 
 public interface ISystemAlertService
 {
-    Task<IEnumerable<SystemAlert>> GetActiveAlertsAsync();
+    Task<IEnumerable<SystemAlertViewModel>> GetActiveAlertsAsync();
 }
