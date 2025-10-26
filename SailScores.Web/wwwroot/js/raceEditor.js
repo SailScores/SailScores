@@ -6,7 +6,7 @@ import "bootstrap";
 const noCodeString = "No Code";
 function checkEnter(e) {
     const ev = e || event;
-    let txtArea = /textarea/i.test(ev.srcElement.tagName);
+    var txtArea = /textarea/i.test(ev.srcElement.tagName);
     return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
 }
 export function initialize() {
@@ -46,12 +46,12 @@ export function initialize() {
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
-        let waiting = $('#ssWaitingModal');
+        var waiting = $('#ssWaitingModal');
         if (!!waiting) {
             waiting.show();
         }
         $('#submitButton').attr('value', 'Please wait...');
-        let form = document.getElementById("raceform");
+        var form = document.getElementById("raceform");
         $('#submitButton').attr('disabled', 'disabled');
         addScoresFieldsToForm(form);
     });
@@ -130,9 +130,9 @@ export function raceStateChanged() {
 export function compCreateSubmit(e) {
     e.preventDefault();
     $("#compLoading").show();
-    let form = $(this);
-    let url = form.attr("data-submit-url");
-    let prep = function (xhr) {
+    var form = $(this);
+    var url = form.attr("data-submit-url");
+    var prep = function (xhr) {
         $('#compLoading').show();
         xhr.setRequestHeader("RequestVerificationToken", $('input:hidden[name="__RequestVerificationToken"]').val());
     };
@@ -151,7 +151,7 @@ export function completeCompCreate() {
     let clubId = $("#clubId").val();
     let fleetId = $("#fleetId").val();
     getCompetitors(clubId, fleetId);
-    let modal = $("#createCompetitor");
+    var modal = $("#createCompetitor");
     modal.modal("hide");
 }
 export function completeCompCreateFailed() {
@@ -161,15 +161,15 @@ export function hideAlert() {
     $("#compCreateAlert").hide();
 }
 export function moveUp() {
-    let btn = event.target;
-    let resultItem = $(btn).closest("li");
+    var btn = event.target;
+    var resultItem = $(btn).closest("li");
     // move up:
     resultItem.prev().insertAfter(resultItem);
     calculatePlaces();
 }
 export function moveDown() {
-    let btn = event.target;
-    let resultItem = $(btn).closest("li");
+    var btn = event.target;
+    var resultItem = $(btn).closest("li");
     resultItem.next().insertBefore(resultItem);
     calculatePlaces();
 }
@@ -177,10 +177,10 @@ export function deleteResult() {
     // fix aria incompatibility.
     const buttonElement = document.activeElement;
     buttonElement.blur();
-    let modal = $("#deleteConfirm");
-    let compId = modal.find("#compIdToDelete").val();
-    let resultList = $("#results");
-    let resultItem = resultList.find(`[data-competitorid='${compId}']`);
+    var modal = $("#deleteConfirm");
+    var compId = modal.find("#compIdToDelete").val();
+    var resultList = $("#results");
+    var resultItem = resultList.find(`[data-competitorid='${compId}']`);
     resultItem.remove();
     calculatePlaces();
     initializeAutoComplete();
@@ -188,14 +188,14 @@ export function deleteResult() {
     modal.modal("hide");
 }
 export function confirmDelete() {
-    let btn = event.target;
-    let resultItem = $(btn).closest("li");
-    let compId = resultItem.data('competitorid');
-    let compName = resultItem.find(".competitor-name").text();
+    var btn = event.target;
+    var resultItem = $(btn).closest("li");
+    var compId = resultItem[0].dataset.competitorid;
+    var compName = resultItem.find(".competitor-name").text();
     if (!compName) {
         compName = resultItem.find(".sail-number").text();
     }
-    let modal = $('#deleteConfirm');
+    var modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
     modal.find('#compIdToDelete').val(compId);
     modal.show();
@@ -218,7 +218,20 @@ function addNewCompetitor(competitor) {
     let compListItem = compTemplate.cloneNode(true);
     compListItem.id = competitor.id.toString();
     compListItem.setAttribute("data-competitorId", competitor.id.toString());
-    let span = compListItem.getElementsByClassName("competitor-name")[0];
+    populateCompetitorInfo(compListItem, competitor, c);
+    setTimingFields(compListItem);
+    attachTimingEventHandlers(compListItem);
+    compListItem.style.display = "";
+    if (!competitorIsInResults(competitor)) {
+        resultDiv.appendChild(compListItem);
+    }
+    else {
+        return;
+    }
+    finalizeCompetitorAdd(compListItem);
+}
+function populateCompetitorInfo(compListItem, competitor, c) {
+    var span = compListItem.getElementsByClassName("competitor-name")[0];
     span.appendChild(document.createTextNode(competitor.name || ""));
     span = compListItem.getElementsByClassName("sail-number")[0];
     span.appendChild(document.createTextNode(competitor.sailNumber || ""));
@@ -229,59 +242,51 @@ function addNewCompetitor(competitor) {
     }
     span = compListItem.getElementsByClassName("race-place")[0];
     span.appendChild(document.createTextNode(c.toString()));
-    let deleteButtons = compListItem.getElementsByClassName("delete-button");
-    for (let i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].setAttribute("data-competitorId", competitor.id.toString());
+    var deleteButtons = compListItem.getElementsByClassName("delete-button");
+    for (var i = 0; i < deleteButtons.length; i++) {
+        deleteButtons[i].dataset.competitorid = competitor.id.toString();
     }
-    // Always add timing fields, but set display based on TrackTimes checkbox
-    let trackTimesChecked = document.getElementById("trackTimesCheckbox")?.checked;
-    let finishDiv = compListItem.getElementsByClassName("finish-time-div")[0];
-    let finishInput = compListItem.getElementsByClassName("finish-time-input")[0];
+}
+function setTimingFields(compListItem) {
+    var trackTimesChecked = document.getElementById("trackTimesCheckbox")?.checked;
+    var finishDiv = compListItem.getElementsByClassName("finish-time-div")[0];
+    var finishInput = compListItem.getElementsByClassName("finish-time-input")[0];
     finishDiv.style.display = trackTimesChecked ? "" : "none";
-    let elapsedDiv = compListItem.getElementsByClassName("elapsed-time-div")[0];
-    let elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0];
+    var elapsedDiv = compListItem.getElementsByClassName("elapsed-time-div")[0];
+    var elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0];
     elapsedDiv.style.display = trackTimesChecked ? "" : "none";
-    // Set FinishTime and ElapsedTime if race date matches client date
     const raceDateStr = $("#date").val();
     const now = new Date();
     const nowDateStr = now.toISOString().substring(0, 10);
     if (raceDateStr === nowDateStr && trackTimesChecked) {
-        // Set FinishTime to current time (HH:mm:ss)
         finishInput.value = now.toTimeString().slice(0, 8);
-        // If StartTime is set, calculate elapsed time
         const startTimeInput = document.getElementById('StartTime');
         if (startTimeInput?.value) {
             const start = parseTimeStringToDate(startTimeInput.value);
             if (start) {
-                // Use today's date for both start and finish
                 const finish = new Date(now);
-                // If start is after finish (crossed midnight), adjust start to yesterday
                 if (start > finish) {
                     start.setDate(start.getDate() - 1);
                 }
                 let elapsedMs = finish.getTime() - start.getTime();
                 if (elapsedMs < 0)
-                    elapsedMs += 24 * 3600 * 1000; // handle midnight wrap
+                    elapsedMs += 24 * 3600 * 1000;
                 elapsedInput.value = formatElapsedTime(elapsedMs);
             }
         }
     }
-    // Attach event handlers to new FinishTime and ElapsedTime fields
+}
+function attachTimingEventHandlers(compListItem) {
+    var finishInput = compListItem.getElementsByClassName("finish-time-input")[0];
+    var elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0];
     if (finishInput) {
         $(finishInput).change(onFinishTimeChanged);
     }
     if (elapsedInput) {
         $(elapsedInput).change(onElapsedTimeChanged);
     }
-    compListItem.style.display = "";
-    // in testing, due to delay in speech recog, could add competitor
-    // twice.Trying to reduce that here.
-    if (!competitorIsInResults(competitor)) {
-        resultDiv.appendChild(compListItem);
-    }
-    else {
-        return;
-    }
+}
+function finalizeCompetitorAdd(compListItem) {
     calculatePlaces();
     $('html, body').animate({
         scrollTop: $(compListItem).offset().top - 150
@@ -293,11 +298,11 @@ function addNewCompetitor(competitor) {
 function addScoresFieldsToForm(form) {
     //clear out old fields first:
     removeScoresFieldsFromForm(form);
-    let resultList = document.getElementById("results");
-    let resultItems = resultList.getElementsByTagName("li");
-    for (let i = 1; i < resultItems.length; i++) {
+    var resultList = document.getElementById("results");
+    var resultItems = resultList.getElementsByTagName("li");
+    for (var i = 1; i < resultItems.length; i++) {
         const listIndex = (i - 1).toString();
-        let input = document.createElement("input");
+        var input = document.createElement("input");
         input.type = "hidden";
         input.name = "Scores[" + listIndex + "].competitorId";
         input.value = resultItems[i].getAttribute("data-competitorId");
@@ -320,7 +325,7 @@ function addScoresFieldsToForm(form) {
         input.value = getCompetitorCodePoints(resultItems[i]);
         form.appendChild(input);
         // Add FinishTime and ElapsedTime if present
-        let finishInput = resultItems[i].querySelector('input[name="FinishTime"]');
+        var finishInput = resultItems[i].querySelector('input[name="FinishTime"]');
         if (finishInput?.value) {
             input = document.createElement("input");
             input.type = "hidden";
@@ -342,13 +347,13 @@ function removeScoresFieldsFromForm(form) {
     $(form).find("[name^=Scores]").remove();
 }
 export function calculatePlaces() {
-    let resultList = document.getElementById("results");
-    let resultItems = resultList.getElementsByTagName("li");
-    let scoreCount = 1;
-    for (let i = 1, len = resultItems.length; i < len; i++) {
-        let span = resultItems[i].getElementsByClassName("race-place")[0];
+    var resultList = document.getElementById("results");
+    var resultItems = resultList.getElementsByTagName("li");
+    var scoreCount = 1;
+    for (var i = 1, len = resultItems.length; i < len; i++) {
+        var span = resultItems[i].getElementsByClassName("race-place")[0];
         resultItems[i].setAttribute("data-place", i.toString());
-        let origScore = resultItems[i].getAttribute("data-originalScore");
+        var origScore = resultItems[i].getAttribute("data-originalScore");
         if (span.id !== "competitorTemplate") {
             if (shouldCompKeepScore(resultItems[i]) &&
                 origScore !== "0") {
@@ -362,7 +367,7 @@ export function calculatePlaces() {
             }
         }
         // show manual entry if needed
-        let codepointsinput = resultItems[i].getElementsByClassName("code-points")[0];
+        var codepointsinput = resultItems[i].getElementsByClassName("code-points")[0];
         if (shouldHaveManualEntry(resultItems[i])) {
             codepointsinput.style.display = "";
         }
@@ -373,9 +378,9 @@ export function calculatePlaces() {
     }
 }
 function competitorIsInResults(comp) {
-    let resultList = document.getElementById("results");
-    let resultItems = resultList.getElementsByTagName("li");
-    for (let i = 0, len = resultItems.length; i < len; i++) {
+    var resultList = document.getElementById("results");
+    var resultItems = resultList.getElementsByTagName("li");
+    for (var i = 0, len = resultItems.length; i < len; i++) {
         if (resultItems[i].getAttribute("data-competitorId")
             === comp.id.toString()) {
             return true;
@@ -403,8 +408,8 @@ function getSuggestions() {
     });
     return competitorSuggestions;
 }
-let allCompetitors;
-let competitorSuggestions;
+var allCompetitors;
+var competitorSuggestions;
 function getCompetitors(clubId, fleetId) {
     if ($ && clubId && fleetId && fleetId.length > 31) {
         $.getJSON("/api/Competitors", {
@@ -442,7 +447,7 @@ function displayRaceNumber() {
         });
     }
 }
-let seriesOptions;
+var seriesOptions;
 function getSeries(clubId, date) {
     if (clubId && date) {
         $.getJSON("/api/Series", {
@@ -480,7 +485,7 @@ function setSeries() {
     // Restore previous selections (if still present)
     seriesSelect.val(selectedSeriesValues).trigger('change');
 }
-let autoCompleteSetup = false;
+var autoCompleteSetup = false;
 function initializeAutoComplete() {
     competitorSuggestions = getSuggestions();
     if (autoCompleteSetup) {
@@ -574,7 +579,7 @@ function clearWeatherFields() {
     $("#cloudcover").val(null);
 }
 function populateEmptyWeatherFields() {
-    let initials = $("#clubInitials").val();
+    var initials = $("#clubInitials").val();
     $.getJSON("/" + initials + "/weather/current/", {}, function (data) {
         if (data.icon && $("#weatherIcon").val(null)) {
             $("#weatherIcon").val(data.icon);
@@ -612,7 +617,7 @@ function toggleTimingFields(show) {
     });
 }
 function RequestAuthorizationToken(continuation) {
-    let prep = function (xhr) {
+    var prep = function (xhr) {
         xhr.setRequestHeader("Accept", "application/json");
     };
     $.ajax({
@@ -735,16 +740,16 @@ function InitializeSpeech(onComplete) {
         onComplete(window.SpeechSDK);
     }
 }
-let language;
-let region;
-let authorizationToken;
-let timeOfLastToken;
-let timeOfLastRecognized;
-let failureCount = 0;
-let SpeechSDK;
-let phraseDiv;
-let scenarioStartButton, scenarioStopButton;
-let reco;
+var language;
+var region;
+var authorizationToken;
+var timeOfLastToken;
+var timeOfLastRecognized;
+var failureCount = 0;
+var SpeechSDK;
+var phraseDiv;
+var scenarioStartButton, scenarioStopButton;
+var reco;
 function resetUiForScenarioStart() {
     phraseDiv.innerHTML = "";
 }
@@ -768,7 +773,7 @@ function getAudioConfig() {
     return SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
 }
 function getSpeechConfig(sdkConfigType) {
-    let speechConfig;
+    var speechConfig;
     if (authorizationToken) {
         speechConfig = sdkConfigType.fromAuthorizationToken(authorizationToken, region);
     }
@@ -787,25 +792,25 @@ function onRecognizedResult(result) {
     console.debug(`(recognized)  Reason: ${SpeechSDK.ResultReason[result.reason]}`);
     switch (result.reason) {
         case SpeechSDK.ResultReason.NoMatch:
-            let noMatchDetail = SpeechSDK.NoMatchDetails.fromResult(result);
+            var noMatchDetail = SpeechSDK.NoMatchDetails.fromResult(result);
             console.debug(` NoMatchReason: ${SpeechSDK.NoMatchReason[noMatchDetail.reason]}\r\n`);
             stopIfTimedOut();
             break;
         case SpeechSDK.ResultReason.Canceled:
-            let cancelDetails = SpeechSDK.CancellationDetails.fromResult(result);
+            var cancelDetails = SpeechSDK.CancellationDetails.fromResult(result);
             console.debug(` CancellationReason: ${SpeechSDK.CancellationReason[cancelDetails.reason]}`);
             console.debug(cancelDetails.reason === SpeechSDK.CancellationReason.Error
                 ? `: ${cancelDetails.errorDetails}` : ``);
             stopIfTimedOut();
             break;
         case SpeechSDK.ResultReason.RecognizedSpeech:
-            //let detailedResultJson = JSON.parse(result.json);
+            //var detailedResultJson = JSON.parse(result.json);
             //// Detailed result JSON includes substantial extra information:
             ////  detailedResultJson['NBest'] is an array of recognition alternates
             ////  detailedResultJson['NBest'][0] is the highest-confidence alternate
             ////  ...['Confidence'] is the raw confidence score of an alternate
             ////  ...['Lexical'] and others provide different result forms
-            //let displayText = detailedResultJson['DisplayText'];
+            //var displayText = detailedResultJson['DisplayText'];
             //phraseDiv.innerHTML += `Detailed result for "${displayText}":\r\n`
             //    + `${JSON.stringify(detailedResultJson, null, 2)}\r\n`;
             if (result.text) {
@@ -820,8 +825,8 @@ function onRecognizedResult(result) {
 function addPotentialMatches(result) {
     console.debug(result);
     let comp;
-    let matchString;
-    let newResultString;
+    var matchString;
+    var newResultString;
     comp =
         allCompetitors.find(c => c.sailNumber && result.startsWith(normalizeText(c.sailNumber) + " "));
     if (comp) {
@@ -840,7 +845,6 @@ function addPotentialMatches(result) {
             matchString = normalizeText(comp.name);
         }
     }
-    let scoreCode;
     if (comp) {
         addNewCompetitor(comp);
         timeOfLastRecognized = Date.now();
@@ -848,7 +852,7 @@ function addPotentialMatches(result) {
     }
     else {
         // look for scorecode
-        scoreCode = scoreCodes.find(sc => result.startsWith(normalizeText(sc.name) + " "));
+        var scoreCode = scoreCodes.find(sc => result.startsWith(normalizeText(sc.name) + " "));
         setLastCompCode(scoreCode.name);
         matchString = normalizeText(scoreCode.name);
         newResultString = result.substr(matchString.length).trimLeft();
@@ -905,8 +909,8 @@ function applyCommonConfigurationTo(recognizer) {
     // PhraseListGrammar allows for the customization of recognizer vocabulary.
     // See https://docs.microsoft.com/azure/cognitive-services/speech-service/get-started-speech-to-text#improve-recognition-accuracy
     if (competitorSuggestions) {
-        let phraseListGrammar = SpeechSDK.PhraseListGrammar.fromRecognizer(reco);
-        for (let index = 0; index < allCompetitors.length; index++) {
+        var phraseListGrammar = SpeechSDK.PhraseListGrammar.fromRecognizer(reco);
+        for (var index = 0; index < allCompetitors.length; index++) {
             if (allCompetitors[index].sailNumber) {
                 phraseListGrammar.addPhrase(allCompetitors[index].sailNumber);
             }
@@ -917,7 +921,7 @@ function applyCommonConfigurationTo(recognizer) {
                 phraseListGrammar.addPhrase(allCompetitors[index].name);
             }
         }
-        for (let index = 0; index < scoreCodes.length; index++) {
+        for (var index = 0; index < scoreCodes.length; index++) {
             phraseListGrammar.addPhrase(scoreCodes[index].name);
         }
     }
@@ -934,8 +938,8 @@ function doContinuousRecognition() {
         RequestAuthorizationToken(doContinuousRecognition);
         return;
     }
-    let audioConfig = getAudioConfig();
-    let speechConfig = getSpeechConfig(SpeechSDK.SpeechConfig);
+    var audioConfig = getAudioConfig();
+    var speechConfig = getSpeechConfig(SpeechSDK.SpeechConfig);
     if (!speechConfig)
         return;
     // Create the SpeechRecognizer and set up common event handlers and PhraseList data

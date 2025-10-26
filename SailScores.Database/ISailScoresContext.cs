@@ -40,6 +40,8 @@ namespace SailScores.Database
         DbSet<ClubRequest> ClubRequests { get; set; }
         DbSet<ClubSequence> ClubSequences { get; set; }
 
+        DbSet<SystemAlert> SystemAlerts { get; set; }
+
         DbSet<ChangeType> ChangeTypes { get; set; }
         DbSet<CompetitorChange> CompetitorChanges { get; set; }
 

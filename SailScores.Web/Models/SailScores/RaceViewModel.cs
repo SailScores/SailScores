@@ -43,7 +43,7 @@ public class RaceViewModel
 
     // New timing fields
     public DateTime? StartTime { get; set; }
-    public bool? TrackTimes { get; set; } = false;
+    public bool TrackTimes { get; set; }
 
     public string DisplayName
     {
