@@ -32,10 +32,9 @@ public class SystemAlertService : ISystemAlertService
                 new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
             
             var sanitizedHtml = _htmlSanitizer.Sanitize(markdownHtml);
-            
-            // Process time countdown if {{COUNTDOWN}} placeholder exists
-            sanitizedHtml = ProcessCountdown(sanitizedHtml, alert.ExpiresUtc);
-            
+
+            sanitizedHtml = ProcessLocalTime(sanitizedHtml, alert.ExpiresUtc);
+
             viewModels.Add(new SystemAlertViewModel
             {
                 Id = alert.Id,
@@ -47,10 +46,10 @@ public class SystemAlertService : ISystemAlertService
         return viewModels;
     }
     
-    private string ProcessCountdown(string html, DateTime expiresUtc)
+    private string ProcessLocalTime(string html, DateTime expiresUtc)
     {
-        // Replace {{COUNTDOWN}} with a span that will be updated with JavaScript
-        var countdownPattern = @"\{\{COUNTDOWN\}\}";
+        // Replace {{LOCALTIME}} with a span that will be updated with JavaScript
+        var countdownPattern = @"\{\{LOCALTIME\}\}";
         var timeout = TimeSpan.FromSeconds(1);
         
         if (Regex.IsMatch(html, countdownPattern, RegexOptions.IgnoreCase, timeout))

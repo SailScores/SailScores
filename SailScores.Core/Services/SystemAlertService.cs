@@ -30,6 +30,14 @@ public class SystemAlertService : ISystemAlertService
             .OrderBy(a => a.CreatedDate)
             .ToListAsync();
 
+        foreach (var alert in dbAlerts)
+        {
+            if (alert.ExpiresUtc.Kind != DateTimeKind.Utc)
+            {
+                alert.ExpiresUtc = DateTime.SpecifyKind(alert.ExpiresUtc, DateTimeKind.Utc);
+            }
+        }
+
         return _mapper.Map<IEnumerable<SystemAlert>>(dbAlerts);
     }
 }

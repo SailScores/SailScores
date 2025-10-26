@@ -41,25 +41,38 @@
                     var expiresTimestamp = parseInt(timer.getAttribute('data-expires'));
                     var now = Math.floor(Date.now() / 1000);
                     var secondsRemaining = expiresTimestamp - now;
-                    
+
+                    // Format local time with timezone
+                    var localDate = new Date(expiresTimestamp * 1000);
+                    var localTimeString = localDate.toLocaleString(undefined, {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        timeZoneName: 'short'
+                    });
+
+                    var countdownString = '';
                     if (secondsRemaining <= 0) {
-                        timer.textContent = 'now';
-                        return;
-                    }
-                    
-                    var hours = Math.floor(secondsRemaining / 3600);
-                    var minutes = Math.floor((secondsRemaining % 3600) / 60);
-                    
-                    if (hours > 24) {
-                        var days = Math.floor(hours / 24);
-                        timer.textContent = 'in ~' + days + ' day' + (days !== 1 ? 's' : '');
-                    } else if (hours > 0) {
-                        timer.textContent = 'in ~' + hours + ' hour' + (hours !== 1 ? 's' : '');
-                    } else if (minutes > 0) {
-                        timer.textContent = 'in ~' + minutes + ' minute' + (minutes !== 1 ? 's' : '');
+                        countdownString = 'now';
                     } else {
-                        timer.textContent = 'in less than a minute';
+                        var hours = Math.floor(secondsRemaining / 3600);
+                        var minutes = Math.floor((secondsRemaining % 3600) / 60);
+
+                        if (hours > 24) {
+                            var days = Math.floor(hours / 24);
+                            countdownString = 'in ' + days + ' day' + (days !== 1 ? 's' : '');
+                        } else if (hours > 0) {
+                            countdownString = 'in ~' + hours + ' hour' + (hours !== 1 ? 's' : '');
+                        } else if (minutes > 0) {
+                            countdownString = 'in ~' + minutes + ' minute' + (minutes !== 1 ? 's' : '');
+                        } else {
+                            countdownString = 'in less than a minute';
+                        }
                     }
+
+                    timer.textContent = `${localTimeString} (${countdownString})`;
                 });
             }
             
