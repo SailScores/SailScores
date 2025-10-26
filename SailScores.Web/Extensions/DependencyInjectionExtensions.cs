@@ -32,6 +32,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ITemplateHelper, TemplateHelper>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ISpeechService, SpeechService>();
+        services.AddScoped<ISystemAlertService, SystemAlertService>();
         services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
         services.AddScoped<ILocalizerService, LocalizerService>();
 

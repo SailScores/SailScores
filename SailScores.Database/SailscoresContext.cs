@@ -45,6 +45,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
+    public DbSet<SystemAlert> SystemAlerts { get; set; }
 
     // these sets below are not tables in the database 
     private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }

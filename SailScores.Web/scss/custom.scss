@@ -590,3 +590,36 @@ form label.required:not(.custom-control-label)::after {
         border-bottom: 1px none;
     }
 }
+
+/* System Alert Banner Styles */
+.system-alert {
+    margin-bottom: 0;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.system-alert .container-lg {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.system-alert .alert-content {
+    flex: 1;
+}
+
+.system-alert .alert-content > *:last-child {
+    margin-bottom: 0;
+}
+
+.system-alert .btn-close {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+

@@ -1,0 +1,86 @@
+@using SailScores.Web.Models.SailScores
+@model IEnumerable<SystemAlertViewModel>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var alert in Model)
+    {
+        var alertId = $"alert-{alert.Id}";
+        
+        <div class="alert alert-warning alert-dismissible fade show system-alert" id="@alertId" role="alert" data-alert-id="@alert.Id">
+            <div class="container-lg">
+                <div class="alert-content">
+                    @Html.Raw(alert.HtmlContent)
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    
+    <script>
+        (function() {
+            // Handle alert dismissal
+            document.querySelectorAll('.system-alert').forEach(function(alertElement) {
+                var alertId = alertElement.getAttribute('data-alert-id');
+                var dismissedKey = 'dismissed_' + alertId;
+                
+                // Check if this alert was dismissed in this session
+                if (sessionStorage.getItem(dismissedKey) === 'true') {
+                    alertElement.style.display = 'none';
+                }
+                
+                // Listen for dismiss event
+                alertElement.addEventListener('closed.bs.alert', function () {
+                    sessionStorage.setItem(dismissedKey, 'true');
+                });
+            });
+            
+            // Handle countdown timers
+            function updateCountdowns() {
+                document.querySelectorAll('.countdown-timer').forEach(function(timer) {
+                    var expiresTimestamp = parseInt(timer.getAttribute('data-expires'));
+                    var now = Math.floor(Date.now() / 1000);
+                    var secondsRemaining = expiresTimestamp - now;
+
+                    // Format local time with timezone
+                    var localDate = new Date(expiresTimestamp * 1000);
+                    var localTimeString = localDate.toLocaleString(undefined, {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        timeZoneName: 'short'
+                    });
+
+                    var countdownString = '';
+                    if (secondsRemaining <= 0) {
+                        countdownString = 'now';
+                    } else {
+                        var hours = Math.floor(secondsRemaining / 3600);
+                        var minutes = Math.floor((secondsRemaining % 3600) / 60);
+
+                        if (hours > 24) {
+                            var days = Math.floor(hours / 24);
+                            countdownString = 'in ' + days + ' day' + (days !== 1 ? 's' : '');
+                        } else if (hours > 0) {
+                            countdownString = 'in ~' + hours + ' hour' + (hours !== 1 ? 's' : '');
+                        } else if (minutes > 0) {
+                            countdownString = 'in ~' + minutes + ' minute' + (minutes !== 1 ? 's' : '');
+                        } else {
+                            countdownString = 'in less than a minute';
+                        }
+                    }
+
+                    timer.textContent = `${localTimeString} (${countdownString})`;
+                });
+            }
+            
+            // Update countdowns immediately and every minute
+            if (document.querySelectorAll('.countdown-timer').length > 0) {
+                updateCountdowns();
+                setInterval(updateCountdowns, 60000);
+            }
+        })();
+    </script>
+}
