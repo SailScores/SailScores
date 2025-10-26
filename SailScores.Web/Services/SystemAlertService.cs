@@ -51,11 +51,13 @@ public class SystemAlertService : ISystemAlertService
     {
         // Replace {{COUNTDOWN}} with a span that will be updated with JavaScript
         var countdownPattern = @"\{\{COUNTDOWN\}\}";
-        if (Regex.IsMatch(html, countdownPattern, RegexOptions.IgnoreCase))
+        var timeout = TimeSpan.FromSeconds(1);
+        
+        if (Regex.IsMatch(html, countdownPattern, RegexOptions.IgnoreCase, timeout))
         {
             var unixTimestamp = ((DateTimeOffset)expiresUtc).ToUnixTimeSeconds();
             var replacement = $"<span class=\"countdown-timer\" data-expires=\"{unixTimestamp}\"></span>";
-            html = Regex.Replace(html, countdownPattern, replacement, RegexOptions.IgnoreCase);
+            html = Regex.Replace(html, countdownPattern, replacement, RegexOptions.IgnoreCase, timeout);
         }
         
         return html;
