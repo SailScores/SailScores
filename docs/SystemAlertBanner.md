@@ -25,8 +25,8 @@ To create a new deployment alert, insert a record directly into the `SystemAlert
 INSERT INTO SystemAlerts (Id, Content, ExpiresUtc, CreatedDateUtc, CreatedBy, IsDeleted)
 VALUES (
     NEWID(),
-    'Scheduled maintenance on **Sunday, November 3rd** from **10:00 PM to 10:10 PM EST**. The site will be unavailable during this time.',
-    '2025-11-04 03:00:00',  -- Alert expires after deployment completes
+    'Scheduled maintenance on **[DAY], [DATE]** from **[START_TIME] to [END_TIME] [TIMEZONE]**. The site will be unavailable during this time.',
+    '[EXPIRATION_UTC_DATETIME]',  -- Alert expires after deployment completes (e.g., '2025-11-04 03:00:00')
     GETUTCDATE(),
     'admin',
     0
@@ -46,7 +46,7 @@ Example with formatting:
 ```markdown
 ⚠️ **Scheduled Deployment**
 
-We will be deploying updates on **Sunday, November 3rd** from **10:00 PM to 10:10 PM EST**.
+We will be deploying updates on **[DAY], [DATE]** from **[START_TIME] to [END_TIME] [TIMEZONE]**.
 
 During this time:
 - The site will be temporarily unavailable
