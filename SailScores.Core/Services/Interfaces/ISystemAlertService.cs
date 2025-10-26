@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Core.Model;
 
-namespace SailScores.Core.Services
+namespace SailScores.Core.Services;
+
+public interface ISystemAlertService
 {
-    public interface ISystemAlertService
-    {
-        Task<IEnumerable<SystemAlert>> GetActiveAlertsAsync();
-    }
+    Task<IEnumerable<SystemAlert>> GetActiveAlertsAsync();
 }
