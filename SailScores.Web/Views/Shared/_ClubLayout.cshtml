@@ -139,6 +139,9 @@
     }
 </header>
 
+@inject SailScores.Web.Services.Interfaces.ISystemAlertService SystemAlertService
+@await Html.PartialAsync("_SystemAlerts", await SystemAlertService.GetActiveAlertsAsync())
+
 <div class=" @(wideLayout? "container-fluid" : "container") body-content">
     <div class="row">
         @if (IsSectionDefined("Sidebar"))

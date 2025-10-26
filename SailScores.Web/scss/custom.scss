@@ -590,3 +590,22 @@ form label.required:not(.custom-control-label)::after {
         border-bottom: 1px none $border-color;
     }
 }
+
+/* System Alert Banner Styles */
+.system-alert {
+    margin-bottom: 0;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+}
+
+.system-alert .container-lg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.system-alert .btn-close {
+    margin-left: 1rem;
+}
+

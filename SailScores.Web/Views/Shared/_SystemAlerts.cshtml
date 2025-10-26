@@ -1,0 +1,41 @@
+@using SailScores.Core.Model
+@using Markdig
+@model IEnumerable<SystemAlert>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var alert in Model)
+    {
+        var alertId = "alert-" + alert.Id.ToString();
+        var dismissedKey = "dismissed_" + alert.Id.ToString();
+        
+        <div class="alert alert-warning alert-dismissible fade show system-alert" id="@alertId" role="alert" data-alert-id="@alert.Id">
+            <div class="container-lg">
+                @Html.Raw(Markdown.ToHtml(alert.Content ?? "", new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()))
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+        
+        <script>
+            (function() {
+                var alertId = '@alert.Id';
+                var dismissedKey = 'dismissed_' + alertId;
+                var alertElement = document.getElementById('@alertId');
+                
+                // Check if this alert was dismissed in this session
+                if (sessionStorage.getItem(dismissedKey) === 'true') {
+                    if (alertElement) {
+                        alertElement.style.display = 'none';
+                    }
+                }
+                
+                // Listen for dismiss event
+                if (alertElement) {
+                    alertElement.addEventListener('closed.bs.alert', function () {
+                        sessionStorage.setItem(dismissedKey, 'true');
+                    });
+                }
+            })();
+        </script>
+    }
+}

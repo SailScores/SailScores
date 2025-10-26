@@ -29,6 +29,7 @@ namespace SailScores.Core.Extensions
             services.AddScoped<IConversionService, ConversionService>();
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IForwarderService, ForwarderService>();
+            services.AddScoped<ISystemAlertService, SystemAlertService>();
 
         }
     }
