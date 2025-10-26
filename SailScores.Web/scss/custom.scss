@@ -577,16 +577,16 @@ form label.required:not(.custom-control-label)::after {
 
 @media (min-width: 576px) {
     .score-row:not(:last-child) {
-        border-bottom: 1px solid;
+        border-bottom: 1px solid var(--bs-table-border-color);
     }
 }
 /* Secondary rows: border except last on xs screens */
 @media (max-width: 575.98px) {
     .score-row-secondary:not(:last-child) {
-        border-bottom: 1px solid $border-color;
+        border-bottom: 1px solid var(--bs-table-border-color);
     }
 
     .score-row {
-        border-bottom: 1px none $border-color;
+        border-bottom: 1px none;
     }
 }
