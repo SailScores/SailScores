@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -62,6 +62,18 @@ namespace SailScores.Core.Services
                 .ScoringSystems
                 .Where(s => s.ClubId == null
                 && (s.IsSiteDefault ?? false))
+                .Include(s => s.ScoreCodes)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+            return _mapper.Map<Model.ScoringSystem>(dbObject);
+        }
+
+        public async Task<Model.ScoringSystem> GetBaseRegattaSystemAsync()
+        {
+            var dbObject = await _dbContext
+                .ScoringSystems
+                .Where(s => s.ClubId == null
+                   && s.Name == "Appendix A For Regatta")
                 .Include(s => s.ScoreCodes)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);

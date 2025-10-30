@@ -1,4 +1,4 @@
-﻿using Ganss.Xss;
+using Ganss.Xss;
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Web.Resources;
 using SailScores.Web.Services;
@@ -33,8 +33,11 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ISpeechService, SpeechService>();
         services.AddScoped<ISystemAlertService, SystemAlertService>();
+        services.AddScoped<IOcrService, OcrService>();
+        services.AddScoped<ISupporterService, SupporterService>();
         services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
         services.AddScoped<ILocalizerService, LocalizerService>();
+        services.AddTransient<IStripeService, StripeService>();
 
 
         services.AddSingleton<AppVersionInfo>();

@@ -13,6 +13,8 @@ public class AppSettingsService
         _config = config;
     }
 
+    public bool ShowSupporterFeatures => _config.GetValue<bool>("ShowSupporterFeatures");
+
     public string GetPreferredUri(HttpRequest request)
     {
         var preferredhost = _config["PreferredHost"];

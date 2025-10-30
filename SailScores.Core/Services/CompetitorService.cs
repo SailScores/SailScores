@@ -63,6 +63,7 @@ public class CompetitorService : ICompetitorService
                 dbObjects = dbObjects
                     .Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleetId));
             }
+            // Note that all boats in club fleet type will fall through to return all.
         }
 
         var list = await dbObjects

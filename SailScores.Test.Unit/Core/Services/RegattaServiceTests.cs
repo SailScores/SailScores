@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Moq;
 using SailScores.Core.Mapping;
 using SailScores.Core.Services;
@@ -78,7 +78,6 @@ public class RegattaServiceTests
                 return Task.FromResult((IList<SailScores.Core.Model.Competitor>)mapped);
             });
 
-
         //yep, this means we are testing the real DbObjectBuilder as well:
         _dbObjectBuilder = new DbObjectBuilder(
             _context,
@@ -92,7 +91,6 @@ public class RegattaServiceTests
             _dbObjectBuilder,
             _mapper
             );
-
 
     }
 
@@ -192,5 +190,4 @@ public class RegattaServiceTests
         Assert.Contains(_context.Regattas.First().RegattaFleet, rf =>
                 rf.FleetId == fleet.Id);
     }
-
 }

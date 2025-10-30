@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,6 +21,8 @@ namespace SailScores.Core.Model
         public String Url { get; set; }
         public bool? UseAdvancedFeatures { get; set; }
         public bool? UseExperimentalFeatures { get; set; }
+        public DateTime? AdvancedFeaturesEnabledDate { get; set; }
+        public String SubscriptionType { get; set; }
 
         public int? DefaultRaceDateOffset { get; set; }
 

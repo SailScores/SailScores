@@ -1,0 +1,96 @@
+@model SailScores.Web.Models.SailScores.SupporterWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Edit Supporter";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <h2>Edit Supporter</h2>
+    <hr />
+    
+    <div class="row">
+        <div class="col-lg-6 col-md-8">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="LogoFileId" />
+                <input type="hidden" asp-for="CreatedDate" />
+                <input type="hidden" asp-for="CreatedBy" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                @if (Model.LogoFileId.HasValue)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Current Logo</label>
+                        <div>
+                            <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo" class="img-thumbnail supporter-logo-preview" />
+                        </div>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label asp-for="LogoFile" class="form-label"></label>
+                    <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" />
+                    <span asp-validation-for="LogoFile" class="text-danger"></span>
+                    <small class="form-text text-muted">Upload a new logo image (max 2 MB) to replace the current one. Supported formats: PNG, JPG, GIF.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LogoUrl" class="form-label"></label>
+                    <input asp-for="LogoUrl" class="form-control" />
+                    <span asp-validation-for="LogoUrl" class="text-danger"></span>
+                    <small class="form-text text-muted">Alternative: Full URL to an external logo image (e.g., https://example.com/logo.png)</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="WebsiteUrl" class="form-label"></label>
+                    <input asp-for="WebsiteUrl" class="form-control" />
+                    <span asp-validation-for="WebsiteUrl" class="text-danger"></span>
+                    <small class="form-text text-muted">Full URL to the website (e.g., https://example.com)</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Note" class="form-label"></label>
+                    <textarea asp-for="Note" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Note" class="text-danger"></span>
+                    <small class="form-text text-muted">A brief note about the supporter</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ClubInitials" class="form-label"></label>
+                    <input asp-for="ClubInitials" class="form-control" />
+                    <span asp-validation-for="ClubInitials" class="text-danger"></span>
+                    <small class="form-text text-muted">Optional: Link to a club page on SailScores</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ExpirationDate" class="form-label"></label>
+                    <input asp-for="ExpirationDate" type="date" class="form-control" />
+                    <span asp-validation-for="ExpirationDate" class="text-danger"></span>
+                    <small class="form-text text-muted">Optional: When this supporter recognition expires</small>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsVisible" class="form-check-input" />
+                    <label asp-for="IsVisible" class="form-check-label"></label>
+                    <span asp-validation-for="IsVisible" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-outline-primary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

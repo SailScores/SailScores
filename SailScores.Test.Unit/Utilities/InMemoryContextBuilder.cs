@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
@@ -79,7 +79,7 @@ public class InMemoryContextBuilder
             }
         };
         context.Competitors.Add(competitor);
-
+        
         var inactiveCompetitor = new Competitor
         {
             Id = Guid.NewGuid(),
@@ -178,7 +178,7 @@ public class InMemoryContextBuilder
         context.Series.Add(regattaSeries);
         var regattaFleet = new
             Fleet
-        { FleetType = Api.Enumerations.FleetType.AllBoatsInClub };
+            {FleetType = Api.Enumerations.FleetType.AllBoatsInClub};
         context.Fleets.Add(regattaFleet);
         var regatta = new Regatta
         {

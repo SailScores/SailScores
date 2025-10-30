@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Core.Model;
@@ -33,4 +33,6 @@ public interface IClubService
     Task UpdateStatsDescription(Guid clubId, string statisticsDescription);
     Task<string> GetClubName(string clubInitials);
     Task<bool> HasCompetitorsAsync(Guid id);
+    Task SetUseAdvancedFeaturesAsync(Guid clubId, bool enabled);
+    Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType);
 }

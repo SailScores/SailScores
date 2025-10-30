@@ -1,70 +1,196 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+using SailScores.Api.Enumerations;
+using SailScores.Core.Extensions;
+using SailScores.Core.FlatModel;
 using SailScores.Database;
+using SailScores.Web.Models.SailScores;
+using System.Globalization;
 using System.Reflection;
+using System.Text;
 
-namespace SailScores.Web.Resources
+namespace SailScores.Web.Resources;
+
+public class LocalizerService : ILocalizerService
 {
-    public class LocalizerService : ILocalizerService
+    private readonly IStringLocalizer _localizer;
+    private readonly ISailScoresContext _dbContext;
+    private readonly IMemoryCache _cache;
+
+    private readonly string cacheKeyName = "ClubLocaleCache";
+
+    private static bool _includePseudo;
+
+    public LocalizerService(
+        IStringLocalizerFactory factory,
+        ISailScoresContext dbContext,
+        IMemoryCache memoryCache)
     {
-        private readonly IStringLocalizer _localizer;
-        private readonly ISailScoresContext _dbContext;
-        private readonly IMemoryCache _cache;
+        var type = typeof(SharedResource);
+        var assemblyName = new AssemblyName(type.GetTypeInfo().Assembly.FullName);
+        _localizer = factory.Create("SharedResource", assemblyName.Name);
+        _dbContext = dbContext;
+        _cache = memoryCache;
+    }
 
-        private readonly string cacheKeyName = "ClubLocaleCache";
+    public string this[string key] => _localizer[key];
 
-        public LocalizerService(
-            IStringLocalizerFactory factory,
-            ISailScoresContext dbContext,
-            IMemoryCache memoryCache)
+    public string GetFullRaceName(RaceViewModel race)
+    {
+        var sb = new StringBuilder();
+
+        if (!string.IsNullOrWhiteSpace(race.Name))
         {
-            var type = typeof(SharedResource);
-            var assemblyName = new AssemblyName(type.GetTypeInfo().Assembly.FullName);
-            _localizer = factory.Create("SharedResource", assemblyName.Name);
-            _dbContext = dbContext;
-            _cache = memoryCache;
+            sb.Append(race.Name);
+            sb.Append(' ');
         }
 
-        public LocalizedString GetLocalizedHtmlString(string key)
+        var useParens = !string.IsNullOrWhiteSpace(race.Name) && race.Date.HasValue;
+        if (useParens) sb.Append('(');
+
+        switch (race.State)
         {
-            return _localizer[key];
+            case RaceState.Scheduled:
+                sb.Append(_localizer["Scheduled for"]);
+                sb.Append(' ');
+                break;
+            case RaceState.Abandoned:
+                sb.Append(_localizer["Abandoned"]);
+                sb.Append(". ");
+                break;
         }
 
-        public async Task UpdateCulture(string initials, string locale)
+        if (race.Date.HasValue)
         {
-            var clubInitialsToLocales = _dbContext.Clubs
-                        .ToDictionary(
-                            c => c.Initials.ToUpperInvariant(),
-                            c => c.Locale);
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(300)
-            };
-            clubInitialsToLocales[initials.ToUpperInvariant()] = locale;
-
-            // Save data in cache.
-            _cache.Set(cacheKeyName, clubInitialsToLocales, cacheEntryOptions);
+            sb.Append(race.Date.Value.ToString("D", CultureInfo.CurrentCulture));
         }
 
-        public Dictionary<string, string> SupportedLocalizations
+        if (race.Order > 0 && race.State != RaceState.Scheduled)
         {
-            get
-            {
-                return _supportedLocalizations;
-            }
+            sb.Append(' ');
+            sb.Append(GetRaceLetter());
+            sb.Append(race.Order);
         }
 
-        public string DefaultLocalization { get { return "en-US"; } }
+        if (useParens) sb.Append(')');
 
-        private Dictionary<string, string> _supportedLocalizations =
-            new Dictionary<string, string> {
-                { "en-AU", "English (Australia)" },
-                { "en-IE", "English (Ireland)" },
-                { "en-US", "English (United States)" },
-                { "fi-FI", "Finnish (Finland)" },
-                { "sv-FI", "Swedish (Finland)" },
-            };
+        return sb.ToString();
+    }
+
+    public string GetShortName(FlatRace race)
+    {
+        if (string.IsNullOrEmpty(race.Name))
+        {
+            var firstLetter = GetRaceLetter();
+            return $"{race.Date.ToSuperShortString()} {firstLetter}{race.Order}";
+        }
+        else if ((race.IsSeries ?? false) && race.StartDate != null && race.EndDate != null)
+        {
+            return $"{race.Name} ({race.StartDate.ToSuperShortString()} - {race.EndDate.ToSuperShortString()})";
+        }
+        else
+        {
+            return $"{race.Name} ({race.Date.ToSuperShortString()})";
+        }
+    }
+
+    public string GetRaceLetter()
+    {
+        var s = _localizer["Race"].ToString();
+        var first = string.IsNullOrEmpty(s) ? "R" : s.Substring(0, 1);
+        return CultureInfo.CurrentCulture.TextInfo.ToUpper(first);
+    }
+
+    public LocalizedString GetLocalizedHtmlString(string key) => _localizer[key];
+
+    public async Task UpdateCulture(string initials, string locale)
+    {
+        var clubInitialsToLocales = await _dbContext.Clubs
+            .ToDictionaryAsync(c => c.Initials.ToUpperInvariant(), c => c.Locale);
+
+        var cacheEntryOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(300)
+        };
+
+        clubInitialsToLocales[initials.ToUpperInvariant()] = locale;
+        _cache.Set(cacheKeyName, clubInitialsToLocales, cacheEntryOptions);
+    }
+
+    public string DefaultLocalization => "en-US";
+
+    private static Dictionary<string, string> _supportedLocalizations =
+        new Dictionary<string, string> {
+            { "en-AU", "English (Australia)" },
+            { "en-CA", "English (Canada)" },
+            { "en-DE", "English (Germany)" },
+            { "en-GB", "English (Great Britain)" },
+            { "en-IE", "English (Ireland)" },
+            { "en-ZA", "English (South Africa)" },
+            { "en-US", "English (United States)" },
+            { "fi-FI", "Finnish (Finland)" },
+            { "sr-Latn-RS", "Serbian Latin (Serbia)" },
+            { "es-AR", "Spanish (Argentina)" },
+            { "sv-FI", "Swedish (Finland)" },
+        };
+
+    public static Dictionary<string, string> GetSupportedLocalisations(bool includePseudo)
+    {
+        _includePseudo = includePseudo;
+        var map = new Dictionary<string, string>(_supportedLocalizations);
+        if (includePseudo)
+        {
+            map["qps-ploc"] = "Pseudo-Localized";
+        }
+        return map;
+    }
+
+    public static List<CultureInfo> GetSupportedCultures(bool includePseudo)
+    {
+        _includePseudo = includePseudo;
+        var map = new Dictionary<string, string>(_supportedLocalizations);
+        if (includePseudo)
+        {
+            map["qps-ploc"] = "Pseudo-Localized";
+        }
+        return map.Select(l => new CultureInfo(l.Key)).ToList();
+    }
+
+    public static List<CultureInfo> GetSupportedCultures()
+    {
+        return GetSupportedCultures(_includePseudo); 
+    }
+
+    public string GetLocaleLongName(string locale)
+    {
+        var locales = GetAllLocales();
+        if (string.IsNullOrWhiteSpace(locale))
+        {
+            return locales[DefaultLocalization];
+        }
+        var found = locales.TryGetValue(locale, out var longName);
+        return found ? longName! : locales[DefaultLocalization];
+    }
+
+    public string GetLocaleShortName(string locale)
+    {
+        var allLocales = GetAllLocales();
+        if (string.IsNullOrWhiteSpace(locale) || !allLocales.ContainsValue(locale)) {
+        
+            return DefaultLocalization;
+        }
+
+        return allLocales.First(l => l.Value == locale).Key;
+
+    }
+    private Dictionary<string, string> GetAllLocales()
+    {
+        var locales = new Dictionary<string, string>(_supportedLocalizations);
+        if (!locales.ContainsKey("qps-ploc"))
+        {
+            locales["qps-ploc"] = "Pseudo-Localized";
+        }
+        return locales;
     }
 }

@@ -216,23 +216,8 @@
   <data name="Scores" xml:space="preserve">
     <value>Tulokset</value>
   </data>
-  <data name="Log out" xml:space="preserve">
-    <value>Kirjaudu ulos</value>
-  </data>
-  <data name="Regattas" xml:space="preserve">
-    <value>Regatat</value>
-  </data>
   <data name="CapCompetitors" xml:space="preserve">
     <value>Kilpailijat</value>
-  </data>
-  <data name="Results" xml:space="preserve">
-    <value>Tuloksia</value>
-  </data>
-  <data name="No results posted" xml:space="preserve">
-    <value>Ei tuoreita tuloksia</value>
-  </data>
-  <data name="Change" xml:space="preserve">
-    <value>Muutos</value>
   </data>
   <data name="Previous Day" xml:space="preserve">
     <value>edelliseen päivään</value>
@@ -248,6 +233,21 @@
   </data>
   <data name="Updated" xml:space="preserve">
     <value>Päivitetty</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Kirjaudu ulos</value>
+  </data>
+  <data name="Regattas" xml:space="preserve">
+    <value>Regatat</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Tuloksia</value>
+  </data>
+  <data name="No results posted" xml:space="preserve">
+    <value>Ei tuoreita tuloksia</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Muutos</value>
   </data>
   <data name="Abandoned" xml:space="preserve">
     <value>Hylätty</value>
@@ -320,5 +320,8 @@
   </data>
   <data name="Top Series" xml:space="preserve">
     <value>Huippusarja</value>
+  </data>
+  <data name="boats" xml:space="preserve">
+    <value>boats</value>
   </data>
 </root>

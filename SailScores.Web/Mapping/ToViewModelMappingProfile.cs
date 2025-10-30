@@ -230,6 +230,11 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.ClubName, o => o.Ignore())
                 .ReverseMap()
                 .ForMember(d => d.Fleets, o => o.Ignore());
+
+            CreateMap<Model.Supporter, SupporterViewModel>();
+            CreateMap<Model.Supporter, SupporterWithOptionsViewModel>()
+                .ReverseMap();
+            CreateMap<SupporterWithOptionsViewModel, Model.Supporter>();
         }
 
         private decimal? ParseDecimal(string decimalString)

@@ -7,7 +7,7 @@
 @using SailScores.Web.Services.Interfaces
 @using System.Text
 
-@inject IStringLocalizer<SharedResource> localizer
+@inject ILocalizerService localizer
 @inject IWeatherService weatherService
 
 @model ResultsTableViewModel
@@ -64,16 +64,16 @@
                             <th class="text-center d-none d-sm-table-cell" scope="col">
                                 @if (Model.IsExport)
                                 {
-                                    @race.ShortName
+                                    @localizer.GetShortName(race)
                                 }
                                 else
                                 {
                                     if(race.IsSeries ?? false)
                                     {
-                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@race.ShortName</a>
+                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@localizer.GetShortName(race)</a>
                                     } else {
                                     @Html.ActionLink(
-                                                 @race.ShortName
+                                                 @localizer.GetShortName(race)
                                                  , "Details", "Race", new { id = race.Id })
                                     }
                                     <div class="weather">
@@ -102,18 +102,18 @@
                             <th class="text-center" scope="col">
                                 @if (Model.IsExport)
                                 {
-                                    @race.ShortName
+                    @localizer.GetShortName(race)
                                 }
                                 else
                                 {
                                     if (race.IsSeries ?? false)
                                     {
-                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@race.ShortName</a>
+                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@localizer.GetShortName(race)</a>
                                     }
                                     else
                                     {
                                         @Html.ActionLink(
-                                        @race.ShortName
+                                        @localizer.GetShortName(race)
                                         , "Details", "Race", new { id = race.Id })
                                     }
                                     <br />
@@ -281,7 +281,7 @@
                             if (firstRow)
                             {
                                     <td rowspan="@(Model.Results?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
-                                    <span>ABANDONED</span>
+                                    <span>@localizer["Abandoned"].ToUpper()</span>
                                 </td>
                             }
                         }
@@ -290,7 +290,7 @@
                             if (firstRow)
                             {
                                     <td rowspan="@(Model.Results?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
-                                    <span>SCHEDULED</span>
+                                        <span>@localizer["Scheduled"].ToUpper()</span>
                                 </td>
                             }
                         }

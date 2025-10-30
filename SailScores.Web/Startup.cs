@@ -32,6 +32,7 @@ using MailChimp.Net.Interfaces;
 using MailChimp.Net;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using SailScores.Web.Resources;
 
 namespace SailScores.Web;
 
@@ -49,28 +50,22 @@ public class Startup
     {
         ConfigureAppInsightsTelemetry(services);
 
-        services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
-        services.Configure<RequestLocalizationOptions>(options =>
-        {
-            options.SupportedCultures = new List<CultureInfo> {
-                new CultureInfo("en-US"),
-                new CultureInfo("fi-FI"),
-                new CultureInfo("sv-FI"),
-                new CultureInfo("en-AU"),
-                new CultureInfo("en-IE"),
-            };
-            options.SupportedUICultures = new List<CultureInfo> {
-                new CultureInfo("en-US"),
-                new CultureInfo("fi-FI"),
-                new CultureInfo("sv-FI"),
-                new CultureInfo("en-AU"),
-                new CultureInfo("en-IE"),
-            };
+        services.AddLocalization();
 
-            options.RequestCultureProviders = new List<IRequestCultureProvider>
-            { new ClubCultureProvider()
-            };
-        });
+
+        services.AddOptions<RequestLocalizationOptions>()
+            .Configure<IWebHostEnvironment>((options, env) =>
+            {
+                var cultures = LocalizerService.GetSupportedCultures(env.IsDevelopment());
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+                options.SupportedCultures = cultures;
+                options.SupportedUICultures = cultures;
+                options.RequestCultureProviders = new List<IRequestCultureProvider>
+                {
+                    new ClubCultureProvider()
+                };
+            });
+
 
         // Register the Swagger generator, defining 1 or more Swagger documents
         services.AddSwaggerGen(c =>
@@ -106,8 +101,11 @@ public class Startup
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         services
-            .AddAuthentication()
-            .AddCookie(options => options.SlidingExpiration = true)
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            })
             .AddJwtBearer(cfg =>
             {
                 cfg.RequireHttpsMetadata = false;
@@ -128,11 +126,11 @@ public class Startup
         {
             options.LoginPath = new PathString("/Account/Login");
             options.LogoutPath = new PathString("/Account/Logout");
+            options.SlidingExpiration = true;
 
             options.Events.OnRedirectToLogin = context =>
             {
-                if (context.Request.Path.StartsWithSegments("/api", StringComparison.InvariantCulture)
-                    && context.Response.StatusCode == StatusCodes.Status200OK)
+                if (context.Request.Path.StartsWithSegments("/api", StringComparison.InvariantCulture))
                 {
                     context.Response.Clear();
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -231,6 +229,7 @@ public class Startup
         services.RegisterWebSailScoresServices();
 
         services.AddDbContext<ISailScoresContext, SailScoresContext>();
+
     }
 
 

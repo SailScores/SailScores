@@ -1,0 +1,72 @@
+@model SailScores.Web.Models.SailScores.SupporterWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Delete Supporter";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <h2>Delete Supporter</h2>
+    <hr />
+    
+    <div class="alert alert-warning">
+        <h4>Are you sure you want to delete this supporter?</h4>
+        <p>This action will hide the supporter from the public list. The record will remain in the database and can be restored by editing and setting it to visible.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-md-8">
+            <dl class="row">
+                <dt class="col-sm-4">Name</dt>
+                <dd class="col-sm-8">@Model.Name</dd>
+
+                @if (Model.LogoFileId.HasValue || !string.IsNullOrWhiteSpace(Model.LogoUrl))
+                {
+                    <dt class="col-sm-4">Logo</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.LogoFileId.HasValue)
+                        {
+                            <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="@Model.Name logo" class="img-thumbnail supporter-logo-preview">
+                        }
+                        else if (!string.IsNullOrWhiteSpace(Model.LogoUrl))
+                        {
+                            <img src="@Model.LogoUrl" alt="@Model.Name logo" class="img-thumbnail supporter-logo-preview">
+                        }
+                    </dd>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.WebsiteUrl))
+                {
+                    <dt class="col-sm-4">Website</dt>
+                    <dd class="col-sm-8">
+                        <a href="@Model.WebsiteUrl" target="_blank" rel="noopener noreferrer">@Model.WebsiteUrl</a>
+                    </dd>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Note))
+                {
+                    <dt class="col-sm-4">Note</dt>
+                    <dd class="col-sm-8">@Model.Note</dd>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.ClubInitials))
+                {
+                    <dt class="col-sm-4">Club</dt>
+                    <dd class="col-sm-8">@Model.ClubInitials</dd>
+                }
+
+                @if (Model.ExpirationDate.HasValue)
+                {
+                    <dt class="col-sm-4">Expiration</dt>
+                    <dd class="col-sm-8">@Model.ExpirationDate.Value.ToString("yyyy-MM-dd")</dd>
+                }
+            </dl>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a asp-action="Index" class="btn btn-outline-primary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

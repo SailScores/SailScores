@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
@@ -140,6 +140,19 @@ namespace SailScores.Core.Services
             return await _dbContext.UserPermissions
                 .AnyAsync(u => u.UserEmail == email &&
                                u.CanEditAllClubs)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<IList<Guid>> GetClubIdsForUserEmailAsync(string email)
+        {
+            // Use a single query with a join to get club IDs that exist in both tables
+            return await _dbContext.UserPermissions
+                .Where(u => u.UserEmail == email && u.ClubId.HasValue)
+                .Join(_dbContext.Clubs,
+                    permission => permission.ClubId.Value,
+                    club => club.Id,
+                    (permission, club) => club.Id)
+                .ToListAsync()
                 .ConfigureAwait(false);
         }
     }

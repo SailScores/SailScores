@@ -1,4 +1,4 @@
-﻿namespace SailScores.Database.Entities;
+namespace SailScores.Database.Entities;
 
 public class Club
 {
@@ -21,6 +21,9 @@ public class Club
 
     public bool? UseAdvancedFeatures { get; set; }
     public bool? UseExperimentalFeatures { get; set; }
+    public DateTime? AdvancedFeaturesEnabledDate { get; set; }
+    [StringLength(20)]
+    public String SubscriptionType { get; set; }
 
     public String StatisticsDescription { get; set; }
     public WeatherSettings WeatherSettings { get; set; }

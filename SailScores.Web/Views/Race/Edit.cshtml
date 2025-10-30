@@ -127,7 +127,7 @@
                                 <div class="row">
                                     <label asp-for="Weather.WindSpeed" class="control-label col-4 col-form-label pe-0 text-end">Wind</label>
                                     <div class="col-4">
-                                        <input id="windSpeed" asp-for="Weather.WindSpeed" class="form-control text-center" type="number" />
+                                        <input id="windSpeed" asp-for="Weather.WindSpeed" class="form-control text-center px-1" type="number" />
                                     </div>
                                     <div class="col-4 col-form-label ps-0">@Model.Weather?.WindSpeedUnits</div>
                                     <span asp-validation-for="Weather.WindSpeed" class="text-danger"></span>
@@ -137,7 +137,7 @@
                                 <div class="row">
                                     <label asp-for="Weather.WindDirection" class="control-label col-4 col-form-label pe-0 text-end">Dir</label>
                                     <div class="col-4">
-                                        <input id="windDirection" asp-for="Weather.WindDirection" class="form-control text-center" />
+                                        <input id="windDirection" asp-for="Weather.WindDirection" class="form-control text-center px-1" />
                                         <span asp-validation-for="Weather.WindDirection" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -148,7 +148,7 @@
                                 <div class="row">
                                     <label asp-for="Weather.WindGust" class="control-label col-4 col-form-label pe-0 text-end">Gust</label>
                                     <div class="col-4">
-                                        <input id="windGust" asp-for="Weather.WindGust" class="form-control text-center" type="number" />
+                                        <input id="windGust" asp-for="Weather.WindGust" class="form-control text-center px-1" type="number" />
                                     </div>
                                     <div class="col-4 col-form-label ps-0">@Model.Weather?.WindSpeedUnits</div>
                                     <span asp-validation-for="Weather.WindGust" class="text-danger"></span>
@@ -158,7 +158,7 @@
                                 <div class="row">
                                     <label asp-for="Weather.Temperature" class="control-label col-4 col-form-label pe-0 text-end">Temp</label>
                                     <div class="col-4">
-                                        <input id="temperature" asp-for="Weather.Temperature" class="form-control text-center" type="number" />
+                                        <input id="temperature" asp-for="Weather.Temperature" class="form-control text-center px-1" type="number" />
                                     </div>
                                     <div class="col-4 col-form-label ps-0">@Model.Weather?.TemperatureLabel</div>
                                     <span asp-validation-for="Weather.Temperature" class="text-danger"></span>
@@ -303,22 +303,24 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12 col-lg-4 mb-3">
+            <div class="col-12 col-lg-6 col-xl-4 mb-3">
                 <div class="mb-3">
                     <label class="control-label h4">Add result:</label>
                     <div class="input-group">
                         <input id="newCompetitor" type="text" class="form-control" />
                         @if (Model.UseAdvancedFeatures)
                         {
-                            <div class="input-group-btn z-0">
-                                <button class="btn btn-outline-success" id="scenarioStartButton" type="button">
-                                    <span class="fas fa-microphone"></span>
-                                </button>
-                                <button class="btn btn-outline-danger" id="scenarioStopButton" type="button"
-                                        style="display: none;">
-                                    <span class="fas fa-microphone-slash"></span>
-                                </button>
-                            </div>
+                            <button type="button" class="btn btn-outline-secondary rounded-0 rounded-end-0" id="ocrButton" disabled
+                                    data-bs-toggle="modal" data-bs-target="#ocrUploadModal">
+                                <span class="fas fa-camera"></span>
+                            </button>
+                            <button class="btn btn-outline-success rounded-0 rounded-end" id="scenarioStartButton" type="button" disabled>
+                                <span class="fas fa-microphone"></span>
+                            </button>
+                            <button class="btn btn-outline-danger rounded-0 rounded-end" id="scenarioStopButton" type="button"
+                                    style="display: none;">
+                                <span class="fas fa-microphone-slash"></span>
+                            </button>
                         }
                     </div>
                 </div>
@@ -408,6 +410,9 @@
 
 @await Html.PartialAsync("_competitorCreate", Model)
 
+@if(Model.UseAdvancedFeatures) {
+  @await Html.PartialAsync("_OcrUploadModal")
+}
 @section PreFooter {
     <footer class="footer mt-auto py-3 score-entry" id="scoreButtonFooter" style="display: none;">
         <div class="container footer-header">
@@ -424,7 +429,11 @@
 }
 
 @section Scripts {
-    <script>
+    @if (Model.UseAdvancedFeatures)
+    {
+      <link rel="stylesheet" href="~/css/cropper.css" />
+    }
+  <script>
         $(function () {
             $('[data-bs-toggle="popover"]').popover()
         });
@@ -457,6 +466,10 @@
                 event.params.args.originalEvent.stopPropagation();
         });
     </script>
+    @if (Model.UseAdvancedFeatures)
+    {
+        <script src="~/js/ocrRaceEntry.min.js" asp-append-version="true"></script>
+    }
     <script src="~/js/raceEditor.min.js" asp-append-version="true"></script>
     @* <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script> *@
     @if (Model.UseAdvancedFeatures)

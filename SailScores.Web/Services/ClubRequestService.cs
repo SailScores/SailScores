@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
@@ -109,6 +109,9 @@ public class ClubRequestService : IClubRequestService
             "AUTH",
             "USER",
             "SITEMAP",
+            "HELP",
+            "DOCS",
+            "ADMIN",
 
             "CSS",
             "VENDOR",
@@ -164,14 +167,28 @@ public class ClubRequestService : IClubRequestService
         }
         else
         {
+            var scoringSystemList = new List<ScoringSystem>();
             var baseScoringSystem = await _coreScoringService.GetSiteDefaultSystemAsync();
 
-            ScoringSystem newScoringSystem = new ScoringSystem
+            var newScoringSystem = new ScoringSystem
             {
                 ParentSystemId = baseScoringSystem.Id,
-                Name = $"{request.ClubInitials} scoring based on App. A Rule 5.3",
-                DiscardPattern = "0,1"
+                Name = $"{request.ClubInitials} scoring based on App. A Rule 5.1",
+                DiscardPattern = "0"
             };
+            scoringSystemList.Add(newScoringSystem);
+
+
+            var regattaScoringSystem = await _coreScoringService.GetBaseRegattaSystemAsync();
+            if (regattaScoringSystem != null)
+            {
+                scoringSystemList.Add(new ScoringSystem
+                {
+                    ParentSystemId = regattaScoringSystem.Id,
+                    Name = $"{request.ClubInitials} scoring based on App. A",
+                    DiscardPattern = "0,1"
+                });
+            }
 
             var initialsToUse = request.ClubInitials + (test ? "TEST" : "");
 
@@ -186,7 +203,7 @@ public class ClubRequestService : IClubRequestService
                 Url = request.ClubWebsite,
                 DefaultScoringSystem = newScoringSystem,
                 Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_" + request.ClubLocation + "_"),
-                ScoringSystems = new List<ScoringSystem> { newScoringSystem },
+                ScoringSystems = scoringSystemList,
                 Locale = "en-US"
             };
 
