@@ -190,7 +190,8 @@ export function deleteResult() {
 export function confirmDelete() {
     var btn = event.target;
     var resultItem = $(btn).closest("li");
-    var compId = resultItem[0].dataset.competitorid;
+    var listElement = resultItem.get(0);
+    var compId = listElement.dataset.competitorid;
     var compName = resultItem.find(".competitor-name").text();
     if (!compName) {
         compName = resultItem.find(".sail-number").text();

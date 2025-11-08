@@ -14,6 +14,9 @@ using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService
 using SailScores.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using SailScores.Identity.Entities;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {
@@ -49,8 +52,11 @@ namespace SailScores.Test.Unit.Web.Controllers
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
             _csvServiceMock = new Mock<ICsvService>();
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
-            _userManagerMock = new Mock<UserManager<ApplicationUser>>();
 
+            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
+            _userManagerMock = new Mock<UserManager<ApplicationUser>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>()))
+                .ReturnsAsync(new ApplicationUser { FirstName = "Test", LastName = "User" });
 
             _controller = new CompetitorController(
                 _clubServiceMock.Object,
@@ -84,7 +90,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             //Assert
             var redirect = Assert.IsType<RedirectToActionResult>(result);
 
-            Assert.Equal("Admin", redirect.ControllerName);
+            Assert.Equal("Competitor", redirect.ControllerName);
         }
 
         [Fact]
@@ -96,8 +102,8 @@ namespace SailScores.Test.Unit.Web.Controllers
             var vm = new CompetitorWithOptionsViewModel();
             await _controller.Create(_clubInitials, vm);
 
-            _competitorServiceMock.Verify(s => s.SaveAsync(vm, string.Empty), Times.Once);
 
+            _competitorServiceMock.Verify(s => s.SaveAsync(vm, "Test User"), Times.Once);
         }
 
         [Fact]

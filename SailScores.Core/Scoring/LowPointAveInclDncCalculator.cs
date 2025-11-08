@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    public class LowPointAverageCalculator : BaseScoringCalculator
+    public class LowPointAveInclDncCalculator : BaseScoringCalculator
     {
-        public LowPointAverageCalculator(ScoringSystem scoringSystem) : base(scoringSystem)
+        public LowPointAveInclDncCalculator(ScoringSystem scoringSystem) : base(scoringSystem)
         {
             CompetitorComparer = new LowPointSeriesCompComparer();
         }

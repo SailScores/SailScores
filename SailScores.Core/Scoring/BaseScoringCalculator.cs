@@ -105,6 +105,7 @@ namespace SailScores.Core.Scoring
             return returnResults;
         }
 
+        // The place for scoring methods to override how DNCs are handled.
         protected virtual void CalculateOverrides(
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)
@@ -432,6 +433,10 @@ namespace SailScores.Core.Scoring
 
         protected ScoreCode GetScoreCode(Score score)
         {
+            if (score == null)
+            {
+                return null;    
+            }
             return GetScoreCode(score.Code);
         }
 
@@ -572,7 +577,7 @@ namespace SailScores.Core.Scoring
 
         private SeriesResults GetResults(Series series)
         {
-            SeriesResults returnResults = BuildResults(series);
+            SeriesResults returnResults = GatherInitialResults(series);
 
             SetScores(returnResults,
                 series
@@ -660,7 +665,7 @@ namespace SailScores.Core.Scoring
             return races.Where(r => r.Id != lastRaceId).ToList();
         }
 
-        private SeriesResults BuildResults(Series series)
+        private SeriesResults GatherInitialResults(Series series)
         {
             var returnResults = new SeriesResults
             {
@@ -705,7 +710,9 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        protected virtual void CalculateRaceDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
+        protected virtual void CalculateRaceDependentScores(
+            SeriesResults resultsWorkInProgress,
+            SeriesCompetitorResults compResults)
         {
             //calculate non-average codes first
             foreach (var race in resultsWorkInProgress.SailedRaces)
