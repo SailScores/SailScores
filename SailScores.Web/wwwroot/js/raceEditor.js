@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/devbridge-autocomplete/typings/jquery-autocomplete/jquery.autocomplete.d.ts" />
+/// <reference path="interfaces/jquery.autocomplete.d.ts" />
 /// <reference types="jquery" />
 /// <reference types="select2" />
 import $ from "jquery";
