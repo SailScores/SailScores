@@ -904,10 +904,13 @@ namespace SailScores.Core.Services
         {
             FlatChartData chartData = await CalculateChartData(fullSeries)
                 .ConfigureAwait(false);
-            var oldCharts = await _dbContext
-                .SeriesChartResults
-                .Where(r => r.SeriesId == fullSeries.Id).ExecuteDeleteAsync()
+
+            // used to have .ExecuteDeleteAsync, but that isn't supported in in-memory provider. :-(
+            var oldCharts = await _dbContext.SeriesChartResults
+                .Where(r => r.SeriesId == fullSeries.Id).ToListAsync()
                 .ConfigureAwait(false);
+            _dbContext.SeriesChartResults.RemoveRange(oldCharts);
+
 
             if (chartData != null)
             {

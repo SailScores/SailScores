@@ -49,6 +49,7 @@ namespace SailScores.Core.Services
                 .Where(s => s.ClubId == clubId ||
                 (includeBaseSystems && s.ClubId == null))
                 .Include(s => s.ScoreCodes)
+                .OrderBy(s => s.Name)
                 .ToListAsync()
                 .ConfigureAwait(false);
             return _mapper.Map<List<Model.ScoringSystem>>(dbObjects);
