@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -33,9 +33,13 @@ namespace SailScores.Core.Scoring
             } else if (baseSystemName.Contains("Cox-Sprague"))
             {
                 return new CoxSpragueCalculator(scoringSystem);
+            } else if (baseSystemName.Contains("Low Point Average")
+                && baseSystemName.Contains("without DNCs"))
+            {
+                return new LowPointAveExclDncCalculator(scoringSystem);
             } else if (baseSystemName.Contains("Low Point Average"))
             {
-                return new LowPointAverageCalculator(scoringSystem);
+                return new LowPointAveInclDncCalculator(scoringSystem);
             }
             else if (baseSystemName.Contains("First = 0"))
             {
@@ -47,7 +51,7 @@ namespace SailScores.Core.Scoring
                 return new AppAAltFirstIsPoint7(scoringSystem);
             }
             else if (baseSystemName.Contains("Top X High Point"))
-            { 
+            {
                 return new TopXHighPointCalculator(scoringSystem);
             }
             else if (baseSystemName.Contains("Appendix A") & baseSystemName.Contains("pre-2025"))
@@ -83,7 +87,7 @@ namespace SailScores.Core.Scoring
                         .ConfigureAwait(false);
                 }
                 baseSystemName = currentSystem.Name;
-                _cache.Set($"ScoringSystemName_{scoringSystem.Id}", baseSystemName, TimeSpan.FromSeconds(20));
+                _cache.Set($"ScoringSystemName_{scoringSystem.Id}", baseSystemName, TimeSpan.FromSeconds(15));
             }
             return baseSystemName;
         }

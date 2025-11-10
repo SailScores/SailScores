@@ -14,6 +14,11 @@
       "ES2020",
       "es5",
       "dom"
+    ],
+    "types": [ "jquery", "select2" ],
+    "typeRoots": [
+      "node_modules/@types",
+      "interfaces"
     ]
   },
   "files": [
