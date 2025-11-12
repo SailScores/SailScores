@@ -166,5 +166,90 @@ namespace SailScores.Test.Unit.Core.Scoring
             // Assert: Three races should count for total and average
             Assert.Equal(2.0m, total); // (1 + 2 +3) / 3
         }
+
+        [Fact]
+        public void CalculateResults_SameAverage_BreaksTiesCorrectly()
+        {
+            // Arrange: 4 races, 4 competitors
+            var competitors = new List<Competitor>
+            {
+                new Competitor { Id = Guid.NewGuid(), Name = "Competitor 1" },
+                new Competitor { Id = Guid.NewGuid(), Name = "Competitor 2" },
+                new Competitor { Id = Guid.NewGuid(), Name = "Competitor 3" },
+                new Competitor { Id = Guid.NewGuid(), Name = "Competitor 4" }
+            };
+            var races = new List<Race>();
+            for (int i = 0; i < 4; i++)
+            {
+                races.Add(new Race
+                {
+                    Id = Guid.NewGuid(),
+                    Name = $"Race {i + 1}",
+                    Order = i + 1,
+                    Date = DateTime.UtcNow.AddDays(i),
+                    Scores = new List<Score>()
+                });
+            }
+            // Assign results:
+            // Race 1: Competitor 1, Competitor 3, Competitor 4
+            races[0].Scores.Add(new Score { Competitor = competitors[0], Race = races[0], Place = 1, Code = null }); // C1
+            races[0].Scores.Add(new Score { Competitor = competitors[2], Race = races[0], Place = 2, Code = null }); // C3
+            races[0].Scores.Add(new Score { Competitor = competitors[3], Race = races[0], Place = 3, Code = null }); // C4
+            races[0].Scores.Add(new Score { Competitor = competitors[1], Race = races[0], Place = null, Code = "DNC" }); // C2
+
+            // Race 2: Competitor 1, Competitor 2, Competitor 3, Competitor 4
+            races[1].Scores.Add(new Score { Competitor = competitors[0], Race = races[1], Place = 1, Code = null }); // C1
+            races[1].Scores.Add(new Score { Competitor = competitors[1], Race = races[1], Place = 2, Code = null }); // C2
+            races[1].Scores.Add(new Score { Competitor = competitors[2], Race = races[1], Place = 3, Code = null }); // C3
+            races[1].Scores.Add(new Score { Competitor = competitors[3], Race = races[1], Place = 4, Code = null }); // C4
+
+            // Race 3: Competitor 1, Competitor 4, Competitor 2, Competitor 3
+            races[2].Scores.Add(new Score { Competitor = competitors[0], Race = races[2], Place = 1, Code = null }); // C1
+            races[2].Scores.Add(new Score { Competitor = competitors[3], Race = races[2], Place = 2, Code = null }); // C4
+            races[2].Scores.Add(new Score { Competitor = competitors[1], Race = races[2], Place = 3, Code = null }); // C2
+            races[2].Scores.Add(new Score { Competitor = competitors[2], Race = races[2], Place = 4, Code = null }); // C3
+
+            // Race 4: Competitor 1, Competitor 4, Competitor 3, Competitor 2
+            races[3].Scores.Add(new Score { Competitor = competitors[0], Race = races[3], Place = 1, Code = null }); // C1
+            races[3].Scores.Add(new Score { Competitor = competitors[3], Race = races[3], Place = 2, Code = null }); // C4
+            races[3].Scores.Add(new Score { Competitor = competitors[2], Race = races[3], Place = 3, Code = null }); // C3
+            races[3].Scores.Add(new Score { Competitor = competitors[1], Race = races[3], Place = 4, Code = null }); // C2
+
+            var series = new Series
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Series",
+                Races = races,
+                Competitors = competitors,
+                ScoringSystem = MakeScoringSystem(),
+                Results = null
+            };
+            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+
+            // Act
+            var results = _calculator.CalculateResults(series);
+
+            // Assert
+            var comp2 = competitors[1];
+            var comp3 = competitors[2];
+
+            Assert.True(results.Results.ContainsKey(comp2));
+            Assert.True(results.Results.ContainsKey(comp3));
+            var comp2Results = results.Results[comp2];
+            var comp3Results = results.Results[comp3];
+            // check sum and possible points
+            Assert.Equal(9, comp2Results.PointsEarned);
+            Assert.Equal(12, comp3Results.PointsEarned);
+
+            Assert.Equal(3, comp2Results.PointsPossible);
+            Assert.Equal(4, comp3Results.PointsPossible);
+
+            // Both should average to 3.0
+            Assert.Equal(3.0m, comp2Results.TotalScore);
+            Assert.Equal(3.0m, comp3Results.TotalScore);
+
+            // Competitor 2 should have a lower (worse) rank than Competitor 3
+            Assert.True(comp2Results.Rank > comp3Results.Rank);
+        }
     }
 }
