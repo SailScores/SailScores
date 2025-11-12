@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -69,6 +69,11 @@ namespace SailScores.Core.Scoring
                         .CalculatedScores.Values
                         .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m)
                         / raceCount;
+                    compResults.PointsPossible = raceCount;
+                    compResults.PointsEarned = compResults
+                        .CalculatedScores.Values
+                        .Where(s => !s.Discard)
+                        .Sum(s => s.ScoreValue ?? 0.0m);
                 } else
                 {
                     compResults.TotalScore = null;

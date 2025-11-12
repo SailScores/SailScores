@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SailScores.Core.Scoring
@@ -44,12 +44,12 @@ namespace SailScores.Core.Scoring
             // must not include discarded results.
             var xScoresLowToHigh =
                 x.CalculatedScores.Values
-                    .Where(s => !s.Discard)
+                    .Where(s => !s.Discard && (s.ScoreValue ?? 0.0m) != 0.0m)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
                     .OrderBy(s => s).ToArray();
             var yScoresLowToHigh =
                 y.CalculatedScores.Values
-                    .Where(s => !s.Discard)
+                    .Where(s => !s.Discard && (s.ScoreValue ?? 0.0m) != 0.0m)
                     .Select(s => s.ScoreValue ?? decimal.MaxValue)
                     .OrderBy(s => s).ToArray();
 
