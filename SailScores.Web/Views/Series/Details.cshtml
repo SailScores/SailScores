@@ -41,9 +41,13 @@
         {
             <h5>@Model.Item.Description</h5>
         }
-        @results.NumberOfSailedRaces @localizer["races sailed with"] @results.NumberOfDiscards
-        @localizer["discards"],
-        @results.Competitors.Count() @localizer["competitors"]
+        @{
+            var raceLabel = results.NumberOfSailedRaces == 1 ? localizer["race sailed"] : localizer["races sailed"];
+            var discardLabel = results.NumberOfDiscards == 1 ? localizer["discard"] : localizer["discards"];
+            var competitorLabel = results.Competitors.Count() == 1 ? localizer["competitor"] : localizer["competitors"];
+        }
+        @results.NumberOfSailedRaces @raceLabel with @results.NumberOfDiscards @discardLabel,
+        @results.Competitors.Count() @competitorLabel
         @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
         {
             @:&ndash; @results.ScoringSystemName
