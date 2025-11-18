@@ -46,6 +46,11 @@ namespace SailScores.Core.Scoring
                 return new AppAAltFirstIsZero(scoringSystem);
             }
             else if (baseSystemName.Contains("First = ")
+                && baseSystemName.Contains(".75"))
+            {
+                return new AppAAltFirstIsPoint75(scoringSystem);
+            }
+            else if (baseSystemName.Contains("First = ")
                 && baseSystemName.Contains(".7"))
             {
                 return new AppAAltFirstIsPoint7(scoringSystem);

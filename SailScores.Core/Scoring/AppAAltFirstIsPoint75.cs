@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SailScores.Core.Scoring;
 
@@ -9,9 +11,9 @@ namespace SailScores.Core.Scoring;
 // it is still considered a "Base" system: it does not inherit
 // scoring codes from any system.
 
-public class AppAAltFirstIsPoint7 : AppendixACalculator
+public class AppAAltFirstIsPoint75 : AppendixACalculator
 {
-    public AppAAltFirstIsPoint7(ScoringSystem scoringSystem) : base(scoringSystem)
+    public AppAAltFirstIsPoint75(ScoringSystem scoringSystem) : base(scoringSystem)
     {
         CompetitorComparer = new LowPointSeriesCompComparer();
     }
@@ -38,7 +40,7 @@ public class AppAAltFirstIsPoint7 : AppendixACalculator
         // but this might catch some edge cases.
         if (currentScore.Place == 1 && returnScore == 1)
         {
-            returnScore = 0.7m;
+            returnScore = 0.75m;
         }
 
         returnScore = GetTiedScore(allScores, currentScore) ?? returnScore;
