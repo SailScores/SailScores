@@ -56,7 +56,7 @@ namespace SailScores.Core.Scoring
 
             for (int i = 0; i < xScoresLowToHigh.Length; i++)
             {
-                if (yScoresLowToHigh.Length < i)
+                if (yScoresLowToHigh.Length <= i)
                 {
                     // x had more scores, so it wins tiebreaker. (all earlier scores were ties.)
                     return -1;
