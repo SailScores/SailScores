@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Model;
+﻿using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,23 +43,42 @@ namespace SailScores.Core.Scoring
 
         protected override void CalculateTotals(SeriesResults results, IEnumerable<Score> scores)
         {
+            results.IsPercentSystem = true;
+            results.PercentRequired = ScoringSystem.ParticipationPercent ?? 0m;
+
+            var totalRaceCount = results.Races.Where(r =>
+                    (r.State ?? RaceState.Raced) == RaceState.Raced
+                        || r.State == RaceState.Preliminary)
+                .Count();
+            var requiredRaces = totalRaceCount * ((ScoringSystem.ParticipationPercent ?? 0) / 100m);
+
             foreach (var comp in results.Competitors)
             {
                 var compResults = results.Results[comp];
 
+                var racesParticipated = compResults.CalculatedScores
+                    .Where(s => CountsAsStarted(s.Value.RawScore) ||
+                           CountsAsParticipation(s.Value.RawScore)).Count();
+                compResults.ParticipationPercent = racesParticipated * 100.0m / totalRaceCount;
                 var raceCount = compResults
                     .CalculatedScores.Values
                     .Count(s => !s.Discard && (s.ScoreValue ?? 0.0m) != 0.0m);
 
+                compResults.TotalScore = null;
                 if (raceCount != 0)
                 {
-                    compResults.TotalScore = compResults
+                    compResults.PointsEarned = compResults
                         .CalculatedScores.Values
-                        .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m)
-                        / raceCount;
-                } else
-                {
-                    compResults.TotalScore = null;
+                        .Where(s => !s.Discard)
+                        .Sum(s => s.ScoreValue ?? 0.0m);
+                    compResults.Average = compResults.PointsEarned / raceCount;
+                    compResults.PointsPossible = raceCount;
+
+                    if (racesParticipated >= requiredRaces)
+                    {
+                        compResults.TotalScore = compResults.Average;
+                    }
+
                 }
             }
         }

@@ -88,46 +88,47 @@ namespace SailScores.Core.Scoring
                 var racesParticipated = currentCompResults.CalculatedScores
                     .Where(s => CountsAsStarted(s.Value.RawScore) ||
                            CountsAsParticipation(s.Value.RawScore)).Count();
-                currentCompResults.ParticipationPercent = racesParticipated * 100.0m / raceCount; 
+                currentCompResults.ParticipationPercent = racesParticipated * 100.0m / raceCount;
                 
-                if (racesParticipated < requiredRaces)
+
+                // racesToExclude should include discards and DNCs
+                var racesToExclude = currentCompResults
+                    .CalculatedScores
+                    .Where(s => s.Value.Discard ||
+                    ( !String.IsNullOrEmpty(s.Value.RawScore.Code) && !(GetScoreCode(s.Value.RawScore.Code).CameToStart ?? false)))
+                    .Select(s => s.Key.Id);
+
+                int perfectScore = 0;
+                foreach (Race r in results.SailedRaces)
                 {
-                    currentCompResults.TotalScore = null;
+                    if (racesToExclude.Contains(r.Id))
+                    {
+                        continue;
+                    }
+
+                    perfectScore += CoxSpragueTable.GetScore(1, starterCounts[r.Id]);
+                }
+
+                var compTotal = currentCompResults
+                    .CalculatedScores.Values
+                    .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
+                currentCompResults.TotalScore = null; //we'll replace this below if they
+                // completed enough races. Making the null value explicit here, though.
+
+                currentCompResults.PointsEarned = compTotal;
+                currentCompResults.PointsPossible = perfectScore;
+                if (perfectScore == 0)
+                {
+                    currentCompResults.Average = 0;
                 }
                 else
                 {
-                    // racesToExclude should include discards and DNCs
-                    var racesToExclude = currentCompResults
-                        .CalculatedScores
-                        .Where(s => s.Value.Discard ||
-                        ( !String.IsNullOrEmpty(s.Value.RawScore.Code) && !(GetScoreCode(s.Value.RawScore.Code).CameToStart ?? false)))
-                        .Select(s => s.Key.Id);
+                    currentCompResults.Average = compTotal * 100 / perfectScore;
+                }
 
-                    int perfectScore = 0;
-                    foreach (Race r in results.SailedRaces)
-                    {
-                        if (racesToExclude.Contains(r.Id))
-                        {
-                            continue;
-                        }
-
-                        perfectScore += CoxSpragueTable.GetScore(1, starterCounts[r.Id]);
-                    }
-
-                    var compTotal = currentCompResults
-                        .CalculatedScores.Values
-                        .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
-
-                    currentCompResults.PointsEarned = compTotal;
-                    currentCompResults.PointsPossible = perfectScore;
-                    if (perfectScore == 0)
-                    {
-                        currentCompResults.TotalScore = 0;
-                    }
-                    else
-                    {
-                        currentCompResults.TotalScore = compTotal * 100 / perfectScore;
-                    }
+                if (racesParticipated >= requiredRaces)
+                {
+                    currentCompResults.TotalScore = currentCompResults.Average;
                 }
             }
         }

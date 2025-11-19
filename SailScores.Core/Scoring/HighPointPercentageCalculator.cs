@@ -82,34 +82,34 @@ namespace SailScores.Core.Scoring
                     .Where(s => CountsAsStarted(s.Value.RawScore) ||
                                 CountsAsParticipation(s.Value.RawScore)).Count();
                 currentCompResults.ParticipationPercent = racesParticipated * 100m / raceCount;
-                if (racesParticipated < requiredRaces)
+
+                currentCompResults.TotalScore = null;
+
+                // racesToExclude should include discards and DNCs
+                var racesToExclude = currentCompResults
+                    .CalculatedScores
+                    .Where(s => s.Value.Discard ||
+                    (!String.IsNullOrEmpty(s.Value.RawScore.Code) && !(GetScoreCode(s.Value.RawScore.Code).CameToStart ?? false)))
+                    .Select(s => s.Key.Id);
+                var perfectScore = scores.Where(s => !racesToExclude.Contains(s.RaceId))
+                    .Count(s => CameToStart(s));
+                var compTotal = currentCompResults
+                    .CalculatedScores.Values
+                    .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
+
+                currentCompResults.PointsEarned = compTotal;
+                currentCompResults.PointsPossible = perfectScore;
+                if (perfectScore > 0)
                 {
-                    currentCompResults.TotalScore = null;
+                    currentCompResults.Average = compTotal * 100 / perfectScore;
                 }
                 else
                 {
-                    // racesToExclude should include discards and DNCs
-                    var racesToExclude = currentCompResults
-                        .CalculatedScores
-                        .Where(s => s.Value.Discard ||
-                        ( !String.IsNullOrEmpty(s.Value.RawScore.Code) && !(GetScoreCode(s.Value.RawScore.Code).CameToStart ?? false)))
-                        .Select(s => s.Key.Id);
-                    var perfectScore = scores.Where(s => !racesToExclude.Contains(s.RaceId))
-                        .Count(s => CameToStart(s));
-                    var compTotal = currentCompResults
-                        .CalculatedScores.Values
-                        .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
-
-                    currentCompResults.PointsEarned = compTotal;
-                    currentCompResults.PointsPossible = perfectScore;
-                    if (perfectScore > 0)
-                    {
-                        currentCompResults.TotalScore = compTotal * 100 / perfectScore;
-                    }
-                    else
-                    {
-                        currentCompResults.TotalScore = 0;
-                    }
+                    currentCompResults.Average = 0;
+                }
+                if (racesParticipated >= requiredRaces)
+                {
+                    currentCompResults.TotalScore = currentCompResults.Average;
                 }
             }
         }
