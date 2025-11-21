@@ -174,6 +174,7 @@ export function moveDown() {
     calculatePlaces();
 }
 export function deleteResult() {
+    isDirty = true; // Mark page as dirty when deleting competitor
     // fix aria incompatibility.
     const buttonElement = document.activeElement;
     buttonElement.blur();
@@ -213,6 +214,7 @@ export function addNewCompetitorFromButton() {
     addNewCompetitor(comp);
 }
 function addNewCompetitor(competitor) {
+    isDirty = true; // Mark page as dirty when adding competitor
     let c = 0;
     let resultDiv = document.getElementById("results");
     let compTemplate = document.getElementById("competitorTemplate");
@@ -990,5 +992,33 @@ function onElapsedTimeChanged() {
         return;
     const finish = new Date(start.getTime() + elapsedMs);
     finishInput.value = formatTimeForInput(finish);
+}
+// Dirty form detection: module-scope flag
+let isDirty = false;
+/**
+ * Sets up dirty form detection and navigation warning for unsaved changes.
+ * Call this on pages with a form that should warn on navigation if dirty.
+ */
+export function setupDirtyFormDetection(formId = 'raceform') {
+    const form = document.getElementById(formId);
+    if (!form)
+        return;
+    // Mark dirty on any input, select, textarea change
+    form.addEventListener('input', () => { isDirty = true; });
+    form.addEventListener('change', () => { isDirty = true; });
+    // Reset dirty on submit
+    form.addEventListener('submit', () => { isDirty = false; });
+    // Warn on navigation if dirty
+    window.addEventListener('beforeunload', function (e) {
+        if (!isDirty)
+            return;
+        const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave this page?';
+        (e || window.event).returnValue = confirmationMessage;
+        return confirmationMessage;
+    });
+}
+// Call setupDirtyFormDetection on DOMContentLoaded for Race Create/Edit pages
+if (document.getElementById('raceform')) {
+    setupDirtyFormDetection('raceform');
 }
 //# sourceMappingURL=raceEditor.js.map
