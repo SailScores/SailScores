@@ -5,6 +5,7 @@
 @using SailScores.Web.Resources
 @using SailScores.Web.Services
 @using SailScores.Web.Services.Interfaces
+@using System.Text
 
 @inject IStringLocalizer<SharedResource> localizer
 @inject IWeatherService weatherService
@@ -230,24 +231,28 @@
                         <strong>
                             @if (Model.Results.IsPercentSystem)
                             {
-                                string tooltipText = String.Empty;
-                                if (compScore?.TotalScore.HasValue ?? false)
+                                var tooltipText = new StringBuilder();
+                                if (compScore?.TotalScore != compScore?.Average && (compScore?.Average.HasValue ?? false))
                                 {
-                                    tooltipText = compScore?.PointsEarned + " / " + compScore?.PointsPossible;
+                                    tooltipText.Append(String.Format("{0:0.###}", compScore?.Average) + "&#010;");
                                 }
-                                if (tooltipText != String.Empty && (compScore?.ParticipationPercent.HasValue ?? false))
+                                if ((compScore?.Average.HasValue ?? false) || (compScore?.TotalScore.HasValue ?? false))
                                 {
-                                    tooltipText = tooltipText + "&#010;";
+                                    tooltipText.Append(compScore?.PointsEarned + " / " + compScore?.PointsPossible);
+                                }
+                                if (tooltipText.Length > 0 && (compScore?.ParticipationPercent.HasValue ?? false))
+                                {
+                                    tooltipText.Append("&#010;");
                                 }
                                 if (compScore?.ParticipationPercent.HasValue ?? false)
                                 {
-                                        tooltipText = tooltipText + "Participation: " + @String.Format("{0:0.#}%", compScore?.ParticipationPercent);
+                                        tooltipText.Append("Participation: " + @String.Format("{0:0.#}%", compScore?.ParticipationPercent));
                                 }
-                                <span data-bs-toggle="tooltip" title="@Html.Raw(tooltipText)">
+                                <span data-bs-toggle="tooltip" data-bs-trigger="manual focus hover" tabindex="0" title="@Html.Raw(tooltipText.ToString())">
                                         @(compScore?.TotalScore != null
                                             ? String.Format("{0:0.###}", compScore?.TotalScore)
-                                        : Html.Raw("&mdash;"))
-                                </span>
+        : Html.Raw("&mdash;"))
+</span>
                             } else {
                                     @String.Format("{0:0.###}", compScore?.TotalScore)
                             }

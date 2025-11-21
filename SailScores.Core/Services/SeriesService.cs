@@ -585,6 +585,7 @@ namespace SailScores.Core.Services
                     CompetitorId = kvp.Key.Id,
                     Rank = kvp.Value.Rank,
                     TotalScore = kvp.Value.TotalScore,
+                    Average = kvp.Value.Average,
                     PointsEarned = kvp.Value.PointsEarned,
                     PointsPossible = kvp.Value.PointsPossible,
                     ParticipationPercent = kvp.Value.ParticipationPercent,
