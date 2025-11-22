@@ -21,7 +21,7 @@ public class ClubController : Controller
         _mapper = mapper;
     }
 
-    // GET: Club
+    // This is the main page for clubs: lives at the url: sailscores.com/{clubinitials}
     public async Task<ActionResult> Index(string clubInitials)
     {
         ViewData["ClubInitials"] = clubInitials;

@@ -50,7 +50,7 @@ namespace SailScores.Core.Services
             var destinationUnitEnum = GetUnit(destinationUnits);
             if (GetUnitType(sourceUnitEnum) != GetUnitType(destinationUnitEnum))
             {
-                _logger.LogInformation("Error: types don't match");
+                _logger.LogWarning("Error: types don't match");
 
                 throw new InvalidOperationException(
                     $"Could not convert between {sourceUnits} and {destinationUnits}");
@@ -65,7 +65,7 @@ namespace SailScores.Core.Services
                 return ConvertSpeed(measure, sourceUnitEnum, destinationUnitEnum);
             }
 
-            _logger.LogInformation("Couldn't complete conversion, so throwing");
+            _logger.LogWarning("Couldn't complete conversion, so throwing");
             throw new InvalidOperationException("Could not complete conversion for the unit types.");
         }
 
@@ -93,7 +93,7 @@ namespace SailScores.Core.Services
 
         private decimal ConvertToKelvin(decimal temp, Units sourceUnits)
         {
-            _logger.LogInformation($"Converting to Kelvin from : unit type {sourceUnits}");
+            _logger.LogTrace($"Converting to Kelvin from : unit type {sourceUnits}");
 
             switch (sourceUnits)
             {
@@ -147,8 +147,6 @@ namespace SailScores.Core.Services
 
         private Units GetUnit(string units)
         {
-            _logger.LogInformation("In GetUnit");
-            _logger.LogInformation($"{units}");
 
             if (units.ToUpperInvariant() == "MPH")
             {

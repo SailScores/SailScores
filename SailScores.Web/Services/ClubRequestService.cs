@@ -103,6 +103,12 @@ public class ClubRequestService : IClubRequestService
             "API",
             "APIV2",
             "APIV3",
+            "APIV4",
+            "APIV5",
+            "ERROR",
+            "AUTH",
+            "USER",
+            "SITEMAP",
 
             "CSS",
             "VENDOR",
@@ -116,6 +122,10 @@ public class ClubRequestService : IClubRequestService
             "SCRIPTS",
             "STATS",
             "SAILSCORES",
+            "HEALTH",
+            "SUPPORTER",
+            "PRICING",
+            "SUPPORT",
 
             "CLUB",
             "CLUBS",

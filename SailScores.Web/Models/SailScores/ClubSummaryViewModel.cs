@@ -42,10 +42,15 @@ public class ClubSummaryViewModel
 
     public IEnumerable<SeriesSummary> RecentSeries => Series
         ?.Where(s =>
-            s.Races
+            (
+                s.Type == SeriesType.Summary
+                && (s.EndDate??DateOnly.MinValue) > DateOnly.FromDateTime(recentCutoff)
+                && (s.UpdatedDate??DateTime.MinValue) > recentCutoff
+            )
+            || (s.Races
                 ?.Any(r => r.Date > recentCutoff
                            && ((r.State ?? RaceState.Raced) == RaceState.Raced
-                               || r.State == RaceState.Preliminary )) ?? false)
+                               || r.State == RaceState.Preliminary )) ?? false))
         .OrderByDescending(s => s.Races
             .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                         || r.State == RaceState.Preliminary).Max(r => r.Date))

@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Identity.Client;
 using SailScores.Api.Enumerations;
@@ -50,13 +51,19 @@ namespace SailScores.Core.Services
         public async Task<IList<Series>> GetAllSeriesAsync(
             Guid clubId,
             DateTime? date,
-            bool includeRegattaSeries)
+            bool includeRegatta,
+            bool includeSummary)
         {
 
-            var regattaSeriesId = _dbContext.Regattas.SelectMany(r =>
-                r.RegattaSeries).Select(rs => rs.SeriesId);
+            IQueryable<Guid> regattaSeriesIds = Enumerable.Empty<Guid>().AsQueryable();
+            
+            if (!includeRegatta)
+            {
+                regattaSeriesIds = _dbContext.Regattas.SelectMany(r =>
+                    r.RegattaSeries).Select(rs => rs.SeriesId);
+            }
 
-            var series = await _dbContext
+            IQueryable<dbObj.Series> seriesQuery =  _dbContext
                 .Clubs
                 .Where(c => c.Id == clubId)
                 .SelectMany(c => c.Series)
@@ -66,8 +73,18 @@ namespace SailScores.Core.Services
                 .Include(s => s.RaceSeries)
                     .ThenInclude(rs => rs.Race)
                     .ThenInclude(r => r.Fleet)
-                 .Include(s => s.ChildLinks)
-                .Where(s => includeRegattaSeries || !regattaSeriesId.Contains(s.Id))
+                 .Include(s => s.ChildLinks);
+
+            if (!includeRegatta)
+            {
+                seriesQuery = seriesQuery.Where(s => !regattaSeriesIds.Contains(s.Id));
+
+            }
+            if (!includeSummary) {
+                seriesQuery = seriesQuery.Where(s => s.Type != dbObj.SeriesType.Summary);
+            }
+                
+            var series = await seriesQuery
                 .OrderBy(s => s.Name)
                 .AsSplitQuery()
                 .ToListAsync().ConfigureAwait(false);
@@ -89,6 +106,13 @@ namespace SailScores.Core.Services
             var fullSeries = _mapper.Map<Series>(seriesDb);
             if (fullSeries != null)
             {
+                // populate parentSeriesIds
+                fullSeries.ParentSeriesIds = await _dbContext.Series
+                    .Where(s => s.ChildLinks.Any(l => l.ChildSeriesId == seriesDb.Id))
+                    .Select(s => s.Id)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+
                 var flatResults = await GetHistoricalResults(fullSeries)
                     .ConfigureAwait(false);
                 if (flatResults == null)
@@ -742,8 +766,48 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
 
+            // Create parent series links if specified
+            if (series.ParentSeriesIds != null && series.ParentSeriesIds.Any())
+            {
+                foreach (var parentSeriesId in series.ParentSeriesIds)
+                {
+                    var parentSeries = await _dbContext.Series
+                        .Include(s => s.ChildLinks)
+                        .FirstOrDefaultAsync(s => s.Id == parentSeriesId)
+                        .ConfigureAwait(false);
+
+                    if (parentSeries != null)
+                    {
+                        parentSeries.ChildLinks ??= new List<dbObj.SeriesToSeriesLink>();
+                        
+                        // Only add if not already present
+                        if (!parentSeries.ChildLinks.Any(l => l.ChildSeriesId == dbSeries.Id))
+                        {
+                            parentSeries.ChildLinks.Add(new dbObj.SeriesToSeriesLink
+                            {
+                                ParentSeriesId = parentSeriesId,
+                                ChildSeriesId = dbSeries.Id
+                            });
+                        }
+                    }
+                }
+                await _dbContext.SaveChangesAsync()
+                    .ConfigureAwait(false);
+            }
+
             await UpdateSeriesResults(dbSeries.Id, series.UpdatedBy)
                 .ConfigureAwait(false);
+
+            // Update parent series results if parent series were specified
+            if (series.ParentSeriesIds != null && series.ParentSeriesIds.Any())
+            {
+                foreach (var parentSeriesId in series.ParentSeriesIds)
+                {
+                    await UpdateSeriesResults(parentSeriesId, series.UpdatedBy, false)
+                        .ConfigureAwait(false);
+                }
+            }
+
             return dbSeries.Id;
         }
 

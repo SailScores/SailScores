@@ -33,6 +33,93 @@ public class SeriesService : ISeriesService
         await _coreSeriesService.Delete(id);
     }
 
+    public async Task<IEnumerable<SeriesSummary>> GetSummarySeriesAsync(Guid clubId)
+    {
+        var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, true);
+        var summarySeries = coreObject
+            .Where(s => s.Type == SeriesType.Summary);
+
+        var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(summarySeries);
+
+        return seriesSummaries.OrderByDescending(s => s.Season.Start)
+            .ThenBy(s => s.Name);
+    }
+
+
+    public async Task<IEnumerable<SeriesSummary>> GetSummarySeriesAsync(
+        Guid clubId,
+        DateTime date)
+    {
+        if(date == default)
+        {
+            return await GetSummarySeriesAsync(clubId);
+        }
+
+        var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, date, false, true);
+        var summarySeries = coreObject
+            .Where(s => s.Type == SeriesType.Summary);
+
+        var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(summarySeries);
+
+        return seriesSummaries.OrderByDescending(s => s.Season.Start)
+            .ThenBy(s => s.Name);
+    }
+
+
+    public async Task<SeriesWithOptionsViewModel> UpdateVmOptions(
+        string clubInitials,
+        SeriesWithOptionsViewModel partialSeries)
+    {
+        var clubId = await _coreClubService.GetClubId(clubInitials);
+        var club = await _coreClubService.GetMinimalClub(clubId);
+
+        var allSeasons = await _coreSeasonService.GetSeasons(clubId);
+        var seasons = allSeasons;
+
+        if (partialSeries.SeasonId == default)
+        {
+            seasons = await _coreSeasonService.GetSeasons(clubId);
+            var selectedSeason = seasons.FirstOrDefault(s =>
+                s.Start < DateTime.Now && s.End > DateTime.Now);
+            if (selectedSeason == null && seasons.Count() == 1)
+            {
+                selectedSeason = seasons.First();
+            }
+            if (selectedSeason != null)
+            {
+                partialSeries.SeasonId = selectedSeason.Id;
+            }
+
+        } else
+        {
+            seasons = allSeasons
+                .Where(s => s.Id == partialSeries.SeasonId)
+                .ToList();
+        }
+
+        partialSeries.SeasonOptions = seasons;
+
+
+        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, true);
+        scoringSystemOptions.Add(new ScoringSystem
+        {
+            Id = Guid.Empty,
+            Name = "<Use Club Default>"
+        });
+        partialSeries.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
+
+        // Get summary series options
+        var selectedSeasonForSummary = seasons.FirstOrDefault(s => s.Id == partialSeries.SeasonId);
+        var centerDate = selectedSeasonForSummary != null
+            ? selectedSeasonForSummary.Start.AddDays(
+                (selectedSeasonForSummary.End - selectedSeasonForSummary.Start).TotalDays / 2)
+            : default;
+        partialSeries.SummarySeriesOptions = (await GetSummarySeriesAsync(clubId, centerDate)).ToList();
+
+        return partialSeries;
+
+    }
+
     public async Task<SeriesWithOptionsViewModel> GetBlankVmForCreate(string clubInitials)
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
@@ -42,8 +129,7 @@ public class SeriesService : ISeriesService
 
         var vm = new SeriesWithOptionsViewModel
         {
-            SeasonOptions = seasons,
-            UseExperimentalFeatures = club.UseExperimentalFeatures ?? false
+            SeasonOptions = seasons
         };
         var selectedSeason = seasons.FirstOrDefault(s =>
             s.Start < DateTime.Now && s.End > DateTime.Now);
@@ -63,6 +149,9 @@ public class SeriesService : ISeriesService
         });
         vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
 
+        // Get summary series options
+        vm.SummarySeriesOptions = (await GetSummarySeriesAsync(clubId)).ToList();
+
         return vm;
 
     }
@@ -75,7 +164,7 @@ public class SeriesService : ISeriesService
     public async Task<IEnumerable<SeriesSummary>> GetNonRegattaSeriesSummariesAsync(string clubInitials)
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
-        var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
+        var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, true);
 
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(coreObject);
         foreach(var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
@@ -109,7 +198,7 @@ public class SeriesService : ISeriesService
         Guid clubId,
         Guid seasonId)
     {
-        var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
+        var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, false);
         var eligibleSeries = coreObject
             .Where(s => (s.Type == default ? SeriesType.Standard : s.Type) == SeriesType.Standard
                 && s.Season.Id == seasonId);

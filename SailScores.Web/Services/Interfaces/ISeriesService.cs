@@ -8,6 +8,7 @@ public interface ISeriesService
     Task<IEnumerable<SeriesSummary>> GetChildSeriesSummariesAsync(
         Guid clubId,
         Guid seasonId);
+    Task<IEnumerable<SeriesSummary>> GetSummarySeriesAsync(Guid clubId);
     Task<Core.Model.Series> GetSeriesAsync(string clubInitials, string season, string seriesUrlName);
     Task<Core.Model.Series> GetSeriesAsync(Guid seriesId);
     Task<Guid> SaveNew(SeriesWithOptionsViewModel model);

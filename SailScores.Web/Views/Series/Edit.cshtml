@@ -53,6 +53,22 @@
 
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
+                            @if (Model.SummarySeriesOptions != null && Model.SummarySeriesOptions.Any() && Model.Type == SailScores.Core.Model.SeriesType.Standard)
+                            {
+                                <div class="mb-3">
+                                    <label asp-for="ParentSeriesIds" class="control-label">Include in Summary Series</label>
+                                    <select id="ParentSeriesIds" asp-for="ParentSeriesIds" class="form-select" multiple>
+                                        @foreach (var series in Model.SummarySeriesOptions)
+                                        {
+                                            <option value="@series.Id">
+                                                @series.Name (@series.Season.Name)
+                                            </option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="ParentSeriesIds" class="text-danger"></span>
+                                    <span class="small">Select one or more summary series that this series should be included in.</span>
+                                </div>
+                            }
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" asp-for="IsImportantSeries" />

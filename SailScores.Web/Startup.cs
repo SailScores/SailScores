@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using SailScores.Core.Extensions;
 using SailScores.Core.JobQueue;
 using SailScores.Core.Mapping;
@@ -26,10 +26,12 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using SailScores.Web.Services.Interfaces;
-using WebMarkupMin.AspNetCore3;
+using WebMarkupMin.AspNetCoreLatest;
 using Microsoft.Extensions.Hosting;
 using MailChimp.Net.Interfaces;
 using MailChimp.Net;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 
 namespace SailScores.Web;
 
@@ -45,6 +47,8 @@ public class Startup
     // This method is now called by the Program.cs file.
     public void ConfigureServices(IServiceCollection services)
     {
+        ConfigureAppInsightsTelemetry(services);
+
         services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
         services.Configure<RequestLocalizationOptions>(options =>
         {
@@ -81,21 +85,8 @@ public class Startup
                 Description = "JWT Authorization header using the Bearer scheme.",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey
-            });
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    Array.Empty<string>()
-                }
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
             });
         });
 
@@ -152,8 +143,6 @@ public class Startup
             };
         });
 
-        services.AddApplicationInsightsTelemetry(Configuration);
-        
         services.AddDbContext<SailScoresContext>(options =>
             options.UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection")));
@@ -190,10 +179,44 @@ public class Startup
                 })
             .AddHttpCompression();
 
+
+        services.AddHealthChecks();
+
         RegisterSailScoresServices(services);
 
         RegisterBackgroundQueueServices(services);
 
+    }
+
+    private void ConfigureAppInsightsTelemetry(IServiceCollection services)
+    {
+
+        services.AddApplicationInsightsTelemetry(options =>
+        {
+            options.ConnectionString = Configuration["ApplicationInsights:ConnectionString"];
+
+            options.EnableAdaptiveSampling = true;
+            options.EnablePerformanceCounterCollectionModule = true;
+            options.EnableDependencyTrackingTelemetryModule = true;
+            options.EnableHeartbeat = true;
+            options.EnableAzureInstanceMetadataTelemetryModule = true;
+
+            // Enable QuickPulse (Live Metrics) for real-time monitoring
+            options.EnableQuickPulseMetricStream = true;
+
+            // Disable in development to avoid unnecessary telemetry costs
+            options.EnableActiveTelemetryConfigurationSetup = true;
+        });
+
+        // Configure sampling settings for better performance
+        services.Configure<TelemetryConfiguration>(config =>
+        {
+            config.DefaultTelemetrySink.TelemetryProcessorChainBuilder.Build();
+        });
+
+        services.AddSingleton<ITelemetryInitializer, SailScoresTelemetryInitializer>();
+        services.AddApplicationInsightsTelemetryProcessor<SailScoresTelemetryProcessor>();
+        services.AddHttpContextAccessor();
     }
 
     private void RegisterBackgroundQueueServices(IServiceCollection services)
@@ -273,6 +296,29 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
+            // Health check endpoint for monitoring
+            endpoints.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+            {
+                Predicate = _ => true,
+                ResponseWriter = async (context, report) =>
+                {
+                    context.Response.ContentType = "application/json";
+                    var result = System.Text.Json.JsonSerializer.Serialize(new
+                    {
+                        status = report.Status.ToString(),
+                        checks = report.Entries.Select(e => new
+                        {
+                            name = e.Key,
+                            status = e.Value.Status.ToString(),
+                            description = e.Value.Description,
+                            duration = e.Value.Duration.ToString()
+                        }),
+                        totalDuration = report.TotalDuration.ToString()
+                    });
+                    await context.Response.WriteAsync(result);
+                }
+            });
+
             var clubRouteConstraint = new ClubRouteConstraint(() =>
                     app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ISailScoresContext>(),
                 app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<IMemoryCache>()

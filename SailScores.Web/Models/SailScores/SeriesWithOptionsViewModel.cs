@@ -11,6 +11,8 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
 
     public IList<SeriesSummary> SeriesOptions { get; set; }
 
+    public IList<SeriesSummary> SummarySeriesOptions { get; set; }
+
     private Guid _seasonId;
 
     [Required]
@@ -31,5 +33,4 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
 
     }
 
-    public bool? UseExperimentalFeatures { get; set; }
 }
