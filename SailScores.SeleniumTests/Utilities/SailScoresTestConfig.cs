@@ -10,6 +10,6 @@ namespace SailScores.SeleniumTests
         public string TestEmail { get; set; }
         public string TestPassword { get; set; }
         public string TestClubInitials { get; set; }
-
+        public bool Headless { get; set; } = true;
     }
 }

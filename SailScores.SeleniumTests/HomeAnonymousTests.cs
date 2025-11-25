@@ -1,17 +1,13 @@
-
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
+using Microsoft.Playwright;
+using Microsoft.Playwright.Xunit;
 using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SailScores.SeleniumTests
 {
     [Trait("Club", "None")]
-    public class HomeAnonymousTests
+    public class HomeAnonymousTests : PageTest
     {
         private readonly SailScoresTestConfig configuration;
 
@@ -20,85 +16,77 @@ namespace SailScores.SeleniumTests
             configuration = TestHelper.GetApplicationConfiguration(Environment.CurrentDirectory);
         }
 
-
         [Trait("Read Only", "True")]
         [Fact]
-        public void HomePage_HasDropdown()
+        public async Task HomePage_HasDropdown()
         {
-            using var driver = new ChromeDriver();
-            driver.Navigate().GoToUrl(configuration.BaseUrl);
+            await Page.GotoAsync(configuration.BaseUrl);
 
-            //if logged in, log out.
-            var logout = driver.FindElements(By.LinkText("Log out"));
-            if(logout.Count > 0)
+            // if logged in, log out
+            var logoutLink = Page.Locator("a:has-text('Log out')");
+            if (await logoutLink.CountAsync() > 0)
             {
-                logout[0].Click();
+                await logoutLink.ClickAsync();
             }
 
-            var clubSelector = new SelectElement(driver.FindElement(By.Id("clubSelect")));
-            Assert.NotNull(clubSelector);
+            var clubSelector = Page.Locator("#clubSelect");
+            Assert.True(await clubSelector.CountAsync() > 0);
         }
 
         [Trait("Read Only", "True")]
         [Fact]
-        public void AboutAndNews_Load()
+        public async Task AboutAndNews_Load()
         {
-            using var driver = new ChromeDriver();
-            driver.Navigate().GoToUrl(configuration.BaseUrl);
+            await Page.GotoAsync(configuration.BaseUrl);
 
-
-            //if logged in, log out.
-            var logout = driver.FindElements(By.LinkText("Log out"));
-            if (logout.Count > 0)
+            // if logged in, log out
+            var logoutLink = Page.Locator("a:has-text('Log out')");
+            if (await logoutLink.CountAsync() > 0)
             {
-                logout[0].Click();
+                await logoutLink.ClickAsync();
             }
 
-            var currentElement = driver.WaitUntilClickable(By.LinkText("About"));
-            currentElement.Click();
+            await Page.Locator("a:has-text('About')").ClickAsync();
+            var aboutHeading = Page.Locator("//h1[contains(.,'kept simple')]");
+            await Expect(aboutHeading).ToBeVisibleAsync(); // auto-waits for visibility
 
-            // Relying on this to throw exception if not found.
-            driver.FindElement(By.XPath("//h1[contains(.,'kept simple')]"));
-
-            currentElement = driver.WaitUntilClickable(By.LinkText("News"));
-            currentElement.Click();
-
-            // Relying on this to throw exception if not found.
-            driver.FindElement(By.XPath("//h5[contains(.,'To the cloud')]"));
+            await Page.Locator("a:has-text('News')").ClickAsync();
+            var newsHeading = Page.Locator("//h5[contains(.,'Something feels different')]");
+            await Expect(newsHeading).ToBeVisibleAsync(); // auto-waits for visibility
         }
 
         [Fact]
-        public void FillOutClubRequest_Load()
+        public async Task FillOutClubRequest_Load()
         {
-            using var driver = new ChromeDriver();
-            driver.Navigate().GoToUrl(configuration.BaseUrl);
+            await Page.GotoAsync(configuration.BaseUrl);
 
-
-            //if logged in, log out.
-            var logout = driver.FindElements(By.LinkText("Log out"));
-            if (logout.Count > 0)
+            // if logged in, log out
+            var logoutLink = Page.Locator("a:has-text('Log out')");
+            if (await logoutLink.CountAsync() > 0)
             {
-                logout[0].Click();
+                await logoutLink.ClickAsync();
             }
+
             int num = new Random().Next(1000);
-            driver.FindElement(By.LinkText("Try it out")).Click();
-            driver.FindElement(By.Id("ClubName")).Click();
-            driver.FindElement(By.Id("ClubName")).SendKeys($"asdf{num}");
-            driver.FindElement(By.Id("ClubInitials")).Click();
-            driver.FindElement(By.Id("ClubInitials")).SendKeys($"ASDF{num}");
-            driver.FindElement(By.Id("ClubLocation")).SendKeys("somewhere");
-            driver.FindElement(By.Id("ClubWebsite")).SendKeys("http://www.google.com");
-            driver.FindElement(By.Id("ContactFirstName")).SendKeys("Jamie");
-            driver.FindElement(By.Id("ContactLastName")).SendKeys("Fraser Test");
-            driver.FindElement(By.Id("ContactEmail")).SendKeys($"test{num}@jamie.com");
+            await Page.Locator("a:has-text('Try it out')").ClickAsync();
+            await Page.Locator("#ClubName").ClickAsync();
+            await Page.Locator("#ClubName").FillAsync($"asdf{num}");
+            await Page.Locator("#ClubInitials").ClickAsync();
+            await Page.Locator("#ClubInitials").FillAsync($"ASDF{num}");
+            await Page.Locator("#ClubLocation").FillAsync("somewhere");
+            await Page.Locator("#ClubWebsite").FillAsync("http://www.google.com");
+            await Page.Locator("#ContactFirstName").FillAsync("Jamie");
+            await Page.Locator("#ContactLastName").FillAsync("Fraser Test");
+            await Page.Locator("#ContactEmail").FillAsync($"test{num}@jamie.com");
 
-            driver.FindElement(By.Id("Password")).SendKeys("P@ssw0rd");
-            driver.FindElement(By.Id("ConfirmPassword")).SendKeys("P@ssw0rd");
-            driver.FindElement(By.Id("Classes")).SendKeys("MC ");
-            driver.FindElement(By.Id("Comments")).SendKeys("Nothing");
-            driver.FindElement(By.CssSelector(".btn-success")).Click();
-            driver.FindElement(By.XPath("//h1[contains(.,'Club Created')]"));
+            await Page.Locator("#Password").FillAsync("P@ssw0rd");
+            await Page.Locator("#ConfirmPassword").FillAsync("P@ssw0rd");
+            await Page.Locator("#Classes").FillAsync("MC ");
+            await Page.Locator("#Comments").FillAsync("Nothing");
+            await Page.Locator(".btn-success").ClickAsync();
+            
+            var successHeading = Page.Locator("//h1[contains(.,'Club Created')]");
+            Assert.True(await successHeading.CountAsync() > 0);
         }
-
     }
 }

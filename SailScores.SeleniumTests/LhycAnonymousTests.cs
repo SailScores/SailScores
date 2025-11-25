@@ -1,17 +1,13 @@
-
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
+using Microsoft.Playwright;
+using Microsoft.Playwright.Xunit;
 using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SailScores.SeleniumTests
 {
     [Trait("Club", "LHYC")]
-    public class LhycAnonymousTests
+    public class LhycAnonymousTests : PageTest
     {
         private readonly SailScoresTestConfig configuration;
 
@@ -20,98 +16,71 @@ namespace SailScores.SeleniumTests
             configuration = TestHelper.GetApplicationConfiguration(Environment.CurrentDirectory);
         }
 
+
         [Trait("Read Only", "True")]
         [Fact]
-        public void LhycSeries()
+        public async Task LhycSeries()
         {
-            using var driver = new ChromeDriver();
-            driver.Navigate().GoToUrl(configuration.BaseUrl);
+            await Page.GotoAsync(configuration.BaseUrl);
 
-            var clubSelector = new SelectElement(driver.FindElement(By.Id("clubSelect")));
-            //javascript should navigate automatically.
-            clubSelector.SelectByText("Lake Harriet Yacht Club");
-            
-            var currentElement = driver.WaitUntilClickable(By.PartialLinkText("LHYC"));
+            // JavaScript should navigate automatically
+            await Page.Locator("#clubSelect").SelectOptionAsync(new SelectOptionValue { Label = "Lake Harriet Yacht Club" });
+            await Page.Locator("a:text-matches('LHYC', 'i')").First.WaitForAsync();
 
-            Assert.Equal(configuration.BaseUrl + "/LHYC", driver.Url);
-            //Thread.Sleep(300);
+            Assert.Equal(configuration.BaseUrl + "/LHYC", Page.Url);
 
-            currentElement = driver.WaitUntilClickable(By.LinkText("Series"));
-            currentElement.Click();
-            //Thread.Sleep(300);
+            await Page.Locator("a:has-text('Series')").ClickAsync();
+            await Page.Locator("a[href*='LHYC/2019/MC Season Champ']").ClickAsync();
 
-            currentElement = driver.WaitUntilClickable(By.CssSelector("a[href*='LHYC/2019/MC Season Champ']"));
-            currentElement.Click();
-
-            driver.WaitUntilVisible(By.CssSelector("table.table"));
-            var rows = driver.FindElements(By.CssSelector("tr"));
+            await Page.Locator("table.table").WaitForAsync();
+            var rows = await Page.Locator("tr").AllAsync();
             Assert.True(rows.Count > 25, "At least 25 rows expected in 2019 season champ results");
-            var headers = driver.FindElements(By.CssSelector("thead th"));
+            var headers = await Page.Locator("thead th").AllAsync();
             Assert.True(headers.Count > 25, "At least 25 headers expected");
         }
 
         [Trait("Read Only", "True")]
         [Fact]
-        public void LhycRace()
+        public async Task LhycRace()
         {
-            // using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            using var driver = new ChromeDriver();
-            driver.Navigate().GoToUrl(configuration.BaseUrl);
+            await Page.GotoAsync(configuration.BaseUrl);
 
-            //if logged in, log out.
-            //var logout = driver.FindElement(By.LinkText("Log out"));
+            await Page.Locator("#clubSelect").SelectOptionAsync(new SelectOptionValue { Label = "Lake Harriet Yacht Club" });
+            await Page.Locator("a:text-matches('LHYC', 'i')").First.WaitForAsync();
 
+            Assert.Equal(configuration.BaseUrl + "/LHYC", Page.Url);
+            await Task.Delay(300);
 
-            var clubSelector = new SelectElement(driver.FindElement(By.Id("clubSelect")));
-            //javascript should navigate automatically.
-            clubSelector.SelectByText("Lake Harriet Yacht Club");
+            await Page.Locator("a:has-text('Races')").ClickAsync();
+            await Page.Locator("a:has-text('2020')").ClickAsync();
+            await Page.Locator("#racelink_5e191bc2-04aa-4c5a-8a19-76b1484a95bb").ClickAsync();
 
-            var currentElement = driver.WaitUntilClickable(By.PartialLinkText("LHYC"));
-
-            Assert.Equal(configuration.BaseUrl + "/LHYC", driver.Url);
-            Thread.Sleep(300);
-
-            currentElement = driver.WaitUntilClickable(By.LinkText("Races"));
-            currentElement.Click();
-
-            currentElement = driver.WaitUntilClickable(By.LinkText("2020"));
-            currentElement.Click();
-
-            currentElement = driver.FindElement(By.XPath("//*[@id='racelink_5e191bc2-04aa-4c5a-8a19-76b1484a95bb']"));
-            currentElement.Click();
-
-            // Relying on these to throw exception if not found.
-            driver.FindElement(By.XPath("//*[contains(.,'Grosch, Ryan')]"));
-            driver.FindElement(By.XPath("//*[contains(.,'Black Cat')]"));
+            var groschElement = Page.Locator("//*[contains(.,'Grosch, Ryan')]");
+            Assert.True(await groschElement.CountAsync() > 0);
+            var blackCatElement = Page.Locator("//*[contains(.,'Black Cat')]");
+            Assert.True(await blackCatElement.CountAsync() > 0);
         }
 
         [Trait("Read Only", "True")]
         [Fact]
-        public void LhycRegatta()
+        public async Task LhycRegatta()
         {
-            using var driver = new ChromeDriver();
-            driver.Navigate().GoToUrl(configuration.BaseUrl);
+            await Page.GotoAsync(configuration.BaseUrl);
 
-            var clubSelector = new SelectElement(driver.FindElement(By.Id("clubSelect")));
-            //javascript should navigate automatically.
-            clubSelector.SelectByText("Lake Harriet Yacht Club");
+            await Page.Locator("#clubSelect").SelectOptionAsync(new SelectOptionValue { Label = "Lake Harriet Yacht Club" });
+            await Page.Locator("a:text-matches('LHYC', 'i')").First.WaitForAsync();
 
-            var currentElement = driver.WaitUntilClickable(By.PartialLinkText("LHYC"));
+            Assert.Equal(configuration.BaseUrl + "/LHYC", Page.Url);
+            await Task.Delay(300);
 
-            Assert.Equal(configuration.BaseUrl + "/LHYC", driver.Url);
-            Thread.Sleep(300);
+            await Page.Locator("a:has-text('Regattas')").ClickAsync();
+            await Page.Locator("a[href*= '/2020/DieHard']").ClickAsync();
 
-            currentElement = driver.WaitUntilClickable(By.LinkText("Regattas"));
-            currentElement.Click();
+            var currentElement = Page.Locator("//*[contains(.,'Grosch, Ryan')]");
+            await currentElement.WaitForAsync();
 
-            currentElement = driver.WaitUntilClickable(By.CssSelector("a[href*= '/2020/DieHard']"));
-            currentElement.Click();
-
-            currentElement = driver.WaitUntilVisible(By.XPath("//*[contains(.,'Grosch, Ryan')]"));
-
-            //*[@id="regattalink_6f2e4bfe-8d0d-41b5-485e-08d732752bb6"]
-            Assert.Contains("Grosch", currentElement.Text);
+            var elementText = await currentElement.TextContentAsync();
+            Assert.Contains("Grosch", elementText);
         }
-
     }
 }

@@ -1,21 +1,13 @@
-﻿
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium.Support.UI;
+﻿using Microsoft.Playwright;
+using Microsoft.Playwright.Xunit;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SailScores.SeleniumTests
 {
-
     [Trait("Club", "TEST")]
-    public class TestClubTests
+    public class TestClubTests : PageTest
     {
         private readonly SailScoresTestConfig configuration;
 
@@ -24,385 +16,230 @@ namespace SailScores.SeleniumTests
             configuration = TestHelper.GetApplicationConfiguration(Environment.CurrentDirectory);
         }
 
-
-        private void LoginAndGoToHiddenTestClub(IWebDriver driver)
+        private async Task LoginAndGoToHiddenTestClubAsync()
         {
-            //navigate to home page.
-            driver.Navigate().GoToUrl(configuration.BaseUrl);
-
-            //log in
-            driver.FindElement(By.LinkText("Log in")).Click();
-            driver.WaitUntilClickable(By.Id("Email")).SendKeys(configuration.TestEmail);
-            driver.FindElement(By.Id("Password")).SendKeys(configuration.TestPassword);
-            driver.FindElement(By.CssSelector("form")).Submit();
-
-            // used go to (hidden) test club
-            driver.Url = UrlCombine(configuration.BaseUrl, configuration.TestClubInitials);
+            await Page.GotoAsync(configuration.BaseUrl);
+            await Page.Locator("a:has-text('Log in')").ClickAsync();
+            await Page.Locator("#Email").FillAsync(configuration.TestEmail);
+            await Page.Locator("#Password").FillAsync(configuration.TestPassword);
+            await Page.Locator("form input[type='submit'], form button[type='submit']").ClickAsync();
+            await Page.GotoAsync(UrlCombine(configuration.BaseUrl, configuration.TestClubInitials));
         }
 
-        //thank you stack overflow:
-        //https://stackoverflow.com/a/2806717/400375
         private string UrlCombine(string url1, string url2)
         {
             if (url1.Length == 0)
             {
                 return url2;
             }
-
             if (url2.Length == 0)
             {
                 return url1;
             }
-
             url1 = url1.TrimEnd('/', '\\');
             url2 = url2.TrimStart('/', '\\');
-
             return string.Format("{0}/{1}", url1, url2);
         }
 
         [Fact]
-        public void AddAndDeleteBoatClass()
+        public async Task AddAndDeleteBoatClass()
         {
             var sectionId = "classes";
-            using var driver = new ChromeDriver();
-            LoginAndGoToHiddenTestClub(driver);
-            driver.WaitUntilClickable(By.LinkText("Admin Page")).Click();
-            driver.WaitUntilClickable(By.Id(sectionId)).Click();
-
-            var createLink = driver.WaitUntilClickable(By.LinkText("New Class"));
-            createLink.Click();
+            await LoginAndGoToHiddenTestClubAsync();
+            await Page.Locator("a:has-text('Admin Page')").ClickAsync();
+            await Page.Locator($"#{sectionId}").ClickAsync();
+            var createLink = Page.Locator("a:has-text('New Class')");
+            await createLink.ClickAsync();
             var className = $"AutoTest Class {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
-            driver.FindElement(By.Id("Name")).SendKeys(className);
-
-            var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
-            submitButton.Click();
-
-            driver.FindElement(By.Id("classes")).Click();
-
-            var deleteButton = GetDeleteButtonForRow(driver, sectionId, className);
-
-            deleteButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
-            submitButton.Click();
-
-            Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete boat class");
+            await Page.Locator("#Name").FillAsync(className);
+            await Page.Locator("input[value='Create']").ClickAsync();
+            await Page.Locator("#classes").ClickAsync();
+            var deleteButton = await GetDeleteButtonForRowAsync(sectionId, className);
+            await deleteButton.ClickAsync();
+            await Page.Locator("input[value='Delete']").ClickAsync();
+            Assert.Contains("/TEST/Admin", Page.Url);
         }
 
         [Fact]
-        public void AddEditDeleteCompetitor()
+        public async Task AddEditDeleteCompetitor()
         {
-
-            using var driver = new ChromeDriver();
-            LoginAndGoToHiddenTestClub(driver);
-            driver.FindElement(By.LinkText("Admin Page")).Click();
-            
-            //link to competitor page
-            driver.FindElement(By.LinkText("Competitor page")).Click();
-
-            var createLink = driver.WaitUntilClickable(By.LinkText("Create"));
-            createLink.Click();
+            await LoginAndGoToHiddenTestClubAsync();
+            await Page.Locator("a:has-text('Admin Page')").ClickAsync();
+            await Page.Locator("a:has-text('Competitor page')").ClickAsync();
+            var createLink = Page.Locator("a:has-text('Create')");
+            await createLink.ClickAsync();
             var compName = $"AutoTest Comp {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
-            driver.FindElement(By.Name("competitors[0].Name")).SendKeys(compName);
-
+            await Page.Locator("[name='competitors[0].Name']").FillAsync(compName);
             var rnd = new Random();
             var sailNumber = $"AT{rnd.Next(9999)}";
-            driver.FindElement(By.Name("competitors[0].SailNumber")).SendKeys(sailNumber);
-            driver.FindElement(By.Name("competitors[0].BoatName")).SendKeys("Test Boat");
-
-            var classSelector = new SelectElement(driver.FindElement(By.Id("BoatClassId")));
-            classSelector.SelectByText("Test Boat Class");
-
-            var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
-            submitButton.Click();
-
-
-            var editButton = driver.WaitUntilVisible(
-                By.XPath($"//div[. = '{compName}']/../../..//a[@title = 'Edit']"));
-            editButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
-            submitButton.Click();
-
-
-            var deleteButton = driver.WaitUntilVisible(
-                By.XPath(
-                $"//div[contains(@class, 'container')]//div[contains(@class, 'row')]" +
-                $"//div[contains(@class, 'row') and contains(., '{compName}')]" +
-                "//a[@title='Delete']"));
-            deleteButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
-            submitButton.Click();
-
-            Assert.True(driver.Url.EndsWith("/TEST/Competitor"), "Failed to delete competitor");
+            await Page.Locator("[name='competitors[0].SailNumber']").FillAsync(sailNumber);
+            await Page.Locator("[name='competitors[0].BoatName']").FillAsync("Test Boat");
+            await Page.Locator("#BoatClassId").SelectOptionAsync(new SelectOptionValue { Label = "Test Boat Class" });
+            await Page.Locator("input[value='Create']").ClickAsync();
+            var editButton = Page.Locator($"//div[. = '{compName}']/../../..//a[@title = 'Edit']");
+            await editButton.ClickAsync();
+            await Page.Locator("input[value='Save']").ClickAsync();
+            var deleteButton = Page.Locator($"//div[contains(@class, 'container')]//div[contains(@class, 'row')]//div[contains(@class, 'row') and contains(., '{compName}')]//a[@title='Delete']");
+            await deleteButton.ClickAsync();
+            await Page.Locator("input[value='Delete']").ClickAsync();
+            Assert.EndsWith("/TEST/Competitor", Page.Url);
         }
 
         [Fact]
-        public void AddEditDeleteFleet()
+        public async Task AddEditDeleteFleet()
         {
             var sectionName = "fleets";
-            using var driver = new ChromeDriver();
-            LoginAndGoToHiddenTestClub(driver);
-            driver.FindElement(By.LinkText("Admin Page")).Click();
-            driver.FindElement(By.Id(sectionName)).Click();
-
-            var createLink = driver.WaitUntilClickable(By.LinkText("New Fleet"));
-            createLink.Click();
+            await LoginAndGoToHiddenTestClubAsync();
+            await Page.Locator("a:has-text('Admin Page')").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var createLink = Page.Locator("a:has-text('New Fleet')");
+            await createLink.ClickAsync();
             var fleetName = $"AutoTest Fleet {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
-            driver.FindElement(By.Id("Name")).SendKeys(fleetName);
-            driver.FindElement(By.Id("NickName")).SendKeys(fleetName);
-
-            var typeSelector = new SelectElement(driver.FindElement(By.Id("fleetType")));
-            typeSelector.SelectByText("Selected Boats");
-
-
-            var boatSelector = new SelectElement(driver.FindElement(By.Id("CompetitorIds")));
-            boatSelector.SelectByText("11111 - Alice (Test Boat Class)");
-            boatSelector.SelectByText("22222 - Bob (Test Boat Class)");
-
-
-            var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
-
-            Actions actions = new Actions(driver);
-            actions.MoveToElement(submitButton);
-            actions.Perform();
-            submitButton.Click();
-
-            driver.FindElement(By.Id(sectionName)).Click();
-
-            var editButton = GetEditButtonForRow(driver, sectionName, fleetName);
-            editButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
-            submitButton.Click();
-
-            driver.FindElement(By.Id(sectionName)).Click();
-
-
-            var deleteButton = GetDeleteButtonForRow(driver, sectionName, fleetName);
-            deleteButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
-            submitButton.Click();
-
-            Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete fleet");
+            await Page.Locator("#Name").FillAsync(fleetName);
+            await Page.Locator("#NickName").FillAsync(fleetName);
+            await Page.Locator("#fleetType").SelectOptionAsync(new SelectOptionValue { Label = "Selected Boats" });
+            await Page.Locator("#CompetitorIds").SelectOptionAsync(new[] {
+                new SelectOptionValue { Label = "11111 - Alice (Test Boat Class)" },
+                new SelectOptionValue { Label = "22222 - Bob (Test Boat Class)" }
+            });
+            var submitButton = Page.Locator("input[value='Create']");
+            await submitButton.ScrollIntoViewIfNeededAsync();
+            await submitButton.ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var editButton = await GetEditButtonForRowAsync(sectionName, fleetName);
+            await editButton.ClickAsync();
+            await Page.Locator("input[value='Save']").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var deleteButton = await GetDeleteButtonForRowAsync(sectionName, fleetName);
+            await deleteButton.ClickAsync();
+            await Page.Locator("input[value='Delete']").ClickAsync();
+            Assert.Contains("/TEST/Admin", Page.Url);
         }
 
         [Fact]
-        public void AddEditDeleteSeason()
+        public async Task AddEditDeleteSeason()
         {
-            using var driver = new ChromeDriver();
-            LoginAndGoToHiddenTestClub(driver);
-            driver.FindElement(By.LinkText("Admin Page")).Click();
+            await LoginAndGoToHiddenTestClubAsync();
+            await Page.Locator("a:has-text('Admin Page')").ClickAsync();
             var sectionName = "seasons";
-            driver.FindElement(By.Id(sectionName)).Click();
-
-            var createLink = driver.WaitUntilClickable(By.LinkText("New Season"));
-            createLink.Click();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var createLink = Page.Locator("a:has-text('New Season')");
+            await createLink.ClickAsync();
             var startDate = DateTime.Today.AddYears(-5);
             var finishDate = DateTime.Today.AddDays(1).AddYears(-5);
             var seasonName = $"Test {startDate.Year}";
-            driver.FindElement(By.Id("Name")).SendKeys(seasonName);
-            driver.FindElement(By.Id("Start")).SendKeys(startDate.ToString("MMDDYYYY"));
-            driver.FindElement(By.Id("End")).SendKeys(finishDate.ToString("MMDDYYYY"));
-
-
-            var submitButton = driver.WaitUntilVisible(By.XPath("//input[@value='Create']"));
-            submitButton.Click();
-            // if submit button fails, check to see if already a season with this name exists.
-
-            driver.FindElement(By.Id(sectionName)).Click();
-
-
-            var editButton = GetEditButtonForRow(driver, sectionName, seasonName);
-            editButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
-            submitButton.Click();
-
-            driver.FindElement(By.Id(sectionName)).Click();
-
-
-            var deleteButton = GetDeleteButtonForRow(driver, sectionName, seasonName);
-            deleteButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
-            submitButton.Click();
-
-            Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete season");
+            await Page.Locator("#Name").FillAsync(seasonName);
+            await Page.Locator("#Start").FillAsync(startDate.ToString("MM/dd/yyyy"));
+            await Page.Locator("#End").FillAsync(finishDate.ToString("MM/dd/yyyy"));
+            await Page.Locator("input[value='Create']").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var editButton = await GetEditButtonForRowAsync(sectionName, seasonName);
+            await editButton.ClickAsync();
+            await Page.Locator("input[value='Save']").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var deleteButton = await GetDeleteButtonForRowAsync(sectionName, seasonName);
+            await deleteButton.ClickAsync();
+            await Page.Locator("input[value='Delete']").ClickAsync();
+            Assert.Contains("/TEST/Admin", Page.Url);
         }
 
         [Fact]
-        public void AddEditDeleteSeries()
+        public async Task AddEditDeleteSeries()
         {
             var sectionName = "series";
             var seriesName = $"Test Series {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
-
-            using var driver = new ChromeDriver();
-            LoginAndGoToHiddenTestClub(driver);
-            driver.FindElement(By.LinkText("Admin Page")).Click();
-            driver.FindElement(By.Id(sectionName)).Click();
-
-            var createLink = driver.WaitUntilClickable(By.LinkText("New Series"));
-            createLink.Click();
-            driver.FindElement(By.Id("Name")).SendKeys(seriesName);
-
-            var seasonSelector = new SelectElement(driver.FindElement(By.Id("SeasonId")));
-            seasonSelector.SelectByText(DateTime.Today.Year.ToString());
-
-            var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
-            submitButton.Click();
-
-            driver.FindElement(By.Id(sectionName)).Click();
-
-            var editButton = GetEditButtonForRow(driver, sectionName, seriesName);
-            editButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
-            submitButton.Click();
-
-            driver.FindElement(By.Id(sectionName)).Click();
-
-            var deleteButton = GetDeleteButtonForRow(driver, sectionName, seriesName);
-            deleteButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
-            submitButton.Click();
-
-            Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete series");
+            await LoginAndGoToHiddenTestClubAsync();
+            await Page.Locator("a:has-text('Admin Page')").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var createLink = Page.Locator("a:has-text('New Series')");
+            await createLink.ClickAsync();
+            await Page.Locator("#Name").FillAsync(seriesName);
+            await Page.Locator("#SeasonId").SelectOptionAsync(new SelectOptionValue { Label = DateTime.Today.Year.ToString() });
+            await Page.Locator("input[value='Create']").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var editButton = await GetEditButtonForRowAsync(sectionName, seriesName);
+            await editButton.ClickAsync();
+            await Page.Locator("input[value='Save']").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var deleteButton = await GetDeleteButtonForRowAsync(sectionName, seriesName);
+            await deleteButton.ClickAsync();
+            await Page.Locator("input[value='Delete']").ClickAsync();
+            Assert.Contains("/TEST/Admin", Page.Url);
         }
 
         [Fact]
-        public void AddEditDeleteRegatta()
+        public async Task AddEditDeleteRegatta()
         {
             var sectionName = "regattas";
             var regattaName = $"Test Regatta {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
-
-            using var driver = new ChromeDriver();
-            LoginAndGoToHiddenTestClub(driver);
-            driver.FindElement(By.LinkText("Admin Page")).Click();
-            driver.FindElement(By.Id(sectionName)).Click();
-
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
-            var createLink = driver.WaitUntilClickable(By.LinkText("New Regatta"));
-            createLink.Click();
-            driver.FindElement(By.Id("Name")).SendKeys(regattaName);
-            driver.FindElement(By.Name("StartDate")).SendKeys(DateTime.Today.AddDays(-1).ToString("MM/dd/yyyy"));
-            driver.FindElement(By.Name("EndDate")).SendKeys(DateTime.Today.AddDays(1).ToString("MM/dd/yyyy"));
-
-            var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
-            submitButton.Click();
-
-            driver.WaitUntilClickable(By.LinkText("Edit Regatta")).Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Save']"));
-            submitButton.Click();
-
-            driver.FindElement(By.LinkText("Club Admin")).Click();
-
-            driver.WaitUntilVisible(By.Id(sectionName)).Click();
-
-            var deleteButton = GetDeleteButtonForRow(driver, sectionName, regattaName);
-            deleteButton.Click();
-
-            submitButton = driver.FindElement(By.XPath("//input[@value='Delete']"));
-            submitButton.Click();
-
-            Assert.True(driver.Url.Contains("/TEST/Admin"), "Failed to delete regatta");
+            await LoginAndGoToHiddenTestClubAsync();
+            await Page.Locator("a:has-text('Admin Page')").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var createLink = Page.Locator("a:has-text('New Regatta')");
+            await createLink.ClickAsync();
+            await Page.Locator("#Name").FillAsync(regattaName);
+            await Page.Locator("[name='StartDate']").FillAsync(DateTime.Today.AddDays(-1).ToString("MM/dd/yyyy"));
+            await Page.Locator("[name='EndDate']").FillAsync(DateTime.Today.AddDays(1).ToString("MM/dd/yyyy"));
+            await Page.Locator("input[value='Create']").ClickAsync();
+            await Page.Locator("a:has-text('Edit Regatta')").ClickAsync();
+            await Page.Locator("input[value='Save']").ClickAsync();
+            await Page.Locator("a:has-text('Club Admin')").ClickAsync();
+            await Page.Locator($"#{sectionName}").ClickAsync();
+            var deleteButton = await GetDeleteButtonForRowAsync(sectionName, regattaName);
+            await deleteButton.ClickAsync();
+            await Page.Locator("input[value='Delete']").ClickAsync();
+            Assert.Contains("/TEST/Admin", Page.Url);
         }
-
 
         [Fact]
-        public void AddRaceAndSeeResults()
+        public async Task AddRaceAndSeeResults()
         {
             var year = DateTime.Today.Year;
-            using var driver = new ChromeDriver();
-            LoginAndGoToHiddenTestClub(driver);
-
-            var serieslink = driver.FindElements(By.LinkText("Series"));
+            await LoginAndGoToHiddenTestClubAsync();
+            var serieslink = await Page.Locator("a:has-text('Series')").AllAsync();
             if (serieslink.Count == 0)
             {
-                var firstButton = driver.FindElement(By.CssSelector("button"));
-                firstButton.Click();
-                serieslink = driver.FindElements(By.LinkText("Series"));
+                await Page.Locator("button").First.ClickAsync();
+                serieslink = await Page.Locator("a:has-text('Series')").AllAsync();
             }
-            serieslink[0].Click();
-
-            var testSeriesLink = driver.WaitUntilClickable(By.LinkText($"{year} Test Series"));
-            testSeriesLink.Click();
-
-            var headerlinks = driver.FindElements(By.CssSelector("th a"));
+            await serieslink[0].ClickAsync();
+            var testSeriesLink = Page.Locator($"a:has-text('{year} Test Series')");
+            await testSeriesLink.ClickAsync();
+            var headerlinks = await Page.Locator("th a").AllAsync();
             int raceCount = headerlinks.Count;
-
-            // back to club page
-            driver.FindElement(By.LinkText("TEST")).Click();
-
-            // click add race button
-            driver.FindElement(By.LinkText("New Race")).Click();
-
-            // set race fields, saving order for later
-            var fleetSelector = new SelectElement(driver.WaitUntilVisible(By.Id("fleetId")));
-            fleetSelector.SelectByText("Test Boat Class Fleet");
-            var seriesSelector = new SelectElement(driver.FindElement(By.Id("seriesIds")));
-            seriesSelector.SelectByText($"{year} Test Series");
-
-            driver.FindElement(By.LinkText("Optional Fields")).Click();
+            await Page.Locator("a:has-text('TEST')").ClickAsync();
+            await Page.Locator("a:has-text('New Race')").ClickAsync();
+            await Page.Locator("#fleetId").SelectOptionAsync(new SelectOptionValue { Label = "Test Boat Class Fleet" });
+            await Page.Locator("#seriesIds").SelectOptionAsync(new SelectOptionValue { Label = $"{year} Test Series" });
+            await Page.Locator("a:has-text('Optional Fields')").ClickAsync();
             int order = ++raceCount;
-            var orderField = driver.WaitUntilVisible(By.Id("InitialOrder"));
-            orderField.SendKeys(order.ToString());
-
-            var addCompElement = driver.FindElement(By.Id("newCompetitor"));
-            addCompElement.SendKeys("11111");
-            addCompElement.SendKeys(Keys.Return);
-
-            addCompElement.SendKeys("222");
-            addCompElement.SendKeys(Keys.Return);
-
-            var submitButton = driver.FindElement(By.XPath("//input[@value='Create']"));
-            submitButton.Click();
-
-            // go to this series.
-            driver.WaitUntilVisible(By.LinkText("TEST")).Click();
-
-            // since results are calculated as a background thread, need to pause here:
-            Thread.Sleep(1000);
-            driver.WaitUntilVisible(By.LinkText($"{year} Test Series")).Click();
-
-            // verify series includes race heading
+            var orderField = Page.Locator("#InitialOrder");
+            await orderField.FillAsync(order.ToString());
+            var addCompElement = Page.Locator("#newCompetitor");
+            await addCompElement.FillAsync("11111");
+            await addCompElement.PressAsync("Enter");
+            await addCompElement.FillAsync("222");
+            await addCompElement.PressAsync("Enter");
+            await Page.Locator("input[value='Create']").ClickAsync();
+            await Page.Locator("a:has-text('TEST')").ClickAsync();
+            await Task.Delay(1000);
+            await Page.Locator($"a:has-text('{year} Test Series')").ClickAsync();
             var linkText = $"{DateTime.Today.ToString("M/d")} R{order}";
-            var raceLink = driver.FindElement(By.LinkText(linkText));
-
-            Assert.NotNull(raceLink);
+            var raceLink = Page.Locator($"a:has-text('{linkText}')");
+            Assert.True(await raceLink.CountAsync() > 0);
         }
 
-        private IWebElement GetDeleteButtonForRow(
-            IWebDriver driver,
-            string sectionId,
-            string itemName
-            )
+        private async Task<ILocator> GetDeleteButtonForRowAsync(string sectionId, string itemName)
         {
-            return driver.WaitUntilClickable(
-                GetButtonSelector("Delete", sectionId, itemName));
+            return Page.Locator(GetButtonSelector("Delete", sectionId, itemName));
         }
-        private IWebElement GetEditButtonForRow(
-           IWebDriver driver,
-           string sectionId,
-           string itemName
-           )
+        private async Task<ILocator> GetEditButtonForRowAsync(string sectionId, string itemName)
         {
-            return driver.WaitUntilClickable(
-                GetButtonSelector("Edit", sectionId, itemName));
+            return Page.Locator(GetButtonSelector("Edit", sectionId, itemName));
         }
-
-        private By GetButtonSelector(
-            string buttonTitle,
-            string sectionId,
-            string itemInRowText)
+        private string GetButtonSelector(string buttonTitle, string sectionId, string itemInRowText)
         {
-            return By.XPath(
-                $"//div[@id=\"{sectionId}div\"]//div[contains(string(), \"{itemInRowText}\")]//a[@title=\"{buttonTitle}\"]");
-
+            return $"//div[@id=\"{sectionId}div\"]//div[contains(string(), \"{itemInRowText}\")]//a[@title=\"{buttonTitle}\"]";
         }
     }
 }

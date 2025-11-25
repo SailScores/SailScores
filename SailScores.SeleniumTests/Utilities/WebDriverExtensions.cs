@@ -1,74 +1,64 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
+﻿using Microsoft.Playwright;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace SailScores.SeleniumTests
 {
-    public static class WebDriverExtensions
+    public static class PageExtensions
     {
-        private static readonly int _basicTimeout = 20;
+        private static readonly int _basicTimeout = 20000; // milliseconds
 
-        // use: element = driver.WaitUntilVisible(By.XPath("//input[@value='Save']"));
-        public static IWebElement WaitUntilVisible(
-            this IWebDriver driver,
-            By itemSpecifier,
-            int? secondsTimeout = null)
+        // Wait until element is visible
+        public static async Task<ILocator> WaitUntilVisibleAsync(
+            this IPage page,
+            string selector,
+            int? millisecondsTimeout = null)
         {
-            var wait = new WebDriverWait(driver, new TimeSpan(0, 0, secondsTimeout ?? _basicTimeout));
-            var element = wait.Until<IWebElement>(driver =>
+            var locator = page.Locator(selector);
+            await locator.WaitForAsync(new LocatorWaitForOptions
             {
-                try
-                {
-                    var elementToBeDisplayed = driver.FindElement(itemSpecifier);
-                    if(elementToBeDisplayed.Displayed)
-                    {
-                        return elementToBeDisplayed;
-                    }
-                    return null;
-                }
-                catch (StaleElementReferenceException)
-                {
-                    return null;
-                }
-                catch (NoSuchElementException)
-                {
-                    return null;
-                }
-
+                State = WaitForSelectorState.Visible,
+                Timeout = millisecondsTimeout ?? _basicTimeout
             });
-            return element;
+            return locator;
         }
 
-        public static IWebElement WaitUntilClickable(
-            this IWebDriver driver,
-            By itemSpecifier,
-            int? secondsTimeout = null)
+        // Wait until element is clickable (visible and enabled)
+        public static async Task<ILocator> WaitUntilClickableAsync(
+            this IPage page,
+            string selector,
+            int? millisecondsTimeout = null)
         {
-            var wait = new WebDriverWait(driver, new TimeSpan(0, 0, secondsTimeout ?? _basicTimeout));
-            var element = wait.Until<IWebElement>(driver =>
+            var locator = page.Locator(selector);
+            await locator.WaitForAsync(new LocatorWaitForOptions
             {
-                try
-                {
-                    var elementToBeFound = driver.FindElement(itemSpecifier);
-                    if (elementToBeFound.Displayed && elementToBeFound.Enabled)
-                    {
-                        return elementToBeFound;
-                    }
-                    return null;
-                }
-                catch (StaleElementReferenceException)
-                {
-                    return null;
-                }
-                catch (NoSuchElementException)
-                {
-                    return null;
-                }
-
+                State = WaitForSelectorState.Visible,
+                Timeout = millisecondsTimeout ?? _basicTimeout
             });
-            return element;
+            // Ensure it's also enabled
+            await page.WaitForFunctionAsync(
+                $"document.querySelector('{selector.Replace("'", "\\'")}')?.disabled === false",
+                new PageWaitForFunctionOptions
+                {
+                    Timeout = millisecondsTimeout ?? _basicTimeout
+                });
+            return locator;
+        }
+
+        // Convert Selenium By locators to Playwright selectors
+        public static string ToPlaywrightSelector(this string selectorType, string value)
+        {
+            return selectorType switch
+            {
+                "Id" => $"#{value}",
+                "Name" => $"[name='{value}']",
+                "ClassName" => $".{value}",
+                "CssSelector" => value,
+                "XPath" => value,
+                "LinkText" => $"a:has-text('{value}')",
+                "PartialLinkText" => $"a:text-matches('{value}', 'i')",
+                _ => value
+            };
         }
     }
 }
