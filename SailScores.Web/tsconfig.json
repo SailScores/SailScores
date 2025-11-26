@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "outDir": "./build/",
+    "outDir": "./wwwroot/js/",
     "noImplicitAny": true,
     "noEmitOnError": true,
     "removeComments": false,
@@ -9,7 +9,7 @@
     "module": "es2020",
     "moduleResolution": "node",
     "target": "es2020",
-    "baseUrl": "scripts",
+    "baseUrl": "./Scripts",
     "lib": [
       "ES2020",
       "es5",
@@ -17,15 +17,15 @@
     ],
     "types": [ "jquery", "select2" ],
     "typeRoots": [
-      "node_modules/@types",
-      "interfaces"
+      "./node_modules/@types",
+      "./Scripts/interfaces"
     ]
   },
   "files": [
-    "./guid.ts",
-    "./raceEditor.ts",
-    "./fleetEditor.ts",
-    "./interfaces/CompetitorDto.cs.d.ts"
+    "./Scripts/guid.ts",
+    "./Scripts/raceEditor.ts",
+    "./Scripts/fleetEditor.ts",
+    "./Scripts/interfaces/CompetitorDto.cs.d.ts"
   ],
   "compileOnSave": true
-  }
+}

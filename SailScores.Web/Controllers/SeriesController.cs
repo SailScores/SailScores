@@ -182,7 +182,14 @@ public class SeriesController : Controller
                 var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
                 model.SeasonOptions = blankVm.SeasonOptions;
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+                model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
                 return View(model);
+            }
+
+            // Clear parent series IDs for Summary Series since they can't have parents
+            if (model.Type == Core.Model.SeriesType.Summary)
+            {
+                model.ParentSeriesIds = null;
             }
 
             model.UpdatedBy = await GetUserStringAsync();
@@ -200,6 +207,13 @@ public class SeriesController : Controller
             var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+
+            // Clear parent series IDs for Summary Series since they can't have parents
+            if (model.Type == Core.Model.SeriesType.Summary)
+            {
+                model.ParentSeriesIds = null;
+            }
 
             ModelState.AddModelError(String.Empty,
                 "A problem occurred creating this series. Does a " +
@@ -238,6 +252,7 @@ public class SeriesController : Controller
         var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
         seriesWithOptions.SeasonOptions = blankVm.SeasonOptions;
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+        seriesWithOptions.SummarySeriesOptions = blankVm.SummarySeriesOptions;
         if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
         {
             seriesWithOptions.SeriesOptions =
@@ -272,10 +287,18 @@ public class SeriesController : Controller
                 var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
                 model.SeasonOptions = blankVm.SeasonOptions;
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+                model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
                 return View(model);
             }
 
             model.UpdatedBy = await GetUserStringAsync();
+            
+            // Clear parent series IDs for Summary Series since they can't have parents
+            if (model.Type == Core.Model.SeriesType.Summary)
+            {
+                model.ParentSeriesIds = null;
+            }
+            
             await _seriesService.Update(model);
 
             if (!string.IsNullOrWhiteSpace(returnUrl))

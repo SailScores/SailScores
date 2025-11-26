@@ -31,6 +31,8 @@ public class Series
 
     public IList<Guid> ChildrenSeriesIds { get; set; } = new List<Guid>();
 
+    public IList<Guid> ParentSeriesIds { get; set; } = new List<Guid>();
+
     public IList<Race> Races { get; set; }
 
     public int? RaceCount { get; set; }
@@ -81,6 +83,7 @@ public class Series
 
 public enum SeriesType
 {
+    Unknown = 0,
     Standard = 1,
     Regatta = 2,
     Summary = 3,

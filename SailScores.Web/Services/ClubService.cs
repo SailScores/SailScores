@@ -47,7 +47,7 @@ public class ClubService : IClubService
         var club = await _coreClubService.GetMinimalClub(clubId);
         // 10 days back, but view filters down to 8 days back.
         club.Races = await _coreRaceService.GetRecentRacesAsync(clubId, 10);
-        club.Series = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false);
+        club.Series = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, true);
         club.Regattas = await _coreRegattaService.GetAllRegattasAsync(clubId);
         return club;
     }

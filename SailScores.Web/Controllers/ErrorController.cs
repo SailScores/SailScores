@@ -1,5 +1,4 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -9,35 +8,32 @@ namespace SailScores.Web.Controllers;
 public class ErrorController : Controller
 {
     private readonly ILogger<ErrorController> _logger;
-    private readonly TelemetryClient _telemetryClient;
 
-    public ErrorController(
-        ILogger<ErrorController> logger,
-        TelemetryClient telemetryClient)
+    public ErrorController(ILogger<ErrorController> logger)
     {
         _logger = logger;
-        _telemetryClient = telemetryClient;
     }
-
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error(int code)
     {
-        // handle different codes or just return the default error view
         if (code == 404)
         {
+            var statusCodeReExecuteFeature = HttpContext?.Features?.Get<IStatusCodeReExecuteFeature>();
+            var originalPath = statusCodeReExecuteFeature?.OriginalPath ?? HttpContext?.Request?.Path;
+            var originalQueryString = statusCodeReExecuteFeature?.OriginalQueryString;
+
+            _logger.LogWarning("404 Not Found: {Path}{QueryString}", originalPath, originalQueryString);
             return View("Error404");
         }
 
         var exceptionHandlerPathFeature = HttpContext?.Features?.Get<IExceptionHandlerPathFeature>();
-        if (exceptionHandlerPathFeature != null && _telemetryClient != null)
+        if (exceptionHandlerPathFeature?.Error != null)
         {
-            _telemetryClient.TrackException(exceptionHandlerPathFeature.Error);
-            _telemetryClient.TrackEvent("Error.ServerError", new Dictionary<string, string>
-            {
-                ["originalPath"] = exceptionHandlerPathFeature?.Path,
-                ["error"] = exceptionHandlerPathFeature?.Error?.Message
-            });
+            _logger.LogError(
+                exceptionHandlerPathFeature.Error,
+                "Unhandled exception occurred on path: {Path}",
+                exceptionHandlerPathFeature.Path);
         }
 
         return View();

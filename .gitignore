@@ -259,24 +259,12 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-SailScores\.Web/SailScores\.Web\.xml
-
-SailScores\.Web/bower_components/
-SailScores\.Web/wwwroot/vendor/
-
-SailScores\.Web/wwwroot/scripts/
-
-SailScores\.Web/Scripts/raceEditor\.js
-
-SailScores\.Web/Scripts/raceEditor\.js\.map
-
-SailScores\.Web/Scripts/build/
-
-SailScores\.Web/Scripts/guid\.js\.map
-
-SailScores\.Web/Scripts/guid\.js
-
-SailScores\.Web/wwwroot/css/custom\.css
+SailScores.Web/SailScores\.Web\.xml
+SailScores.Web/bower_components/
+SailScores.Web/wwwroot/vendor/
+SailScores.Web/wwwroot/scripts/
+SailScores.Web/Scripts/build/
+SailScores.Web/wwwroot/css/custom\.css
 
 \.sonarqube/
 
@@ -285,3 +273,19 @@ SailScores\.Web/wwwroot/css/custom\.css
 *.pubxml
 
 SailScores.Web/Properties/ServiceDependencies/sailscorestest - Web Deploy/
+
+SailScores.Web/wwwroot/js/guid.js
+SailScores.Web/wwwroot/js/microsoft.cognitiveservices.speech.sdk.bundle-min.min.js
+SailScores.Web/wwwroot/js/microsoft.cognitiveservices.speech.sdk.bundle-min.min.js.LICENSE.txt
+SailScores.Web/wwwroot/js/raceEditor.min.js.LICENSE.txt
+
+SailScores.Web/appsettings.Development.json
+SailScores.Web/appsettings.ApplicationInsights.json
+
+# TypeScript compiled output
+SailScores.Web/wwwroot/js/**/*.js
+SailScores.Web/wwwroot/js/**/*.js.map
+!SailScores.Web/wwwroot/js/vendor/**
+
+# Gulp output
+SailScores.Web/wwwroot/css/site.min.css

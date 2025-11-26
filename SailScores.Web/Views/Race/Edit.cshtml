@@ -229,7 +229,7 @@
 {
     var score = Model.Scores[i];
     <li id="@score.CompetitorId" class="list-group-item"
-        data-competitorid="@score.CompetitorId" data-originalScore="@score.Place">
+        data-competitor-id="@score.CompetitorId" data-originalScore="@score.Place">
         <div class="d-flex w-100 flex-wrap">
             <div>
                 <span class="badge text-bg-secondary rounded-pill race-place"></span>
@@ -279,7 +279,7 @@
                     <button class="btn btn-light move-down" type="button"><span class="fas fa-angle-down"></span></button>
                     &ensp;
                     <button class="btn btn-light delete-button" type="button" data-bs-toggle="modal"
-                            data-bs-target="#deleteConfirm" data-competitorid="@score.CompetitorId">
+                            data-bs-target="#deleteConfirm" data-competitor-id="@score.CompetitorId">
                         <span class="far fa-trash-alt text-danger"></span>
                     </button>
                 </div>
@@ -435,6 +435,8 @@
         var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
         var speechInfoUrl =
             '@Url.Action("SpeechInfo", "Race")';
+        // Set speech debug mode based on environment
+        window.SPEECH_DEBUG = @(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? "true" : "false");
     </script>
     <script>
         function formatText (icon) {
@@ -459,7 +461,7 @@
     @* <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script> *@
     @if (Model.UseAdvancedFeatures)
     {
-        <script src="~/js/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.40.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle.min.js"></script>
     }
 
     <script>

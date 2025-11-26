@@ -163,7 +163,7 @@ public class RaceService : IRaceService
         {
             ClubId = club.Id,
             FleetOptions = await _coreClubService.GetActiveFleets(club.Id),
-            SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(club.Id, DateTime.Today, false),
+            SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(club.Id, DateTime.Today, false, false),
             ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
                 .OrderBy(s => s.Name).ToList(),
             CompetitorOptions = new List<Competitor>(),
@@ -309,7 +309,8 @@ public class RaceService : IRaceService
         raceWithOptions.SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(
             raceWithOptions.ClubId,
             raceWithOptions.Date ?? DateTime.Today,
-            true);
+            true,
+            false);
 
         raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(raceWithOptions.ClubId))
             .OrderBy(s => s.Name).ToList();
@@ -402,7 +403,7 @@ public class RaceService : IRaceService
         CleanUpRaceTimes(race);
         await EnsureSeasonExists(race.ClubId, race.Date);
         var fleets = await _coreClubService.GetAllFleets(race.ClubId);
-        var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, race.Date, false);
+        var series = await _coreSeriesService.GetAllSeriesAsync(race.ClubId, race.Date, false, false);
 
         // fill in series and fleets
         if (race.SeriesIds != null)

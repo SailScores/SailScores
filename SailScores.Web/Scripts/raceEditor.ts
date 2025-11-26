@@ -8,20 +8,17 @@ import "bootstrap";
 
 import { competitorDto, scoreCodeDto, seriesDto, speechInfo } from "./interfaces/server";
 
-import { Guid } from "./guid";
-
-declare var scoreCodes: scoreCodeDto[];
+declare let scoreCodes: scoreCodeDto[];
 const noCodeString = "No Code";
 
 function checkEnter(e: KeyboardEvent) {
-    const ev = e || event;
-    var txtArea = /textarea/i.test((ev.srcElement as HTMLElement).tagName);
-    return txtArea || (e.keyCode || e.which || e.charCode || 0) !== 13;
+    let txtArea = /textarea/i.test((e.target as HTMLElement).tagName);
+    return txtArea || e.key !== 'Enter';
 }
 
 export function initialize() {
-    document.querySelector('form').onkeypress = checkEnter;
-    $('#fleetId').change(loadFleet);
+    document.querySelector('form')?.addEventListener('keypress', checkEnter);
+    document.getElementById('fleetId')?.addEventListener('change', loadFleet);
     if ($("#defaultRaceDateOffset").val() == "") {
         $('#date').val('');
     } else if ($('#needsLocalDate').val() === "True") {
@@ -45,16 +42,16 @@ export function initialize() {
         $('#needsLocalDate').val('');
     }
 
-    $('#date').change(dateChanged);
+    document.getElementById('date')?.addEventListener('change', dateChanged);
 
 
-    $('#results input[name="FinishTime"]').change( onFinishTimeChanged );
+    document.querySelectorAll('#results input[name="FinishTime"]').forEach(el => el.addEventListener('change', onFinishTimeChanged));
 
-    $('#results input[name="ElapsedTime"]').change( onElapsedTimeChanged );
+    document.querySelectorAll('#results input[name="ElapsedTime"]').forEach(el => el.addEventListener('change', onElapsedTimeChanged));
 
     $('#raceState').data("previous", $('#raceState').val());
-    $('#raceState').change(raceStateChanged);
-    $('.weather-input').change(weatherChanged);
+    document.getElementById('raceState')?.addEventListener('change', raceStateChanged);
+    document.querySelectorAll('.weather-input').forEach(el => el.addEventListener('change', weatherChanged));
     $('#results').on('click', '.select-code', calculatePlaces);
     $('#results').on('click', '.move-up', moveUp);
     $('#results').on('click', '.move-down', moveDown);
@@ -64,12 +61,12 @@ export function initialize() {
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
-        var waiting = $('#ssWaitingModal');
-        if (!!waiting) {
+        let waiting = $('#ssWaitingModal');
+        if (waiting) {
             waiting.show();
         }
         $('#submitButton').attr('value', 'Please wait...');
-        var form = document.getElementById("raceform") as HTMLFormElement;
+        let form = document.getElementById("raceform") as HTMLFormElement;
         $('#submitButton').attr('disabled', 'disabled');
         addScoresFieldsToForm(form);
     });
@@ -79,11 +76,11 @@ export function initialize() {
 
     RequestAuthorizationToken(null);
 
-    window.onload = function () {
+    window.addEventListener('load', function () {
         loadFleet();
         loadSeriesOptions();
         calculatePlaces();
-    };
+    });
 
 
     // TrackTimes dynamic show/hide
@@ -105,7 +102,6 @@ export function initialize() {
             updateAllScoreTimesForStartTimeChange();
         });
     }
-
 }
 
 export function loadSeriesOptions() {
@@ -165,10 +161,10 @@ export function compCreateSubmit(e: any) {
 
     e.preventDefault();
     $("#compLoading").show();
-    var form = $(this as HTMLFormElement);
-    var url = form.attr("data-submit-url");
+    let form = $(this as HTMLFormElement);
+    let url = form.attr("data-submit-url");
 
-    var prep = function (xhr: any) {
+    let prep = function (xhr: any) {
         $('#compLoading').show();
         xhr.setRequestHeader("RequestVerificationToken",
             $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -193,7 +189,7 @@ export function completeCompCreate() {
     let fleetId = ($("#fleetId").val() as string);
     getCompetitors(clubId, fleetId);
 
-    var modal = $("#createCompetitor");
+    let modal = $("#createCompetitor");
     (<any>modal).modal("hide");
 }
 
@@ -205,17 +201,17 @@ export function hideAlert() {
     $("#compCreateAlert").hide();
 }
 
-export function moveUp() {
-    var btn = <Node>event.target;
-    var resultItem = $(btn).closest("li");
+export function moveUp(event: Event) {
+    let btn = event.target as Node;
+    let resultItem = $(btn).closest("li");
     // move up:
     resultItem.prev().insertAfter(resultItem);
     calculatePlaces();
 }
 
-export function moveDown() {
-    var btn = <Node>event.target;
-    var resultItem = $(btn).closest("li");
+export function moveDown(event: Event) {
+    let btn = event.target as Node;
+    let resultItem = $(btn).closest("li");
     resultItem.next().insertBefore(resultItem);
     calculatePlaces();
 }
@@ -226,10 +222,10 @@ export function deleteResult() {
     const buttonElement = document.activeElement as HTMLElement;
     buttonElement.blur();
 
-    var modal = $("#deleteConfirm");
-    var compId = modal.find("#compIdToDelete").val();
-    var resultList = $("#results");
-    var resultItem = resultList.find(`[data-competitorid='${compId}']`);
+    let modal = $("#deleteConfirm");
+    let compId = modal.find("#compIdToDelete").val();
+    let resultList = $("#results");
+    let resultItem = resultList.find(`[data-competitor-id='${compId}']`);
     resultItem.remove();
     calculatePlaces();
     initializeAutoComplete();
@@ -237,17 +233,17 @@ export function deleteResult() {
     (<any>modal).modal("hide");
 }
 
-export function confirmDelete() {
+export function confirmDelete(event: Event) {
 
-    var btn = <Node>event.target;
-    var resultItem = $(btn).closest("li");
-    var listElement = resultItem.get(0) as HTMLLIElement;
-    var compId = listElement.dataset.competitorid;
-    var compName = resultItem.find(".competitor-name").text();
+    let btn = event.target as Node;
+    let resultItem = $(btn).closest("li");
+    let listElement = resultItem.get(0) as HTMLLIElement;
+    let compId = listElement.dataset.competitorId;
+    let compName = resultItem.find(".competitor-name").text();
     if (!compName) {
         compName = resultItem.find(".sail-number").text();
     }
-    var modal = $('#deleteConfirm');
+    let modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
     modal.find('#compIdToDelete').val(compId);
     modal.show();
@@ -257,11 +253,11 @@ export function hideScoreButtonFooter() {
     $('#scoreButtonFooter').hide();
 }
 
-export function addNewCompetitorFromButton() {
+export function addNewCompetitorFromButton(event: Event) {
     if (!(event.target instanceof HTMLButtonElement)) {
         return;
     }
-    let competitorId = event.target.dataset['competitorid'];
+    let competitorId = event.target.dataset['competitorId'];
     let comp = allCompetitors.find(c => c.id.toString() === competitorId);
     addNewCompetitor(comp);
 }
@@ -273,7 +269,7 @@ function addNewCompetitor(competitor: competitorDto) {
     let compTemplate = document.getElementById("competitorTemplate");
     let compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
     compListItem.id = competitor.id.toString();
-    compListItem.setAttribute("data-competitorId", competitor.id.toString());
+    compListItem.dataset.competitorId = competitor.id.toString();
 
     populateCompetitorInfo(compListItem, competitor, c);
     setTimingFields(compListItem);
@@ -290,42 +286,42 @@ function addNewCompetitor(competitor: competitorDto) {
 }
 
 function populateCompetitorInfo(compListItem: HTMLLIElement, competitor: competitorDto, c: number) {
-    var span = compListItem.getElementsByClassName("competitor-name")[0] as HTMLElement;
-    span.appendChild(document.createTextNode(competitor.name || ""));
+    let span = compListItem.getElementsByClassName("competitor-name")[0] as HTMLElement | undefined;
+    span?.appendChild(document.createTextNode(competitor.name ?? ""));
 
-    span = compListItem.getElementsByClassName("sail-number")[0] as HTMLElement;
-    span.appendChild(document.createTextNode(competitor.sailNumber || ""));
+    span = compListItem.getElementsByClassName("sail-number")[0] as HTMLElement | undefined;
+    span?.appendChild(document.createTextNode(competitor.sailNumber ?? ""));
     if (competitor.alternativeSailNumber) {
-        span = compListItem.getElementsByClassName("alt-sail-number")[0] as HTMLElement;
-        span.appendChild(document.createTextNode(" ("+competitor.alternativeSailNumber+")"));
-        span.style.display = "";
+        span = compListItem.getElementsByClassName("alt-sail-number")[0] as HTMLElement | undefined;
+        span?.appendChild(document.createTextNode(" ("+competitor.alternativeSailNumber+")"));
+        if (span) span.style.display = "";
     }
 
-    span = compListItem.getElementsByClassName("race-place")[0] as HTMLElement;
-    span.appendChild(document.createTextNode(c.toString()));
+    span = compListItem.getElementsByClassName("race-place")[0] as HTMLElement | undefined;
+    span?.appendChild(document.createTextNode(c.toString()));
 
-    var deleteButtons = compListItem.getElementsByClassName("delete-button");
-    for (var i = 0; i < deleteButtons.length; i++) {
-        (deleteButtons[i] as HTMLElement).dataset.competitorid = competitor.id.toString();
+    let deleteButtons = compListItem.getElementsByClassName("delete-button");
+    for (let i = 0; i < deleteButtons.length; i++) {
+        (deleteButtons[i] as HTMLElement)?.dataset && ((deleteButtons[i] as HTMLElement).dataset.competitorId = competitor.id.toString());
     }
 }
 
 function setTimingFields(compListItem: HTMLLIElement) {
-    var trackTimesChecked = (document.getElementById("trackTimesCheckbox") as HTMLInputElement)?.checked;
-    var finishDiv = compListItem.getElementsByClassName("finish-time-div")[0] as HTMLElement;
-    var finishInput = compListItem.getElementsByClassName("finish-time-input")[0] as HTMLInputElement;
-    finishDiv.style.display = trackTimesChecked ? "" : "none";
+    let trackTimesChecked = (document.getElementById("trackTimesCheckbox") as HTMLInputElement | null)?.checked ?? false;
+    let finishDiv = compListItem.getElementsByClassName("finish-time-div")[0] as HTMLElement | undefined;
+    let finishInput = compListItem.getElementsByClassName("finish-time-input")[0] as HTMLInputElement | undefined;
+    if (finishDiv) finishDiv.style.display = trackTimesChecked ? "" : "none";
 
-    var elapsedDiv = compListItem.getElementsByClassName("elapsed-time-div")[0] as HTMLElement;
-    var elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0] as HTMLInputElement;
-    elapsedDiv.style.display = trackTimesChecked ? "" : "none";
+    let elapsedDiv = compListItem.getElementsByClassName("elapsed-time-div")[0] as HTMLElement | undefined;
+    let elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0] as HTMLInputElement | undefined;
+    if (elapsedDiv) elapsedDiv.style.display = trackTimesChecked ? "" : "none";
 
-    const raceDateStr = ($("#date").val() as string);
+    const raceDateStr = $("#date").val() as string;
     const now = new Date();
     const nowDateStr = now.toISOString().substring(0, 10);
     if (raceDateStr === nowDateStr && trackTimesChecked) {
-        finishInput.value = now.toTimeString().slice(0, 8);
-        const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
+        if (finishInput) finishInput.value = now.toTimeString().slice(0, 8);
+        const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
         if (startTimeInput?.value) {
             const start = parseTimeStringToDate(startTimeInput.value);
             if (start) {
@@ -335,21 +331,17 @@ function setTimingFields(compListItem: HTMLLIElement) {
                 }
                 let elapsedMs = finish.getTime() - start.getTime();
                 if (elapsedMs < 0) elapsedMs += 24 * 3600 * 1000;
-                elapsedInput.value = formatElapsedTime(elapsedMs);
+                if (elapsedInput) elapsedInput.value = formatElapsedTime(elapsedMs);
             }
         }
     }
 }
 
 function attachTimingEventHandlers(compListItem: HTMLLIElement) {
-    var finishInput = compListItem.getElementsByClassName("finish-time-input")[0] as HTMLInputElement;
-    var elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0] as HTMLInputElement;
-    if (finishInput) {
-        $(finishInput).change(onFinishTimeChanged);
-    }
-    if (elapsedInput) {
-        $(elapsedInput).change(onElapsedTimeChanged);
-    }
+    let finishInput = compListItem.getElementsByClassName("finish-time-input")[0] as HTMLInputElement | undefined;
+    let elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0] as HTMLInputElement | undefined;
+    finishInput?.addEventListener('change', onFinishTimeChanged);
+    elapsedInput?.addEventListener('change', onElapsedTimeChanged);
 }
 
 function finalizeCompetitorAdd(compListItem: HTMLLIElement) {
@@ -365,22 +357,22 @@ function finalizeCompetitorAdd(compListItem: HTMLLIElement) {
 function addScoresFieldsToForm(form: HTMLFormElement) {
     //clear out old fields first:
     removeScoresFieldsFromForm(form);
-    var resultList = document.getElementById("results");
-    var resultItems = resultList.getElementsByTagName("li");
+    let resultList = document.getElementById("results");
+    let resultItems = resultList.getElementsByTagName("li");
 
-    for (var i = 1; i < resultItems.length; i++) {
+    for (let i = 1; i < resultItems.length; i++) {
         const listIndex = (i - 1).toString();
-        var input = document.createElement("input");
+        let input = document.createElement("input");
         input.type = "hidden";
         input.name = "Scores[" + listIndex + "].competitorId";
-        input.value = resultItems[i].getAttribute("data-competitorId");
+        input.value = resultItems[i].dataset.competitorId;
         form.appendChild(input);
 
         input = document.createElement("input");
         input.type = "hidden";
         input.name = "Scores[" + listIndex + "].place";
         if (shouldCompKeepScore(resultItems[i])) {
-            input.value = resultItems[i].getAttribute("data-place");
+            input.value = resultItems[i].dataset.place;
         }
         form.appendChild(input);
 
@@ -397,7 +389,7 @@ function addScoresFieldsToForm(form: HTMLFormElement) {
         form.appendChild(input);
 
         // Add FinishTime and ElapsedTime if present
-        var finishInput = resultItems[i].querySelector('input[name="FinishTime"]') as HTMLInputElement;
+        let finishInput = resultItems[i].querySelector('input[name="FinishTime"]') as HTMLInputElement;
         if (finishInput?.value) {
             input = document.createElement("input");
             input.type = "hidden";
@@ -421,42 +413,43 @@ function removeScoresFieldsFromForm(form: HTMLFormElement) {
 }
 
 export function calculatePlaces() {
-    var resultList = document.getElementById("results");
-    var resultItems = resultList.getElementsByTagName("li");
-    var scoreCount = 1;
-    for (var i = 1, len = resultItems.length; i < len; i++) {
-        var span = resultItems[i].getElementsByClassName("race-place")[0];
-        resultItems[i].setAttribute("data-place", i.toString());
-        var origScore = resultItems[i].getAttribute("data-originalScore");
-        if (span.id !== "competitorTemplate") {
-            if (shouldCompKeepScore(resultItems[i]) &&
-                origScore !== "0") {
-                span.textContent = (scoreCount).toString();
-                resultItems[i].setAttribute("data-place", scoreCount.toString());
+    let resultList = document.getElementById("results");
+    let resultItems = Array.from(resultList?.getElementsByTagName("li") ?? []) as HTMLLIElement[];
+    let scoreCount = 1;
+    // Skip the first item (index 0)
+    for (const [i, item] of Array.from(resultItems).entries()) {
+        if (i === 0) continue;
+        let span = item.getElementsByClassName("race-place")[0] as HTMLElement | undefined;
+        item.dataset.place = i.toString();
+        let origScore = item.getAttribute("data-originalScore");
+        if (span?.id !== "competitorTemplate") {
+            if (shouldCompKeepScore(item) && origScore !== "0") {
+                if (span) span.textContent = (scoreCount).toString();
+                item.dataset.place = scoreCount.toString();
                 scoreCount++;
             } else {
-                span.textContent = getCompetitorCode(resultItems[i]);
-                resultItems[i].removeAttribute("data-place");
+                if (span) span.textContent = getCompetitorCode(item) as string | null;
+                delete item.dataset.place;
             }
         }
-
         // show manual entry if needed
-        var codepointsinput = resultItems[i].getElementsByClassName("code-points")[0] as HTMLInputElement;
-        if (shouldHaveManualEntry(resultItems[i])) {
-            codepointsinput.style.display = "";
+        let codepointsinput = item.getElementsByClassName("code-points")[0] as HTMLInputElement | undefined;
+        if (shouldHaveManualEntry(item)) {
+            if (codepointsinput) codepointsinput.style.display = "";
         } else {
-            codepointsinput.style.display = "none";
-            codepointsinput.value = "";
+            if (codepointsinput) {
+                codepointsinput.style.display = "none";
+                codepointsinput.value = "";
+            }
         }
     }
 }
 
 function competitorIsInResults(comp: competitorDto) {
-    var resultList = document.getElementById("results");
-    var resultItems = resultList.getElementsByTagName("li");
-    for (var i = 0, len = resultItems.length; i < len; i++) {
-        if (resultItems[i].getAttribute("data-competitorId")
-            === comp.id.toString()) {
+    let resultList = document.getElementById("results");
+    let resultItems = Array.from(resultList?.getElementsByTagName("li") ?? []) as HTMLElement[];
+    for (let i = 0, len = resultItems.length; i < len; i++) {
+        if (resultItems[i]?.dataset?.competitorId === comp.id.toString()) {
             return true;
         }
     }
@@ -465,7 +458,7 @@ function competitorIsInResults(comp: competitorDto) {
 
 function getSuggestions(): AutocompleteSuggestion[] {
     const competitorSuggestions: AutocompleteSuggestion[] = [];
-    allCompetitors.forEach(c => {
+    for (const c of allCompetitors) {
         if (!competitorIsInResults(c)) {
             let comp = {
                 value: c.name,
@@ -479,12 +472,12 @@ function getSuggestions(): AutocompleteSuggestion[] {
             }
             competitorSuggestions.push(comp);
         }
-    });
+    }
     return competitorSuggestions;
 }
 
-var allCompetitors: competitorDto[];
-var competitorSuggestions: AutocompleteSuggestion[];
+let allCompetitors: competitorDto[];
+let competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
     if ($ && clubId && fleetId && fleetId.length > 31) {
         $.getJSON("/api/Competitors",
@@ -529,13 +522,14 @@ function displayRaceNumber() {
 }
 
 
-var seriesOptions: seriesDto[];
+let seriesOptions: seriesDto[];
 function getSeries(clubId: string, date: string) {
     if (clubId && date) {
         $.getJSON("/api/Series",
             {
                 clubId: clubId,
-                date: date
+                date: date,
+                includeSummary: false
             },
             function (data: seriesDto[]) {
                 seriesOptions = data;
@@ -576,7 +570,7 @@ function setSeries() {
     seriesSelect.val(selectedSeriesValues).trigger('change');
 }
 
-var autoCompleteSetup: boolean = false;
+let autoCompleteSetup: boolean = false;
 function initializeAutoComplete() {
     competitorSuggestions = getSuggestions();
     if (autoCompleteSetup) {
@@ -603,7 +597,7 @@ function initializeButtonFooter() {
     // hide if too long.
     $('#scoreButtonFooter').show();
 
-    allCompetitors.forEach(c => {
+    for (const c of allCompetitors) {
         let style = 'btn quick-comp ';
         if (!competitorIsInResults(c)) {
             style += 'btn-outline-primary add-comp-enabled';
@@ -611,14 +605,14 @@ function initializeButtonFooter() {
             style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            '" data-competitorid="' + c.id + '" > ' +
+            '" data-competitor-id="' + c.id + '" > ' +
             (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
-    });
+    };
 }
 
 function updateButtonFooter() {
     $('#scoreButtonDiv').empty();
-    allCompetitors.forEach(c => {
+    for (const c of allCompetitors) {
         let style = 'btn quick-comp ';
         if (!competitorIsInResults(c)) {
             style += 'btn-outline-primary add-comp-enabled';
@@ -626,14 +620,14 @@ function updateButtonFooter() {
             style += 'btn-primary add-comp-disabled';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
-            '" data-competitorid="' + c.id + '" > ' +
+            '" data-competitor-id="' + c.id + '" > ' +
             (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
 
-    });
+    }
 }
 
 function getCompetitorCode(compListItem: HTMLLIElement) {
-    const codeText = (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement).value;
+    const codeText = (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement)?.value;
     if (codeText === noCodeString) {
         return null;
     }
@@ -641,7 +635,7 @@ function getCompetitorCode(compListItem: HTMLLIElement) {
 }
 
 function getCompetitorCodePoints(compListItem: HTMLLIElement) {
-    const codePoints = (compListItem.getElementsByClassName("code-points")[0] as HTMLInputElement).value;
+    const codePoints = (compListItem.getElementsByClassName("code-points")[0] as HTMLInputElement)?.value;
     if (codePoints === noCodeString) {
         return null;
     }
@@ -651,23 +645,23 @@ function getCompetitorCodePoints(compListItem: HTMLLIElement) {
 function shouldCompKeepScore(compListItem: HTMLLIElement): boolean {
     const codeText =
         (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement)
-        .value;
+        ?.value;
     if (codeText === noCodeString) {
         return true;
     }
     const fullCodeObj = scoreCodes.filter(s => s.name === codeText);
-    return !!(fullCodeObj[0].preserveResult);
+    return !!(fullCodeObj[0]?.preserveResult);
 }
 
 function shouldHaveManualEntry(compListItem: HTMLLIElement): boolean {
     const codeText =
         (compListItem.getElementsByClassName("select-code")[0] as HTMLSelectElement)
-            .value;
+            ?.value;
     if (codeText === noCodeString) {
         return false;
     }
     const fullCodeObj = scoreCodes.filter(s => s.name === codeText);
-    return (fullCodeObj[0].formula === "MAN");
+    return (fullCodeObj[0]?.formula === "MAN");
 }
 
 function clearWeatherFields() {
@@ -683,7 +677,7 @@ function clearWeatherFields() {
 }
 
 function populateEmptyWeatherFields() {
-    var initials = $("#clubInitials").val();
+    let initials = $("#clubInitials").val();
     $.getJSON("/" + initials +"/weather/current/",
         {},
         function (data: any) {
@@ -726,84 +720,7 @@ function toggleTimingFields(show: boolean) {
     });
 }
 
-/// Speech section
-
-declare global {
-    interface Window {
-        SpeechSDK: any;
-        webkitAudioContext: any;
-        speechInfoUrl: string;
-    }
-}
-
-function RequestAuthorizationToken(continuation: () => any) {
-
-    var prep = function (xhr: any) {
-        xhr.setRequestHeader("Accept", "application/json");
-    };
-
-    $.ajax({
-        type: "GET",
-        url: window.speechInfoUrl,
-        dataType: "json",
-        beforeSend: prep,
-        success: function (data: speechInfo) {
-            failureCount = 0;
-            authorizationToken = data.token;
-            region = data.region;
-            language = data.userLanguage;
-            timeOfLastToken = Date.now();
-            if (continuation) {
-                continuation();
-            }
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            failureCount++;
-            if (failureCount < 3) {
-                $.ajax(this);
-                return
-            }
-        }
-    });
-}
-
-
-function updateAllScoreTimesForStartTimeChange() {
-    const trackTimesCheckbox = document.getElementById("trackTimesCheckbox") as HTMLInputElement;
-    if (!trackTimesCheckbox || !trackTimesCheckbox.checked) return;
-    const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
-    if (!startTimeInput || !startTimeInput.value) return;
-    const start = parseTimeStringToDate(startTimeInput.value);
-    if (!start) return;
-    $("#results li").each(function () {
-        const finishInput = $(this).find('input[name="FinishTime"]')[0] as HTMLInputElement;
-        const elapsedInput = $(this).find('input[name="ElapsedTime"]')[0] as HTMLInputElement;
-        if (!finishInput && !elapsedInput) return;
-        // If elapsed is set, recalc finish; else if finish is set, recalc elapsed
-        if (elapsedInput && elapsedInput.value) {
-            const elapsedMs = parseElapsedTimeString(elapsedInput.value);
-            if (elapsedMs !== null) {
-                let finish = new Date(start.getTime() + elapsedMs);
-                // Always ensure finish is after start (roll to next day if needed)
-                if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
-                finishInput.value = formatTimeForInput(finish);
-            }
-        } else if (finishInput && finishInput.value) {
-            let finish = parseTimeStringToDate(finishInput.value, start);
-            if (finish) {
-                // Always ensure finish is after start (roll to next day if needed)
-                if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
-                const elapsedMs = finish.getTime() - start.getTime();
-                elapsedInput.value = formatElapsedTime(elapsedMs);
-                // Also update finishInput in case we rolled to next day
-                finishInput.value = formatTimeForInput(finish);
-            }
-        }
-    });
-}
-
-initialize();
-
+// Helper functions for time parsing and formatting
 function parseTimeStringToDate(timeString: string, baseDate?: Date): Date | null {
     // timeString: "HH:mm:ss" or "HH:mm" or "hh:mm:ss" or "hh:mm"
     if (!timeString) return null;
@@ -849,25 +766,136 @@ function formatTimeForInput(date: Date): string {
     return date.toTimeString().slice(0, 8);
 }
 
+function updateAllScoreTimesForStartTimeChange() {
+    const trackTimesCheckbox = document.getElementById("trackTimesCheckbox") as HTMLInputElement;
+    const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
+    if (!(trackTimesCheckbox?.checked && startTimeInput?.value)) return;
+    const start = parseTimeStringToDate(startTimeInput.value);
+    if (!start) return;
+    $("#results li").each(function () {
+        const finishInput = $(this).find('input[name="FinishTime"]')[0] as HTMLInputElement;
+        const elapsedInput = $(this).find('input[name="ElapsedTime"]')[0] as HTMLInputElement;
+        if (!finishInput && !elapsedInput) return;
+        // If elapsed is set, recalc finish; else if finish is set, recalc elapsed
+        if (elapsedInput?.value) {
+            const elapsedMs = parseElapsedTimeString(elapsedInput.value);
+            if (elapsedMs !== null) {
+                let finish = new Date(start.getTime() + elapsedMs);
+                // Always ensure finish is after start (roll to next day if needed)
+                if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                finishInput.value = formatTimeForInput(finish);
+            }
+        } else if (finishInput?.value) {
+            let finish = parseTimeStringToDate(finishInput.value, start);
+            if (finish) {
+                // Always ensure finish is after start (roll to next day if needed)
+                if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                const elapsedMs = finish.getTime() - start.getTime();
+                elapsedInput.value = formatElapsedTime(elapsedMs);
+                // Also update finishInput in case we rolled to next day
+                finishInput.value = formatTimeForInput(finish);
+            }
+        }
+    });
+}
+
+function onFinishTimeChanged(this: HTMLInputElement) {
+    const finishInput = this;
+    const li = $(finishInput).closest('li');
+    const elapsedInput = li.find('input[name="ElapsedTime"]')[0] as HTMLInputElement | undefined;
+    const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
+    if (!startTimeInput || !startTimeInput.value || !finishInput.value) return;
+    // Parse StartTime and FinishTime
+    const start = parseTimeStringToDate(startTimeInput.value);
+    const finish = parseTimeStringToDate(finishInput.value, start);
+    if (!start || !finish) return;
+    let elapsedMs = finish.getTime() - start.getTime();
+    if (elapsedMs < 0) elapsedMs += 24 * 3600 * 1000; // handle midnight wrap
+    if (elapsedInput) elapsedInput.value = formatElapsedTime(elapsedMs);
+}
+
+function onElapsedTimeChanged(this: HTMLInputElement) {
+    const elapsedInput = this;
+    const li = $(elapsedInput).closest('li');
+    const finishInput = li.find('input[name="FinishTime"]')[0] as HTMLInputElement | undefined;
+    const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
+    if (!startTimeInput || !startTimeInput.value || !elapsedInput.value) return;
+    const start = parseTimeStringToDate(startTimeInput.value);
+    const elapsedMs = parseElapsedTimeString(elapsedInput.value);
+    if (!start || elapsedMs === null) return;
+    const finish = new Date(start.getTime() + elapsedMs);
+    if (finishInput) finishInput.value = formatTimeForInput(finish);
+}
+
+
+/// Speech section
+
+// Debug flag - automatically set from server-side environment variable
+// Can be overridden by setting window.SPEECH_DEBUG before this script loads
+const SPEECH_DEBUG = (window as any).SPEECH_DEBUG ?? false;
+
+declare global {
+    interface Window {
+        SPEECH_DEBUG?: boolean;
+        SpeechSDK: any;
+        webkitAudioContext: any;
+        speechInfoUrl: string;
+    }
+}
+
+function RequestAuthorizationToken(continuation: () => any) {
+
+    let prep = function (xhr: any) {
+        xhr.setRequestHeader("Accept", "application/json");
+    };
+
+    $.ajax({
+        type: "GET",
+        url: window.speechInfoUrl,
+        dataType: "json",
+        beforeSend: prep,
+        success: function (data: speechInfo) {
+            failureCount = 0;
+            authorizationToken = data.token;
+            region = data.region;
+            language = data.userLanguage;
+            timeOfLastToken = Date.now();
+            if (continuation) {
+                continuation();
+            }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            failureCount++;
+            if (failureCount < 3) {
+                $.ajax(this);
+                return
+            }
+        }
+    });
+}
+
 
 function InitializeSpeech(onComplete: any) {
-    if (!!window.SpeechSDK) {
-        document.getElementById('speechwarning').style.display = 'none';
+    if (window.SpeechSDK) {
+        const speechWarning = document.getElementById('speechwarning');
+        if (speechWarning) {
+            speechWarning.style.display = 'none';
+        }
         onComplete(window.SpeechSDK);
     }
 }
 
-var language: string;
-var region: string;
-var authorizationToken: string;
-var timeOfLastToken: number;
-var timeOfLastRecognized: number;
-var failureCount: number = 0;
+let language: string;
+let region: string;
+let authorizationToken: string;
+let timeOfLastToken: number;
+let timeOfLastRecognized: number;
+let failureCount: number = 0;
 
-var SpeechSDK: any;
-var phraseDiv: HTMLDivElement;
-var scenarioStartButton: HTMLButtonElement, scenarioStopButton: HTMLButtonElement;
-var reco:any;
+let SpeechSDK: any;
+let phraseDiv: HTMLDivElement;
+let scenarioStartButton: HTMLButtonElement, scenarioStopButton: HTMLButtonElement;
+let reco:any;
 
 
 function resetUiForScenarioStart() {
@@ -881,17 +909,45 @@ document.addEventListener("DOMContentLoaded", function () {
     phraseDiv = document.getElementById("phraseDiv") as HTMLDivElement;
 
     // if the buttons aren't there, don't enable.
-    if (!!scenarioStopButton) {
+    if (scenarioStopButton) {
         scenarioStopButton.addEventListener("click",
             stopContinuousRecognition);
     }
 
-    if (!!scenarioStartButton) {
+    if (scenarioStartButton) {
         scenarioStartButton.addEventListener("click",
             doContinuousRecognition);
 
+        // Check microphone permissions on load
+        if (navigator.mediaDevices?.getUserMedia) {
+            if (SPEECH_DEBUG) console.log("🎤 Checking microphone access...");
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    if (SPEECH_DEBUG) {
+                        console.log("✅ Microphone access granted");
+                        console.log("🎙️ Audio tracks:", stream.getAudioTracks().length);
+                        stream.getAudioTracks().forEach(track => {
+                            console.log("  Track:", track.label, "enabled:", track.enabled, "muted:", track.muted);
+                        });
+                    }
+                    // Stop the test stream
+                    stream.getTracks().forEach(track => track.stop());
+                })
+                .catch(function(err) {
+                    console.error("❌ Microphone access denied:", err);
+                    const speechWarning = document.getElementById('speechwarning');
+                    if (speechWarning) {
+                        speechWarning.textContent = "Microphone access denied: " + err.message;
+                        speechWarning.style.display = '';
+                    }
+                });
+        } else {
+            console.error("❌ getUserMedia not supported in this browser");
+        }
+
         InitializeSpeech(function (speechSdk: any) {
             SpeechSDK = speechSdk;
+            if (SPEECH_DEBUG) console.log("✅ Speech SDK initialized:", !!SpeechSDK);
         });
     }
 
@@ -903,7 +959,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 function getSpeechConfig(sdkConfigType: any) {
-    var speechConfig;
+    let speechConfig;
     if (authorizationToken) {
         speechConfig = sdkConfigType.fromAuthorizationToken(authorizationToken, region);
     }
@@ -913,7 +969,7 @@ function getSpeechConfig(sdkConfigType: any) {
     // advanced information.
     //speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
 
-    speechConfig.setProperty(SpeechSDK.SpeechServiceConnection_EndSilenceTimeoutMs, 1000);
+    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "1000");
     speechConfig.speechRecognitionLanguage = language;
     return speechConfig;
 }
@@ -925,38 +981,57 @@ function onRecognized(sender: any, recognitionEventArgs: any) {
 function onRecognizedResult(result: any) {
 
     console.debug(`(recognized)  Reason: ${SpeechSDK.ResultReason[result.reason]}`);
+    if (SPEECH_DEBUG) {
+        console.log("📝 Recognition result:", {
+            reason: SpeechSDK.ResultReason[result.reason],
+            text: result.text,
+            duration: result.duration,
+            offset: result.offset,
+            errorDetails: result.errorDetails
+        });
+    }
 
     switch (result.reason) {
         case SpeechSDK.ResultReason.NoMatch:
-            var noMatchDetail = SpeechSDK.NoMatchDetails.fromResult(result);
+            let noMatchDetail = SpeechSDK.NoMatchDetails.fromResult(result);
+            if (SPEECH_DEBUG) console.warn("⚠️ NO MATCH - Reason:", SpeechSDK.NoMatchReason[noMatchDetail.reason]);
             console.debug(` NoMatchReason: ${SpeechSDK.NoMatchReason[noMatchDetail.reason]}\r\n`);
+            if (phraseDiv) {
+                phraseDiv.innerHTML = "No match detected - keep speaking";
+            }
             stopIfTimedOut();
             break;
         case SpeechSDK.ResultReason.Canceled:
-            var cancelDetails = SpeechSDK.CancellationDetails.fromResult(result);
+            let cancelDetails = SpeechSDK.CancellationDetails.fromResult(result);
+            console.error("❌ CANCELED - Reason:", SpeechSDK.CancellationReason[cancelDetails.reason]);
+            console.error("Error details:", cancelDetails.errorDetails);
             console.debug( ` CancellationReason: ${SpeechSDK.CancellationReason[cancelDetails.reason]}`);
             console.debug(cancelDetails.reason === SpeechSDK.CancellationReason.Error
                 ? `: ${cancelDetails.errorDetails}` : ``);
+            if (phraseDiv) {
+                phraseDiv.innerHTML = "Error: " + cancelDetails.errorDetails;
+            }
             stopIfTimedOut();
             break;
         case SpeechSDK.ResultReason.RecognizedSpeech:
+            if (SPEECH_DEBUG) console.log("✅ RECOGNIZED SPEECH:", result.text);
 
-                //var detailedResultJson = JSON.parse(result.json);
+            //let detailedResultJson = JSON.parse(result.json);
 
-                //// Detailed result JSON includes substantial extra information:
-                ////  detailedResultJson['NBest'] is an array of recognition alternates
-                ////  detailedResultJson['NBest'][0] is the highest-confidence alternate
-                ////  ...['Confidence'] is the raw confidence score of an alternate
-                ////  ...['Lexical'] and others provide different result forms
-                //var displayText = detailedResultJson['DisplayText'];
-                //phraseDiv.innerHTML += `Detailed result for "${displayText}":\r\n`
-                //    + `${JSON.stringify(detailedResultJson, null, 2)}\r\n`;
+            //// Detailed result JSON includes substantial extra information:
+            ////  detailedResultJson['NBest'] is an array of recognition alternates
+            ////  detailedResultJson['NBest'][0] is the highest-confidence alternate
+            ////  ...['Confidence'] is the raw confidence score of an alternate
+            ////  ...['Lexical'] and others provide different result forms
+            //let displayText = detailedResultJson['DisplayText'];
+            //phraseDiv.innerHTML += `Detailed result for "${displayText}":\r\n`
+            //    + `${JSON.stringify(detailedResultJson, null, 2)}\r\n`;
 
             if (result.text) {
                 phraseDiv.innerHTML = result.text;
             }
 
-            if (!!result.text) {
+            if (result.text) {
                 addPotentialMatches(normalizeText(result.text) + " ");
             }
             break;
@@ -965,77 +1040,83 @@ function onRecognizedResult(result: any) {
 
 function addPotentialMatches(result: string) {
     console.debug(result);
-    let comp: competitorDto;
-    var matchString: string;
-    var newResultString: string;
-    comp =
-        allCompetitors.find(c => c.sailNumber && result.startsWith(normalizeText(c.sailNumber) + " "));
-    if (comp) {
-        matchString = normalizeText(comp.sailNumber);
-    }
-    if (!comp) {
-        comp = allCompetitors.find(c => c.alternativeSailNumber && result.startsWith(normalizeText(c.alternativeSailNumber) + " "));
-        if (comp) {
-            matchString = normalizeText(comp.alternativeSailNumber);
+
+    // Helper to find a competitor by matching field
+    function findCompetitorByField(field: keyof competitorDto): { comp: competitorDto | undefined, matchString: string | undefined } {
+        for (const c of allCompetitors) {
+            const value = c[field];
+            if (typeof value === "string" && value && result.startsWith(normalizeText(value) + " ")) {
+                return { comp: c, matchString: normalizeText(value) };
+            }
         }
+        return { comp: undefined, matchString: undefined };
     }
-    if (!comp) {
-        comp =
-            allCompetitors.find(c => c.name && result.startsWith(normalizeText(c.name) + " "));
-        if (comp) {
-            matchString = normalizeText(comp.name);
+
+    // Try matching by sailNumber, alternativeSailNumber, name
+    const fields: (keyof competitorDto)[] = ["sailNumber", "alternativeSailNumber", "name"];
+    let comp: competitorDto | undefined;
+    let matchString: string | undefined;
+    for (const field of fields) {
+        const found = findCompetitorByField(field);
+        if (found.comp) {
+            comp = found.comp;
+            matchString = found.matchString;
+            break;
         }
     }
 
-    if (comp) {
+    let newResultString: string | undefined;
+    if (comp && matchString) {
         addNewCompetitor(comp);
         timeOfLastRecognized = Date.now();
-        newResultString = result.substr(matchString.length).trimLeft();
+        newResultString = result.slice(matchString.length).trimStart();
     } else {
-        // look for scorecode
-        var scoreCode = scoreCodes.find(sc => result.startsWith(normalizeText(sc.name) + " "));
-        setLastCompCode(scoreCode.name);
-        matchString = normalizeText(scoreCode.name);
-        newResultString = result.substr(matchString.length).trimLeft();
-    }
-
-    if (!comp && !scoreCode) {
-        //didn't find anything, trim a word off and try again.
-        if (!newResultString && (result.indexOf(" ") > -1)) {
-            newResultString = result.substr(result.indexOf(" ") + 1).trimLeft();
+        // Try matching scoreCode
+        const scoreCode = scoreCodes.find(sc => result.startsWith(normalizeText(sc.name) + " "));
+        if (scoreCode) {
+            setLastCompCode(scoreCode.name);
+            matchString = normalizeText(scoreCode.name);
+            newResultString = result.slice(matchString.length).trimStart();
+        } else if (result.includes(" ")) {
+            // Trim a word and try again
+            newResultString = result.slice(result.indexOf(" ") + 1).trimStart();
         }
     }
-    if (newResultString.length > 0) {
+
+    if (newResultString && newResultString.length > 0) {
         addPotentialMatches(newResultString);
     }
     stopIfTimedOut();
 }
 
 function normalizeText(fullText: string) {
-    if (!!fullText) {
+    if (fullText) {
         return fullText.replace(/[.?,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toUpperCase();
     }
     return null;
 }
 
 function onSessionStarted(sender: any, sessionEventArgs: any) {
+    if (SPEECH_DEBUG) console.log("✅ Session STARTED");
     console.debug(`(sessionStarted)`);
 
-    scenarioStartButton.style.display = "none";
-    scenarioStopButton.style.display = "block";
+    if (scenarioStartButton) scenarioStartButton.style.display = "none";
+    if (scenarioStopButton) scenarioStopButton.style.display = "block";
 
-    phraseDiv.innerHTML = "Listening";
+    if (phraseDiv) phraseDiv.innerHTML = "Listening";
 }
 
 function onSessionStopped(sender: any, sessionEventArgs: any) {
+    if (SPEECH_DEBUG) console.log("⛔ Session STOPPED");
     console.debug(`(sessionStopped)`);
-    phraseDiv.innerHTML = "";
-    scenarioStartButton.style.display = "block";
-    scenarioStopButton.style.display = "none";
+
+    if (phraseDiv) phraseDiv.innerHTML = "";
+    if (scenarioStartButton) scenarioStartButton.style.display = "block";
+    if (scenarioStopButton) scenarioStopButton.style.display = "none";
 }
 
 function onCanceled(sender: any, cancellationEventArgs: any) {
-    window.console.log(cancellationEventArgs);
+    console.debug(cancellationEventArgs);
 
     console.debug("(cancel) Reason: " + SpeechSDK.CancellationReason[cancellationEventArgs.reason]);
     if (cancellationEventArgs.reason === SpeechSDK.CancellationReason.Error) {
@@ -1063,20 +1144,14 @@ function applyCommonConfigurationTo(recognizer: any) {
     // PhraseListGrammar allows for the customization of recognizer vocabulary.
     // See https://docs.microsoft.com/azure/cognitive-services/speech-service/get-started-speech-to-text#improve-recognition-accuracy
     if (competitorSuggestions) {
-        var phraseListGrammar = SpeechSDK.PhraseListGrammar.fromRecognizer(reco);
-        for (var index = 0; index < allCompetitors.length; index++) {
-            if (allCompetitors[index].sailNumber) {
-                phraseListGrammar.addPhrase(allCompetitors[index].sailNumber);
-            }
-            if (allCompetitors[index].alternativeSailNumber) {
-                phraseListGrammar.addPhrase(allCompetitors[index].alternativeSailNumber);
-            }
-            if (allCompetitors[index].name) {
-                phraseListGrammar.addPhrase(allCompetitors[index].name);
-            }
+        let phraseListGrammar = SpeechSDK.PhraseListGrammar.fromRecognizer(reco);
+        for (const competitor of allCompetitors) {
+            if (competitor.sailNumber) phraseListGrammar.addPhrase(competitor.sailNumber);
+            if (competitor.alternativeSailNumber) phraseListGrammar.addPhrase(competitor.alternativeSailNumber);
+            if (competitor.name) phraseListGrammar.addPhrase(competitor.name);
         }
-        for (var index = 0; index < scoreCodes.length; index++) {
-            phraseListGrammar.addPhrase(scoreCodes[index].name);
+        for (const scoreCode of scoreCodes) {
+            phraseListGrammar.addPhrase(scoreCode.name);
         }
     }
 }
@@ -1091,20 +1166,65 @@ function doContinuousRecognition() {
     resetUiForScenarioStart();
     timeOfLastRecognized = Date.now();
 
+    if (SPEECH_DEBUG) {
+        console.log("🎤 Starting speech recognition...");
+        console.log("🔑 Token present:", !!authorizationToken);
+        console.log("🌍 Region:", region);
+        console.log("🗣️ Language:", language);
+    }
+
     if (timeOfLastToken < Date.now() - (5 * 60000)) {
+        if (SPEECH_DEBUG) console.log("⏰ Token expired, requesting new token...");
         RequestAuthorizationToken(doContinuousRecognition);
         return;
     }
 
-    var audioConfig = getAudioConfig();
-    var speechConfig = getSpeechConfig(SpeechSDK.SpeechConfig);
-    if (!speechConfig) return;
+    let audioConfig = getAudioConfig();
+    if (SPEECH_DEBUG) console.log("🎙️ Audio config created:", audioConfig);
+    
+    let speechConfig = getSpeechConfig(SpeechSDK.SpeechConfig);
+    if (!speechConfig) {
+        console.error("❌ Failed to create speech config");
+        return;
+    }
+    if (SPEECH_DEBUG) console.log("⚙️ Speech config created successfully");
 
     // Create the SpeechRecognizer and set up common event handlers and PhraseList data
     reco = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    
+    // Add detailed event logging
+    reco.recognizing = function(s: any, e: any) {
+        if (SPEECH_DEBUG) console.log("🔄 RECOGNIZING:", e.result.text);
+        if (phraseDiv) {
+            phraseDiv.innerHTML = "Recognizing: " + e.result.text;
+        }
+    };
+    
+    reco.speechStartDetected = function(s: any, e: any) {
+        if (SPEECH_DEBUG) console.log("🎤 SPEECH START detected at offset:", e.offset);
+        if (phraseDiv) {
+            phraseDiv.innerHTML = "Speech detected...";
+        }
+    };
+    
+    reco.speechEndDetected = function(s: any, e: any) {
+        if (SPEECH_DEBUG) console.log("🔇 SPEECH END detected at offset:", e.offset);
+    };
+    
     applyCommonConfigurationTo(reco);
 
-    reco.startContinuousRecognitionAsync();
+    if (SPEECH_DEBUG) console.log("▶️ Starting continuous recognition async...");
+    reco.startContinuousRecognitionAsync(
+        function() {
+            if (SPEECH_DEBUG) console.log("✅ Recognition started successfully");
+        },
+        function(err: any) {
+            console.error("❌ Error starting recognition:", err);
+            if (phraseDiv) {
+                phraseDiv.innerHTML = "Error: " + err;
+            }
+        }
+    );
 }
 function stopContinuousRecognition() {
     reco.stopContinuousRecognitionAsync(
@@ -1121,34 +1241,6 @@ function stopContinuousRecognition() {
 
 function setLastCompCode(scoreCode: string) {
     $(".select-code").last().val(scoreCode);
-}
-
-function onFinishTimeChanged(this: HTMLInputElement) {
-    const finishInput = this;
-    const li = $(finishInput).closest('li');
-    const elapsedInput = li.find('input[name="ElapsedTime"]')[0] as HTMLInputElement;
-    const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
-    if (!startTimeInput || !startTimeInput.value || !finishInput.value) return;
-    // Parse StartTime and FinishTime
-    const start = parseTimeStringToDate(startTimeInput.value);
-    const finish = parseTimeStringToDate(finishInput.value, start);
-    if (!start || !finish) return;
-    let elapsedMs = finish.getTime() - start.getTime();
-    if (elapsedMs < 0) elapsedMs += 24 * 3600 * 1000; // handle midnight wrap
-    elapsedInput.value = formatElapsedTime(elapsedMs);
-}
-
-function onElapsedTimeChanged(this: HTMLInputElement) {
-    const elapsedInput = this;
-    const li = $(elapsedInput).closest('li');
-    const finishInput = li.find('input[name="FinishTime"]')[0] as HTMLInputElement;
-    const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
-    if (!startTimeInput || !startTimeInput.value || !elapsedInput.value) return;
-    const start = parseTimeStringToDate(startTimeInput.value);
-    const elapsedMs = parseElapsedTimeString(elapsedInput.value);
-    if (!start || elapsedMs === null) return;
-    const finish = new Date(start.getTime() + elapsedMs);
-    finishInput.value = formatTimeForInput(finish);
 }
 
 // Dirty form detection: module-scope flag
@@ -1180,4 +1272,5 @@ if (document.getElementById('raceform')) {
     setupDirtyFormDetection('raceform');
 }
 
+initialize();
 
