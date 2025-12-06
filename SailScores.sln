@@ -26,9 +26,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SailScores.Utility", "SailS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AE2F13E0-64D0-43D5-8D31-B6BDEAFA5B73}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 		azure-pipeline-prod-deploy.yml = azure-pipeline-prod-deploy.yml
 		azure-pipeline-SQAnalysis.yml = azure-pipeline-SQAnalysis.yml
 		azure-pipeline-test-deploy.yml = azure-pipeline-test-deploy.yml
+		ef.json = ef.json
 		README.md = README.md
 		SonarQube.Analysis.xml = SonarQube.Analysis.xml
 	EndProjectSection
@@ -39,6 +42,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\SailScores.yml = .github\workflows\SailScores.yml
 		.github\workflows\sailscorestest.yml = .github\workflows\sailscorestest.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Test.Integration", "SailScores.Web.IntegrationTests\SailScores.Test.Integration.csproj", "{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6F63462D-8914-48A5-9390-5CEC7DC5146B} = {6F63462D-8914-48A5-9390-5CEC7DC5146B}
 	EndProjectSection
 EndProject
 Global
@@ -197,6 +205,22 @@ Global
 		{AF83E78D-4FA7-45AA-BEB7-E9FBA7C91935}.Release|x64.Build.0 = Release|Any CPU
 		{AF83E78D-4FA7-45AA-BEB7-E9FBA7C91935}.Release|x86.ActiveCfg = Release|Any CPU
 		{AF83E78D-4FA7-45AA-BEB7-E9FBA7C91935}.Release|x86.Build.0 = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|x64.Build.0 = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|ARM.Build.0 = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|x64.ActiveCfg = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|x64.Build.0 = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9A3EA9F-8331-B88D-19F5-1D7D083FD0E8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

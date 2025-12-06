@@ -1,0 +1,11 @@
+@{
+    var current = (string?)ViewContext.RouteData.Values["page"] ?? "";
+    string Active(string page) => StringComparer.OrdinalIgnoreCase.Equals(current, page) ? "active" : "";
+}
+
+<nav class="nav flex-column help-side-nav bg-almost">
+    <a asp-page="/Help/Index" class="nav-link @Active("/Help/Index")">Help Overview</a>
+    <a asp-page="/Help/FAQ" class="nav-link @Active("/Help/FAQ")">FAQ</a>
+    <a asp-page="/Help/GettingStarted" class="nav-link @Active("/Help/GettingStarted")">Getting Started</a>
+    <a asp-page="/Help/Reference" class="nav-link @Active("/Help/Reference")">Deep Dive</a>
+</nav>

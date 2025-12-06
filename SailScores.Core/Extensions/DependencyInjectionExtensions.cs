@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 
@@ -30,6 +30,8 @@ namespace SailScores.Core.Extensions
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IForwarderService, ForwarderService>();
             services.AddScoped<ISystemAlertService, SystemAlertService>();
+            services.AddScoped<IMatchingService, MatchingService>();
+            services.AddScoped<ISupporterService, SupporterService>();
 
         }
     }

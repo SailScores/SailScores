@@ -1,0 +1,50 @@
+﻿@page
+@model SailScores.Web.Pages.Help.IndexModel
+@{
+    Layout = "/Pages/Help/_HelpLayout.cshtml";
+    ViewData["Title"] = "SailScores Help";
+}
+
+<h1>@ViewData["Title"]</h1>
+<p>Welcome to the SailScores help center.</p>
+<p>
+    Our goal is to keep SailScores intuitive and easy to use without needing documentation.
+    But if you're curious, troubleshooting, or just want to dig deeper, these pages are here
+    to support you.
+</p>
+<p>
+    We’re actively expanding this section over the 2025–26 winter. If there’s
+    something you’d like explained or clarified, we’d love to
+    <a href="mailto:info@sailscores.com">hear from you.</a>
+</p>
+<p>
+    Here's what you'll find:
+</p>
+
+<section id="faq">
+    <a asp-page="/Help/FAQ"><h3>FAQ</h3></a>
+    <p>Quick answers to common questions about SailScores&mdash;perfect for new users or anyone needing a refresher.</p>
+</section>
+
+<section id="getting-started">
+    <a asp-page="/Help/GettingStarted"><h3>Getting Started</h3></a>
+    <p>A step-by-step guide to setting up your club, creating series, and understanding the basics of scoring.</p>
+</section>
+
+<section id="deep-dive">
+    <a asp-page="/Help/Reference"><h3>Deep Dive</h3></a>
+    <p>
+        Explore advanced scoring features, tips for scorekeepers, and technical insights for curious sailors. This section combines:
+    </p>
+    <ul>
+        <li>Advanced Scoring &amp; Tips</li>
+        <li>About &amp; Reference</li>
+    </ul>
+    <p>Here you'll find:</p>
+    <ul>
+        <li>Insights into SailScores’ values, data practices, and technical design</li>
+        <li>Tips for speeding up score entry</li>
+        <li>Guides into the advanced features of SailScores</li>
+        <li>Troubleshooting tips</li>
+    </ul>
+</section>

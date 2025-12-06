@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Services.Interfaces;
@@ -11,4 +11,8 @@ public interface IClubService
     Task UpdateStatsDescription(string clubInitials, string statisticsDescription);
 
     Task<Guid> GetClubId(string initials);
+
+    Task SetUseAdvancedFeaturesAsync(Guid clubId, bool enabled);
+    Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType);
+    Task<Club> GetClubByIdAsync(Guid clubId);
 }

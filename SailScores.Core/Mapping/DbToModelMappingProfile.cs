@@ -66,6 +66,8 @@ namespace SailScores.Core.Mapping
                 .ReverseMap();
             CreateMap<Db.SystemAlert, Model.SystemAlert>()
                 .ReverseMap();
+            CreateMap<Db.Supporter, Model.Supporter>()
+                .ReverseMap();
             CreateMap<Db.Document, Model.Document>()
                 .ReverseMap();
 

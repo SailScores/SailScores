@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
@@ -117,6 +117,7 @@ public class SeriesServiceTests
             _clubInitials,
             season.UrlName,
             _seriesUrlName);
+
 
         // Assert
         Assert.NotNull(result);

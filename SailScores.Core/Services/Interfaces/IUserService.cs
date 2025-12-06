@@ -1,4 +1,4 @@
-﻿using SailScores.Database.Entities;
+using SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,5 +15,6 @@ namespace SailScores.Core.Services
         Task<IEnumerable<UserClubPermission>> GetAllPermissionsForClub(Guid clubId);
         Task<UserClubPermission> GetPermission(Guid permissionId);
         Task Delete(Guid permissionId);
+        Task<IList<Guid>> GetClubIdsForUserEmailAsync(string email);
     }
 }

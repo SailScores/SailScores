@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
@@ -140,7 +140,7 @@ public class RegattaService : IRegattaService
             SeasonOptions = await _coreSeasonService.GetSeasons(clubId),
             FleetOptions = await _coreFleetService.GetAllFleetsForClub(clubId)
         };
-        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, true);
+        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, false);
         scoringSystemOptions.Add(new ScoringSystem
         {
             Id = Guid.Empty,

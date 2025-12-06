@@ -394,11 +394,71 @@ form label.required:not(.custom-control-label)::after {
 }
 
 
+/* Help navigation */
+.help-side-nav .nav-link {
+    padding: .25rem .5rem;
+    font-size: .95rem;
+    border-radius: .25rem;
+}
+
+.help-side-nav .nav-link.active {
+    background: var(--bs-dark);
+    color: #fff;
+}
+
+.help-nav {
+    position: sticky;
+    top: 1rem;
+    align-self: flex-start;
+}
+
+// Help side nav active link styling
+.help-side-nav .nav-link.active {
+    // Light mode styles
+    background-color: #e9f1fb; // Soft blue, adjust as needed
+    color: #0d3a6b; // Dark blue text for contrast
+    font-weight: 600;
+    border-radius: 0.375rem;
+    // Optional: subtle border or shadow for emphasis
+    box-shadow: 0 1px 4px rgba(13, 58, 107, 0.06);
+}
+
+.faq-page [data-bs-toggle="collapse"]::before {
+    content: "▸";
+    display: inline-block;
+    font-size: 1.75rem;
+    line-height: 1;
+    width: 1.75rem;
+    margin-right: .25rem;
+    transform-origin: center;
+    transition: transform .2s ease-in-out;
+}
+
+.faq-page [data-bs-toggle="collapse"][aria-expanded="true"]::before {
+    content: "▾";
+}
+
+
+@media (max-width: 767.98px) {
+    .help-nav {
+        position: static;
+        margin-bottom: 1rem;
+    }
+}
+
+
 @media (prefers-color-scheme: dark) {
     $dark-primary: #266FAE;
     $almost-dark-primary: #367FCE;
     $secondary-background: #3B3B3B;
     $almost-background: #2A2A2A;
+
+    $ocr-table-bg: #274032;
+    $ocr-table-border: #395243;
+    $ocr-table-striped: #2b4a3b;
+    $ocr-table-hover: #2c4f3c;
+    $ocr-table-active: #2f553f;
+    $ocr-table-color: #e6efe8;
 
     :root {
         --bs-primary: #{$dark-primary};
@@ -408,7 +468,7 @@ form label.required:not(.custom-control-label)::after {
         --bs-btn-bg: #{$dark-primary};
         --bs-btn-border-color: #{$dark-primary};
         --bs-btn-color: #{$dark-primary};
-
+        
         .btn-primary {
             --bs-btn-bg: #{$dark-primary};
             --bs-btn-border-color: #{$dark-primary};
@@ -566,6 +626,132 @@ form label.required:not(.custom-control-label)::after {
     .select2-container--default .select2-dropdown .select2-results__options .select2-results__option[role=group] .select2-results__group {
         color: var(--bs-secondary-color) !important;
     }
+
+    .ocr-cropped-preview {
+        background-color: $secondary-background;
+        overflow: hidden;
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    .help-side-nav .nav-link.active {
+        background-color: #222b38;
+        color: #fff;
+        box-shadow: none;
+    }
+
+    /* OCR preview and overlay styles */
+    /* Prevent layout shift when drawing overlays by hiding overflow
+       and ensuring the image and canvas behave as block-level elements */
+    .ocr-cropped-preview {
+        position: relative;
+        overflow: hidden;
+    }
+    .ocr-cropped-preview img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+    #ocrBoundingBoxOverlay {
+        position: absolute;
+        left: 0;
+        top: 0;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    .insert-row-btn {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.35rem;
+        opacity: 0.4;
+        transition: opacity 0.2s ease;
+        position: relative;
+        top: -8px;
+    }
+
+    .insert-row-btn:hover {
+        opacity: 0.8;
+    }
+
+    .insert-row-btn i {
+        font-size: 0.65rem;
+    }
+
+    #ocrResultsTable tbody tr:hover .insert-row-btn {
+        opacity: 0.6;
+    }
+
+    #ocrProgressBar {
+        height: 6px;
+    }
+    
+    /* Set CSS custom properties for OCR table colors */
+    :root {
+        --bs-table-bg: #{$ocr-table-bg};
+        --bs-table-border-color: #{$ocr-table-border};
+        --bs-table-striped-bg: #{$ocr-table-striped};
+        --bs-table-active-bg: #{$ocr-table-active};
+        --bs-table-hover-bg: #{$ocr-table-hover};
+        --bs-table-color: #{$ocr-table-color};
+    }
+
+    /* Apply dark mode colors to OCR table with high specificity */
+    #ocrResultsTable {
+        background-color: transparent !important;
+        color: $ocr-table-color !important;
+
+        /* Table header */
+        thead {
+            background-color: $ocr-table-bg !important;
+            
+            th {
+                background-color: $ocr-table-bg !important;
+                color: $ocr-table-color !important;
+                border-color: $ocr-table-border !important;
+            }
+        }
+
+        /* Table body base styles */
+        tbody {
+            background-color: transparent !important;
+
+            tr {
+                background-color: $ocr-table-bg !important;
+                color: $ocr-table-color !important;
+
+                td, th {
+                    background-color: inherit !important;
+                    color: $ocr-table-color !important;
+                    border-color: $ocr-table-border !important;
+                }
+            }
+
+            tr:hover {
+                background-color: $ocr-table-hover !important;
+
+                td, th {
+                    background-color: inherit !important;
+                }
+            }
+
+            tr.table-active,
+            tr.active {
+                background-color: $ocr-table-active !important;
+
+                td, th {
+                    background-color: inherit !important;
+                }
+            }
+        }
+    }
 }
 
 @media (max-width: 767.98px) {
@@ -623,3 +809,214 @@ form label.required:not(.custom-control-label)::after {
     margin-top: 0.125rem;
 }
 
+
+/* Supporter Card Styles */
+.supporter-logo-container {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* --- OCR Upload Modal Styles (moved from _OcrUploadModal.cshtml) --- */
+.cropper-container-wrapper {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+#ocrResultsTable .table-success {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+#ocrResultsTable .table-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.insert-row-btn {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.35rem;
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+    position: relative;
+    top: -8px;
+}
+
+.insert-row-btn:hover {
+    opacity: 0.8;
+}
+
+.insert-row-btn i {
+    font-size: 0.65rem;
+}
+
+#ocrResultsTable tbody tr:hover .insert-row-btn {
+    opacity: 0.6;
+}
+
+#ocrProgressBar {
+    height: 6px;
+}
+
+/* Prevent layout shift when drawing overlays by hiding overflow
+   and ensuring the image and canvas behave as block-level elements */
+.ocr-cropped-preview {
+    position: relative;
+    overflow-y: scroll; /* always show vertical scrollbar */
+    overflow-x: hidden;
+}
+.ocr-cropped-preview img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+#ocrBoundingBoxOverlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+@media (max-width: 767.98px) {
+    .ocr-results-container {
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+
+    cropper-canvas {
+        height: 60vh;
+        max-height: 90vh;
+        min-height: 300px;
+    }
+
+    /* Always limit preview height on mobile, even before expand */
+    .ocr-cropped-preview {
+        max-height: 200px;
+        transition: max-height 0.2s;
+        overflow-y: auto; /* Allow finger/touch scrolling */
+        overflow-x: hidden;
+    }
+    /* Chevron right when collapsed, down when expanded */
+    #ocrStepResults h6 a .chevron {
+        transition: transform 0.2s;
+        display: inline-block;
+    }
+    #ocrImagePreviewCollapse:not(.show) ~ .ocr-cropped-preview,
+    #ocrStepResults h6 a[aria-expanded="false"] .chevron {
+        transform: rotate(0deg); /* right */
+    }
+    #ocrStepResults h6 a[aria-expanded="true"] .chevron {
+        transform: rotate(90deg); /* down */
+    }
+}
+
+@media (min-width: 768px) {
+    .ocr-results-container {
+        overflow-y: auto;
+    }
+
+    .ocr-cropped-preview {
+        max-height: 70vh; 
+        min-height: 400px;
+        transition: max-height 0.2s;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    cropper-canvas {
+        height: 75vh;
+        max-height: 90vh;
+        min-height: 300px;
+    }
+
+    .ocr-tip-list {
+        list-style-position: inside;
+    }
+}
+
+/* Lower z-index for input group with camera/mic buttons on race create page */
+#raceform .input-group {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure the floating/hideable footer panel stays above */
+#scoreButtonFooter,
+.score-entry {
+    z-index: 10;
+}
+
+.supporter-logo {
+    max-height: 120px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.supporter-logo-preview {
+    max-width: 200px;
+}
+
+
+
+@media print {
+    .faq-page .collapse {
+        display: block !important;
+        height: auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .faq-page .collapse:not(.show) {
+        display: block !important;
+    }
+
+    .faq-page [data-bs-toggle="collapse"]::before {
+        content: "" !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .faq-page [data-bs-toggle="collapse"]::before {
+        transition: none;
+    }
+}
+
+// FAQ details transition styles
+.faq-details {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.faq-details-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
+  opacity: 0;
+}
+
+.faq-details[open] .faq-details-content {
+  max-height: 1000px; // Large enough for content
+  opacity: 1;
+}
+
+// Optional: smooth out summary arrow
+.faq-details > summary {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.faq-details > summary:hover {
+  color: $primary;
+}

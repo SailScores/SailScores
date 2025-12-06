@@ -23,9 +23,9 @@ software that: 1) has a modern interface, 2) supports mobile devices, 3) is inex
  - Stats for competitors and clubs.
 
 ### Technologies:
- - .NET 8
- - ASP.NET 8
- - Entity Framework Core 8
+ - .NET 10
+ - ASP.NET 10
+ - Entity Framework Core
  - MS-SQL
  - Production is running on Azure App Service Linux
 

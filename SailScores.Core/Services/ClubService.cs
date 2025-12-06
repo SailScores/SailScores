@@ -136,6 +136,7 @@ namespace SailScores.Core.Services
                 {
                     return clubGuid;
                 }
+                // Is the check to see if initials are a guid necessary?
                 if (!Guid.TryParse(initials, out clubGuid))
                 {
                     clubGuid = await _dbContext.Clubs
@@ -172,6 +173,8 @@ namespace SailScores.Core.Services
                 .Include(c => c.Seasons)
                 .Include(c => c.Series)
                 .ThenInclude(s => s.RaceSeries)
+                .Include(c => c.Series)
+                .ThenInclude(s => s.Season)
                 .Include(c => c.BoatClasses)
                 .Include(c => c.DefaultScoringSystem)
                 .Include(c => c.ScoringSystems)
@@ -238,6 +241,8 @@ namespace SailScores.Core.Services
                 .Include(c => c.Seasons)
                 .Include(c => c.Series)
                 .ThenInclude(s => s.RaceSeries)
+                .Include(c => c.Series)
+                .ThenInclude(s => s.Season)
                 .Include(c => c.Competitors)
                 .Include(c => c.BoatClasses)
                 .Include(c => c.DefaultScoringSystem)
@@ -537,6 +542,27 @@ namespace SailScores.Core.Services
             var dbClub = await _dbContext.Clubs
                 .SingleAsync(c => c.Id == clubId).ConfigureAwait(false);
             dbClub.StatisticsDescription = statisticsDescription;
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async Task SetUseAdvancedFeaturesAsync(Guid clubId, bool enabled)
+        {
+            var dbClub = await _dbContext.Clubs.SingleAsync(c => c.Id == clubId).ConfigureAwait(false);
+            
+            // If turning advanced features on (from null or false to true), set the enabled date
+            if (enabled && !(dbClub.UseAdvancedFeatures ?? false))
+            {
+                dbClub.AdvancedFeaturesEnabledDate = DateTime.UtcNow;
+            }
+            
+            dbClub.UseAdvancedFeatures = enabled;
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType)
+        {
+            var dbClub = await _dbContext.Clubs.SingleAsync(c => c.Id == clubId).ConfigureAwait(false);
+            dbClub.SubscriptionType = subscriptionType;
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 

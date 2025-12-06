@@ -289,3 +289,25 @@ SailScores.Web/wwwroot/js/**/*.js.map
 
 # Gulp output
 SailScores.Web/wwwroot/css/site.min.css
+
+\.sonarqube/
+
+.sonarlint/
+
+*.pubxml
+
+SailScores.Web/Properties/ServiceDependencies/sailscorestest - Web Deploy/
+
+# OCR Integration Test Configuration (contains Azure credentials)
+SailScores.Web.IntegrationTests/appsettings.test.json
+SailScores.Web.IntegrationTests/TestImages/*.jpg
+SailScores.Web.IntegrationTests/TestImages/*.png
+SailScores.Web.IntegrationTests/TestImages/*.jpeg
+
+SailScores.Web/wwwroot/js/*.js.map
+SailScores.Web/wwwroot/js/*.LICENSE.txt
+SailScores.Web/wwwroot/js/ocrRaceEntry.js
+SailScores.Web/wwwroot/js/ocrRaceEntry.min.js
+SailScores.Web/wwwroot/js/raceEditor.min.js
+
+SailScores.Web/appsettings.Development.json

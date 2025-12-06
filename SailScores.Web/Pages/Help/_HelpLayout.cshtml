@@ -1,0 +1,17 @@
+﻿@{
+    // Use the main site layout for header/footer/navigation bar
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row gx-4 gy-3">
+    <aside class="col-12 col-md-3 col-xl-2 help-nav">
+        @await Html.PartialAsync("Help/_HelpNav")
+    </aside>
+    <div class="col-12 col-md-9 col-xl-10 help-content">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

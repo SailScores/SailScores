@@ -1,4 +1,4 @@
-﻿using SailScores.Core.FlatModel;
+using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
@@ -100,7 +100,7 @@ public class SeriesService : ISeriesService
         partialSeries.SeasonOptions = seasons;
 
 
-        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, true);
+        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, false);
         scoringSystemOptions.Add(new ScoringSystem
         {
             Id = Guid.Empty,
@@ -141,7 +141,7 @@ public class SeriesService : ISeriesService
         {
             vm.SeasonId = selectedSeason.Id;
         }
-        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, true);
+        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, false);
         scoringSystemOptions.Add(new ScoringSystem
         {
             Id = Guid.Empty,

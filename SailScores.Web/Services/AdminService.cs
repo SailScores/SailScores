@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Linq;
 using SailScores.Core.Model;
 using SailScores.Database.Migrations;
@@ -20,6 +21,7 @@ public class AdminService : IAdminService
     private readonly IPermissionService _permissionService;
     private readonly ILocalizerService _localizerService;
     private readonly IMapper _mapper;
+    private readonly IHostEnvironment _env;
 
     public AdminService(
         CoreServices.IClubService clubService,
@@ -31,7 +33,8 @@ public class AdminService : IAdminService
         IWeatherService weatherService,
         IPermissionService permissionService,
         ILocalizerService localizerService,
-        IMapper mapper)
+        IMapper mapper,
+        IHostEnvironment env)
     {
         _coreClubService = clubService;
         _coreScoringService = scoringService;
@@ -43,59 +46,38 @@ public class AdminService : IAdminService
         _permissionService = permissionService;
         _localizerService = localizerService;
         _mapper = mapper;
+        _env = env;
     }
-
 
     public async Task<AdminViewModel> GetClubForEdit(string clubInitials)
     {
-
         var club = await _coreClubService.GetClubForAdmin(clubInitials);
 
         var vm = _mapper.Map<AdminViewModel>(club);
-        vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);
+        vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, false);
         vm.SpeedUnitOptions = _weatherService.GetSpeedUnitOptions();
         vm.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
         vm.LocaleOptions = GetLocaleLongNames();
-        vm.Locale = GetLocaleLongName(club.Locale);
+        vm.Locale = _localizerService.GetLocaleLongName(club.Locale);
         return vm;
-
-    }
-
-    private string GetLocaleLongName(string locale)
-    {
-        if(String.IsNullOrWhiteSpace(locale))
-        {
-            return _localizerService.SupportedLocalizations[_localizerService.DefaultLocalization];
-        }
-        var returnValue = _localizerService.SupportedLocalizations[locale];
-
-        return returnValue ?? _localizerService.SupportedLocalizations[_localizerService.DefaultLocalization]; 
-
     }
 
     private IList<string> GetLocaleLongNames()
     {
-        return _localizerService.SupportedLocalizations.Values.ToList();
-    }
-
-    public string GetLocaleShortName(string locale)
-    {
-        var returnValue = _localizerService.SupportedLocalizations.FirstOrDefault( l => l.Value == locale).Key;
-
-        return returnValue ?? _localizerService.SupportedLocalizations[_localizerService.DefaultLocalization];
-
+        var locales = LocalizerService.GetSupportedLocalisations(_env.IsDevelopment());
+        return locales.Values.ToList(); ;
     }
 
     public async Task<AdminViewModel> GetClub(string clubInitials)
     {
         var club = await _coreClubService.GetClubForAdmin(clubInitials);
-
         var vm = _mapper.Map<AdminViewModel>(club);
 
-        foreach (var boatClass in vm.BoatClasses ?? new List<BoatClassDeleteViewModel>()) {
+        foreach (var boatClass in vm.BoatClasses ?? new List<BoatClassDeleteViewModel>())
+        {
             var deletableInfo = await _coreBoatClassService.GetDeletableInfo(boatClass.Id);
             boatClass.IsDeletable = deletableInfo.IsDeletable;
-            boatClass.PreventDeleteReason = deletableInfo.Reason;
+            boatClass.PreventDeleteReason = deletableInfo.IsDeletable ? string.Empty : "Fleet has races assigned.";
         }
 
         var fleetDeleteInfo = await _coreFleetService.GetDeletableInfo(club.Id);
@@ -104,8 +86,7 @@ public class AdminService : IAdminService
         {
             var delInfo = fleetDeleteInfo.FirstOrDefault(fdi => fdi.Id == fleet.Id);
             fleet.IsDeletable = delInfo.IsDeletable;
-            fleet.PreventDeleteReason = delInfo.IsDeletable ?
-                String.Empty : "Fleet has races assigned.";
+            fleet.PreventDeleteReason = delInfo.IsDeletable ? string.Empty : "Fleet has races assigned.";
             fleet.IsRegattaFleet = fleetRegattaInfo.Any(f => f.Key == fleet.Id);
         }
 
@@ -114,19 +95,18 @@ public class AdminService : IAdminService
         {
             var delInfo = seasonDeleteInfo.FirstOrDefault(fdi => fdi.Id == season.Id);
             season.IsDeletable = delInfo.IsDeletable;
-            season.PreventDeleteReason = delInfo.IsDeletable ?
-                String.Empty : "Season has series assigned.";
+            season.PreventDeleteReason = delInfo.IsDeletable ? string.Empty : "Season has series assigned.";
         }
+
         var scoringSysDeleteInfo = await _coreScoringService.GetDeletableInfo(club.Id);
         foreach (var scoringSystem in vm.ScoringSystems)
         {
             var delInfo = scoringSysDeleteInfo.FirstOrDefault(fdi => fdi.Id == scoringSystem.Id);
             scoringSystem.IsDeletable = delInfo.IsDeletable;
-            scoringSystem.PreventDeleteReason = delInfo.IsDeletable ?
-                String.Empty : "Scoring System is in use.";
+            scoringSystem.PreventDeleteReason = delInfo.IsDeletable ? string.Empty : "Scoring System is in use.";
         }
 
-        vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, true);
+        vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, false);
 
         vm.HasCompetitors = vm.BoatClasses.Count != 0 &&
                             (await _coreClubService.HasCompetitorsAsync(club.Id));
@@ -139,7 +119,11 @@ public class AdminService : IAdminService
 
     public async Task UpdateClub(Club clubObject)
     {
-        await _localizerService.UpdateCulture(clubObject.Initials, clubObject.Locale);
+        // Map the posted long name to a proper culture code
+        var shortLocale = _localizerService.GetLocaleShortName(clubObject.Locale);
+        clubObject.Locale = shortLocale;
+
+        await _localizerService.UpdateCulture(clubObject.Initials, shortLocale);
         await _coreClubService.UpdateClub(clubObject);
     }
 }

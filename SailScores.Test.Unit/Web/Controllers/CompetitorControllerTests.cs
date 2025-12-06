@@ -52,7 +52,6 @@ namespace SailScores.Test.Unit.Web.Controllers
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
             _csvServiceMock = new Mock<ICsvService>();
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
-
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
             _userManagerMock = new Mock<UserManager<ApplicationUser>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
             _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>()))
@@ -98,10 +97,8 @@ namespace SailScores.Test.Unit.Web.Controllers
         {
             SetupAsAuthorized();
 
-
             var vm = new CompetitorWithOptionsViewModel();
             await _controller.Create(_clubInitials, vm);
-
 
             _competitorServiceMock.Verify(s => s.SaveAsync(vm, "Test User"), Times.Once);
         }

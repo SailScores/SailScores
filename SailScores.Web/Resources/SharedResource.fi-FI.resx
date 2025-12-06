@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Race" xml:space="preserve">
+    <value>Kilpailu</value>
+  </data>
+  <data name="Scores" xml:space="preserve">
+    <value>Tulokset</value>
+  </data>
+  <data name="New Race" xml:space="preserve">
+    <value>Uusi kilpailu</value>
+  </data>
+  <data name="Edit Club Info" xml:space="preserve">
+    <value>Muokkaa seuran tietoja</value>
+  </data>
+  <data name="Club Web Site" xml:space="preserve">
+    <value>Seuran verkkosivusto</value>
+  </data>
+  <data name="Scheduled for" xml:space="preserve">
+    <value>Suunniteltu päivälle</value>
+  </data>
+  <data name="Abandoned" xml:space="preserve">
+    <value>Keskeytetty</value>
+  </data>
+  <data name="Helm" xml:space="preserve">
+    <value>Ohjaaja</value>
+  </data>
+  <data name="Sail" xml:space="preserve">
+    <value>Purjenumero</value>
+  </data>
+  <data name="Boat" xml:space="preserve">
+    <value>Vene</value>
+  </data>
+  <data name="Stats" xml:space="preserve">
+    <value>Tilastot</value>
+  </data>
+  <data name="All Races" xml:space="preserve">
+    <value>All Races</value>
+  </data>
+  <data name="All Series" xml:space="preserve">
+    <value>All Series</value>
+  </data>
+  <data name="Boat Name" xml:space="preserve">
+    <value>Boat Name</value>
+  </data>
+  <data name="Competitor" xml:space="preserve">
+    <value>Competitor</value>
+  </data>
+  <data name="competitors" xml:space="preserve">
+    <value>competitors</value>
+  </data>
+  <data name="discards" xml:space="preserve">
+    <value>discards</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="No Competitors" xml:space="preserve">
+    <value>No Competitors</value>
+  </data>
+  <data name="No races" xml:space="preserve">
+    <value>No races</value>
+  </data>
+  <data name="No recent races found." xml:space="preserve">
+    <value>No recent races found</value>
+  </data>
+  <data name="No recent series found." xml:space="preserve">
+    <value>No recent series found.</value>
+  </data>
+  <data name="No scheduled races found." xml:space="preserve">
+    <value>No scheduled races found.</value>
+  </data>
+  <data name="Place" xml:space="preserve">
+    <value>Place</value>
+  </data>
+  <data name="Races" xml:space="preserve">
+    <value>Races</value>
+  </data>
+  <data name="races sailed with" xml:space="preserve">
+    <value>races sailed with</value>
+  </data>
+  <data name="Recent Races" xml:space="preserve">
+    <value>Recent Races</value>
+  </data>
+  <data name="Recent Series" xml:space="preserve">
+    <value>Recent Series</value>
+  </data>
+  <data name="Sail Number" xml:space="preserve">
+    <value>Sail Number</value>
+  </data>
+  <data name="Seasons" xml:space="preserve">
+    <value>Seasons</value>
+  </data>
+  <data name="Series" xml:space="preserve">
+    <value>Series</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Upcoming Races" xml:space="preserve">
+    <value>Upcoming Races</value>
+  </data>
+  <data name="Admin Page" xml:space="preserve">
+    <value>Admin Page</value>
+  </data>
+  <data name="New Competitor" xml:space="preserve">
+    <value>New Competitor</value>
+  </data>
+  <data name="No seasons are set up." xml:space="preserve">
+    <value>No seasons are set up.</value>
+  </data>
+  <data name="CapCompetitors" xml:space="preserve">
+    <value>Competitors</value>
+  </data>
+  <data name="Previous Day" xml:space="preserve">
+    <value>previous day</value>
+  </data>
+  <data name="Previous Race" xml:space="preserve">
+    <value>previous race</value>
+  </data>
+  <data name="Previous Week" xml:space="preserve">
+    <value>previous week</value>
+  </data>
+  <data name="Rank change from" xml:space="preserve">
+    <value>Rank change from</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>Updated</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="All Boats" xml:space="preserve">
+    <value>All Boats</value>
+  </data>
+  <data name="Boats Raced" xml:space="preserve">
+    <value>Boats Raced</value>
+  </data>
+  <data name="Classes" xml:space="preserve">
+    <value>Classes</value>
+  </data>
+  <data name="boats" xml:space="preserve">
+    <value>boats</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Log out</value>
+  </data>
+  <data name="Regattas" xml:space="preserve">
+    <value>Regattas</value>
+  </data>
+  <data name="Club Admin" xml:space="preserve">
+    <value>Club Admin</value>
+  </data>
+  <data name="Club Stats" xml:space="preserve">
+    <value>Club Stats</value>
+  </data>
+  <data name="Default Scoring" xml:space="preserve">
+    <value>Default Scoring</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Default Scoring</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="No results posted" xml:space="preserve">
+    <value>No results posted</value>
+  </data>
+  <data name="Top Series" xml:space="preserve">
+    <value>Top Series</value>
+  </data>
+  <data name="Regatta!" xml:space="preserve">
+    <value>Regatta!</value>
+  </data>
+</root>

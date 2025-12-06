@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 
@@ -84,5 +84,20 @@ public class ClubService : IClubService
     public Task<System.Guid> GetClubId(string initials)
     {
         return _coreClubService.GetClubId(initials);
+    }
+
+    public async Task SetUseAdvancedFeaturesAsync(Guid clubId, bool enabled)
+    {
+        await _coreClubService.SetUseAdvancedFeaturesAsync(clubId, enabled);
+    }
+
+    public async Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType)
+    {
+        await _coreClubService.SetSubscriptionTypeAsync(clubId, subscriptionType);
+    }
+
+    public async Task<Club> GetClubByIdAsync(Guid clubId)
+    {
+        return await _coreClubService.GetMinimalClub(clubId);
     }
 }

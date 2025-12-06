@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
@@ -44,7 +44,7 @@ public class AdminController : Controller
     }
 
 
-    // GET: Admin/Edit/LHYC
+    // GET: Admin/Edit
     public async Task<ActionResult> Edit(string clubInitials)
     {
         ViewData["ClubInitials"] = clubInitials;
@@ -56,7 +56,7 @@ public class AdminController : Controller
         return View(vm);
     }
 
-    // POST: Admin/Edit/LHYC
+    // POST: Admin/Edit
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Edit(
@@ -92,7 +92,6 @@ public class AdminController : Controller
                 TemperatureUnits = clubAdmin.TemperatureUnits,
                 WindSpeedUnits = clubAdmin.SpeedUnits
             };
-            clubObject.Locale = _adminService.GetLocaleShortName(clubAdmin.Locale);
             clubObject.Initials = clubInitials;
 
             await _adminService.UpdateClub(clubObject);

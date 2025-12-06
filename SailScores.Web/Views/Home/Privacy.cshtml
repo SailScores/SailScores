@@ -89,6 +89,23 @@
             entry. When this feature is used, audio data from the Scorekeepers' device is sent
             to a third party for interpretation into textual data.
         </li>
+        <li>
+            <strong>Images: </strong> Scorekeepers may choose to upload an image for text
+            recognition. The cropped portion of the image will be transmitted to Microsoft
+            Azure ComputerVision for processing into text. Images may be stored temporarily
+            to complete processing but are not retained beyond the time it takes to return
+            the processed image to the user. Microsoft’s privacy practices for this service
+            can be found at https://azure.microsoft.com/en-us/support/legal/.
+        </li>
+        <li>
+            <strong>Payments</strong> When you make a payment through our Services, payment
+            information is collected and processed by Stripe Checkout. SailScores does not
+            have access to any of the payment information except the final outcome of the
+            payment: success, payment canceled, or payment error. Stripe may collect information
+            such as your card number, billing address, and transaction details to process
+            payments securely. You can learn more about Stripe’s privacy practices
+            at https://stripe.com/privacy.
+        </li>
     </ul>
 </section>
 <section id="information-we-collect-from-another-user">
@@ -212,14 +229,22 @@
         <li>
             <strong>Third-party vendors:</strong> 
             We may share information about you with third-party vendors who need the information
-            in order to provide their services to us. Currently, this includes a single vendor, Microsoft,
-            to provide Speech Recognition services. Information regarding their privacy policy for this service
-            can be found at 
-            <a href="https://azure.microsoft.com/en-us/support/legal/cognitive-services-compliance-and-privacy/"
-                target=""
-                >Azure Cognitive Services</a>.
+            in order to provide their services to us. Currently, this includes two vendors:
+            <ul>
+                <li>
+                    Microsoft, to provide Speech and Image Recognition services. Their privacy
+                    policy for these services can be found at
+                    <a href="https://azure.microsoft.com/en-us/support/legal/cognitive-services-compliance-and-privacy/"
+                        target="">Azure Cognitive Services</a>.
+                </li>
+                <li>
+                  Stripe, to process payments. We send the club initials if you are
+                  a scorekeeper to Stripe, so that we can associate a payment with a particular club. Stripe's
+                  Privacy policy is located at <a href="https://stripe.com/privacy">https://stripe.com/privacy</a>.
+                </li>
+            </ul>
             In the future we may use other vendors to help us provide our Services to
-            you, payment providers that process your credit and debit card information, and postal
+            you, such as postal
             and email delivery services that help us stay in touch with you. We require vendors
             commit to customer privacy, including obligations that disallow the resale of our users'
             data. 
@@ -472,13 +497,15 @@
 <section id="change-log">
     <h3>Change log</h3>
     <ul>
-        <li><em>December 29, 2024: </em>Added preference storage to cookie description. We have added
+        <li><em>December 1, 2025:</em> Added details for upcoming features: Azure ComputerVision and
+            Stripe payment processing.</li>
+        <li><em>December 29, 2024:</em> Added preference storage to cookie description. We have added
             cookies to store Scorekeeper page display preferences.</li>
-        <li><em>April 25, 2021: </em>Added specific mention of speech recognition services provided by
+        <li><em>April 25, 2021:</em> Added specific mention of speech recognition services provided by
         Microsoft. To process speech, data will be processed by Microsoft.</li>
-        <li><em>December 23, 2020: </em>Removed reference to blocking cookies with browser. Most users
+        <li><em>December 23, 2020:</em> Removed reference to blocking cookies with browser. Most users
         will not receive cookies from SailScores. We use minimal cookies to track logged in users.</li>
-        <li><em>December 17, 2020: </em>Initial version of this policy shared.</li>
+        <li><em>December 17, 2020:</em> Initial version of this policy shared.</li>
     </ul>
 </section>
 <section id="attribution">

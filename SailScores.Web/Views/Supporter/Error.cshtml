@@ -1,0 +1,99 @@
+@{
+    ViewData["Title"] = "Payment Error";
+    ViewData["MetaDescription"] = "There was an issue processing your payment. Please try again or contact us for assistance.";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card border-danger">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <h1 class="display-4 text-danger mb-4">Payment Error</h1>
+                    
+                    <p class="lead mb-4">
+                        We encountered an issue processing your payment.
+                    </p>
+
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Common Issues</h5>
+                        <ul class="text-start mb-0">
+                            <li>Card declined by your bank</li>
+                            <li>Insufficient funds</li>
+                            <li>Incorrect card details</li>
+                            <li>Temporary network issue</li>
+                        </ul>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h3 class="mb-3">What to do next?</h3>
+                    
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-redo text-primary"></i> Try Again</h5>
+                                    <p class="small mb-0">
+                                        You can try the checkout process again with the same or a different payment method.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-phone text-primary"></i> Contact Your Bank</h5>
+                                    <p class="small mb-0">
+                                        If the issue persists, you may need to contact your bank to authorize the payment.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a asp-controller="Supporter" asp-action="Index" class="btn btn-primary btn-lg me-2">
+                            <i class="fas fa-redo"></i> Try Again
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-home"></i> Go to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Contact Section -->
+            <div class="card mt-4 border-0">
+                <div class="card-body text-center">
+                    <h5 class="mb-3">Need Help?</h5>
+                    <p class="text-muted mb-0">
+                        Feel free to <a href="mailto:info@SailScores.com">contact us</a>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Alternative Support Methods -->
+            <div class="card mt-3 border-0 bg-light">
+                <div class="card-body text-center">
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-shield-alt"></i> All payments are securely processed by Stripe. 
+                        Your payment information is never stored on our servers.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Clear any Stripe-related session storage
+        if (window.sessionStorage) {
+            sessionStorage.removeItem('stripeCheckoutInProgress');
+        }
+    </script>
+}

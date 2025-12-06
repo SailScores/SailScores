@@ -1,8 +1,6 @@
-import { Guid } from "../guid";
-
 export interface competitorDto {
-	id: Guid;
-	clubId: Guid;
+	id: string;
+	clubId: string;
 	name: string;
 	sailNumber: string;
 	alternativeSailNumber?: string;
@@ -10,7 +8,7 @@ export interface competitorDto {
     homeClubName: string;
 	notes?: string;
     isActive?: boolean;
-    boatClassId: Guid;
-	fleetIds: Guid[];
-	scoreIds: Guid[];
+    boatClassId: string;
+	fleetIds: string[];
+	scoreIds: string[];
 }

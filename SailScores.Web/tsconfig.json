@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "outDir": "./wwwroot/js/",
+    "esModuleInterop": true,
     "noImplicitAny": true,
     "noEmitOnError": true,
     "removeComments": false,
@@ -25,7 +26,8 @@
     "./Scripts/guid.ts",
     "./Scripts/raceEditor.ts",
     "./Scripts/fleetEditor.ts",
-    "./Scripts/interfaces/CompetitorDto.cs.d.ts"
+    "./Scripts/interfaces/CompetitorDto.cs.d.ts",
+    "./Scripts/ocrRaceEntry.ts"
   ],
   "compileOnSave": true
-}
+  }

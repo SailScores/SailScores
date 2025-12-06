@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Checkout Cancelled";
+    ViewData["MetaDescription"] = "Your SailScores supporter checkout was cancelled. You can try again anytime.";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card border-secondary">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle text-secondary" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <h1 class="display-4 mb-4">Checkout Cancelled</h1>
+                    
+                    <p class="lead mb-4">
+                        Your payment was not processed. No charges were made to your account.
+                    </p>
+
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <i class="fas fa-info-circle"></i> 
+                            If you experienced any issues during checkout or have questions, please don't hesitate to <a href="mailto:info@SailScores.com">contact us</a>.
+                        </p>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h3 class="mb-3">You can still support SailScores anytime</h3>
+                    
+                    <p class="text-muted mb-4">
+                        SailScores remains free for all sailing clubs. Your support helps us maintain high availability,
+                        develop new features, and keep the service running for the sailing community worldwide.
+                    </p>
+
+                    <div class="mt-4">
+                        <a asp-controller="Supporter" asp-action="Index" class="btn btn-primary btn-lg me-2">
+                            <i class="fas fa-heart"></i> View Supporter Options
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-home"></i> Go to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Clear any Stripe-related session storage
+        if (window.sessionStorage) {
+            sessionStorage.removeItem('stripeCheckoutInProgress');
+        }
+    </script>
+}

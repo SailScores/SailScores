@@ -8,7 +8,8 @@ var gulp = require("gulp"),
     sass = require('gulp-sass')(require('sass')),
     named = require('vinyl-named'),
     rename = require('gulp-rename'),
-    webpack = require('webpack-stream');
+    webpack = require('webpack-stream'),
+    exec = require('child_process').exec;
 
 var paths = {
     webroot: "./wwwroot/"
@@ -53,7 +54,14 @@ gulp.task("min:js", function () {
 });
 
 gulp.task("min:css", function () {
-    return gulp.src([paths.css, "!" + paths.minCss])
+    // Concatenate CSS with `custom.css` emitted last so its rules (including dark-mode variables) win the cascade
+    return gulp.src([
+        'wwwroot/css/bootstrap.min.css',            // bootstrap first
+        'wwwroot/css/*.css',                        // other css files
+        '!' + paths.minCss,                         // exclude previously generated min
+        '!' + 'wwwroot/css/custom.css',             // exclude custom so we can add it last
+        'wwwroot/css/custom.css'                    // add custom.css last
+    ], { allowEmpty: true })
         .pipe(concat(paths.concatCssDest))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(gulp.dest("."));

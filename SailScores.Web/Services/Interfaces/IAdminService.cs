@@ -8,5 +8,4 @@ public interface IAdminService
     Task<AdminViewModel> GetClubForEdit(string clubInitials);
     Task<AdminViewModel> GetClub(string clubInitials);
     Task UpdateClub(Club clubObject);
-    string GetLocaleShortName(string locale);
 }

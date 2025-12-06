@@ -1,3 +1,6 @@
+@using SailScores.Web.Services
+@inject AppSettingsService settingsService
 @{
     Layout = "_Layout";
+    ViewBag.ShowSupporterFeatures = settingsService.ShowSupporterFeatures;
 }

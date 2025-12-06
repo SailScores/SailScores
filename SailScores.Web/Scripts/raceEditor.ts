@@ -2,14 +2,17 @@
 /// <reference types="jquery" />
 /// <reference types="select2" />
 
-
 import $ from "jquery";
 import "bootstrap";
 
 import { competitorDto, scoreCodeDto, seriesDto, speechInfo } from "./interfaces/server";
+import { initializeOcrRaceEntry, OcrRaceEntry } from "./ocrRaceEntry";
 
 declare let scoreCodes: scoreCodeDto[];
 const noCodeString = "No Code";
+
+// OCR module instance
+let ocrModule: OcrRaceEntry | null = null;
 
 function checkEnter(e: KeyboardEvent) {
     let txtArea = /textarea/i.test((e.target as HTMLElement).tagName);
@@ -119,14 +122,23 @@ export function loadFleet() {
     if (boatClassId) {
         $("#createCompBoatClassSelect").val(boatClassId);
     }
+    // Enable/disable OCR and Microphone buttons based on fleet selection
     if (fleetId.length < 30) {
         $("#createCompButton").prop('disabled', true);
+        $("#ocrButton").prop('disabled', true);
+        $("#scenarioStartButton").prop('disabled', true);
     } else {
         $("#createCompButton").prop('disabled', false);
+        $("#ocrButton").prop('disabled', false);
+        $("#scenarioStartButton").prop('disabled', false);
     }
 
     $("#createCompFleetId").val(fleetId);
     getCompetitors(clubId, fleetId);
+    // Update OCR module fleet/club context
+    if (ocrModule) {
+        ocrModule.setCurrentFleet(fleetId, clubId);
+    }
     displayRaceNumber();
 }
 
@@ -241,7 +253,7 @@ export function confirmDelete(event: Event) {
     let compId = listElement.dataset.competitorId;
     let compName = resultItem.find(".competitor-name").text();
     if (!compName) {
-        compName = resultItem.find(".sail-number").text();
+     compName = resultItem.find(".sail-number").text();
     }
     let modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
@@ -479,7 +491,7 @@ function getSuggestions(): AutocompleteSuggestion[] {
 let allCompetitors: competitorDto[];
 let competitorSuggestions: AutocompleteSuggestion[];
 function getCompetitors(clubId: string, fleetId: string) {
-    if ($ && clubId && fleetId && fleetId.length > 31) {
+    if ($ && clubId && fleetId && fleetId.length >31) {
         $.getJSON("/api/Competitors",
             {
                 clubId: clubId,
@@ -489,7 +501,15 @@ function getCompetitors(clubId: string, fleetId: string) {
                 allCompetitors = data;
                 initializeAutoComplete();
                 initializeButtonFooter();
-            });
+                // Initialize or update OCR module when competitors are loaded
+                if (ocrModule) {
+                    ocrModule.updateCompetitors(data);
+                    ocrModule.setCurrentFleet(fleetId, clubId);
+                } else {
+                    ocrModule = initializeOcrRaceEntry(data);
+                    ocrModule.setCurrentFleet(fleetId, clubId);
+                }
+     });
     }
 }
 
@@ -918,33 +938,6 @@ document.addEventListener("DOMContentLoaded", function () {
         scenarioStartButton.addEventListener("click",
             doContinuousRecognition);
 
-        // Check microphone permissions on load
-        if (navigator.mediaDevices?.getUserMedia) {
-            if (SPEECH_DEBUG) console.log("🎤 Checking microphone access...");
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(function(stream) {
-                    if (SPEECH_DEBUG) {
-                        console.log("✅ Microphone access granted");
-                        console.log("🎙️ Audio tracks:", stream.getAudioTracks().length);
-                        stream.getAudioTracks().forEach(track => {
-                            console.log("  Track:", track.label, "enabled:", track.enabled, "muted:", track.muted);
-                        });
-                    }
-                    // Stop the test stream
-                    stream.getTracks().forEach(track => track.stop());
-                })
-                .catch(function(err) {
-                    console.error("❌ Microphone access denied:", err);
-                    const speechWarning = document.getElementById('speechwarning');
-                    if (speechWarning) {
-                        speechWarning.textContent = "Microphone access denied: " + err.message;
-                        speechWarning.style.display = '';
-                    }
-                });
-        } else {
-            console.error("❌ getUserMedia not supported in this browser");
-        }
-
         InitializeSpeech(function (speechSdk: any) {
             SpeechSDK = speechSdk;
             if (SPEECH_DEBUG) console.log("✅ Speech SDK initialized:", !!SpeechSDK);
@@ -1173,9 +1166,46 @@ function doContinuousRecognition() {
         console.log("🗣️ Language:", language);
     }
 
+    // Check microphone permissions when user initiates recognition
+    if (navigator.mediaDevices?.getUserMedia) {
+        if (SPEECH_DEBUG) console.log("🎤 Checking microphone access...");
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function(stream) {
+                if (SPEECH_DEBUG) {
+                    console.log("✅ Microphone access granted");
+                    console.log("🎙️ Audio tracks:", stream.getAudioTracks().length);
+                    stream.getAudioTracks().forEach(track => {
+                        console.log("  Track:", track.label, "enabled:", track.enabled, "muted:", track.muted);
+                    });
+                }
+                // Stop the test stream
+                stream.getTracks().forEach(track => track.stop());
+                // Proceed with recognition
+                startRecognition();
+            })
+            .catch(function(err) {
+                console.error("❌ Microphone access denied:", err);
+                const speechWarning = document.getElementById('speechwarning');
+                if (speechWarning) {
+                    speechWarning.textContent = "Microphone access denied: " + err.message;
+                    speechWarning.style.display = '';
+                }
+                if (phraseDiv) {
+                    phraseDiv.innerHTML = "Microphone access denied. Please allow microphone access to use speech recognition.";
+                }
+            });
+    } else {
+        console.error("❌ getUserMedia not supported in this browser");
+        if (phraseDiv) {
+            phraseDiv.innerHTML = "Speech recognition not supported in this browser.";
+        }
+    }
+}
+
+function startRecognition() {
     if (timeOfLastToken < Date.now() - (5 * 60000)) {
         if (SPEECH_DEBUG) console.log("⏰ Token expired, requesting new token...");
-        RequestAuthorizationToken(doContinuousRecognition);
+        RequestAuthorizationToken(startRecognition);
         return;
     }
 
@@ -1272,5 +1302,10 @@ if (document.getElementById('raceform')) {
     setupDirtyFormDetection('raceform');
 }
 
+// Expose addNewCompetitor globally for OCR module to use
+(window as any).addNewCompetitorFromOCR = addNewCompetitor;
+
+
 initialize();
+
 

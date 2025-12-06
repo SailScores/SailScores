@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Core.Model;
@@ -21,5 +21,6 @@ namespace SailScores.Core.Services
         Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId);
         Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId, bool skipCache);
         Task<Guid?> GetClubDefaultScoringSystemId(Guid clubId);
+        Task<ScoringSystem> GetBaseRegattaSystemAsync();
     }
 }
