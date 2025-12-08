@@ -71,6 +71,7 @@
     <Folder Include="wwwroot\vendor\bootstrap\js\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="wwwroot\images\help\SailScoresClubHomePage.png" />
     <None Include="wwwroot\js\build\guid.js" />
     <None Include="wwwroot\js\build\interfaces\server.js" />
     <None Include="wwwroot\js\build\raceEditor.js" />
