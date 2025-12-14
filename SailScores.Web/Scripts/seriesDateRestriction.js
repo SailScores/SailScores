@@ -2,10 +2,10 @@
     'use strict';
 
     function toggleDateRestrictionFields() {
-        var dateRestrictedCheckbox = document.getElementById('DateRestricted');
-        var dateFields = document.getElementById('dateRestrictionFields');
-        var startDateInput = document.querySelector('input[name="EnforcedStartDate"]');
-        var endDateInput = document.querySelector('input[name="EnforcedEndDate"]');
+        let dateRestrictedCheckbox = document.getElementById('DateRestricted');
+        let dateFields = document.getElementById('dateRestrictionFields');
+        let startDateInput = document.querySelector('input[name="EnforcedStartDate"]');
+        let endDateInput = document.querySelector('input[name="EnforcedEndDate"]');
 
         if (dateRestrictedCheckbox && dateRestrictedCheckbox.checked) {
             if (dateFields) dateFields.style.display = 'block';
@@ -27,7 +27,7 @@
 
     // Auto-wire on DOM ready so pages that include the script get expected behavior
     document.addEventListener('DOMContentLoaded', function () {
-        var dateRestrictedCheckbox = document.getElementById('DateRestricted');
+        let dateRestrictedCheckbox = document.getElementById('DateRestricted');
         if (dateRestrictedCheckbox) {
             dateRestrictedCheckbox.addEventListener('change', toggleDateRestrictionFields);
             // initialize on load (handles validation error re-display)

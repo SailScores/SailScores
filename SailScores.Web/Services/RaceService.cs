@@ -252,6 +252,7 @@ public class RaceService : IRaceService
     {
         var model = await CreateClubRaceAsync(clubInitials);
         var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
+        // Season doesn't include now. so use last race date or season start.
         if(series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)
         {
             if (series.Races.Any(r => r.Date.HasValue))
@@ -263,19 +264,15 @@ public class RaceService : IRaceService
             }
         }
 
-        // Ensure default date falls within series date range. Prefer enforced dates when DateRestricted is true.
+        // Ensure default date falls within series date range.
+        // Prefer series enforced dates when DateRestricted is true.
         DateTime candidateDate = model.Date ?? DateTime.Today;
-        if (series.DateRestricted == true && series.EnforcedStartDate.HasValue && series.EnforcedEndDate.HasValue)
+        if (series.DateRestricted == true)
         {
-            var enforcedStart = series.EnforcedStartDate.Value.ToDateTime(TimeOnly.MinValue);
-            var enforcedEnd = series.EnforcedEndDate.Value.ToDateTime(TimeOnly.MinValue);
-            if (candidateDate > enforcedEnd)
+            var restrictedDate = GetDateRestrictedSeriesRaceDate(series, candidateDate);
+            if (restrictedDate != null)
             {
-                model.Date = enforcedEnd;
-            }
-            else if (candidateDate < enforcedStart)
-            {
-                model.Date = enforcedStart;
+                model.Date = restrictedDate;
             }
         }
         else if (series.StartDate.HasValue && series.EndDate.HasValue)
@@ -332,6 +329,27 @@ public class RaceService : IRaceService
         }
 
         return model;
+    }
+
+    private DateTime? GetDateRestrictedSeriesRaceDate(
+        Series series,
+        DateTime candidateDate)
+    {
+        if(series.EnforcedStartDate == null || series.EnforcedEndDate == null)
+        {
+            return null;
+        }
+        var enforcedStart = series.EnforcedStartDate.Value.ToDateTime(TimeOnly.MinValue);
+        var enforcedEnd = series.EnforcedEndDate.Value.ToDateTime(TimeOnly.MinValue);
+        if (candidateDate > enforcedEnd)
+        {
+            return enforcedEnd;
+        }
+        else if (candidateDate < enforcedStart)
+        {
+            return enforcedStart;
+        }
+        return null;
     }
 
     public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions)
@@ -413,7 +431,6 @@ public class RaceService : IRaceService
                 {
                     score.FinishTime = null;
                     score.ElapsedTime = null;
-                    continue;
                 }
                 else if (score.FinishTime.HasValue)
                 {

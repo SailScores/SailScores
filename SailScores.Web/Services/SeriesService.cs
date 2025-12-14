@@ -269,7 +269,7 @@ public class SeriesService : ISeriesService
             Season season;
             
             // Check if SeasonId is available in the model (not default/empty)
-            if (model.SeasonId != Guid.Empty && model.SeasonId != default)
+            if (model.SeasonId != default)
             {
                 // Use the season from the model
                 var seasons = await _coreSeasonService.GetSeasons(model.ClubId);

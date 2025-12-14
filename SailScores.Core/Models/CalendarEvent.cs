@@ -21,7 +21,7 @@ public class CalendarEvent
     public string Category { get; set; }
 }
 
-public class CalendarEventType
+public static class CalendarEventType
 {
     public const string Series = "series";
     public const string Regatta = "regatta";

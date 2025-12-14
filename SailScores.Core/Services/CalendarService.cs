@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SailScores.Core.Model;
 using SailScores.Core.Models;
 using SailScores.Core.Utility;
 using SailScores.Database;
-using SailScores.Database.Entities;
 
 namespace SailScores.Core.Services;
 
@@ -38,7 +35,7 @@ public class CalendarService : ICoreCalendarService
             endDate.ToDateTime()));
 
         // someday: get other events
-        // todo: get races without series
+        // someday: get races without series
         return eventList;
     }
 
@@ -75,7 +72,7 @@ public class CalendarService : ICoreCalendarService
     {
         // add series that are date restricted if their date range is 4 days or less.
 
-        // then add other series, with contigous date ranges merged: date ranges
+        // then add other series, with contiguous date ranges merged: date ranges
         // should be based on the races within the series.
 
         var startDateOnly = DateOnly.FromDateTime(startDate);
@@ -156,37 +153,38 @@ public class CalendarService : ICoreCalendarService
                 EventType = CalendarEventType.Series,
                 Category = fleetName
             };
-            foreach (var race in races)
+            foreach (var raceDate in races
+                .Where(r => r.Date.HasValue)
+                .Select(r => DateOnly.FromDateTime(r.Date.Value)))
             {
                 // keep track of current dates of races.
                 // as soon as we get to a gap, add the previous event and start a new one.
                 if (currentEvent.StartDate == default)
                 {
-                    currentEvent.StartDate = DateOnly.FromDateTime(race.Date.Value);
-                    currentEvent.EndDate = DateOnly.FromDateTime(race.Date.Value);
-                } else
-                {
-                    var raceDateOnly = DateOnly.FromDateTime(race.Date.Value);
-                    if(raceDateOnly.DayNumber - currentEvent.EndDate.DayNumber <= 1)
-                    {
-                        // extend the current event
-                        currentEvent.EndDate = raceDateOnly;
-                    } else
-                    {
-                        // gap detected, add the current event and start a new one
-                        calendarEvents.Add(currentEvent);
-                        currentEvent = new CalendarEvent
-                        {
-                            StartDate = raceDateOnly,
-                            EndDate = raceDateOnly,
-                            Title = $"{series.Name}",
-                            Description = series.Description,
-                            Uri = new Uri($"/{clubInitials}/{series.Season.Name}/{series.UrlName}", UriKind.Relative),
-                            EventType = CalendarEventType.Series,
-                            Category = fleetName
-                        };
-                    }
+                    currentEvent.StartDate = raceDate;
+                    currentEvent.EndDate = raceDate;
+                    continue;
                 }
+
+                if(raceDate.DayNumber - currentEvent.EndDate.DayNumber <= 1)
+                {
+                    // extend the current event
+                    currentEvent.EndDate = raceDate;
+                    continue;
+                }
+
+                // gap detected, add the current event and start a new one
+                calendarEvents.Add(currentEvent);
+                currentEvent = new CalendarEvent
+                {
+                    StartDate = raceDate,
+                    EndDate = raceDate,
+                    Title = $"{series.Name}",
+                    Description = series.Description,
+                    Uri = new Uri($"/{clubInitials}/{series.Season.Name}/{series.UrlName}", UriKind.Relative),
+                    EventType = CalendarEventType.Series,
+                    Category = fleetName
+                };
 
             }
             // add the last event if it has a start date

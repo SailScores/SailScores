@@ -300,8 +300,8 @@ namespace SailScores.Core.Services
                 childSeries.RaceCount = childSeries.RaceSeries.Count();
                 var minDate = childSeries.RaceSeries.Select(rs => rs.Race).Min(r => r.Date);
                 var maxDate = childSeries.RaceSeries.Select(rs => rs.Race).Max(r => r.Date);
-                childSeries.StartDate = minDate.HasValue ? DateOnly.FromDateTime(minDate.Value) : (DateOnly?)null;
-                childSeries.EndDate = maxDate.HasValue ? DateOnly.FromDateTime(maxDate.Value) : (DateOnly?)null;
+                childSeries.StartDate = GetDateOnlyFromNullableDate(minDate);
+                childSeries.EndDate = GetDateOnlyFromNullableDate(maxDate);
 
                 // If the series is date restricted, prefer the enforced dates
                 if (childSeries.DateRestricted == true)
@@ -316,6 +316,13 @@ namespace SailScores.Core.Services
                     }
                 }
             }
+        }
+
+        private DateOnly? GetDateOnlyFromNullableDate(DateTime? nullableDateTime)
+        {
+            return nullableDateTime.HasValue ?
+                DateOnly.FromDateTime(nullableDateTime.Value) :
+                (DateOnly?)null;
         }
 
         private async Task PopulateSummaryForRegularSeries(dbObj.Series dbSeries)

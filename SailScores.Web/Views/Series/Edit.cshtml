@@ -84,7 +84,7 @@
                             </div>
                             <div class="mb-3">
                                 <label asp-for="TrendOption">Calculate Rank Trend</label>
-                                <select id="ScoringSystemId" asp-for="TrendOption" class="form-select">
+                                <select asp-for="TrendOption" class="form-select">
                                     @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
                                     {
                                         <option value="@trendOption">

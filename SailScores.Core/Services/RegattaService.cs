@@ -375,7 +375,6 @@ namespace SailScores.Core.Services
                 DateOnly? startDate = DetermineStartDate(dbRegatta, race);
                 DateOnly? endDate = DetermineEndDate(dbRegatta, race);
 
-                bool enforceDates = false;
                 if (startDate.HasValue && endDate.HasValue)
                 {
                     series.DateRestricted = true;
