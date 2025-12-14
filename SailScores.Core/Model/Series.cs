@@ -72,6 +72,10 @@ public class Series
     // used in the competitor summary statistics.
     public bool ExcludeFromCompetitorStats { get; set; }
 
+    public bool? DateRestricted { get; set; }
+    public DateOnly? EnforcedStartDate { get; set; }
+    public DateOnly? EnforcedEndDate { get; set; }
+
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
 

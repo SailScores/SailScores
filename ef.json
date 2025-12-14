@@ -1,4 +1,5 @@
 {
   "project": "SailScores.Database/SailScores.Database.csproj",
-  "startup-project": "SailScores.Web/SailScores.Web.csproj"
+  "startup-project": "SailScores.Web/SailScores.Web.csproj",
+  "default-context": "SailScoresContext"
 }

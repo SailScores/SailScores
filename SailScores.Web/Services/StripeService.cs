@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Stripe;
@@ -40,28 +41,17 @@ public class StripeService : IStripeService
         string userEmail,
         string domain)
     {
-        
         var clubInfo = await GetFirstClubForUserEmailAsync(userEmail);
 
         var clubId = clubInfo.ClubId;
         var clubInitials = clubInfo.ClubInitials;
 
         var options = new SessionCreateOptions
-        {            
+        {
             PaymentMethodTypes = new List<string> { "card" },
-            LineItems = new List<SessionLineItemOptions>
-            {
-                new SessionLineItemOptions
-                {
-                    Price = plan == "yearly"
-                        ? _configuration["Stripe:YearlyPriceId"]
-                        : _configuration["Stripe:MonthlyPriceId"],
-                    Quantity = 1,
-                },
-            },
+            LineItems = new List<SessionLineItemOptions>(),
             Mode = "subscription",
-            SuccessUrl = domain +
-                "/Supporter/Success?session_id={CHECKOUT_SESSION_ID}",
+            SuccessUrl = domain + "/Supporter/Success?session_id={CHECKOUT_SESSION_ID}",
             CancelUrl = domain + "/Supporter/Cancel",
             Metadata = new Dictionary<string, string>
             {
@@ -74,6 +64,52 @@ public class StripeService : IStripeService
         if (!string.IsNullOrEmpty(userEmail))
         {
             options.CustomerEmail = userEmail;
+        }
+
+        // Handle plan types:
+        // - "monthly" -> recurring monthly price id
+        // - "yearly"  -> recurring annual price id
+        // - "custom" -> one-time payment
+        if (!string.IsNullOrWhiteSpace(plan) &&
+            plan.StartsWith("custom", StringComparison.OrdinalIgnoreCase))
+        {
+            options.Mode = "payment";
+            var priceId = _configuration["Stripe:UserSelectsPriceId"];
+            
+            if (string.IsNullOrWhiteSpace(priceId))
+            {
+                throw new InvalidOperationException(
+                    "Stripe configuration for custom pricing is missing. " +
+                    "Please ensure 'Stripe:UserSelectsPriceId' is configured in application settings.");
+            }
+            
+            options.LineItems.Add(new SessionLineItemOptions
+            {
+                Price = priceId,
+                Quantity = 1,
+            });
+        }
+        else
+        {
+            // Recurring subscription branch (monthly / yearly)
+            var priceId = plan == "yearly"
+                ? _configuration["Stripe:YearlyPriceId"]
+                : _configuration["Stripe:MonthlyPriceId"];
+
+            if (string.IsNullOrWhiteSpace(priceId))
+            {
+                var configKey = plan == "yearly" ? "Stripe:YearlyPriceId" : "Stripe:MonthlyPriceId";
+                throw new InvalidOperationException(
+                    $"Stripe configuration for {plan} pricing is missing. " +
+                    $"Please ensure '{configKey}' is configured in application settings.");
+            }
+
+            options.Mode = "subscription";
+            options.LineItems.Add(new SessionLineItemOptions
+            {
+                Price = priceId,
+                Quantity = 1,
+            });
         }
 
         // Add custom fields for visibility in Stripe dashboard

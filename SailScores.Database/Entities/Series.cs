@@ -53,6 +53,10 @@ public class Series
     public bool? ChildrenSeriesAsSingleRace { get; set; }
     public int? RaceCount { get; set; }
 
+    public bool? DateRestricted { get; set; }
+    public DateOnly? EnforcedStartDate { get; set; }
+    public DateOnly? EnforcedEndDate { get; set; }
+
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
 }

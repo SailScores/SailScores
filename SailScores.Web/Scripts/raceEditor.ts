@@ -563,9 +563,19 @@ function setSeries() {
     // Save current selections as an array of strings
     let selectedSeriesValues = seriesSelect.val() as string[] || [];
 
+    // Capture existing option texts so we can restore selected ones that may not be in the new list
+    const existingOptionTextMap: Record<string, string> = {};
+    seriesSelect.find('option').each(function () {
+        const $opt = $(this);
+        const val = $opt.val() as string;
+        if (val) {
+            existingOptionTextMap[val] = $opt.text();
+        }
+    });
+
     // Destroy existing Select2 instance to avoid duplicates
     if (seriesSelect.hasClass("select2-hidden-accessible")) {
-        seriesSelect.select2('destroy');
+        try { seriesSelect.select2('destroy'); } catch (e) { /* ignore */ }
     }
 
     // Remove options

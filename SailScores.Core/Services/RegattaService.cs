@@ -1,13 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
 using SailScores.Core.Utility;
 using SailScores.Database;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
 using dbObj = SailScores.Database.Entities;
 
 namespace SailScores.Core.Services
@@ -336,6 +337,15 @@ namespace SailScores.Core.Services
             {
                 // create a new series for this fleet.
                 var seriesName = $"{dbRegatta.Season.Name} {dbRegatta.Name} {dbFleet.NickName}";
+
+                DateOnly? startDate = DetermineStartDate(dbRegatta, race);
+                DateOnly? endDate = DetermineEndDate(dbRegatta, race);
+
+                bool enforceDates = false;
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    enforceDates = true;
+                }
                 series = new Database.Entities.Series
                 {
                     ClubId = race.ClubId,
@@ -346,7 +356,12 @@ namespace SailScores.Core.Services
                     TrendOption = Api.Enumerations.TrendOption.PreviousRace,
                     FleetId = dbFleet.Id,
                     RaceSeries = new List<Database.Entities.SeriesRace>(),
-                    UrlName = UrlUtility.GetUrlName(seriesName)
+                    UrlName = UrlUtility.GetUrlName(seriesName),
+                    Type = Database.Entities.SeriesType.Regatta,
+                    DateRestricted = enforceDates,
+                    EnforcedStartDate = startDate,
+                    EnforcedEndDate = endDate
+
                 };
                 dbRegatta.RegattaSeries.Add(new dbObj.RegattaSeries
                 {
@@ -354,12 +369,29 @@ namespace SailScores.Core.Services
                     Series = series
                 });
                 _dbContext.Series.Add(series);
+            } else
+            {
+                // series exists, but we may need to update the date restrictions
+                DateOnly? startDate = DetermineStartDate(dbRegatta, race);
+                DateOnly? endDate = DetermineEndDate(dbRegatta, race);
+
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    series.DateRestricted = true;
+                    series.EnforcedStartDate = startDate;
+                    series.EnforcedEndDate = endDate;
+                } else
+                {
+                    series.DateRestricted = false;
+                    series.EnforcedStartDate = null;
+                    series.EnforcedEndDate = null;
+                }
             }
             series.RaceSeries.Add(new dbObj.SeriesRace
-            {
-                RaceId = race.Id,
-                SeriesId = series.Id
-            });
+                {
+                    RaceId = race.Id,
+                    SeriesId = series.Id
+                });
 
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
             await _seriesService.UpdateSeriesResults(series.Id, race.UpdatedBy)
@@ -387,6 +419,64 @@ namespace SailScores.Core.Services
                 await _dbContext.SaveChangesAsync()
                     .ConfigureAwait(false);
             }
+        }
+
+        private static DateOnly? DetermineStartDate(dbObj.Regatta regatta, Race race)
+        {
+            // neither date provided
+            if (regatta?.StartDate == null && race?.Date == null)
+            {
+                return null;
+            }
+
+            // convert available dates to DateOnly for consistent comparison
+            DateOnly? regattaDate = regatta?.StartDate != null
+                ? DateOnly.FromDateTime(regatta.StartDate.Value)
+                : null;
+            DateOnly? raceDate = race?.Date != null
+                ? DateOnly.FromDateTime(race.Date.Value)
+                : null;
+
+            if (regattaDate == null) { return raceDate; }
+            if (raceDate == null) { return regattaDate; }
+
+            // choose the earlier of the two
+            return raceDate < regattaDate ? raceDate : regattaDate;
+        }
+
+        private static DateOnly? DetermineEndDate(dbObj.Regatta regatta, Race race)
+        {
+            // no dates provided
+            if (regatta?.EndDate == null && regatta?.StartDate == null && race?.Date == null)
+            {
+                return null;
+            }
+
+            DateOnly? regattaEndDate = regatta?.EndDate != null
+                ? DateOnly.FromDateTime(regatta.EndDate.Value)
+                : null;
+            DateOnly? regattaStartDate = regatta?.StartDate != null
+                ? DateOnly.FromDateTime(regatta.StartDate.Value)
+                : null;
+            DateOnly? raceDate = race?.Date != null
+                ? DateOnly.FromDateTime(race.Date.Value)
+                : null;
+
+            // If regatta end date exists, return the later of regatta end and race date (if race date present)
+            if (regattaEndDate != null)
+            {
+                if (raceDate == null) { return regattaEndDate; }
+                return regattaEndDate > raceDate ? regattaEndDate : raceDate;
+            }
+
+            // No regatta end date: prefer the later of start date and race date if both present
+            if (regattaStartDate != null && raceDate != null)
+            {
+                return regattaStartDate > raceDate ? regattaStartDate : raceDate;
+            }
+
+            if (regattaStartDate != null) { return regattaStartDate; }
+            return raceDate;
         }
 
         public async Task<Regatta> GetRegattaForRace(Guid raceId)

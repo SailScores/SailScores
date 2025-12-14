@@ -1,0 +1,201 @@
+@using SailScores.Core.Models
+@model CalendarViewModel
+@{
+    Layout = "_ClubLayout";
+    ViewData["Title"] = "Calendar";
+}
+
+<h2>Calendar</h2>
+
+@if (Model == null)
+{
+    <p>No events found for this club.</p>
+}
+else
+{
+    var earliest = Model.StartDate;
+    var latest = Model.EndDate;
+
+    // Find Monday of the earliest event week
+    var start = earliest;
+    while (start.DayOfWeek != DayOfWeek.Monday)
+    {
+        start = start.AddDays(-1);
+    }
+
+    // Find Sunday of the latest event week, then add a week to show one week after last
+    var end = latest;
+    while (end.DayOfWeek != DayOfWeek.Sunday)
+    {
+        end = end.AddDays(1);
+    }
+    end = end.AddDays(7);
+
+    <div class="mt-3">
+        <form method="get" asp-action="Index" class="row g-2 align-items-center align-items-md-end">
+            <div class="col-9 col-md-5">
+                <div class="row g-1 align-items-center w-100">
+                    <label for="start" class="col-6 col-md-4 col-form-label mb-0 text-end">Start Date:</label>
+                    <div class="col-6 col-md-8">
+                        <input type="date" id="start" name="start" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-9 col-md-5">
+                <div class="row g-1 align-items-center w-100">
+                    <label for="end" class="col-6 col-md-4 col-form-label mb-0 text-end">End Date:</label>
+                    <div class="col-6 col-md-8">
+                        <input type="date" id="end" name="end" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 col-md-auto d-flex align-items-center align-items-md-end">
+                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <a asp-action="Index" asp-route-start="@(start.AddDays(-28).ToString("yyyy-MM-dd"))"
+           asp-route-end="@(end.AddDays(-28).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary" title="Back 4 weeks"><i class="fas fa-chevron-left"></i></a>
+        <span class="fw-semibold">@(start.ToString("d")) - @(end.ToString("d"))</span>
+        <a asp-action="Index" asp-route-start="@(start.AddDays(28).ToString("yyyy-MM-dd"))"
+          asp-route-end="@(end.AddDays(28).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary" title="Forward 4 weeks"><i class="fas fa-chevron-right"></i></a>
+    </div>
+
+    <div class="mt-4 px-0">
+        <div class="week-grid mb-2 week-row">
+            <div class="border-0 p-2 small fw-semibold text-muted"><span class="d-none d-md-inline">Monday</span><span class="d-inline d-md-none">M</span></div>
+            <div class="border-0 p-2 small fw-semibold text-muted"><span class="d-none d-md-inline">Tuesday</span><span class="d-inline d-md-none">T</span></div>
+            <div class="border-0 p-2 small fw-semibold text-muted"><span class="d-none d-md-inline">Wednesday</span><span class="d-inline d-md-none">W</span></div>
+            <div class="border-0 p-2 small fw-semibold text-muted"><span class="d-none d-md-inline">Thursday</span><span class="d-inline d-md-none">T</span></div>
+            <div class="border-0 p-2 small fw-semibold text-muted"><span class="d-none d-md-inline">Friday</span><span class="d-inline d-md-none">F</span></div>
+            <div class="border-0 p-2 small fw-semibold text-muted"><span class="d-none d-md-inline">Saturday</span><span class="d-inline d-md-none">S</span></div>
+            <div class="border-0 p-2 small fw-semibold text-muted"><span class="d-none d-md-inline">Sunday</span><span class="d-inline d-md-none">S</span></div>
+        </div>
+
+        @{
+            int? prevMonth = null;
+        }
+
+        @for (var weekStart = start; weekStart <= end; weekStart = weekStart.AddDays(7))
+        {
+            var weekEnd = weekStart.AddDays(6);
+
+            // Render month header before the first week and whenever the month changes
+            if (prevMonth == null || weekEnd.Month != prevMonth.Value)
+            {
+                <div class="month-row mb-1">
+                    <div class="fw-semibold text-end">@(weekEnd.ToString("MMMM yyyy"))</div>
+                </div>
+            }
+
+            prevMonth = weekEnd.Month;
+
+            var weekEvents = Model.List
+                .Where(e => e.EndDate >= weekStart && e.StartDate <= weekEnd)
+                .OrderBy(e => e.Description)
+                .ToList();
+
+            <div class="week-row">
+                @{ 
+                // render day-number cells in the first grid row
+                for (int i = 0; i < 7; i++)
+                {
+                    var current = weekStart.AddDays(i);
+                    var col = i + 1;
+                    <div class="day-cell p-2" style="grid-column: @col; grid-row: 1;"> 
+                        <div class="fw-bold text-end">@current.Day</div>
+                    </div>
+                }
+
+                // occupancy rows: each row is a bool[7] indicating occupied columns for that visual row
+                var occupancy = new List<bool[]>();
+
+                foreach (var e in weekEvents)
+                {
+                    var spanStart = e.StartDate < weekStart ? weekStart : e.StartDate;
+                    var spanEnd = e.EndDate > weekEnd ? weekEnd : e.EndDate;
+
+                    var startIdx = spanStart.DayNumber - weekStart.DayNumber; // 0-based
+                    var endIdx = spanEnd.DayNumber - weekStart.DayNumber; // 0-based inclusive
+
+                    // find first row where all columns in [startIdx..endIdx] are free
+                    var rowIndex = 0;
+                    while (true)
+                    {
+                        if (occupancy.Count <= rowIndex)
+                        {
+                            occupancy.Add(new bool[7]);
+                        }
+
+                        var row = occupancy[rowIndex];
+                        var conflict = false;
+                        for (int c = startIdx; c <= endIdx; c++)
+                        {
+                            if (row[c]) { conflict = true; break; }
+                        }
+
+                        if (!conflict)
+                        {
+                            // mark occupied
+                            for (int c = startIdx; c <= endIdx; c++) row[c] = true;
+                            break;
+                        }
+
+                        rowIndex++;
+                    }
+
+                    var colStartCss = startIdx + 1; // grid columns are 1-based
+                    var colEndCss = endIdx + 2; // exclusive end
+                    var gridRow = rowIndex + 2; // row 1 = day numbers, so event rows start at 2
+
+                    // choose subtle background by hashing the event title; keep same text color for both
+                    var titleForHash = e.Category ?? e.Title ?? string.Empty;
+                    var hash = 0;
+                    foreach (var ch in titleForHash)
+                    {
+                        hash = (hash * 31) + ch;
+                    }
+
+                    // Distribute across several subtle variants so colors vary but remain accessible in both light/dark mode
+                    var variants = new[] { "bs-primary-border-subtle", "bs-secondary-border-subtle", "bs-info-border-subtle", "bs-warning-border-subtle", "bs-light-border-subtle" };
+                    var idx = variants.Length > 0 ? (int)(Math.Abs((long)hash) % variants.Length) : 0;
+                    var colorClass = variants[idx] + " text-body";
+                    if (e.EventType == CalendarEventType.Regatta)
+                    {
+                        colorClass = "bg-success-subtle text-body";
+                    }
+                    var styleString = $"grid-column: {colStartCss} / {colEndCss}; grid-row: {gridRow};";
+
+                    @* Use the event Uri if available, otherwise render a non-clickable element *@
+                    @if (e.Uri != null)
+                    {
+                        <a class="event-bar @colorClass" href="@e.Uri.OriginalString" style="@styleString">
+                          @e.Title
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="event-bar @colorClass" style="@styleString">@e.Title</div>
+                    }
+                }
+
+                @for (int rowIndex = 0; rowIndex < occupancy.Count; rowIndex++)
+                {
+                  for (int col = 0; col < 7; col++)
+                  {
+                    if (!occupancy[rowIndex][col])
+                    {
+                      var colStart = col + 1;
+                      var colEnd = col + 2;
+                      var gridRow = rowIndex + 2;
+                      <div class="day-cell @(col==0?"monday":"")" style="grid-column:@colStart / @colEnd; grid-row:@gridRow;"></div>
+                    }
+                  }
+                }
+                }
+            </div>
+        }
+    </div>
+}
