@@ -66,6 +66,7 @@
     <Folder Include="Areas\Api\Models\" />
     <Folder Include="Areas\Api\Views\" />
     <Folder Include="Data\" />
+    <Folder Include="Models\Calendar\" />
     <Folder Include="Views\Error\" />
     <Folder Include="wwwroot\lib\" />
     <Folder Include="wwwroot\vendor\bootstrap\js\" />

@@ -74,6 +74,21 @@ namespace SailScores.Core.Services
                     .ThenInclude(rs => rs.Race)
                     .ThenInclude(r => r.Fleet)
                  .Include(s => s.ChildLinks);
+            
+            // Apply date restriction filtering
+            if (date.HasValue)
+            {
+                var dateOnly = DateOnly.FromDateTime(date.Value);
+                seriesQuery = seriesQuery.Where(s =>
+                    // Either not date restricted
+                    (s.DateRestricted != true) ||
+                    // Or date restricted and date falls within enforced range
+                    (s.DateRestricted == true && 
+                     s.EnforcedStartDate != null && 
+                     s.EnforcedEndDate != null &&
+                     s.EnforcedStartDate <= dateOnly && 
+                     s.EnforcedEndDate >= dateOnly));
+            }
 
             if (!includeRegatta)
             {
@@ -287,6 +302,19 @@ namespace SailScores.Core.Services
                 var maxDate = childSeries.RaceSeries.Select(rs => rs.Race).Max(r => r.Date);
                 childSeries.StartDate = minDate.HasValue ? DateOnly.FromDateTime(minDate.Value) : (DateOnly?)null;
                 childSeries.EndDate = maxDate.HasValue ? DateOnly.FromDateTime(maxDate.Value) : (DateOnly?)null;
+
+                // If the series is date restricted, prefer the enforced dates
+                if (childSeries.DateRestricted == true)
+                {
+                    if (childSeries.EnforcedStartDate.HasValue)
+                    {
+                        childSeries.StartDate = childSeries.EnforcedStartDate;
+                    }
+                    if (childSeries.EnforcedEndDate.HasValue)
+                    {
+                        childSeries.EndDate = childSeries.EnforcedEndDate;
+                    }
+                }
             }
         }
 
@@ -297,6 +325,19 @@ namespace SailScores.Core.Services
             dbSeries.RaceCount = await races.CountAsync().ConfigureAwait(false);
             dbSeries.StartDate = await races.MinAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null).ConfigureAwait(false);
             dbSeries.EndDate = await races.MaxAsync(r => r.Date.HasValue ? DateOnly.FromDateTime(r.Date.Value) : (DateOnly?)null).ConfigureAwait(false);
+
+            // If the series has date restrictions, use the enforced dates instead of calculated ones
+            if (dbSeries.DateRestricted == true)
+            {
+                if (dbSeries.EnforcedStartDate.HasValue)
+                {
+                    dbSeries.StartDate = dbSeries.EnforcedStartDate;
+                }
+                if (dbSeries.EnforcedEndDate.HasValue)
+                {
+                    dbSeries.EndDate = dbSeries.EnforcedEndDate;
+                }
+            }
         }
 
         private async Task CalculateScoresAsync(Series fullSeries)
@@ -873,6 +914,9 @@ namespace SailScores.Core.Services
             existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
             existingSeries.ChildrenSeriesAsSingleRace = model.ChildrenSeriesAsSingleRace;
+            existingSeries.DateRestricted = model.DateRestricted;
+            existingSeries.EnforcedStartDate = model.EnforcedStartDate;
+            existingSeries.EnforcedEndDate = model.EnforcedEndDate;
         }
 
         private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)

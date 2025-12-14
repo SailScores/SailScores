@@ -263,18 +263,58 @@ public class RaceService : IRaceService
             }
         }
 
+        // Ensure default date falls within series date range. Prefer enforced dates when DateRestricted is true.
+        DateTime candidateDate = model.Date ?? DateTime.Today;
+        if (series.DateRestricted == true && series.EnforcedStartDate.HasValue && series.EnforcedEndDate.HasValue)
+        {
+            var enforcedStart = series.EnforcedStartDate.Value.ToDateTime(TimeOnly.MinValue);
+            var enforcedEnd = series.EnforcedEndDate.Value.ToDateTime(TimeOnly.MinValue);
+            if (candidateDate > enforcedEnd)
+            {
+                model.Date = enforcedEnd;
+            }
+            else if (candidateDate < enforcedStart)
+            {
+                model.Date = enforcedStart;
+            }
+        }
+        else if (series.StartDate.HasValue && series.EndDate.HasValue)
+        {
+            var start = series.StartDate.Value.ToDateTime(TimeOnly.MinValue);
+            var end = series.EndDate.Value.ToDateTime(TimeOnly.MinValue);
+            if (candidateDate > end)
+            {
+                model.Date = end;
+            }
+            else if (candidateDate < start)
+            {
+                model.Date = start;
+            }
+        }
 
         if (series.Races.Any())
         {
             model.FleetId = series.Races.OrderByDescending(r => r.Date)
-                                .ThenByDescending(r => r.Order).First().Fleet?.Id
-                            ?? Guid.Empty;
+                                    .ThenByDescending(r => r.Order).First().Fleet?.Id
+                                ?? Guid.Empty;
         }
 
         model.SeriesIds = new List<Guid>
         {
             seriesId
         };
+
+        // Ensure the SeriesOptions contains the series so it will be shown/selected on the page
+        if (model.SeriesOptions == null)
+        {
+            model.SeriesOptions = new List<Series>();
+        }
+        if (!model.SeriesOptions.Any(s => s.Id == series.Id))
+        {
+            // Add the full series object so the option text is available
+            model.SeriesOptions.Add(series);
+        }
+
         if (series.ScoringSystemId.HasValue)
         {
             var scoreSystem = await _coreScoringService

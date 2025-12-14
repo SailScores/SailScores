@@ -22,6 +22,7 @@ paths.minCss = paths.webroot + "css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "js/**/*";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.jsDir = paths.webroot + "js/";
+paths.scriptsSrc = "Scripts/**/*.js";
 
 gulp.task("clean:js", function () {
     return del(paths.concatJsDest);
@@ -32,6 +33,11 @@ gulp.task("clean:css", function () {
 });
 
 gulp.task("clean", gulp.parallel("clean:js", "clean:css"));
+
+gulp.task("copy:scripts", function () {
+    return gulp.src(paths.scriptsSrc, { allowEmpty: true })
+        .pipe(gulp.dest(paths.jsDir));
+});
 
 gulp.task("min:js", function () {
     return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
@@ -73,8 +79,10 @@ gulp.task("sass", function () {
         .pipe(gulp.dest('wwwroot/css'));
 });
 
+// Ensure copy happens before minification so project Scripts/ files are available in wwwroot/js
 gulp.task('prebuild',  gulp.series(
         "sass",
+        "copy:scripts",
         "min:js",
         "min:css"));
 

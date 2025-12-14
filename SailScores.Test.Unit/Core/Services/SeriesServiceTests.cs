@@ -132,4 +132,89 @@ public class SeriesServiceTests
 
         Assert.True(_context.HistoricalResults.Count() > historicalResultCount);
     }
+
+    [Fact]
+    public async Task GetAllSeriesAsync_WithDateRestriction_FiltersCorrectly()
+    {
+        // Arrange
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+        var testDate = season.Start.AddDays(5);
+
+        // Create a date-restricted series
+        var restrictedSeries = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Date Restricted Series",
+            UrlName = "date-restricted-series",
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            DateRestricted = true,
+            EnforcedStartDate = DateOnly.FromDateTime(testDate.AddDays(-2)),
+            EnforcedEndDate = DateOnly.FromDateTime(testDate.AddDays(2))
+        };
+
+        // Create a non-restricted series
+        var nonRestrictedSeries = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Non Restricted Series",
+            UrlName = "non-restricted-series",
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            DateRestricted = false
+        };
+
+        _context.Series.Add(restrictedSeries);
+        _context.Series.Add(nonRestrictedSeries);
+        await _context.SaveChangesAsync();
+
+        // Act - query with date within restricted series range
+        var seriesWithinRange = await _service.GetAllSeriesAsync(clubId, testDate, false, false);
+
+        // Assert - both series should be returned (restricted is within range, non-restricted has no restriction)
+        Assert.Contains(seriesWithinRange, s => s.Id == restrictedSeries.Id);
+        Assert.Contains(seriesWithinRange, s => s.Id == nonRestrictedSeries.Id);
+
+        // Act - query with date outside restricted series range
+        var dateOutsideRange = testDate.AddDays(10);
+        var seriesOutsideRange = await _service.GetAllSeriesAsync(clubId, dateOutsideRange, false, false);
+
+        // Assert - only non-restricted series should be returned
+        Assert.DoesNotContain(seriesOutsideRange, s => s.Id == restrictedSeries.Id);
+        Assert.Contains(seriesOutsideRange, s => s.Id == nonRestrictedSeries.Id);
+    }
+
+    [Fact]
+    public async Task GetAllSeriesAsync_WithNullDate_ReturnsAllSeries()
+    {
+        // Arrange
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+
+        // Create a date-restricted series
+        var restrictedSeries = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Restricted for Null Date Test",
+            UrlName = "restricted-null-test",
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            DateRestricted = true,
+            EnforcedStartDate = DateOnly.FromDateTime(season.Start),
+            EnforcedEndDate = DateOnly.FromDateTime(season.End)
+        };
+
+        _context.Series.Add(restrictedSeries);
+        await _context.SaveChangesAsync();
+
+        // Act - query with null date
+        var allSeries = await _service.GetAllSeriesAsync(clubId, null, false, false);
+
+        // Assert - restricted series should be included when date is null
+        Assert.Contains(allSeries, s => s.Id == restrictedSeries.Id);
+    }
 }
