@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 using SailScores.Api.Enumerations;
@@ -87,7 +87,13 @@ public class LocalizerService : ILocalizerService
         }
         else if ((race.IsSeries ?? false) && race.StartDate != null && race.EndDate != null)
         {
-            return $"{race.Name} ({race.StartDate.ToSuperShortString()} - {race.EndDate.ToSuperShortString()})";
+            if (race.StartDate != race.EndDate)
+            {
+                return $"{race.Name} ({race.StartDate.ToSuperShortString()} - {race.EndDate.ToSuperShortString()})";
+            } else
+            {
+                return $"{race.Name} ({race.StartDate.ToSuperShortString()})";
+            }
         }
         else
         {
