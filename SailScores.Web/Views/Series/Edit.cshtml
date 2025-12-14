@@ -94,7 +94,9 @@
                                 </select>
                                 <span asp-validation-for="TrendOption" class="text-danger"></span>
                             </div>
-                            @if (Model.Type == SailScores.Core.Model.SeriesType.Standard || Model.Type == SailScores.Core.Model.SeriesType.Regatta)
+                            @if (Model.Type == SailScores.Core.Model.SeriesType.Unknown ||
+                              Model.Type == SailScores.Core.Model.SeriesType.Standard ||
+                              Model.Type == SailScores.Core.Model.SeriesType.Regatta)
                             {
                                 <div class="mb-3">
                                     <div class="form-check">
