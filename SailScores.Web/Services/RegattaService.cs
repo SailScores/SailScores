@@ -57,6 +57,11 @@ public class RegattaService : IRegattaService
             .ConfigureAwait(false);
         var filteredRegattas = coreRegattas
             .Where(r => r.HideFromFrontPage == false)
+            // include only regattas that last for less than 8 days
+            .Where(r =>
+                r.StartDate.HasValue &&
+                (!r.EndDate.HasValue ||
+                r.EndDate.Value < r.StartDate.Value.AddDays(8)))
             .OrderBy(s => s.StartDate)
             .ThenBy(s => s.Name);
         var vm = _mapper.Map<IList<RegattaSummaryViewModel>>(filteredRegattas);

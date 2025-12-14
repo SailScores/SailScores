@@ -13,6 +13,12 @@ public class SeriesService : ISeriesService
     private readonly IScoringService _coreScoringService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly IMapper _mapper;
+    
+    // Validation error messages for date restrictions
+    private const string ErrorMissingDates = "Both start date and end date must be provided when date restriction is enabled.";
+    private const string ErrorStartDateOutOfRange = "Series start date must fall within the selected season.";
+    private const string ErrorEndDateOutOfRange = "Series end date must fall within the selected season.";
+    private const string ErrorStartAfterEnd = "Series start date must be before or equal to the end date.";
 
     public SeriesService(
         Core.Services.IClubService clubService,
@@ -233,6 +239,19 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
+        
+        // Handle date restriction logic
+        if (model.DateRestricted == true)
+        {
+            ValidateDateRestriction(model, season);
+        }
+        else
+        {
+            // Clear dates when not restricted
+            model.EnforcedStartDate = null;
+            model.EnforcedEndDate = null;
+        }
+        
         return await _coreSeriesService.SaveNewSeries(model);
     }
 
@@ -243,6 +262,70 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
+        
+        // Handle date restriction logic
+        if (model.DateRestricted == true)
+        {
+            Season season;
+            
+            // Check if SeasonId is available in the model (not default/empty)
+            if (model.SeasonId != default)
+            {
+                // Use the season from the model
+                var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
+                season = seasons.Single(s => s.Id == model.SeasonId);
+            }
+            else
+            {
+                // Get season from database since the season input is disabled on Edit page
+                var existingSeries = await _coreSeriesService.GetOneSeriesAsync(model.Id);
+                if (existingSeries?.Season == null)
+                {
+                    throw new InvalidOperationException("Could not retrieve season for series validation.");
+                }
+                season = existingSeries.Season;
+            }
+            
+            ValidateDateRestriction(model, season);
+        }
+        else
+        {
+            // Clear dates when not restricted
+            model.EnforcedStartDate = null;
+            model.EnforcedEndDate = null;
+        }
+        
         await _coreSeriesService.Update(model);
+    }
+    
+    private void ValidateDateRestriction(SeriesWithOptionsViewModel model, Season season)
+    {
+        // When date restriction is enabled, both dates must be provided
+        if (!model.EnforcedStartDate.HasValue || !model.EnforcedEndDate.HasValue)
+        {
+            throw new InvalidOperationException(ErrorMissingDates);
+        }
+        
+        // Convert Season DateTime to DateOnly for comparison
+        var seasonStart = DateOnly.FromDateTime(season.Start);
+        var seasonEnd = DateOnly.FromDateTime(season.End);
+        
+        // Validate start date falls within season
+        if (model.EnforcedStartDate.Value < seasonStart || model.EnforcedStartDate.Value > seasonEnd)
+        {
+            throw new InvalidOperationException(ErrorStartDateOutOfRange);
+        }
+        
+        // Validate end date falls within season
+        if (model.EnforcedEndDate.Value < seasonStart || model.EnforcedEndDate.Value > seasonEnd)
+        {
+            throw new InvalidOperationException(ErrorEndDateOutOfRange);
+        }
+        
+        // Validate start is before end
+        if (model.EnforcedStartDate.Value > model.EnforcedEndDate.Value)
+        {
+            throw new InvalidOperationException(ErrorStartAfterEnd);
+        }
     }
 }

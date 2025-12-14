@@ -11,7 +11,7 @@
 <h4>Create a Series</h4>
 <hr />
 <div class="row">
-    <div class="col-lg-4 col-md-8">
+    <div class="col-lg-6 col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
@@ -101,6 +101,25 @@
                                 </select>
                                 <span asp-validation-for="TrendOption" class="text-danger"></span>
                             </div>
+                            <div class="mb-3" id="standardRegattaOnly" style="display: @(Model.Type == SailScores.Core.Model.SeriesType.Standard || Model.Type == SailScores.Core.Model.SeriesType.Regatta ? "block" : "none");">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="DateRestricted" name="DateRestricted" value="true" @(Model.DateRestricted == true ? "checked" : "") />
+                                    <label class="form-check-label" for="DateRestricted"> Restrict Series Dates</label>
+                                    <small class="form-text text-muted d-block">Limit when this series appears in race creation/editing.</small>
+                                </div>
+                            </div>
+                            <div id="dateRestrictionFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label asp-for="EnforcedStartDate" class="control-label">Series Start Date</label>
+                                    <input asp-for="EnforcedStartDate" type="date" class="form-control" />
+                                    <span asp-validation-for="EnforcedStartDate" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="EnforcedEndDate" class="control-label">Series End Date</label>
+                                    <input asp-for="EnforcedEndDate" type="date" class="form-control" />
+                                    <span asp-validation-for="EnforcedEndDate" class="text-danger"></span>
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label asp-for="ScoringSystemId">Scoring System</label>
                                 <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
@@ -122,7 +141,7 @@
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" asp-for="HideDncDiscards" />
-                                    <label class="form-check-label"> Hide discarded DNC scores (Show as blank.)</label>
+                                    <label class="form-check-label"> Hide discarded DNC scores (Show as blank)</label>
                                 </div>
                             </div>
                         </div>
@@ -144,25 +163,40 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/seriesDateRestriction.js"></script>
     <script>
         function toggleSummarySeriesNote() {
             var typeSelect = document.getElementById('Type');
             var note = document.getElementById('summarySeriesNote');
             var parentSeriesSelection = document.getElementById('parentSeriesSelection');
+            var standardRegattaOnly = document.getElementById('standardRegattaOnly');
             if (typeSelect.value === "3") {
                 note.style.display = 'block';
                 if (parentSeriesSelection) {
                     parentSeriesSelection.style.display = 'none';
+                }
+                if (standardRegattaOnly) {
+                    standardRegattaOnly.style.display = 'none';
                 }
             } else {
                 note.style.display = 'none';
                 if (parentSeriesSelection) {
                     parentSeriesSelection.style.display = 'block';
                 }
+                if (standardRegattaOnly) {
+                    standardRegattaOnly.style.display = 'block';
+                }
             }
         }
+        
         document.getElementById('Type').addEventListener('change', toggleSummarySeriesNote);
+        var dateRestrictedCheckbox = document.getElementById('DateRestricted');
+        if (dateRestrictedCheckbox) {
+            dateRestrictedCheckbox.addEventListener('change', toggleDateRestrictionFields);
+        }
+        
         // Run on page load in case of validation errors
         toggleSummarySeriesNote();
+        toggleDateRestrictionFields();
     </script>
 }

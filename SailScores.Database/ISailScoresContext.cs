@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
@@ -42,7 +42,7 @@ namespace SailScores.Database
 
         DbSet<SystemAlert> SystemAlerts { get; set; }
 
-    DbSet<Supporter> Supporters { get; set; }
+        DbSet<Supporter> Supporters { get; set; }
 
         DbSet<ChangeType> ChangeTypes { get; set; }
         DbSet<CompetitorChange> CompetitorChanges { get; set; }

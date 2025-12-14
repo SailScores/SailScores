@@ -38,6 +38,7 @@ public static class DependencyInjectionExtensions
         services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
         services.AddScoped<ILocalizerService, LocalizerService>();
         services.AddTransient<IStripeService, StripeService>();
+        services.AddScoped<ICalendarService, CalendarService>();
 
 
         services.AddSingleton<AppVersionInfo>();

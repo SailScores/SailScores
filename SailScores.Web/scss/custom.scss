@@ -1,5 +1,12 @@
 @import "../node_modules/bootstrap/scss/functions";
 
+// NOTE: The following selectors have media-query or dark-mode specific overrides elsewhere in this file:
+// - `.ocr-cropped-preview` : dark-mode background in `@media (prefers-color-scheme: dark)`; height/overflow adjusted in mobile/desktop breakpoints
+// - `.help-side-nav .nav-link.active` : light-mode styles here; dark-mode override in `@media (prefers-color-scheme: dark)`
+// - `.score-entry` : adjusted at `sm` breakpoint
+// - `.form-control` padding : adjusted at `max-width: 767.98px`
+// - `.ocr-results-container` : max-height/overflow adjusted at mobile/desktop breakpoints
+
 $color-mode-type: media-query;
 
 $my-link-color: #0063CC;
@@ -401,25 +408,20 @@ form label.required:not(.custom-control-label)::after {
     border-radius: .25rem;
 }
 
-.help-side-nav .nav-link.active {
-    background: var(--bs-dark);
-    color: #fff;
-}
-
 .help-nav {
     position: sticky;
     top: 1rem;
     align-self: flex-start;
 }
 
-// Help side nav active link styling
+// Help side nav active link styling (Light mode)
+// Dark-mode override is in `@media (prefers-color-scheme: dark)` below
 .help-side-nav .nav-link.active {
     // Light mode styles
-    background-color: #e9f1fb; // Soft blue, adjust as needed
-    color: #0d3a6b; // Dark blue text for contrast
+    background-color: #e9f1fb;
+    color: #0d3a6b;
     font-weight: 600;
     border-radius: 0.375rem;
-    // Optional: subtle border or shadow for emphasis
     box-shadow: 0 1px 4px rgba(13, 58, 107, 0.06);
 }
 
@@ -645,54 +647,7 @@ form label.required:not(.custom-control-label)::after {
         color: #fff;
         box-shadow: none;
     }
-
-    /* OCR preview and overlay styles */
-    /* Prevent layout shift when drawing overlays by hiding overflow
-       and ensuring the image and canvas behave as block-level elements */
-    .ocr-cropped-preview {
-        position: relative;
-        overflow: hidden;
-    }
-    .ocr-cropped-preview img {
-        display: block;
-        max-width: 100%;
-        height: auto;
-    }
-    #ocrBoundingBoxOverlay {
-        position: absolute;
-        left: 0;
-        top: 0;
-        pointer-events: none;
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
-
-    .insert-row-btn {
-        font-size: 0.7rem;
-        padding: 0.15rem 0.35rem;
-        opacity: 0.4;
-        transition: opacity 0.2s ease;
-        position: relative;
-        top: -8px;
-    }
-
-    .insert-row-btn:hover {
-        opacity: 0.8;
-    }
-
-    .insert-row-btn i {
-        font-size: 0.65rem;
-    }
-
-    #ocrResultsTable tbody tr:hover .insert-row-btn {
-        opacity: 0.6;
-    }
-
-    #ocrProgressBar {
-        height: 6px;
-    }
-    
+   
     /* Set CSS custom properties for OCR table colors */
     :root {
         --bs-table-bg: #{$ocr-table-bg};
@@ -752,6 +707,18 @@ form label.required:not(.custom-control-label)::after {
             }
         }
     }
+
+    .d-dark-none {
+        display: none !important;
+    }
+
+    .d-dark-inline {
+        display: inline !important;
+    }
+    .d-dark-block {
+        display: block !important;
+    }
+
 }
 
 @media (max-width: 767.98px) {
@@ -809,8 +776,6 @@ form label.required:not(.custom-control-label)::after {
     margin-top: 0.125rem;
 }
 
-
-/* Supporter Card Styles */
 .supporter-logo-container {
     min-height: 150px;
     display: flex;
@@ -825,7 +790,6 @@ form label.required:not(.custom-control-label)::after {
     z-index: 10;
 }
 
-/* --- OCR Upload Modal Styles (moved from _OcrUploadModal.cshtml) --- */
 .cropper-container-wrapper {
     background-color: #f8f9fa;
     border-radius: 4px;
@@ -865,18 +829,17 @@ form label.required:not(.custom-control-label)::after {
     height: 6px;
 }
 
-/* Prevent layout shift when drawing overlays by hiding overflow
-   and ensuring the image and canvas behave as block-level elements */
 .ocr-cropped-preview {
     position: relative;
-    overflow-y: scroll; /* always show vertical scrollbar */
-    overflow-x: hidden;
+    overflow: hidden;
 }
+
 .ocr-cropped-preview img {
     display: block;
     max-width: 100%;
     height: auto;
 }
+
 #ocrBoundingBoxOverlay {
     position: absolute;
     left: 0;
@@ -1019,4 +982,183 @@ form label.required:not(.custom-control-label)::after {
 
 .faq-details > summary:hover {
   color: $primary;
+}
+
+// Week-by-week calendar grid styles
+// Scoped to .week-grid to avoid interference with other layouts/tables
+.week-grid { display: grid; gap: 0; }
+/* Make day cell corners square (override any Bootstrap .rounded) */
+.week-grid > div .border {
+  border-radius: 0 !important;
+}
+@media (max-width: 575.98px) { .week-grid { grid-template-columns: repeat(1, 1fr); } }
+@media (min-width: 576px) and (max-width: 767.98px) { .week-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 768px) { .week-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+
+.week-grid .short { display: none; }
+.week-grid .full { display: inline; }
+
+@media (max-width: 575.98px) {
+  .week-grid .short { display: inline; }
+  .week-grid .full { display: none; }
+}
+
+/* Week row and event bar styles */
+.week-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: auto; /* rows grow to fit content */
+  position: relative;
+  gap: 0; /* remove gaps between cells */
+
+  /* Ensure day cells stretch to the full height of the week-row so per-cell
+     borders/pseudo-elements match container height and don't overflow into the footer */
+  align-items: stretch;
+  overflow: hidden; /* prevent any absolutely-positioned lines from escaping */
+}
+
+.week-row .day-cell {
+  /* remove all borders first, then add specific ones */
+  border: none;
+  border-right: 1px solid var(--bs-border-color);
+  padding: .75rem .5rem 0.5rem .5rem; /* more space at top, keep number toward bottom */
+  background: var(--bs-body-bg);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* keep day number at bottom */
+  grid-row: 1; /* explicit: day number row */
+
+  /* fill the full height of the week-row so pseudo-element lines stop at the bottom */
+  align-self: stretch;
+  height: 100%;
+}
+
+/* First column needs left border too */
+.week-row .day-cell:first-child {
+  border-left: 1px solid var(--bs-border-color);
+}
+
+/* Ensure placeholder/empty cells in the first column also get a left border
+   regardless of DOM order by targeting the `monday` helper class */
+.week-row .day-cell.monday {
+  border-left: 1px solid var(--bs-border-color);
+}
+
+/* Use per-cell pseudo-elements sized to the cell height (100%) so lines stop at container bottom */
+.week-row .day-cell::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -1px; /* align with the right border */
+  width: 1px;
+  height: 100%;
+  background: var(--bs-border-color);
+  z-index: 2; /* above events but below interactive elements */
+  pointer-events: none; /* don't interfere with clicks */
+}
+
+.week-row .day-cell:first-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 1px;
+  height: 100%;
+  background: var(--bs-border-color);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.monday {
+    border-left: solid;
+    border-left-color: var(--bs-border-color);
+    border-left-width: 1px;
+}
+
+/* Last column doesn't need the right pseudo-element */
+.week-row .day-cell:last-child::after {
+  display: none;
+}
+
+.week-row .event-bar {
+    display: block;
+    padding: .25rem .5rem;
+    color: var(--bs-body-color); /* same text color for both schemes */
+    text-decoration: none;
+    position: relative; /* participate in grid flow */
+    z-index: 3; /* above day cell and vertical lines */
+    border: 1px solid transparent;
+    margin-top: .125rem; /* tiny vertical gap between stacked badges */
+    grid-row: 1; /* place in same row as day-cell so it appears in the same box */
+}
+
+/*.event-bar.empty {
+  background: transparent;
+  border: none;
+  min-height: 48px;*/ /* match your event-bar height */
+  /*pointer-events: none;
+}*/
+
+/* subtle primary background */
+.week-row .event-bar.bs-primary-border-subtle {
+    /* use Bootstrap primary RGB variable with fallback */
+    background-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.06); /* subtle primary */
+    border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.16);
+}
+
+/* subtle light background */
+.week-row .event-bar.bs-light-border-subtle {
+    /* use body color RGB so this adapts to light/dark where possible; fallback to black */
+    background-color: rgba(var(--bs-body-color-rgb, 0, 0, 0), 0.04); /* subtle light */
+    border-color: rgba(var(--bs-body-color-rgb, 0, 0, 0), 0.08);
+}
+
+.week-row .event-bar.bs-secondary-border-subtle {
+    background-color: rgba(var(--bs-secondary-rgb, 108, 117, 125), 0.06);
+    border-color: rgba(var(--bs-secondary-rgb, 108, 117, 125), 0.16);
+}
+.week-row .event-bar.bs-success-border-subtle {
+    background-color: rgba(var(--bs-success-rgb, 25, 135, 84), 0.06);
+    border-color: rgba(var(--bs-success-rgb, 25, 135, 84), 0.16);
+}
+.week-row .event-bar.bs-warning-border-subtle {
+    background-color: rgba(var(--bs-warning-rgb, 255, 193, 7), 0.06);
+    border-color: rgba(var(--bs-warning-rgb, 255, 193, 7), 0.16);
+}
+.week-row .event-bar.bs-info-border-subtle {
+    background-color: rgba(var(--bs-info-rgb, 13, 202, 240), 0.06);
+    border-color: rgba(var(--bs-info-rgb, 13, 202, 240), 0.16);
+}
+
+/* dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .week-row .event-bar.bs-primary-border-subtle {
+        background-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.10);
+        border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.22);
+    }
+
+    .week-row .event-bar.bs-light-border-subtle {
+        /* use CSS variable for white (fall back to 255,255,255) so the colors are driven by variables */
+        background-color: rgba(var(--bs-white-rgb, 255, 255, 255), 0.04);
+        border-color: rgba(var(--bs-white-rgb, 255, 255, 255), 0.08);   
+    }
+
+    .week-row .event-bar.bs-secondary-border-subtle {
+        background-color: rgba(var(--bs-secondary-rgb, 108, 117, 125), 0.10);
+        border-color: rgba(var(--bs-secondary-rgb, 108, 117, 125), 0.22);
+    }
+    .week-row .event-bar.bs-success-border-subtle {
+        background-color: rgba(var(--bs-success-rgb, 25, 135, 84), 0.10);
+        border-color: rgba(var(--bs-success-rgb, 25, 135, 84), 0.22);
+    }
+    .week-row .event-bar.bs-warning-border-subtle {
+        background-color: rgba(var(--bs-warning-rgb, 255, 193, 7), 0.10);
+        border-color: rgba(var(--bs-warning-rgb, 255, 193, 7), 0.22);
+    }
+    .week-row .event-bar.bs-info-border-subtle {
+        background-color: rgba(var(--bs-info-rgb, 13, 202, 240), 0.10);
+        border-color: rgba(var(--bs-info-rgb, 13, 202, 240), 0.22);
+    }
 }
