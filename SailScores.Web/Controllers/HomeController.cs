@@ -39,10 +39,22 @@ public class HomeController : Controller
         {
             Regattas = (await _regattaService.GetCurrentRegattas()).ToList()
         };
+        
+        var recentlyActiveClubs = (await _clubservice.GetClubsWithRecentActivity(14))
+            .OrderBy(c => c.Name)
+            .ToList();
+        
+        var allVisibleClubs = (await _clubservice.GetClubs(false))
+            .Where(c => !c.IsHidden)
+            .OrderBy(c => c.Name)
+            .ToList();
+        
         var model = new SiteHomePageModel
         {
             ClubSelectorModel = clubSelector,
-            RegattaSelectorModel = regattaSelector
+            RegattaSelectorModel = regattaSelector,
+            RecentlyActiveClubs = recentlyActiveClubs,
+            AllVisibleClubs = allVisibleClubs
         };
         return View(model);
     }

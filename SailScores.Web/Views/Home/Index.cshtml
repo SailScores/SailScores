@@ -4,11 +4,18 @@
     ViewData["MetaDescription"] = "Fast web-based mobile-friendly scores for sailing clubs";
     ViewData["MetaKeywords"] = "sailing race scoring results scores sail web mobile-friendly club series free";
 }
-<h1 class="display-4">SailScores</h1>
-<p class="lead">Simple score collection and reporting for one-design sailing.</p>
-<hr class="my-4">
-<div class="row">
-    <div class="col-md-4 d-none d-md-block order-md-0 pe-lg-4">
+
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-lg-8">
+        <h1 class="display-4">SailScores</h1>
+        <p class="lead">Simple score collection and reporting for one-design sailing.</p>
+        <hr class="my-4">
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4 d-none d-md-block">
         <div id="carouselScreenshots" class="carousel slide carousel-fade" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -30,25 +37,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4 order-md-5">
-        <br class="d-none d-md-inline" />
-        @(await Html.PartialAsync("_ClubSelectorView", Model.ClubSelectorModel))
-        <br />
-        @if (Model.RegattaSelectorModel?.Regattas?.Any() ?? false)
-        {
-            @(await Html.PartialAsync("_RegattaSelectorView", Model.RegattaSelectorModel))
-            <br />
-        }
-        <hr class="my-4">
-        <div class="d-none d-md-inline">
-            <br />
-            <p>SailScores is <a href="https://github.com/SailScores/SailScores#sailscores">open source</a> and volunteer driven.</p>
-            <p>
-                <a asp-area="" asp-controller="ClubRequest" asp-action="Index">Host your club's scores</a> here for free.
-            </p>
-        </div>
-    </div>
-    <div class="col-md-4 order-md-3 p-xl-4">
+    <div class="col-md-8">
         <h4>What's important in sailing club scoring software?</h4>
         <ul>
             <li>Fast, simple result entry and sharing using the web. Optional speech
@@ -62,5 +51,143 @@
             <li>Automatically collect and share weather information.</li>
             <li>Laptop and phone friendly, for scorekeepers as well as racers.</li>
         </ul>
+        <p>SailScores is <a href="https://github.com/SailScores/SailScores#sailscores">open source</a> and volunteer driven.</p>
+        <p>
+            <a asp-area="" asp-controller="ClubRequest" asp-action="Index" class="btn btn-primary">Host your club's scores for free</a>
+        </p>
     </div>
 </div>
+
+<!-- Recently Active Clubs Section -->
+@if (Model.RecentlyActiveClubs?.Any() ?? false)
+{
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3">Recently Active Clubs</h3>
+            <p class="text-muted">Clubs with races or series updates in the past two weeks</p>
+            <div class="list-group">
+                @foreach (var club in Model.RecentlyActiveClubs.Take(10))
+                {
+                    <a href="/@club.Initials" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@club.Name</h5>
+                            <small>@club.Initials</small>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(club.Description))
+                        {
+                            <p class="mb-1 text-muted small">@club.Description</p>
+                        }
+                    </a>
+                }
+            </div>
+            @if (Model.RecentlyActiveClubs.Count() > 10)
+            {
+                <p class="text-muted mt-2 small">Showing 10 of @Model.RecentlyActiveClubs.Count() recently active clubs. Use search below to find more.</p>
+            }
+        </div>
+    </div>
+}
+
+<!-- Regattas Section -->
+@if (Model.RegattaSelectorModel?.Regattas?.Any() ?? false)
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">Current Regattas</h3>
+            @(await Html.PartialAsync("_RegattaSelectorView", Model.RegattaSelectorModel))
+        </div>
+    </div>
+}
+
+<!-- All Clubs Search Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h3 class="mb-3">Find a Club</h3>
+        <div class="mb-4">
+            <input type="text" id="clubSearch" class="form-control form-control-lg" 
+                   placeholder="Search clubs by name or description..." 
+                   aria-label="Search clubs">
+        </div>
+    </div>
+</div>
+
+<!-- All Clubs Cards Section -->
+<div class="row" id="clubCardsContainer">
+    @if (Model.AllVisibleClubs?.Any() ?? false)
+    {
+        @foreach (var club in Model.AllVisibleClubs)
+        {
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4 club-card" 
+                 data-club-name="@club.Name.ToLowerInvariant()" 
+                 data-club-description="@(club.Description?.ToLowerInvariant() ?? "")">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">@club.Name</h5>
+                        @if (!string.IsNullOrWhiteSpace(club.Description))
+                        {
+                            <p class="card-text text-muted small">@club.Description</p>
+                        }
+                        <div class="mt-auto">
+                            <a href="/@club.Initials" class="btn btn-sm btn-outline-primary stretched-link">View Results</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <p class="text-muted">No clubs available at this time.</p>
+        </div>
+    }
+</div>
+
+<div id="noResultsMessage" class="alert alert-info d-none">
+    No clubs match your search. Try a different search term.
+</div>
+
+@section Scripts {
+    <script>
+        // Shuffle clubs on page load for random ordering
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('clubCardsContainer');
+            const cards = Array.from(document.querySelectorAll('.club-card'));
+            
+            // Fisher-Yates shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            
+            // Re-append shuffled cards
+            cards.forEach(card => container.appendChild(card));
+        });
+        
+        // Dynamic search filtering
+        document.getElementById('clubSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.club-card');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                const clubName = card.getAttribute('data-club-name');
+                const clubDescription = card.getAttribute('data-club-description');
+                
+                if (clubName.includes(searchTerm) || clubDescription.includes(searchTerm)) {
+                    card.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+            
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResultsMessage.classList.remove('d-none');
+            } else {
+                noResultsMessage.classList.add('d-none');
+            }
+        });
+    </script>
+}

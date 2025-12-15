@@ -128,6 +128,37 @@ namespace SailScores.Core.Services
             return _mapper.ProjectTo<ClubSummary>(dbObjects);
         }
 
+        public async Task<IEnumerable<ClubSummary>> GetClubsWithRecentActivity(int daysBack = 14)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-daysBack);
+            
+            var clubsWithRecentRaces = await _dbContext
+                .Races
+                .Where(r => r.Date.HasValue && r.Date.Value >= cutoffDate)
+                .Select(r => r.ClubId)
+                .Distinct()
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var clubsWithRecentSeries = await _dbContext
+                .Series
+                .Where(s => s.UpdatedDate.HasValue && s.UpdatedDate.Value >= cutoffDate)
+                .Select(s => s.ClubId)
+                .Distinct()
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var recentClubIds = clubsWithRecentRaces.Union(clubsWithRecentSeries).Distinct();
+
+            var dbObjects = _dbContext
+                .Clubs
+                .Where(c => !c.IsHidden 
+                    && (c.ShowClubInResults ?? false)
+                    && recentClubIds.Contains(c.Id));
+
+            return _mapper.ProjectTo<ClubSummary>(dbObjects);
+        }
+
         public async Task<Guid> GetClubId(string initials)
         {
             if (!Guid.TryParse(initials, out Guid clubGuid))
