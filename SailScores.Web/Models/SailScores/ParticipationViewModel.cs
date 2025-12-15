@@ -15,6 +15,6 @@ public class ParticipationItem
 {
     public string Period { get; set; }
     public DateTime PeriodStart { get; set; }
-    public string FleetName { get; set; }
+    public string BoatClassName { get; set; }
     public int DistinctSkippers { get; set; }
 }

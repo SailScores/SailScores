@@ -1,5 +1,5 @@
 // Participation Trends Chart using Chart.js
-function initParticipationChart(fleets, periods, participationData) {
+function initParticipationChart(boatClasses, periods, participationData) {
     const ctx = document.getElementById('participationChart');
     
     const colors = [
@@ -15,11 +15,11 @@ function initParticipationChart(fleets, periods, participationData) {
         'rgba(106, 90, 205, 0.7)'
     ];
     
-    // Filter fleets to only include those with >= 3 data points
-    const fleetsWithData = fleets.filter(function(fleet) {
+    // Filter boat classes to only include those with >= 3 data points
+    const boatClassesWithData = boatClasses.filter(function(boatClass) {
         const data = periods.map(function(period) {
             const item = participationData.find(function(d) { 
-                return d.Period === period && d.FleetName === fleet; 
+                return d.Period === period && d.BoatClassName === boatClass; 
             });
             return item ? item.DistinctSkippers : 0;
         });
@@ -27,16 +27,16 @@ function initParticipationChart(fleets, periods, participationData) {
         return nonZeroCount >= 3;
     });
     
-    const datasets = fleetsWithData.map(function(fleet, index) {
+    const datasets = boatClassesWithData.map(function(boatClass, index) {
         const data = periods.map(function(period) {
             const item = participationData.find(function(d) { 
-                return d.Period === period && d.FleetName === fleet; 
+                return d.Period === period && d.BoatClassName === boatClass; 
             });
             return item ? item.DistinctSkippers : 0;
         });
         
         return {
-            label: fleet,
+            label: boatClass,
             data: data,
             backgroundColor: colors[index % colors.length],
             borderColor: colors[index % colors.length].replace('0.7', '1'),

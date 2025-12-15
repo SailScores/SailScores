@@ -40,7 +40,7 @@
         <div class="row mb-3">
             <div class="col-12">
                 <a href="~/@Model.ClubInitials/Reports/CompetitorStatsExport?startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")" 
-                   class="btn btn-success">
+                   class="btn btn-outline-primary">
                     <i class="bi bi-download"></i> Export as CSV
                 </a>
             </div>
@@ -57,10 +57,10 @@
                             <tr>
                                 <th>Competitor</th>
                                 <th>Sail Number</th>
-                                <th>Fleet</th>
+                                <th>Boat Class</th>
                                 <th>Season</th>
                                 <th class="text-end">Races Participated</th>
-                                <th class="text-end">Total Fleet Races</th>
+                                <th class="text-end">Total Boat Class Races</th>
                                 <th class="text-end">Boats Beat</th>
                                 <th class="text-end">Participation %</th>
                             </tr>
@@ -71,10 +71,10 @@
                                 <tr>
                                     <td>@stat.CompetitorName</td>
                                     <td>@stat.SailNumber</td>
-                                    <td>@stat.FleetName</td>
+                                    <td>@stat.BoatClassName</td>
                                     <td>@stat.SeasonName</td>
                                     <td class="text-end">@stat.RacesParticipated</td>
-                                    <td class="text-end">@stat.TotalFleetRaces</td>
+                                    <td class="text-end">@stat.TotalBoatClassRaces</td>
                                     <td class="text-end">@stat.BoatsBeat</td>
                                     <td class="text-end">@stat.ParticipationPercentage.ToString("F1")%</td>
                                 </tr>

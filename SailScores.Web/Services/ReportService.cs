@@ -78,10 +78,10 @@ public class ReportService : Interfaces.IReportService
                     CompetitorId = s.CompetitorId,
                     CompetitorName = s.CompetitorName,
                     SailNumber = s.SailNumber,
-                    FleetName = s.FleetName,
+                    BoatClassName = s.BoatClassName,
                     SeasonName = s.SeasonName,
                     RacesParticipated = s.RacesParticipated,
-                    TotalFleetRaces = s.TotalFleetRaces,
+                    TotalBoatClassRaces = s.TotalBoatClassRaces,
                     BoatsBeat = s.BoatsBeat,
                     ParticipationPercentage = s.ParticipationPercentage,
                     FirstRaceDate = s.FirstRaceDate,
@@ -122,7 +122,7 @@ public class ReportService : Interfaces.IReportService
                 {
                     Period = p.Period,
                     PeriodStart = p.PeriodStart,
-                    FleetName = p.FleetName,
+                    BoatClassName = p.BoatClassName,
                     DistinctSkippers = p.DistinctSkippers
                 }).ToList()
             };

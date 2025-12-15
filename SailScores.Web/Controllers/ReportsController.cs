@@ -141,11 +141,11 @@ public class ReportsController : Controller
             var model = await _reportService.GetParticipationAsync(clubInitials, groupBy, startDate, endDate);
             
             var csv = new System.Text.StringBuilder();
-            csv.AppendLine("Period,Fleet,Distinct Skippers");
+            csv.AppendLine("Period,Boat Class,Distinct Skippers");
             
             foreach (var item in model.ParticipationData)
             {
-                csv.AppendLine($"{item.Period},{item.FleetName},{item.DistinctSkippers}");
+                csv.AppendLine($"{item.Period},{item.BoatClassName},{item.DistinctSkippers}");
             }
             
             var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
@@ -166,11 +166,11 @@ public class ReportsController : Controller
             var model = await _reportService.GetSkipperStatsAsync(clubInitials, startDate, endDate);
             
             var csv = new System.Text.StringBuilder();
-            csv.AppendLine("Competitor,Sail Number,Fleet,Season,Races Participated,Total Fleet Races,Boats Beat,Participation %");
+            csv.AppendLine("Competitor,Sail Number,Boat Class,Season,Races Participated,Total Boat Class Races,Boats Beat,Participation %");
             
             foreach (var item in model.SkipperStats)
             {
-                csv.AppendLine($"\"{item.CompetitorName}\",{item.SailNumber},{item.FleetName},{item.SeasonName},{item.RacesParticipated},{item.TotalFleetRaces},{item.BoatsBeat},{item.ParticipationPercentage:F1}");
+                csv.AppendLine($"\"{item.CompetitorName}\",{item.SailNumber},{item.BoatClassName},{item.SeasonName},{item.RacesParticipated},{item.TotalBoatClassRaces},{item.BoatsBeat},{item.ParticipationPercentage:F1}");
             }
             
             var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());

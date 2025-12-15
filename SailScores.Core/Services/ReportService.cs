@@ -105,6 +105,7 @@ public class ReportService : IReportService
             var scores = await _dbContext.Scores
                 .Where(s => raceIds.Contains(s.RaceId))
                 .Include(s => s.Competitor)
+                    .ThenInclude(c => c.BoatClass)
                 .ToListAsync()
                 .ConfigureAwait(false);
             
@@ -125,16 +126,19 @@ public class ReportService : IReportService
                 r => r.SeriesRaces.FirstOrDefault()?.Series?.Season?.Name ?? "Unknown"
             );
 
-            var fleetSeasonRaceCounts = includedRaces
-                .GroupBy(r => new { FleetName = r.Fleet?.Name ?? "Unknown", SeasonName = raceSeasons[r.Id] })
-                .ToDictionary(g => (g.Key.FleetName, g.Key.SeasonName), g => g.Count());
+            var boatClassSeasonRaceCounts = includedRaces
+                .SelectMany(r => r.Scores
+                    .Where(s => s.Competitor?.BoatClass != null)
+                    .Select(s => new { BoatClassName = s.Competitor.BoatClass.Name, SeasonName = raceSeasons[r.Id], RaceId = r.Id }))
+                .GroupBy(x => new { x.BoatClassName, x.SeasonName })
+                .ToDictionary(g => (g.Key.BoatClassName, g.Key.SeasonName), g => g.Select(x => x.RaceId).Distinct().Count());
 
             var competitorStats = includedRaces
                 .SelectMany(r => r.Scores.Select(s => new
                 {
                     Race = r,
                     Score = s,
-                    FleetName = r.Fleet?.Name ?? "Unknown",
+                    BoatClassName = s.Competitor?.BoatClass?.Name ?? "Unknown",
                     SeasonName = raceSeasons[r.Id]
                 }))
                 .Where(x => x.Score.Competitor != null)
@@ -143,13 +147,13 @@ public class ReportService : IReportService
                     x.Score.Competitor.Id,
                     x.Score.Competitor.Name,
                     x.Score.Competitor.SailNumber,
-                    x.FleetName,
+                    x.BoatClassName,
                     x.SeasonName
                 })
                 .Select(g =>
                 {
-                    var totalFleetRaces = fleetSeasonRaceCounts.TryGetValue(
-                        (g.Key.FleetName, g.Key.SeasonName), 
+                    var totalBoatClassRaces = boatClassSeasonRaceCounts.TryGetValue(
+                        (g.Key.BoatClassName, g.Key.SeasonName), 
                         out var count) ? count : 0;
 
                     var racesParticipated = g.Select(x => x.Race.Id).Distinct().Count();
@@ -175,13 +179,13 @@ public class ReportService : IReportService
                         CompetitorId = g.Key.Id,
                         CompetitorName = g.Key.Name,
                         SailNumber = g.Key.SailNumber,
-                        FleetName = g.Key.FleetName,
+                        BoatClassName = g.Key.BoatClassName,
                         SeasonName = g.Key.SeasonName,
                         RacesParticipated = racesParticipated,
-                        TotalFleetRaces = totalFleetRaces,
+                        TotalBoatClassRaces = totalBoatClassRaces,
                         BoatsBeat = boatsBeat,
-                        ParticipationPercentage = totalFleetRaces > 0
-                            ? (decimal)racesParticipated / totalFleetRaces * 100
+                        ParticipationPercentage = totalBoatClassRaces > 0
+                            ? (decimal)racesParticipated / totalBoatClassRaces * 100
                             : 0,
                         FirstRaceDate = raceDates.FirstOrDefault(),
                         LastRaceDate = raceDates.LastOrDefault()
@@ -230,6 +234,7 @@ public class ReportService : IReportService
             var scores = await _dbContext.Scores
                 .Where(s => raceIds.Contains(s.RaceId))
                 .Include(s => s.Competitor)
+                    .ThenInclude(c => c.BoatClass)
                 .ToListAsync()
                 .ConfigureAwait(false);
             
@@ -241,34 +246,34 @@ public class ReportService : IReportService
 
             var metrics = races
                 .SelectMany(r => r.Scores
-                    .Where(s => s.Competitor != null)
+                    .Where(s => s.Competitor?.BoatClass != null)
                     .Select(s => new
                     {
                         Race = r,
                         Score = s,
-                        FleetName = r.Fleet?.Name ?? "Unknown"
+                        BoatClassName = s.Competitor.BoatClass.Name
                     }))
                 .GroupBy(x => new
                 {
                     Period = GetPeriodKey(x.Race.Date.Value, groupBy),
                     PeriodStart = GetPeriodStart(x.Race.Date.Value, groupBy),
-                    x.FleetName
+                    x.BoatClassName
                 })
                 .Select(g => new ParticipationMetric
                 {
                     Period = g.Key.Period,
                     PeriodStart = g.Key.PeriodStart,
-                    FleetName = g.Key.FleetName,
+                    BoatClassName = g.Key.BoatClassName,
                     DistinctSkippers = g.Select(x => x.Score.Competitor.Id).Distinct().Count()
                 })
                 .OrderBy(m => m.PeriodStart)
-                .ThenBy(m => m.FleetName)
+                .ThenBy(m => m.BoatClassName)
                 .ToList();
 
             // Fill in missing periods with zero values
             if (metrics.Any())
             {
-                var allFleets = metrics.Select(m => m.FleetName).Distinct().ToList();
+                var allBoatClasses = metrics.Select(m => m.BoatClassName).Distinct().ToList();
                 var minDate = metrics.Min(m => m.PeriodStart);
                 var maxDate = metrics.Max(m => m.PeriodStart);
                 
@@ -278,10 +283,10 @@ public class ReportService : IReportService
                 foreach (var periodStart in allPeriods)
                 {
                     var periodKey = GetPeriodKey(periodStart, groupBy);
-                    foreach (var fleet in allFleets)
+                    foreach (var boatClass in allBoatClasses)
                     {
                         var existing = metrics.FirstOrDefault(m => 
-                            m.PeriodStart == periodStart && m.FleetName == fleet);
+                            m.PeriodStart == periodStart && m.BoatClassName == boatClass);
                         
                         if (existing != null)
                         {
@@ -293,14 +298,14 @@ public class ReportService : IReportService
                             {
                                 Period = periodKey,
                                 PeriodStart = periodStart,
-                                FleetName = fleet,
+                                BoatClassName = boatClass,
                                 DistinctSkippers = 0
                             });
                         }
                     }
                 }
                 
-                return filledMetrics.OrderBy(m => m.PeriodStart).ThenBy(m => m.FleetName).ToList();
+                return filledMetrics.OrderBy(m => m.PeriodStart).ThenBy(m => m.BoatClassName).ToList();
             }
 
             return metrics;

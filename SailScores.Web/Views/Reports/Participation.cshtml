@@ -46,7 +46,7 @@
 
     @if (Model.ParticipationData != null && Model.ParticipationData.Any())
     {
-        var fleets = Model.ParticipationData.Select(p => p.FleetName).Distinct().OrderBy(f => f).ToList();
+        var boatClasses = Model.ParticipationData.Select(p => p.BoatClassName).Distinct().OrderBy(f => f).ToList();
         
         <div class="row">
             <div class="col-12">
@@ -68,7 +68,7 @@
                         <thead>
                             <tr>
                                 <th>Period</th>
-                                <th>Fleet</th>
+                                <th>Boat Class</th>
                                 <th class="text-end">Distinct Skippers</th>
                             </tr>
                         </thead>
@@ -77,7 +77,7 @@
                             {
                                 <tr>
                                     <td>@item.Period</td>
-                                    <td>@item.FleetName</td>
+                                    <td>@item.BoatClassName</td>
                                     <td class="text-end">@item.DistinctSkippers</td>
                                 </tr>
                             }
@@ -100,7 +100,7 @@
     <script src="~/js/participationChart.js" asp-append-version="true"></script>
     @if (Model.ParticipationData != null && Model.ParticipationData.Any())
     {
-        var fleets = Model.ParticipationData.Select(p => p.FleetName).Distinct().OrderBy(f => f).ToList();
+        var boatClasses = Model.ParticipationData.Select(p => p.BoatClassName).Distinct().OrderBy(f => f).ToList();
         // Sort periods by PeriodStart date, not alphabetically
         var periods = Model.ParticipationData
             .GroupBy(p => new { p.Period, p.PeriodStart })
@@ -111,11 +111,11 @@
         
         <script>
             (function() {
-                const fleets = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(fleets));
+                const boatClasses = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(boatClasses));
                 const periods = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(periods));
                 const participationData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(allData));
                 
-                initParticipationChart(fleets, periods, participationData);
+                initParticipationChart(boatClasses, periods, participationData);
             })();
         </script>
     }
