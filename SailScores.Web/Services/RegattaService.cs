@@ -75,6 +75,7 @@ public class RegattaService : IRegattaService
             }
             regatta.ClubInitials = club.Initials;
             regatta.ClubName = club.Name;
+            regatta.ClubLogoFileId = club.LogoFileId;
         }
         var returnObject = vm.Except(regattasToRemove);
         _cache.Set("CurrentRegattas", returnObject, TimeSpan.FromMinutes(5));

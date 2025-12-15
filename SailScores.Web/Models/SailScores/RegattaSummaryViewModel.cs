@@ -20,6 +20,7 @@ public class RegattaSummaryViewModel
 
     public String ClubInitials { get; set; }
     public String ClubName { get; set; }
+    public Guid? ClubLogoFileId { get; set; }
 
     public String FleetCountString
     {

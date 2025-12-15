@@ -73,9 +73,18 @@
                                 <div class="card-body">
                                     <div class="d-flex align-items-start">
                                         <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
-                                            <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
-                                                <span class="text-muted small">@club.Initials</span>
-                                            </div>
+                                            @if (club.LogoFileId.HasValue)
+                                            {
+                                                <div class="d-flex align-items-start justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                    <img src="@Url.Action("GetLogo", "Admin", new { id = club.LogoFileId })" alt="@club.Name logo" style="max-width:64px;max-height:64px;object-fit:contain;" />
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                    <span class="text-muted small">@club.Initials</span>
+                                                </div>
+                                            }
                                         </div>
                                         <div class="flex-grow-1">
                                             <h5 class="card-title mb-1">@club.Name</h5>
@@ -129,9 +138,18 @@
                                 <div class="card-body">
                                     <div class="d-flex align-items-start">
                                         <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
-                                            <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
-                                                <span class="text-muted small">@regatta.ClubInitials</span>
-                                            </div>
+                                            @if (regatta.ClubLogoFileId.HasValue)
+                                            {
+                                                <div class="d-flex align-items-start justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                    <img src="@Url.Action("GetLogo", "Admin", new { id = regatta.ClubLogoFileId })" alt="@regatta.ClubName logo" style="max-width:64px;max-height:64px;object-fit:contain;" />
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                    <span class="text-muted small">@regatta.ClubInitials</span>
+                                                </div>
+                                            }
                                         </div>
                                         <div class="flex-grow-1">
                                             <h5 class="card-title mb-1">@regatta.Name</h5>
@@ -203,7 +221,7 @@
                             <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
                                 @if (club.LogoFileId.HasValue)
                                 {
-                                    <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                    <div class="d-flex align-items-start justify-content-center" style="width:64px;height:64px;border-radius:4px;">
                                         <img src="@Url.Action("GetLogo", "Admin", new { id = club.LogoFileId })" alt="@club.Name logo" style="max-width:64px;max-height:64px;object-fit:contain;" />
                                     </div>
                                 }
