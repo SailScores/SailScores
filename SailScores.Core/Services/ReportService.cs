@@ -94,19 +94,34 @@ public class ReportService : IReportService
                 .Include(r => r.Fleet)
                 .Include(r => r.Scores)
                     .ThenInclude(s => s.Competitor)
+                .Include(r => r.SeriesRaces)
+                    .ThenInclude(sr => sr.Series)
+                        .ThenInclude(s => s.Season)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
-            var fleetRaceCounts = races
-                .GroupBy(r => r.Fleet?.Name ?? "Unknown")
-                .ToDictionary(g => g.Key, g => g.Count());
+            // Filter out races from series marked as ExcludeFromCompetitorStats
+            var includedRaces = races
+                .Where(r => !r.SeriesRaces.Any(sr => sr.Series.ExcludeFromCompetitorStats == true))
+                .ToList();
 
-            var competitorStats = races
+            // Get season info for races (use first series season if available)
+            var raceSeasons = includedRaces.ToDictionary(
+                r => r.Id,
+                r => r.SeriesRaces.FirstOrDefault()?.Series?.Season?.Name ?? "Unknown"
+            );
+
+            var fleetSeasonRaceCounts = includedRaces
+                .GroupBy(r => new { FleetName = r.Fleet?.Name ?? "Unknown", SeasonName = raceSeasons[r.Id] })
+                .ToDictionary(g => (g.Key.FleetName, g.Key.SeasonName), g => g.Count());
+
+            var competitorStats = includedRaces
                 .SelectMany(r => r.Scores.Select(s => new
                 {
                     Race = r,
                     Score = s,
-                    FleetName = r.Fleet?.Name ?? "Unknown"
+                    FleetName = r.Fleet?.Name ?? "Unknown",
+                    SeasonName = raceSeasons[r.Id]
                 }))
                 .Where(x => x.Score.Competitor != null)
                 .GroupBy(x => new
@@ -114,13 +129,14 @@ public class ReportService : IReportService
                     x.Score.Competitor.Id,
                     x.Score.Competitor.Name,
                     x.Score.Competitor.SailNumber,
-                    x.FleetName
+                    x.FleetName,
+                    x.SeasonName
                 })
                 .Select(g =>
                 {
-                    var totalFleetRaces = fleetRaceCounts.ContainsKey(g.Key.FleetName)
-                        ? fleetRaceCounts[g.Key.FleetName]
-                        : 0;
+                    var totalFleetRaces = fleetSeasonRaceCounts.TryGetValue(
+                        (g.Key.FleetName, g.Key.SeasonName), 
+                        out var count) ? count : 0;
 
                     var racesParticipated = g.Select(x => x.Race.Id).Distinct().Count();
 
@@ -141,6 +157,7 @@ public class ReportService : IReportService
                         CompetitorName = g.Key.Name,
                         SailNumber = g.Key.SailNumber,
                         FleetName = g.Key.FleetName,
+                        SeasonName = g.Key.SeasonName,
                         RacesParticipated = racesParticipated,
                         TotalFleetRaces = totalFleetRaces,
                         BoatsBeat = boatsBeat,
@@ -215,9 +232,10 @@ public class ReportService : IReportService
             return groupBy.ToLower() switch
             {
                 "day" => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                "week" => $"Week {CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday):D2} ({date.Year})",
-                "month" => date.ToString("yyyy-MM", CultureInfo.InvariantCulture),
-                _ => date.ToString("yyyy-MM", CultureInfo.InvariantCulture),
+                "week" => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), // Use date for week label
+                "month" => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
+                "year" => date.Year.ToString(CultureInfo.InvariantCulture),
+                _ => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
             };
         }
 
@@ -228,6 +246,7 @@ public class ReportService : IReportService
                 "day" => date.Date,
                 "week" => GetMondayOfWeek(date),
                 "month" => new DateTime(date.Year, date.Month, 1),
+                "year" => new DateTime(date.Year, 1, 1),
                 _ => new DateTime(date.Year, date.Month, 1),
             };
         }

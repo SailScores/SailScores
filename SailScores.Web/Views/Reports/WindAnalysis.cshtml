@@ -84,21 +84,40 @@
             })));
 
             new Chart(ctx, {
-                type: 'polarArea',
+                type: 'scatter',
                 data: {
                     datasets: [{
                         label: 'Wind Data',
                         data: windData,
-                        backgroundColor: windData.map(() => `rgba(54, 162, 235, 0.5)`),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
                     scales: {
-                        r: {
+                        x: {
+                            type: 'linear',
+                            min: 0,
+                            max: 360,
+                            ticks: {
+                                stepSize: 45,
+                                callback: function(value) {
+                                    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+                                    const index = Math.round(value / 45);
+                                    return directions[index] || value + '°';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Wind Direction'
+                            }
+                        },
+                        y: {
                             beginAtZero: true,
                             title: {
                                 display: true,

@@ -28,6 +28,7 @@
                 <option value="day" selected="@(Model.GroupBy == "day")">Day</option>
                 <option value="week" selected="@(Model.GroupBy == "week")">Week</option>
                 <option value="month" selected="@(Model.GroupBy == "month" || string.IsNullOrEmpty(Model.GroupBy))">Month</option>
+                <option value="year" selected="@(Model.GroupBy == "year")">Year</option>
             </select>
         </div>
         <div class="col-md-3">
@@ -117,7 +118,11 @@
                     'rgba(255, 206, 86, 0.7)',
                     'rgba(75, 192, 192, 0.7)',
                     'rgba(153, 102, 255, 0.7)',
-                    'rgba(255, 159, 64, 0.7)'
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(201, 203, 207, 0.7)',
+                    'rgba(255, 99, 71, 0.7)',
+                    'rgba(60, 179, 113, 0.7)',
+                    'rgba(106, 90, 205, 0.7)'
                 ];
                 
                 const data = periods.map(period => {
@@ -126,6 +131,9 @@
                     return item ? item.DistinctSkippers : 0;
                 });
                 
+                // Count non-zero data points
+                const nonZeroCount = data.filter(d => d > 0).length;
+                
                 return {
                     label: fleet,
                     data: data,
@@ -133,7 +141,8 @@
                     borderColor: colors[index % colors.length].replace('0.7', '1'),
                     borderWidth: 2,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    hidden: nonZeroCount < 3  // Hide fleets with fewer than 3 data points
                 };
             });
 
@@ -169,11 +178,40 @@
                     plugins: {
                         legend: {
                             display: true,
-                            position: 'top'
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                },
+                                filter: function(legendItem, chartData) {
+                                    // Show all items but with smaller font
+                                    return true;
+                                }
+                            }
                         },
                         tooltip: {
                             mode: 'index',
-                            intersect: false
+                            intersect: false,
+                            position: 'nearest',
+                            bodySpacing: 4,
+                            padding: 10,
+                            boxPadding: 4,
+                            usePointStyle: true,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return 'Period: ' + tooltipItems[0].label;
+                                },
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y + ' skippers';
+                                    return label;
+                                }
+                            }
                         }
                     },
                     interaction: {

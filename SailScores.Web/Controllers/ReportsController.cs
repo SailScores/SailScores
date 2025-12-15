@@ -61,7 +61,7 @@ public class ReportsController : Controller
             return View(model);
         }
 
-        public async Task<ActionResult> SkipperStats(
+        public async Task<ActionResult> CompetitorStats(
             string clubInitials,
             DateTime? startDate = null,
             DateTime? endDate = null)

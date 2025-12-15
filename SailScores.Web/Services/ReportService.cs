@@ -70,6 +70,7 @@ public class ReportService : Interfaces.IReportService
                     CompetitorName = s.CompetitorName,
                     SailNumber = s.SailNumber,
                     FleetName = s.FleetName,
+                    SeasonName = s.SeasonName,
                     RacesParticipated = s.RacesParticipated,
                     TotalFleetRaces = s.TotalFleetRaces,
                     BoatsBeat = s.BoatsBeat,

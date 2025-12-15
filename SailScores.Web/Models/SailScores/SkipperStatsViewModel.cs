@@ -16,6 +16,7 @@ public class SkipperStatItem
     public string CompetitorName { get; set; }
     public string SailNumber { get; set; }
     public string FleetName { get; set; }
+    public string SeasonName { get; set; }
     public int RacesParticipated { get; set; }
     public int TotalFleetRaces { get; set; }
     public int BoatsBeat { get; set; }
