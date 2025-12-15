@@ -684,13 +684,13 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
         }
 
-        public async Task SaveFileAsync(Entities.File file)
+        public async Task SaveFileAsync(Db.File file)
         {
             await _dbContext.Files.AddAsync(file);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<Entities.File> GetFileAsync(Guid id)
+        public async Task<Db.File> GetFileAsync(Guid id)
         {
             return await _dbContext.Files.FirstOrDefaultAsync(f => f.Id == id);
         }
