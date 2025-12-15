@@ -128,12 +128,6 @@ namespace SailScores.Core.Services
             return _mapper.ProjectTo<ClubSummary>(dbObjects);
         }
 
-        // PERFORMANCE OPTIMIZATION NOTES:
-        // For optimal performance with this front-page query, consider these database indexes:
-        // 1. CREATE NONCLUSTERED INDEX IX_Races_Date_ClubId ON Races(Date DESC, ClubId) INCLUDE (Id) WHERE Date IS NOT NULL;
-        // 2. CREATE NONCLUSTERED INDEX IX_Series_UpdatedDate_ClubId ON Series(UpdatedDateUtc DESC, ClubId) INCLUDE (Id) WHERE UpdatedDateUtc IS NOT NULL;
-        // 3. CREATE NONCLUSTERED INDEX IX_Clubs_IsHidden_Id ON Clubs(IsHidden, Id) INCLUDE (Name, Initials, Description) WHERE IsHidden = 0;
-        // These indexes will significantly improve query performance by enabling index seeks and covering queries.
         public async Task<IEnumerable<ClubActivitySummary>> GetClubsWithRecentActivity(int daysBack = 14)
         {
             var cutoffDate = DateTime.UtcNow.AddDays(-daysBack);
