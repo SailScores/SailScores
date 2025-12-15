@@ -113,8 +113,13 @@ public class ReportsController : Controller
             
             foreach (var item in model.WindData)
             {
+                if(item.WindSpeed == null || item.WindDirection == null)
+                {
+                    continue; // Skip entries with missing data
+                }
+
                 // Round wind speed to 1 decimal place, direction to whole degrees
-                csv.AppendLine($"{item.Date:yyyy-MM-dd},{item.WindSpeed:F1},{Math.Round(item.WindDirection)},{item.RaceCount}");
+                csv.AppendLine($"{item.Date:yyyy-MM-dd},{item.WindSpeed:F1},{Math.Round(item.WindDirection.Value)},{item.RaceCount}");
             }
             
             var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
