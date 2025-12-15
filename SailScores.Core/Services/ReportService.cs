@@ -311,7 +311,7 @@ public class ReportService : IReportService
             return groupBy.ToLower() switch
             {
                 "day" => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                "week" => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), // Use date for week label
+                "week" => GetMondayOfWeek(date).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), // Use Monday for week grouping
                 "month" => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
                 "year" => date.Year.ToString(CultureInfo.InvariantCulture),
                 _ => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
