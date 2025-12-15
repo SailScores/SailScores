@@ -25,9 +25,9 @@
         <div class="col-md-3">
             <label for="groupBy" class="form-label">Group By</label>
             <select class="form-select" id="groupBy" name="groupBy">
-                <option value="day" @(Model.GroupBy == "day" ? "selected" : "")>Day</option>
-                <option value="week" @(Model.GroupBy == "week" ? "selected" : "")>Week</option>
-                <option value="month" @(Model.GroupBy == "month" || string.IsNullOrEmpty(Model.GroupBy) ? "selected" : "")>Month</option>
+                <option value="day" selected="@(Model.GroupBy == "day")">Day</option>
+                <option value="week" selected="@(Model.GroupBy == "week")">Week</option>
+                <option value="month" selected="@(Model.GroupBy == "month" || string.IsNullOrEmpty(Model.GroupBy))">Month</option>
             </select>
         </div>
         <div class="col-md-3">

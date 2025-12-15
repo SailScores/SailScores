@@ -7,7 +7,7 @@ using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Services;
 
-public class ReportService : IReportService
+public class ReportService : Interfaces.IReportService
     {
         private readonly CoreServices.IReportService _coreReportService;
         private readonly CoreServices.IClubService _clubService;
