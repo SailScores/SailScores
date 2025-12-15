@@ -15,15 +15,25 @@ function initParticipationChart(fleets, periods, participationData) {
         'rgba(106, 90, 205, 0.7)'
     ];
     
-    const datasets = fleets.map(function(fleet, index) {
+    // Filter fleets to only include those with >= 3 data points
+    const fleetsWithData = fleets.filter(function(fleet) {
         const data = periods.map(function(period) {
             const item = participationData.find(function(d) { 
                 return d.Period === period && d.FleetName === fleet; 
             });
             return item ? item.DistinctSkippers : 0;
         });
-        
         const nonZeroCount = data.filter(function(d) { return d > 0; }).length;
+        return nonZeroCount >= 3;
+    });
+    
+    const datasets = fleetsWithData.map(function(fleet, index) {
+        const data = periods.map(function(period) {
+            const item = participationData.find(function(d) { 
+                return d.Period === period && d.FleetName === fleet; 
+            });
+            return item ? item.DistinctSkippers : 0;
+        });
         
         return {
             label: fleet,
@@ -32,8 +42,7 @@ function initParticipationChart(fleets, periods, participationData) {
             borderColor: colors[index % colors.length].replace('0.7', '1'),
             borderWidth: 2,
             fill: true,
-            tension: 0.4,
-            hidden: nonZeroCount < 3
+            tension: 0.4
         };
     });
     

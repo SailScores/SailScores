@@ -8,15 +8,12 @@
 }
 
 <div class="container p-0 p-md-2">
-    <div class="row">
-        <div class="col-12">
+    <div class="row mb-3">
+        <div class="col-12 col-md-8">
             <h1>Wind Analysis</h1>
             <p class="lead">Wind speed and direction from race days</p>
         </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
             <a href="~/@Model.ClubInitials/Reports" class="btn btn-outline-secondary">← Back to Reports</a>
         </div>
     </div>
@@ -44,7 +41,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Wind Speed vs Direction (Polar Chart)</h5>
+                        <h5 class="card-title">Wind Speed vs Direction</h5>
                         <div id="windChart" style="width: 100%; height: 600px;"></div>
                     </div>
                 </div>
@@ -53,9 +50,10 @@
 
         <div class="row mt-4">
             <div class="col-12">
-                <h3>Data Summary</h3>
+                <h5>Data Summary</h5>
                 <p>Total race days: @Model.WindData.Count</p>
                 <p>Date range: @Model.WindData.Min(w => w.Date).ToString("d") to @Model.WindData.Max(w => w.Date).ToString("d")</p>
+                <p><a href="~/@Model.ClubInitials/Reports/WindAnalysisExport?startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-sm btn-outline-primary">Export as CSV</a></p>
             </div>
         </div>
     }

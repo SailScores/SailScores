@@ -97,6 +97,13 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
         .style('opacity', 0)
         .style('box-shadow', '0 2px 4px rgba(0,0,0,0.2)');
     
+    // Determine date ranges for highlighting
+    const now = new Date();
+    const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const currentYear = now.getFullYear();
+    const currentSeasonStart = new Date(currentYear, 0, 1);
+    const currentSeasonEnd = new Date(currentYear, 11, 31);
+    
     // Plot data points
     svg.selectAll('.data-point')
         .data(windData)
@@ -112,14 +119,43 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
             return rScale(d.speed) * Math.sin(angleRad);
         })
         .attr('r', 5)
-        .attr('fill', 'rgba(54, 162, 235, 0.6)')
-        .attr('stroke', 'rgba(54, 162, 235, 1)')
+        .attr('fill', function(d) {
+            const dataDate = new Date(d.date);
+            if (dataDate >= oneMonthAgo) {
+                // Within past month - brightest
+                return 'rgba(255, 99, 132, 0.8)';
+            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
+                // Within current season/year - moderate
+                return 'rgba(255, 159, 64, 0.7)';
+            } else {
+                // Older data - standard
+                return 'rgba(54, 162, 235, 0.6)';
+            }
+        })
+        .attr('stroke', function(d) {
+            const dataDate = new Date(d.date);
+            if (dataDate >= oneMonthAgo) {
+                return 'rgba(255, 99, 132, 1)';
+            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
+                return 'rgba(255, 159, 64, 1)';
+            } else {
+                return 'rgba(54, 162, 235, 1)';
+            }
+        })
         .attr('stroke-width', 1)
         .style('cursor', 'pointer')
         .on('mouseover', function(event, d) {
+            const dataDate = new Date(d.date);
+            let fillColor = 'rgba(54, 162, 235, 0.9)';
+            if (dataDate >= oneMonthAgo) {
+                fillColor = 'rgba(255, 99, 132, 0.9)';
+            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
+                fillColor = 'rgba(255, 159, 64, 0.9)';
+            }
+            
             d3.select(this)
                 .attr('r', 7)
-                .attr('fill', 'rgba(54, 162, 235, 0.9)');
+                .attr('fill', fillColor);
             
             const directionIndex = Math.round(d.direction / 45) % 8;
             const directionName = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][directionIndex];
@@ -133,10 +169,18 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
                 .style('left', (event.pageX + 10) + 'px')
                 .style('top', (event.pageY - 10) + 'px');
         })
-        .on('mouseout', function() {
+        .on('mouseout', function(event, d) {
+            const dataDate = new Date(d.date);
+            let fillColor = 'rgba(54, 162, 235, 0.6)';
+            if (dataDate >= oneMonthAgo) {
+                fillColor = 'rgba(255, 99, 132, 0.8)';
+            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
+                fillColor = 'rgba(255, 159, 64, 0.7)';
+            }
+            
             d3.select(this)
                 .attr('r', 5)
-                .attr('fill', 'rgba(54, 162, 235, 0.6)');
+                .attr('fill', fillColor);
             
             tooltip.style('opacity', 0);
         });
@@ -149,4 +193,32 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
         .attr('font-size', '12px')
         .attr('fill', '#666')
         .text('Wind Speed (' + windSpeedUnits + ')');
+    
+    // Add legend for date highlighting
+    const legendData = [
+        { color: 'rgba(255, 99, 132, 0.8)', label: 'Past month' },
+        { color: 'rgba(255, 159, 64, 0.7)', label: 'Current year' },
+        { color: 'rgba(54, 162, 235, 0.6)', label: 'Historical' }
+    ];
+    
+    const legend = svg.append('g')
+        .attr('transform', 'translate(' + (radius - 100) + ',' + (radius - 60) + ')');
+    
+    legendData.forEach(function(item, i) {
+        const legendRow = legend.append('g')
+            .attr('transform', 'translate(0,' + (i * 20) + ')');
+        
+        legendRow.append('circle')
+            .attr('r', 5)
+            .attr('fill', item.color)
+            .attr('stroke', item.color.replace(/0\.[67]/, '1'))
+            .attr('stroke-width', 1);
+        
+        legendRow.append('text')
+            .attr('x', 10)
+            .attr('y', 4)
+            .attr('font-size', '10px')
+            .attr('fill', '#666')
+            .text(item.label);
+    });
 }

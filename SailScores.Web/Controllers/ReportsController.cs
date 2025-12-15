@@ -95,4 +95,55 @@ public class ReportsController : Controller
             ViewData["ClubInitials"] = clubInitials;
             return View(model);
         }
+
+        public async Task<ActionResult> WindAnalysisExport(
+            string clubInitials,
+            DateTime? startDate = null,
+            DateTime? endDate = null)
+        {
+            if (!await _authService.CanUserEdit(User, clubInitials))
+            {
+                return Unauthorized();
+            }
+
+            var model = await _reportService.GetWindAnalysisAsync(clubInitials, startDate, endDate);
+            
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine($"Date,Wind Speed ({model.WindSpeedUnits}),Wind Direction (degrees),Race Count");
+            
+            foreach (var item in model.WindData)
+            {
+                csv.AppendLine($"{item.Date:yyyy-MM-dd},{item.WindSpeed},{item.WindDirection},{item.RaceCount}");
+            }
+            
+            var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+            var fileName = $"{clubInitials}_WindAnalysis_{DateTime.Now:yyyyMMdd}.csv";
+            return File(bytes, "text/csv", fileName);
+        }
+
+        public async Task<ActionResult> ParticipationExport(
+            string clubInitials,
+            string groupBy = "month",
+            DateTime? startDate = null,
+            DateTime? endDate = null)
+        {
+            if (!await _authService.CanUserEdit(User, clubInitials))
+            {
+                return Unauthorized();
+            }
+
+            var model = await _reportService.GetParticipationAsync(clubInitials, groupBy, startDate, endDate);
+            
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Period,Fleet,Distinct Skippers");
+            
+            foreach (var item in model.ParticipationData)
+            {
+                csv.AppendLine($"{item.Period},{item.FleetName},{item.DistinctSkippers}");
+            }
+            
+            var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+            var fileName = $"{clubInitials}_Participation_{groupBy}_{DateTime.Now:yyyyMMdd}.csv";
+            return File(bytes, "text/csv", fileName);
+        }
     }

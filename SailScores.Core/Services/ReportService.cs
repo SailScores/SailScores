@@ -44,7 +44,10 @@ public class ReportService : IReportService
 
             var racesWithWeather = await query
                 .Include(r => r.Weather)
-                .Where(r => r.Weather != null)
+                .Where(r => r.Weather != null 
+                    && r.Weather.WindSpeedMeterPerSecond.HasValue 
+                    && r.Weather.WindSpeedMeterPerSecond > 0
+                    && r.Weather.WindDirectionDegrees.HasValue)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
@@ -58,12 +61,10 @@ public class ReportService : IReportService
                 {
                     Date = g.Key,
                     WindSpeed = _conversionService.Convert(
-                        g.Where(r => r.Weather.WindSpeedMeterPerSecond.HasValue)
-                            .Average(r => r.Weather.WindSpeedMeterPerSecond),
+                        g.Average(r => r.Weather.WindSpeedMeterPerSecond),
                         _conversionService.MeterPerSecond,
                         windSpeedUnits),
-                    WindDirection = g.Where(r => r.Weather.WindDirectionDegrees.HasValue)
-                        .Average(r => r.Weather.WindDirectionDegrees),
+                    WindDirection = g.Average(r => r.Weather.WindDirectionDegrees),
                     RaceCount = g.Count()
                 })
                 .OrderBy(w => w.Date)
@@ -92,13 +93,26 @@ public class ReportService : IReportService
 
             var races = await query
                 .Include(r => r.Fleet)
-                .Include(r => r.Scores)
-                    .ThenInclude(s => s.Competitor)
                 .Include(r => r.SeriesRaces)
                     .ThenInclude(sr => sr.Series)
                         .ThenInclude(s => s.Season)
+                .AsSplitQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
+            
+            // Load scores separately to avoid multiple collection include warning
+            var raceIds = races.Select(r => r.Id).ToList();
+            var scores = await _dbContext.Scores
+                .Where(s => raceIds.Contains(s.RaceId))
+                .Include(s => s.Competitor)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            
+            // Associate scores with races
+            foreach (var race in races)
+            {
+                race.Scores = scores.Where(s => s.RaceId == race.Id).ToList();
+            }
 
             // Filter out races from series marked as ExcludeFromCompetitorStats
             var includedRaces = races
@@ -193,10 +207,30 @@ public class ReportService : IReportService
 
             var races = await query
                 .Include(r => r.Fleet)
-                .Include(r => r.Scores)
-                    .ThenInclude(s => s.Competitor)
+                .Include(r => r.SeriesRaces)
+                    .ThenInclude(sr => sr.Series)
+                .AsSplitQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
+            
+            // Filter out races from series marked as ExcludeFromCompetitorStats
+            races = races
+                .Where(r => !r.SeriesRaces.Any(sr => sr.Series.ExcludeFromCompetitorStats == true))
+                .ToList();
+            
+            // Load scores separately to avoid multiple collection include warning
+            var raceIds = races.Select(r => r.Id).ToList();
+            var scores = await _dbContext.Scores
+                .Where(s => raceIds.Contains(s.RaceId))
+                .Include(s => s.Competitor)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            
+            // Associate scores with races
+            foreach (var race in races)
+            {
+                race.Scores = scores.Where(s => s.RaceId == race.Id).ToList();
+            }
 
             var metrics = races
                 .SelectMany(r => r.Scores
