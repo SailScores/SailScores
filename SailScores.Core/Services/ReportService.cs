@@ -165,6 +165,11 @@ public class ReportService : IReportService
                         .Distinct()
                         .Count();
 
+                    var raceDates = g.Where(x => x.Race.Date.HasValue)
+                        .Select(x => x.Race.Date.Value)
+                        .OrderBy(d => d)
+                        .ToList();
+
                     return new SkipperStatistics
                     {
                         CompetitorId = g.Key.Id,
@@ -177,7 +182,9 @@ public class ReportService : IReportService
                         BoatsBeat = boatsBeat,
                         ParticipationPercentage = totalFleetRaces > 0
                             ? (decimal)racesParticipated / totalFleetRaces * 100
-                            : 0
+                            : 0,
+                        FirstRaceDate = raceDates.FirstOrDefault(),
+                        LastRaceDate = raceDates.LastOrDefault()
                     };
                 })
                 .OrderByDescending(s => s.RacesParticipated)

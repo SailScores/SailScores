@@ -83,7 +83,9 @@ public class ReportService : Interfaces.IReportService
                     RacesParticipated = s.RacesParticipated,
                     TotalFleetRaces = s.TotalFleetRaces,
                     BoatsBeat = s.BoatsBeat,
-                    ParticipationPercentage = s.ParticipationPercentage
+                    ParticipationPercentage = s.ParticipationPercentage,
+                    FirstRaceDate = s.FirstRaceDate,
+                    LastRaceDate = s.LastRaceDate
                 }).ToList()
             };
         }

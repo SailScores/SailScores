@@ -22,18 +22,30 @@
         <div class="col-md-4">
             <label for="startDate" class="form-label">Start Date</label>
             <input type="date" class="form-control" id="startDate" name="startDate"
-                   value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+                   value="@(Model.StartDate?.ToString("yyyy-MM-dd") ?? (Model.SkipperStats?.Any() == true ? Model.SkipperStats.Min(s => s.FirstRaceDate)?.ToString("yyyy-MM-dd") : ""))" />
         </div>
         <div class="col-md-4">
             <label for="endDate" class="form-label">End Date</label>
             <input type="date" class="form-control" id="endDate" name="endDate"
-                   value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+                   value="@(Model.EndDate?.ToString("yyyy-MM-dd") ?? (Model.SkipperStats?.Any() == true ? Model.SkipperStats.Max(s => s.LastRaceDate)?.ToString("yyyy-MM-dd") : ""))" />
         </div>
         <div class="col-md-4 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary me-2">Filter</button>
+            <button type="submit" class="btn btn-primary me-2">Update</button>
             <a href="~/@Model.ClubInitials/Reports/CompetitorStats" class="btn btn-outline-secondary">Clear</a>
         </div>
     </form>
+
+    @if (Model.SkipperStats != null && Model.SkipperStats.Any())
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <a href="~/@Model.ClubInitials/Reports/CompetitorStatsExport?startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")" 
+                   class="btn btn-success">
+                    <i class="bi bi-download"></i> Export as CSV
+                </a>
+            </div>
+        </div>
+    }
 
     @if (Model.SkipperStats != null && Model.SkipperStats.Any())
     {

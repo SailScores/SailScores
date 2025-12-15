@@ -202,7 +202,7 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
     ];
     
     const legend = svg.append('g')
-        .attr('transform', 'translate(' + (radius - 100) + ',' + (radius - 60) + ')');
+        .attr('transform', 'translate(' + (-radius + 10) + ',' + (radius - 60) + ')');
     
     legendData.forEach(function(item, i) {
         const legendRow = legend.append('g')

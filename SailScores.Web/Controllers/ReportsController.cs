@@ -113,7 +113,8 @@ public class ReportsController : Controller
             
             foreach (var item in model.WindData)
             {
-                csv.AppendLine($"{item.Date:yyyy-MM-dd},{item.WindSpeed},{item.WindDirection},{item.RaceCount}");
+                // Round wind speed to 1 decimal place, direction to whole degrees
+                csv.AppendLine($"{item.Date:yyyy-MM-dd},{item.WindSpeed:F1},{Math.Round(item.WindDirection)},{item.RaceCount}");
             }
             
             var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
@@ -144,6 +145,31 @@ public class ReportsController : Controller
             
             var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
             var fileName = $"{clubInitials}_Participation_{groupBy}_{DateTime.Now:yyyyMMdd}.csv";
+            return File(bytes, "text/csv", fileName);
+        }
+
+        public async Task<ActionResult> CompetitorStatsExport(
+            string clubInitials,
+            DateTime? startDate = null,
+            DateTime? endDate = null)
+        {
+            if (!await _authService.CanUserEdit(User, clubInitials))
+            {
+                return Unauthorized();
+            }
+
+            var model = await _reportService.GetSkipperStatsAsync(clubInitials, startDate, endDate);
+            
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Competitor,Sail Number,Fleet,Season,Races Participated,Total Fleet Races,Boats Beat,Participation %");
+            
+            foreach (var item in model.SkipperStats)
+            {
+                csv.AppendLine($"\"{item.CompetitorName}\",{item.SailNumber},{item.FleetName},{item.SeasonName},{item.RacesParticipated},{item.TotalFleetRaces},{item.BoatsBeat},{item.ParticipationPercentage:F1}");
+            }
+            
+            var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+            var fileName = $"{clubInitials}_CompetitorStats_{DateTime.Now:yyyyMMdd}.csv";
             return File(bytes, "text/csv", fileName);
         }
     }

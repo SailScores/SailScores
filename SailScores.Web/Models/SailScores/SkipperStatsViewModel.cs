@@ -21,4 +21,6 @@ public class SkipperStatItem
     public int TotalFleetRaces { get; set; }
     public int BoatsBeat { get; set; }
     public decimal ParticipationPercentage { get; set; }
+    public DateTime? FirstRaceDate { get; set; }
+    public DateTime? LastRaceDate { get; set; }
 }
