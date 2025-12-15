@@ -201,7 +201,7 @@ namespace SailScores.Core.Services
             return groupBy.ToLower() switch
             {
                 "day" => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                "week" => $"{CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstDay, DayOfWeek.Monday):D2} ({date.Year})",
+                "week" => $"Week {CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday):D2} ({date.Year})",
                 "month" => date.ToString("yyyy-MM", CultureInfo.InvariantCulture),
                 _ => date.ToString("yyyy-MM", CultureInfo.InvariantCulture),
             };
@@ -212,10 +212,19 @@ namespace SailScores.Core.Services
             return groupBy.ToLower() switch
             {
                 "day" => date.Date,
-                "week" => date.Date.AddDays(-(int)date.DayOfWeek + (int)DayOfWeek.Monday),
+                "week" => GetMondayOfWeek(date),
                 "month" => new DateTime(date.Year, date.Month, 1),
                 _ => new DateTime(date.Year, date.Month, 1),
             };
+        }
+
+        private DateTime GetMondayOfWeek(DateTime date)
+        {
+            var dayOfWeek = (int)date.DayOfWeek;
+            // Convert Sunday (0) to 7 for easier calculation
+            if (dayOfWeek == 0) dayOfWeek = 7;
+            // Monday is day 1, so subtract (dayOfWeek - 1) to get to Monday
+            return date.Date.AddDays(-(dayOfWeek - 1));
         }
     }
 }
