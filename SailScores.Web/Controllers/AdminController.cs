@@ -113,6 +113,7 @@ public class AdminController : Controller
         }
     }
 
+    [AllowAnonymous]
     public async Task<IActionResult> GetLogo(Guid id)
     {
         var result = await _adminService.GetLogoAsync(id);

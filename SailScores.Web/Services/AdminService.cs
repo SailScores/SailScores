@@ -128,7 +128,8 @@ public class AdminService : IAdminService
     }
 
     private const int MaxLogoFileSizeBytes = 2097152; // 2 MB
-    private static readonly string[] AllowedImageContentTypes = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif", "image/svg+xml" };
+    // Note: SVG not supported due to XSS security concerns (SVG can contain JavaScript)
+    private static readonly string[] AllowedImageContentTypes = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif" };
 
     public async Task ProcessLogoFile(AdminEditViewModel model)
     {
@@ -137,7 +138,7 @@ public class AdminService : IAdminService
             // Validate content type
             if (!AllowedImageContentTypes.Contains(model.LogoFile.ContentType?.ToLowerInvariant()))
             {
-                throw new ArgumentException($"Invalid file type. Allowed types: PNG, JPG, GIF, SVG. Received: {model.LogoFile.ContentType}");
+                throw new ArgumentException($"Invalid file type. Allowed types: PNG, JPG, GIF. Received: {model.LogoFile.ContentType}");
             }
 
             using (var memoryStream = new MemoryStream())
@@ -196,9 +197,9 @@ public class AdminService : IAdminService
         {
             return null;
         }
-        var stream = new MemoryStream();
-        stream.Write(file.FileContents, 0, file.FileContents.Length);
-        stream.Position = 0;
+        
+        // Create stream efficiently without copying
+        var stream = new MemoryStream(file.FileContents, writable: false);
         
         // Determine content type from file content or default to PNG
         var contentType = DetermineContentType(file.FileContents);
@@ -212,17 +213,13 @@ public class AdminService : IAdminService
             return "image/png"; // default
         }
 
-        // Check file signatures (magic numbers)
+        // Check file signatures (magic numbers) for supported formats only
         if (fileContents[0] == 0x89 && fileContents[1] == 0x50 && fileContents[2] == 0x4E && fileContents[3] == 0x47)
             return "image/png";
         if (fileContents[0] == 0xFF && fileContents[1] == 0xD8 && fileContents[2] == 0xFF)
             return "image/jpeg";
         if (fileContents[0] == 0x47 && fileContents[1] == 0x49 && fileContents[2] == 0x46)
             return "image/gif";
-        if (fileContents[0] == 0x3C && fileContents[1] == 0x3F && fileContents[2] == 0x78 && fileContents[3] == 0x6D) // <?xm (SVG starts with XML)
-            return "image/svg+xml";
-        if (fileContents[0] == 0x3C && fileContents[1] == 0x73 && fileContents[2] == 0x76 && fileContents[3] == 0x67) // <svg
-            return "image/svg+xml";
 
         return "image/png"; // default fallback
     }
