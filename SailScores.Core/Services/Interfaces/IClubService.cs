@@ -36,4 +36,6 @@ public interface IClubService
     Task<bool> HasCompetitorsAsync(Guid id);
     Task SetUseAdvancedFeaturesAsync(Guid clubId, bool enabled);
     Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType);
+    Task SaveFileAsync(Entities.File file);
+    Task<Entities.File> GetFileAsync(Guid id);
 }

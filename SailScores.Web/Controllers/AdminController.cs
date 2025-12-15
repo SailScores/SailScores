@@ -53,7 +53,8 @@ public class AdminController : Controller
             return Unauthorized();
         }
         var vm = await _adminService.GetClubForEdit(clubInitials);
-        return View(vm);
+        var editVm = _mapper.Map<AdminEditViewModel>(vm);
+        return View(editVm);
     }
 
     // POST: Admin/Edit
@@ -61,7 +62,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Edit(
         string clubInitials,
-        AdminViewModel clubAdmin)
+        AdminEditViewModel clubAdmin)
     {
         ViewData["ClubInitials"] = clubInitials;
         try
@@ -81,6 +82,9 @@ public class AdminController : Controller
                 clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
                 return View(clubAdmin);
             }
+
+            // Process logo file upload if provided
+            await _adminService.ProcessLogoFile(clubAdmin);
 
             var clubObject = _mapper.Map<Club>(clubAdmin);
             clubObject.DefaultScoringSystemId =
@@ -107,6 +111,11 @@ public class AdminController : Controller
             clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
             return View(clubAdmin);
         }
+    }
+
+    public async Task<FileStreamResult> GetLogo(Guid id)
+    {
+        return await _adminService.GetLogoAsync(id);
     }
 
 }

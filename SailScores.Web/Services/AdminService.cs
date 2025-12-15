@@ -126,4 +126,46 @@ public class AdminService : IAdminService
         await _localizerService.UpdateCulture(clubObject.Initials, shortLocale);
         await _coreClubService.UpdateClub(clubObject);
     }
+
+    public async Task ProcessLogoFile(AdminEditViewModel model)
+    {
+        if (model.LogoFile != null)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await model.LogoFile.CopyToAsync(memoryStream);
+
+                // Upload the file if less than 2 MB
+                if (memoryStream.Length < 2097152)
+                {
+                    var file = new Database.Entities.File
+                    {
+                        Id = Guid.NewGuid(),
+                        FileContents = memoryStream.ToArray(),
+                        Created = DateTime.UtcNow
+                    };
+
+                    await _coreClubService.SaveFileAsync(file);
+                    model.LogoFileId = file.Id;
+                }
+                else
+                {
+                    throw new ArgumentException("File is too large. Maximum size is 2 MB.");
+                }
+            }
+        }
+    }
+
+    public async Task<FileStreamResult> GetLogoAsync(Guid id)
+    {
+        var file = await _coreClubService.GetFileAsync(id);
+        if (file == null)
+        {
+            return null;
+        }
+        var stream = new MemoryStream();
+        stream.Write(file.FileContents, 0, file.FileContents.Length);
+        stream.Position = 0;
+        return new FileStreamResult(stream, "image/png");
+    }
 }

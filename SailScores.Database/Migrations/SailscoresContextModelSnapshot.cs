@@ -175,6 +175,9 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("HomePageDescription")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Initials")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -185,6 +188,9 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Locale")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<Guid?>("LogoFileId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()

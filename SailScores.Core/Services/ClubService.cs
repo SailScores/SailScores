@@ -201,6 +201,7 @@ namespace SailScores.Core.Services
                         Name = c.Name,
                         Initials = c.Initials,
                         Description = c.Description,
+                        LogoFileId = c.LogoFileId,
                         IsHidden = c.IsHidden,
                         RecentRaceCount = activity.RaceCount,
                         RecentSeriesCount = activity.SeriesCount,
@@ -681,6 +682,17 @@ namespace SailScores.Core.Services
             return await _dbContext.Competitors
                 .AnyAsync(r => r.ClubId == id)
                 .ConfigureAwait(false);
+        }
+
+        public async Task SaveFileAsync(Entities.File file)
+        {
+            await _dbContext.Files.AddAsync(file);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Entities.File> GetFileAsync(Guid id)
+        {
+            return await _dbContext.Files.FirstOrDefaultAsync(f => f.Id == id);
         }
     }
 }

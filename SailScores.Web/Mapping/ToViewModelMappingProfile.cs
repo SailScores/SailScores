@@ -47,6 +47,22 @@ namespace SailScores.Web.Mapping
                 .ReverseMap()
                 .ForMember(d => d.DefaultScoringSystem, o => o.Ignore());
 
+            CreateMap<AdminViewModel, AdminEditViewModel>();
+            
+            CreateMap<AdminEditViewModel, Model.Club>()
+                .ForMember(d => d.DefaultScoringSystem, o => o.Ignore())
+                .ForMember(d => d.WeatherSettings, o => o.Ignore())
+                .ForMember(d => d.Fleets, o => o.Ignore())
+                .ForMember(d => d.Competitors, o => o.Ignore())
+                .ForMember(d => d.BoatClasses, o => o.Ignore())
+                .ForMember(d => d.Seasons, o => o.Ignore())
+                .ForMember(d => d.Series, o => o.Ignore())
+                .ForMember(d => d.Races, o => o.Ignore())
+                .ForMember(d => d.Regattas, o => o.Ignore())
+                .ForMember(d => d.ScoringSystems, o => o.Ignore())
+                .ForMember(d => d.StatisticsDescription, o => o.Ignore())
+                .ForMember(d => d.Locale, o => o.Ignore());
+
             CreateMap<Model.Fleet, FleetSummary>()
                 .ForMember(d => d.Series, o => o.Ignore());
             CreateMap<Model.Fleet, FleetWithOptionsViewModel>()

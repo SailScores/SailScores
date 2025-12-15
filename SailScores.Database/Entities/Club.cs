@@ -10,6 +10,8 @@ public class Club
     [StringLength(10)]
     public String Initials { get; set; }
     public String Description { get; set; }
+    public String HomePageDescription { get; set; }
+    public Guid? LogoFileId { get; set; }
     public bool IsHidden { get; set; }
     public bool? ShowClubInResults { get; set; }
 

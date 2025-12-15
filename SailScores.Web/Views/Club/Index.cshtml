@@ -39,6 +39,14 @@
         </div>
     </div>
 }
+@if (!String.IsNullOrWhiteSpace(Model.HomePageDescription))
+{
+    <div class="row">
+        <div class="col-md-9">
+            @Html.Raw(Markdig.Markdown.ToHtml(Model.HomePageDescription))
+        </div>
+    </div>
+}
 @if (Model.CanEdit && (Model.Series?.Count() ?? 0) == 0)
 {
     <div class="row bg-almost">

@@ -8,6 +8,7 @@ public class ClubActivitySummary
     public String Name { get; set; }
     public String Initials { get; set; }
     public String Description { get; set; }
+    public Guid? LogoFileId { get; set; }
     public bool IsHidden { get; set; }
     public int RecentRaceCount { get; set; }
     public int RecentSeriesCount { get; set; }

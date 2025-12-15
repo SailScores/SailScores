@@ -1,4 +1,4 @@
-@model SailScores.Web.Models.SailScores.AdminViewModel
+@model SailScores.Web.Models.SailScores.AdminEditViewModel
 
 @{
     ViewData["Title"] = "Edit " + Model.Name;
@@ -10,8 +10,9 @@
 <hr />
 <div class="row">
     <div class="col-12 col-6-md">
-    <form asp-action="Edit">
+    <form asp-action="Edit" enctype="multipart/form-data">
         <input hidden asp-for="Id" class="form-control" />
+        <input hidden asp-for="LogoFileId" class="form-control" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="mb-3">
             <label asp-for="Name" class="control-label"></label>
@@ -24,7 +25,39 @@
                 <span title="Supports MarkDown formatting" class="fab fa-markdown"></span></a>
             <textarea asp-for="Description" class="form-control" cols="60" rows="6"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
+            <small class="form-text text-muted">Public description shown on front page and club home page</small>
         </div>
+        <div class="mb-3">
+            <label asp-for="HomePageDescription" class="control-label"></label>
+            <a target="_blank" href="https://www.markdownguide.org/">
+                <span title="Supports MarkDown formatting" class="fab fa-markdown"></span></a>
+            <textarea asp-for="HomePageDescription" class="form-control" cols="60" rows="4"></textarea>
+            <span asp-validation-for="HomePageDescription" class="text-danger"></span>
+            <small class="form-text text-muted">Additional information shown only on club home page (e.g., coordination notes for members)</small>
+        </div>
+        
+        @if (Model.LogoFileId.HasValue)
+        {
+            <div class="mb-3">
+                <label class="form-label">Current Burgee/Logo</label>
+                <div class="d-flex gap-3">
+                    <div class="p-2 bg-light" style="width:80px;">
+                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on light background" class="img-fluid" style="width:64px;height:64px;object-fit:contain;" />
+                    </div>
+                    <div class="p-2 bg-dark" style="width:80px;">
+                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on dark background" class="img-fluid" style="width:64px;height:64px;object-fit:contain;" />
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="mb-3">
+            <label asp-for="LogoFile" class="form-label"></label>
+            <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" />
+            <span asp-validation-for="LogoFile" class="text-danger"></span>
+            <small class="form-text text-muted">Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). Supported formats: PNG, JPG, GIF. SVG recommended for best quality.</small>
+        </div>
+        
         <div class="row">
             <div class="mb-3 col-md-6">
                 <div class="checkbox">
