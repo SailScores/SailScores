@@ -265,6 +265,44 @@ public class ReportService : IReportService
                 .ThenBy(m => m.FleetName)
                 .ToList();
 
+            // Fill in missing periods with zero values
+            if (metrics.Any())
+            {
+                var allFleets = metrics.Select(m => m.FleetName).Distinct().ToList();
+                var minDate = metrics.Min(m => m.PeriodStart);
+                var maxDate = metrics.Max(m => m.PeriodStart);
+                
+                var allPeriods = GenerateAllPeriods(minDate, maxDate, groupBy);
+                var filledMetrics = new List<ParticipationMetric>();
+                
+                foreach (var periodStart in allPeriods)
+                {
+                    var periodKey = GetPeriodKey(periodStart, groupBy);
+                    foreach (var fleet in allFleets)
+                    {
+                        var existing = metrics.FirstOrDefault(m => 
+                            m.PeriodStart == periodStart && m.FleetName == fleet);
+                        
+                        if (existing != null)
+                        {
+                            filledMetrics.Add(existing);
+                        }
+                        else
+                        {
+                            filledMetrics.Add(new ParticipationMetric
+                            {
+                                Period = periodKey,
+                                PeriodStart = periodStart,
+                                FleetName = fleet,
+                                DistinctSkippers = 0
+                            });
+                        }
+                    }
+                }
+                
+                return filledMetrics.OrderBy(m => m.PeriodStart).ThenBy(m => m.FleetName).ToList();
+            }
+
             return metrics;
         }
 
@@ -299,5 +337,28 @@ public class ReportService : IReportService
             if (dayOfWeek == 0) dayOfWeek = 7;
             // Monday is day 1, so subtract (dayOfWeek - 1) to get to Monday
             return date.Date.AddDays(-(dayOfWeek - 1));
+        }
+
+        private List<DateTime> GenerateAllPeriods(DateTime minDate, DateTime maxDate, string groupBy)
+        {
+            var periods = new List<DateTime>();
+            var current = GetPeriodStart(minDate, groupBy);
+            var end = GetPeriodStart(maxDate, groupBy);
+            
+            while (current <= end)
+            {
+                periods.Add(current);
+                
+                current = groupBy.ToLower() switch
+                {
+                    "day" => current.AddDays(1),
+                    "week" => current.AddDays(7),
+                    "month" => current.AddMonths(1),
+                    "year" => current.AddYears(1),
+                    _ => current.AddMonths(1),
+                };
+            }
+            
+            return periods;
         }
     }
