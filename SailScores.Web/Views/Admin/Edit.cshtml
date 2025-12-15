@@ -60,9 +60,21 @@
 
         <div class="mb-3">
             <label asp-for="LogoFile" class="form-label"></label>
-            <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" />
+            <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" id="logoFileInput" />
             <span asp-validation-for="LogoFile" class="text-danger"></span>
             <small class="form-text text-muted">Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). Supported formats: PNG, JPG, GIF. PNG with transparent background recommended for best results.</small>
+        </div>
+        
+        <div id="newLogoPreview" class="mb-3" style="display:none;">
+            <label class="form-label">New Logo Preview</label>
+            <div class="d-flex gap-3">
+                <div class="p-2 bg-light" style="width:80px;">
+                    <img id="previewLight" alt="New logo on light background" class="img-fluid logo-preview" />
+                </div>
+                <div class="p-2 bg-dark" style="width:80px;">
+                    <img id="previewDark" alt="New logo on dark background" class="img-fluid logo-preview" />
+                </div>
+            </div>
         </div>
         
         <div class="row">
@@ -197,4 +209,28 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.getElementById('logoFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('newLogoPreview');
+            const previewLight = document.getElementById('previewLight');
+            const previewDark = document.getElementById('previewDark');
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const dataUrl = event.target.result;
+                    previewLight.src = dataUrl;
+                    previewDark.src = dataUrl;
+                    preview.style.display = 'block';
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
 }

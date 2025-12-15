@@ -491,6 +491,8 @@ namespace SailScores.Core.Services
             dbClub.ShowClubInResults = club.ShowClubInResults;
             dbClub.Locale = club.Locale;
             dbClub.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
+            dbClub.LogoFileId = club.LogoFileId;
+            dbClub.HomePageDescription = club.HomePageDescription;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings.Latitude;
