@@ -135,28 +135,32 @@ namespace SailScores.Core.Services
             var clubsWithRecentRaces = await _dbContext
                 .Races
                 .Where(r => r.Date.HasValue && r.Date.Value >= cutoffDate)
-                .Select(r => r.ClubId)
-                .Distinct()
+                .Select(r => new { r.ClubId, ActivityDate = r.Date.Value })
                 .ToListAsync()
                 .ConfigureAwait(false);
 
             var clubsWithRecentSeries = await _dbContext
                 .Series
                 .Where(s => s.UpdatedDate.HasValue && s.UpdatedDate.Value >= cutoffDate)
-                .Select(s => s.ClubId)
-                .Distinct()
+                .Select(s => new { s.ClubId, ActivityDate = s.UpdatedDate.Value })
                 .ToListAsync()
                 .ConfigureAwait(false);
 
-            var recentClubIds = clubsWithRecentRaces.Union(clubsWithRecentSeries).Distinct();
+            var allActivity = clubsWithRecentRaces.Cast<dynamic>()
+                .Concat(clubsWithRecentSeries.Cast<dynamic>())
+                .GroupBy(a => a.ClubId)
+                .Select(g => new { ClubId = g.Key, MostRecentActivity = g.Max(a => a.ActivityDate) })
+                .OrderByDescending(a => a.MostRecentActivity)
+                .Select(a => a.ClubId)
+                .ToList();
 
             var dbObjects = _dbContext
                 .Clubs
-                .Where(c => !c.IsHidden 
-                    && (c.ShowClubInResults ?? false)
-                    && recentClubIds.Contains(c.Id));
+                .Where(c => !c.IsHidden && allActivity.Contains(c.Id))
+                .AsEnumerable()
+                .OrderBy(c => allActivity.IndexOf(c.Id));
 
-            return _mapper.ProjectTo<ClubSummary>(dbObjects);
+            return _mapper.Map<IEnumerable<ClubSummary>>(dbObjects);
         }
 
         public async Task<Guid> GetClubId(string initials)

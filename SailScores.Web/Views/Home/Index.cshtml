@@ -64,20 +64,33 @@
     <div class="row mb-5">
         <div class="col-12">
             <h3 class="mb-3">Recently Active Clubs</h3>
-            <p class="text-muted">Clubs with races or series updates in the past two weeks</p>
-            <div class="list-group">
+            <p class="text-muted">Recently Active</p>
+            <div class="row">
                 @foreach (var club in Model.RecentlyActiveClubs.Take(10))
                 {
-                    <a href="/@club.Initials" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">@club.Name</h5>
-                            <small>@club.Initials</small>
-                        </div>
-                        @if (!string.IsNullOrWhiteSpace(club.Description))
-                        {
-                            <p class="mb-1 text-muted small">@club.Description</p>
-                        }
-                    </a>
+                    <div class="col-12 col-md-6 col-lg-4 mb-3">
+                        <a href="/@club.Initials" class="text-decoration-none">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
+                                            <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                <span class="text-muted small">@club.Initials</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="card-title mb-1">@club.Name</h5>
+                                            <small class="text-muted">@club.Initials</small>
+                                            @if (!string.IsNullOrWhiteSpace(club.Description))
+                                            {
+                                                <div class="card-text small mt-2">@Html.Raw(Markdig.Markdown.ToHtml(club.Description))</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 }
             </div>
             @if (Model.RecentlyActiveClubs.Count() > 10)
@@ -112,20 +125,29 @@
 </div>
 
 <!-- All Clubs Cards Section -->
-<div class="row" id="clubCardsContainer">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="clubCardsContainer">
     @if (Model.AllVisibleClubs?.Any() ?? false)
     {
         @foreach (var club in Model.AllVisibleClubs)
         {
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4 club-card" 
+            <div class="col club-card" 
                  data-club-name="@club.Name.ToLowerInvariant()" 
                  data-club-description="@(club.Description?.ToLowerInvariant() ?? "")">
                 <div class="card h-100">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">@club.Name</h5>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                    <span class="text-muted small">@club.Initials</span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-0">@club.Name</h5>
+                            </div>
+                        </div>
                         @if (!string.IsNullOrWhiteSpace(club.Description))
                         {
-                            <p class="card-text text-muted small">@club.Description</p>
+                            <div class="card-text text-muted small mb-2">@Html.Raw(Markdig.Markdown.ToHtml(club.Description))</div>
                         }
                         <div class="mt-auto">
                             <a href="/@club.Initials" class="btn btn-sm btn-outline-primary stretched-link">View Results</a>

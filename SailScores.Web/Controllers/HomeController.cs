@@ -41,17 +41,9 @@ public class HomeController : Controller
         };
         
         var recentlyActiveClubs = (await _clubservice.GetClubsWithRecentActivity(14))
-            .OrderBy(c => c.Name)
             .ToList();
         
-        // Get all clubs for display. Note: GetClubs() returns clubs filtered by IsHidden,
-        // but not by ShowClubInResults. This is intentional - GetClubs() is used in multiple
-        // contexts (admin, API, sitemap) where ShowClubInResults filtering isn't appropriate.
-        // For the front page, we use GetClubsWithRecentActivity which includes that filter.
-        // For the "all clubs" section, we currently show all non-hidden clubs to maximize
-        // discoverability, but this could be changed if needed.
         var allVisibleClubs = (await _clubservice.GetClubs(false))
-            .Where(c => !c.IsHidden)
             .OrderBy(c => c.Name)
             .ToList();
         
