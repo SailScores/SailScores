@@ -128,39 +128,84 @@ namespace SailScores.Core.Services
             return _mapper.ProjectTo<ClubSummary>(dbObjects);
         }
 
-        public async Task<IEnumerable<ClubSummary>> GetClubsWithRecentActivity(int daysBack = 14)
+        public async Task<IEnumerable<ClubActivitySummary>> GetClubsWithRecentActivity(int daysBack = 14)
         {
             var cutoffDate = DateTime.UtcNow.AddDays(-daysBack);
             
             var clubsWithRecentRaces = await _dbContext
                 .Races
                 .Where(r => r.Date.HasValue && r.Date.Value >= cutoffDate)
-                .Select(r => new { r.ClubId, ActivityDate = r.Date.Value })
+                .GroupBy(r => r.ClubId)
+                .Select(g => new { 
+                    ClubId = g.Key, 
+                    RaceCount = g.Count(),
+                    MostRecentRace = g.Max(r => r.Date.Value)
+                })
                 .ToListAsync()
                 .ConfigureAwait(false);
 
             var clubsWithRecentSeries = await _dbContext
                 .Series
                 .Where(s => s.UpdatedDate.HasValue && s.UpdatedDate.Value >= cutoffDate)
-                .Select(s => new { s.ClubId, ActivityDate = s.UpdatedDate.Value })
+                .GroupBy(s => s.ClubId)
+                .Select(g => new { 
+                    ClubId = g.Key, 
+                    SeriesCount = g.Count(),
+                    MostRecentSeries = g.Max(s => s.UpdatedDate.Value)
+                })
                 .ToListAsync()
                 .ConfigureAwait(false);
 
-            var allActivity = clubsWithRecentRaces.Cast<dynamic>()
-                .Concat(clubsWithRecentSeries.Cast<dynamic>())
+            var allActivityByClub = clubsWithRecentRaces
+                .Select(r => new { 
+                    r.ClubId, 
+                    RaceCount = r.RaceCount,
+                    SeriesCount = 0,
+                    MostRecentActivity = r.MostRecentRace 
+                })
+                .Concat(clubsWithRecentSeries.Select(s => new { 
+                    s.ClubId, 
+                    RaceCount = 0,
+                    SeriesCount = s.SeriesCount,
+                    MostRecentActivity = s.MostRecentSeries 
+                }))
                 .GroupBy(a => a.ClubId)
-                .Select(g => new { ClubId = g.Key, MostRecentActivity = g.Max(a => a.ActivityDate) })
+                .Select(g => new { 
+                    ClubId = g.Key, 
+                    RaceCount = g.Sum(x => x.RaceCount),
+                    SeriesCount = g.Sum(x => x.SeriesCount),
+                    MostRecentActivity = g.Max(x => x.MostRecentActivity)
+                })
                 .OrderByDescending(a => a.MostRecentActivity)
-                .Select(a => a.ClubId)
                 .ToList();
 
-            var dbObjects = _dbContext
-                .Clubs
-                .Where(c => !c.IsHidden && allActivity.Contains(c.Id))
-                .AsEnumerable()
-                .OrderBy(c => allActivity.IndexOf(c.Id));
+            var clubIds = allActivityByClub.Select(a => a.ClubId).ToList();
 
-            return _mapper.Map<IEnumerable<ClubSummary>>(dbObjects);
+            var clubs = await _dbContext
+                .Clubs
+                .Where(c => !c.IsHidden && clubIds.Contains(c.Id))
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var result = clubs
+                .Select(c => {
+                    var activity = allActivityByClub.First(a => a.ClubId == c.Id);
+                    return new ClubActivitySummary
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Initials = c.Initials,
+                        Description = c.Description,
+                        IsHidden = c.IsHidden,
+                        RecentRaceCount = activity.RaceCount,
+                        RecentSeriesCount = activity.SeriesCount,
+                        MostRecentActivity = activity.MostRecentActivity
+                    };
+                })
+                .OrderByDescending(c => c.MostRecentActivity)
+                .ToList();
+
+            return result;
         }
 
         public async Task<Guid> GetClubId(string initials)

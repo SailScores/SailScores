@@ -8,7 +8,7 @@ public class SiteHomePageModel
 
     public RegattaSelectorModel RegattaSelectorModel { get; set; }
     
-    public IEnumerable<ClubSummary> RecentlyActiveClubs { get; set; }
+    public IEnumerable<ClubActivitySummary> RecentlyActiveClubs { get; set; }
     
     public IEnumerable<ClubSummary> AllVisibleClubs { get; set; }
 

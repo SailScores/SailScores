@@ -81,6 +81,24 @@
                                         <div class="flex-grow-1">
                                             <h5 class="card-title mb-1">@club.Name</h5>
                                             <small class="text-muted">@club.Initials</small>
+                                            @if (club.RecentRaceCount > 0 || club.RecentSeriesCount > 0)
+                                            {
+                                                <div class="small text-muted mt-1">
+                                                    @if (club.RecentRaceCount > 0)
+                                                    {
+                                                        <span>@club.RecentRaceCount race@(club.RecentRaceCount != 1 ? "s" : "")</span>
+                                                    }
+                                                    @if (club.RecentRaceCount > 0 && club.RecentSeriesCount > 0)
+                                                    {
+                                                        <span> • </span>
+                                                    }
+                                                    @if (club.RecentSeriesCount > 0)
+                                                    {
+                                                        <span>@club.RecentSeriesCount series</span>
+                                                    }
+                                                    <span> in past 2 weeks</span>
+                                                </div>
+                                            }
                                             @if (!string.IsNullOrWhiteSpace(club.Description))
                                             {
                                                 <div class="card-text small mt-2">@Html.Raw(Markdig.Markdown.ToHtml(club.Description))</div>

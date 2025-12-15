@@ -10,7 +10,7 @@ namespace SailScores.Core.Services;
 public interface IClubService
 {
     Task<IEnumerable<ClubSummary>> GetClubs(bool includeHidden);
-    Task<IEnumerable<ClubSummary>> GetClubsWithRecentActivity(int daysBack = 14);
+    Task<IEnumerable<ClubActivitySummary>> GetClubsWithRecentActivity(int daysBack = 14);
     Task<Club> GetFullClubExceptScores(Guid id);
     Task<Club> GetFullClubExceptScores(string clubInitials);
     Task<Club> GetClubForAdmin(Guid id);
