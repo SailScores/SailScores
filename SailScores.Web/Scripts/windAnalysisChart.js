@@ -19,30 +19,31 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
         .attr('transform', 'translate(' + width/2 + ',' + height/2 + ')');
     
     // Find max speed for scale
-    const maxSpeed = d3.max(windData, function(d) { return d.speed; });
+    const maxSpeed = d3.max(windData, function(d) { return d.speed; }) || 0;
     
-    // Create radial scale for speed
+    // Determine nice max domain (round up) and create radial scale for speed
+    const maxDomain = Math.ceil(maxSpeed * 1.1);
     const rScale = d3.scaleLinear()
-        .domain([0, maxSpeed * 1.1])
+        .domain([0, maxDomain])
         .range([0, radius]);
     
-    // Draw concentric circles
-    const circles = [0.25, 0.5, 0.75, 1];
-    circles.forEach(function(factor) {
+    // Draw concentric circles at even speed ticks
+    const tickCount = 4; // number of circles (excluding 0)
+    const ticks = d3.ticks(0, maxDomain, tickCount);
+    ticks.forEach(function(t) {
+        if (t === 0) return; // skip the center
         svg.append('circle')
-            .attr('r', radius * factor)
+            .attr('r', rScale(t))
             .attr('fill', 'none')
             .attr('stroke', '#ccc')
             .attr('stroke-width', 1);
         
-        if (factor < 1) {
-            svg.append('text')
-                .attr('x', 5)
-                .attr('y', -radius * factor)
-                .attr('font-size', '10px')
-                .attr('fill', '#666')
-                .text((maxSpeed * factor * 1.1).toFixed(1));
-        }
+        svg.append('text')
+            .attr('x', 5)
+            .attr('y', -rScale(t))
+            .attr('font-size', '10px')
+            .attr('fill', '#666')
+            .text(Number.isInteger(t) ? t.toString() : t.toFixed(1));
     });
     
     // Draw direction lines and labels
@@ -201,8 +202,9 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
         { color: 'rgba(54, 162, 235, 0.6)', label: 'Historical' }
     ];
     
+    // Move legend to left outside of chart to prevent overlap
     const legend = svg.append('g')
-        .attr('transform', 'translate(' + (-radius + 20) + ',' + (radius - 60) + ')');
+        .attr('transform', 'translate(' + (-radius - 80) + ',' + (-radius + 20) + ')');
     
     legendData.forEach(function(item, i) {
         const legendRow = legend.append('g')
