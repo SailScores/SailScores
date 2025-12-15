@@ -166,7 +166,7 @@
         
         // Dynamic search filtering
         document.getElementById('clubSearch').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
+            const searchTerm = e.target.value.trim().toLowerCase();
             const cards = document.querySelectorAll('.club-card');
             const noResultsMessage = document.getElementById('noResultsMessage');
             let visibleCount = 0;
