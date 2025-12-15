@@ -132,7 +132,7 @@ public class AdminService : IAdminService
     private const int BytesPerMegabyte = 1048576;
     private const int MaxLogoFileSizeBytes = 2 * BytesPerMegabyte; // 2 MB
     // Note: SVG not supported due to XSS security concerns (SVG can contain JavaScript)
-    private static readonly string[] AllowedImageContentTypes = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif" };
+    private static readonly string[] AllowedImageContentTypes = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp" };
 
     public async Task ProcessLogoFile(AdminEditViewModel model)
     {
@@ -141,7 +141,7 @@ public class AdminService : IAdminService
             // Validate content type
             if (!AllowedImageContentTypes.Contains(model.LogoFile.ContentType?.ToLowerInvariant()))
             {
-                throw new ArgumentException($"Invalid file type. Allowed types: PNG, JPG, GIF. Received: {model.LogoFile.ContentType}");
+                throw new ArgumentException($"Invalid file type. Allowed types: PNG, JPG, GIF, WebP. Received: {model.LogoFile.ContentType}");
             }
 
             using (var memoryStream = new MemoryStream())
@@ -224,6 +224,11 @@ public class AdminService : IAdminService
             return "image/jpeg";
         if (fileContents[0] == 0x47 && fileContents[1] == 0x49 && fileContents[2] == 0x46)
             return "image/gif";
+        // WebP: RIFF....WEBP (check for "RIFF" at start and "WEBP" at bytes 8-11)
+        if (fileContents.Length >= 12 && 
+            fileContents[0] == 0x52 && fileContents[1] == 0x49 && fileContents[2] == 0x46 && fileContents[3] == 0x46 &&
+            fileContents[8] == 0x57 && fileContents[9] == 0x45 && fileContents[10] == 0x42 && fileContents[11] == 0x50)
+            return "image/webp";
 
         return "image/png"; // default fallback
     }

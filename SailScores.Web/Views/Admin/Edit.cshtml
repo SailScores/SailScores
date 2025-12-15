@@ -60,9 +60,9 @@
 
         <div class="mb-3">
             <label asp-for="LogoFile" class="form-label"></label>
-            <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" id="logoFileInput" />
+            <input asp-for="LogoFile" type="file" class="form-control" accept=".png,.jpg,.jpeg,.jpe,.jfif,.gif,.webp,image/png,image/jpeg,image/gif,image/webp" id="logoFileInput" />
             <span asp-validation-for="LogoFile" class="text-danger"></span>
-            <small class="form-text text-muted">Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). Supported formats: PNG, JPG, GIF. PNG with transparent background recommended for best results.</small>
+            <small class="form-text text-muted">Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). Supported formats: PNG, JPG, GIF, WebP. PNG or WebP with transparent background recommended for best results.</small>
         </div>
         
         <div id="newLogoPreview" class="mb-3" style="display:none;">
