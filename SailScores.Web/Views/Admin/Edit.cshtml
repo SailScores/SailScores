@@ -42,13 +42,20 @@
                 <label class="form-label">Current Burgee/Logo</label>
                 <div class="d-flex gap-3">
                     <div class="p-2 bg-light" style="width:80px;">
-                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on light background" class="img-fluid" style="width:64px;height:64px;object-fit:contain;" />
+                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on light background" class="img-fluid logo-preview" />
                     </div>
                     <div class="p-2 bg-dark" style="width:80px;">
-                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on dark background" class="img-fluid" style="width:64px;height:64px;object-fit:contain;" />
+                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on dark background" class="img-fluid logo-preview" />
                     </div>
                 </div>
             </div>
+            <style>
+                .logo-preview {
+                    width: 64px;
+                    height: 64px;
+                    object-fit: contain;
+                }
+            </style>
         }
 
         <div class="mb-3">

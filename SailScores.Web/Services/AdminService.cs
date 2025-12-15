@@ -127,7 +127,8 @@ public class AdminService : IAdminService
         await _coreClubService.UpdateClub(clubObject);
     }
 
-    private const int MaxLogoFileSizeBytes = 2097152; // 2 MB
+    private const int BytesPerMegabyte = 1048576;
+    private const int MaxLogoFileSizeBytes = 2 * BytesPerMegabyte; // 2 MB
     // Note: SVG not supported due to XSS security concerns (SVG can contain JavaScript)
     private static readonly string[] AllowedImageContentTypes = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif" };
 
@@ -149,7 +150,7 @@ public class AdminService : IAdminService
                 // Validate file size
                 if (fileContents.Length > MaxLogoFileSizeBytes)
                 {
-                    throw new ArgumentException($"File is too large. Maximum size is {MaxLogoFileSizeBytes / 1048576} MB.");
+                    throw new ArgumentException($"File is too large. Maximum size is {MaxLogoFileSizeBytes / BytesPerMegabyte} MB.");
                 }
 
                 // Validate file signature matches content type
@@ -199,6 +200,7 @@ public class AdminService : IAdminService
         }
         
         // Create stream efficiently without copying
+        // FileStreamResult will dispose the stream when done
         var stream = new MemoryStream(file.FileContents, writable: false);
         
         // Determine content type from file content or default to PNG
