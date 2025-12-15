@@ -6,9 +6,9 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SailScores.Core.Services
-{
-    public class ReportService : IReportService
+namespace SailScores.Core.Services;
+
+public class ReportService : IReportService
     {
         private readonly ISailScoresContext _dbContext;
 
@@ -227,4 +227,3 @@ namespace SailScores.Core.Services
             return date.Date.AddDays(-(dayOfWeek - 1));
         }
     }
-}

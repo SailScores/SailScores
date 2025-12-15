@@ -112,12 +112,12 @@
             
             const datasets = fleets.map((fleet, index) => {
                 const colors = [
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)'
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)'
                 ];
                 
                 const data = periods.map(period => {
@@ -130,13 +130,15 @@
                     label: fleet,
                     data: data,
                     backgroundColor: colors[index % colors.length],
-                    borderColor: colors[index % colors.length].replace('0.8', '1'),
-                    borderWidth: 1
+                    borderColor: colors[index % colors.length].replace('0.7', '1'),
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
                 };
             });
 
             new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: periods,
                     datasets: datasets
@@ -146,14 +148,14 @@
                     maintainAspectRatio: true,
                     scales: {
                         x: {
-                            stacked: false,
+                            stacked: true,
                             title: {
                                 display: true,
                                 text: 'Period'
                             }
                         },
                         y: {
-                            stacked: false,
+                            stacked: true,
                             title: {
                                 display: true,
                                 text: 'Distinct Skippers'
@@ -168,7 +170,16 @@
                         legend: {
                             display: true,
                             position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
                         }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
             });

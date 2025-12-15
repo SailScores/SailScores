@@ -4,12 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
-using CoreServices = SailScores.Core.Services;
 
-namespace SailScores.Web.Controllers
-{
-    [Authorize]
-    public class ReportsController : Controller
+namespace SailScores.Web.Controllers;
+
+[Authorize]
+public class ReportsController : Controller
     {
         private readonly IReportService _reportService;
         private readonly CoreServices.IClubService _clubService;
@@ -97,4 +96,3 @@ namespace SailScores.Web.Controllers
             return View(model);
         }
     }
-}

@@ -101,10 +101,18 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Wind Direction (degrees)'
+                                text: 'Wind Direction'
                             },
                             min: 0,
-                            max: 360
+                            max: 360,
+                            ticks: {
+                                stepSize: 45,
+                                callback: function(value) {
+                                    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+                                    const index = Math.round(value / 45);
+                                    return directions[index] || value + '°';
+                                }
+                            }
                         },
                         y: {
                             title: {
@@ -119,9 +127,12 @@
                             callbacks: {
                                 label: function(context) {
                                     const point = context.raw;
+                                    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+                                    const directionIndex = Math.round(point.x / 45) % 8;
+                                    const directionName = directions[directionIndex];
                                     return [
                                         `Date: ${point.date}`,
-                                        `Direction: ${point.x}°`,
+                                        `Direction: ${directionName} (${point.x}°)`,
                                         `Speed: ${point.y} m/s`,
                                         `Races: ${point.raceCount}`
                                     ];
