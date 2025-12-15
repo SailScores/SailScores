@@ -53,7 +53,7 @@
         </ul>
         <p>SailScores is <a href="https://github.com/SailScores/SailScores#sailscores">open source</a> and volunteer driven.</p>
         <p>
-            <a asp-area="" asp-controller="ClubRequest" asp-action="Index" class="btn btn-primary">Host your club's scores for free</a>
+            <a asp-area="" asp-controller="ClubRequest" asp-action="Index">Host your club's scores on SailScores.</a>
         </p>
     </div>
 </div>
@@ -64,7 +64,6 @@
     <div class="row mb-5">
         <div class="col-12">
             <h3 class="mb-3">Recently Active Clubs</h3>
-            <p class="text-muted">Recently Active</p>
             <div class="row">
                 @foreach (var club in Model.RecentlyActiveClubs.Take(10))
                 {
@@ -90,7 +89,7 @@
                                                     }
                                                     @if (club.RecentRaceCount > 0 && club.RecentSeriesCount > 0)
                                                     {
-                                                        <span> • </span>
+                                                        <span> across </span>
                                                     }
                                                     @if (club.RecentSeriesCount > 0)
                                                     {
@@ -98,10 +97,6 @@
                                                     }
                                                     <span> in past 2 weeks</span>
                                                 </div>
-                                            }
-                                            @if (!string.IsNullOrWhiteSpace(club.Description))
-                                            {
-                                                <div class="card-text small mt-2">@Html.Raw(Markdig.Markdown.ToHtml(club.Description))</div>
                                             }
                                         </div>
                                     </div>
@@ -169,10 +164,6 @@
                                                     }
                                                 </div>
                                             }
-                                            @if (!string.IsNullOrWhiteSpace(regatta.Description))
-                                            {
-                                                <div class="card-text small mt-2">@Html.Raw(Markdig.Markdown.ToHtml(regatta.Description))</div>
-                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -222,9 +213,7 @@
                         {
                             <div class="card-text text-muted small mb-2">@Html.Raw(Markdig.Markdown.ToHtml(club.Description))</div>
                         }
-                        <div class="mt-auto">
-                            <a href="/@club.Initials" class="btn btn-sm btn-outline-primary stretched-link">View Results</a>
-                        </div>
+                        <a href="/@club.Initials" class="stretched-link"></a>
                     </div>
                 </div>
             </div>
@@ -241,6 +230,19 @@
 <div id="noResultsMessage" class="alert alert-info d-none">
     No clubs match your search. Try a different search term.
 </div>
+
+<style>
+    /* Subtle hover effect for interactive cards */
+    .card:hover {
+        box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .card {
+        transition: all 0.2s ease-in-out;
+    }
+</style>
 
 @section Scripts {
     <script>
