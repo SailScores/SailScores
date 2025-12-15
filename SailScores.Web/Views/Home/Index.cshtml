@@ -119,13 +119,68 @@
     </div>
 }
 
-<!-- Regattas Section -->
+<!-- Current Regattas Section -->
 @if (Model.RegattaSelectorModel?.Regattas?.Any() ?? false)
 {
-    <div class="row mb-4">
+    <div class="row mb-5">
         <div class="col-12">
             <h3 class="mb-3">Current Regattas</h3>
-            @(await Html.PartialAsync("_RegattaSelectorView", Model.RegattaSelectorModel))
+            <div class="row">
+                @foreach (var regatta in Model.RegattaSelectorModel.Regattas)
+                {
+                    <div class="col-12 col-md-6 col-lg-4 mb-3">
+                        <a href="/@regatta.ClubInitials/Regatta/@regatta.Season.UrlName/@regatta.UrlName" class="text-decoration-none">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
+                                            <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                <span class="text-muted small">@regatta.ClubInitials</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="card-title mb-1">@regatta.Name</h5>
+                                            <small class="text-muted">@regatta.ClubName</small>
+                                            @if (regatta.StartDate.HasValue || regatta.EndDate.HasValue)
+                                            {
+                                                <div class="small text-muted mt-1">
+                                                    @if (regatta.StartDate.HasValue && regatta.EndDate.HasValue)
+                                                    {
+                                                        if (regatta.StartDate.Value.Date == regatta.EndDate.Value.Date)
+                                                        {
+                                                            <span>@regatta.StartDate.Value.ToString("MMM d, yyyy")</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@regatta.StartDate.Value.ToString("MMM d") - @regatta.EndDate.Value.ToString("MMM d, yyyy")</span>
+                                                        }
+                                                    }
+                                                    else if (regatta.StartDate.HasValue)
+                                                    {
+                                                        <span>Starts @regatta.StartDate.Value.ToString("MMM d, yyyy")</span>
+                                                    }
+                                                    else if (regatta.EndDate.HasValue)
+                                                    {
+                                                        <span>Ends @regatta.EndDate.Value.ToString("MMM d, yyyy")</span>
+                                                    }
+                                                    @if (regatta.Fleets?.Any() ?? false)
+                                                    {
+                                                        <span> • @regatta.FleetCountString</span>
+                                                    }
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(regatta.Description))
+                                            {
+                                                <div class="card-text small mt-2">@Html.Raw(Markdig.Markdown.ToHtml(regatta.Description))</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 }

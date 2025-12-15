@@ -5,7 +5,6 @@ using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Controllers;
 
-[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
 public class HomeController : Controller
 {
 
@@ -27,6 +26,8 @@ public class HomeController : Controller
         _versionService = versionService;
     }
 
+    // Cache front page for 60 seconds to balance freshness with performance
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false, VaryByHeader = "User-Agent")]
     public async Task<IActionResult> Index()
     {
         var clubSelector = new ClubSelectorModel
@@ -57,6 +58,7 @@ public class HomeController : Controller
         return View(model);
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public IActionResult About()
     {
         var vm = new AboutViewModel
@@ -75,17 +77,20 @@ public class HomeController : Controller
         return View(vm);
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> Stats()
     {
         var vm = await _webClubService.GetAllClubStats();
         return View(vm);
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public IActionResult News()
     {
         return View();
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public IActionResult Privacy()
     {
         return View();
