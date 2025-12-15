@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
-using CoreServices = SailScores.Core.Services;
 
-namespace SailScores.Web.Services
-{
-    public class ReportService : IReportService
+namespace SailScores.Web.Services;
+
+public class ReportService : IReportService
     {
         private readonly CoreServices.IReportService _coreReportService;
         private readonly CoreServices.IClubService _clubService;
@@ -28,6 +27,7 @@ namespace SailScores.Web.Services
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             var clubName = await _clubService.GetClubName(clubInitials);
+            var club = await _clubService.GetMinimalClub(clubId);
 
             var windData = await _coreReportService.GetWindDataAsync(clubId, startDate, endDate);
 
@@ -37,6 +37,7 @@ namespace SailScores.Web.Services
                 ClubName = clubName,
                 StartDate = startDate,
                 EndDate = endDate,
+                WindSpeedUnits = club?.WeatherSettings?.WindSpeedUnits ?? "m/s",
                 WindData = windData.Select(w => new WindDataItem
                 {
                     Date = w.Date,
@@ -106,4 +107,3 @@ namespace SailScores.Web.Services
             };
         }
     }
-}

@@ -1,6 +1,5 @@
-namespace SailScores.Web.Models.SailScores
+namespace SailScores.Web.Models.SailScores;
+
+public class ReportsIndexViewModel : ClubBaseViewModel
 {
-    public class ReportsIndexViewModel : ClubBaseViewModel
-    {
-    }
 }

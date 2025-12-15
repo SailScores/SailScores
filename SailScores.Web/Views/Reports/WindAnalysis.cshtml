@@ -74,66 +74,53 @@
         {
             <text>
             const ctx = document.getElementById('windChart');
+            const windSpeedUnits = '@Model.WindSpeedUnits';
             
             const windData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.WindData.Select(w => new {
-                x = w.WindDirection,
-                y = w.WindSpeed,
+                r = w.WindSpeed,
+                theta = w.WindDirection,
                 date = w.Date.ToString("yyyy-MM-dd"),
                 raceCount = w.RaceCount
             })));
 
             new Chart(ctx, {
-                type: 'scatter',
+                type: 'polarArea',
                 data: {
                     datasets: [{
-                        label: 'Wind Data (Speed vs Direction)',
+                        label: 'Wind Data',
                         data: windData,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        backgroundColor: windData.map(() => `rgba(54, 162, 235, 0.5)`),
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1,
-                        pointRadius: 5
+                        borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
                     scales: {
-                        x: {
+                        r: {
+                            beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Wind Direction'
-                            },
-                            min: 0,
-                            max: 360,
-                            ticks: {
-                                stepSize: 45,
-                                callback: function(value) {
-                                    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-                                    const index = Math.round(value / 45);
-                                    return directions[index] || value + '°';
-                                }
+                                text: `Wind Speed (${windSpeedUnits})`
                             }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Wind Speed (m/s)'
-                            },
-                            beginAtZero: true
                         }
                     },
                     plugins: {
+                        legend: {
+                            display: false
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     const point = context.raw;
                                     const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-                                    const directionIndex = Math.round(point.x / 45) % 8;
+                                    const directionIndex = Math.round(point.theta / 45) % 8;
                                     const directionName = directions[directionIndex];
                                     return [
                                         `Date: ${point.date}`,
-                                        `Direction: ${directionName} (${point.x}°)`,
-                                        `Speed: ${point.y} m/s`,
+                                        `Direction: ${directionName} (${Math.round(point.theta)}°)`,
+                                        `Speed: ${point.r?.toFixed(1)} ${windSpeedUnits}`,
                                         `Races: ${point.raceCount}`
                                     ];
                                 }

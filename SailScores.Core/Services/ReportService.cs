@@ -11,10 +11,17 @@ namespace SailScores.Core.Services;
 public class ReportService : IReportService
     {
         private readonly ISailScoresContext _dbContext;
+        private readonly IConversionService _conversionService;
+        private readonly IClubService _clubService;
 
-        public ReportService(ISailScoresContext dbContext)
+        public ReportService(
+            ISailScoresContext dbContext,
+            IConversionService conversionService,
+            IClubService clubService)
         {
             _dbContext = dbContext;
+            _conversionService = conversionService;
+            _clubService = clubService;
         }
 
         public async Task<IList<WindDataPoint>> GetWindDataAsync(
@@ -41,13 +48,20 @@ public class ReportService : IReportService
                 .ToListAsync()
                 .ConfigureAwait(false);
 
+            // Get club's preferred wind speed units
+            var club = await _clubService.GetMinimalClub(clubId);
+            var windSpeedUnits = club?.WeatherSettings?.WindSpeedUnits ?? _conversionService.MeterPerSecond;
+
             var windData = racesWithWeather
                 .GroupBy(r => r.Date.Value.Date)
                 .Select(g => new WindDataPoint
                 {
                     Date = g.Key,
-                    WindSpeed = g.Where(r => r.Weather.WindSpeedMeterPerSecond.HasValue)
-                        .Average(r => r.Weather.WindSpeedMeterPerSecond),
+                    WindSpeed = _conversionService.Convert(
+                        g.Where(r => r.Weather.WindSpeedMeterPerSecond.HasValue)
+                            .Average(r => r.Weather.WindSpeedMeterPerSecond),
+                        _conversionService.MeterPerSecond,
+                        windSpeedUnits),
                     WindDirection = g.Where(r => r.Weather.WindDirectionDegrees.HasValue)
                         .Average(r => r.Weather.WindDirectionDegrees),
                     RaceCount = g.Count()
