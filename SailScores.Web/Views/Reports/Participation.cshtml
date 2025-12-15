@@ -101,7 +101,12 @@
     @if (Model.ParticipationData != null && Model.ParticipationData.Any())
     {
         var fleets = Model.ParticipationData.Select(p => p.FleetName).Distinct().OrderBy(f => f).ToList();
-        var periods = Model.ParticipationData.Select(p => p.Period).Distinct().OrderBy(p => p).ToList();
+        // Sort periods by PeriodStart date, not alphabetically
+        var periods = Model.ParticipationData
+            .GroupBy(p => new { p.Period, p.PeriodStart })
+            .OrderBy(g => g.Key.PeriodStart)
+            .Select(g => g.Key.Period)
+            .ToList();
         var allData = Model.ParticipationData;
         
         <script>

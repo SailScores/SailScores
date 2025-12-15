@@ -30,13 +30,22 @@ public class ReportService : Interfaces.IReportService
             var club = await _clubService.GetMinimalClub(clubId);
 
             var windData = await _coreReportService.GetWindDataAsync(clubId, startDate, endDate);
+            
+            // If no dates provided, get full range for display
+            DateTime? displayStartDate = startDate;
+            DateTime? displayEndDate = endDate;
+            if (!startDate.HasValue && !endDate.HasValue && windData.Any())
+            {
+                displayStartDate = windData.Min(w => w.Date);
+                displayEndDate = windData.Max(w => w.Date);
+            }
 
             return new WindAnalysisViewModel
             {
                 ClubInitials = clubInitials,
                 ClubName = clubName,
-                StartDate = startDate,
-                EndDate = endDate,
+                StartDate = displayStartDate,
+                EndDate = displayEndDate,
                 WindSpeedUnits = club?.WeatherSettings?.WindSpeedUnits ?? "m/s",
                 WindData = windData.Select(w => new WindDataItem
                 {
@@ -90,13 +99,22 @@ public class ReportService : Interfaces.IReportService
 
             var participationData = await _coreReportService.GetParticipationMetricsAsync(
                 clubId, groupBy, startDate, endDate);
+            
+            // If no dates provided, get full range for display
+            DateTime? displayStartDate = startDate;
+            DateTime? displayEndDate = endDate;
+            if (!startDate.HasValue && !endDate.HasValue && participationData.Any())
+            {
+                displayStartDate = participationData.Min(p => p.PeriodStart);
+                displayEndDate = participationData.Max(p => p.PeriodStart);
+            }
 
             return new ParticipationViewModel
             {
                 ClubInitials = clubInitials,
                 ClubName = clubName,
-                StartDate = startDate,
-                EndDate = endDate,
+                StartDate = displayStartDate,
+                EndDate = displayEndDate,
                 GroupBy = groupBy,
                 ParticipationData = participationData.Select(p => new ParticipationItem
                 {
