@@ -113,7 +113,7 @@
         $(document).ready(function() {
             $('#competitorTable').DataTable({
                 pageLength: 25,
-                order: [[4, 'desc']], // Sort by Races Participated descending
+                order: [[3, 'desc'],[0, 'asc']], // Sort by Races Participated descending
                 columnDefs: [
                     { targets: [4, 5, 6, 7], className: 'text-end' }
                 ]
