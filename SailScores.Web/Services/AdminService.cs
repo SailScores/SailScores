@@ -127,33 +127,66 @@ public class AdminService : IAdminService
         await _coreClubService.UpdateClub(clubObject);
     }
 
+    private const int MaxLogoFileSizeBytes = 2097152; // 2 MB
+    private static readonly string[] AllowedImageContentTypes = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif", "image/svg+xml" };
+
     public async Task ProcessLogoFile(AdminEditViewModel model)
     {
         if (model.LogoFile != null)
         {
+            // Validate content type
+            if (!AllowedImageContentTypes.Contains(model.LogoFile.ContentType?.ToLowerInvariant()))
+            {
+                throw new ArgumentException($"Invalid file type. Allowed types: PNG, JPG, GIF, SVG. Received: {model.LogoFile.ContentType}");
+            }
+
             using (var memoryStream = new MemoryStream())
             {
                 await model.LogoFile.CopyToAsync(memoryStream);
+                var fileContents = memoryStream.ToArray();
 
-                // Upload the file if less than 2 MB
-                if (memoryStream.Length < 2097152)
+                // Validate file size
+                if (fileContents.Length > MaxLogoFileSizeBytes)
                 {
-                    var file = new Database.Entities.File
-                    {
-                        Id = Guid.NewGuid(),
-                        FileContents = memoryStream.ToArray(),
-                        Created = DateTime.UtcNow
-                    };
+                    throw new ArgumentException($"File is too large. Maximum size is {MaxLogoFileSizeBytes / 1048576} MB.");
+                }
 
-                    await _coreClubService.SaveFileAsync(file);
-                    model.LogoFileId = file.Id;
-                }
-                else
+                // Validate file signature matches content type
+                if (!ValidateFileSignature(fileContents, model.LogoFile.ContentType))
                 {
-                    throw new ArgumentException("File is too large. Maximum size is 2 MB.");
+                    throw new ArgumentException("File content does not match the declared content type. Possible file type spoofing detected.");
                 }
+
+                var file = new Database.Entities.File
+                {
+                    Id = Guid.NewGuid(),
+                    FileContents = fileContents,
+                    Created = DateTime.UtcNow
+                };
+
+                await _coreClubService.SaveFileAsync(file);
+                model.LogoFileId = file.Id;
             }
         }
+    }
+
+    private bool ValidateFileSignature(byte[] fileContents, string contentType)
+    {
+        if (fileContents == null || fileContents.Length < 4)
+        {
+            return false;
+        }
+
+        var detectedType = DetermineContentType(fileContents);
+        var normalizedContentType = contentType?.ToLowerInvariant();
+
+        // Allow jpeg/jpg mismatch
+        if ((normalizedContentType == "image/jpeg" || normalizedContentType == "image/jpg") && detectedType == "image/jpeg")
+        {
+            return true;
+        }
+
+        return detectedType == normalizedContentType;
     }
 
     public async Task<FileStreamResult> GetLogoAsync(Guid id)
@@ -166,6 +199,31 @@ public class AdminService : IAdminService
         var stream = new MemoryStream();
         stream.Write(file.FileContents, 0, file.FileContents.Length);
         stream.Position = 0;
-        return new FileStreamResult(stream, "image/png");
+        
+        // Determine content type from file content or default to PNG
+        var contentType = DetermineContentType(file.FileContents);
+        return new FileStreamResult(stream, contentType);
+    }
+
+    private string DetermineContentType(byte[] fileContents)
+    {
+        if (fileContents == null || fileContents.Length < 4)
+        {
+            return "image/png"; // default
+        }
+
+        // Check file signatures (magic numbers)
+        if (fileContents[0] == 0x89 && fileContents[1] == 0x50 && fileContents[2] == 0x4E && fileContents[3] == 0x47)
+            return "image/png";
+        if (fileContents[0] == 0xFF && fileContents[1] == 0xD8 && fileContents[2] == 0xFF)
+            return "image/jpeg";
+        if (fileContents[0] == 0x47 && fileContents[1] == 0x49 && fileContents[2] == 0x46)
+            return "image/gif";
+        if (fileContents[0] == 0x3C && fileContents[1] == 0x3F && fileContents[2] == 0x78 && fileContents[3] == 0x6D) // <?xm (SVG starts with XML)
+            return "image/svg+xml";
+        if (fileContents[0] == 0x3C && fileContents[1] == 0x73 && fileContents[2] == 0x76 && fileContents[3] == 0x67) // <svg
+            return "image/svg+xml";
+
+        return "image/png"; // default fallback
     }
 }

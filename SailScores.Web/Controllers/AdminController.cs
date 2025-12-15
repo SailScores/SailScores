@@ -113,9 +113,14 @@ public class AdminController : Controller
         }
     }
 
-    public async Task<FileStreamResult> GetLogo(Guid id)
+    public async Task<IActionResult> GetLogo(Guid id)
     {
-        return await _adminService.GetLogoAsync(id);
+        var result = await _adminService.GetLogoAsync(id);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return result;
     }
 
 }
