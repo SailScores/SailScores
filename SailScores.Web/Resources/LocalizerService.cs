@@ -87,12 +87,13 @@ public class LocalizerService : ILocalizerService
         }
         else if ((race.IsSeries ?? false) && race.StartDate != null && race.EndDate != null)
         {
-            if (race.StartDate != race.EndDate)
-            {
-                return $"{race.Name} ({race.StartDate.ToSuperShortString()} - {race.EndDate.ToSuperShortString()})";
-            } else
+            if (race.StartDate == race.EndDate)
             {
                 return $"{race.Name} ({race.StartDate.ToSuperShortString()})";
+            }
+            else
+            {
+                return $"{race.Name} ({race.StartDate.ToSuperShortString()} - {race.EndDate.ToSuperShortString()})";
             }
         }
         else
