@@ -1,0 +1,73 @@
+@using SailScores.Web.Models.SailScores
+@model ReportsIndexViewModel
+
+@{
+    ViewBag.Title = Model.ClubInitials + " Reports";
+    ViewData["MetaDescription"] = $"{Model.ClubName} Reports";
+    Layout = "_ClubLayout";
+}
+
+<div class="container p-0 p-md-2">
+    <div class="row">
+        <div class="col-12">
+            <h1>Reports</h1>
+            <p class="lead">Analysis and statistics for @Model.ClubName</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="~/@Model.ClubInitials/Reports/WindAnalysis" class="text-decoration-none">Wind Analysis</a>
+                    </h5>
+                    <p class="card-text">
+                        Wind speed and direction by race day in a polar chart.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="~/@Model.ClubInitials/Reports/CompetitorStats" class="text-decoration-none">Competitor Statistics</a>
+                    </h5>
+                    <p class="card-text">
+                        Summary stats for competitors including races participated,
+                        boats beat, and participation by boat class and season.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="~/@Model.ClubInitials/Reports/Participation" class="text-decoration-none">Participation Trends</a>
+                    </h5>
+                    <p class="card-text">
+                        Number of distinct skippers participating,
+                        broken down by boat class and time period.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="~/@Model.ClubInitials/Reports/ClubStats" class="text-decoration-none">Club Statistics</a>
+                    </h5>
+                    <p class="card-text">
+                        General statistics about the club including competitors, races, and starts per season.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

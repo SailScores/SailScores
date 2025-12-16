@@ -1,0 +1,87 @@
+@using SailScores.Web.Models.SailScores
+@model WindAnalysisViewModel
+
+@{
+    ViewBag.Title = Model.ClubInitials + " Wind Analysis";
+    ViewData["MetaDescription"] = $"{Model.ClubName} Wind Analysis Report";
+    Layout = "_ClubLayout";
+}
+
+<div class="container p-0 p-md-2">
+    <div class="row mb-3">
+        <div class="col-12 col-md-8">
+            <h1>Wind Analysis</h1>
+            <p class="lead">Wind speed and direction of race days</p>
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
+            <a href="~/@Model.ClubInitials/Reports" class="btn btn-outline-secondary">← Back to Reports</a>
+        </div>
+    </div>
+
+    <form method="get" class="row mb-4">
+        <div class="col-md-4">
+            <label for="startDate" class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="startDate" name="startDate"
+                   value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-4">
+            <label for="endDate" class="form-label">End Date</label>
+            <input type="date" class="form-control" id="endDate" name="endDate"
+                   value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">Filter</button>
+            <a href="~/@Model.ClubInitials/Reports/WindAnalysis" class="btn btn-outline-secondary">Clear</a>
+        </div>
+    </form>
+
+    @if (Model.WindData != null && Model.WindData.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Wind Speed vs Direction</h5>
+                        <div id="windChart" style="width: 100%; height: 600px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5>Data Summary</h5>
+                <p>Total race days: @Model.WindData.Count</p>
+                <p>Date range: @Model.WindData.Min(w => w.Date).ToString("d") to @Model.WindData.Max(w => w.Date).ToString("d")</p>
+                <p><a href="~/@Model.ClubInitials/Reports/WindAnalysisExport?startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-sm btn-outline-primary">Export as CSV</a></p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No wind data available for the selected date range.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="~/js/windAnalysisChart.js" asp-append-version="true"></script>
+    @if (Model.WindData != null && Model.WindData.Any())
+    {
+        <script>
+            (function() {
+                const windSpeedUnits = '@Model.WindSpeedUnits';
+                const windData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.WindData.Select(w => new {
+                    speed = w.WindSpeed,
+                    direction = w.WindDirection,
+                    date = w.Date.ToString("yyyy-MM-dd"),
+                    raceCount = w.RaceCount
+                })));
+                
+                initWindAnalysisChart(windData, windSpeedUnits);
+            })();
+        </script>
+    }
+}

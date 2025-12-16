@@ -35,11 +35,6 @@ public class ClubService : IClubService
         return _mapper.Map<IEnumerable<AllClubStatsViewModel>>(coreEnumeration);
     }
 
-    public async Task UpdateStatsDescription(string clubInitials, string statisticsDescription)
-    {
-        var clubId = await _coreClubService.GetClubId(clubInitials);
-        await _coreClubService.UpdateStatsDescription(clubId, statisticsDescription);
-    }
 
     public async Task<Club> GetClubForClubHome(string clubInitials)
     {
@@ -65,7 +60,6 @@ public class ClubService : IClubService
             {
                 Initials = firstSeason.ClubInitials,
                 Name = firstSeason.ClubName,
-                StatisticsDescription = club.StatisticsDescription,
                 SeasonStats = _mapper.Map<IEnumerable<ClubSeasonStatsViewModel>>(seasonStats)
             };
         } else
@@ -74,7 +68,6 @@ public class ClubService : IClubService
             {
                 Initials = club.Initials,
                 Name = club.Name,
-                StatisticsDescription = club.StatisticsDescription,
                 SeasonStats = new List<ClubSeasonStatsViewModel>()
             };
         }
