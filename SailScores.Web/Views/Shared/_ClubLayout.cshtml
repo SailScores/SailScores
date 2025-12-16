@@ -4,9 +4,35 @@
 @using System.Globalization;
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject SailScores.Web.Services.Interfaces.IAuthorizationService AuthService
+@inject SailScores.Core.Services.IClubService ClubService
+@inject SailScores.Database.SailScoresContext DbContext
+@inject AppSettingsService SettingsService
 
 @{
     bool wideLayout = ((bool?)ViewData["WideLayout"]) ?? false;
+    var clubInitials = Context.GetRouteData().Values["ClubInitials"]?.ToString()?.ToUpperInvariant();
+    var controller = Context.GetRouteData().Values["controller"]?.ToString();
+    var action = Context.GetRouteData().Values["action"]?.ToString();
+    
+    // Determine current page for highlighting
+    bool isClubHome = controller?.Equals("Club", StringComparison.OrdinalIgnoreCase) == true && action?.Equals("Index", StringComparison.OrdinalIgnoreCase) == true;
+    bool isSeriesIndex = controller?.Equals("Series", StringComparison.OrdinalIgnoreCase) == true && action?.Equals("Index", StringComparison.OrdinalIgnoreCase) == true;
+    bool isRaceIndex = controller?.Equals("Race", StringComparison.OrdinalIgnoreCase) == true && action?.Equals("Index", StringComparison.OrdinalIgnoreCase) == true;
+    bool isRegattaIndex = controller?.Equals("Regatta", StringComparison.OrdinalIgnoreCase) == true && action?.Equals("Index", StringComparison.OrdinalIgnoreCase) == true;
+    
+    // Get club information
+    var club = await ClubService.GetMinimalClub(clubInitials);
+    bool canEdit = await AuthService.CanUserEdit(User, clubInitials);
+    bool showCalendarInNav = club?.ShowCalendarInNav ?? false;
+    bool showHelp = canEdit && SettingsService.ShowSupporterFeatures;
+    
+    // Check if club has regattas (only if user cannot edit, to avoid unnecessary query for scorekeepers)
+    bool hasRegattas = false;
+    if (!canEdit)
+    {
+        hasRegattas = await DbContext.Regattas.AnyAsync(r => r.ClubId == club.Id);
+    }
 }
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentCulture.TwoLetterISOLanguageName" 
@@ -100,8 +126,8 @@
     }
     <nav class="navbar navbar-expand-md navbar-dark bg-dark @(wideLayout? "py-0 px-3" : "p-0")">
         <a asp-area="" asp-controller="Club" asp-action="Index"
-           asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-           class="navbar-brand">@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()</a>
+           asp-route-clubInitials="@clubInitials"
+           class="navbar-brand@(isClubHome ? " active" : "")">@clubInitials</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -112,8 +138,8 @@
                     <a asp-area=""
                        asp-controller="Series"
                        asp-action="Index"
-                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                       class="nav-link">
+                       asp-route-clubInitials="@clubInitials"
+                       class="nav-link@(isSeriesIndex ? " active" : "")">
                         @localizer["Series"]
                     </a>
                 </li>
@@ -121,20 +147,44 @@
                     <a asp-area=""
                        asp-controller="Race"
                        asp-action="Index"
-                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                       class="nav-link">
+                       asp-route-clubInitials="@clubInitials"
+                       class="nav-link@(isRaceIndex ? " active" : "")">
                         @localizer["Races"]
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a asp-area=""
-                       asp-controller="Regatta"
-                       asp-action="Index"
-                       asp-route-clubInitials="@Context.GetRouteData().Values["ClubInitials"].ToString().ToUpperInvariant()"
-                       class="nav-link">
-                        @localizer["Regattas"]
-                    </a>
-                </li>
+                @if (canEdit || hasRegattas)
+                {
+                    <li class="nav-item">
+                        <a asp-area=""
+                           asp-controller="Regatta"
+                           asp-action="Index"
+                           asp-route-clubInitials="@clubInitials"
+                           class="nav-link@(isRegattaIndex ? " active" : "")">
+                            @localizer["Regattas"]
+                        </a>
+                    </li>
+                }
+                @if (showCalendarInNav)
+                {
+                    <li class="nav-item">
+                        <a asp-area=""
+                           asp-controller="Calendar"
+                           asp-action="Index"
+                           asp-route-clubInitials="@clubInitials"
+                           class="nav-link">
+                            @localizer["Calendar"]
+                        </a>
+                    </li>
+                }
+                @if (showHelp)
+                {
+                    <li class="nav-item">
+                        <a asp-page="/Help/Index"
+                           class="nav-link">
+                            @localizer["Help"]
+                        </a>
+                    </li>
+                }
             </ul>
             <ul class="navbar-nav navbar-right">
                 <li class="nav-item"><a href="~/" class="nav-link navbar-brand faded-logo">SailScores</a></li>

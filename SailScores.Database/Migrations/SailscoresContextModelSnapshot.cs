@@ -197,6 +197,9 @@ namespace SailScores.Database.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<bool?>("ShowCalendarInNav")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("ShowClubInResults")
                         .HasColumnType("bit");
 

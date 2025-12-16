@@ -95,6 +95,13 @@ header.bg-dark, nav.bg-dark {
     background-color: $my-nav-bg-dark !important;
 }
 
+// Club navigation active state - light mode
+.navbar-dark .navbar-brand.active,
+.navbar-dark .nav-link.active {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 500;
+}
+
 .select2-search {
     display: none !important;
 }
@@ -484,6 +491,13 @@ form label.required:not(.custom-control-label)::after {
 
     header.bg-dark, nav.bg-dark {
         background-color: $secondary-background !important;
+    }
+
+    // Club navigation active state - dark mode
+    .navbar-dark .navbar-brand.active,
+    .navbar-dark .nav-link.active {
+        color: rgba(255, 255, 255, 1) !important;
+        font-weight: 500;
     }
 
     svg text {

@@ -26,6 +26,7 @@ public class Club
     public DateTime? AdvancedFeaturesEnabledDate { get; set; }
     [StringLength(20)]
     public String SubscriptionType { get; set; }
+    public bool? ShowCalendarInNav { get; set; }
 
     public String StatisticsDescription { get; set; }
     public WeatherSettings WeatherSettings { get; set; }

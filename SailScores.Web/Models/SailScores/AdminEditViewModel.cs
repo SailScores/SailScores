@@ -31,6 +31,9 @@ public class AdminEditViewModel
     
     public bool IsHidden { get; set; }
     public bool ShowClubInResults { get; set; }
+    
+    [Display(Name = "Show Calendar in Navigation")]
+    public bool ShowCalendarInNav { get; set; }
 
     public String Url { get; set; }
 

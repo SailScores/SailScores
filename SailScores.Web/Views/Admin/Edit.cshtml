@@ -95,6 +95,16 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="mb-3 col-md-12">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="ShowCalendarInNav" /> Show Calendar in Navigation
+                    </label>
+                    <span class="small">Add Calendar link to the club navigation bar. Caution: If you maintain your official race calendar elsewhere, enabling this may cause confusion. The calendar is always accessible at /@Model.Initials/Calendar regardless of this setting.</span>
+                </div>
+            </div>
+        </div>
         <div class="mb-3">
             <label asp-for="Url" class="control-label"></label>
             <span class="small">External website for the club</span>
