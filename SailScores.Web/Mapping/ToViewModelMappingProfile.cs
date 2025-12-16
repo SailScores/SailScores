@@ -41,6 +41,7 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Tips, o => o.Ignore())
                 .ForMember(d => d.DefaultScoringSystemName, o => o.MapFrom(s => s.DefaultScoringSystem.Name))
                 .ForMember(d => d.ShowClubInResults, o => o.MapFrom(s => s.ShowClubInResults ?? false))
+                .ForMember(d => d.ShowCalendarInNav, o => o.MapFrom(s => s.ShowCalendarInNav ?? false))
                 .ForMember(d => d.HasRaces, o => o.Ignore())
                 .ForMember(d => d.HasCompetitors, o => o.Ignore())
                 .ForMember(d => d.Users, o => o.Ignore())

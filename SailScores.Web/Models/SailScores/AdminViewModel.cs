@@ -21,6 +21,7 @@ public class AdminViewModel
     public Guid? LogoFileId { get; set; }
     public bool IsHidden { get; set; }
     public bool ShowClubInResults { get; set; }
+    public bool ShowCalendarInNav { get; set; }
 
     public String Url { get; set; }
 
