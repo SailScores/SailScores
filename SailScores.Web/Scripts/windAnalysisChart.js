@@ -86,24 +86,49 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
             .text(dir.label);
     });
     
+    // Determine tooltip colors based on preferred color scheme
+    const getTooltipStyle = (isDark) => ({
+        background: isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.8)',
+        color: isDark ? '#ffffff' : '#000000',
+        border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid #ddd'
+    });
+
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTooltipStyle = getTooltipStyle(prefersDark);
+
     // Create tooltip
     const tooltip = d3.select('body').append('div')
         .attr('class', 'tooltip')
         .style('position', 'absolute')
-        .style('background-color', 'white')
-        .style('border', '1px solid #ddd')
+        .style('background-color', initialTooltipStyle.background)
+        .style('color', initialTooltipStyle.color)
+        .style('border', initialTooltipStyle.border)
         .style('border-radius', '4px')
         .style('padding', '10px')
         .style('pointer-events', 'none')
         .style('opacity', 0)
         .style('box-shadow', '0 2px 4px rgba(0,0,0,0.2)');
+
+    // Update tooltip colors when system preference changes
+    if (window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const update = (e) => {
+            const isDark = e && typeof e.matches === 'boolean' ? e.matches : mq.matches;
+            const s = getTooltipStyle(isDark);
+            d3.select('.tooltip')
+                .style('background-color', s.background)
+                .style('color', s.color)
+                .style('border', s.border);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', update);
+        else if (mq.addListener) mq.addListener(update);
+    }
     
     // Determine date ranges for highlighting
     const now = new Date();
     const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-    const currentYear = now.getFullYear();
-    const currentSeasonStart = new Date(currentYear, 0, 1);
-    const currentSeasonEnd = new Date(currentYear, 11, 31);
+    // Use a rolling past-year window instead of current calendar year
+    const oneYearAgo = new Date(now.getTime() - (365 * 24 * 60 * 60 * 1000));
     
     // Plot data points
     svg.selectAll('.data-point')
@@ -125,8 +150,8 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
             if (dataDate >= oneMonthAgo) {
                 // Within past month - brightest
                 return 'rgba(255, 99, 132, 0.8)';
-            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
-                // Within current season/year - moderate
+            } else if (dataDate >= oneYearAgo) {
+                // Within past year - moderate
                 return 'rgba(255, 159, 64, 0.7)';
             } else {
                 // Older data - standard
@@ -137,7 +162,7 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
             const dataDate = new Date(d.date);
             if (dataDate >= oneMonthAgo) {
                 return 'rgba(255, 99, 132, 1)';
-            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
+            } else if (dataDate >= oneYearAgo) {
                 return 'rgba(255, 159, 64, 1)';
             } else {
                 return 'rgba(54, 162, 235, 1)';
@@ -150,7 +175,7 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
             let fillColor = 'rgba(54, 162, 235, 0.9)';
             if (dataDate >= oneMonthAgo) {
                 fillColor = 'rgba(255, 99, 132, 0.9)';
-            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
+            } else if (dataDate >= oneYearAgo) {
                 fillColor = 'rgba(255, 159, 64, 0.9)';
             }
             
@@ -163,10 +188,10 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
             
             tooltip
                 .style('opacity', 1)
-                .html('<strong>Date:</strong> ' + d.date + '<br>' +
-                      '<strong>Direction:</strong> ' + directionName + ' (' + Math.round(d.direction) + '°)<br>' +
-                      '<strong>Speed:</strong> ' + (d.speed || 0).toFixed(1) + ' ' + windSpeedUnits + '<br>' +
-                      '<strong>Races:</strong> ' + d.raceCount)
+                .html('Date: ' + d.date + '<br>' +
+                      'Direction: ' + directionName + ' (' + Math.round(d.direction) + '°)<br>' +
+                      'Speed: ' + (d.speed || 0).toFixed(1) + ' ' + windSpeedUnits + '<br>' +
+                      'Races: ' + d.raceCount)
                 .style('left', (event.pageX + 10) + 'px')
                 .style('top', (event.pageY - 10) + 'px');
         })
@@ -175,7 +200,7 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
             let fillColor = 'rgba(54, 162, 235, 0.6)';
             if (dataDate >= oneMonthAgo) {
                 fillColor = 'rgba(255, 99, 132, 0.8)';
-            } else if (dataDate >= currentSeasonStart && dataDate <= currentSeasonEnd) {
+            } else if (dataDate >= oneYearAgo) {
                 fillColor = 'rgba(255, 159, 64, 0.7)';
             }
             
@@ -198,7 +223,7 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
     // Add legend for date highlighting
     const legendData = [
         { color: 'rgba(255, 99, 132, 0.8)', label: 'Past month' },
-        { color: 'rgba(255, 159, 64, 0.7)', label: 'Current year' },
+        { color: 'rgba(255, 159, 64, 0.7)', label: 'Past Year' },
         { color: 'rgba(54, 162, 235, 0.6)', label: 'Historical' }
     ];
     

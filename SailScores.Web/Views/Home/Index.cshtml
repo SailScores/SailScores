@@ -6,7 +6,7 @@
 }
 
 <!-- Hero Section -->
-<div class="row mb-5">
+<div class="row mb-md-4">
     <div class="col-12">
         <h1 class="display-4">SailScores</h1>
         <p class="lead">Simple score collection and reporting for one-design sailing.</p>
@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<div class="row mb-md-5">
+<div class="row mb-md-4">
     <div class="col-md-4 d-none d-md-block">
         <div id="carouselScreenshots" class="carousel slide carousel-fade" data-bs-ride="carousel">
             <div class="carousel-inner">
@@ -52,7 +52,8 @@
             <li>Laptop and phone friendly, for scorekeepers as well as racers.</li>
         </ul>
         <p>SailScores is <a href="https://github.com/SailScores/SailScores#sailscores">open source</a> and volunteer driven.</p>
-        <p>
+        
+        <p class="my-4">
             <a asp-area="" asp-controller="ClubRequest" asp-action="Index">Host your club's scores on SailScores.</a>
         </p>
     </div>
@@ -81,14 +82,13 @@
                                             }
                                             else
                                             {
-                                                <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
                                                     <span class="text-muted small">@club.Initials</span>
                                                 </div>
                                             }
                                         </div>
                                         <div class="flex-grow-1">
                                             <h5 class="card-title mb-1">@club.Name</h5>
-                                            <small class="text-muted">@club.Initials</small>
                                             @if (club.RecentRaceCount > 0 || club.RecentSeriesCount > 0)
                                             {
                                                 <div class="small text-muted mt-1">
@@ -146,7 +146,7 @@
                                             }
                                             else
                                             {
-                                                <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
                                                     <span class="text-muted small">@regatta.ClubInitials</span>
                                                 </div>
                                             }
@@ -214,7 +214,8 @@
         {
             <div class="col club-card" 
                  data-club-name="@club.Name.ToLowerInvariant()" 
-                 data-club-description="@(club.Description?.ToLowerInvariant() ?? "")">
+                 data-club-description="@(club.Description?.ToLowerInvariant() ?? "")" 
+                 data-club-initials="@( (club.Initials ?? "").ToLowerInvariant() )">
                 <div class="card h-100 border-primary">
                     <div class="card-body d-flex flex-column">
                         <div class="d-flex align-items-start mb-2">
@@ -227,7 +228,7 @@
                                 }
                                 else
                                 {
-                                    <div class="bg-light d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                    <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
                                         <span class="text-muted small">@club.Initials</span>
                                     </div>
                                 }
@@ -298,8 +299,9 @@
             cards.forEach(card => {
                 const clubName = card.getAttribute('data-club-name');
                 const clubDescription = card.getAttribute('data-club-description');
+                const clubInitials = card.getAttribute('data-club-initials');
                 
-                if (clubName.includes(searchTerm) || clubDescription.includes(searchTerm)) {
+                if (clubName.includes(searchTerm) || clubDescription.includes(searchTerm) || (clubInitials && clubInitials.includes(searchTerm))) {
                     card.classList.remove('d-none');
                     visibleCount++;
                 } else {
