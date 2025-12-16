@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Moq;
 
 namespace SailScores.Test.Unit.Core.Services
 {
@@ -17,7 +18,12 @@ namespace SailScores.Test.Unit.Core.Services
         public ReportServiceTests()
         {
             _context = InMemoryContextBuilder.GetContext();
-            _service = new ReportService(_context);
+
+            // Mock the required dependencies
+            var conversionServiceMock = new Mock<IConversionService>();
+            var clubServiceMock = new Mock<IClubService>();
+
+            _service = new ReportService(_context, conversionServiceMock.Object, clubServiceMock.Object);
             _clubId = _context.Clubs.First().Id;
         }
 
