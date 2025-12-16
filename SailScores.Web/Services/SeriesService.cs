@@ -13,7 +13,7 @@ public class SeriesService : ISeriesService
     private readonly IScoringService _coreScoringService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly IMapper _mapper;
-    
+
     // Validation error messages for date restrictions
     private const string ErrorMissingDates = "Both start date and end date must be provided when date restriction is enabled.";
     private const string ErrorStartDateOutOfRange = "Series start date must fall within the selected season.";
@@ -56,7 +56,7 @@ public class SeriesService : ISeriesService
         Guid clubId,
         DateTime date)
     {
-        if(date == default)
+        if (date == default)
         {
             return await GetSummarySeriesAsync(clubId);
         }
@@ -96,7 +96,8 @@ public class SeriesService : ISeriesService
                 partialSeries.SeasonId = selectedSeason.Id;
             }
 
-        } else
+        }
+        else
         {
             seasons = allSeasons
                 .Where(s => s.Id == partialSeries.SeasonId)
@@ -139,11 +140,11 @@ public class SeriesService : ISeriesService
         };
         var selectedSeason = seasons.FirstOrDefault(s =>
             s.Start < DateTime.Now && s.End > DateTime.Now);
-        if(selectedSeason == null && seasons.Count() == 1)
+        if (selectedSeason == null && seasons.Count() == 1)
         {
             selectedSeason = seasons.First();
         }
-        if(selectedSeason != null)
+        if (selectedSeason != null)
         {
             vm.SeasonId = selectedSeason.Id;
         }
@@ -173,14 +174,14 @@ public class SeriesService : ISeriesService
         var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, true);
 
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(coreObject);
-        foreach(var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
+        foreach (var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
         {
             var races = coreObject.Where(s => summaryTypeSeries.ChildrenSeriesIds.Contains(s.Id)).SelectMany(s => s.Races).ToList();
             seriesSummaries.Single(ss => ss.Id == summaryTypeSeries.Id).FleetName = GetFleetsString(races);
         }
 
         return seriesSummaries.OrderByDescending(s => s.Season.Start)
-            .ThenBy( s => s.FleetName)
+            .ThenBy(s => s.FleetName)
             .ThenBy(s => s.Name);
     }
 
@@ -239,7 +240,7 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
-        
+
         // Handle date restriction logic
         if (model.DateRestricted == true)
         {
@@ -251,7 +252,7 @@ public class SeriesService : ISeriesService
             model.EnforcedStartDate = null;
             model.EnforcedEndDate = null;
         }
-        
+
         return await _coreSeriesService.SaveNewSeries(model);
     }
 
@@ -262,14 +263,14 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
-        
+
         // Handle date restriction logic
         if (model.DateRestricted == true)
         {
             Season season;
-            
+
             // Check if SeasonId is available in the model (not default/empty)
-            if (model.SeasonId != default)
+            if (model.SeasonId != Guid.Empty)
             {
                 // Use the season from the model
                 var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
@@ -285,7 +286,7 @@ public class SeriesService : ISeriesService
                 }
                 season = existingSeries.Season;
             }
-            
+
             ValidateDateRestriction(model, season);
         }
         else
@@ -294,10 +295,10 @@ public class SeriesService : ISeriesService
             model.EnforcedStartDate = null;
             model.EnforcedEndDate = null;
         }
-        
+
         await _coreSeriesService.Update(model);
     }
-    
+
     private void ValidateDateRestriction(SeriesWithOptionsViewModel model, Season season)
     {
         // When date restriction is enabled, both dates must be provided
@@ -305,23 +306,23 @@ public class SeriesService : ISeriesService
         {
             throw new InvalidOperationException(ErrorMissingDates);
         }
-        
+
         // Convert Season DateTime to DateOnly for comparison
         var seasonStart = DateOnly.FromDateTime(season.Start);
         var seasonEnd = DateOnly.FromDateTime(season.End);
-        
+
         // Validate start date falls within season
         if (model.EnforcedStartDate.Value < seasonStart || model.EnforcedStartDate.Value > seasonEnd)
         {
             throw new InvalidOperationException(ErrorStartDateOutOfRange);
         }
-        
+
         // Validate end date falls within season
         if (model.EnforcedEndDate.Value < seasonStart || model.EnforcedEndDate.Value > seasonEnd)
         {
             throw new InvalidOperationException(ErrorEndDateOutOfRange);
         }
-        
+
         // Validate start is before end
         if (model.EnforcedStartDate.Value > model.EnforcedEndDate.Value)
         {
