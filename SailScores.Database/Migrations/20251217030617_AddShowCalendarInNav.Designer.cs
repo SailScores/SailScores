@@ -12,7 +12,7 @@ using SailScores.Database;
 namespace SailScores.Database.Migrations
 {
     [DbContext(typeof(SailScoresContext))]
-    [Migration("20251216040000_AddShowCalendarInNav")]
+    [Migration("20251217030617_AddShowCalendarInNav")]
     partial class AddShowCalendarInNav
     {
         /// <inheritdoc />
