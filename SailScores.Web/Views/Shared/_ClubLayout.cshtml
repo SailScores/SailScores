@@ -6,7 +6,7 @@
 @inject IStringLocalizer<SharedResource> localizer
 @inject SailScores.Web.Services.Interfaces.IAuthorizationService AuthService
 @inject SailScores.Core.Services.IClubService ClubService
-@inject SailScores.Database.SailScoresContext DbContext
+@inject SailScores.Web.Services.Interfaces.IRegattaService RegattaService
 @inject AppSettingsService SettingsService
 
 @{
@@ -31,7 +31,7 @@
     bool hasRegattas = false;
     if (!canEdit)
     {
-        hasRegattas = await DbContext.Regattas.AnyAsync(r => r.ClubId == club.Id);
+        hasRegattas = await RegattaService.ClubHasRegattasAsync(clubInitials);
     }
 }
 <!DOCTYPE html>

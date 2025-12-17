@@ -162,4 +162,19 @@ public class RegattaService : IRegattaService
     {
         return await _coreRegattaService.GetRegattaForFleet(fleetId);
     }
+
+    public async Task<bool> ClubHasRegattasAsync(string clubInitials)
+    {
+        var cacheKey = $"ClubHasRegattas_{clubInitials}";
+        if (_cache.TryGetValue(cacheKey, out bool hasRegattas))
+        {
+            return hasRegattas;
+        }
+
+        var clubId = await _clubService.GetClubId(clubInitials);
+        hasRegattas = await _coreRegattaService.ClubHasRegattasAsync(clubId);
+        
+        _cache.Set(cacheKey, hasRegattas, TimeSpan.FromMinutes(5));
+        return hasRegattas;
+    }
 }

@@ -502,5 +502,12 @@ namespace SailScores.Core.Services
 
             return _mapper.Map<Regatta>(regatta);
         }
+
+        public async Task<bool> ClubHasRegattasAsync(Guid clubId)
+        {
+            return await _dbContext.Regattas
+                .AnyAsync(r => r.ClubId == clubId)
+                .ConfigureAwait(false);
+        }
     }
 }
