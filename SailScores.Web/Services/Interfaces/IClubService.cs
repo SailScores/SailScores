@@ -14,4 +14,5 @@ public interface IClubService
     Task SetUseAdvancedFeaturesAsync(Guid clubId, bool enabled);
     Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType);
     Task<Club> GetClubByIdAsync(Guid clubId);
+    Task<Club> GetMinimalClubAsync(string clubInitials);
 }

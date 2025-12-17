@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
@@ -11,6 +12,7 @@ public class ClubService : IClubService
     private readonly Core.Services.IRaceService _coreRaceService;
     private readonly Core.Services.ISeriesService _coreSeriesService;
     private readonly Core.Services.IRegattaService _coreRegattaService;
+    private readonly IMemoryCache _cache;
     private readonly IMapper _mapper;
 
     public ClubService(
@@ -19,6 +21,7 @@ public class ClubService : IClubService
         Core.Services.IRaceService raceService,
         Core.Services.ISeriesService seriesService,
         Core.Services.IRegattaService regattaService,
+        IMemoryCache cache,
         IMapper mapper)
     {
         _coreClubService = clubService;
@@ -26,6 +29,7 @@ public class ClubService : IClubService
         _coreRaceService = raceService;
         _coreSeriesService = seriesService;
         _coreRegattaService = regattaService;
+        _cache = cache;
         _mapper = mapper;
     }
 
@@ -92,5 +96,18 @@ public class ClubService : IClubService
     public async Task<Club> GetClubByIdAsync(Guid clubId)
     {
         return await _coreClubService.GetMinimalClub(clubId);
+    }
+
+    public async Task<Club> GetMinimalClubAsync(string clubInitials)
+    {
+        var cacheKey = $"MinimalClub_{clubInitials}";
+        if (_cache.TryGetValue(cacheKey, out Club cachedClub))
+        {
+            return cachedClub;
+        }
+
+        var club = await _coreClubService.GetMinimalClub(clubInitials);
+        _cache.Set(cacheKey, club, TimeSpan.FromMinutes(5));
+        return club;
     }
 }
