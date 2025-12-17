@@ -172,6 +172,11 @@ public class RegattaService : IRegattaService
         }
 
         var clubId = await _clubService.GetClubId(clubInitials);
+        if (clubId == Guid.Empty)
+        {
+            return false;
+        }
+
         hasRegattas = await _coreRegattaService.ClubHasRegattasAsync(clubId);
         
         _cache.Set(cacheKey, hasRegattas, TimeSpan.FromMinutes(5));
