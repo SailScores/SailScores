@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.Extensions.Caching.Memory;
 using SailScores.Web.Services.Interfaces;
 
@@ -40,7 +40,7 @@ public class AuthorizationService : IAuthorizationService
         }
 
         canEdit = await _userService.IsUserAllowedToEdit(email, clubInitials);
-        _cache.Set(cacheKey, canEdit, TimeSpan.FromMinutes(5));
+        _cache.Set(cacheKey, canEdit, TimeSpan.FromMinutes(2));
         return canEdit;
     }
 

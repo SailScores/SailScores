@@ -100,14 +100,20 @@ public class ClubService : IClubService
 
     public async Task<Club> GetMinimalClubAsync(string clubInitials)
     {
-        var cacheKey = $"MinimalClub_{clubInitials}";
+        var cacheKey = $"MinimalClub_{clubInitials.ToLowerInvariant()}";
         if (_cache.TryGetValue(cacheKey, out Club cachedClub))
         {
             return cachedClub;
         }
 
         var club = await _coreClubService.GetMinimalClub(clubInitials);
-        _cache.Set(cacheKey, club, TimeSpan.FromMinutes(5));
+        _cache.Set(cacheKey, club, TimeSpan.FromMinutes(30));
         return club;
+    }
+
+    public void InvalidateClubCache(string clubInitials)
+    {
+        var cacheKey = $"MinimalClub_{clubInitials.ToLowerInvariant()}";
+        _cache.Remove(cacheKey);
     }
 }

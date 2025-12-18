@@ -6,10 +6,10 @@ SailScores is a free web service for sharing club sailing scores, hosted at [sai
 
 ## Tech Stack
 
-- **Framework**: ASP.NET Core 8 MVC
-- **Language**: C# with .NET 8
+- **Framework**: ASP.NET Core 10 MVC
+- **Language**: C# with .NET 10
 - **Database**: Microsoft SQL Server
-- **ORM**: Entity Framework Core 8
+- **ORM**: Entity Framework Core 10
 - **Frontend**: Razor views (.cshtml), JavaScript, Bootstrap 5
 - **Hosting**: Azure App Service Linux
 

@@ -22,11 +22,12 @@ public class AdminService : IAdminService
     private readonly IWeatherService _weatherService;
     private readonly IPermissionService _permissionService;
     private readonly ILocalizerService _localizerService;
+    private readonly IClubService _webClubService;
     private readonly IMapper _mapper;
     private readonly IHostEnvironment _env;
 
     public AdminService(
-        CoreServices.IClubService clubService,
+        CoreServices.IClubService coreClubService,
         CoreServices.IScoringService scoringService,
         CoreServices.IRaceService raceService,
         CoreServices.IBoatClassService boatClassService,
@@ -35,10 +36,11 @@ public class AdminService : IAdminService
         IWeatherService weatherService,
         IPermissionService permissionService,
         ILocalizerService localizerService,
+        IClubService clubService,
         IMapper mapper,
         IHostEnvironment env)
     {
-        _coreClubService = clubService;
+        _coreClubService = coreClubService;
         _coreScoringService = scoringService;
         _coreRaceService = raceService;
         _coreBoatClassService = boatClassService;
@@ -47,6 +49,7 @@ public class AdminService : IAdminService
         _weatherService = weatherService;
         _permissionService = permissionService;
         _localizerService = localizerService;
+        _webClubService = clubService;
         _mapper = mapper;
         _env = env;
     }
@@ -127,6 +130,9 @@ public class AdminService : IAdminService
 
         await _localizerService.UpdateCulture(clubObject.Initials, shortLocale);
         await _coreClubService.UpdateClub(clubObject);
+        // invalidate the minimal club cache:
+        _webClubService.InvalidateClubCache(clubObject.Initials);
+
     }
 
     private const int BytesPerMegabyte = 1048576;

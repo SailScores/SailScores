@@ -96,7 +96,7 @@ namespace SailScores.Core.Services
                     .Select(c => c.Id)
                     .SingleOrDefaultAsync()
                     .ConfigureAwait(false);
-                _cache.Set($"ClubId_{clubInitials}", clubGuid, TimeSpan.FromMinutes(10));
+                _cache.Set($"ClubId_{clubInitials}", clubGuid, TimeSpan.FromMinutes(30));
             }
 
             return await IsUserAllowedToEdit(email, clubGuid)

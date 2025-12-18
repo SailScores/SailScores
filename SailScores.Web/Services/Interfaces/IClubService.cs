@@ -15,4 +15,5 @@ public interface IClubService
     Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType);
     Task<Club> GetClubByIdAsync(Guid clubId);
     Task<Club> GetMinimalClubAsync(string clubInitials);
+    void InvalidateClubCache(string initials);
 }
