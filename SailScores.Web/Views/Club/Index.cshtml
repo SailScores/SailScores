@@ -15,22 +15,48 @@
     ViewData["ogDescription"] = Model.LongDescription;
 }
 <div class="row">
+
+
     <div class="col-12">
-        <h1 class="display-4">@Model.Name</h1>
-    </div>
-</div>
-@if (!String.IsNullOrWhiteSpace(Model.Url))
-{
-    <div class="row">
-        <div class="col-12">
-            <p>
-                <a href="@Model.Url" target="_blank" rel="noopener noreferrer">
-                    <span class="fas fa-external-link-alt"></span> @localizer["Club Web Site"]
+        <div class="d-flex align-items-start">
+          @if (Model.LogoFileId.HasValue)
+          {
+            @if (!String.IsNullOrWhiteSpace(Model.Url))
+            {
+                <a href="@Model.Url" target="_blank" rel="noopener noreferrer" title="@Model.Name" class="me-3">
+                    <div class="club-logo-container" style="width:140px;height:80px;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;">
+                        <img src="@Url.Action("GetLogo", "Admin", new { id = Model.LogoFileId })" 
+                              alt="@Model.Name burgee" 
+                              style="max-width:140px;max-height:80px;object-fit:contain;margin-top:-10px;" />
+                    </div>
                 </a>
-            </p>
+            }
+            else
+            {
+                <a asp-controller="Club" asp-action="Index" asp-route-clubInitials="@Model.Initials" title="@Model.Name" class="me-3">
+                    <div class="club-logo-container" style="width:140px;height:80px;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;">
+                        <img src="@Url.Action("GetLogo", "Admin", new { id = Model.LogoFileId })" 
+                              alt="@Model.Name burgee" 
+                              style="max-width:140px;max-height:80px;object-fit:contain;margin-top:-10px;" />
+                    </div>
+                </a>
+            }
+          }
+            <div>
+                <h1 class="display-4 mb-1">@Model.Name</h1>
+                @if (!String.IsNullOrWhiteSpace(Model.Url))
+                {
+                    <p class="mb-0">
+                        <a href="@Model.Url" target="_blank" rel="noopener noreferrer">
+                            <span class="fas fa-external-link-alt"></span> @localizer["Club Web Site"]
+                        </a>
+                    </p>
+                }
+            </div>
         </div>
     </div>
-}
+
+</div>
 @if (!String.IsNullOrWhiteSpace(Model.Description))
 {
     <div class="row">

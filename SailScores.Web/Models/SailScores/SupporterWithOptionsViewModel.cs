@@ -33,6 +33,10 @@ namespace SailScores.Web.Models.SailScores
         [StringLength(10)]
         public string ClubInitials { get; set; }
 
+        public Guid? ClubId { get; set; }
+
+        public List<ClubOption> ClubOptions { get; set; }
+
         [Display(Name = "Expiration Date")]
         public DateTime? ExpirationDate { get; set; }
 

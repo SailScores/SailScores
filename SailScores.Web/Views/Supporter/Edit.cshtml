@@ -63,10 +63,29 @@
                 </div>
 
                 <div class="mb-3">
+                    <label asp-for="ClubId" class="form-label">Link to Club</label>
+                    <select asp-for="ClubId" class="form-select" id="clubSelector">
+                        <option value="">-- No club link / Use separate logo --</option>
+                        @foreach (var club in Model.ClubOptions)
+                        {
+                            <option value="@club.Id" data-initials="@club.Initials" data-logo="@club.LogoFileId">
+                                @club.Name (@club.Initials)@(club.LogoFileId.HasValue ? " ✓" : "")
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="ClubId" class="text-danger"></span>
+                    <small class="form-text text-muted">
+                        Link this supporter to an existing club to use the club's burgee/logo. 
+                        Clubs with a burgee are marked with ✓. 
+                        The ClubInitials field will be automatically set when you select a club.
+                    </small>
+                </div>
+
+                <div class="mb-3">
                     <label asp-for="ClubInitials" class="form-label"></label>
-                    <input asp-for="ClubInitials" class="form-control" />
+                    <input asp-for="ClubInitials" class="form-control" readonly />
                     <span asp-validation-for="ClubInitials" class="text-danger"></span>
-                    <small class="form-text text-muted">Optional: Link to a club page on SailScores</small>
+                    <small class="form-text text-muted">Automatically set from club selection</small>
                 </div>
 
                 <div class="mb-3">
@@ -93,4 +112,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/supporterClubSelector.js"></script>
 }
