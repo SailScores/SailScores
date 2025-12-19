@@ -12,6 +12,20 @@
         <div class="col-12">
             <h1>Reports</h1>
             <p class="lead">Analysis and statistics for @Model.ClubName</p>
+            @if (!Model.UseAdvancedFeatures)
+            {
+                <div class="alert alert-info">
+                    <strong>Note:</strong> To keep the service fast and free, some reports show only recent data.
+                    <a asp-controller="Supporter" asp-action="Index" target="_blank">Supporters</a>
+                    get full historical access, which helps fund hosting and development.
+                </div>
+            } else
+            {
+              <div class="alert alert-info">
+                    <strong>Thank you</strong> for supporting SailScores. <a href="mailto:info@SailScores.com">Let
+                      us know</a> about additional reports you'd like to see here.
+              </div>
+            }
         </div>
     </div>
 

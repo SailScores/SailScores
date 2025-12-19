@@ -9,6 +9,7 @@ public class ParticipationViewModel : ClubBaseViewModel
     public DateTime? EndDate { get; set; }
     public string GroupBy { get; set; }
     public IList<ParticipationItem> ParticipationData { get; set; }
+    public bool UseAdvancedFeatures { get; set; }
 }
 
 public class ParticipationItem

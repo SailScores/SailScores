@@ -1,5 +1,5 @@
 // Wind Analysis Polar Chart using D3.js
-function initWindAnalysisChart(windData, windSpeedUnits) {
+function initWindAnalysisChart(windData, windSpeedUnits, useAdvancedFeatures) {
     // Set up dimensions
     const container = document.getElementById('windChart');
     const width = container.clientWidth;
@@ -223,9 +223,13 @@ function initWindAnalysisChart(windData, windSpeedUnits) {
     // Add legend for date highlighting
     const legendData = [
         { color: 'rgba(255, 99, 132, 0.8)', label: 'Past month' },
-        { color: 'rgba(255, 159, 64, 0.7)', label: 'Past Year' },
-        { color: 'rgba(54, 162, 235, 0.6)', label: 'Historical' }
+        { color: 'rgba(255, 159, 64, 0.7)', label: 'Past Year' }
     ];
+    
+    // Only add Historical legend entry if advanced features are enabled
+    if (useAdvancedFeatures) {
+        legendData.push({ color: 'rgba(54, 162, 235, 0.6)', label: 'Historical' });
+    }
     
     // Move legend to left outside of chart to prevent overlap
     const legend = svg.append('g')

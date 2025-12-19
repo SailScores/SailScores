@@ -12,6 +12,12 @@
         <div class="col-12 col-md-8">
             <h1>Participation Trends</h1>
             <p class="lead">Distinct skippers participating over time</p>
+            @if (!Model.UseAdvancedFeatures)
+            {
+                <div class="alert alert-info">
+                    <strong>Note:</strong> Date range is limited.
+                </div>
+            }
         </div>
         <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
             <a href="~/@Model.ClubInitials/Reports" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back to Reports</a>
@@ -25,13 +31,17 @@
                 <option value="day" selected="@(Model.GroupBy == "day")">Day</option>
                 <option value="week" selected="@(Model.GroupBy == "week")">Week</option>
                 <option value="month" selected="@(Model.GroupBy == "month" || string.IsNullOrEmpty(Model.GroupBy))">Month</option>
-                <option value="year" selected="@(Model.GroupBy == "year")">Year</option>
+                @if (Model.UseAdvancedFeatures)
+                {
+                    <option value="year" selected="@(Model.GroupBy == "year")">Year</option>
+                }
             </select>
         </div>
         <div class="col-md-3">
             <label for="startDate" class="form-label">Start Date</label>
             <input type="date" class="form-control" id="startDate" name="startDate"
-                   value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+                   value="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                   @(!Model.UseAdvancedFeatures ? $"min={DateTime.Today.AddDays(-90):yyyy-MM-dd}" : "") />
         </div>
         <div class="col-md-3">
             <label for="endDate" class="form-label">End Date</label>

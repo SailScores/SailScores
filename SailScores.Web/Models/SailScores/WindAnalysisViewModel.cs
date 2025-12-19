@@ -9,6 +9,7 @@ public class WindAnalysisViewModel : ClubBaseViewModel
     public DateTime? EndDate { get; set; }
     public IList<WindDataItem> WindData { get; set; }
     public string WindSpeedUnits { get; set; }
+    public bool UseAdvancedFeatures { get; set; }
 }
 
 public class WindDataItem

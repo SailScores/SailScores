@@ -34,13 +34,16 @@ public class ReportsController : Controller
             return Unauthorized();
         }
 
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var club = await _clubService.GetMinimalClub(clubId);
         var clubName = await _clubService.GetClubName(clubInitials);
 
         var model = new Models.SailScores.ReportsIndexViewModel
         {
             ClubInitials = clubInitials,
             ClubName = clubName,
-            CanEdit = true
+            CanEdit = true,
+            UseAdvancedFeatures = club?.UseAdvancedFeatures ?? false
         };
 
         ViewData["ClubInitials"] = clubInitials;

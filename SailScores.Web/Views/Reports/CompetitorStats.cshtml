@@ -12,6 +12,12 @@
         <div class="col-12 col-md-8">
             <h1>Competitor Statistics</h1>
             <p class="lead">Participation and performance metrics</p>
+            @if (!Model.UseAdvancedFeatures)
+            {
+                <div class="alert alert-info">
+                    <strong>Note:</strong> Date range is limited.
+                </div>
+            }
         </div>
         <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
             <a href="~/@Model.ClubInitials/Reports" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back to Reports</a>
@@ -22,7 +28,8 @@
         <div class="col-md-4">
             <label for="startDate" class="form-label">Start Date</label>
             <input type="date" class="form-control" id="startDate" name="startDate"
-                   value="@(Model.StartDate?.ToString("yyyy-MM-dd") ?? (Model.SkipperStats?.Any() == true ? Model.SkipperStats.Min(s => s.FirstRaceDate)?.ToString("yyyy-MM-dd") : ""))" />
+                   value="@(Model.StartDate?.ToString("yyyy-MM-dd") ?? (Model.SkipperStats?.Any() == true ? Model.SkipperStats.Min(s => s.FirstRaceDate)?.ToString("yyyy-MM-dd") : ""))"
+                   @(!Model.UseAdvancedFeatures ? $"min={DateTime.Today.AddDays(-60):yyyy-MM-dd}" : "") />
         </div>
         <div class="col-md-4">
             <label for="endDate" class="form-label">End Date</label>

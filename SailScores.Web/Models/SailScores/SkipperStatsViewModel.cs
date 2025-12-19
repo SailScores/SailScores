@@ -8,6 +8,7 @@ public class SkipperStatsViewModel : ClubBaseViewModel
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public IList<SkipperStatItem> SkipperStats { get; set; }
+    public bool UseAdvancedFeatures { get; set; }
 }
 
 public class SkipperStatItem

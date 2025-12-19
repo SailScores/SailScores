@@ -29,12 +29,25 @@ public class ReportService : Interfaces.IReportService
             var clubName = await _clubService.GetClubName(clubInitials);
             var club = await _clubService.GetMinimalClub(clubId);
 
+            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+            var originalStartDate = startDate;
+
+            // Enforce 60-day limit for non-advanced clubs
+            if (!useAdvancedFeatures)
+            {
+                var sixtyDaysAgo = DateTime.Today.AddDays(-60);
+                if (!startDate.HasValue || startDate.Value < sixtyDaysAgo)
+                {
+                    startDate = sixtyDaysAgo;
+                }
+            }
+
             var windData = await _coreReportService.GetWindDataAsync(clubId, startDate, endDate);
             
             // If no dates provided, get full range for display
-            DateTime? displayStartDate = startDate;
+            DateTime? displayStartDate = originalStartDate;
             DateTime? displayEndDate = endDate;
-            if (!startDate.HasValue && !endDate.HasValue && windData.Any())
+            if (!originalStartDate.HasValue && !endDate.HasValue && windData.Any())
             {
                 displayStartDate = windData.Min(w => w.Date);
                 displayEndDate = windData.Max(w => w.Date);
@@ -47,6 +60,7 @@ public class ReportService : Interfaces.IReportService
                 StartDate = displayStartDate,
                 EndDate = displayEndDate,
                 WindSpeedUnits = club?.WeatherSettings?.WindSpeedUnits ?? "m/s",
+                UseAdvancedFeatures = useAdvancedFeatures,
                 WindData = windData.Select(w => new WindDataItem
                 {
                     Date = w.Date,
@@ -64,6 +78,19 @@ public class ReportService : Interfaces.IReportService
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             var clubName = await _clubService.GetClubName(clubInitials);
+            var club = await _clubService.GetMinimalClub(clubId);
+
+            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+
+            // Enforce 60-day limit for non-advanced clubs
+            if (!useAdvancedFeatures)
+            {
+                var sixtyDaysAgo = DateTime.Today.AddDays(-60);
+                if (!startDate.HasValue || startDate.Value < sixtyDaysAgo)
+                {
+                    startDate = sixtyDaysAgo;
+                }
+            }
 
             var skipperStats = await _coreReportService.GetSkipperStatisticsAsync(clubId, startDate, endDate);
 
@@ -73,6 +100,7 @@ public class ReportService : Interfaces.IReportService
                 ClubName = clubName,
                 StartDate = startDate,
                 EndDate = endDate,
+                UseAdvancedFeatures = useAdvancedFeatures,
                 SkipperStats = skipperStats.Select(s => new SkipperStatItem
                 {
                     CompetitorId = s.CompetitorId,
@@ -98,14 +126,28 @@ public class ReportService : Interfaces.IReportService
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             var clubName = await _clubService.GetClubName(clubInitials);
+            var club = await _clubService.GetMinimalClub(clubId);
+
+            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+            var originalStartDate = startDate;
+
+            // Enforce 90-day limit for non-advanced clubs
+            if (!useAdvancedFeatures)
+            {
+                var ninetyDaysAgo = DateTime.Today.AddDays(-90);
+                if (!startDate.HasValue || startDate.Value < ninetyDaysAgo)
+                {
+                    startDate = ninetyDaysAgo;
+                }
+            }
 
             var participationData = await _coreReportService.GetParticipationMetricsAsync(
                 clubId, groupBy, startDate, endDate);
             
             // If no dates provided, get full range for display
-            DateTime? displayStartDate = startDate;
+            DateTime? displayStartDate = originalStartDate;
             DateTime? displayEndDate = endDate;
-            if (!startDate.HasValue && !endDate.HasValue && participationData.Any())
+            if (!originalStartDate.HasValue && !endDate.HasValue && participationData.Any())
             {
                 displayStartDate = participationData.Min(p => p.PeriodStart);
                 displayEndDate = participationData.Max(p => p.PeriodStart);
@@ -118,6 +160,7 @@ public class ReportService : Interfaces.IReportService
                 StartDate = displayStartDate,
                 EndDate = displayEndDate,
                 GroupBy = groupBy,
+                UseAdvancedFeatures = useAdvancedFeatures,
                 ParticipationData = participationData.Select(p => new ParticipationItem
                 {
                     Period = p.Period,
