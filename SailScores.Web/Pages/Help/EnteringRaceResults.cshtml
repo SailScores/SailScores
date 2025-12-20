@@ -1,0 +1,62 @@
+@page
+@model SailScores.Web.Pages.Help.EnteringRaceResultsModel
+@{
+    Layout = "/Pages/Help/_HelpLayout.cshtml";
+    ViewData["Title"] = "Entering Race Results";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p class="lead">
+    A concise walkthrough for scorekeepers to create a race and enter finishing results quickly.
+</p>
+
+<section class="mt-3">
+    <h2>Before you begin</h2>
+    <ul>
+        <li>Make sure the race date falls within an existing Season.</li>
+        <li>Confirm the Series has the correct Scoring System and classes assigned.</li>
+        <li>Have competitors registered (sail number, class). You can also add competitors while entering results.</li>
+    </ul>
+</section>
+
+<section class="mt-3">
+    <h2>Quick entry workflow</h2>
+    <ol>
+        <li>
+            Open the Series or Regatta page and click <strong>New Race</strong>. Set the date, name, and fleet/class if applicable.
+        </li>
+        <li>
+            Click <strong>Enter Results</strong> to open the race editor.
+        </li>
+        <li>
+            Use the small buttons to mark starts/finish positions for small fleets. For larger fleets:
+            type partial sail numbers into the entry box, choose from autocomplete, and press Enter to add the competitor.
+        </li>
+        <li>
+            To enter score codes (e.g., DNF, OCS), type the code into the entry field or select from the score code menu. Score codes apply to the most recently added competitor unless you change the selection.
+        </li>
+        <li>
+            If a result is provisional, mark the race as <em>Provisional</em> before saving; this will flag the series results as provisional until confirmed.
+        </li>
+        <li>
+            Save the race. Series results are recalculated automatically after save.
+        </li>
+    </ol>
+</section>
+
+<section class="mt-3">
+    <h2>Tips for speed</h2>
+    <ul>
+        <li>Use autocomplete to avoid typing full competitor names or sail numbers.</li>
+        <li>For repetitive sail numbers, the browser autofill + Enter is often fastest.</li>
+        <li>If you track times, enable "Track Times" for the race to capture elapsed and clock times.</li>
+    </ul>
+</section>
+
+<section class="mt-3">
+    <h2>Troubleshooting</h2>
+    <p>
+        If competitors do not appear in autocomplete, verify their class and season membership. You can add missing competitors directly from the race editor.
+    </p>
+</section>

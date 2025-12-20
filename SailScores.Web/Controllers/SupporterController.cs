@@ -45,7 +45,6 @@ public class SupporterController : Controller
 
         ViewBag.IsAdmin = isAdmin;
         ViewData["StripePublishableKey"] = _configuration["Stripe:PublishableKey"];
-        ViewBag.ShowSupporterFeatures = _appSettingsService.ShowSupporterFeatures || isAdmin;
         return View(supporters);
     }
 

@@ -87,14 +87,8 @@
                     <ul class="navbar-nav">
                         <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link@(isAbout ? " active" : "")">About</a></li>
                         <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="News" class="nav-link@(isNews ? " active" : "")">News</a></li>
-                        @if (ViewBag.ShowSupporterFeatures as bool? ?? false)
-                        {
-                            <li class="nav-item"><a asp-page="/Help/Index" class="nav-link@(isHelp ? " active" : "")">Help</a></li>
-                        }
-                        @if (ViewBag.ShowSupporterFeatures as bool? ?? false)
-                        {
-                            <li class="nav-item"><a asp-area="" asp-controller="Supporter" asp-action="Index" class="nav-link@(isPricing ? " active" : "")">Pricing</a></li>
-                        }
+                        <li class="nav-item"><a asp-page="/Help/Index" class="nav-link@(isHelp ? " active" : "")">Help</a></li>
+                        <li class="nav-item"><a asp-area="" asp-controller="Supporter" asp-action="Index" class="nav-link@(isPricing ? " active" : "")">Pricing</a></li>
                         <li class="nav-item"><a asp-area="" asp-controller="ClubRequest" asp-action="Index" class="nav-link@(isTryItOut ? " active" : "")">Try it out</a></li>
                     </ul>
                 </div>

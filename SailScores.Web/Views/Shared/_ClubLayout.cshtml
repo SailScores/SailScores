@@ -26,7 +26,7 @@
     var club = await ClubService.GetMinimalClubAsync(clubInitials);
     bool canEdit = await AuthService.CanUserEdit(User, clubInitials);
     bool showCalendarInNav = club?.ShowCalendarInNav ?? false;
-    bool showHelp = canEdit && SettingsService.ShowSupporterFeatures;
+    bool showHelp = canEdit;
     
     // Check if club has regattas (only if user cannot edit, to avoid unnecessary query for scorekeepers)
     bool hasRegattas = false;

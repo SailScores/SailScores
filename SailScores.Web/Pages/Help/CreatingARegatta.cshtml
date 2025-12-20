@@ -1,0 +1,48 @@
+@page
+@model SailScores.Web.Pages.Help.CreatingARegattaModel
+@{
+    Layout = "/Pages/Help/_HelpLayout.cshtml";
+    ViewData["Title"] = "Creating A Regatta";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p class="lead">
+    Steps to create a regatta, configure fleets, and prepare for multi-day event scoring.
+</p>
+
+<section class="mt-3">
+    <h2>Preparation</h2>
+    <ul>
+        <li>Ensure the regatta dates are within an existing Season or create a Season first.</li>
+        <li>Decide fleets (by class or handicap) and the scoring system for each fleet.</li>
+        <li>Gather competitor registration information (sail number, name, club).</li>
+    </ul>
+</section>
+
+<section class="mt-3">
+    <h2>Create the regatta</h2>
+    <ol>
+        <li>From the Club Admin page locate the <strong>Regattas</strong> section and click <strong>New Regatta</strong>.</li>
+        <li>Provide the regatta name, date range, and any high-level notes.</li>
+        <li>Create Fleets for the regatta. Each fleet can have its own scoring options and competitor list.</li>
+        <li>Add or import competitors into each fleet. You can also create competitors later from the regatta page.</li>
+        <li>Create races for each fleet (single or multiple races per day) and set the scoring options (e.g., track times, racing area).</li>
+    </ol>
+</section>
+
+<section class="mt-3">
+    <h2>During the event</h2>
+    <ul>
+        <li>Use the regatta page to enter results per fleet. Results for regattas are shown on a single regatta page with fleet tabs.</li>
+        <li>For protests or changes, mark races provisional until resolved then save to trigger recalculation.</li>
+        <li>Publish daily results from the regatta page so competitors can view standings as the event progresses.</li>
+    </ul>
+</section>
+
+<section class="mt-3">
+    <h2>After the regatta</h2>
+    <p>
+        Review final races, confirm all protests are resolved, then mark races as final so series/regatta standings are published without the provisional flag.
+    </p>
+</section>

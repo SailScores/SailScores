@@ -1,8 +1,6 @@
 @using SailScores.Web.Services
 @inject AppSettingsService SettingsService
 @{
-    // TODO: Temporary — enable supporter features in main layout for Help pages. Remove after ~2 weeks.
-    ViewBag.ShowSupporterFeatures = SettingsService.ShowSupporterFeatures;
     // Use the main site layout for header/footer/navigation bar
     Layout = "/Views/Shared/_Layout.cshtml";
 }

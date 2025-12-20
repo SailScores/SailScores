@@ -4,7 +4,7 @@
     ViewData["Title"] = "Club Created";
 }
 
-<h1>Club Created</h1>
+<h1 class="h2">Club Created</h1>
 @{
     var clubUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~")}/{Model.ClubInitials + ((Model.ForTesting ?? false) ? "TEST" : "")}";
 }

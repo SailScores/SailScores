@@ -1,12 +1,13 @@
 using Moq;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
+using CoreServices = SailScores.Core.Services;
 using SailScores.Web.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+
 
 namespace SailScores.Test.Unit.Web.Services
 {
@@ -55,7 +56,7 @@ namespace SailScores.Test.Unit.Web.Services
                 _clubId, 
                 It.IsAny<DateTime?>(), 
                 It.IsAny<DateTime?>()))
-                .ReturnsAsync(new List<WindDataPoint>());
+                .ReturnsAsync(new List<CoreServices.WindDataPoint>());
 
             // Act
             var result = await _service.GetWindAnalysisAsync(_clubInitials, startDate, endDate);
@@ -87,7 +88,7 @@ namespace SailScores.Test.Unit.Web.Services
                 _clubId, 
                 It.IsAny<DateTime?>(), 
                 It.IsAny<DateTime?>()))
-                .ReturnsAsync(new List<WindDataPoint>());
+                .ReturnsAsync(new List<CoreServices.WindDataPoint>());
 
             // Act
             var result = await _service.GetWindAnalysisAsync(_clubInitials, startDate, endDate);
@@ -121,7 +122,7 @@ namespace SailScores.Test.Unit.Web.Services
                 _clubId, 
                 It.IsAny<DateTime?>(), 
                 It.IsAny<DateTime?>()))
-                .ReturnsAsync(new List<SkipperStatistics>());
+                .ReturnsAsync(new List<CoreServices.SkipperStatistics>());
 
             // Act
             var result = await _service.GetSkipperStatsAsync(_clubInitials, startDate, endDate);
@@ -153,7 +154,7 @@ namespace SailScores.Test.Unit.Web.Services
                 _clubId, 
                 It.IsAny<DateTime?>(), 
                 It.IsAny<DateTime?>()))
-                .ReturnsAsync(new List<SkipperStatistics>());
+                .ReturnsAsync(new List<CoreServices.SkipperStatistics>());
 
             // Act
             var result = await _service.GetSkipperStatsAsync(_clubInitials, startDate, endDate);
@@ -188,7 +189,7 @@ namespace SailScores.Test.Unit.Web.Services
                 It.IsAny<string>(),
                 It.IsAny<DateTime?>(), 
                 It.IsAny<DateTime?>()))
-                .ReturnsAsync(new List<ParticipationMetric>());
+                .ReturnsAsync(new List<CoreServices.ParticipationMetric>());
 
             // Act
             var result = await _service.GetParticipationAsync(_clubInitials, "month", startDate, endDate);
@@ -222,7 +223,7 @@ namespace SailScores.Test.Unit.Web.Services
                 It.IsAny<string>(),
                 It.IsAny<DateTime?>(), 
                 It.IsAny<DateTime?>()))
-                .ReturnsAsync(new List<ParticipationMetric>());
+                .ReturnsAsync(new List<CoreServices.ParticipationMetric>());
 
             // Act
             var result = await _service.GetParticipationAsync(_clubInitials, "month", startDate, endDate);
@@ -254,7 +255,7 @@ namespace SailScores.Test.Unit.Web.Services
                 _clubId, 
                 It.IsAny<DateTime?>(), 
                 It.IsAny<DateTime?>()))
-                .ReturnsAsync(new List<WindDataPoint>());
+                .ReturnsAsync(new List<CoreServices.WindDataPoint>());
 
             // Act
             var result = await _service.GetWindAnalysisAsync(_clubInitials, null, null);

@@ -19,7 +19,7 @@
 
     <div class="col-12">
         <div class="d-flex align-items-start">
-          @if (Model.LogoFileId.HasValue)
+@*           @if (Model.LogoFileId.HasValue)
           {
             @if (!String.IsNullOrWhiteSpace(Model.Url))
             {
@@ -41,7 +41,7 @@
                     </div>
                 </a>
             }
-          }
+          } *@
             <div>
                 <h1 class="display-4 mb-1">@Model.Name</h1>
                 @if (!String.IsNullOrWhiteSpace(Model.Url))
@@ -60,7 +60,7 @@
 @if (!String.IsNullOrWhiteSpace(Model.Description))
 {
     <div class="row">
-        <div class="col-md-9 d-none d-md-block">
+        <div class="col-md-9 d-none d-md-block mt-2">
             @Html.Raw(Markdig.Markdown.ToHtml(Model.Description))
         </div>
     </div>
