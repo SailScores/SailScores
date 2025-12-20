@@ -98,7 +98,8 @@
 
     @inject SailScores.Web.Services.Interfaces.ISystemAlertService SystemAlertService
     @await Html.PartialAsync("_SystemAlerts", await SystemAlertService.GetActiveAlertsAsync())
-    <div class="container-lg body-content">
+
+    <div class="container-lg body-content">
         <main class="col-12 bd-content" role="main">
             @RenderBody()
         </main>

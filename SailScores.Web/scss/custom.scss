@@ -91,6 +91,19 @@ body {
     margin-bottom: 130px;
 }
 
+/* Prevent layout shift when pages gain/lose a vertical scrollbar */
+html {
+    /* modern browsers will reserve space for the scrollbar */
+    scrollbar-gutter: stable;
+}
+
+/* Fallback for browsers that don't support `scrollbar-gutter` - always show a vertical scrollbar */
+@supports not (scrollbar-gutter: stable) {
+    html {
+        overflow-y: scroll;
+    }
+}
+
 header.bg-dark, nav.bg-dark {
     background-color: $my-nav-bg-dark !important;
 }

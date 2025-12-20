@@ -5,7 +5,7 @@
     ViewData["Title"] = "FAQ";
 }
 
-<div class="faq-page">
+<div class="faq-page col-12 col-lg-9 mx-auto">
     <h1 class="mb-4">@ViewData["Title"]</h1>
     <p class="lead">
         Answers to common questions about SailScores. If you do not find what you need,
@@ -263,7 +263,7 @@
                     fleets, and formats. It’s a great way to get familiar
                     with the system before race day.
                     <a href="mailto:info@SailScores.com">Let us know</a> if
-                    you'd like some of the tests cleared out.
+                    we'd like some of the tests cleared out.
                 </p>
             </div>
         </details>
@@ -501,74 +501,4 @@
                     <strong>TODO:</strong> Document automated exports and retention policy.
                 </p>
                 <p>
-                    Series results can be exported as CSV for backup from the series result
-                    pages.
-                </p>
-
-            </div>
-        </details>
-
-        <details class="faq-details">
-            <summary class="h4">What happens to my data if I stop using SailScores?</summary>
-            <div class="faq-details-content">
-                <p>
-                    SailScores data will be kept accessible for at least a year after
-                    the most recent race activity. When cleaning up apparently abandoned clubs,
-                    we will reach out to the registered scorekeepers to determine the
-                    club's intent before removing data.
-                </p>
-
-            </div>
-        </details>
-    </section>
-
-    <section id="contribution" class="mb-5">
-        <h2 class="h3 fw-bold">Open Source &amp; Contribution</h2>
-
-        <details class="faq-details">
-            <summary class="h4">How can I report bugs or request features?</summary>
-            <div class="faq-details-content">
-                <p>Log an <a href="https://github.com/SailScores/SailScores/issues" target="_blank">
-                  issue on GitHub</a> or <a href="mailto:info@SailScores.com">email
-                    the team</a>.
-                </p>
-            </div>
-        </details>
-
-        <details class="faq-details">
-            <summary class="h4">Can I contribute to development?</summary>
-            <div class="faq-details-content">
-                <p>Yes. SailScores welcomes feedback, code contributions, translations, and
-                  documentation help. We are particularly eager to accept features that
-                  improve the site for many users.
-                </p>
-            </div>
-        </details>
-    </section>
-
-    <p class="mt-5">
-        <strong>Still need help?</strong> <a href="mailto:info@SailScores.com">Reach out</a> with details.
-        Screenshots and links to pages help us help you.
-    </p>
-</div>
-
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script>
-        // $(function () {
-        //     $('[data-bs-toggle="popover"]').popover()
-        // })
-
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-          return new bootstrap.Popover(popoverTriggerEl)
-        })
-
-    </script>
-}
+                    Series results can be exported as CSV for back
