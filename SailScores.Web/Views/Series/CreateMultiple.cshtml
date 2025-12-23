@@ -1,0 +1,251 @@
+@using SailScores.Web.Services
+@using SailScores.Api.Enumerations
+
+@model SailScores.Web.Models.SailScores.MultipleSeriesWithOptionsViewModel
+
+@{
+    ViewData["Title"] = "Create Multiple Series";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<div class="container">
+    <h2>Create Multiple Series</h2>
+    <hr />
+    <br class="d-none d-md-block" />
+
+    <form asp-action="CreateMultiple">
+        <div class="row">
+            <div class="col-md-6">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="SeasonId" class="control-label">Season <em>Required</em></label>
+                    <select asp-for="SeasonId" class="form-select">
+                        <option selected="selected">Select a season...</option>
+                        @foreach (var season in Model.SeasonOptions)
+                        {
+                            <option value="@season.Id">@season.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="SeasonId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ScoringSystemId">Scoring System</label>
+                    <select asp-for="ScoringSystemId" class="form-select">
+                        @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                        {
+                            <option value="@scoringSystem.Id">@scoringSystem.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TrendOption">Calculate Rank Trend</label>
+                    <select asp-for="TrendOption" class="form-select">
+                        @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+                        {
+                            <option value="@trendOption">@(EnumHelper<TrendOption>.GetDisplayValue(trendOption))</option>
+                        }
+                    </select>
+                    <span asp-validation-for="TrendOption" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="HideDncDiscards" />
+                        <label class="form-check-label" asp-for="HideDncDiscards">Hide discarded DNC scores (Show as blank)</label>
+                    </div>
+                </div>
+
+                <div id="advancedFields" role="tablist">
+                    <div class="card">
+                        <div class="card-header" role="tab" id="advancedHeading">
+                            <h5 class="mb-0">
+                                <a class="collapsed" data-bs-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                    Additional Settings <span class="fas fa-chevron-down"></span></a>
+                                <span class="small"><em>&ensp;Optional</em></span>
+                            </h5>
+                        </div>
+
+                        <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" asp-for="CreateSummarySeries" />
+                                        <label class="form-check-label" asp-for="CreateSummarySeries">Create summary series for these new series</label>
+                                        <span class="small"><br />Creates a summary series that groups the series created below.</span>
+                                    </div>
+                                </div>
+
+                                <div id="summarySeriesFields" style="display: @(Model.CreateSummarySeries ? "block" : "none");">
+                                    <div class="mb-3">
+                                        <label asp-for="SummarySeriesName" class="control-label"></label>
+                                        <input asp-for="SummarySeriesName" class="form-control" />
+                                        <span asp-validation-for="SummarySeriesName" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" asp-for="SummaryChildrenSeriesAsSingleRace" />
+                                            <label class="form-check-label" asp-for="SummaryChildrenSeriesAsSingleRace">Children series each count as a single race</label>
+                                            <span class="small"><br />If not checked, all races will be counted in this summary series as individual races.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div id="allSeries">
+                    <div class="row d-none d-md-flex mt-4">
+                        <div class="col-md-5">
+                            <div class="mb-3">Name <span class="small muted"><em>Must be unique in Season</em></span></div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">Series Start Date <span class="small muted"><em>Optional</em></span></div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">Series End Date <span class="small muted"><em>Optional</em></span></div>
+                        </div>
+                        <div class="col-md-1"></div>
+                    </div>
+
+                    <div class="row" id="seriesRowTemplate" style="display: none">
+                        <div class="col-3 d-md-none">Name</div>
+                        <div class="col-9 col-md-5">
+                            <div class="mb-3">
+                                <input type="text" name="template.Name" class="form-control" data-column="0" />
+                            </div>
+                        </div>
+                        <div class="col-3 d-md-none">Start</div>
+                        <div class="col-9 col-md-3">
+                            <div class="mb-3">
+                                <input type="date" name="template.EnforcedStartDate" class="form-control" data-column="1" />
+                            </div>
+                        </div>
+                        <div class="col-3 d-md-none">End</div>
+                        <div class="col-9 col-md-3">
+                            <div class="mb-3">
+                                <input type="date" name="template.EnforcedEndDate" class="form-control" data-column="2" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-1">
+                            <button type="button" class="btn btn-outline-danger" onclick="deleteRow(this)" title="Delete Row">
+                                <span class="fas fa-trash-alt"></span>
+                            </button>
+                        </div>
+                        <div class="col-12 d-md-none">
+                            <hr class="d-md-none" />
+                        </div>
+                    </div>
+
+                    @if (Model.Series != null && Model.Series.Count > 0)
+                    {
+                        for (var i = 0; i < Model.Series.Count; i++)
+                        {
+                            <div class="row series-row">
+                                <div class="col-3 d-md-none">Name</div>
+                                <div class="col-9 col-md-5">
+                                    <div class="mb-3">
+                                        <input type="text" name="series[@i].Name" class="form-control" value="@Model.Series[i].Name" data-column="0" data-row="@i" />
+                                        <span asp-validation-for="Series[i].Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-md-none">Start</div>
+                                <div class="col-9 col-md-3">
+                                    <div class="mb-3">
+                                        <input type="date" name="series[@i].EnforcedStartDate" class="form-control" value="@(Model.Series[i].EnforcedStartDate?.ToString("yyyy-MM-dd"))" data-column="1" data-row="@i" />
+                                        <span asp-validation-for="Series[i].EnforcedStartDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-md-none">End</div>
+                                <div class="col-9 col-md-3">
+                                    <div class="mb-3">
+                                        <input type="date" name="series[@i].EnforcedEndDate" class="form-control" value="@(Model.Series[i].EnforcedEndDate?.ToString("yyyy-MM-dd"))" data-column="2" data-row="@i" />
+                                        <span asp-validation-for="Series[i].EnforcedEndDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-1">
+                                    <button type="button" class="btn btn-outline-danger" onclick="deleteRow(this)" title="Delete Row">
+                                        <span class="fas fa-trash-alt"></span>
+                                    </button>
+                                </div>
+                                <div class="col-12 d-md-none">
+                                    <hr class="d-md-none" />
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="row series-row">
+                            <div class="col-3 d-md-none">Name</div>
+                            <div class="col-9 col-md-5">
+                                <div class="mb-3">
+                                    <input type="text" name="series[0].Name" class="form-control" data-column="0" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-3 d-md-none">Start</div>
+                            <div class="col-9 col-md-3">
+                                <div class="mb-3">
+                                    <input type="date" name="series[0].EnforcedStartDate" class="form-control" data-column="1" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-3 d-md-none">End</div>
+                            <div class="col-9 col-md-3">
+                                <div class="mb-3">
+                                    <input type="date" name="series[0].EnforcedEndDate" class="form-control" data-column="2" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-1">
+                                <button type="button" class="btn btn-outline-danger" onclick="deleteRow(this)" title="Delete Row">
+                                    <span class="fas fa-trash-alt"></span>
+                                </button>
+                            </div>
+                            <div class="col-12 d-md-none">
+                                <hr class="d-md-none" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-2">
+                <button class="btn btn-light" type="button" onclick="addNewRow()">
+                    <span class="fas fa-plus"></span>
+                </button>
+            </div>
+            <div class="col-10 d-none d-md-block">
+                <span class="small"><em>Paste cells from Excel or Google Sheets to add many at once.</em></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="d-grid gap-2">
+                    <input type="submit" value="Create" class="btn btn-primary btn-block my-2" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="d-grid gap-2">
+                    <a asp-controller="Admin" asp-action="Index" asp-fragment="series"
+                       class="btn btn-outline-primary btn-block my-2">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/createMultipleSeries.js"></script>
+    <script type="text/javascript" src="~/js/createMultipleSeriesSummary.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

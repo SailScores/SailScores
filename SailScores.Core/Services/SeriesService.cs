@@ -814,6 +814,26 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
 
+            // Create child series links if specified (used by Summary series)
+            if (series.ChildrenSeriesIds != null && series.ChildrenSeriesIds.Any())
+            {
+                var distinctChildIds = series.ChildrenSeriesIds.Distinct().ToList();
+                foreach (var childSeriesId in distinctChildIds)
+                {
+                    dbSeries.ChildLinks ??= new List<dbObj.SeriesToSeriesLink>();
+
+                    if (!dbSeries.ChildLinks.Any(l => l.ChildSeriesId == childSeriesId))
+                    {
+                        dbSeries.ChildLinks.Add(new dbObj.SeriesToSeriesLink
+                        {
+                            ParentSeriesId = dbSeries.Id,
+                            ChildSeriesId = childSeriesId
+                        });
+                    }
+                }
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+
             // Create parent series links if specified
             if (series.ParentSeriesIds != null && series.ParentSeriesIds.Any())
             {

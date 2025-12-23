@@ -15,14 +15,28 @@
             </h3>
         </div>
         <div class="col-2 col-sm-4 col-md-3 col-lg-2">
-            <a class="btn btn-primary"
-                asp-action="Create"
-                asp-controller="Series">
-                <span class="fas fa-plus"></span>
-                <span class="d-none d-sm-inline">
-                    New Series
-                </span>
-            </a>
+            <div class="btn-group">
+                <a class="btn btn-primary"
+                   asp-action="Create"
+                   asp-controller="Series">
+                    <span class="fas fa-plus"></span>
+                    <span class="d-none d-sm-inline">
+                        New Series
+                    </span>
+                </a>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item"
+                           asp-action="CreateMultiple"
+                           asp-controller="Series">
+                            Create Multiple...
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end mt-2 mt-md-0">
             <div class="form-row w-100">

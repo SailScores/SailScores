@@ -96,6 +96,7 @@ public class CalendarService : ICoreCalendarService
             .Include(s => s.RaceSeries)
             .ThenInclude(rs => rs.Race)
             .ThenInclude(r => r.Fleet)
+            .Include(s => s.Season)
             .AsSplitQuery();
 
         var dateLimitedSeriesIds = await dateLimitedSeriesList

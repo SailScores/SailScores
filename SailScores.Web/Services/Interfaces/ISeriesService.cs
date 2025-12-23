@@ -16,4 +16,6 @@ public interface ISeriesService
     Task DeleteAsync(Guid id);
     Task<Core.FlatModel.FlatChartData> GetChartData(Guid seriesId);
     Task<SeriesWithOptionsViewModel> GetBlankVmForCreate(string clubInitials);
+    Task<MultipleSeriesWithOptionsViewModel> GetBlankVmForCreateMultiple(string clubInitials);
+    Task<IList<Guid>> CreateMultipleAsync(string clubInitials, Guid clubId, MultipleSeriesWithOptionsViewModel model, string updatedBy);
 }

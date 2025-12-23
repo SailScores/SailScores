@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
 using SailScores.Database;
@@ -96,6 +96,19 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             retObj.Season = dbSeason;
+
+            foreach(var childSeriesId in series.ChildrenSeriesIds ?? Enumerable.Empty<Guid>())
+            {
+                if (retObj.ChildLinks == null)
+                {
+                    retObj.ChildLinks = new List<dbObj.SeriesToSeriesLink>();
+                }
+                retObj.ChildLinks.Add(new dbObj.SeriesToSeriesLink
+                {
+                    ParentSeries = retObj,
+                    ChildSeriesId = childSeriesId
+                });
+            }
 
             return retObj;
         }

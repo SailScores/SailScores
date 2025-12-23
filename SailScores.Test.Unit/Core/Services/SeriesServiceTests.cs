@@ -217,4 +217,63 @@ public class SeriesServiceTests
         // Assert - restricted series should be included when date is null
         Assert.Contains(allSeries, s => s.Id == restrictedSeries.Id);
     }
+
+    [Fact]
+    public async Task SaveNewSeries_SummaryWithChildren_PersistsChildLinks()
+    {
+        // Arrange
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+
+        var child1 = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Child Series 1",
+            UrlName = "child-series-1",
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            RaceSeries = new List<Database.Entities.SeriesRace>(),
+            ChildLinks = new List<Database.Entities.SeriesToSeriesLink>(),
+            ParentLinks = new List<Database.Entities.SeriesToSeriesLink>()
+        };
+        var child2 = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Child Series 2",
+            UrlName = "child-series-2",
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            RaceSeries = new List<Database.Entities.SeriesRace>(),
+            ChildLinks = new List<Database.Entities.SeriesToSeriesLink>(),
+            ParentLinks = new List<Database.Entities.SeriesToSeriesLink>()
+        };
+
+        _context.Series.Add(child1);
+        _context.Series.Add(child2);
+        await _context.SaveChangesAsync();
+
+        var summary = new Series
+        {
+            ClubId = clubId,
+            Name = "My Summary",
+            Season = _mapper.Map<Season>(season),
+            Type = SeriesType.Summary,
+            ChildrenSeriesIds = new List<Guid> { child1.Id, child2.Id },
+            UpdatedBy = "test"
+        };
+
+        // Act
+        var summaryId = await _service.SaveNewSeries(summary);
+
+        // Assert
+        var dbSummary = await _context.Series
+            .Include(s => s.ChildLinks)
+            .SingleAsync(s => s.Id == summaryId);
+
+        Assert.NotNull(dbSummary.ChildLinks);
+        Assert.Contains(dbSummary.ChildLinks, l => l.ChildSeriesId == child1.Id);
+        Assert.Contains(dbSummary.ChildLinks, l => l.ChildSeriesId == child2.Id);
+    }
 }
