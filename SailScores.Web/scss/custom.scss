@@ -1213,3 +1213,24 @@ form label.required:not(.custom-control-label)::after {
         border-color: rgba(var(--bs-info-rgb, 13, 202, 240), 0.22);
     }
 }
+
+/* Home page styles */
+.home-index {
+    /* Subtle hover effect for interactive cards */
+    .card {
+        transition: all 0.2s ease-in-out;
+        
+        &:hover {
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            transition: all 0.2s ease-in-out;
+        }
+    }
+
+    #clubCardsContainer .card-text {
+        max-height: 200px;
+        overflow-y: auto;
+        position: relative;
+        z-index: 2;
+    }
+}
