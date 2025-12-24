@@ -298,7 +298,6 @@ span.discardmuted {
 }
 
 
-
 [data-toggle="collapse"]:after {
     display: inline-block;
     font-family: "Font Awesome 5 Free";
@@ -746,6 +745,31 @@ form label.required:not(.custom-control-label)::after {
         display: block !important;
     }
 
+}
+
+/* Sticky headers for AllCompHistogram report table */
+.allcomp-table {
+  thead {
+    th {
+      position: sticky;
+      top: 0; /* header reaches top of viewport (navbar not fixed) */
+      background-color: var(--bs-tertiary-bg, #f8f9fa);
+      z-index: 1100;
+      border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    }
+  }
+
+  /* Center all cells in the table */
+  th,
+  td {
+    text-align: center;
+    vertical-align: middle;
+  }
+}
+
+/* Ensure table-responsive does not clip sticky headers vertically */
+.table-responsive {
+  overflow: visible;
 }
 
 @media (max-width: 767.98px) {

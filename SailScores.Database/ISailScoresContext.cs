@@ -60,5 +60,13 @@ namespace SailScores.Database
         Task<IList<SiteStats>> GetSiteStats();
         Task<IList<DeletableInfo>> GetDeletableInfoForCompetitorsAsync(Guid clubId);
         Task<IList<CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId);
+        Task<IList<AllCompHistogramFields>> GetAllCompHistogramFields(
+            Guid clubId,
+            DateTime? startDate,
+            DateTime? endDate);
+        Task<IList<AllCompHistogramStats>> GetAllCompHistogramStats(
+            Guid clubId,
+            DateTime? startDate,
+            DateTime? endDate);
     }
 }

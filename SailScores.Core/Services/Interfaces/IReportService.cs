@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SailScores.Database.Entities;
 
 namespace SailScores.Core.Services;
 
@@ -21,6 +22,7 @@ public interface IReportService
         string groupBy = "month",
         DateTime? startDate = null,
         DateTime? endDate = null);
+    Task<CompHistogram> GetAllCompHistogramStats(Guid clubId, DateTime? startDate = null, DateTime? endDate = null);
 }
 
 public class WindDataPoint
@@ -52,4 +54,10 @@ public class ParticipationMetric
     public DateTime PeriodStart { get; set; }
     public string BoatClassName { get; set; }
     public int DistinctSkippers { get; set; }
+}
+
+public class CompHistogram
+{
+    public IEnumerable<AllCompHistogramFields> FieldList { get; set; }
+    public IEnumerable<AllCompHistogramStats> Stats { get; set; }
 }

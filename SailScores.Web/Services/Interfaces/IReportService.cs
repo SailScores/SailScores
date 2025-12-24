@@ -21,4 +21,9 @@ public interface IReportService
         string groupBy = "month",
         DateTime? startDate = null,
         DateTime? endDate = null);
+
+    Task<AllCompHistogramViewModel> GetAllCompHistogramAsync(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null);
 }

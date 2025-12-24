@@ -38,6 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sql\AllCompHistogram.sql" />
+    <EmbeddedResource Include="Sql\AllCompHistogramFields.sql" />
     <EmbeddedResource Include="Sql\CompetitorActiveDates.sql" />
     <EmbeddedResource Include="Sql\DeletableCompetitors.sql" />
     <EmbeddedResource Include="Sql\SiteStats.sql" />
