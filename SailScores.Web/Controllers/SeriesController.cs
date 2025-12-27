@@ -202,6 +202,24 @@ public class SeriesController : Controller
 
             return RedirectToAction("Index", "Admin");
         }
+        catch (InvalidOperationException ex)
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+
+            // Clear parent series IDs for Summary Series since they can't have parents
+            // probably redundant with above, but doesn't hurt.
+            if (model.Type == Core.Model.SeriesType.Summary)
+            {
+                model.ParentSeriesIds = null;
+            }
+
+            ModelState.AddModelError(String.Empty, ex.Message);
+
+            return View(model);
+        }
         catch
         {
             var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
@@ -352,6 +370,66 @@ public class SeriesController : Controller
                 "A problem occurred deleting this series.");
             var series = await _seriesService.GetSeriesAsync(id);
             return View(series);
+        }
+    }
+
+    [Authorize]
+    public async Task<ActionResult> CreateMultiple(string clubInitials)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        var vm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<ActionResult> CreateMultiple(
+        string clubInitials,
+        MultipleSeriesWithOptionsViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            return View(model);
+        }
+
+        try
+        {
+            await _seriesService.CreateMultipleAsync(clubInitials, clubId, model, await GetUserStringAsync());
+            return RedirectToAction("Index", "Admin", new { clubInitials });
+        }
+        catch (InvalidOperationException ex)
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+        catch
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+
+            ModelState.AddModelError(string.Empty, "A problem occurred creating these series. Check" +
+                " for duplicate names within the selected season or invalid date ranges.");
+            return View(model);
         }
     }
 }

@@ -47,15 +47,18 @@ namespace SailScores.Core.Services
 
             var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
 
+            var bizById = bizObj.ToDictionary(x => x.Id);
+
             // ignored in mapper to avoid loops.
             foreach (var fleet in dbFleets)
             {
+                var target = bizById[fleet.Id];
                 var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
-                bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
+                target.BoatClasses
                     = _mapper.Map<IList<BoatClass>>(boatClasses);
 
                 var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
-                bizObj.First(bo => bo.Id == fleet.Id).Competitors
+                target.Competitors
                     = _mapper.Map<IList<Competitor>>(competitors);
             }
 
@@ -148,7 +151,11 @@ namespace SailScores.Core.Services
             // Optimized query: Aggregate series counts and most recent update date per club
             var clubsWithRecentSeries = await _dbContext
                 .Series
-                .Where(s => s.UpdatedDate.HasValue && s.UpdatedDate.Value >= cutoffDate)
+                .Where(s => s.UpdatedDate.HasValue && s.UpdatedDate.Value >= cutoffDate
+                    && (s.StartDate.HasValue && s.StartDate.Value <= DateOnly.FromDateTime(DateTime.UtcNow) 
+                        || s.EnforcedStartDate.HasValue && s.EnforcedStartDate.Value <= DateOnly.FromDateTime(DateTime.UtcNow))
+                    && (s.EndDate.HasValue && s.EndDate.Value > DateOnly.FromDateTime(cutoffDate) 
+                        || s.EnforcedEndDate.HasValue && s.EnforcedEndDate.Value > DateOnly.FromDateTime(cutoffDate)))
                 .GroupBy(s => s.ClubId)
                 .Select(g => new { 
                     ClubId = g.Key, 

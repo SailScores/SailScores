@@ -79,6 +79,8 @@ public class SeriesService : ISeriesService
         var clubId = await _coreClubService.GetClubId(clubInitials);
         var club = await _coreClubService.GetMinimalClub(clubId);
 
+        partialSeries.ClubId = clubId;
+
         var allSeasons = await _coreSeasonService.GetSeasons(clubId);
         var seasons = allSeasons;
 
@@ -116,12 +118,24 @@ public class SeriesService : ISeriesService
         partialSeries.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
 
         // Get summary series options
-        var selectedSeasonForSummary = seasons.FirstOrDefault(s => s.Id == partialSeries.SeasonId);
-        var centerDate = selectedSeasonForSummary != null
-            ? selectedSeasonForSummary.Start.AddDays(
-                (selectedSeasonForSummary.End - selectedSeasonForSummary.Start).TotalDays / 2)
-            : default;
-        partialSeries.SummarySeriesOptions = (await GetSummarySeriesAsync(clubId, centerDate)).ToList();
+        if (partialSeries.SeasonId != default)
+        {
+            var selectedSeasonForSummary = seasons.FirstOrDefault(s => s.Id == partialSeries.SeasonId);
+            if (selectedSeasonForSummary != null)
+            {
+                partialSeries.SummarySeriesOptions = (await GetSummarySeriesAsync(clubId, selectedSeasonForSummary.Start))
+                    .Where(s => s.Season != null && s.Season.Id == selectedSeasonForSummary.Id)
+                    .ToList();
+            }
+            else
+            {
+                partialSeries.SummarySeriesOptions = new List<SeriesSummary>();
+            }
+        }
+        else
+        {
+            partialSeries.SummarySeriesOptions = new List<SeriesSummary>();
+        }
 
         return partialSeries;
 
@@ -136,6 +150,7 @@ public class SeriesService : ISeriesService
 
         var vm = new SeriesWithOptionsViewModel
         {
+            ClubId = clubId,
             SeasonOptions = seasons
         };
         var selectedSeason = seasons.FirstOrDefault(s =>
@@ -161,6 +176,137 @@ public class SeriesService : ISeriesService
 
         return vm;
 
+    }
+
+    public async Task<MultipleSeriesWithOptionsViewModel> GetBlankVmForCreateMultiple(string clubInitials)
+    {
+        var blankSingle = await GetBlankVmForCreate(clubInitials);
+
+        return new MultipleSeriesWithOptionsViewModel
+        {
+            SeasonId = blankSingle.SeasonId,
+            SeasonOptions = blankSingle.SeasonOptions,
+            ScoringSystemId = blankSingle.ScoringSystemId,
+            ScoringSystemOptions = blankSingle.ScoringSystemOptions,
+            TrendOption = blankSingle.TrendOption,
+            HideDncDiscards = blankSingle.HideDncDiscards,
+            Series = new List<MultipleSeriesRowViewModel>
+            {
+                new()
+            }
+        };
+    }
+
+    public async Task<IList<Guid>> CreateMultipleAsync(
+        string clubInitials,
+        Guid clubId,
+        MultipleSeriesWithOptionsViewModel model,
+        string updatedBy)
+    {
+        var createdIds = new List<Guid>();
+
+        var rows = model.Series
+            .Where(r => r != null)
+            .Where(r => !string.IsNullOrWhiteSpace(r.Name))
+            .ToList();
+
+        // Pre-validate all rows
+        var seasons = await _coreSeasonService.GetSeasons(clubId);
+        var season = seasons.Single(s => s.Id == model.SeasonId);
+
+        foreach (var row in rows)
+        {
+            if (row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue)
+            {
+                var vm = new SeriesWithOptionsViewModel
+                {
+                    EnforcedStartDate = row.EnforcedStartDate,
+                    EnforcedEndDate = row.EnforcedEndDate,
+                    DateRestricted = true
+                };
+                try
+                {
+                    ValidateDateRestriction(vm, season);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new InvalidOperationException($"Series '{row.Name}': {ex.Message}", ex);
+                }
+            }
+        }
+
+        foreach (var row in rows)
+        {
+            var dateRestricted = row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue;
+
+            var vm = new SeriesWithOptionsViewModel
+            {
+                ClubId = clubId,
+                Name = row.Name.Trim(),
+                SeasonId = model.SeasonId,
+                ScoringSystemId = model.ScoringSystemId,
+                TrendOption = model.TrendOption,
+                HideDncDiscards = model.HideDncDiscards,
+
+                Type = SeriesType.Standard,
+                ExcludeFromCompetitorStats = false,
+                Description = string.Empty,
+                IsImportantSeries = false,
+                ParentSeriesIds = null,
+
+                DateRestricted = dateRestricted,
+                EnforcedStartDate = row.EnforcedStartDate,
+                EnforcedEndDate = row.EnforcedEndDate,
+
+                UpdatedBy = updatedBy
+            };
+
+            var id = await SaveNew(vm);
+            createdIds.Add(id);
+        }
+
+        if (model.CreateSummarySeries)
+        {
+            if (string.IsNullOrWhiteSpace(model.SummarySeriesName))
+            {
+                throw new InvalidOperationException("To create a summary series, a summary series name is required.");
+            }
+            if (createdIds.Count == 0)
+            {
+                throw new InvalidOperationException("No series were created to include in the summary series.");
+            }
+
+            var summaryVm = new SeriesWithOptionsViewModel
+            {
+                ClubId = clubId,
+                Name = model.SummarySeriesName.Trim(),
+                SeasonId = model.SeasonId,
+                Season = season,
+                ScoringSystemId = model.ScoringSystemId == Guid.Empty ? null : model.ScoringSystemId,
+                TrendOption = model.TrendOption,
+                HideDncDiscards = model.HideDncDiscards,
+
+                Type = SeriesType.Summary,
+                ExcludeFromCompetitorStats = false,
+                Description = string.Empty,
+                IsImportantSeries = false,
+                ParentSeriesIds = null,
+
+                ChildrenSeriesAsSingleRace = model.SummaryChildrenSeriesAsSingleRace,
+                ChildrenSeriesIds = createdIds,
+
+                DateRestricted = false,
+                EnforcedStartDate = null,
+                EnforcedEndDate = null,
+
+                UpdatedBy = updatedBy
+            };
+
+            var summaryId = await _coreSeriesService.SaveNewSeries(summaryVm);
+            createdIds.Add(summaryId);
+        }
+
+        return createdIds;
     }
 
     public async Task<FlatChartData> GetChartData(Guid seriesId)
