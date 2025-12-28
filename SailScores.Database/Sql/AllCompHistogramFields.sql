@@ -18,8 +18,8 @@ WHERE Races.ClubId = @ClubId
         Select RaceId from SeriesRace
         inner join Series on SeriesRace.SeriesId = Series.Id
         where Series.ExcludeFromCompetitorStats = 1 AND Series.ClubId = @ClubId)
-    AND Races.Date >= @StartDate
-    AND Races.Date <= @EndDate
+    AND ( @StartDate is null OR Races.Date >= @StartDate )
+    AND ( @EndDate is null OR Races.Date <= @EndDate )
 GROUP BY
     Code
 

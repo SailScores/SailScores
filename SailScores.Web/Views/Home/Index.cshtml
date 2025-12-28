@@ -38,11 +38,11 @@
             </div>
         </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-8 col-lg-6">
         <h4>What's important in sailing club scoring software?</h4>
         <ul>
-            <li>Fast, simple result entry and sharing using the web. Optional speech
-                recognition to make things really easy.</li>
+            <li>Fast, simple result entry and sharing using the web. Optional handwriting
+              and speech recognition to make things really easy.</li>
             <li>Support for Appendix A Low Point Scoring including 2025-2028 rounding rules,
                 High Point Percentage, Cox-Sprague, and customized club scoring codes.
             </li>
@@ -69,51 +69,51 @@
             <div class="row">
                 @foreach (var club in Model.RecentlyActiveClubs.Take(10))
                 {
-                    <div class="col-12 col-md-6 col-lg-4 mb-3">
-                        <a href="/@club.Initials" class="text-decoration-none">
-                            <div class="card h-100 border-primary">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-start">
-                                        <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
-                                            @if (club.LogoFileId.HasValue)
-                                            {
-                                                <div class="club-logo-container" style="width:64px;height:64px;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;">
-                                                    <img src="@Url.Action("GetLogo", "Admin", new { id = club.LogoFileId })" alt="@club.Name logo" style="max-width:64px;max-height:64px;object-fit:contain;margin-top:-7.5px;" />
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
-                                                    <span class="text-muted small">@club.Initials</span>
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h5 class="card-title mb-1">@club.Name</h5>
-                                            @if (club.RecentRaceCount > 0 || club.RecentSeriesCount > 0)
-                                            {
-                                                <div class="small text-muted mt-1">
-                                                    @if (club.RecentRaceCount > 0)
-                                                    {
-                                                        <span>@club.RecentRaceCount race@(club.RecentRaceCount != 1 ? "s" : "")</span>
-                                                    }
-                                                    @if (club.RecentRaceCount > 0 && club.RecentSeriesCount > 0)
-                                                    {
-                                                        <span> across </span>
-                                                    }
-                                                    @if (club.RecentSeriesCount > 0)
-                                                    {
-                                                        <span>@club.RecentSeriesCount series</span>
-                                                    }
-                                                    <span> in past 2 weeks</span>
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
+                  <div class="col-12 col-md-6 col-lg-4 mb-3">
+                    <a href="/@club.Initials" class="text-decoration-none">
+                      <div class="card h-100 border-primary">
+                        <div class="card-body">
+                          <div class="d-flex align-items-start">
+                            <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
+                              @if (club.LogoFileId.HasValue)
+                              {
+                                <div class="club-logo-container" style="width:64px;height:64px;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;">
+                                    <img src="@Url.Action("GetLogo", "Admin", new { id = club.LogoFileId })" alt="@club.Name logo" style="max-width:64px;max-height:64px;object-fit:contain;margin-top:-7.5px;" />
                                 </div>
+                              }
+                              else
+                              {
+                                <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                    <span class="text-muted small">@club.Initials</span>
+                                </div>
+                              }
+                          </div>
+                          <div class="flex-grow-1">
+                              <h5 class="card-title mb-1">@club.Name</h5>
+                              @if (club.RecentRaceCount > 0 || club.RecentSeriesCount > 0)
+                              {
+                                <div class="small text-muted mt-1">
+                                  @if (club.RecentRaceCount > 0)
+                                  {
+                                      <span>@club.RecentRaceCount race@(club.RecentRaceCount != 1 ? "s" : "")</span>
+                                  }
+                                  @if (club.RecentRaceCount > 0 && club.RecentSeriesCount > 0)
+                                  {
+                                      <span> across </span>
+                                  }
+                                  @if (club.RecentSeriesCount > 0)
+                                  {
+                                      <span>@club.RecentSeriesCount series</span>
+                                  }
+                                  <span> in past 2 weeks</span>
+                                </div>
+                              }
                             </div>
-                        </a>
-                    </div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
                 }
             </div>
             @if (Model.RecentlyActiveClubs.Count() > 10)

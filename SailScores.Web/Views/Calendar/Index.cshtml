@@ -56,11 +56,11 @@ else
     </div>
 
     <div class="d-flex justify-content-between align-items-center mt-3">
-        <a asp-action="Index" asp-route-start="@(start.AddDays(-28).ToString("yyyy-MM-dd"))"
-           asp-route-end="@(end.AddDays(-28).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary" title="Back 4 weeks"><i class="fas fa-chevron-left"></i></a>
+        <a asp-action="Index" asp-route-start="@(earliest.AddDays(-28).ToString("yyyy-MM-dd"))"
+           asp-route-end="@(latest.AddDays(-28).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary" title="Back 4 weeks"><i class="fas fa-chevron-left"></i></a>
         <span class="fw-semibold">@(start.ToString("d")) - @(end.ToString("d"))</span>
-        <a asp-action="Index" asp-route-start="@(start.AddDays(28).ToString("yyyy-MM-dd"))"
-          asp-route-end="@(end.AddDays(28).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary" title="Forward 4 weeks"><i class="fas fa-chevron-right"></i></a>
+        <a asp-action="Index" asp-route-start="@(earliest.AddDays(28).ToString("yyyy-MM-dd"))"
+          asp-route-end="@(latest.AddDays(28).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary" title="Forward 4 weeks"><i class="fas fa-chevron-right"></i></a>
     </div>
 
     <div class="mt-4 px-0">

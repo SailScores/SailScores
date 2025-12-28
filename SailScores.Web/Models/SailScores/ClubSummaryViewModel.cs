@@ -48,6 +48,7 @@ public class ClubSummaryViewModel
                 s.Type == SeriesType.Summary
                 && (s.EndDate??DateOnly.MinValue) > DateOnly.FromDateTime(recentCutoff)
                 && (s.UpdatedDate??DateTime.MinValue) > recentCutoff
+                && (s.StartDate ?? DateOnly.MinValue) < DateOnly.FromDateTime(DateTime.Now)
             )
             || (s.Races
                 ?.Any(r => r.Date > recentCutoff
