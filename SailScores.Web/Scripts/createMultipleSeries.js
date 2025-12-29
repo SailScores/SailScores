@@ -130,3 +130,102 @@ document.addEventListener('paste', function (e) {
         }
     }
 });
+
+function importIcal() {
+    var seasonId = document.getElementById('SeasonId').value;
+    if (!seasonId || seasonId === "Select a season...") {
+        alert("Please select a season first.");
+        return;
+    }
+
+    var fileInput = document.getElementById('icalFile');
+    var urlInput = document.getElementById('icalUrl');
+    var errorDiv = document.getElementById('importError');
+    errorDiv.classList.add('d-none');
+
+    var formData = new FormData();
+    formData.append('seasonId', seasonId);
+    
+    var pathParts = window.location.pathname.split('/');
+    var clubInitials = pathParts[1]; 
+    
+    var url = '/' + clubInitials + '/Series/ImportIcal';
+
+    if (document.getElementById('file-tab').classList.contains('active')) {
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        } else {
+            errorDiv.textContent = "Please select a file.";
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+    } else {
+        if (urlInput.value) {
+            formData.append('url', urlInput.value);
+        } else {
+            errorDiv.textContent = "Please enter a URL.";
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+    }
+
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text) });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.warning) {
+            alert(data.warning);
+        }
+        
+        var rows = document.querySelectorAll('.series-row');
+        var firstRow = rows[0];
+        var isFirstRowBlank = true;
+        if (firstRow) {
+            var firstRowInputs = firstRow.querySelectorAll('input');
+            firstRowInputs.forEach(input => {
+                if (input.type !== 'hidden' && input.value.trim() !== '') {
+                    isFirstRowBlank = false;
+                }
+            });
+        }
+
+        data.series.forEach((s, index) => {
+            var targetRow;
+            
+            if (index === 0 && isFirstRowBlank && firstRow) {
+                targetRow = firstRow;
+            } else {
+                addNewRow();
+                var currentRows = document.querySelectorAll('.series-row');
+                targetRow = currentRows[currentRows.length - 1];
+            }
+
+            var inputs = targetRow.querySelectorAll('input');
+            
+            inputs.forEach(input => {
+                var col = input.getAttribute('data-column');
+                if (col === '0') input.value = s.name;
+                if (col === '1') input.value = s.startDate;
+                if (col === '2') input.value = s.endDate;
+            });
+        });
+        
+        var modalEl = document.getElementById('importIcalModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) {
+             modal = new bootstrap.Modal(modalEl);
+        }
+        modal.hide();
+    })
+    .catch(error => {
+        errorDiv.textContent = "Error: " + error.message;
+        errorDiv.classList.remove('d-none');
+    });
+}

@@ -32,6 +32,7 @@
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="HtmlSanitizer" Version="9.0.889" />
     <PackageReference Include="Humanizer" Version="3.0.1" />
+    <PackageReference Include="Ical.Net" Version="5.2.0" />
     <PackageReference Include="MailChimp.Net.V3" Version="5.8.2" />
     <PackageReference Include="Markdig" Version="0.44.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />

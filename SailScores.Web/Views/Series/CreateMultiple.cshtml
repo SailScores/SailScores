@@ -30,35 +30,6 @@
                     <span asp-validation-for="SeasonId" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="ScoringSystemId">Scoring System</label>
-                    <select asp-for="ScoringSystemId" class="form-select">
-                        @foreach (var scoringSystem in Model.ScoringSystemOptions)
-                        {
-                            <option value="@scoringSystem.Id">@scoringSystem.Name</option>
-                        }
-                    </select>
-                    <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="TrendOption">Calculate Rank Trend</label>
-                    <select asp-for="TrendOption" class="form-select">
-                        @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
-                        {
-                            <option value="@trendOption">@(EnumHelper<TrendOption>.GetDisplayValue(trendOption))</option>
-                        }
-                    </select>
-                    <span asp-validation-for="TrendOption" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" asp-for="HideDncDiscards" />
-                        <label class="form-check-label" asp-for="HideDncDiscards">Hide discarded DNC scores (Show as blank)</label>
-                    </div>
-                </div>
-
                 <div id="advancedFields" role="tablist">
                     <div class="card">
                         <div class="card-header" role="tab" id="advancedHeading">
@@ -71,6 +42,34 @@
 
                         <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                             <div class="card-body">
+                                <div class="mb-3">
+                                    <label asp-for="ScoringSystemId">Scoring System</label>
+                                    <select asp-for="ScoringSystemId" class="form-select">
+                                        @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                                        {
+                                            <option value="@scoringSystem.Id">@scoringSystem.Name</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="TrendOption">Calculate Rank Trend</label>
+                                    <select asp-for="TrendOption" class="form-select">
+                                        @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+                                        {
+                                            <option value="@trendOption">@(EnumHelper<TrendOption>.GetDisplayValue(trendOption))</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="TrendOption" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" asp-for="HideDncDiscards" />
+                                        <label class="form-check-label" asp-for="HideDncDiscards">Hide discarded DNC scores (Show as blank)</label>
+                                    </div>
+                                </div>
                                 <div class="mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" asp-for="CreateSummarySeries" />
@@ -225,6 +224,9 @@
             </div>
             <div class="col-10 d-none d-md-block">
                 <span class="small"><em>Paste cells from Excel or Google Sheets to add many at once.</em></span>
+                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#importIcalModal">
+                    Import from iCal
+                </button>
             </div>
         </div>
 
@@ -242,6 +244,47 @@
             </div>
         </div>
     </form>
+
+    <!-- Modal -->
+    <div class="modal fade" id="importIcalModal" tabindex="-1" aria-labelledby="importIcalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importIcalModalLabel">Import Series from iCal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="importTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="file-tab" data-bs-toggle="tab" data-bs-target="#file" type="button" role="tab" aria-controls="file" aria-selected="true">File Upload</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url" type="button" role="tab" aria-controls="url" aria-selected="false">URL</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3" id="importTabsContent">
+                        <div class="tab-pane fade show active" id="file" role="tabpanel" aria-labelledby="file-tab">
+                            <div class="mb-3">
+                                <label for="icalFile" class="form-label">Select .ics file</label>
+                                <input class="form-control" type="file" id="icalFile" accept=".ics,text/calendar">
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="url" role="tabpanel" aria-labelledby="url-tab">
+                            <div class="mb-3">
+                                <label for="icalUrl" class="form-label">iCal URL</label>
+                                <input type="url" class="form-control" id="icalUrl" placeholder="https://example.com/calendar.ics">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="importError" class="alert alert-danger d-none mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="importIcal()">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

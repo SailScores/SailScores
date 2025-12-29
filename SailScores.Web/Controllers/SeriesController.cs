@@ -1,5 +1,7 @@
 using System.Text;
 using System.Web;
+using System.IO;
+using System.Net.Http;
 using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -430,6 +432,40 @@ public class SeriesController : Controller
             ModelState.AddModelError(string.Empty, "A problem occurred creating these series. Check" +
                 " for duplicate names within the selected season or invalid date ranges.");
             return View(model);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> ImportIcal(string clubInitials, Guid seasonId, IFormFile file, string url)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var result = await _seriesService.ImportIcalAsync(clubInitials, seasonId, file, url);
+            
+            // Map the result to the anonymous object structure expected by the frontend
+            var seriesList = result.Series.Select(s => new
+            {
+                Name = s.Name,
+                StartDate = s.StartDate,
+                EndDate = s.EndDate
+            }).ToList();
+
+            return Json(new { series = seriesList, warning = result.Warning });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"An error occurred: {ex.Message}");
         }
     }
 }
