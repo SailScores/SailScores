@@ -468,4 +468,31 @@ public class SeriesController : Controller
             return BadRequest($"An error occurred: {ex.Message}");
         }
     }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> CheckSeriesNamesUnique(
+        string clubInitials,
+        Guid seasonId,
+        [FromBody] List<string> names)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        var existingNames = await _seriesService.GetSeriesNamesAsync(clubId, seasonId);
+        var existingNamesSet = new HashSet<string>(
+            existingNames.Select(n => n.Trim()),
+            StringComparer.OrdinalIgnoreCase);
+
+        var conflictingNames = names
+            .Where(n => !string.IsNullOrWhiteSpace(n) && existingNamesSet.Contains(n.Trim()))
+            .Select(n => n.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Json(new { conflictingNames });
+    }
 }

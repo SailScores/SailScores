@@ -123,8 +123,9 @@ public class ReportService : Interfaces.IReportService
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            var club = await _clubService.GetMinimalClub(clubId);
+
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            var clubId = club.Id;
 
             var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
             var originalStartDate = startDate;
@@ -174,8 +175,9 @@ public class ReportService : Interfaces.IReportService
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            var club = await _clubService.GetMinimalClub(clubId);
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            var clubId = club.Id;
+
 
             var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
             var originalStartDate = startDate;

@@ -383,13 +383,11 @@ public class SeriesService : ISeriesService
 
     private void ValidateDateRestriction(SeriesWithOptionsViewModel model, Season season)
     {
-        // When date restriction is enabled, both dates must be provided
         if (!model.EnforcedStartDate.HasValue || !model.EnforcedEndDate.HasValue)
         {
             throw new InvalidOperationException(ErrorMissingDates);
         }
 
-        // Convert Season DateTime to DateOnly for comparison
         var seasonStart = DateOnly.FromDateTime(season.Start);
         var seasonEnd = DateOnly.FromDateTime(season.End);
 
@@ -421,6 +419,7 @@ public class SeriesService : ISeriesService
             .ToList();
     }
 
+    // Does not actually import the calendar events, but prepares them for the CreateMultiple series form.
     public async Task<IcalImportResult> ImportIcalAsync(string clubInitials, Guid seasonId, IFormFile file, string url)
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);

@@ -13,6 +13,8 @@
     <hr />
     <br class="d-none d-md-block" />
 
+    <div id="seriesNameValidationErrors" class="alert alert-danger d-none mb-3"></div>
+
     <form asp-action="CreateMultiple">
         <div class="row">
             <div class="col-md-6">
@@ -158,14 +160,14 @@
                                         <span asp-validation-for="Series[i].Name" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="col-3 d-md-none">Start</div>
+                                <div class="col-3 d-md-none">Optional Start</div>
                                 <div class="col-9 col-md-3">
                                     <div class="mb-3">
                                         <input type="date" name="series[@i].EnforcedStartDate" class="form-control" value="@(Model.Series[i].EnforcedStartDate?.ToString("yyyy-MM-dd"))" data-column="1" data-row="@i" />
                                         <span asp-validation-for="Series[i].EnforcedStartDate" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="col-3 d-md-none">End</div>
+                                <div class="col-3 d-md-none">Optional End</div>
                                 <div class="col-9 col-md-3">
                                     <div class="mb-3">
                                         <input type="date" name="series[@i].EnforcedEndDate" class="form-control" value="@(Model.Series[i].EnforcedEndDate?.ToString("yyyy-MM-dd"))" data-column="2" data-row="@i" />
@@ -192,13 +194,13 @@
                                     <input type="text" name="series[0].Name" class="form-control" data-column="0" data-row="0" />
                                 </div>
                             </div>
-                            <div class="col-3 d-md-none">Start</div>
+                            <div class="col-3 d-md-none">Optional Start</div>
                             <div class="col-9 col-md-3">
                                 <div class="mb-3">
                                     <input type="date" name="series[0].EnforcedStartDate" class="form-control" data-column="1" data-row="0" />
                                 </div>
                             </div>
-                            <div class="col-3 d-md-none">End</div>
+                            <div class="col-3 d-md-none">Optional End</div>
                             <div class="col-9 col-md-3">
                                 <div class="mb-3">
                                     <input type="date" name="series[0].EnforcedEndDate" class="form-control" data-column="2" data-row="0" />
@@ -290,5 +292,6 @@
 @section Scripts {
     <script type="text/javascript" src="~/js/createMultipleSeries.js"></script>
     <script type="text/javascript" src="~/js/createMultipleSeriesSummary.js"></script>
+    <script type="text/javascript" src="~/js/seriesNameValidation.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
