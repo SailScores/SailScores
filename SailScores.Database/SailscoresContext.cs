@@ -49,6 +49,14 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<SystemAlert> SystemAlerts { get; set; }
     public DbSet<Supporter> Supporters { get; set; }
 
+    // Junction tables for relationships
+    public DbSet<SeriesRace> SeriesRaces { get; set; }
+    public DbSet<CompetitorFleet> CompetitorFleets { get; set; }
+    public DbSet<FleetBoatClass> FleetBoatClasses { get; set; }
+    public DbSet<RegattaSeries> RegattaSeries { get; set; }
+    public DbSet<RegattaFleet> RegattaFleets { get; set; }
+    public DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
+
     // these sets below are not tables in the database 
     private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
     private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
@@ -200,15 +208,22 @@ public class SailScoresContext : DbContext, ISailScoresContext
         }
 
         modelBuilder.Entity<CompetitorFleet>()
+            .ToTable("CompetitorFleet")
             .HasKey(x => new { x.CompetitorId, x.FleetId });
         modelBuilder.Entity<SeriesRace>()
+            .ToTable("SeriesRace")
             .HasKey(x => new { x.SeriesId, x.RaceId });
         modelBuilder.Entity<FleetBoatClass>()
+            .ToTable("FleetBoatClass")
             .HasKey(x => new { x.FleetId, x.BoatClassId });
         modelBuilder.Entity<RegattaFleet>()
+            .ToTable("RegattaFleet")
             .HasKey(x => new { x.RegattaId, x.FleetId });
         modelBuilder.Entity<RegattaSeries>()
+            .ToTable("RegattaSeries")
             .HasKey(x => new { x.RegattaId, x.SeriesId });
+        modelBuilder.Entity<SeriesToSeriesLink>()
+            .ToTable("SeriesToSeriesLink");
 
         modelBuilder.Entity<Club>()
             .HasOne(c => c.DefaultScoringSystem)

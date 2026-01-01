@@ -40,6 +40,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ILocalizerService, LocalizerService>();
         services.AddTransient<IStripeService, StripeService>();
         services.AddScoped<ICalendarService, CalendarService>();
+        services.AddScoped<IBackupService, BackupService>();
 
 
         services.AddSingleton<AppVersionInfo>();
