@@ -35,7 +35,7 @@ public class ClubSummaryViewModel
 
     public IList<ScoringSystem> ScoringSystems { get; set; }
 
-    private DateTime recentCutoff = DateTime.Now.AddDays(-8);
+    private DateTime recentCutoff = DateTime.Now.AddDays(-9);
     public IEnumerable<RaceSummaryViewModel> RecentRaces => Races?.Where(r => r.Date > recentCutoff
                                                                               && ((r.State ?? RaceState.Raced) == RaceState.Raced
                                                                                   || r.State == RaceState.Preliminary))

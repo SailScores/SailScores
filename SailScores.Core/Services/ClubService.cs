@@ -131,7 +131,7 @@ namespace SailScores.Core.Services
             return _mapper.ProjectTo<ClubSummary>(dbObjects);
         }
 
-        public async Task<IEnumerable<ClubActivitySummary>> GetClubsWithRecentActivity(int daysBack = 14)
+        public async Task<IEnumerable<ClubActivitySummary>> GetClubsWithRecentActivity(int daysBack)
         {
             var cutoffDate = DateTime.UtcNow.AddDays(-daysBack);
             
@@ -139,6 +139,8 @@ namespace SailScores.Core.Services
             var clubsWithRecentRaces = await _dbContext
                 .Races
                 .Where(r => r.Date.HasValue && r.Date.Value >= cutoffDate)
+                .Where(r => r.State == Api.Enumerations.RaceState.Raced ||
+                    r.State == Api.Enumerations.RaceState.Preliminary)
                 .GroupBy(r => r.ClubId)
                 .Select(g => new { 
                     ClubId = g.Key, 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
@@ -40,7 +40,7 @@ public class HomeController : Controller
             Regattas = (await _regattaService.GetCurrentRegattas()).ToList()
         };
         
-        var recentlyActiveClubs = (await _clubservice.GetClubsWithRecentActivity(14))
+        var recentlyActiveClubs = (await _clubservice.GetClubsWithRecentActivity(9))
             .ToList();
         
         var allVisibleClubs = (await _clubservice.GetClubs(false))
