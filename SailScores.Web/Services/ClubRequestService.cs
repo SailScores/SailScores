@@ -200,7 +200,7 @@ public class ClubRequestService : IClubRequestService
                 Name = request.ClubName,
                 Initials = initialsToUse,
                 IsHidden = true,
-                Url = request.ClubWebsite,
+                Url = url,
                 DefaultScoringSystem = newScoringSystem,
                 Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_" + request.ClubLocation + "_"),
                 ScoringSystems = scoringSystemList,

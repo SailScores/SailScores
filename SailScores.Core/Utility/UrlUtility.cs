@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -54,14 +54,25 @@ namespace SailScores.Core.Utility
                 return String.Empty;
             }
 
-            // Check if the URL already starts with http:// or https://
-            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
-                !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            string trimmed = url.Trim();
+
+            if (trimmed.StartsWith("//", StringComparison.Ordinal))
             {
-                return "http://" + url;
+                return "https:" + trimmed;
             }
 
-            return url;
+            Uri uri;
+            if (Uri.TryCreate(trimmed, UriKind.Absolute, out uri))
+            {
+                var builder = new UriBuilder(uri);
+                builder.Scheme = Uri.UriSchemeHttps;
+                return builder.ToString();
+            }
+            else
+            {
+                // Assume it's a host or relative path, prepend https://
+                return "https://" + trimmed;
+            }
         }
     }
 }
