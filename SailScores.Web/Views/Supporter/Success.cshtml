@@ -25,7 +25,7 @@
                             <i class="fas fa-info-circle"></i> Your subscription is now active.
                         </p>
                         <p class="mb-0">
-                            You'll receive a confirmation email from Stripe with your receipt and subscription details.
+                            You should receive a confirmation email from Stripe with your receipt and subscription details.
                         </p>
                     </div>
 
@@ -50,6 +50,11 @@
                                     <h5><i class="fas fa-envelope text-primary"></i> Manage Subscription</h5>
                                     <p class="small mb-0">
                                         You can manage your subscription, update payment methods, or cancel anytime through the Stripe customer portal link in your email.
+                                        @if (!string.IsNullOrWhiteSpace(ViewBag.StripeCustomerPortalUrl as string))
+                                        {
+                                            <br />
+                                            <a href="@ViewBag.StripeCustomerPortalUrl" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary mt-2">Manage Subscription</a>
+                                        }
                                     </p>
                                 </div>
                             </div>

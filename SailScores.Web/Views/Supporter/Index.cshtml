@@ -173,6 +173,11 @@
                             style="height: 25px; vertical-align: middle;" />
                       <br />
                       <small>Buttons redirect to Stripe's secure checkout.</small>
+                      @if (!string.IsNullOrWhiteSpace(ViewBag.StripeCustomerPortalUrl as string))
+                      {
+                          <br />
+                          <small><a href="@ViewBag.StripeCustomerPortalUrl" target="_blank" rel="noopener noreferrer">Manage existing Supporter subscription</a></small>
+                      }
                   </p>
               </div>
           </div>

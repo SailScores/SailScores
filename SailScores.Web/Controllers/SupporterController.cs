@@ -45,6 +45,7 @@ public class SupporterController : Controller
 
         ViewBag.IsAdmin = isAdmin;
         ViewData["StripePublishableKey"] = _configuration["Stripe:PublishableKey"];
+        ViewBag.StripeCustomerPortalUrl = _configuration["Stripe:CustomerPortalUrl"];
         return View(supporters);
     }
 
@@ -69,6 +70,7 @@ public class SupporterController : Controller
         ViewBag.ClubInitials = clubInitials;
         ViewBag.SessionId = session_id;
         ViewBag.MultipleClubs = multipleClubs;
+        ViewBag.StripeCustomerPortalUrl = _configuration["Stripe:CustomerPortalUrl"];
 
         return View();
     }
@@ -77,6 +79,7 @@ public class SupporterController : Controller
 
     public ActionResult Cancel()
     {
+        ViewBag.StripeCustomerPortalUrl = _configuration["Stripe:CustomerPortalUrl"];
         return View();
     }
 
