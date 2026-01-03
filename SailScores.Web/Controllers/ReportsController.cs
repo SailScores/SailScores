@@ -261,62 +261,8 @@ public class ReportsController : Controller
 
         var model = await _reportService.GetAllCompHistogramAsync(clubInitials, startDate, endDate);
 
-        var csv = new System.Text.StringBuilder();
-
-        // Header
-        var header = "Competitor,Sail Number,Season,Aggregation";
-        if (model.Places != null && model.Places.Any())
-        {
-            foreach (var p in model.Places)
-            {
-                header += "," + $"Place {p}";
-            }
-        }
-
-        if (model.Codes != null && model.Codes.Any())
-        {
-            foreach (var c in model.Codes)
-            {
-                header += "," + c;
-            }
-        }
-
-        csv.AppendLine(header);
-
-        if (model.Rows != null)
-        {
-            foreach (var row in model.Rows)
-            {
-                var line = new System.Text.StringBuilder();
-                var escapedName = (row.CompetitorName ?? string.Empty).Replace("\"", "\"\"");
-                line.Append('"').Append(escapedName).Append('"');
-                line.Append(",").Append(row.SailNumber ?? string.Empty);
-                line.Append(",").Append(row.SeasonName ?? string.Empty);
-                line.Append(",").Append(row.AggregationType ?? string.Empty);
-
-                if (model.Places != null && model.Places.Any())
-                {
-                    foreach (var p in model.Places)
-                    {
-                        row.PlaceCounts.TryGetValue(p, out var pcount);
-                        line.Append(",").Append(pcount?.ToString() ?? string.Empty);
-                    }
-                }
-
-                if (model.Codes != null && model.Codes.Any())
-                {
-                    foreach (var c in model.Codes)
-                    {
-                        row.CodeCounts.TryGetValue(c, out var ccount);
-                        line.Append(",").Append(ccount?.ToString() ?? string.Empty);
-                    }
-                }
-
-                csv.AppendLine(line.ToString());
-            }
-        }
-
-        var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+        var csv = _reportService.BuildAllCompPlacesCsv(model);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(csv);
         var fileName = $"{clubInitials}_AllCompetitorPlaces_{DateTime.Now:yyyyMMdd}.csv";
         return File(bytes, "text/csv", fileName);
     }

@@ -3,8 +3,8 @@
 (function () {
     'use strict';
 
-    var validationContainer = null;
-    var form = null;
+    let validationContainer = null;
+    let form = null;
 
     document.addEventListener('DOMContentLoaded', function () {
         form = document.querySelector('form[action*="CreateMultiple"]');
@@ -19,10 +19,10 @@
     });
 
     function getSeriesNames() {
-        var names = [];
-        var rows = document.querySelectorAll('.series-row');
+        const names = [];
+        const rows = document.querySelectorAll('.series-row');
         rows.forEach(function (row) {
-            var nameInput = row.querySelector('input[data-column="0"]');
+            const nameInput = row.querySelector('input[data-column="0"]');
             if (nameInput && nameInput.value.trim()) {
                 names.push(nameInput.value.trim());
             }
@@ -31,10 +31,10 @@
     }
 
     function findDuplicatesInForm(names) {
-        var seen = {};
-        var duplicates = [];
+        const seen = {};
+        const duplicates = [];
         names.forEach(function (name) {
-            var lowerName = name.toLowerCase();
+            const lowerName = name.toLowerCase();
             if (seen[lowerName]) {
                 if (duplicates.indexOf(name) === -1) {
                     duplicates.push(name);
@@ -49,7 +49,7 @@
     function showValidationErrors(formDuplicates, existingConflicts) {
         if (!validationContainer) return;
 
-        var messages = [];
+        const messages = [];
 
         if (formDuplicates.length > 0) {
             messages.push('Duplicate names within form: ' + formDuplicates.join(', '));
@@ -73,7 +73,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
@@ -86,28 +86,28 @@
     }
 
     function highlightDuplicateInputs(formDuplicates, existingConflicts) {
-        var allConflicts = formDuplicates.concat(existingConflicts).map(function (n) {
+        const allConflicts = formDuplicates.concat(existingConflicts).map(function (n) {
             return n.toLowerCase();
         });
 
-        var rows = document.querySelectorAll('.series-row');
+        const rows = document.querySelectorAll('.series-row');
         rows.forEach(function (row) {
-            var nameInput = row.querySelector('input[data-column="0"]');
+            const nameInput = row.querySelector('input[data-column="0"]');
             if (nameInput) {
-                var name = nameInput.value.trim().toLowerCase();
-                if (allConflicts.indexOf(name) !== -1) {
-                    nameInput.classList.add('is-invalid');
-                } else {
+                const name = nameInput.value.trim().toLowerCase();
+                if (allConflicts.indexOf(name) === -1) {
                     nameInput.classList.remove('is-invalid');
+                } else {
+                    nameInput.classList.add('is-invalid');
                 }
             }
         });
     }
 
     function clearHighlights() {
-        var rows = document.querySelectorAll('.series-row');
+        const rows = document.querySelectorAll('.series-row');
         rows.forEach(function (row) {
-            var nameInput = row.querySelector('input[data-column="0"]');
+            const nameInput = row.querySelector('input[data-column="0"]');
             if (nameInput) {
                 nameInput.classList.remove('is-invalid');
             }
@@ -115,8 +115,8 @@
     }
 
     function validateAndSubmit() {
-        var seasonSelect = document.getElementById('SeasonId');
-        var seasonId = seasonSelect ? seasonSelect.value : null;
+        const seasonSelect = document.getElementById('SeasonId');
+        const seasonId = seasonSelect ? seasonSelect.value : null;
 
         if (!seasonId || seasonId === 'Select a season...') {
             // Let standard form validation handle the season requirement
@@ -124,7 +124,7 @@
             return;
         }
 
-        var names = getSeriesNames();
+        const names = getSeriesNames();
 
         if (names.length === 0) {
             // Let standard validation handle empty form
@@ -133,16 +133,16 @@
         }
 
         // Check for duplicates within the form first
-        var formDuplicates = findDuplicatesInForm(names);
+        const formDuplicates = findDuplicatesInForm(names);
 
         // Then check against existing series in the database
-        var pathParts = window.location.pathname.split('/');
-        var clubInitials = pathParts[1];
-        var url = '/' + clubInitials + '/Series/CheckSeriesNamesUnique';
+        const pathParts = globalThis.location.pathname.split('/');
+        const clubInitials = pathParts[1];
+        const url = '/' + clubInitials + '/Series/CheckSeriesNamesUnique';
 
         // Get the anti-forgery token
-        var tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
-        var token = tokenInput ? tokenInput.value : '';
+        const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+        const token = tokenInput ? tokenInput.value : '';
 
         fetch(url, {
             method: 'POST',
@@ -159,7 +159,7 @@
                 return response.json();
             })
             .then(function (data) {
-                var existingConflicts = data.conflictingNames || [];
+                const existingConflicts = data.conflictingNames || [];
 
                 if (formDuplicates.length > 0 || existingConflicts.length > 0) {
                     showValidationErrors(formDuplicates, existingConflicts);
@@ -187,7 +187,7 @@
     }
 
     // Export for potential testing
-    window.seriesValidation = {
+    globalThis.seriesValidation = {
         getSeriesNames: getSeriesNames,
         findDuplicatesInForm: findDuplicatesInForm
     };

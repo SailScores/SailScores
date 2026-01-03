@@ -11,6 +11,7 @@ namespace SailScores.Core.Services;
 
 public class ReportService : IReportService
 {
+    private const string monthPeriodName = "month";
     private readonly ISailScoresContext _dbContext;
     private readonly IConversionService _conversionService;
     private readonly IClubService _clubService;
@@ -116,25 +117,241 @@ public class ReportService : IReportService
             race.Scores = scores.Where(s => s.RaceId == race.Id).ToList();
         }
 
+        var includedRaces = GetIncludedRaces(races);
+        var raceSeasons = GetRaceSeasons(includedRaces);
+        var boatClassSeasonRaceCounts = GetBoatClassSeasonRaceCounts(includedRaces, raceSeasons);
+        var competitorStats = CalculateSkipperStatistics(includedRaces, raceSeasons, boatClassSeasonRaceCounts);
+
+        return competitorStats;
+    }
+
+    public async Task<IList<ParticipationMetric>> GetParticipationMetricsAsync(
+        Guid clubId,
+        string groupBy = monthPeriodName,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
+    {
+        var query = _dbContext.Races
+            .Where(r => r.ClubId == clubId && r.Date.HasValue);
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(r => r.Date >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(r => r.Date <= endDate.Value);
+        }
+
+        var races = await query
+            .Include(r => r.Fleet)
+            .Include(r => r.SeriesRaces)
+                .ThenInclude(sr => sr.Series)
+            .AsSplitQuery()
+            .ToListAsync()
+            .ConfigureAwait(false);
+            
         // Filter out races from series marked as ExcludeFromCompetitorStats
-        var includedRaces = races
+        races = GetIncludedRaces(races);
+            
+        // Load scores separately to avoid multiple collection include warning
+        var raceIds = races.Select(r => r.Id).ToList();
+        var scores = await _dbContext.Scores
+            .Where(s => raceIds.Contains(s.RaceId))
+            .Include(s => s.Competitor)
+                .ThenInclude(c => c.BoatClass)
+            .ToListAsync()
+            .ConfigureAwait(false);
+            
+        // Associate scores with races
+        foreach (var race in races)
+        {
+            race.Scores = scores.Where(s => s.RaceId == race.Id).ToList();
+        }
+
+        var metrics = CalculateParticipationMetrics(races, groupBy);
+        return FillMissingPeriods(metrics, groupBy);
+    }
+
+
+    public async Task<CompHistogram> GetAllCompHistogramStats(
+        Guid clubId,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
+    {
+        var results = await _dbContext.GetAllCompHistogramStats(
+            clubId,
+            startDate,
+            endDate);
+
+        var fields = await _dbContext.GetAllCompHistogramFields(
+            clubId,
+            startDate,
+            endDate);
+
+        return new CompHistogram
+        {
+            Stats = results,
+            FieldList = fields
+        };
+    }
+
+    private List<ParticipationMetric> CalculateParticipationMetrics(List<Race> includedRaces, string groupBy)
+    {
+        return includedRaces
+            .SelectMany(r => r.Scores
+                .Where(s => s.Competitor?.BoatClass != null)
+                .Select(s => new
+                {
+                    Race = r,
+                    Score = s,
+                    BoatClassName = s.Competitor.BoatClass.Name
+                }))
+            .GroupBy(x => new
+            {
+                Period = GetPeriodKey(x.Race.Date.Value, groupBy),
+                PeriodStart = GetPeriodStart(x.Race.Date.Value, groupBy),
+                x.BoatClassName
+            })
+            .Select(g => new ParticipationMetric
+            {
+                Period = g.Key.Period,
+                PeriodStart = g.Key.PeriodStart,
+                BoatClassName = g.Key.BoatClassName,
+                DistinctSkippers = g.Select(x => x.Score.Competitor.Id).Distinct().Count()
+            })
+            .OrderBy(m => m.PeriodStart)
+            .ThenBy(m => m.BoatClassName)
+            .ToList();
+    }
+
+    private List<ParticipationMetric> FillMissingPeriods(List<ParticipationMetric> metrics, string groupBy)
+    {
+        if (!metrics.Any())
+        {
+            return metrics;
+        }
+
+        var allBoatClasses = metrics.Select(m => m.BoatClassName).Distinct().ToList();
+        var minDate = metrics.Min(m => m.PeriodStart);
+        var maxDate = metrics.Max(m => m.PeriodStart);
+            
+        var allPeriods = GenerateAllPeriods(minDate, maxDate, groupBy);
+        var filledMetrics = new List<ParticipationMetric>();
+            
+        foreach (var periodStart in allPeriods)
+        {
+            var periodKey = GetPeriodKey(periodStart, groupBy);
+            foreach (var boatClass in allBoatClasses)
+            {
+                var existing = metrics.FirstOrDefault(m => 
+                    m.PeriodStart == periodStart && m.BoatClassName == boatClass);
+                        
+                if (existing != null)
+                {
+                    filledMetrics.Add(existing);
+                }
+                else
+                {
+                    filledMetrics.Add(new ParticipationMetric
+                    {
+                        Period = periodKey,
+                        PeriodStart = periodStart,
+                        BoatClassName = boatClass,
+                        DistinctSkippers = 0
+                    });
+                }
+            }
+        }
+            
+        return filledMetrics.OrderBy(m => m.PeriodStart).ThenBy(m => m.BoatClassName).ToList();
+    }
+
+    private static string GetPeriodKey(DateTime date, string groupBy)
+    {
+        return groupBy.ToLower() switch
+        {
+            "day" => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            "week" => GetMondayOfWeek(date).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), // Use Monday for week grouping
+            monthPeriodName => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
+            "year" => date.Year.ToString(CultureInfo.InvariantCulture),
+            _ => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
+        };
+    }
+
+    private static DateTime GetPeriodStart(DateTime date, string groupBy)
+    {
+        return groupBy.ToLower() switch
+        {
+            "day" => date.Date,
+            "week" => GetMondayOfWeek(date),
+            monthPeriodName => new DateTime(date.Year, date.Month, 1, 0, 0, 0, DateTimeKind.Unspecified),
+            "year" => new DateTime(date.Year, 1, 1, 0, 0, 0, DateTimeKind.Unspecified),
+            _ => new DateTime(date.Year, date.Month, 1, 0, 0, 0, DateTimeKind.Unspecified),
+        };
+    }
+
+    private static DateTime GetMondayOfWeek(DateTime date)
+    {
+        var dayOfWeek = (int)date.DayOfWeek;
+        // Convert Sunday (0) to 7 for easier calculation
+        if (dayOfWeek == 0) dayOfWeek = 7;
+        // Monday is day 1, so subtract (dayOfWeek - 1) to get to Monday
+        return date.Date.AddDays(-(dayOfWeek - 1));
+    }
+
+    private static List<DateTime> GenerateAllPeriods(DateTime minDate, DateTime maxDate, string groupBy)
+    {
+        var periods = new List<DateTime>();
+        var current = GetPeriodStart(minDate, groupBy);
+        var end = GetPeriodStart(maxDate, groupBy);
+            
+        while (current <= end)
+        {
+            periods.Add(current);
+                
+            current = groupBy.ToLower() switch
+            {
+                "day" => current.AddDays(1),
+                "week" => current.AddDays(7),
+                monthPeriodName => current.AddMonths(1),
+                "year" => current.AddYears(1),
+                _ => current.AddMonths(1),
+            };
+        }
+            
+        return periods;
+    }
+
+    private static List<Race> GetIncludedRaces(List<Race> races)
+    {
+        return races
             .Where(r => !r.SeriesRaces.Any(sr => sr.Series.ExcludeFromCompetitorStats == true))
             .ToList();
+    }
 
-        // Get season info for races (use first series season if available)
-        var raceSeasons = includedRaces.ToDictionary(
+    private static Dictionary<Guid, string> GetRaceSeasons(List<Race> includedRaces)
+    {
+        return includedRaces.ToDictionary(
             r => r.Id,
             r => r.SeriesRaces.FirstOrDefault()?.Series?.Season?.Name ?? "Unknown"
         );
+    }
 
-        var boatClassSeasonRaceCounts = includedRaces
+    private Dictionary<(string, string), int> GetBoatClassSeasonRaceCounts(List<Race> includedRaces, Dictionary<Guid, string> raceSeasons)
+    {
+        return includedRaces
             .SelectMany(r => r.Scores
                 .Where(s => s.Competitor?.BoatClass != null)
                 .Select(s => new { BoatClassName = s.Competitor.BoatClass.Name, SeasonName = raceSeasons[r.Id], RaceId = r.Id }))
             .GroupBy(x => new { x.BoatClassName, x.SeasonName })
             .ToDictionary(g => (g.Key.BoatClassName, g.Key.SeasonName), g => g.Select(x => x.RaceId).Distinct().Count());
+    }
 
-        var competitorStats = includedRaces
+    private List<SkipperStatistics> CalculateSkipperStatistics(List<Race> includedRaces, Dictionary<Guid, string> raceSeasons, Dictionary<(string, string), int> boatClassSeasonRaceCounts)
+    {
+        return includedRaces
             .SelectMany(r => r.Scores.Select(s => new
             {
                 Race = r,
@@ -194,201 +411,7 @@ public class ReportService : IReportService
             })
             .OrderByDescending(s => s.RacesParticipated)
             .ToList();
-
-        return competitorStats;
-    }
-
-    public async Task<IList<ParticipationMetric>> GetParticipationMetricsAsync(
-        Guid clubId,
-        string groupBy = "month",
-        DateTime? startDate = null,
-        DateTime? endDate = null)
-    {
-        var query = _dbContext.Races
-            .Where(r => r.ClubId == clubId && r.Date.HasValue);
-
-        if (startDate.HasValue)
-        {
-            query = query.Where(r => r.Date >= startDate.Value);
-        }
-
-        if (endDate.HasValue)
-        {
-            query = query.Where(r => r.Date <= endDate.Value);
-        }
-
-        var races = await query
-            .Include(r => r.Fleet)
-            .Include(r => r.SeriesRaces)
-                .ThenInclude(sr => sr.Series)
-            .AsSplitQuery()
-            .ToListAsync()
-            .ConfigureAwait(false);
-            
-        // Filter out races from series marked as ExcludeFromCompetitorStats
-        races = races
-            .Where(r => !r.SeriesRaces.Any(sr => sr.Series.ExcludeFromCompetitorStats == true))
-            .ToList();
-            
-        // Load scores separately to avoid multiple collection include warning
-        var raceIds = races.Select(r => r.Id).ToList();
-        var scores = await _dbContext.Scores
-            .Where(s => raceIds.Contains(s.RaceId))
-            .Include(s => s.Competitor)
-                .ThenInclude(c => c.BoatClass)
-            .ToListAsync()
-            .ConfigureAwait(false);
-            
-        // Associate scores with races
-        foreach (var race in races)
-        {
-            race.Scores = scores.Where(s => s.RaceId == race.Id).ToList();
-        }
-
-        var metrics = races
-            .SelectMany(r => r.Scores
-                .Where(s => s.Competitor?.BoatClass != null)
-                .Select(s => new
-                {
-                    Race = r,
-                    Score = s,
-                    BoatClassName = s.Competitor.BoatClass.Name
-                }))
-            .GroupBy(x => new
-            {
-                Period = GetPeriodKey(x.Race.Date.Value, groupBy),
-                PeriodStart = GetPeriodStart(x.Race.Date.Value, groupBy),
-                x.BoatClassName
-            })
-            .Select(g => new ParticipationMetric
-            {
-                Period = g.Key.Period,
-                PeriodStart = g.Key.PeriodStart,
-                BoatClassName = g.Key.BoatClassName,
-                DistinctSkippers = g.Select(x => x.Score.Competitor.Id).Distinct().Count()
-            })
-            .OrderBy(m => m.PeriodStart)
-            .ThenBy(m => m.BoatClassName)
-            .ToList();
-
-        // Fill in missing periods with zero values
-        if (metrics.Any())
-        {
-            var allBoatClasses = metrics.Select(m => m.BoatClassName).Distinct().ToList();
-            var minDate = metrics.Min(m => m.PeriodStart);
-            var maxDate = metrics.Max(m => m.PeriodStart);
-                
-            var allPeriods = GenerateAllPeriods(minDate, maxDate, groupBy);
-            var filledMetrics = new List<ParticipationMetric>();
-                
-            foreach (var periodStart in allPeriods)
-            {
-                var periodKey = GetPeriodKey(periodStart, groupBy);
-                foreach (var boatClass in allBoatClasses)
-                {
-                    var existing = metrics.FirstOrDefault(m => 
-                        m.PeriodStart == periodStart && m.BoatClassName == boatClass);
-                        
-                    if (existing != null)
-                    {
-                        filledMetrics.Add(existing);
-                    }
-                    else
-                    {
-                        filledMetrics.Add(new ParticipationMetric
-                        {
-                            Period = periodKey,
-                            PeriodStart = periodStart,
-                            BoatClassName = boatClass,
-                            DistinctSkippers = 0
-                        });
-                    }
-                }
-            }
-                
-            return filledMetrics.OrderBy(m => m.PeriodStart).ThenBy(m => m.BoatClassName).ToList();
-        }
-
-        return metrics;
     }
 
 
-    public async Task<CompHistogram> GetAllCompHistogramStats(
-        Guid clubId,
-        DateTime? startDate = null,
-        DateTime? endDate = null)
-    {
-        var results = await _dbContext.GetAllCompHistogramStats(
-            clubId,
-            startDate,
-            endDate);
-
-        var fields = await _dbContext.GetAllCompHistogramFields(
-            clubId,
-            startDate,
-            endDate);
-
-        return new CompHistogram
-        {
-            Stats = results,
-            FieldList = fields
-        };
-    }
-
-
-    private string GetPeriodKey(DateTime date, string groupBy)
-    {
-        return groupBy.ToLower() switch
-        {
-            "day" => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-            "week" => GetMondayOfWeek(date).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), // Use Monday for week grouping
-            "month" => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
-            "year" => date.Year.ToString(CultureInfo.InvariantCulture),
-            _ => date.ToString("MMM yyyy", CultureInfo.InvariantCulture),
-        };
-    }
-
-    private DateTime GetPeriodStart(DateTime date, string groupBy)
-    {
-        return groupBy.ToLower() switch
-        {
-            "day" => date.Date,
-            "week" => GetMondayOfWeek(date),
-            "month" => new DateTime(date.Year, date.Month, 1),
-            "year" => new DateTime(date.Year, 1, 1),
-            _ => new DateTime(date.Year, date.Month, 1),
-        };
-    }
-
-    private DateTime GetMondayOfWeek(DateTime date)
-    {
-        var dayOfWeek = (int)date.DayOfWeek;
-        // Convert Sunday (0) to 7 for easier calculation
-        if (dayOfWeek == 0) dayOfWeek = 7;
-        // Monday is day 1, so subtract (dayOfWeek - 1) to get to Monday
-        return date.Date.AddDays(-(dayOfWeek - 1));
-    }
-
-    private List<DateTime> GenerateAllPeriods(DateTime minDate, DateTime maxDate, string groupBy)
-    {
-        var periods = new List<DateTime>();
-        var current = GetPeriodStart(minDate, groupBy);
-        var end = GetPeriodStart(maxDate, groupBy);
-            
-        while (current <= end)
-        {
-            periods.Add(current);
-                
-            current = groupBy.ToLower() switch
-            {
-                "day" => current.AddDays(1),
-                "week" => current.AddDays(7),
-                "month" => current.AddMonths(1),
-                "year" => current.AddYears(1),
-                _ => current.AddMonths(1),
-            };
-        }
-            
-        return periods;
-    }
 }

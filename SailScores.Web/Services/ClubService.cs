@@ -111,9 +111,9 @@ public class ClubService : IClubService
         return club;
     }
 
-    public void InvalidateClubCache(string clubInitials)
+    public void InvalidateClubCache(string initials)
     {
-        var cacheKey = $"MinimalClub_{clubInitials.ToLowerInvariant()}";
+        var cacheKey = $"MinimalClub_{initials.ToLowerInvariant()}";
         _cache.Remove(cacheKey);
     }
 }

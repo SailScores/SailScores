@@ -26,10 +26,10 @@ public class ReportService : Interfaces.IReportService
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            var club = await _clubService.GetMinimalClub(clubId);
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            var clubId = club.Id;
 
-            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+        var useAdvancedFeatures = club.UseAdvancedFeatures ?? false;
             var originalStartDate = startDate;
 
             // Enforce 60-day limit for non-advanced clubs
@@ -59,7 +59,7 @@ public class ReportService : Interfaces.IReportService
                 ClubName = club.Name,
                 StartDate = displayStartDate,
                 EndDate = displayEndDate,
-                WindSpeedUnits = club?.WeatherSettings?.WindSpeedUnits ?? "m/s",
+                WindSpeedUnits = club.WeatherSettings?.WindSpeedUnits ?? "m/s",
                 UseAdvancedFeatures = useAdvancedFeatures,
                 WindData = windData.Select(w => new WindDataItem
                 {
@@ -76,10 +76,10 @@ public class ReportService : Interfaces.IReportService
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            var club = await _clubService.GetMinimalClub(clubId);
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            var clubId = club.Id;
 
-            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+        var useAdvancedFeatures = club.UseAdvancedFeatures ?? false;
 
             // Enforce 60-day limit for non-advanced clubs
             if (!useAdvancedFeatures)
@@ -127,7 +127,7 @@ public class ReportService : Interfaces.IReportService
             var club = await _clubService.GetMinimalClub(clubInitials);
             var clubId = club.Id;
 
-            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+            var useAdvancedFeatures = club.UseAdvancedFeatures ?? false;
             var originalStartDate = startDate;
 
             // Enforce 90-day limit for non-advanced clubs
@@ -179,7 +179,7 @@ public class ReportService : Interfaces.IReportService
             var clubId = club.Id;
 
 
-            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+            var useAdvancedFeatures = club.UseAdvancedFeatures ?? false;
             var originalStartDate = startDate;
 
             // Enforce 60-day limit for non-advanced clubs
@@ -194,91 +194,185 @@ public class ReportService : Interfaces.IReportService
 
             var histogram = await _coreReportService.GetAllCompHistogramStats(clubId, startDate, endDate);
 
-            var codes = (histogram.FieldList ?? new List<SailScores.Database.Entities.AllCompHistogramFields>())
+            var codes = GetCodes(histogram.FieldList);
+            var places = GetPlaces(histogram.FieldList);
+            var rows = BuildRows(histogram.Stats, codes, places);
+
+            var displayDates = await GetDisplayDatesAsync(clubId, originalStartDate, endDate, startDate);
+
+            return new AllCompHistogramViewModel
+            {
+                ClubInitials = clubInitials,
+                ClubName = club.Name,
+                StartDate = displayDates.startDate,
+                EndDate = displayDates.endDate,
+                UseAdvancedFeatures = useAdvancedFeatures,
+                Codes = codes,
+                Places = places,
+                Rows = rows
+            };
+        }
+
+
+        private static List<string> GetCodes(IEnumerable<SailScores.Database.Entities.AllCompHistogramFields> fieldList)
+        {
+            return (fieldList ?? new List<SailScores.Database.Entities.AllCompHistogramFields>())
                 .Select(f => f.Code)
                 .Where(c => !string.IsNullOrWhiteSpace(c))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(c => c)
                 .ToList();
+        }
 
-            var maxPlace = (histogram.FieldList ?? new List<SailScores.Database.Entities.AllCompHistogramFields>())
+        private static List<int> GetPlaces(IEnumerable<SailScores.Database.Entities.AllCompHistogramFields> fieldList)
+        {
+            var maxPlace = (fieldList ?? new List<SailScores.Database.Entities.AllCompHistogramFields>())
                 .Where(f => f.MaxPlace.HasValue)
                 .Select(f => f.MaxPlace!.Value)
                 .DefaultIfEmpty(0)
                 .Max();
 
-            var places = maxPlace > 0
+            return maxPlace > 0
                 ? Enumerable.Range(1, maxPlace).ToList()
                 : new List<int>();
+        }
 
-            var stats = histogram.Stats ?? new List<SailScores.Database.Entities.AllCompHistogramStats>();
+        private List<AllCompHistogramRow> BuildRows(IEnumerable<SailScores.Database.Entities.AllCompHistogramStats> stats, List<string> codes, List<int> places)
+        {
+            var statsList = stats ?? new List<SailScores.Database.Entities.AllCompHistogramStats>();
 
-            var rows = stats
+            return statsList
                 .GroupBy(s => new { s.CompetitorId, s.CompetitorName, s.SailNumber, s.SeasonName, s.AggregationType })
                 .OrderBy(g => g.Key.CompetitorName)
                 .ThenBy(g => g.Key.SailNumber)
                 .ThenBy(g => g.Key.SeasonName)
                 .ThenBy(g => g.Key.AggregationType)
-                .Select(g =>
-                {
-                    var row = new AllCompHistogramRow
-                    {
-                        CompetitorName = g.Key.CompetitorName,
-                        SailNumber = g.Key.SailNumber,
-                        SeasonName = g.Key.SeasonName,
-                        AggregationType = g.Key.AggregationType,
-                    };
-
-                    foreach (var code in codes)
-                    {
-                        row.CodeCounts[code] = null;
-                    }
-
-                    foreach (var place in places)
-                    {
-                        row.PlaceCounts[place] = null;
-                    }
-
-                    foreach (var item in g)
-                    {
-                        if (!string.IsNullOrWhiteSpace(item.Code) && row.CodeCounts.ContainsKey(item.Code))
-                        {
-                            row.CodeCounts[item.Code] = (row.CodeCounts[item.Code] ?? 0) + item.CountOfDistinct;
-                        }
-
-                        if (item.Place.HasValue && row.PlaceCounts.ContainsKey(item.Place.Value))
-                        {
-                            row.PlaceCounts[item.Place.Value] = (row.PlaceCounts[item.Place.Value]??0) + item.CountOfDistinct;
-                        }
-                    }
-
-                    return row;
-                })
+                .Select(g => BuildRow(g, codes, places))
                 .ToList();
+        }
 
-            // If no dates provided, attempt to derive display range from skipper stats (they contain first/last race dates)
-            DateTime? displayStartDate = originalStartDate ?? startDate;
+        private AllCompHistogramRow BuildRow(IGrouping<dynamic, SailScores.Database.Entities.AllCompHistogramStats> group, List<string> codes, List<int> places)
+        {
+            var row = new AllCompHistogramRow
+            {
+                CompetitorName = group.Key.CompetitorName,
+                SailNumber = group.Key.SailNumber,
+                SeasonName = group.Key.SeasonName,
+                AggregationType = group.Key.AggregationType,
+            };
+
+            foreach (var code in codes)
+            {
+                row.CodeCounts[code] = null;
+            }
+
+            foreach (var place in places)
+            {
+                row.PlaceCounts[place] = null;
+            }
+
+            foreach (var item in group)
+            {
+                if (!string.IsNullOrWhiteSpace(item.Code) && row.CodeCounts.ContainsKey(item.Code))
+                {
+                    row.CodeCounts[item.Code] = (row.CodeCounts[item.Code] ?? 0) + item.CountOfDistinct;
+                }
+
+                if (item.Place.HasValue && row.PlaceCounts.ContainsKey(item.Place.Value))
+                {
+                    row.PlaceCounts[item.Place.Value] = (row.PlaceCounts[item.Place.Value] ?? 0) + item.CountOfDistinct;
+                }
+            }
+
+            return row;
+        }
+
+        private async Task<(DateTime? startDate, DateTime? endDate)> GetDisplayDatesAsync(Guid clubId, DateTime? originalStartDate, DateTime? endDate, DateTime? adjustedStartDate)
+        {
+            DateTime? displayStartDate = originalStartDate ?? adjustedStartDate;
             DateTime? displayEndDate = endDate;
             if (!originalStartDate.HasValue && !endDate.HasValue)
             {
                 var skipperStats = await _coreReportService.GetSkipperStatisticsAsync(clubId, null, null);
                 if (skipperStats != null && skipperStats.Any())
                 {
-                    displayStartDate = skipperStats.Min(s => s.FirstRaceDate);
-                    displayEndDate = skipperStats.Max(s => s.LastRaceDate);
+                    var validStats = skipperStats.Where(s => s.FirstRaceDate.HasValue && s.LastRaceDate.HasValue);
+                    if (validStats.Any())
+                    {
+                        displayStartDate = validStats.Min(s => s.FirstRaceDate.Value);
+                        displayEndDate = validStats.Max(s => s.LastRaceDate.Value);
+                    }
+                }
+            }
+            return (displayStartDate, displayEndDate);
+        }
+
+        public string BuildAllCompPlacesCsv(AllCompHistogramViewModel model)
+        {
+            var csv = new System.Text.StringBuilder();
+
+            csv.AppendLine(BuildCsvHeader(model));
+
+            if (model.Rows != null)
+            {
+                foreach (var row in model.Rows)
+                {
+                    csv.AppendLine(BuildCsvRow(row, model));
                 }
             }
 
-            return new AllCompHistogramViewModel
+            return csv.ToString();
+        }
+
+        private static string BuildCsvHeader(AllCompHistogramViewModel model)
+        {
+            var header = "Competitor,Sail Number,Season,Aggregation";
+            if (model.Places != null && model.Places.Any())
             {
-                ClubInitials = clubInitials,
-                ClubName = club.Name,
-                StartDate = displayStartDate,
-                EndDate = displayEndDate,
-                UseAdvancedFeatures = useAdvancedFeatures,
-                Codes = codes,
-                Places = places,
-                Rows = rows
-            };
+                foreach (var p in model.Places)
+                {
+                    header += "," + $"Place {p}";
+                }
+            }
+
+            if (model.Codes != null && model.Codes.Any())
+            {
+                foreach (var c in model.Codes)
+                {
+                    header += "," + c;
+                }
+            }
+
+            return header;
+        }
+
+        private static string BuildCsvRow(AllCompHistogramRow row, AllCompHistogramViewModel model)
+        {
+            var line = new System.Text.StringBuilder();
+            var escapedName = (row.CompetitorName ?? string.Empty).Replace("\"", "\"\"");
+            line.Append('"').Append(escapedName).Append('"');
+            line.Append(",").Append(row.SailNumber ?? string.Empty);
+            line.Append(",").Append(row.SeasonName ?? string.Empty);
+            line.Append(",").Append(row.AggregationType ?? string.Empty);
+
+            if (model.Places != null && model.Places.Any())
+            {
+                foreach (var p in model.Places)
+                {
+                    row.PlaceCounts.TryGetValue(p, out var pcount);
+                    line.Append(",").Append(pcount?.ToString() ?? string.Empty);
+                }
+            }
+
+            if (model.Codes != null && model.Codes.Any())
+            {
+                foreach (var c in model.Codes)
+                {
+                    row.CodeCounts.TryGetValue(c, out var ccount);
+                    line.Append(",").Append(ccount?.ToString() ?? string.Empty);
+                }
+            }
+
+            return line.ToString();
         }
     }

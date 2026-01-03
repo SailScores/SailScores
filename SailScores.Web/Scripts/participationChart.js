@@ -46,7 +46,7 @@ function initParticipationChart(boatClasses, periods, participationData) {
         };
     });
     
-    new Chart(ctx, {
+    const chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: periods,
@@ -103,7 +103,7 @@ function initParticipationChart(boatClasses, periods, participationData) {
                             return 'Period: ' + tooltipItems[0].label;
                         },
                         label: function(context) {
-                            var label = context.dataset.label || '';
+                            let label = context.dataset.label || '';
                             if (label) {
                                 label += ': ';
                             }

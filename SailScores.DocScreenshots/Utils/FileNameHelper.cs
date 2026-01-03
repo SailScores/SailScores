@@ -17,10 +17,5 @@ internal static class FileNameHelper
             return baseName + ".png";
         }
         return baseName + $"-{mode}.png";
-
-        //if (pageInfo.Region is null)
-        //   return baseName + $"-{mode}.png";
-
-        //return baseName + $"-{mode}-region-{pageInfo.Region.X}_{pageInfo.Region.Y}_{pageInfo.Region.Width}_{pageInfo.Region.Height}.png";
     }
 }

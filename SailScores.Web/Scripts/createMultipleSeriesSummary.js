@@ -1,7 +1,7 @@
 (function () {
     function toggleSummaryFields() {
-        var cb = document.getElementById('CreateSummarySeries');
-        var fields = document.getElementById('summarySeriesFields');
+        const cb = document.getElementById('CreateSummarySeries');
+        const fields = document.getElementById('summarySeriesFields');
         if (!cb || !fields) {
             return;
         }
@@ -9,7 +9,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        var cb = document.getElementById('CreateSummarySeries');
+        const cb = document.getElementById('CreateSummarySeries');
         if (cb) {
             cb.addEventListener('change', toggleSummaryFields);
         }

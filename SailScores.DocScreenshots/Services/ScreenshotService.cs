@@ -12,7 +12,7 @@ internal class ScreenshotService : IAsyncDisposable
     private readonly string? _loginEmail;
     private readonly string? _loginPassword;
 
-    private ScreenshotService(IPlaywright playwright, IBrowser browser, string? loginEmail, string? loginPassword)
+    public ScreenshotService(IPlaywright playwright, IBrowser browser, string? loginEmail, string? loginPassword)
     {
         _playwright = playwright;
         _browser = browser;

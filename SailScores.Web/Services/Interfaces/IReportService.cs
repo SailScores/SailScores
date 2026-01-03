@@ -26,4 +26,6 @@ public interface IReportService
         string clubInitials,
         DateTime? startDate = null,
         DateTime? endDate = null);
+
+    string BuildAllCompPlacesCsv(AllCompHistogramViewModel model);
 }

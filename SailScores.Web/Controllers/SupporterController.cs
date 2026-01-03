@@ -18,22 +18,19 @@ public class SupporterController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
     private readonly IStripeService _stripeService;
-    private readonly AppSettingsService _appSettingsService;
 
     public SupporterController(
         ISupporterService supporterService,
         IAuthorizationService authService,
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        IStripeService stripeService,
-        AppSettingsService appSettingsService)
+        IStripeService stripeService)
     {
         _supporterService = supporterService;
         _authService = authService;
         _userManager = userManager;
         _configuration = configuration;
         _stripeService = stripeService;
-        _appSettingsService = appSettingsService;
     }
 
     public async Task<ActionResult> Index()

@@ -9,7 +9,7 @@
             
             if (selectedOption.value) {
                 // Set the club initials from the selected club
-                initialsField.value = selectedOption.getAttribute('data-initials') || '';
+                initialsField.value = selectedOption.dataset.initials || '';
             } else {
                 // Clear the initials if no club is selected
                 initialsField.value = '';

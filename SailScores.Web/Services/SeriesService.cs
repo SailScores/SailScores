@@ -149,96 +149,18 @@ public class SeriesService : ISeriesService
         // Pre-validate all rows
         var seasons = await _coreSeasonService.GetSeasons(clubId);
         var season = seasons.Single(s => s.Id == model.SeasonId);
+        PreValidateRows(rows, season);
 
         foreach (var row in rows)
         {
-            if (row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue)
-            {
-                var vm = new SeriesWithOptionsViewModel
-                {
-                    EnforcedStartDate = row.EnforcedStartDate,
-                    EnforcedEndDate = row.EnforcedEndDate,
-                    DateRestricted = true
-                };
-                try
-                {
-                    ValidateDateRestriction(vm, season);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    throw new InvalidOperationException($"Series '{row.Name}': {ex.Message}", ex);
-                }
-            }
-        }
-
-        foreach (var row in rows)
-        {
-            var dateRestricted = row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue;
-
-            var vm = new SeriesWithOptionsViewModel
-            {
-                ClubId = clubId,
-                Name = row.Name.Trim(),
-                SeasonId = model.SeasonId,
-                ScoringSystemId = model.ScoringSystemId,
-                TrendOption = model.TrendOption,
-                HideDncDiscards = model.HideDncDiscards,
-
-                Type = SeriesType.Standard,
-                ExcludeFromCompetitorStats = false,
-                Description = string.Empty,
-                IsImportantSeries = false,
-                ParentSeriesIds = null,
-
-                DateRestricted = dateRestricted,
-                EnforcedStartDate = row.EnforcedStartDate,
-                EnforcedEndDate = row.EnforcedEndDate,
-
-                UpdatedBy = updatedBy
-            };
-
+            var vm = CreateVmFromRow(row, model, clubId, updatedBy);
             var id = await SaveNew(vm);
             createdIds.Add(id);
         }
 
         if (model.CreateSummarySeries)
         {
-            if (string.IsNullOrWhiteSpace(model.SummarySeriesName))
-            {
-                throw new InvalidOperationException("To create a summary series, a summary series name is required.");
-            }
-            if (createdIds.Count == 0)
-            {
-                throw new InvalidOperationException("No series were created to include in the summary series.");
-            }
-
-            var summaryVm = new SeriesWithOptionsViewModel
-            {
-                ClubId = clubId,
-                Name = model.SummarySeriesName.Trim(),
-                SeasonId = model.SeasonId,
-                Season = season,
-                ScoringSystemId = model.ScoringSystemId == Guid.Empty ? null : model.ScoringSystemId,
-                TrendOption = model.TrendOption,
-                HideDncDiscards = model.HideDncDiscards,
-
-                Type = SeriesType.Summary,
-                ExcludeFromCompetitorStats = false,
-                Description = string.Empty,
-                IsImportantSeries = false,
-                ParentSeriesIds = null,
-
-                ChildrenSeriesAsSingleRace = model.SummaryChildrenSeriesAsSingleRace,
-                ChildrenSeriesIds = createdIds,
-
-                DateRestricted = false,
-                EnforcedStartDate = null,
-                EnforcedEndDate = null,
-
-                UpdatedBy = updatedBy
-            };
-
-            var summaryId = await _coreSeriesService.SaveNewSeries(summaryVm);
+            var summaryId = await CreateSummarySeriesAsync(model, clubId, season, createdIds, updatedBy);
             createdIds.Add(summaryId);
         }
 
@@ -593,5 +515,89 @@ public class SeriesService : ISeriesService
             }
         }
         return name;
+    }
+
+    private void PreValidateRows(List<MultipleSeriesRowViewModel> rows, Season season)
+    {
+        foreach (var row in rows)
+        {
+            if (row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue)
+            {
+                var vm = new SeriesWithOptionsViewModel
+                {
+                    EnforcedStartDate = row.EnforcedStartDate,
+                    EnforcedEndDate = row.EnforcedEndDate,
+                    DateRestricted = true
+                };
+                ValidateDateRestriction(vm, season);
+            }
+        }
+    }
+
+    private SeriesWithOptionsViewModel CreateVmFromRow(MultipleSeriesRowViewModel row, MultipleSeriesWithOptionsViewModel model, Guid clubId, string updatedBy)
+    {
+        var dateRestricted = row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue;
+
+        return new SeriesWithOptionsViewModel
+        {
+            ClubId = clubId,
+            Name = row.Name.Trim(),
+            SeasonId = model.SeasonId,
+            ScoringSystemId = model.ScoringSystemId,
+            TrendOption = model.TrendOption,
+            HideDncDiscards = model.HideDncDiscards,
+
+            Type = SeriesType.Standard,
+            ExcludeFromCompetitorStats = false,
+            Description = string.Empty,
+            IsImportantSeries = false,
+            ParentSeriesIds = null,
+
+            DateRestricted = dateRestricted,
+            EnforcedStartDate = row.EnforcedStartDate,
+            EnforcedEndDate = row.EnforcedEndDate,
+
+            UpdatedBy = updatedBy
+        };
+    }
+
+    private async Task<Guid> CreateSummarySeriesAsync(MultipleSeriesWithOptionsViewModel model, Guid clubId, Season season, List<Guid> createdIds, string updatedBy)
+    {
+        if (string.IsNullOrWhiteSpace(model.SummarySeriesName))
+        {
+            throw new InvalidOperationException("To create a summary series, a summary series name is required.");
+        }
+        if (createdIds.Count == 0)
+        {
+            throw new InvalidOperationException("No series were created to include in the summary series.");
+        }
+
+        var summaryVm = new SeriesWithOptionsViewModel
+        {
+            ClubId = clubId,
+            Name = model.SummarySeriesName.Trim(),
+            SeasonId = model.SeasonId,
+            Season = season,
+            ScoringSystemId = model.ScoringSystemId == Guid.Empty ? null : model.ScoringSystemId,
+            TrendOption = model.TrendOption,
+            HideDncDiscards = model.HideDncDiscards,
+
+            Type = SeriesType.Summary,
+            ExcludeFromCompetitorStats = false,
+            Description = string.Empty,
+            IsImportantSeries = false,
+            ParentSeriesIds = null,
+
+            ChildrenSeriesAsSingleRace = model.SummaryChildrenSeriesAsSingleRace,
+            ChildrenSeriesIds = createdIds,
+
+            DateRestricted = false,
+            EnforcedStartDate = null,
+            EnforcedEndDate = null,
+
+            UpdatedBy = updatedBy
+        };
+
+        return await _coreSeriesService.SaveNewSeries(summaryVm);
     }
 }

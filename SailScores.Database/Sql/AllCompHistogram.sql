@@ -14,10 +14,6 @@ base AS (
         Races.Date,
         Code,
         Place
-        -- CASE 
-        --     WHEN Code IS NOT NULL THEN Code
-        --     ELSE CONVERT(nvarchar(10), Place)
-        -- END AS ScoreType
     FROM Scores
     INNER JOIN Races   ON Scores.RaceId = Races.Id
     INNER JOIN Competitors ON Scores.CompetitorId = Competitors.Id
