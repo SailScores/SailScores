@@ -4,11 +4,19 @@
     ViewData["MetaDescription"] = "Fast web-based mobile-friendly scores for sailing clubs";
     ViewData["MetaKeywords"] = "sailing race scoring results scores sail web mobile-friendly club series free";
 }
-<h1 class="display-4">SailScores</h1>
-<p class="lead">Simple score collection and reporting for one-design sailing.</p>
-<hr class="my-4">
-<div class="row">
-    <div class="col-md-4 d-none d-md-block order-md-0 pe-lg-4">
+
+<!-- Hero Section -->
+<div class="home-index">
+<div class="row mb-md-4">
+    <div class="col-12">
+        <h1 class="display-4">SailScores</h1>
+        <p class="lead">Simple score collection and reporting for one-design sailing.</p>
+        <hr class="my-4">
+    </div>
+</div>
+
+<div class="row mb-md-4">
+    <div class="col-md-4 d-none d-md-block">
         <div id="carouselScreenshots" class="carousel slide carousel-fade" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -30,29 +38,11 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4 order-md-5">
-        <br class="d-none d-md-inline" />
-        @(await Html.PartialAsync("_ClubSelectorView", Model.ClubSelectorModel))
-        <br />
-        @if (Model.RegattaSelectorModel?.Regattas?.Any() ?? false)
-        {
-            @(await Html.PartialAsync("_RegattaSelectorView", Model.RegattaSelectorModel))
-            <br />
-        }
-        <hr class="my-4">
-        <div class="d-none d-md-inline">
-            <br />
-            <p>SailScores is <a href="https://github.com/SailScores/SailScores#sailscores">open source</a> and volunteer driven.</p>
-            <p>
-                <a asp-area="" asp-controller="ClubRequest" asp-action="Index">Host your club's scores</a> here for free.
-            </p>
-        </div>
-    </div>
-    <div class="col-md-4 order-md-3 p-xl-4">
+    <div class="col-md-8 col-lg-6">
         <h4>What's important in sailing club scoring software?</h4>
         <ul>
-            <li>Fast, simple result entry and sharing using the web. Optional speech
-                recognition to make things really easy.</li>
+            <li>Fast, simple result entry and sharing using the web. Optional handwriting
+              and speech recognition to make things really easy.</li>
             <li>Support for Appendix A Low Point Scoring including 2025-2028 rounding rules,
                 High Point Percentage, Cox-Sprague, and customized club scoring codes.
             </li>
@@ -62,5 +52,257 @@
             <li>Automatically collect and share weather information.</li>
             <li>Laptop and phone friendly, for scorekeepers as well as racers.</li>
         </ul>
+        <p>SailScores is <a href="https://github.com/SailScores/SailScores#sailscores">open source</a> and volunteer driven.</p>
+        
+        <p class="my-4">
+            <a asp-area="" asp-controller="ClubRequest" asp-action="Index">Host your club's scores on SailScores.</a>
+        </p>
     </div>
 </div>
+
+<!-- Recently Active Clubs Section -->
+@if (Model.RecentlyActiveClubs?.Any() ?? false)
+{
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3">Recently Active Clubs</h3>
+            <div class="row">
+                @foreach (var club in Model.RecentlyActiveClubs.Take(10))
+                {
+                  <div class="col-12 col-md-6 col-lg-4 mb-3">
+                    <a href="/@club.Initials" class="text-decoration-none">
+                      <div class="card h-100 border-primary">
+                        <div class="card-body">
+                          <div class="d-flex align-items-start">
+                            <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
+                              @if (club.LogoFileId.HasValue)
+                              {
+                                <div class="club-logo-container" style="width:64px;height:64px;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;">
+                                    <img src="@Url.Action("GetLogo", "Admin", new { id = club.LogoFileId })" alt="@club.Name logo" style="max-width:64px;max-height:64px;object-fit:contain;margin-top:-7.5px;" />
+                                </div>
+                              }
+                              else
+                              {
+                                <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                    <span class="text-muted small">@club.Initials</span>
+                                </div>
+                              }
+                          </div>
+                          <div class="flex-grow-1">
+                              <h5 class="card-title mb-1">@club.Name</h5>
+                              @if (club.RecentRaceCount > 0 || club.RecentSeriesCount > 0)
+                              {
+                                <div class="small text-muted mt-1">
+                                  @if (club.RecentRaceCount > 0)
+                                  {
+                                      <span>@club.RecentRaceCount race@(club.RecentRaceCount != 1 ? "s" : "")</span>
+                                  }
+                                  @if (club.RecentRaceCount > 0 && club.RecentSeriesCount > 0)
+                                  {
+                                      <span> across </span>
+                                  }
+                                  @if (club.RecentSeriesCount > 0)
+                                  {
+                                      <span>@club.RecentSeriesCount series</span>
+                                  }
+                                  <span> recently</span>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                }
+            </div>
+            @if (Model.RecentlyActiveClubs.Count() > 10)
+            {
+                <p class="text-muted mt-2 small">Showing 10 of @Model.RecentlyActiveClubs.Count() recently active clubs. Use search below to find more.</p>
+            }
+        </div>
+    </div>
+}
+
+<!-- Current Regattas Section -->
+@if (Model.RegattaSelectorModel?.Regattas?.Any() ?? false)
+{
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3">Current Regattas</h3>
+            <div class="row">
+                @foreach (var regatta in Model.RegattaSelectorModel.Regattas)
+                {
+                    <div class="col-12 col-md-6 col-lg-4 mb-3">
+                        <a href="/@regatta.ClubInitials/Regatta/@regatta.Season.UrlName/@regatta.UrlName" class="text-decoration-none">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
+                                            @if (regatta.ClubLogoFileId.HasValue)
+                                            {
+                                                <div class="club-logo-container" style="width:64px;height:64px;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;">
+                                                    <img src="@Url.Action("GetLogo", "Admin", new { id = regatta.ClubLogoFileId })" alt="@regatta.ClubName logo" style="max-width:64px;max-height:64px;object-fit:contain;margin-top:-7.5px;" />
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                                    <span class="text-muted small">@regatta.ClubInitials</span>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="card-title mb-1">@regatta.Name</h5>
+                                            <small class="text-muted">@regatta.ClubName</small>
+                                            @if (regatta.StartDate.HasValue || regatta.EndDate.HasValue)
+                                            {
+                                                <div class="small text-muted mt-1">
+                                                    @if (regatta.StartDate.HasValue && regatta.EndDate.HasValue)
+                                                    {
+                                                        if (regatta.StartDate.Value.Date == regatta.EndDate.Value.Date)
+                                                        {
+                                                            <span>@regatta.StartDate.Value.ToString("MMM d, yyyy")</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@regatta.StartDate.Value.ToString("MMM d") - @regatta.EndDate.Value.ToString("MMM d, yyyy")</span>
+                                                        }
+                                                    }
+                                                    else if (regatta.StartDate.HasValue)
+                                                    {
+                                                        <span>Starts @regatta.StartDate.Value.ToString("MMM d, yyyy")</span>
+                                                    }
+                                                    else if (regatta.EndDate.HasValue)
+                                                    {
+                                                        <span>Ends @regatta.EndDate.Value.ToString("MMM d, yyyy")</span>
+                                                    }
+                                                    @if (regatta.Fleets?.Any() ?? false)
+                                                    {
+                                                        <span> • @regatta.FleetCountString</span>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- All Clubs Search Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h3 class="mb-3">Find a Club</h3>
+        <div class="mb-4">
+            <input type="text" id="clubSearch" class="form-control form-control-lg" 
+                   placeholder="Search clubs by name or description..." 
+                   aria-label="Search clubs">
+        </div>
+    </div>
+</div>
+
+<!-- All Clubs Cards Section -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="clubCardsContainer">
+    @if (Model.AllVisibleClubs?.Any() ?? false)
+    {
+        @foreach (var club in Model.AllVisibleClubs)
+        {
+            <div class="col club-card" 
+                 data-club-name="@club.Name.ToLowerInvariant()" 
+                 data-club-description="@(club.Description?.ToLowerInvariant() ?? "")" 
+                 data-club-initials="@( (club.Initials ?? "").ToLowerInvariant() )">
+                <div class="card h-100 border-primary">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="me-3 flex-shrink-0" style="width:64px;max-width:64px;">
+                                @if (club.LogoFileId.HasValue)
+                                {
+                                    <div class="club-logo-container" style="width:64px;height:64px;border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;">
+                                        <img src="@Url.Action("GetLogo", "Admin", new { id = club.LogoFileId })" alt="@club.Name logo" style="max-width:64px;max-height:64px;object-fit:contain;margin-top:-7.5px;" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center justify-content-center" style="width:64px;height:64px;border-radius:4px;">
+                                        <span class="text-muted small">@club.Initials</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-0">@club.Name</h5>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(club.Description))
+                        {
+                            <div class="card-text text-muted small mb-2">@Html.Raw(Markdig.Markdown.ToHtml(club.Description))</div>
+                        }
+                        <a href="/@club.Initials" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <p class="text-muted">No clubs available at this time.</p>
+        </div>
+    }
+</div>
+
+<div id="noResultsMessage" class="alert alert-info d-none">
+    No clubs match your search. Try a different search term.
+</div>
+</div>
+
+@section Scripts {
+    <script>
+        // Shuffle clubs on page load for random ordering
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('clubCardsContainer');
+            const cards = Array.from(document.querySelectorAll('.club-card'));
+            
+            // Fisher-Yates shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            
+            // Re-append shuffled cards
+            cards.forEach(card => container.appendChild(card));
+        });
+        
+        // Dynamic search filtering
+        document.getElementById('clubSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.trim().toLowerCase();
+            const cards = document.querySelectorAll('.club-card');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                const clubName = card.getAttribute('data-club-name');
+                const clubDescription = card.getAttribute('data-club-description');
+                const clubInitials = card.getAttribute('data-club-initials');
+                
+                if (clubName.includes(searchTerm) || clubDescription.includes(searchTerm) || (clubInitials && clubInitials.includes(searchTerm))) {
+                    card.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+            
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResultsMessage.classList.remove('d-none');
+            } else {
+                noResultsMessage.classList.add('d-none');
+            }
+        });
+    </script>
+}

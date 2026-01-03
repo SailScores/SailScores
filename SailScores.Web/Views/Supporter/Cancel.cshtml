@@ -42,6 +42,12 @@
                             <i class="fas fa-home"></i> Go to Home
                         </a>
                     </div>
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.StripeCustomerPortalUrl as string))
+                    {
+                        <p class="text-center mt-3">
+                            <small><a href="@ViewBag.StripeCustomerPortalUrl" target="_blank" rel="noopener noreferrer">Manage your subscription</a> at Stripe.</small>
+                        </p>
+                    }
                 </div>
             </div>
         </div>

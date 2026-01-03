@@ -13,13 +13,14 @@
 <div class="row">
     <div class="col-lg-6 col-md-8">
         <form asp-action="Create">
+            <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
                 <span class="small">
-                    Add the boats' class to the name if other classes have similar series, e.g. <em>Laser Championship</em><br />
+                    Include a class name if other classes have similar series, e.g. <em>Laser Championship</em><br />
                     Don't include the season in the series name; it will be added automatically.
                 </span>
 
@@ -163,7 +164,11 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        window.sailscoresClubInitials = '@(ViewContext.RouteData.Values["ClubInitials"]?.ToString())';
+    </script>
     <script src="~/js/seriesDateRestriction.js"></script>
+    <script src="~/js/seriesParentSeriesOptions.js"></script>
     <script>
         function toggleSummarySeriesNote() {
             var typeSelect = document.getElementById('Type');

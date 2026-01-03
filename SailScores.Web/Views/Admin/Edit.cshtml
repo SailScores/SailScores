@@ -1,4 +1,4 @@
-@model SailScores.Web.Models.SailScores.AdminViewModel
+@model SailScores.Web.Models.SailScores.AdminEditViewModel
 
 @{
     ViewData["Title"] = "Edit " + Model.Name;
@@ -6,155 +6,248 @@
 }
 
 <h2>@Model.Name</h2>
-<h3>Basic Club Information</h3>
-<hr />
-<div class="row">
-    <div class="col-12 col-6-md">
-    <form asp-action="Edit">
-        <input hidden asp-for="Id" class="form-control" />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="mb-3">
-            <label asp-for="Name" class="control-label"></label>
-            <input asp-for="Name" class="form-control" autocomplete="off"/>
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Description" class="control-label"></label>
-            <a target="_blank" href="https://www.markdownguide.org/">
-                <span title="Supports MarkDown formatting" class="fab fa-markdown"></span></a>
-            <textarea asp-for="Description" class="form-control" cols="60" rows="6"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
-        <div class="row">
-            <div class="mb-3 col-md-6">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="IsHidden" /> Hidden
-                    </label>
-                    <span class="small">Hide this club on the front page list?</span>
+
+<form asp-action="Edit" enctype="multipart/form-data">
+    <input hidden asp-for="Id" />
+    <input hidden asp-for="LogoFileId" />
+
+    <div class="row g-4">
+        <!-- Basic Information -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Basic Information</h5>
                 </div>
-            </div>
-            <div class="mb-3 col-md-6">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="ShowClubInResults" /> Show Clubs
-                    </label>
-                    <span class="small">List clubs in series results?</span>
-                </div>
-            </div>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Url" class="control-label"></label>
-            <span class="small">External website for the club</span>
-            <input asp-for="Url" class="form-control" />
-            <span asp-validation-for="Url" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="DefaultScoringSystemId">Default Scoring System</label>
-            <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-select">
-                @foreach (var scoringSystem in Model.ScoringSystemOptions)
-                {
-                    <option value="@scoringSystem.Id">
-                        @scoringSystem.Name
-                    </option>
-                }
-            </select>
-            <span asp-validation-for="DefaultScoringSystemId" class="text-danger"></span>
-        </div>
-        <div class="row">
-            <div class="mb-3 col-sm-6">
-                <div class="row">
-                    <label class="col-6 col-form-label"
-                            asp-for="Latitude"></label>
-                    <div class="col-6">
-                    <input asp-for="Latitude"
-                            class="form-control"
-                            type="text" pattern="[0-9]+([\.,][0-9]+)?" />
-                    <span asp-validation-for="Latitude" class="text-danger"></span>
-                        <small id="emailHelp" class="form-text text-muted">Positive numbers are Northern Hemisphere.</small>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" autocomplete="off" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6 mb-3">
+                            <label asp-for="Url" class="form-label"></label>
+                            <input asp-for="Url" class="form-control" />
+                            <span asp-validation-for="Url" class="text-danger"></span>
+                            <div class="small text-muted">External website for the club</div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="mb-3 col-sm-6">
-                <div class="row">
-                    <label class="col-6 col-form-label"
-                            asp-for="Longitude"></label>
 
-                        <div class="col-6">
-                    <input asp-for="Longitude"
-                            class="form-control"
-                            type="text" pattern="[0-9]+([\.,][0-9]+)?" />
-                    <span asp-validation-for="Longitude" class="text-danger"></span>
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <a target="_blank" href="https://www.markdownguide.org/">
+                            <span title="Supports MarkDown formatting" class="fab fa-markdown"></span>
+                        </a>
+                        <textarea asp-for="Description" class="form-control" cols="60" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <small class="form-text text-muted">Public description shown on both the front page and club home page</small>
+                    </div>
 
-                        <small id="emailHelp" class="form-text text-muted">Negative for Western Hemisphere (including U.S.)</small>
-                </div>
+                    <div class="mb-3">
+                        <label asp-for="HomePageDescription" class="form-label"></label>
+                        <a target="_blank" href="https://www.markdownguide.org/">
+                            <span title="Supports MarkDown formatting" class="fab fa-markdown"></span>
+                        </a>
+                        <textarea asp-for="HomePageDescription" class="form-control" cols="60" rows="3"></textarea>
+                        <span asp-validation-for="HomePageDescription" class="text-danger"></span>
+                        <small class="form-text text-muted">Additional information shown only on club home page (e.g., coordination notes for members)</small>
+                    </div>
+
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="mb-3 col-sm-6">
-                <div class="row">
-                    <label class="col-6 col-form-label control-label"
-                            asp-for="SpeedUnits">Wind Speed Units</label>
 
-                        <div class="col-6">
-                    <select id="speedUnits" asp-for="SpeedUnits"
-                            class="form-select"
-                            asp-items="new SelectList(Model.SpeedUnitOptions)"></select>
-                    <span asp-validation-for="SpeedUnits" class="text-danger"></span>
+        <!-- Logo Section -->
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Club Logo</h6>
                 </div>
-                </div>
-            </div>
-            <div class="mb-3 col-sm-6">
-                <div class="row">
-                    <label class="col-6 col-form-label control-label"
-                            asp-for="TemperatureUnits">Temp Units</label>
+                <div class="card-body">
+                    @if (Model.LogoFileId.HasValue)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Current Burgee/Logo</label>
+                            <div class="d-flex gap-3">
+                                <div class="p-2 bg-light" style="width:80px;">
+                                    <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on light background" class="img-fluid logo-preview" />
+                                </div>
+                                <div class="p-2 bg-dark" style="width:80px;">
+                                    <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on dark background" class="img-fluid logo-preview" />
+                                </div>
+                            </div>
+                        </div>
+                        <style>
+                            .logo-preview { width:64px; height:64px; object-fit:contain; }
+                        </style>
+                    }
 
-                        <div class="col-6">
-                    <select id="temperatureUnits" asp-for="TemperatureUnits"
-                            class="form-select"
-                            asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
-                    <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
+                    <div class="mb-3">
+                        <label asp-for="LogoFile" class="form-label"></label>
+                        <input asp-for="LogoFile" type="file" class="form-control" accept=".png,.jpg,.jpeg,.jpe,.jfif,.gif,.webp,image/png,image/jpeg,image/gif,image/webp" id="logoFileInput" />
+                        <span asp-validation-for="LogoFile" class="text-danger"></span>
+                        <small class="form-text text-muted">Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). Supported formats: PNG, JPG, GIF, WebP. PNG or WebP with transparent background recommended for best results.</small>
                     </div>
+
+                    <div id="newLogoPreview" class="mb-3" style="display:none;">
+                        <label class="form-label">New Logo Preview</label>
+                        <div class="d-flex gap-3">
+                            <div class="p-2 bg-light" style="width:80px;">
+                                <img id="previewLight" alt="New logo on light background" class="img-fluid logo-preview" />
+                            </div>
+                            <div class="p-2 bg-dark" style="width:80px;">
+                                <img id="previewDark" alt="New logo on dark background" class="img-fluid logo-preview" />
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-            <div class="mb-3 col-sm-6">
-                <div class="row">
-                    <label class="col-6 col-form-label control-label"
-                               asp-for="DefaultRaceDateOffset">Default Race Date</label>
-                    <div class="col-6">
+        </div>
+
+        <!-- Visibility & Navigation -->
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Visibility & Navigation</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input asp-for="IsHidden" class="form-check-input" id="IsHidden" />
+                        <label class="form-check-label" for="IsHidden">Hidden</label>
+                        <div class="small text-muted">Hide this club on the front page list?</div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="ShowCalendarInNav" class="form-check-input" id="ShowCalendarInNav" />
+                        <label class="form-check-label" for="ShowCalendarInNav">Show Calendar in Navigation</label>
+                        <div class="small text-muted">Add Calendar link to the top navigation bar. <strong>Caution:</strong> If you maintain your official race calendar elsewhere, enabling this may cause confusion. The calendar is always accessible at <a href="/@Model.Initials/Calendar" target="_blank">/@Model.Initials/Calendar</a> regardless of this setting.</div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="ShowClubInResults" class="form-check-input" id="ShowClubInResults" />
+                        <label class="form-check-label" for="ShowClubInResults">Show Clubs in Results</label>
+                        <div class="small text-muted">List clubs in series results?</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Scoring & Localization -->
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Scoring & Localization</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="DefaultScoringSystemId" class="form-label">Default Scoring System</label>
+                        <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-select">
+                            @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                            {
+                                <option value="@scoringSystem.Id">@scoringSystem.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="DefaultScoringSystemId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DefaultRaceDateOffset" class="form-label">Default Race Date</label>
                         <select asp-for="DefaultRaceDateOffset" class="form-select">
                             <option value="">Empty</option>
                             <option value="0">Current date</option>
                             <option value="-1">Previous Day</option>
                         </select>
-                    <span asp-validation-for="DefaultRaceDateOffset" class="text-danger"></span>
+                        <span asp-validation-for="DefaultRaceDateOffset" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Locale" class="form-label">Localization</label>
+                        <select id="locale" asp-for="Locale" class="form-select" asp-items="new SelectList(Model.LocaleOptions)"></select>
+                        <span asp-validation-for="Locale" class="text-danger"></span>
                     </div>
                 </div>
             </div>
-                <div class="mb-3 col-sm-6">
+        </div>
+
+        <!-- Weather Settings -->
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Weather Settings</h6>
+                </div>
+                <div class="card-body">
                     <div class="row">
-                        <label class="col-6 col-form-label control-label"
-                               asp-for="Locale">Localization</label>
-                        <div class="col-6">
-                            <select id="locale" asp-for="Locale"
-                                    class="form-select col-6"
-                                    asp-items="new SelectList(Model.LocaleOptions)"></select>
-                            <span asp-validation-for="Locale" class="text-danger"></span>
+                        <div class="mb-3 col-sm-6">
+                            <label asp-for="Latitude" class="form-label"></label>
+                            <input asp-for="Latitude" class="form-control" type="text" pattern="[0-9]+([\.,][0-9]+)?" />
+                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                            <small class="form-text text-muted">Positive numbers are Northern Hemisphere.</small>
+                        </div>
+
+                        <div class="mb-3 col-sm-6">
+                            <label asp-for="Longitude" class="form-label"></label>
+                            <input asp-for="Longitude" class="form-control" type="text" pattern="[0-9]+([\.,][0-9]+)?" />
+                            <span asp-validation-for="Longitude" class="text-danger"></span>
+                            <small class="form-text text-muted">Negative for Western Hemisphere (including U.S.)</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="mb-3 col-sm-6">
+                            <label asp-for="SpeedUnits" class="form-label">Wind Speed Units</label>
+                            <select id="speedUnits" asp-for="SpeedUnits" class="form-select" asp-items="new SelectList(Model.SpeedUnitOptions)"></select>
+                            <span asp-validation-for="SpeedUnits" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 col-sm-6">
+                            <label asp-for="TemperatureUnits" class="form-label">Temp Units</label>
+                            <select id="temperatureUnits" asp-for="TemperatureUnits" class="form-select" asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
+                            <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <input type="submit" value="Save" class="btn btn-primary" />
-            <a asp-controller="Admin"
-               asp-action="Index"
-               class="btn btn-outline-primary">Cancel</a>
+
+        <!-- Actions -->
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-primary">Cancel</a>
+            </div>
         </div>
-    </form>
     </div>
-</div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.getElementById('logoFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('newLogoPreview');
+            const previewLight = document.getElementById('previewLight');
+            const previewDark = document.getElementById('previewDark');
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const dataUrl = event.target.result;
+                    previewLight.src = dataUrl;
+                    previewDark.src = dataUrl;
+                    preview.style.display = 'block';
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
 }

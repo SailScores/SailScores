@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
+using Microsoft.Extensions.Caching.Memory;
 using SailScores.Web.Services.Interfaces;
 
 namespace SailScores.Web.Services;
@@ -6,12 +7,15 @@ namespace SailScores.Web.Services;
 public class AuthorizationService : IAuthorizationService
 {
     private readonly Core.Services.IUserService _userService;
+    private readonly IMemoryCache _cache;
 
     public AuthorizationService(
-        Core.Services.IUserService userService
+        Core.Services.IUserService userService,
+        IMemoryCache cache
     )
     {
         _userService = userService;
+        _cache = cache;
     }
 
     public async Task<bool> CanUserEdit(
@@ -28,9 +32,16 @@ public class AuthorizationService : IAuthorizationService
         {
             return false;
         }
-        return await _userService.IsUserAllowedToEdit(
-            email,
-            clubInitials);
+
+        var cacheKey = $"CanEdit_{email}_{clubInitials}";
+        if (_cache.TryGetValue(cacheKey, out bool canEdit))
+        {
+            return canEdit;
+        }
+
+        canEdit = await _userService.IsUserAllowedToEdit(email, clubInitials);
+        _cache.Set(cacheKey, canEdit, TimeSpan.FromMinutes(2));
+        return canEdit;
     }
 
     public async Task<bool> CanUserEdit(

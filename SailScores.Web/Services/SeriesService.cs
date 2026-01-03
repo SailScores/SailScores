@@ -3,6 +3,11 @@ using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using ISeriesService = SailScores.Web.Services.Interfaces.ISeriesService;
+using Ical.Net;
+using Ical.Net.DataTypes;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Net.Http;
 
 namespace SailScores.Web.Services;
 
@@ -13,7 +18,7 @@ public class SeriesService : ISeriesService
     private readonly IScoringService _coreScoringService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly IMapper _mapper;
-    
+
     // Validation error messages for date restrictions
     private const string ErrorMissingDates = "Both start date and end date must be provided when date restriction is enabled.";
     private const string ErrorStartDateOutOfRange = "Series start date must fall within the selected season.";
@@ -56,7 +61,7 @@ public class SeriesService : ISeriesService
         Guid clubId,
         DateTime date)
     {
-        if(date == default)
+        if (date == default)
         {
             return await GetSummarySeriesAsync(clubId);
         }
@@ -72,60 +77,6 @@ public class SeriesService : ISeriesService
     }
 
 
-    public async Task<SeriesWithOptionsViewModel> UpdateVmOptions(
-        string clubInitials,
-        SeriesWithOptionsViewModel partialSeries)
-    {
-        var clubId = await _coreClubService.GetClubId(clubInitials);
-        var club = await _coreClubService.GetMinimalClub(clubId);
-
-        var allSeasons = await _coreSeasonService.GetSeasons(clubId);
-        var seasons = allSeasons;
-
-        if (partialSeries.SeasonId == default)
-        {
-            seasons = await _coreSeasonService.GetSeasons(clubId);
-            var selectedSeason = seasons.FirstOrDefault(s =>
-                s.Start < DateTime.Now && s.End > DateTime.Now);
-            if (selectedSeason == null && seasons.Count() == 1)
-            {
-                selectedSeason = seasons.First();
-            }
-            if (selectedSeason != null)
-            {
-                partialSeries.SeasonId = selectedSeason.Id;
-            }
-
-        } else
-        {
-            seasons = allSeasons
-                .Where(s => s.Id == partialSeries.SeasonId)
-                .ToList();
-        }
-
-        partialSeries.SeasonOptions = seasons;
-
-
-        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, false);
-        scoringSystemOptions.Add(new ScoringSystem
-        {
-            Id = Guid.Empty,
-            Name = "<Use Club Default>"
-        });
-        partialSeries.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
-
-        // Get summary series options
-        var selectedSeasonForSummary = seasons.FirstOrDefault(s => s.Id == partialSeries.SeasonId);
-        var centerDate = selectedSeasonForSummary != null
-            ? selectedSeasonForSummary.Start.AddDays(
-                (selectedSeasonForSummary.End - selectedSeasonForSummary.Start).TotalDays / 2)
-            : default;
-        partialSeries.SummarySeriesOptions = (await GetSummarySeriesAsync(clubId, centerDate)).ToList();
-
-        return partialSeries;
-
-    }
-
     public async Task<SeriesWithOptionsViewModel> GetBlankVmForCreate(string clubInitials)
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
@@ -135,15 +86,16 @@ public class SeriesService : ISeriesService
 
         var vm = new SeriesWithOptionsViewModel
         {
+            ClubId = clubId,
             SeasonOptions = seasons
         };
         var selectedSeason = seasons.FirstOrDefault(s =>
             s.Start < DateTime.Now && s.End > DateTime.Now);
-        if(selectedSeason == null && seasons.Count() == 1)
+        if (selectedSeason == null && seasons.Count() == 1)
         {
             selectedSeason = seasons.First();
         }
-        if(selectedSeason != null)
+        if (selectedSeason != null)
         {
             vm.SeasonId = selectedSeason.Id;
         }
@@ -162,6 +114,59 @@ public class SeriesService : ISeriesService
 
     }
 
+    public async Task<MultipleSeriesWithOptionsViewModel> GetBlankVmForCreateMultiple(string clubInitials)
+    {
+        var blankSingle = await GetBlankVmForCreate(clubInitials);
+
+        return new MultipleSeriesWithOptionsViewModel
+        {
+            SeasonId = blankSingle.SeasonId,
+            SeasonOptions = blankSingle.SeasonOptions,
+            ScoringSystemId = blankSingle.ScoringSystemId,
+            ScoringSystemOptions = blankSingle.ScoringSystemOptions,
+            TrendOption = blankSingle.TrendOption,
+            HideDncDiscards = blankSingle.HideDncDiscards,
+            Series = new List<MultipleSeriesRowViewModel>
+            {
+                new()
+            }
+        };
+    }
+
+    public async Task<IList<Guid>> CreateMultipleAsync(
+        string clubInitials,
+        Guid clubId,
+        MultipleSeriesWithOptionsViewModel model,
+        string updatedBy)
+    {
+        var createdIds = new List<Guid>();
+
+        var rows = model.Series
+            .Where(r => r != null)
+            .Where(r => !string.IsNullOrWhiteSpace(r.Name))
+            .ToList();
+
+        // Pre-validate all rows
+        var seasons = await _coreSeasonService.GetSeasons(clubId);
+        var season = seasons.Single(s => s.Id == model.SeasonId);
+        PreValidateRows(rows, season);
+
+        foreach (var row in rows)
+        {
+            var vm = CreateVmFromRow(row, model, clubId, updatedBy);
+            var id = await SaveNew(vm);
+            createdIds.Add(id);
+        }
+
+        if (model.CreateSummarySeries)
+        {
+            var summaryId = await CreateSummarySeriesAsync(model, clubId, season, createdIds, updatedBy);
+            createdIds.Add(summaryId);
+        }
+
+        return createdIds;
+    }
+
     public async Task<FlatChartData> GetChartData(Guid seriesId)
     {
         return await _coreSeriesService.GetChartData(seriesId);
@@ -173,14 +178,14 @@ public class SeriesService : ISeriesService
         var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, true);
 
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(coreObject);
-        foreach(var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
+        foreach (var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
         {
             var races = coreObject.Where(s => summaryTypeSeries.ChildrenSeriesIds.Contains(s.Id)).SelectMany(s => s.Races).ToList();
             seriesSummaries.Single(ss => ss.Id == summaryTypeSeries.Id).FleetName = GetFleetsString(races);
         }
 
         return seriesSummaries.OrderByDescending(s => s.Season.Start)
-            .ThenBy( s => s.FleetName)
+            .ThenBy(s => s.FleetName)
             .ThenBy(s => s.Name);
     }
 
@@ -239,7 +244,7 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
-        
+
         // Handle date restriction logic
         if (model.DateRestricted == true)
         {
@@ -251,7 +256,7 @@ public class SeriesService : ISeriesService
             model.EnforcedStartDate = null;
             model.EnforcedEndDate = null;
         }
-        
+
         return await _coreSeriesService.SaveNewSeries(model);
     }
 
@@ -262,14 +267,14 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
-        
+
         // Handle date restriction logic
         if (model.DateRestricted == true)
         {
             Season season;
-            
+
             // Check if SeasonId is available in the model (not default/empty)
-            if (model.SeasonId != default)
+            if (model.SeasonId != Guid.Empty)
             {
                 // Use the season from the model
                 var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
@@ -285,7 +290,7 @@ public class SeriesService : ISeriesService
                 }
                 season = existingSeries.Season;
             }
-            
+
             ValidateDateRestriction(model, season);
         }
         else
@@ -294,38 +299,305 @@ public class SeriesService : ISeriesService
             model.EnforcedStartDate = null;
             model.EnforcedEndDate = null;
         }
-        
+
         await _coreSeriesService.Update(model);
     }
-    
+
     private void ValidateDateRestriction(SeriesWithOptionsViewModel model, Season season)
     {
-        // When date restriction is enabled, both dates must be provided
         if (!model.EnforcedStartDate.HasValue || !model.EnforcedEndDate.HasValue)
         {
             throw new InvalidOperationException(ErrorMissingDates);
         }
-        
-        // Convert Season DateTime to DateOnly for comparison
+
         var seasonStart = DateOnly.FromDateTime(season.Start);
         var seasonEnd = DateOnly.FromDateTime(season.End);
-        
+
         // Validate start date falls within season
         if (model.EnforcedStartDate.Value < seasonStart || model.EnforcedStartDate.Value > seasonEnd)
         {
             throw new InvalidOperationException(ErrorStartDateOutOfRange);
         }
-        
+
         // Validate end date falls within season
         if (model.EnforcedEndDate.Value < seasonStart || model.EnforcedEndDate.Value > seasonEnd)
         {
             throw new InvalidOperationException(ErrorEndDateOutOfRange);
         }
-        
+
         // Validate start is before end
         if (model.EnforcedStartDate.Value > model.EnforcedEndDate.Value)
         {
             throw new InvalidOperationException(ErrorStartAfterEnd);
         }
+    }
+
+    public async Task<IEnumerable<string>> GetSeriesNamesAsync(Guid clubId, Guid seasonId)
+    {
+        var allSeries = await _coreSeriesService.GetAllSeriesAsync(clubId, null, true, true);
+        return allSeries
+            .Where(s => s.Season != null && s.Season.Id == seasonId)
+            .Select(s => s.Name)
+            .ToList();
+    }
+
+    // Does not actually import the calendar events, but prepares them for the CreateMultiple series form.
+    public async Task<IcalImportResult> ImportIcalAsync(string clubInitials, Guid seasonId, IFormFile file, string url)
+    {
+        var clubId = await _coreClubService.GetClubId(clubInitials);
+        
+        var seasons = await _coreSeasonService.GetSeasons(clubId);
+        var season = seasons.FirstOrDefault(s => s.Id == seasonId);
+        if (season == null)
+        {
+            throw new ArgumentException("Invalid season.");
+        }
+
+        var icalContent = await GetIcalContentAsync(file, url);
+        var calendar = ParseCalendar(icalContent);
+        var sortedOccurrences = GetSortedOccurrences(calendar, season);
+        
+        var (seriesList, outOfRange) = await ProcessOccurrencesAsync(sortedOccurrences, clubId, seasonId, season);
+
+        return new IcalImportResult
+        {
+            Series = seriesList,
+            Warning = outOfRange ? "Some events were outside the season date range and were ignored." : null
+        };
+    }
+
+    private async Task<string> GetIcalContentAsync(IFormFile file, string url)
+    {
+        if (file != null && file.Length > 0)
+        {
+            using var reader = new StreamReader(file.OpenReadStream());
+            return await reader.ReadToEndAsync();
+        }
+        
+        if (!string.IsNullOrEmpty(url))
+        {
+            using var client = new HttpClient();
+            return await client.GetStringAsync(url);
+        }
+
+        throw new ArgumentException("No file or URL provided.");
+    }
+
+    private Ical.Net.Calendar ParseCalendar(string content)
+    {
+        try
+        {
+            return Ical.Net.Calendar.Load(content);
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentException($"Failed to parse iCal content: {ex.Message}");
+        }
+    }
+
+    private List<Occurrence> GetSortedOccurrences(Ical.Net.Calendar calendar, Season season)
+    {
+        var start = new CalDateTime(season.Start);
+        var end = new CalDateTime(season.End);
+        
+        var occurrences = new List<Occurrence>();
+        foreach (var evt in calendar.Events)
+        {
+            var eventOccurrences = evt.GetOccurrences(start)
+                .TakeWhile(o => o.Period.StartTime.Value <= end.Value);
+                
+            occurrences.AddRange(eventOccurrences);
+        }
+        
+        return occurrences
+            .OrderBy(o => o.Period.StartTime.Value)
+            .ToList();
+    }
+
+    private async Task<(List<ImportedSeries> Series, bool OutOfRange)> ProcessOccurrencesAsync(
+        List<Occurrence> occurrences, 
+        Guid clubId, 
+        Guid seasonId, 
+        Season season)
+    {
+        var seriesList = new List<ImportedSeries>();
+        bool outOfRange = false;
+
+        var existingNames = new HashSet<string>(
+            await GetSeriesNamesAsync(clubId, seasonId),
+            StringComparer.OrdinalIgnoreCase);
+        var currentBatchNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var occurrence in occurrences)
+        {
+            var evt = occurrence.Source as Ical.Net.CalendarComponents.CalendarEvent;
+            if (evt == null) continue;
+
+            var (startDate, endDate) = GetDatesFromOccurrence(occurrence);
+
+            if (!IsWithinSeason(startDate, endDate, season))
+            {
+                outOfRange = true;
+                continue;
+            }
+
+            var name = GenerateUniqueName(evt.Summary, startDate, existingNames, currentBatchNames);
+            
+            currentBatchNames.Add(name);
+
+            seriesList.Add(new ImportedSeries
+            {
+                Name = name,
+                StartDate = startDate.ToString("yyyy-MM-dd"),
+                EndDate = endDate.ToString("yyyy-MM-dd")
+            });
+        }
+
+        return (seriesList, outOfRange);
+    }
+
+    private (DateOnly Start, DateOnly End) GetDatesFromOccurrence(Occurrence occurrence)
+    {
+        var evt = occurrence.Source as Ical.Net.CalendarComponents.CalendarEvent;
+        var dtStart = occurrence.Period.StartTime.Value;
+        var dtEnd = occurrence.Period?.EndTime?.Value ?? dtStart;
+
+        DateOnly startDate;
+        DateOnly endDate;
+
+        if (evt != null && evt.IsAllDay)
+        {
+            startDate = DateOnly.FromDateTime(dtStart);
+            endDate = DateOnly.FromDateTime(dtEnd.AddDays(-1));
+            if (endDate < startDate) endDate = startDate;
+        }
+        else
+        {
+            startDate = DateOnly.FromDateTime(dtStart);
+            endDate = DateOnly.FromDateTime(dtEnd);
+            if (endDate < startDate) endDate = startDate;
+        }
+        return (startDate, endDate);
+    }
+
+    private bool IsWithinSeason(DateOnly startDate, DateOnly endDate, Season season)
+    {
+        var seasonStart = DateOnly.FromDateTime(season.Start);
+        var seasonEnd = DateOnly.FromDateTime(season.End);
+
+        return !(startDate < seasonStart || endDate > seasonEnd);
+    }
+
+    private string GenerateUniqueName(
+        string baseName,
+        DateOnly startDate,
+        HashSet<string> existingNames,
+        HashSet<string> currentBatchNames)
+    {
+        if (string.IsNullOrWhiteSpace(baseName))
+        {
+            baseName = "Untitled Series";
+        }
+        var name = baseName;
+
+        if (existingNames.Contains(name) || currentBatchNames.Contains(name))
+        {
+            name = $"{baseName} {startDate:MMM dd}";
+            if (existingNames.Contains(name) || currentBatchNames.Contains(name))
+            {
+                int counter = 1;
+                var nameWithDate = name;
+                do
+                {
+                    name = $"{nameWithDate} {counter}";
+                    counter++;
+                } while (existingNames.Contains(name) || currentBatchNames.Contains(name));
+            }
+        }
+        return name;
+    }
+
+    private void PreValidateRows(List<MultipleSeriesRowViewModel> rows, Season season)
+    {
+        foreach (var row in rows)
+        {
+            if (row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue)
+            {
+                var vm = new SeriesWithOptionsViewModel
+                {
+                    EnforcedStartDate = row.EnforcedStartDate,
+                    EnforcedEndDate = row.EnforcedEndDate,
+                    DateRestricted = true
+                };
+                ValidateDateRestriction(vm, season);
+            }
+        }
+    }
+
+    private SeriesWithOptionsViewModel CreateVmFromRow(MultipleSeriesRowViewModel row, MultipleSeriesWithOptionsViewModel model, Guid clubId, string updatedBy)
+    {
+        var dateRestricted = row.EnforcedStartDate.HasValue || row.EnforcedEndDate.HasValue;
+
+        return new SeriesWithOptionsViewModel
+        {
+            ClubId = clubId,
+            Name = row.Name.Trim(),
+            SeasonId = model.SeasonId,
+            ScoringSystemId = model.ScoringSystemId,
+            TrendOption = model.TrendOption,
+            HideDncDiscards = model.HideDncDiscards,
+
+            Type = SeriesType.Standard,
+            ExcludeFromCompetitorStats = false,
+            Description = string.Empty,
+            IsImportantSeries = false,
+            ParentSeriesIds = null,
+
+            DateRestricted = dateRestricted,
+            EnforcedStartDate = row.EnforcedStartDate,
+            EnforcedEndDate = row.EnforcedEndDate,
+
+            UpdatedBy = updatedBy
+        };
+    }
+
+    private async Task<Guid> CreateSummarySeriesAsync(MultipleSeriesWithOptionsViewModel model, Guid clubId, Season season, List<Guid> createdIds, string updatedBy)
+    {
+        if (string.IsNullOrWhiteSpace(model.SummarySeriesName))
+        {
+            throw new InvalidOperationException("To create a summary series, a summary series name is required.");
+        }
+        if (createdIds.Count == 0)
+        {
+            throw new InvalidOperationException("No series were created to include in the summary series.");
+        }
+
+        var summaryVm = new SeriesWithOptionsViewModel
+        {
+            ClubId = clubId,
+            Name = model.SummarySeriesName.Trim(),
+            SeasonId = model.SeasonId,
+            Season = season,
+            ScoringSystemId = model.ScoringSystemId == Guid.Empty ? null : model.ScoringSystemId,
+            TrendOption = model.TrendOption,
+            HideDncDiscards = model.HideDncDiscards,
+
+            Type = SeriesType.Summary,
+            ExcludeFromCompetitorStats = false,
+            Description = string.Empty,
+            IsImportantSeries = false,
+            ParentSeriesIds = null,
+
+            ChildrenSeriesAsSingleRace = model.SummaryChildrenSeriesAsSingleRace,
+            ChildrenSeriesIds = createdIds,
+
+            DateRestricted = false,
+            EnforcedStartDate = null,
+            EnforcedEndDate = null,
+
+            UpdatedBy = updatedBy
+        };
+
+        return await _coreSeriesService.SaveNewSeries(summaryVm);
     }
 }

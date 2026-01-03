@@ -91,8 +91,28 @@ body {
     margin-bottom: 130px;
 }
 
+/* Prevent layout shift when pages gain/lose a vertical scrollbar */
+html {
+    /* modern browsers will reserve space for the scrollbar */
+    scrollbar-gutter: stable;
+}
+
+/* Fallback for browsers that don't support `scrollbar-gutter` - always show a vertical scrollbar */
+@supports not (scrollbar-gutter: stable) {
+    html {
+        overflow-y: scroll;
+    }
+}
+
 header.bg-dark, nav.bg-dark {
     background-color: $my-nav-bg-dark !important;
+}
+
+// Club navigation active state - light mode
+.navbar-dark .navbar-brand.active,
+.navbar-dark .nav-link.active {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 500;
 }
 
 .select2-search {
@@ -276,7 +296,6 @@ span.discardmuted {
         text-orientation: upright;
     }
 }
-
 
 
 [data-toggle="collapse"]:after {
@@ -484,6 +503,13 @@ form label.required:not(.custom-control-label)::after {
 
     header.bg-dark, nav.bg-dark {
         background-color: $secondary-background !important;
+    }
+
+    // Club navigation active state - dark mode
+    .navbar-dark .navbar-brand.active,
+    .navbar-dark .nav-link.active {
+        color: rgba(255, 255, 255, 1) !important;
+        font-weight: 500;
     }
 
     svg text {
@@ -721,6 +747,31 @@ form label.required:not(.custom-control-label)::after {
 
 }
 
+/* Sticky headers for AllCompHistogram report table */
+.allcomp-table {
+  thead {
+    th {
+      position: sticky;
+      top: 0; /* header reaches top of viewport (navbar not fixed) */
+      background-color: var(--bs-tertiary-bg, #f8f9fa);
+      z-index: 1100;
+      border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    }
+  }
+
+  /* Center all cells in the table */
+  th,
+  td {
+    text-align: center;
+    vertical-align: middle;
+  }
+}
+
+/* Ensure table-responsive does not clip sticky headers vertically */
+.table-responsive {
+  overflow: visible;
+}
+
 @media (max-width: 767.98px) {
   .form-control {
     padding-left: 0.25rem;
@@ -777,7 +828,7 @@ form label.required:not(.custom-control-label)::after {
 }
 
 .supporter-logo-container {
-    min-height: 150px;
+    min-height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1160,5 +1211,26 @@ form label.required:not(.custom-control-label)::after {
     .week-row .event-bar.bs-info-border-subtle {
         background-color: rgba(var(--bs-info-rgb, 13, 202, 240), 0.10);
         border-color: rgba(var(--bs-info-rgb, 13, 202, 240), 0.22);
+    }
+}
+
+/* Home page styles */
+.home-index {
+    /* Subtle hover effect for interactive cards */
+    .card {
+        transition: all 0.2s ease-in-out;
+        
+        &:hover {
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            transition: all 0.2s ease-in-out;
+        }
+    }
+
+    #clubCardsContainer .card-text {
+        max-height: 200px;
+        overflow-y: auto;
+        position: relative;
+        z-index: 2;
     }
 }

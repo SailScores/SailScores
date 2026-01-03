@@ -18,22 +18,19 @@ public class SupporterController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
     private readonly IStripeService _stripeService;
-    private readonly AppSettingsService _appSettingsService;
 
     public SupporterController(
         ISupporterService supporterService,
         IAuthorizationService authService,
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        IStripeService stripeService,
-        AppSettingsService appSettingsService)
+        IStripeService stripeService)
     {
         _supporterService = supporterService;
         _authService = authService;
         _userManager = userManager;
         _configuration = configuration;
         _stripeService = stripeService;
-        _appSettingsService = appSettingsService;
     }
 
     public async Task<ActionResult> Index()
@@ -45,7 +42,7 @@ public class SupporterController : Controller
 
         ViewBag.IsAdmin = isAdmin;
         ViewData["StripePublishableKey"] = _configuration["Stripe:PublishableKey"];
-        ViewBag.ShowSupporterFeatures = _appSettingsService.ShowSupporterFeatures || isAdmin;
+        ViewBag.StripeCustomerPortalUrl = _configuration["Stripe:CustomerPortalUrl"];
         return View(supporters);
     }
 
@@ -70,6 +67,7 @@ public class SupporterController : Controller
         ViewBag.ClubInitials = clubInitials;
         ViewBag.SessionId = session_id;
         ViewBag.MultipleClubs = multipleClubs;
+        ViewBag.StripeCustomerPortalUrl = _configuration["Stripe:CustomerPortalUrl"];
 
         return View();
     }
@@ -78,6 +76,7 @@ public class SupporterController : Controller
 
     public ActionResult Cancel()
     {
+        ViewBag.StripeCustomerPortalUrl = _configuration["Stripe:CustomerPortalUrl"];
         return View();
     }
 

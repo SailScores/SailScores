@@ -55,8 +55,42 @@ public class SailScoresContext : DbContext, ISailScoresContext
     private DbSet<SiteStats> SiteStats { get; set; }
     private DbSet<DeletableInfo> CompetitorDeletableInfo { get; set; }
     private DbSet<CompetitorActiveDates> CompetitorActiveDates { get; set; }
+
+    private DbSet<AllCompHistogramFields> AllCompHistogramFields { get; set; }
+    private DbSet<AllCompHistogramStats> AllCompHistogramStats { get; set; }
+
     public DbSet<ChangeType> ChangeTypes { get; set; }
     public DbSet<CompetitorChange> CompetitorChanges { get; set; }
+
+    public async Task<IList<AllCompHistogramFields>> GetAllCompHistogramFields(
+        Guid clubId,
+        DateTime? startDate,
+        DateTime? endDate)
+    {
+        var query = await GetSqlQuery("AllCompHistogramFields");
+        var clubParam = new SqlParameter("ClubId", clubId);
+        var startDateParam = new SqlParameter("StartDate", startDate ?? (object)DBNull.Value);
+        var endDateParam = new SqlParameter("EndDate", endDate ?? (object)DBNull.Value);
+        var result = await this.AllCompHistogramFields
+            .FromSqlRaw(query, clubParam, startDateParam, endDateParam)
+            .ToListAsync();
+        return result;
+    }
+
+    public async Task<IList<AllCompHistogramStats>> GetAllCompHistogramStats(
+        Guid clubId,
+        DateTime? startDate,
+        DateTime? endDate)
+    {
+        var query = await GetSqlQuery("AllCompHistogram");
+        var clubParam = new SqlParameter("ClubId", clubId);
+        var startDateParam = new SqlParameter("StartDate", startDate ?? (object)DBNull.Value);
+        var endDateParam = new SqlParameter("EndDate", endDate ?? (object)DBNull.Value);
+        var result = await this.AllCompHistogramStats
+            .FromSqlRaw(query, clubParam, startDateParam, endDateParam)
+            .ToListAsync();
+        return result;
+    }
 
     public async Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId)
     {
@@ -309,6 +343,18 @@ public class SailScoresContext : DbContext, ISailScoresContext
             });
 
         modelBuilder.Entity<SiteStats>(
+            cs =>
+            {
+                cs.HasNoKey();
+            });
+
+        modelBuilder.Entity<AllCompHistogramStats>(
+            cs =>
+            {
+                cs.HasNoKey();
+            });
+
+        modelBuilder.Entity<AllCompHistogramFields>(
             cs =>
             {
                 cs.HasNoKey();

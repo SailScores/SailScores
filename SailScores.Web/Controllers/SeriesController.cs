@@ -1,5 +1,7 @@
 using System.Text;
 using System.Web;
+using System.IO;
+using System.Net.Http;
 using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -202,6 +204,24 @@ public class SeriesController : Controller
 
             return RedirectToAction("Index", "Admin");
         }
+        catch (InvalidOperationException ex)
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+
+            // Clear parent series IDs for Summary Series since they can't have parents
+            // probably redundant with above, but doesn't hurt.
+            if (model.Type == Core.Model.SeriesType.Summary)
+            {
+                model.ParentSeriesIds = null;
+            }
+
+            ModelState.AddModelError(String.Empty, ex.Message);
+
+            return View(model);
+        }
         catch
         {
             var blankVm = await _seriesService.GetBlankVmForCreate(clubInitials);
@@ -353,5 +373,126 @@ public class SeriesController : Controller
             var series = await _seriesService.GetSeriesAsync(id);
             return View(series);
         }
+    }
+
+    [Authorize]
+    public async Task<ActionResult> CreateMultiple(string clubInitials)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        var vm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<ActionResult> CreateMultiple(
+        string clubInitials,
+        MultipleSeriesWithOptionsViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            return View(model);
+        }
+
+        try
+        {
+            await _seriesService.CreateMultipleAsync(clubInitials, clubId, model, await GetUserStringAsync());
+            return RedirectToAction("Index", "Admin", new { clubInitials });
+        }
+        catch (InvalidOperationException ex)
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+        catch
+        {
+            var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+            model.SeasonOptions = blankVm.SeasonOptions;
+            model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+
+            ModelState.AddModelError(string.Empty, "A problem occurred creating these series. Check" +
+                " for duplicate names within the selected season or invalid date ranges.");
+            return View(model);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> ImportIcal(string clubInitials, Guid seasonId, IFormFile file, string url)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var result = await _seriesService.ImportIcalAsync(clubInitials, seasonId, file, url);
+            
+            // Map the result to the anonymous object structure expected by the frontend
+            var seriesList = result.Series.Select(s => new
+            {
+                Name = s.Name,
+                StartDate = s.StartDate,
+                EndDate = s.EndDate
+            }).ToList();
+
+            return Json(new { series = seriesList, warning = result.Warning });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"An error occurred: {ex.Message}");
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> CheckSeriesNamesUnique(
+        string clubInitials,
+        Guid seasonId,
+        [FromBody] List<string> names)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.CanUserEdit(User, clubId))
+        {
+            return Unauthorized();
+        }
+
+        var existingNames = await _seriesService.GetSeriesNamesAsync(clubId, seasonId);
+        var existingNamesSet = new HashSet<string>(
+            existingNames.Select(n => n.Trim()),
+            StringComparer.OrdinalIgnoreCase);
+
+        var conflictingNames = names
+            .Where(n => !string.IsNullOrWhiteSpace(n) && existingNamesSet.Contains(n.Trim()))
+            .Select(n => n.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Json(new { conflictingNames });
     }
 }

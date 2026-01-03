@@ -6,4 +6,390 @@
 }
 
 <h1>Getting Started</h1>
-<p>Introductory guidance goes here.</p>
+<p>
+  This page covers the basic steps after a club is first created: from the
+    first look at the SailScores club page to the entry of races. It
+    doesn't aim to cover every option.
+</p>
+
+<div class="container mt-4">
+  <div class="row">
+    <main class="col-md-8">
+      <section id="glossary" class="mt-4">
+        <h2>Glossary</h2>
+        <p>How terms are used in SailScores.</p>
+
+        <dl class="row">
+          <dt>Club</dt>
+          <dd>
+            All results in SailScores belong to a club. The elements of scoring are setup at the
+            Club level and can be shared across Series and Races within the club.
+          </dd>
+
+          <dt>Competitor</dt>
+          <dd>
+            A sailor or boat entered into a race. Sail number is the most commonly used method for
+            entering results, but the alternative sail number and competitor name may also be used
+            in some circumstances.
+          </dd>
+
+          <dt>Season</dt>
+          <dd>
+            Series and Regattas belong to a Season. Seasons are typically a year long, and Series
+            will repeat each year, in a new Season. The dates of a Season are important:
+            races can only belong to series assigned to a season including the date of the race.
+          </dd>
+
+          <dt>Series</dt>
+          <dd>
+            A set of races grouped for scoring. Results are recalculated when a race within the
+            Series is edited. Races can be in multiple series. These are the most frequently viewed
+            items in SailScores.
+          </dd>
+
+          <dt>Race</dt>
+          <dd>
+            A race is a start and results for a group of boats scored against each other. These are
+            the most frequently edited items in SailScores.
+          </dd>
+
+          <dt>Regatta</dt>
+          <dd>
+            A group of Series for difference fleets that share the same scoring rules and where
+            results will be shared on the same page. Usually only a few days long.
+          </dd>
+
+          <dt>Scoring System</dt>
+          <dd>
+            Scoring Systems are the instructions to combind multiple races into series results. The
+            most common Scoring Systems are based on the Racing Rules of Sailing Appendix A. Score
+            Codes and Discard rules are setup within a Scoring System. Scoring System calculations,
+            such as tie-breaking, averaging, and totals are defined in a base Scoring System.
+            SailScores supports a number of base Scoring Systems such as Appendix A, Low Point
+            Average, Cox-Sprague, High Point Percent, and others.
+          </dd>
+
+          <dt>Score Codes</dt>
+          <dd>
+            Often three letters, Score Codes can be entered as race results to indicate special
+            circumstances, such as Did Not Finish, On-Course Start, or Did Not Start. Clubs often
+            set up custom codes or change the calculation of the usual score codes, such as Race
+            Committee duty. Score Codes provide a scoring value as set in the Scoring System
+            assigned to a series.
+          </dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Prerequisites</h2>
+        <p>
+          Before following the instructions below you should have an account on
+          SailScores.com and completed a request for a SailScores club, after which you'll get an
+          emailed response with instructions on accessing your club's home page.
+        </p>
+        <p>
+          You should also have a modern web browser. Most functions work well on a phone, tablet
+          or PC. A larger screen can make the initial set-up a little easier as you'll see more
+          details together.
+        </p>
+        <p>
+          For the quickest setup, be ready:
+          <ul>
+            <li>
+              Know your club's usual scoring rules: what system is used, what custom codes are
+              defined, and what's the usual discard pattern?
+            </li>
+            <li>
+              Have a list of competitors, including sail number, boat class and, optionally, boat
+              name.
+            </li>
+            <li>
+              To set up automatic retrieval of day of race weather, know your club's latitude and
+              longitude. (Right-clicking in popular map websites will usually show this.)
+            </li>
+          </ul>
+        </p>
+      </section>
+            <p class="alert alert-info">
+                <strong>Tip:</strong> Whenever you see a
+                <a class="text-primary"
+                    data-bs-container="body"
+                    data-bs-toggle="popover"
+                    data-bs-placement="top"
+                    data-bs-trigger="focus hover"
+                    data-bs-content="Icons like this provide extra help during setup and result entry.">
+          <span class="far fa-question-circle"></span></a> icon in the setup pages, you can hover or tap it to
+          find helpful guidance. These tips appear throughout setup and result entry
+          to help you get the best results.
+        </p>
+
+      <section class="mt-4">
+        <h3>Step 1 — Make yourself at home</h3>
+        <p>
+          The email indicating that your club has been created will include a link to your club's
+          SailScores Home Page. This page is worth bookmarking. It is the starting point for
+          scorekeepers and result viewers. Feel free to share links to other pages, the links
+          should be stable and work for a long time. But if you need one link to share, it will be
+          to the SailScores Club Home Page. This link address ends with your club's initials, and
+          will be the start of other links for your club's results.
+        </p>
+
+        <figure class="figure">
+          <theme-image src="/images/help/SailScoresClubHome.png"
+                       class="img-fluid img-thumbnail"
+                       alt="SailScores Club Home Page"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">
+            Figure 1: The Club Home Page shows more buttons when a registered scorekeeper is logged in.
+          </figcaption>
+        </figure>
+
+        <p>
+          The club home page has a link to the Club Admin Page where the initial club setup will
+          happen.
+        </p>
+      </section>
+
+      <section class="mt-4">
+        <h3>Step 2 — One Time Club Configuration</h3>
+        <p>
+          There are a few settings to confirm when you first get access to a club.
+          These can be changed later, but usually they can be ignored after initial setup.
+        </p>
+
+        <h4 class="mt-3">Confirm General Club settings</h4>
+        <p>
+          Open the Club Admin page and then click on <strong>Edit Club Info</strong>. Verify the club name,
+          club URL, and location details. Enter latitude and longitude so that SailScores
+          can get the current conditions for your races.
+        </p>
+        <figure class="figure">
+          <theme-image src="/images/help/club-settings.png"
+                       alt="Club settings screenshot"
+                       class="img-fluid img-thumbnail"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">Figure: Verify general club settings.</figcaption>
+        </figure>
+
+        <h4 class="mt-3">Add Classes</h4>
+        <p>
+          Create the boat classes (e.g., Laser, Optimist, 470) used by your club. Classes
+          filter entries and help gather statistics. Every competitor will be assigned to
+          one class.
+        </p>
+        <figure class="figure">
+          <theme-image src="/images/help/add-class.png"
+                       alt="Add classes screenshot"
+                       class="img-fluid img-thumbnail"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">Figure: Add boat classes to the club.</figcaption>
+        </figure>
+
+        <h4 class="mt-3">Confirm Scoring System</h4>
+        <p>
+          If you are testing out SailScores, you can skip this and customize the scoring
+          later. Scoring Systems are
+          defined towards the bottom of the Club Admin page. The most common change
+          is to the discard pattern. You can edit it to match your club's published rules.
+          Add any custom scoring codes that your club uses.
+        </p>
+        <figure class="figure">
+          <theme-image src="/images/help/scoring-system.png"
+                       alt="Scoring system screenshot"
+                       class="img-fluid img-thumbnail"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">
+            Figure: Select or configure the club Scoring System.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="mt-4">
+        <h3>Step 3 — Recurring Series and Competitor Setup</h3>
+        <p>
+          Set up the recurring items and register competitors so race entry is quick and
+          repeatable. You'll come back to these activities every so often. 
+        </p>
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">Understanding seasons</h4>
+                    <p>
+                        Every series and regatta in SailScores belongs to a <strong>season</strong>. Most of the links
+                        to your club's results will include a season in the URL, which keeps years of results organized
+                        and easy to navigate.
+                    </p>
+                    <p>
+                        Many clubs use calendar years (e.g., “2026”) or hyphenated years in the southern hemisphere
+                        (e.g., “25–26”). You can define any date range that fits your schedule. Choose an interval that
+                        covers the races in your series; often the same series name will repeat each season.
+                    </p>
+                    <p class="mb-0">
+                        Before entering results, make sure there is a season whose dates cover every race you plan to
+                        record. You can always add additional seasons later if your plans change.
+                    </p>
+                </div>
+
+        <h4 class="mt-3">Season setup</h4>
+        <p>
+          Create a Season (typically a year) and set the date range. Seasons provide the
+          container for Series and Events and limit how races can be grouped together. Don't
+          worry about making the series longer than your sailing season. The season start and
+          end dates don't get displayed on the site. For a club that sails during the Northern
+          summer, set the season dates to January 1 to December 31, even if there
+          are never races in winter.
+        </p>
+        <figure class="figure">
+          <theme-image src="/images/help/create-season.png"
+                       alt="Season setup screenshot"
+                       class="img-fluid img-thumbnail"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">
+            Figure: Creating a season and setting its date range.
+          </figcaption>
+        </figure>
+
+        <h4 class="mt-3">Series setup</h4>
+        <p>
+          Create Series (weekly league, summer series, regatta series). For now, leave the
+          Series Type set to <strong>Standard</strong>. <strong>Summary Series</strong>
+          can automatically roll-up other
+          series results into a aggregated score. But you'll need to have Standard Series
+          before you can use those.
+        </p>
+        <figure class="figure">
+          <theme-image src="/images/help/create-series.png"
+                       alt="Series setup screenshot"
+                       class="img-fluid img-thumbnail"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">
+            Figure: Configure a series and its scoring options.
+          </figcaption>
+        </figure>
+        <p>
+          Under <strong>Additional Settings</strong> there are a few
+          options for series, but
+          you can keep the defaults if you want to get up and going quickly. 
+          <dl>
+            <dt>
+                List as Top Series
+            </dt>
+            <dd>
+                Always show the series on the club's SailScores home page.
+                Normally, series only show on the club page when they've had
+                recent races. 
+            </dd>
+            <dt>
+                Calculate Rank Trend
+            </dt>
+            <dd>
+                Will show an arrow and rank change on the left of series
+                results as competitor places change.
+            </dd>
+            <dt>
+                Restrict Series Dates
+            </dt>
+            <dd>
+                The series will only be an option when the race date falls
+                within the limited series dates.
+            </dd>
+            <dt>
+                Scoring System
+            </dt>
+            <dd>
+                If a series needs to use different scoring than the club's usual
+                settings, change that here.
+            </dd>
+            <dt>
+                Exclude from competitor summary statistics
+            </dt>
+            <dd>
+                Any races assigned to a series with this setting enabled will not count
+                in most competitor reports. Event if a race is in multiple series, if
+                one has this setting enabled, the race will not show in club statistics. 
+            </dd>
+            <dt>
+                Hide discarded DNC scores
+            </dt>
+            <dd>
+                Popular for Cox-Sprague or percentage-based systems, discarded DNC results
+                will show as a blank cell on the results table.
+            </dd>
+          </dl>
+
+        </p>
+        <p><strong>Note:</strong> When a series is deleted the races in it won't be
+          removed. You can add them to another series.</p>
+
+        <h4 class="mt-3">Competitor setup</h4>
+        <p>
+          There are a few ways to get to competitor page. Once there, use the
+          <strong>Create</strong>
+          button to open a page that allows the creation of many competitors at once.
+          You can paste columns from a spreadsheet into this page if you maintain these
+          lists elsewhere.
+        </p>
+        <figure class="figure">
+          <theme-image src="/images/help/create-competitors.png"
+                       alt="Competitor setup screenshot"
+                       class="img-fluid img-thumbnail"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">
+            Figure: Add competitors or import a list for quick entry.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="mt-4">
+        <h3>Step 4 — The Goal: Quick, Easy Race Entry</h3>
+        <p>
+          The setup means races can now be created and scored quickly.
+          Open your club page and click "New Race". The race editing
+          pages have four different methods to add finishers. All of them are fast. The
+          fastest depends on the fleet size and the scorekeeper's preferences.
+        </p>
+
+        <figure class="figure">
+          <theme-image src="/images/help/race-results.png"
+                       alt="Enter results screenshot"
+                       class="img-fluid img-thumbnail"
+                       asp-append-version="true" />
+          <figcaption class="figure-caption">Figure 3: Enter results for a race.</figcaption>
+        </figure>
+      </section>
+
+
+      <section class="mt-4">
+        <h3>Other Getting Started Guides</h3>
+        <ul>
+          <li><a asp-page="/Help/EnteringRaceResults">Entering Race Results</a>: For scorekeepers that will be using existing
+            series and only need to create races and enter the results.</li>
+          <li><a asp-page="/Help/CreatingARegatta">Creating A Regatta</a>: A walkthrough, similar to the above, but focused
+            on setting up an event on SailScores.</li>
+        </ul>
+      </section>
+    </main>
+
+    <aside class="col-md-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h4 class="card-title">Quick links</h4>
+          <ul class="list-unstyled">
+            <li><a href="/Account/Register">Register</a></li>
+            <li><a href="/ClubRequest">Create Club</a></li>
+            <li><a href="/Help/Scoring">Scoring Reference</a></li>
+            <li><a href="/Help/EnteringRaceResults">Entering Race Results</a></li>
+            <li><a href="/Help/CreatingARegatta">Creating A Regatta</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h5>Tips</h5>
+          <ul>
+            <li>Use a recent browser for best results.</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

@@ -3,10 +3,10 @@
     ViewData["MetaDescription"] = "Latest news about SailScores";
 }
 <div class="col-lg-8">
-    <h1 class="h3"><span class="far fa-newspaper"></span>News</h1>
+    <h1 class="h2">News</h1>
 
     <div id="mc_embed_shell">
-        <link href="//cdn-images.mailchimp.com/embedcode/classic-061523.css" rel="stylesheet" type="text/css">
+        <link href="https://cdn-images.mailchimp.com/embedcode/classic-061523.css" rel="stylesheet" type="text/css" integrity="sha256-WIPn784vL2Neq61pBoUKyDrCI29nW8lp/1CMKtLG4EE=" crossorigin="anonymous">
         <style type="text/css">
             #mc_embed_signup {
             }
@@ -54,6 +54,63 @@
         <script type="text/javascript">(function ($) { window.fnames = new Array(); window.ftypes = new Array(); fnames[0] = 'EMAIL'; ftypes[0] = 'email'; fnames[1] = 'FNAME'; ftypes[1] = 'text'; fnames[2] = 'LNAME'; ftypes[2] = 'text'; fnames[3] = 'ADDRESS'; ftypes[3] = 'address'; fnames[4] = 'PHONE'; ftypes[4] = 'phone'; fnames[5] = 'BIRTHDAY'; ftypes[5] = 'birthday'; fnames[6] = 'MMERGE6'; ftypes[6] = 'text'; }(jQuery)); var $mcj = jQuery.noConflict(true);</script>
     </div>
     <hr />
+    <h3>January 1st, 2026</h3>
+    <h5>&#x1F389; Supporters &amp; Growth &#x1F389;</h5>
+    <p>
+        We’re excited to share a new way to support SailScores. The new
+        <a asp-controller="supporter" asp-action="index">Pricing page</a> connects directly
+        to Stripe and makes it easy for anyone to help cover the cost of running the service. We'll also highlight
+        supporters who choose to be acknowledged.
+    </p>
+    <p>
+        SailScores will <strong>continue to be free</strong> &mdash; that’s core to the project and isn’t changing.
+        Supporter contributions go toward the practical side of keeping the site fast and reliable as more clubs
+        join in: things like server capacity and hosting. Development
+        remains a volunteer effort, fueled by a love of sailing and a desire to make scoring easier for everyone.
+    </p>
+    <p>
+        You’ll also notice a new Help section, where we’re adding guides and
+        documentation. We aim to make SailScores intuitive, but sometimes a well‑written
+        page is the quickest way to get someone up to speed. We'll be adding to this section and refining it
+        over the next few months.
+    </p>
+    <p>
+        On the front page, you’ll now see a new layout that highlights clubs with recent activity
+        and gives space to show a burgee or small graphic plus a short public blurb.
+    </p>
+    <p>
+        SailScores has continues to grow &mdash; roughly doubling in usage over the past several years &mdash;
+        and we’re grateful
+        to everyone who’s been part of that journey.
+    </p>
+    <div class="text-center my-3">
+        <picture>
+            <source srcset="~/images/2025growth-chart-dark.png" media="(prefers-color-scheme: dark)">
+            <img src="~/images/2025growth-chart-light.png" alt="Chart showing 2x growth of SailScores" class="img-fluid" style="max-width: 100%; height: auto;">
+        </picture>
+    </div>
+    <p>
+      Some numbers:
+      <ul>
+            <li>47 clubs scored at least one race on the site</li>
+            <li>27 of those were new to SailScores in 2025</li>
+            <li>Over 5,250 races were scored in 599 different series</li>
+            <li>Over 48,600 individual results entered</li>
+            <li>2025's largest series had 119 races</li>
+      </ul>
+    </p>
+    <p>
+      Expected features for 2026 include:
+      <ul>
+        <li>Self-service backup and restore capability for scorekeepers.</li>
+        <li>Continued optimization for clubs with many races, series, competitors and
+          scores &mdash; including ways to show only the features you need, alongside the
+          current "all-the-things" Admin section.
+          </li>
+      </ul>
+    </p>
+
+    <br />
     <h3>December 13th, 2025</h3>
     <h5>Limitations</h5>
     <p>
@@ -68,12 +125,12 @@
         Some more details on these:
     </p>
     <p>
-        Restricting the dates for a series shouldn't be necessary for most clubs. But if the list of
-        series when you create a race is getting too long, here's the answer. If the option to restrict
-        a series dates is selected, you must enter a start and end date for the series. After that, the
-        series will only appear as an option for races within that date range. And if a scorekeeper
-        uses the "New Race" button from the series, the race date will be set to the nearest date
-        that falls in the series date range. (Regatta Series will now default to these settings.)
+      Restricting the dates for a series shouldn't be necessary for most clubs. But if the list of
+      series when you create a race is getting too long, here's the answer. If the option to restrict
+      a series dates is selected, you must enter a start and end date for the series. After that, the
+      series will only appear as an option for races within that date range. And if a scorekeeper
+      uses the "New Race" button from the series, the race date will be set to the nearest date
+      that falls in the series date range. (Regatta Series will now default to these settings.)
     </p>
     <p>
       Previously, the list of available scoring systems for a series included all the systems that a club
@@ -131,15 +188,6 @@
                 should help those testing out the regatta functionality.</li>
         </ul>
         </p>
-    <br />
-    <h3>January 23rd, 2025</h3>
-    <h5>Racing Rules of Sailing 2025-2028</h5>
-    <p>
-        In addition to some minor changes to a few scoring codes, RRS 2025-2028 also includes a change to how scoring
-        penalties are calculated. A Scoring Penalty should now be rounded to a single decimal place, like other calculated scores.
-        Previously, penalties were rounded to the nearest whole number. The default scoring system in SailScores has been updated
-        to comply with the new rules. There are also base systems added for those who need to use the pre-2025 scoring systems.
-    </p>
     <br />
     <h3>February 12th, 2025</h3>
     <h5>Formatting tweak</h5>

@@ -18,6 +18,8 @@ public class ClubSummaryViewModel
     [StringLength(10)]
     public String Initials { get; set; }
     public String Description { get; set; }
+    public String HomePageDescription { get; set; }
+    public Guid? LogoFileId { get; set; }
     public bool IsHidden { get; set; }
     public String Url { get; set; }
 
@@ -33,7 +35,7 @@ public class ClubSummaryViewModel
 
     public IList<ScoringSystem> ScoringSystems { get; set; }
 
-    private DateTime recentCutoff = DateTime.Now.AddDays(-8);
+    private DateTime recentCutoff = DateTime.Now.AddDays(-9);
     public IEnumerable<RaceSummaryViewModel> RecentRaces => Races?.Where(r => r.Date > recentCutoff
                                                                               && ((r.State ?? RaceState.Raced) == RaceState.Raced
                                                                                   || r.State == RaceState.Preliminary))
@@ -46,6 +48,7 @@ public class ClubSummaryViewModel
                 s.Type == SeriesType.Summary
                 && (s.EndDate??DateOnly.MinValue) > DateOnly.FromDateTime(recentCutoff)
                 && (s.UpdatedDate??DateTime.MinValue) > recentCutoff
+                && (s.StartDate ?? DateOnly.MinValue) < DateOnly.FromDateTime(DateTime.Now)
             )
             || (s.Races
                 ?.Any(r => r.Date > recentCutoff

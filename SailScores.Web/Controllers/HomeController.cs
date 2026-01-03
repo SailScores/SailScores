@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
@@ -39,14 +39,25 @@ public class HomeController : Controller
         {
             Regattas = (await _regattaService.GetCurrentRegattas()).ToList()
         };
+        
+        var recentlyActiveClubs = (await _clubservice.GetClubsWithRecentActivity(9))
+            .ToList();
+        
+        var allVisibleClubs = (await _clubservice.GetClubs(false))
+            .OrderBy(c => c.Name)
+            .ToList();
+        
         var model = new SiteHomePageModel
         {
             ClubSelectorModel = clubSelector,
-            RegattaSelectorModel = regattaSelector
+            RegattaSelectorModel = regattaSelector,
+            RecentlyActiveClubs = recentlyActiveClubs,
+            AllVisibleClubs = allVisibleClubs
         };
         return View(model);
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public IActionResult About()
     {
         var vm = new AboutViewModel
@@ -65,17 +76,20 @@ public class HomeController : Controller
         return View(vm);
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> Stats()
     {
         var vm = await _webClubService.GetAllClubStats();
         return View(vm);
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public IActionResult News()
     {
         return View();
     }
 
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
     public IActionResult Privacy()
     {
         return View();

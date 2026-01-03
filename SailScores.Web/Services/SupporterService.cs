@@ -17,41 +17,90 @@ namespace SailScores.Web.Services
         private readonly Core.Services.ISupporterService _coreSupporterService;
         private readonly IMapper _mapper;
         private readonly ISailScoresContext _dbContext;
+        private readonly Core.Services.IClubService _clubService;
 
         public SupporterService(
             Core.Services.ISupporterService coreSupporterService,
             IMapper mapper,
-            ISailScoresContext dbContext)
+            ISailScoresContext dbContext,
+            Core.Services.IClubService clubService)
         {
             _coreSupporterService = coreSupporterService;
             _mapper = mapper;
             _dbContext = dbContext;
+            _clubService = clubService;
         }
 
         public async Task<IEnumerable<SupporterViewModel>> GetVisibleSupportersAsync()
         {
             var supporters = await _coreSupporterService.GetVisibleSupportersAsync();
-            return _mapper.Map<IEnumerable<SupporterViewModel>>(supporters);
+            return await EnrichSupportersWithClubData(supporters);
         }
 
         public async Task<IEnumerable<SupporterViewModel>> GetAllSupportersAsync()
         {
             var supporters = await _coreSupporterService.GetAllSupportersAsync();
-            return _mapper.Map<IEnumerable<SupporterViewModel>>(supporters);
+            return await EnrichSupportersWithClubData(supporters);
+        }
+
+        private async Task<IEnumerable<SupporterViewModel>> EnrichSupportersWithClubData(IEnumerable<Core.Model.Supporter> supporters)
+        {
+            var viewModels = _mapper.Map<IEnumerable<SupporterViewModel>>(supporters).ToList();
+            
+            // Get club data for supporters that are linked to clubs
+            var clubIds = viewModels.Where(s => s.ClubId.HasValue).Select(s => s.ClubId.Value).Distinct().ToList();
+            
+            if (clubIds.Any())
+            {
+                var clubs = await _dbContext.Clubs
+                    .Where(c => clubIds.Contains(c.Id))
+                    .Select(c => new { c.Id, c.LogoFileId })
+                    .ToListAsync();
+                
+                foreach (var supporter in viewModels.Where(s => s.ClubId.HasValue))
+                {
+                    var club = clubs.FirstOrDefault(c => c.Id == supporter.ClubId.Value);
+                    if (club?.LogoFileId.HasValue == true && !supporter.LogoFileId.HasValue)
+                    {
+                        // Use club's burgee if supporter doesn't have its own logo
+                        supporter.LogoFileId = club.LogoFileId;
+                    }
+                }
+            }
+            
+            return viewModels;
         }
 
         public async Task<SupporterWithOptionsViewModel> GetSupporterAsync(Guid id)
         {
             var supporter = await _coreSupporterService.GetSupporterAsync(id);
-            return _mapper.Map<SupporterWithOptionsViewModel>(supporter);
+            var vm = _mapper.Map<SupporterWithOptionsViewModel>(supporter);
+            vm.ClubOptions = await GetClubOptionsAsync();
+            return vm;
         }
 
-        public Task<SupporterWithOptionsViewModel> GetBlankSupporter()
+        public async Task<SupporterWithOptionsViewModel> GetBlankSupporter()
         {
-            return Task.FromResult(new SupporterWithOptionsViewModel
+            return new SupporterWithOptionsViewModel
             {
-                IsVisible = true
-            });
+                IsVisible = true,
+                ClubOptions = await GetClubOptionsAsync()
+            };
+        }
+
+        private async Task<List<ClubOption>> GetClubOptionsAsync()
+        {
+            var clubs = await _clubService.GetClubs(includeHidden: true);
+            return clubs
+                .OrderBy(c => c.Name)
+                .Select(c => new ClubOption
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Initials = c.Initials,
+                    LogoFileId = c.LogoFileId
+                })
+                .ToList();
         }
 
         public async Task SaveNew(SupporterWithOptionsViewModel supporter)

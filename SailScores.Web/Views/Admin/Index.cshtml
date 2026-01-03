@@ -43,6 +43,10 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#scorekeepers">Scorekeepers</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Reports"
+                       asp-action="Index">Reports</a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -55,7 +59,7 @@
     @await Html.PartialAsync("_AdminToDoList", Model.Tips)
 }
 <div class="row">
-    <div class="col-6 col-sm-4">
+    <div class="col-6 col-md-5 col-lg-4">
         <a asp-controller="Race"
            asp-action="Create"
            class="btn btn-outline-primary btn-sm">@localizer["New Race"]</a>
@@ -123,6 +127,10 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#regattas">Regattas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Reports"
+               asp-action="Index">Reports</a>
         </li>
     </ul>
 </div>

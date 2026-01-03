@@ -3,198 +3,186 @@
 @{
     ViewData["Title"] = "Pricing";
     ViewData["MetaDescription"] = "SailScores is free for everyone. Learn about our community-driven model and how you can support the project.";
-    var showSupporterFeatures = (ViewBag.ShowSupporterFeatures as bool? ?? false) || ViewBag.IsAdmin;
 }
 
-@if (!showSupporterFeatures)
-{
-    <div class="container mt-5">
-        <div class="alert alert-info text-center">
-            <h2>Supporter features are currently hidden in production.</h2>
-        </div>
-    </div>
-    return;
-}
+  <!-- Free Service Message Section -->
+  <div class="row mb-5 mt-4">
+      <div class="col-12">
+        <h1 class="display-4">SailScores is free for all clubs</h1><br /><h2 class="display-5">And made possible by our supporters</h2>
+      </div>
+  </div>
 
-<div class="container">    
-    <!-- Free Service Message Section -->
-    <div class="row mb-5 mt-4">
-        <div class="col-12">
-          <h1 class="display-4">SailScores is free for all clubs</h1><br /><h2 class="display-5">And made possible by our supporters</h2>
-        </div>
-    </div>
+  <!-- Supporters List Section -->
+  <div class="row mb-4">
+      <div class="col-12">
+          <p class="lead">
+              Their generous contributions help provide this service to the sailing community worldwide.
+          </p>
+      </div>
+  </div>
 
-    <!-- Supporters List Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2>Our Supporters</h2>
-            <p class="lead">
-                Generous support helps provide this service to the sailing community worldwide.
-            </p>
-        </div>
-    </div>
+  @if (ViewBag.IsAdmin)
+  {
+      <div class="row mb-3">
+          <div class="col-12">
+              <a asp-action="Create" class="btn btn-primary">
+                  <i class="fas fa-plus"></i> Add New Supporter
+              </a>
+          </div>
+      </div>
+  }
 
-    @if (ViewBag.IsAdmin)
-    {
-        <div class="row mb-3">
-            <div class="col-12">
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add New Supporter
-                </a>
-            </div>
-        </div>
-    }
+  <div class="row">
+      @if (Model != null && Model.Any())
+      {
+          @foreach (var supporter in Model)
+          {
+              <div class="col-12 col-md-6 col-lg-4 mb-4">
+                  <div class="card h-100">
+                      <div class="card-body d-flex flex-column">
+                          <div class="d-flex align-items-start">
+                              @if (supporter.LogoFileId.HasValue || !string.IsNullOrWhiteSpace(supporter.LogoUrl))
+                              {
+                                  <div class="me-3 flex-shrink-0 supporter-logo-container d-flex align-items-start" style="width:64px;max-width:64px;">
+                                      @if (supporter.LogoFileId.HasValue)
+                                      {
+                                          <img src="@Url.Action("GetLogo", new { id = supporter.LogoFileId })" alt="@supporter.Name logo" class="img-fluid supporter-logo" style="max-height:64px;max-width:64px;" />
+                                      }
+                                      else if (!string.IsNullOrWhiteSpace(supporter.LogoUrl))
+                                      {
+                                          <img src="@supporter.LogoUrl" alt="@supporter.Name logo" class="img-fluid supporter-logo" style="max-height:64px;max-width:64px;" />
+                                      }
+                                  </div>
+                              }
+                              <div>
+                                  <h5 class="card-title">
+                                      @supporter.Name
+                                  </h5>
+                                  @if (!string.IsNullOrWhiteSpace(supporter.Note))
+                                  {
+                                      <div class="card-text mb-0">@Html.Raw(Markdig.Markdown.ToHtml(supporter.Note))</div>
+                                  }
+                              </div>
+                          </div>
+                          <div class="mt-auto">
+                              <span class="ms-2">
+                                  @if (!string.IsNullOrWhiteSpace(supporter.WebsiteUrl))
+                                  {
+                                      <a href="@supporter.WebsiteUrl" target="_blank" rel="noopener noreferrer" class="small link-primary me-1">Club Website</a>
+                                      @:&nbsp; &nbsp;
+                                  }
+                                  @if (!string.IsNullOrWhiteSpace(supporter.ClubInitials))
+                                  {
+                                      <a href="/@supporter.ClubInitials" class="small link-primary">View Scores</a>
+                                  }
+                              </span>
+                              @if (ViewBag.IsAdmin)
+                              {
+                                  <div class="mt-3 pt-3 border-top">
+                                      <small class="text-muted">
+                                          Admin:
+                                          @if (!supporter.IsVisible)
+                                          {
+                                              <span class="badge bg-warning">Hidden</span>
+                                          }
+                                          @if (supporter.ExpirationDate.HasValue)
+                                          {
+                                              <span>Expires: @supporter.ExpirationDate.Value.ToString("yyyy-MM-dd")</span>
+                                          }
+                                      </small>
+                                      <div class="mt-2">
+                                          <a asp-action="Edit" asp-route-id="@supporter.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                          <a asp-action="Delete" asp-route-id="@supporter.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                                      </div>
+                                  </div>
+                              }
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          }
+      }
+      else
+      {
+          <div class="col-12">
+              <p class="text-muted">No supporters to display at this time. Be the first to support SailScores!</p>
+          </div>
+      }
+  </div>
 
-    <div class="row">
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var supporter in Model)
-            {
-                <div class="col-12 col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex align-items-start">
-                                @if (supporter.LogoFileId.HasValue || !string.IsNullOrWhiteSpace(supporter.LogoUrl))
-                                {
-                                    <div class="me-3 flex-shrink-0 supporter-logo-container d-flex align-items-start" style="width:64px;max-width:64px;">
-                                        @if (supporter.LogoFileId.HasValue)
-                                        {
-                                            <img src="@Url.Action("GetLogo", new { id = supporter.LogoFileId })" alt="@supporter.Name logo" class="img-fluid supporter-logo" style="max-height:64px;max-width:64px;" />
-                                        }
-                                        else if (!string.IsNullOrWhiteSpace(supporter.LogoUrl))
-                                        {
-                                            <img src="@supporter.LogoUrl" alt="@supporter.Name logo" class="img-fluid supporter-logo" style="max-height:64px;max-width:64px;" />
-                                        }
-                                    </div>
-                                }
-                                <div>
-                                    <h5 class="card-title">
-                                        @supporter.Name
-                                    </h5>
-                                    @if (!string.IsNullOrWhiteSpace(supporter.Note))
-                                    {
-                                        <div class="card-text mb-0">@Html.Raw(Markdig.Markdown.ToHtml(supporter.Note))</div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="mt-auto">
-                                <span class="ms-2">
-                                    @if (!string.IsNullOrWhiteSpace(supporter.WebsiteUrl))
-                                    {
-                                        <a href="@supporter.WebsiteUrl" target="_blank" rel="noopener noreferrer" class="small link-primary me-1">Club Website</a>
-                                        @:&nbsp; &nbsp;
-                                    }
-                                    @if (!string.IsNullOrWhiteSpace(supporter.ClubInitials))
-                                    {
-                                        <a href="/@supporter.ClubInitials" class="small link-primary">View Scores</a>
-                                    }
-                                </span>
-                                @if (ViewBag.IsAdmin)
-                                {
-                                    <div class="mt-3 pt-3 border-top">
-                                        <small class="text-muted">
-                                            Admin:
-                                            @if (!supporter.IsVisible)
-                                            {
-                                                <span class="badge bg-warning">Hidden</span>
-                                            }
-                                            @if (supporter.ExpirationDate.HasValue)
-                                            {
-                                                <span>Expires: @supporter.ExpirationDate.Value.ToString("yyyy-MM-dd")</span>
-                                            }
-                                        </small>
-                                        <div class="mt-2">
-                                            <a asp-action="Edit" asp-route-id="@supporter.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                                            <a asp-action="Delete" asp-route-id="@supporter.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        }
-        else
-        {
-            <div class="col-12">
-                <p class="text-muted">No supporters to display at this time. Be the first to support SailScores!</p>
-            </div>
-        }
-    </div>
-
-    <!-- Supporter Benefits Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h2>Supporter Benefits</h2>
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5><i class="fas fa-check-circle text-success"></i> Keep SailScores Free for All</h5>
-                            <p>Your support helps us maintain this service free for sailing clubs worldwide.</p>
+  <!-- Supporter Benefits Section -->
+  <div class="row mb-5">
+      <div class="col-12">
+          <h2>Supporter Benefits</h2>
+          <div class="card">
+              <div class="card-body">
+                  <div class="row">
+                      <div class="col-md-6">
+                          <h5><i class="fas fa-check-circle text-success"></i> Keep SailScores Free for All</h5>
+                          <p>Your support helps maintain this service for sailing clubs worldwide.</p>
                             
-                            <h5><i class="fas fa-check-circle text-success"></i> High Availability Servers</h5>
-                            <p>Supporting infrastructure that allows updates without interruption, ensuring your race results are always accessible.</p>
+                          <h5><i class="fas fa-check-circle text-success"></i> High Availability Servers</h5>
+                          <p>Supporting infrastructure that allows updates without interruption, ensuring your race results are always accessible.</p>
                             
-                            <h5><i class="fas fa-check-circle text-success"></i> Advanced Result Entry</h5>
-                            <p>Access to speech recognition and handwriting/image recognition for faster, easier result entry.</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h5><i class="fas fa-check-circle text-success"></i> Additional Reports</h5>
-                            <p>Enhanced reporting capabilities to analyze your race data in more depth.</p>
+                          <h5><i class="fas fa-check-circle text-success"></i> Advanced Result Entry</h5>
+                          <p>Access to speech recognition and handwriting/image recognition for faster, easier result entry.</p>
+                      </div>
+                      <div class="col-md-6">
+                          <h5><i class="fas fa-check-circle text-success"></i> Additional Report History</h5>
+                          <p>Supporter clubs access full race history in their reports.</p>
                             
-                            <h5><i class="fas fa-check-circle text-success"></i> Extra File Storage</h5>
-                            <p>Additional storage for shared regatta documents and race document storage (coming soon).</p>
-                            
-                            <h5><i class="fas fa-check-circle text-success"></i> Recognition (Optional)</h5>
-                            <p>Choose to be recognized on this Pricing page as a valued supporter of the sailing community.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                          <h5><i class="fas fa-check-circle text-success"></i> Recognition</h5>
+                          <p>Optional recognition on this page as a valued supporter of the sailing community.</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
 
 
-    <!-- Call to Action Section -->
-    <div class="row mb-5 mt-4">
-        <div class="col-12">
-            <div class="card border-primary">
-                <div class="card-body text-center">
-                    <h2 class="card-title text-primary">Become a Supporter</h2>
-                    <p class="lead">
-                        Help us keep SailScores free and accessible for sailing clubs around the world.
-                    </p>
-                    <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 mt-4">
-                        <button class="btn btn-primary btn-lg w-100 w-md-auto" onclick="initiateStripeCheckout('monthly')">
-                            <i class="fas fa-heart"></i> $10/month
-                        </button>
-                        <button class="btn btn-outline-primary btn-lg w-100 w-md-auto" onclick="initiateStripeCheckout('yearly')">
-                            <i class="fas fa-heart"></i> $60/year
-                        </button>
-                        <button class="btn btn-outline-primary btn-lg w-100 w-md-auto" onclick="initiateStripeCheckout('custom')">
-                            <i class="fas fa-heart"></i> One Time Amount
-                        </button>
-                    </div>
-                    <p class="text-muted mt-3 mb-0">
-                        <i class="fas fa-lock"></i> Payment processing powered by 
-                        <img src="~/images/stripe_wordmark_slate_sml.png" 
-                             alt="Stripe" 
-                             class="d-inline d-dark-none"
-                             style="height: 25px; vertical-align: middle;" />
-                        <img src="~/images/stripe_wordmark_white_sml.png" 
-                             alt="Stripe" 
-                             class="d-none d-dark-inline"
-                             style="height: 25px; vertical-align: middle;" />
-                        <br />
-                        <small>Buttons redirect to Stripe's secure checkout.</small>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+  <!-- Call to Action Section -->
+  <div class="row mb-5 mt-4">
+      <div class="col-12">
+          <div class="card border-primary">
+              <div class="card-body text-center">
+                  <h2 class="card-title text-primary">Become a Supporter</h2>
+                  <p class="lead">
+                      Help us keep SailScores free and accessible for sailing clubs around the world.
+                  </p>
+                  <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 mt-4">
+                      <button class="btn btn-primary btn-lg w-100 w-md-auto" onclick="initiateStripeCheckout('monthly')">
+                          <i class="fas fa-heart"></i> $10/month
+                      </button>
+                      <button class="btn btn-outline-primary btn-lg w-100 w-md-auto" onclick="initiateStripeCheckout('yearly')">
+                          <i class="fas fa-heart"></i> $60/year
+                      </button>
+                      <button class="btn btn-outline-primary btn-lg w-100 w-md-auto" onclick="initiateStripeCheckout('custom')">
+                          <i class="fas fa-heart"></i> One Time Amount
+                      </button>
+                  </div>
+                  <p class="text-muted mt-3 mb-0">
+                      <i class="fas fa-lock"></i> Payment processing powered by 
+                      <img src="~/images/stripe_wordmark_slate_sml.png" 
+                            alt="Stripe" 
+                            class="d-inline d-dark-none"
+                            style="height: 25px; vertical-align: middle;" />
+                      <img src="~/images/stripe_wordmark_white_sml.png" 
+                            alt="Stripe" 
+                            class="d-none d-dark-inline"
+                            style="height: 25px; vertical-align: middle;" />
+                      <br />
+                      <small>Buttons redirect to Stripe's secure checkout.</small>
+                      @if (!string.IsNullOrWhiteSpace(ViewBag.StripeCustomerPortalUrl as string))
+                      {
+                          <br />
+                          <small><a href="@ViewBag.StripeCustomerPortalUrl" target="_blank" rel="noopener noreferrer">Manage existing Supporter subscription</a></small>
+                      }
+                  </p>
+              </div>
+          </div>
+      </div>
+  </div>
 
 @section Scripts {
     <script src="https://js.stripe.com/v3/"></script>

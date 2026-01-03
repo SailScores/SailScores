@@ -1,0 +1,137 @@
+@using SailScores.Web.Models.SailScores
+@model ParticipationViewModel
+
+@{
+    ViewBag.Title = Model.ClubInitials + " Participation Trends";
+    ViewData["MetaDescription"] = $"{Model.ClubName} Participation Trends Report";
+    Layout = "_ClubLayout";
+}
+
+<div class="container p-0 p-md-2">
+    <div class="row mb-3">
+        <div class="col-12 col-md-8">
+            <h1>Participation Trends</h1>
+            <p class="lead">Distinct skippers participating over time</p>
+            @if (!Model.UseAdvancedFeatures)
+            {
+                <div class="alert alert-info">
+                    <strong>Note:</strong> Date range is limited.
+                </div>
+            }
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
+            <a href="~/@Model.ClubInitials/Reports" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back to Reports</a>
+        </div>
+    </div>
+
+    <form method="get" class="row mb-4">
+        <div class="col-md-3">
+            <label for="groupBy" class="form-label">Group By</label>
+            <select class="form-select" id="groupBy" name="groupBy">
+                <option value="day" selected="@(Model.GroupBy == "day")">Day</option>
+                <option value="week" selected="@(Model.GroupBy == "week")">Week</option>
+                <option value="month" selected="@(Model.GroupBy == "month" || string.IsNullOrEmpty(Model.GroupBy))">Month</option>
+                @if (Model.UseAdvancedFeatures)
+                {
+                    <option value="year" selected="@(Model.GroupBy == "year")">Year</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="startDate" class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="startDate" name="startDate"
+                   value="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                   @(!Model.UseAdvancedFeatures ? $"min={DateTime.Today.AddDays(-90):yyyy-MM-dd}" : "") />
+        </div>
+        <div class="col-md-3">
+            <label for="endDate" class="form-label">End Date</label>
+            <input type="date" class="form-control" id="endDate" name="endDate"
+                   value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">Update</button>
+            <a href="~/@Model.ClubInitials/Reports/Participation" class="btn btn-outline-secondary">Clear</a>
+        </div>
+    </form>
+
+    @if (Model.ParticipationData != null && Model.ParticipationData.Any())
+    {
+        var boatClasses = Model.ParticipationData.Select(p => p.BoatClassName).Distinct().OrderBy(f => f).ToList();
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Participation Over Time</h5>
+                        <canvas id="participationChart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col-12">
+              <a href="~/@Model.ClubInitials/Reports/ParticipationExport?groupBy=@Model.GroupBy&startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-sm btn-outline-primary">Export as CSV</a>
+                
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5>Data Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Boat Class</th>
+                                <th class="text-end">Distinct Skippers</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ParticipationData.Where(p => p.DistinctSkippers > 0))
+                            {
+                                <tr>
+                                    <td>@item.Period</td>
+                                    <td>@item.BoatClassName</td>
+                                    <td class="text-end">@item.DistinctSkippers</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No participation data available for the selected date range.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha256-DiMmxoaAcr7BWSdgxnKQQ8ruopYKK0bO5qIZKqxqv/A=" crossorigin="anonymous"></script>
+    <script src="~/js/participationChart.js" asp-append-version="true"></script>
+    @if (Model.ParticipationData != null && Model.ParticipationData.Any())
+    {
+        var boatClasses = Model.ParticipationData.Select(p => p.BoatClassName).Distinct().OrderBy(f => f).ToList();
+        // Sort periods by PeriodStart date, not alphabetically
+        var periods = Model.ParticipationData
+            .GroupBy(p => new { p.Period, p.PeriodStart })
+            .OrderBy(g => g.Key.PeriodStart)
+            .Select(g => g.Key.Period)
+            .ToList();
+        var allData = Model.ParticipationData;
+        
+        <script>
+            (function() {
+                const boatClasses = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(boatClasses));
+                const periods = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(periods));
+                const participationData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(allData));
+                
+                initParticipationChart(boatClasses, periods, participationData);
+            })();
+        </script>
+    }
+}

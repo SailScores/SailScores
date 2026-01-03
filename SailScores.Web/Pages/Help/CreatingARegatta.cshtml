@@ -1,0 +1,55 @@
+@page
+@model SailScores.Web.Pages.Help.CreatingARegattaModel
+@{
+    Layout = "/Pages/Help/_HelpLayout.cshtml";
+    ViewData["Title"] = "Creating A Regatta";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p class="lead">
+    Steps to create a regatta, configure fleets, and prepare for multi-day event scoring.
+</p>
+
+<section class="mt-3">
+    <h2>Preparation</h2>
+    <ul>
+        <li>Ensure the regatta dates are within an existing Season. If needed, create a Season.</li>
+        <li>Know fleets and scoring system (including discard rules).</li>
+        <li>Gather competitor registration information (sail number, name, club).</li>
+    </ul>
+</section>
+
+<section class="mt-3">
+    <h2>Create the regatta</h2>
+    <ol>
+        <li>From the Club Admin page locate the <strong>Regattas</strong> section and click <strong>New Regatta</strong>.</li>
+        <li>Provide the regatta name, date range, and any high-level notes. Select the correct scoring system.</li>
+        <li>Navigate to the regatta scoring home page by clicking through the <strong>Regatta</strong> link in the
+          header and clicking on the link for the newly created regatta.</li>
+        <li>Create Fleets for the regatta from the Regatta home page. Each fleet will have its own competitor list.</li>
+        <li>Add or import competitors into each fleet using the <strong>Edit Fleet</strong> links on the regatta page.</li>
+        <p>Each fleet has its own section on the regatta page, and the Competitors tab includes a button to add or edit the boats and crews assigned to that fleet.</p>
+        <li><strong>Important!</strong></>Create new races from the regatta page to auomatically connect them to the correct
+          regatta series and fleet.</li>
+    </ol>
+</section>
+
+<section class="mt-3">
+    <h2>During the event</h2>
+    <ul>
+        <li>Use the regatta page to enter new races. Results for regattas are shown on a single regatta page with a section for
+          each fleet.</li>
+        <li>For protests or changes, mark races provisional until resolved then save to trigger recalculation.</li>
+        <li>Share the scores at the event with the regatta home page. Most browsers can make a QR Code by
+          right-clicking on a page background. Competitors can use their phone to browse the results.</li>
+    </ul>
+</section>
+
+<section class="mt-3">
+    <h2>After the regatta</h2>
+    <p>
+        Review final races, confirm all protests are resolved, then mark races as Completed so series/regatta
+        standings are published without the provisional notice.
+    </p>
+</section>

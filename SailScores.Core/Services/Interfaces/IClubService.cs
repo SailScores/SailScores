@@ -10,6 +10,7 @@ namespace SailScores.Core.Services;
 public interface IClubService
 {
     Task<IEnumerable<ClubSummary>> GetClubs(bool includeHidden);
+    Task<IEnumerable<ClubActivitySummary>> GetClubsWithRecentActivity(int daysBack);
     Task<Club> GetFullClubExceptScores(Guid id);
     Task<Club> GetFullClubExceptScores(string clubInitials);
     Task<Club> GetClubForAdmin(Guid id);
@@ -35,4 +36,6 @@ public interface IClubService
     Task<bool> HasCompetitorsAsync(Guid id);
     Task SetUseAdvancedFeaturesAsync(Guid clubId, bool enabled);
     Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType);
+    Task SaveFileAsync(Entities.File file);
+    Task<Entities.File> GetFileAsync(Guid id);
 }

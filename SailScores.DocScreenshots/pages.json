@@ -1,0 +1,82 @@
+[
+  {
+    "Name": "SailScoresClubHome",
+    "Url": "http://localhost:5000/LHYC/",
+    "Region": {
+      "X": 0.0,
+      "Y": 0.0,
+      "Width": 1024.0,
+      "Height": 695.0
+    }
+  },
+  {
+    "Name": "club-settings",
+    "Url": "http://localhost:5000/LHYC/Admin/Edit",
+    "Region": {
+      "X": 0.0,
+      "Y": 0.0,
+      "Width": 1024.0,
+      "Height": 1150.0
+    }
+  },
+  {
+    "Name": "add-class",
+    "Url": "https://localhost:5001/LHYC/Admin#classes",
+    "Region": {
+      "X": 150.0,
+      "Y": 0.0,
+      "Width": 800.0,
+      "Height": 300.0
+    }
+  },
+  {
+    "Name": "scoring-system",
+    "Url": "https://localhost:5001/LHYC/ScoringSystem/Edit/0551a25e-bd0c-4431-9b9d-590597d2d008",
+    "Region": {
+      "X": 0.0,
+      "Y": 0.0,
+      "Width": 800.0,
+      "Height": 355.0
+    }
+  },
+    {
+      "Name": "create-season",
+      "Url": "https://localhost:5001/LHYC/Season/Create",
+      "Region": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Width": 800.0,
+        "Height": 435.0
+      }
+    },
+    {
+      "Name": "create-series",
+      "Url": "https://localhost:5001/LHYC/Series/Create",
+      "Region": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Width": 800.0,
+        "Height": 635.0
+      }
+    },
+    {
+      "Name": "create-competitors",
+      "Url": "https://localhost:5001/LHYC/Competitor/CreateMultiple",
+      "Region": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Width": 1024.0,
+        "Height": 530.0
+      }
+    },
+    {
+      "Name": "race-results",
+      "Url": "https://localhost:5001/LHYC/Race/Create",
+      "Region": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Width": 1024.0,
+        "Height": 510.0
+      }
+    }
+]

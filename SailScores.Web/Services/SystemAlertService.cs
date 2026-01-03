@@ -56,7 +56,7 @@ public class SystemAlertService : ISystemAlertService
 
         return await _memoryCache.GetOrCreateAsync(cacheKey, async entry =>
         {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
             var alerts = await _coreSystemAlertService.GetActiveAlertsAsync();
             return alerts;
         });

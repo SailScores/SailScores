@@ -17,7 +17,7 @@ namespace SailScores.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -175,6 +175,9 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("HomePageDescription")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Initials")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -186,10 +189,16 @@ namespace SailScores.Database.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<Guid?>("LogoFileId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool?>("ShowCalendarInNav")
+                        .HasColumnType("bit");
 
                     b.Property<bool?>("ShowClubInResults")
                         .HasColumnType("bit");
@@ -1279,6 +1288,9 @@ namespace SailScores.Database.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ClubId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ClubInitials")

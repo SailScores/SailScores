@@ -53,7 +53,8 @@ public class AdminController : Controller
             return Unauthorized();
         }
         var vm = await _adminService.GetClubForEdit(clubInitials);
-        return View(vm);
+        var editVm = _mapper.Map<AdminEditViewModel>(vm);
+        return View(editVm);
     }
 
     // POST: Admin/Edit
@@ -61,7 +62,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Edit(
         string clubInitials,
-        AdminViewModel clubAdmin)
+        AdminEditViewModel clubAdmin)
     {
         ViewData["ClubInitials"] = clubInitials;
         try
@@ -79,6 +80,24 @@ public class AdminController : Controller
                 clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
                 clubAdmin.LocaleOptions = club.LocaleOptions;
                 clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
+                return View(clubAdmin);
+            }
+
+            try
+            {
+                // Process logo file upload if provided
+                await _adminService.ProcessLogoFile(clubAdmin);
+            } catch (Exception ex)
+            {
+                ModelState.AddModelError("LogoFile", $"Error processing logo file: {ex.Message}");
+                var club = await _adminService.GetClubForEdit(clubInitials);
+                clubAdmin.Seasons = club.Seasons;
+                clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
+                clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
+                clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
+                clubAdmin.LocaleOptions = club.LocaleOptions;
+                clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
+                clubAdmin.LogoFile = null; // Clear the file input
                 return View(clubAdmin);
             }
 
@@ -107,6 +126,17 @@ public class AdminController : Controller
             clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
             return View(clubAdmin);
         }
+    }
+
+    [AllowAnonymous]
+    public async Task<IActionResult> GetLogo(Guid id)
+    {
+        var result = await _adminService.GetLogoAsync(id);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return result;
     }
 
 }

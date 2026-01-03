@@ -35,6 +35,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ISystemAlertService, SystemAlertService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<ISupporterService, SupporterService>();
+        services.AddScoped<IReportService, ReportService>();
         services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
         services.AddScoped<ILocalizerService, LocalizerService>();
         services.AddTransient<IStripeService, StripeService>();

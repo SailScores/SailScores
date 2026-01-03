@@ -1,0 +1,85 @@
+@page
+@model SailScores.Web.Pages.Help.EnteringRaceResultsModel
+@{
+    Layout = "/Pages/Help/_HelpLayout.cshtml";
+    ViewData["Title"] = "Entering Race Results";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <h1>@ViewData["Title"]</h1>
+
+            <p class="lead">
+                A concise walkthrough for scorekeepers to create a race and enter finishing results quickly.
+            </p>
+
+            <section class="mt-3">
+                <h2>Before you begin</h2>
+                <ul>
+                    <li>Any Series for the race should be created, and using the correct Scoring System. See the main
+                        <a asp-page="/Help/GettingStarted">Getting Started</a> topic.
+                    </li>
+                    <li>Competitors should be created with sail numbers. You can add competitors while entering results,
+                      but it's faster to enter those ahead of time.
+                    </li>
+                </ul>
+            </section>
+
+            <section class="mt-3">
+                <h2>Quick entry workflow</h2>
+                <ol>
+                    <li>
+                        Open the Series or Regatta page and click <strong>New Race</strong>. Set the date and fleet.
+                    </li>
+                    <li>
+                        A panel at the bottom of the screen will show sail numbers. Click on buttons in this panel to add
+                        finishers in order. For large fleets, dismiss the button panel with <strong>X</strong> and
+                        type partial sail numbers into the entry box, choose from autocomplete,
+                        and press Enter to add the competitor.
+                    </li>
+                    <li>
+                      Supporter clubs have Handwriting recognition (Camera) and speech recognition (Microphone) enabled.
+                    </li>
+                    <li>
+                        To enter score codes (e.g., DNF, OCS), enter the competitor as if they finished, but then select
+                        from the score code menu. In speech recognition, you can say a three letter code after a sail number
+                        to change the code selection.
+                    </li>
+                    <li>
+                        If a result is provisional, mark the race as <em>Provisional</em> before saving; this will flag the series
+                        results as provisional until confirmed.
+                    </li>
+                    <li>
+                        Save the race. Series results are recalculated automatically after save.
+                    </li>
+                </ol>
+            </section>
+
+            <section class="mt-3">
+                <h2>Tips for speed</h2>
+                <ul>
+                  <li>For most club races, a fleet that matches a class of boat is the best choice.</li>
+                  <li>Don't enter DNC boats. Any competitor that is not added to a race will receive a DNC result.</li>
+                  <li>Smaller fleets prefer the buttons. Larger fleets prefer typing sail numbers.</li>
+                  <li>Use autocomplete to avoid typing full competitor names or sail numbers.</li>
+                  <li>If you track times, enable "Track Times" for the race to capture elapsed and clock times.</li>
+                </ul>
+            </section>
+
+            <section class="mt-3">
+                <h2>Troubleshooting</h2>
+                <p>
+                    If competitors do not appear in autocomplete, verify their fleet membership. You can add
+                    missing competitors directly from the race editor.
+                </p>
+                <p>
+                  Make sure the race date falls within an existing season.
+                </p>
+                <p>If the series you'd like to add to the race doesn't appear as an option, make sure that the
+                  series isn't limited to other dates and that the series is assigned to the season matching
+                  the race date.</p>
+            </section>
+        </div>
+    </div>
+</div>

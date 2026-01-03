@@ -23,6 +23,8 @@ namespace SailScores.Core.Model
         [StringLength(10)]
         public string ClubInitials { get; set; }
 
+        public Guid? ClubId { get; set; }
+
         public DateTime? ExpirationDate { get; set; }
 
         public bool IsVisible { get; set; }

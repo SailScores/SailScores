@@ -47,15 +47,18 @@ namespace SailScores.Core.Services
 
             var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
 
+            var bizById = bizObj.ToDictionary(x => x.Id);
+
             // ignored in mapper to avoid loops.
             foreach (var fleet in dbFleets)
             {
+                var target = bizById[fleet.Id];
                 var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
-                bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
+                target.BoatClasses
                     = _mapper.Map<IList<BoatClass>>(boatClasses);
 
                 var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
-                bizObj.First(bo => bo.Id == fleet.Id).Competitors
+                target.Competitors
                     = _mapper.Map<IList<Competitor>>(competitors);
             }
 
@@ -126,6 +129,98 @@ namespace SailScores.Core.Services
                 .Clubs
                 .Where(c => includeHidden || !c.IsHidden);
             return _mapper.ProjectTo<ClubSummary>(dbObjects);
+        }
+
+        public async Task<IEnumerable<ClubActivitySummary>> GetClubsWithRecentActivity(int daysBack)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-daysBack);
+            
+            // Optimized query: Aggregate race counts and most recent date per club in a single database query
+            var clubsWithRecentRaces = await _dbContext
+                .Races
+                .Where(r => r.Date.HasValue && r.Date.Value >= cutoffDate)
+                .Where(r => r.State == Api.Enumerations.RaceState.Raced ||
+                    r.State == Api.Enumerations.RaceState.Preliminary)
+                .GroupBy(r => r.ClubId)
+                .Select(g => new { 
+                    ClubId = g.Key, 
+                    RaceCount = g.Count(),
+                    MostRecentRace = g.Max(r => r.Date.Value)
+                })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            // Optimized query: Aggregate series counts and most recent update date per club
+            var clubsWithRecentSeries = await _dbContext
+                .Series
+                .Where(s => s.UpdatedDate.HasValue && s.UpdatedDate.Value >= cutoffDate
+                    && (s.StartDate.HasValue && s.StartDate.Value <= DateOnly.FromDateTime(DateTime.UtcNow) 
+                        || s.EnforcedStartDate.HasValue && s.EnforcedStartDate.Value <= DateOnly.FromDateTime(DateTime.UtcNow))
+                    && (s.EndDate.HasValue && s.EndDate.Value > DateOnly.FromDateTime(cutoffDate) 
+                        || s.EnforcedEndDate.HasValue && s.EnforcedEndDate.Value > DateOnly.FromDateTime(cutoffDate)))
+                .GroupBy(s => s.ClubId)
+                .Select(g => new { 
+                    ClubId = g.Key, 
+                    SeriesCount = g.Count(),
+                    MostRecentSeries = g.Max(s => s.UpdatedDate.Value)
+                })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            // Combine race and series activity in memory (already minimal data loaded)
+            var allActivityByClub = clubsWithRecentRaces
+                .Select(r => new { 
+                    r.ClubId, 
+                    RaceCount = r.RaceCount,
+                    SeriesCount = 0,
+                    MostRecentActivity = r.MostRecentRace 
+                })
+                .Concat(clubsWithRecentSeries.Select(s => new { 
+                    s.ClubId, 
+                    RaceCount = 0,
+                    SeriesCount = s.SeriesCount,
+                    MostRecentActivity = s.MostRecentSeries 
+                }))
+                .GroupBy(a => a.ClubId)
+                .Select(g => new { 
+                    ClubId = g.Key, 
+                    RaceCount = g.Sum(x => x.RaceCount),
+                    SeriesCount = g.Sum(x => x.SeriesCount),
+                    MostRecentActivity = g.Max(x => x.MostRecentActivity)
+                })
+                .OrderByDescending(a => a.MostRecentActivity)
+                .ToList();
+
+            var clubIds = allActivityByClub.Select(a => a.ClubId).ToList();
+
+            // Fetch only clubs with activity, filtered by visibility
+            var clubs = await _dbContext
+                .Clubs
+                .Where(c => !c.IsHidden && clubIds.Contains(c.Id))
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            // Build final result with activity stats, maintaining activity-date order
+            var result = clubs
+                .Select(c => {
+                    var activity = allActivityByClub.First(a => a.ClubId == c.Id);
+                    return new ClubActivitySummary
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Initials = c.Initials,
+                        Description = c.Description,
+                        LogoFileId = c.LogoFileId,
+                        IsHidden = c.IsHidden,
+                        RecentRaceCount = activity.RaceCount,
+                        RecentSeriesCount = activity.SeriesCount,
+                        MostRecentActivity = activity.MostRecentActivity
+                    };
+                })
+                .OrderByDescending(c => c.MostRecentActivity)
+                .ToList();
+
+            return result;
         }
 
         public async Task<Guid> GetClubId(string initials)
@@ -405,6 +500,9 @@ namespace SailScores.Core.Services
             dbClub.ShowClubInResults = club.ShowClubInResults;
             dbClub.Locale = club.Locale;
             dbClub.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
+            dbClub.LogoFileId = club.LogoFileId;
+            dbClub.HomePageDescription = club.HomePageDescription;
+            dbClub.ShowCalendarInNav = club.ShowCalendarInNav;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings.Latitude;
@@ -596,6 +694,17 @@ namespace SailScores.Core.Services
             return await _dbContext.Competitors
                 .AnyAsync(r => r.ClubId == id)
                 .ConfigureAwait(false);
+        }
+
+        public async Task SaveFileAsync(Db.File file)
+        {
+            await _dbContext.Files.AddAsync(file);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Db.File> GetFileAsync(Guid id)
+        {
+            return await _dbContext.Files.FirstOrDefaultAsync(f => f.Id == id);
         }
     }
 }

@@ -38,6 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sql\AllCompHistogram.sql" />
+    <EmbeddedResource Include="Sql\AllCompHistogramFields.sql" />
     <EmbeddedResource Include="Sql\CompetitorActiveDates.sql" />
     <EmbeddedResource Include="Sql\DeletableCompetitors.sql" />
     <EmbeddedResource Include="Sql\SiteStats.sql" />
@@ -48,9 +50,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

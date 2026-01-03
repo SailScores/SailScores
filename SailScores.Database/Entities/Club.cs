@@ -10,6 +10,8 @@ public class Club
     [StringLength(10)]
     public String Initials { get; set; }
     public String Description { get; set; }
+    public String HomePageDescription { get; set; }
+    public Guid? LogoFileId { get; set; }
     public bool IsHidden { get; set; }
     public bool? ShowClubInResults { get; set; }
 
@@ -24,6 +26,7 @@ public class Club
     public DateTime? AdvancedFeaturesEnabledDate { get; set; }
     [StringLength(20)]
     public String SubscriptionType { get; set; }
+    public bool? ShowCalendarInNav { get; set; }
 
     public String StatisticsDescription { get; set; }
     public WeatherSettings WeatherSettings { get; set; }

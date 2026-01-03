@@ -173,7 +173,7 @@ public class ClubRequestService : IClubRequestService
             var newScoringSystem = new ScoringSystem
             {
                 ParentSystemId = baseScoringSystem.Id,
-                Name = $"{request.ClubInitials} scoring based on App. A Rule 5.1",
+                Name = $"{request.ClubInitials} scoring based on App. A Rule 5.3",
                 DiscardPattern = "0"
             };
             scoringSystemList.Add(newScoringSystem);
@@ -200,7 +200,7 @@ public class ClubRequestService : IClubRequestService
                 Name = request.ClubName,
                 Initials = initialsToUse,
                 IsHidden = true,
-                Url = request.ClubWebsite,
+                Url = url,
                 DefaultScoringSystem = newScoringSystem,
                 Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_" + request.ClubLocation + "_"),
                 ScoringSystems = scoringSystemList,

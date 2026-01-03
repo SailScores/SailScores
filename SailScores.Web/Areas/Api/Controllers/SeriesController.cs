@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Api.Dtos;
@@ -60,6 +60,30 @@ namespace SailScores.Web.Areas.Api.Controllers
                 .Single(s => s.Name == series.Name
                     && s.Season.Id == series.SeasonId);
             return Ok(savedSeries.Id);
+        }
+
+        /// <summary>
+        /// Returns summary series for a given club and season. Intended for UI option lists.
+        /// </summary>
+        [HttpGet("summary")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<object>>> GetSummarySeries(
+            [FromQuery] Guid clubId,
+            [FromQuery] Guid seasonId)
+        {
+            if (clubId == Guid.Empty || seasonId == Guid.Empty)
+            {
+                return BadRequest();
+            }
+
+            var all = await _service.GetAllSeriesAsync(clubId, null, true, true);
+            var summaries = all
+                .Where(s => s.Type == SeriesType.Summary)
+                .Where(s => s.Season != null && s.Season.Id == seasonId)
+                .OrderBy(s => s.Name)
+                .Select(s => new { id = s.Id, name = s.Name });
+
+            return Ok(summaries);
         }
     }
 }

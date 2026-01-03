@@ -75,6 +75,7 @@ public class RegattaService : IRegattaService
             }
             regatta.ClubInitials = club.Initials;
             regatta.ClubName = club.Name;
+            regatta.ClubLogoFileId = club.LogoFileId;
         }
         var returnObject = vm.Except(regattasToRemove);
         _cache.Set("CurrentRegattas", returnObject, TimeSpan.FromMinutes(5));
@@ -160,5 +161,25 @@ public class RegattaService : IRegattaService
     public async Task<Regatta> GetRegattaForFleet(Guid fleetId)
     {
         return await _coreRegattaService.GetRegattaForFleet(fleetId);
+    }
+
+    public async Task<bool> ClubHasRegattasAsync(string clubInitials)
+    {
+        var cacheKey = $"ClubHasRegattas_{clubInitials}";
+        if (_cache.TryGetValue(cacheKey, out bool hasRegattas))
+        {
+            return hasRegattas;
+        }
+
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (clubId == Guid.Empty)
+        {
+            return false;
+        }
+
+        hasRegattas = await _coreRegattaService.ClubHasRegattasAsync(clubId);
+        
+        _cache.Set(cacheKey, hasRegattas, TimeSpan.FromMinutes(5));
+        return hasRegattas;
     }
 }

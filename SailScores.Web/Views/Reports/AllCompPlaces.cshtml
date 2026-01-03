@@ -1,0 +1,147 @@
+@model SailScores.Web.Models.SailScores.AllCompHistogramViewModel
+@{
+    ViewBag.Title = Model.ClubInitials + " Competitor Places & Codes";
+    ViewData["MetaDescription"] = $"Competitor places at {Model.ClubName} ({Model.ClubInitials})";
+    Layout = "_ClubLayout";
+    // Use wide layout for this report
+    ViewData["WideLayout"] = true;
+}
+
+  <div class="row mb-3">
+      <div class="col-12 col-md-8">
+          <h1>Competitor Placings &amp; Codes</h1>
+          <p class="lead">Counts by competitor and season for scored place and codes</p>
+          @if (!Model.UseAdvancedFeatures)
+          {
+              <div class="alert alert-info">
+                  <strong>Note:</strong> Date range for non-supporting clubs is limited to the most recent 60 days.
+              </div>
+          }
+          <strong>Note:</strong> Races assigned to series marked as excluded from competitor statistics are not included in this report.
+      </div>
+      <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
+          <a href="~/@Model.ClubInitials/Reports" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left"></i> Back to Reports
+          </a>
+      </div>
+  </div>
+
+  <form method="get" class="row mb-4">
+      <div class="col-md-4">
+          <label for="startDate" class="form-label">Start Date</label>
+          <input type="date" class="form-control" id="startDate" name="startDate"
+                 value="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                 @(!Model.UseAdvancedFeatures ? $"min={DateTime.Today.AddDays(-60):yyyy-MM-dd}" : "") />
+      </div>
+      <div class="col-md-4">
+          <label for="endDate" class="form-label">End Date</label>
+          <input type="date" class="form-control" id="endDate" name="endDate"
+                 value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary me-2">Filter</button>
+          <a href="~/@Model.ClubInitials/Reports/AllCompHistogram" class="btn btn-outline-secondary">Clear</a>
+      </div>
+  </form>
+
+  <div class="row">
+      <div class="col-12">
+          @if (Model.Rows != null && Model.Rows.Any())
+          {
+             <div class="row mb-3">
+                 <div class="col-12">
+                     <a href="~/@Model.ClubInitials/Reports/AllCompPlacesExport?startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-primary">
+                         <i class="bi bi-download"></i> Export as CSV
+                     </a>
+                 </div>
+             </div>
+              <div class="table-responsive">
+                  <table class="table table-hover table-sm allcomp-table">
+                      <thead>
+                          <tr>
+                              <th>Competitor</th>
+                              <th>Sail #</th>
+                              <th>Season</th>
+                              <th>Aggregation</th>
+                              @foreach (var place in Model.Places)
+                              {
+                                  <th>@place</th>
+                              }
+                              @foreach (var code in Model.Codes)
+                              {
+                                  <th>@code</th>
+                              }
+                          </tr>
+                      </thead>
+                      <tbody>
+                          @{
+                              var byCompetitor = Model.Rows
+                                  .GroupBy(r => new { r.CompetitorName, r.SailNumber })
+                                  .OrderBy(g => g.Key.CompetitorName)
+                                  .ThenBy(g => g.Key.SailNumber);
+                          }
+
+                          @foreach (var competitorGroup in byCompetitor)
+                          {
+                              var competitorRows = competitorGroup.ToList();
+                              var competitorRowSpan = competitorRows.Count;
+
+                              var bySeason = competitorRows
+                                  .GroupBy(r => r.SeasonName)
+                                  .OrderBy(g => g.Key ?? string.Empty);
+
+                              var competitorRendered = false;
+
+                              foreach (var seasonGroup in bySeason)
+                              {
+                                  var seasonRows = seasonGroup.ToList();
+                                  var seasonRowSpan = seasonRows.Count;
+
+                                  var seasonRendered = false;
+
+                                  foreach (var row in seasonRows)
+                                  {
+                                      <tr>
+                                          @if (!competitorRendered)
+                                          {
+                                              <td rowspan="@competitorRowSpan">@competitorGroup.Key.CompetitorName</td>
+                                              <td rowspan="@competitorRowSpan">@competitorGroup.Key.SailNumber</td>
+                                              competitorRendered = true;
+                                          }
+
+                                          @if (!seasonRendered)
+                                          {
+                                              <td rowspan="@seasonRowSpan">@seasonGroup.Key</td>
+                                              seasonRendered = true;
+                                          }
+
+                                          <td>@row.AggregationType</td>
+
+                                          @* Place columns *@
+                                          @foreach (var place in Model.Places)
+                                          {
+                                              row.PlaceCounts.TryGetValue(place, out var pcount);
+                                              <td>@(pcount?.ToString() ?? "")</td>
+                                          }
+
+                                          @* Code columns *@
+                                          @foreach (var code in Model.Codes)
+                                          {
+                                              row.CodeCounts.TryGetValue(code, out var ccount);
+                                              <td>@(ccount?.ToString() ?? "")</td>
+                                          }
+                                      </tr>
+                                  }
+                              }
+                          }
+                      </tbody>
+                  </table>
+              </div>
+          }
+          else
+          {
+              <div class="alert alert-info">No data found for the selected period.</div>
+          }
+      </div>
+  </div>
+
