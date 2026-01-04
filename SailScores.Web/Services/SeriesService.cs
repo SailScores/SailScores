@@ -80,7 +80,6 @@ public class SeriesService : ISeriesService
     public async Task<SeriesWithOptionsViewModel> GetBlankVmForCreate(string clubInitials)
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
-        var club = await _coreClubService.GetMinimalClub(clubId);
 
         var seasons = await _coreSeasonService.GetSeasons(clubId);
 
@@ -93,7 +92,7 @@ public class SeriesService : ISeriesService
             s.Start < DateTime.Now && s.End > DateTime.Now);
         if (selectedSeason == null && seasons.Count() == 1)
         {
-            selectedSeason = seasons.First();
+            selectedSeason = seasons[0];
         }
         if (selectedSeason != null)
         {
@@ -303,7 +302,7 @@ public class SeriesService : ISeriesService
         await _coreSeriesService.Update(model);
     }
 
-    private void ValidateDateRestriction(SeriesWithOptionsViewModel model, Season season)
+    private static void ValidateDateRestriction(SeriesWithOptionsViewModel model, Season season)
     {
         if (!model.EnforcedStartDate.HasValue || !model.EnforcedEndDate.HasValue)
         {
@@ -366,7 +365,7 @@ public class SeriesService : ISeriesService
         };
     }
 
-    private async Task<string> GetIcalContentAsync(IFormFile file, string url)
+    private static async Task<string> GetIcalContentAsync(IFormFile file, string url)
     {
         if (file != null && file.Length > 0)
         {
@@ -383,7 +382,7 @@ public class SeriesService : ISeriesService
         throw new ArgumentException("No file or URL provided.");
     }
 
-    private Ical.Net.Calendar ParseCalendar(string content)
+    private static Ical.Net.Calendar ParseCalendar(string content)
     {
         try
         {
@@ -395,7 +394,7 @@ public class SeriesService : ISeriesService
         }
     }
 
-    private List<Occurrence> GetSortedOccurrences(Ical.Net.Calendar calendar, Season season)
+    private static List<Occurrence> GetSortedOccurrences(Ical.Net.Calendar calendar, Season season)
     {
         var start = new CalDateTime(season.Start);
         var end = new CalDateTime(season.End);
@@ -456,7 +455,7 @@ public class SeriesService : ISeriesService
         return (seriesList, outOfRange);
     }
 
-    private (DateOnly Start, DateOnly End) GetDatesFromOccurrence(Occurrence occurrence)
+    private static (DateOnly Start, DateOnly End) GetDatesFromOccurrence(Occurrence occurrence)
     {
         var evt = occurrence.Source as Ical.Net.CalendarComponents.CalendarEvent;
         var dtStart = occurrence.Period.StartTime.Value;
@@ -480,7 +479,7 @@ public class SeriesService : ISeriesService
         return (startDate, endDate);
     }
 
-    private bool IsWithinSeason(DateOnly startDate, DateOnly endDate, Season season)
+    private static bool IsWithinSeason(DateOnly startDate, DateOnly endDate, Season season)
     {
         var seasonStart = DateOnly.FromDateTime(season.Start);
         var seasonEnd = DateOnly.FromDateTime(season.End);
@@ -488,7 +487,7 @@ public class SeriesService : ISeriesService
         return !(startDate < seasonStart || endDate > seasonEnd);
     }
 
-    private string GenerateUniqueName(
+    private static string GenerateUniqueName(
         string baseName,
         DateOnly startDate,
         HashSet<string> existingNames,

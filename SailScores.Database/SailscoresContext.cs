@@ -14,6 +14,7 @@ namespace SailScores.Database;
 
 public class SailScoresContext : DbContext, ISailScoresContext
 {
+    private const string ClubIdParameterName = "ClubId";
     private readonly Assembly _executingAssembly;
 
     public DbSet<Club> Clubs { get; set; }
@@ -68,7 +69,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
         DateTime? endDate)
     {
         var query = await GetSqlQuery("AllCompHistogramFields");
-        var clubParam = new SqlParameter("ClubId", clubId);
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId);
         var startDateParam = new SqlParameter("StartDate", startDate ?? (object)DBNull.Value);
         var endDateParam = new SqlParameter("EndDate", endDate ?? (object)DBNull.Value);
         var result = await this.AllCompHistogramFields
@@ -83,7 +84,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
         DateTime? endDate)
     {
         var query = await GetSqlQuery("AllCompHistogram");
-        var clubParam = new SqlParameter("ClubId", clubId);
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId);
         var startDateParam = new SqlParameter("StartDate", startDate ?? (object)DBNull.Value);
         var endDateParam = new SqlParameter("EndDate", endDate ?? (object)DBNull.Value);
         var result = await this.AllCompHistogramStats
@@ -152,7 +153,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public async Task<IList<DeletableInfo>> GetDeletableInfoForCompetitorsAsync(Guid clubId)
     {
         var query = await GetSqlQuery("DeletableCompetitors");
-        var clubParam = new SqlParameter("ClubId", clubId); 
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId); 
         var result = await this.CompetitorDeletableInfo
             .FromSqlRaw(query, clubParam)
             .ToListAsync();
@@ -162,7 +163,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public async Task<IList<CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId)
     {
         var query = await GetSqlQuery("CompetitorActiveDates");
-        var clubParam = new SqlParameter("ClubId", clubId);
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId);
         var result = await this.CompetitorActiveDates
             .FromSqlRaw(query, clubParam)
             .ToListAsync();
