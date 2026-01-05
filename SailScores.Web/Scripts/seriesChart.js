@@ -1,4 +1,3 @@
-﻿
 (function () {
 
     var chartOverallWidth = 960;
@@ -296,8 +295,7 @@
 
         }
     }
-    return {
-        drawChart: drawChart
-    };
+
+    globalThis.drawChart = drawChart;
 
 })();
