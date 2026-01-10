@@ -636,6 +636,7 @@ namespace SailScores.Core.Services
                 NumberOfDiscards = series.Results.NumberOfDiscards,
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),
                 IsPercentSystem = series.Results.IsPercentSystem,
+                LowerScoreWins = series.Results.LowerScoreWins,
                 PercentRequired = series.Results.PercentRequired,
                 ScoringSystemName = series.ScoringSystem?.Name,
                 ScoreCodesUsed = series.Results.ScoreCodesUsed,
@@ -1100,7 +1101,7 @@ namespace SailScores.Core.Services
             fullSeries.Races = copyOfRaces;
             fullSeries.Competitors = copyOfCompetitors;
 
-            var isLowPoint = !(fullSeries.Results.IsPercentSystem);
+            var isLowPoint = fullSeries.Results.LowerScoreWins ?? !(fullSeries.Results.IsPercentSystem);
 
             return new FlatChartData
             {

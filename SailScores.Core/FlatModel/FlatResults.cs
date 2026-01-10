@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Scoring;
+using SailScores.Core.Scoring;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +17,7 @@ namespace SailScores.Core.FlatModel
         public int NumberOfSailedRaces { get; set; }
         public bool? IsPreliminary { get; set; }
         public bool IsPercentSystem { get; set; }
+        public bool? LowerScoreWins { get; set; }
         public decimal? PercentRequired { get; set; }
         public string ScoringSystemName { get; set; }
 

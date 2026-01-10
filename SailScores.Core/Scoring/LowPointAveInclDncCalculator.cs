@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -44,6 +44,7 @@ namespace SailScores.Core.Scoring
         protected override void CalculateTotals(SeriesResults results, IEnumerable<Score> scores)
         {
             results.IsPercentSystem = true;
+            results.LowerScoreWins = true;
             results.PercentRequired = ScoringSystem.ParticipationPercent ?? 0m;
 
             var totalRaceCount = results.Races.Where(r =>

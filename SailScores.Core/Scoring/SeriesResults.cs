@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,8 @@ namespace SailScores.Core.Scoring
         public int NumberOfDiscards { get; set; }
 
         public bool IsPercentSystem { get; set; }
+
+        public bool? LowerScoreWins { get; set; } = true;
 
         public Decimal? PercentRequired { get; set; }
 
