@@ -1,3 +1,5 @@
+import { getY, getDate } from './seriesChartUtils.js';
+
 (function () {
 
     var chartOverallWidth = 960;
@@ -23,47 +25,6 @@
         var dataPath = "/series/chart?seriesId=" + seriesId;
         if (typeof (d3) != "undefined" && d3 != null) {
             d3.json(dataPath).then(processChartData);
-        }
-
-
-        function getDate(result, allData) {
-            var thisRace = allData.races.find(r => r.id === result.raceId);
-            var racesThisDate = allData.races.filter(r => r.date === thisRace.date);
-
-            var order = racesThisDate.findIndex(r => r.id === thisRace.id) + 1;
-
-            return new Date(new Date(thisRace.date).getTime()
-                + (order * 24 * 60 * 60 * 1000 / (racesThisDate.length + 1)));
-        }
-
-        function getY(result, allData) {
-
-            var maxScore = Math.max(...allData.entries
-                .filter(e => e.raceId === result.raceId)
-                .map(e => e.seriesPoints));
-            var minScore = Math.min(...allData.entries
-                .filter(e => e.raceId === result.raceId
-                    && e.seriesPoints !== 0)
-                .map(e => e.seriesPoints));
-            var minNonnullScore = Math.min(...allData.entries
-                .filter(e => e.raceId === result.raceId
-                    && e.seriesPoints !== 0
-                    && e.seriesPoints !== null)
-                .map(e => e.seriesPoints));
-
-            // This gives a better bottom of chart than 0 for Cox-Sprague
-            minScore = Math.max(minScore, minNonnullScore - 10)
-            var ratio = (Math.max(result.seriesPoints - minScore, 0 )) / (maxScore - minScore);
-            if (!allData.isLowPoints) {
-                ratio = 1.0 - ratio;
-            }
-            if (isNaN(ratio)) {
-                ratio = 0;
-            }
-            if (result.seriesPoints === 0) {
-                ratio = 1;
-            }
-            return margin + (ratio * (chartOverallHeight - margin - margin));
         }
 
         function responsivefy(svg) {
@@ -154,7 +115,7 @@
             function onMouseOverRace(d) {
                 tooltipGroup
                     .attr("transform", "translate(" + xScale(getDate(d, data)) + ","
-                        + (getY(d, data) - legendLineHeight) + ")")
+                        + (getY(d, data, margin, chartOverallHeight) - legendLineHeight) + ")")
                     .attr("opacity", 1)
                     .select("text")
                     .selectAll("*")
@@ -249,7 +210,7 @@
 
             var lineData = d3.line()
                 .x(d => xScale(getDate(d, data)))
-                .y(d => getY(d, data));
+                .y(d => getY(d, data, margin, chartOverallHeight));
 
             svgElement
                 .selectAll("path.compLine")
@@ -273,7 +234,7 @@
                 .enter()
                 .append("circle")
                 .attr("r", 3)
-                .attr("cy", d => getY(d, data))
+                .attr("cy", d => getY(d, data, margin, chartOverallHeight))
                 .attr("cx", d => xScale(getDate(d, data)))
                 .attr("data-compId", d => d.competitorId)
                 .attr("fill", d => color(d.competitorId))
@@ -297,5 +258,6 @@
     }
 
     globalThis.drawChart = drawChart;
+    globalThis.getY = getY;
 
 })();
