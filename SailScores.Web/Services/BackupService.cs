@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using SailScores.Core.Model;
+using SailScores.Core.Model.BackupEntities;
 using SailScores.Core.Services;
 using CoreBackupService = SailScores.Core.Services.IBackupService;
 

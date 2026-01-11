@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using SailScores.Core.Model;
+using SailScores.Core.Model.BackupEntities;
 using SailScores.Core.Services;
 
 namespace SailScores.Web.Services.Interfaces;

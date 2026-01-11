@@ -1,6 +1,5 @@
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using SailScores.Core.Model;
+using SailScores.Core.Model.BackupEntities;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
@@ -13,17 +12,13 @@ namespace SailScores.Core.Services;
 public class BackupService : IBackupService
 {
     private readonly ISailScoresContext _dbContext;
-    private readonly IMapper _mapper;
 
     // Used for GUID remapping during restore
     private Dictionary<Guid, Guid> _guidMap;
 
-    public BackupService(
-        ISailScoresContext dbContext,
-        IMapper mapper)
+    public BackupService(ISailScoresContext dbContext)
     {
         _dbContext = dbContext;
-        _mapper = mapper;
     }
 
     public async Task<ClubBackupData> CreateBackupAsync(Guid clubId, string createdBy)
@@ -66,7 +61,13 @@ public class BackupService : IBackupService
         // Weather settings
         if (club.WeatherSettings != null)
         {
-            backup.WeatherSettings = _mapper.Map<WeatherSettings>(club.WeatherSettings);
+            backup.WeatherSettings = new WeatherSettingsBackup
+            {
+                Latitude = club.WeatherSettings.Latitude,
+                Longitude = club.WeatherSettings.Longitude,
+                TemperatureUnits = club.WeatherSettings.TemperatureUnits,
+                WindSpeedUnits = club.WeatherSettings.WindSpeedUnits
+            };
         }
 
         // Boat Classes
@@ -75,7 +76,12 @@ public class BackupService : IBackupService
             .AsNoTracking()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.BoatClasses = _mapper.Map<IList<BoatClass>>(boatClasses);
+        backup.BoatClasses = boatClasses.Select(bc => new BoatClassBackup
+        {
+            Id = bc.Id,
+            Name = bc.Name,
+            Description = bc.Description
+        }).ToList();
 
         // Seasons
         var seasons = await _dbContext.Seasons
@@ -83,7 +89,14 @@ public class BackupService : IBackupService
             .AsNoTracking()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Seasons = _mapper.Map<IList<Season>>(seasons);
+        backup.Seasons = seasons.Select(s => new SeasonBackup
+        {
+            Id = s.Id,
+            Name = s.Name,
+            UrlName = s.UrlName,
+            Start = s.Start,
+            End = s.End
+        }).ToList();
 
         // Scoring Systems (only those owned by this club)
         var scoringSystems = await _dbContext.ScoringSystems
@@ -92,7 +105,30 @@ public class BackupService : IBackupService
             .AsNoTracking()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.ScoringSystems = _mapper.Map<IList<ScoringSystem>>(scoringSystems);
+        backup.ScoringSystems = scoringSystems.Select(ss => new ScoringSystemBackup
+        {
+            Id = ss.Id,
+            Name = ss.Name,
+            DiscardPattern = ss.DiscardPattern,
+            ParticipationPercent = ss.ParticipationPercent,
+            ParentSystemId = ss.ParentSystemId,
+            ScoreCodes = ss.ScoreCodes?.Select(sc => new ScoreCodeBackup
+            {
+                Id = sc.Id,
+                Name = sc.Name,
+                Description = sc.Description,
+                Formula = sc.Formula,
+                FormulaValue = sc.FormulaValue,
+                ScoreLike = sc.ScoreLike,
+                Discardable = sc.Discardable,
+                CameToStart = sc.CameToStart,
+                Started = sc.Started,
+                Finished = sc.Finished,
+                PreserveResult = sc.PreserveResult,
+                AdjustOtherScores = sc.AdjustOtherScores,
+                CountAsParticipation = sc.CountAsParticipation
+            }).ToList() ?? new List<ScoreCodeBackup>()
+        }).ToList();
 
         // Get default scoring system name for reference
         if (club.DefaultScoringSystemId.HasValue)
@@ -114,7 +150,17 @@ public class BackupService : IBackupService
             .AsSplitQuery()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Fleets = MapFleets(fleets, boatClasses);
+        backup.Fleets = fleets.Select(f => new FleetBackup
+        {
+            Id = f.Id,
+            Name = f.Name,
+            ShortName = f.ShortName,
+            NickName = f.NickName,
+            Description = f.Description,
+            IsActive = f.IsActive,
+            FleetType = f.FleetType,
+            BoatClassIds = f.FleetBoatClasses?.Select(fbc => fbc.BoatClassId).ToList() ?? new List<Guid>()
+        }).ToList();
 
         // Competitors with fleet associations
         var competitors = await _dbContext.Competitors
@@ -123,7 +169,22 @@ public class BackupService : IBackupService
             .AsNoTracking()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Competitors = MapCompetitors(competitors, boatClasses, fleets);
+        backup.Competitors = competitors.Select(c => new CompetitorBackup
+        {
+            Id = c.Id,
+            Name = c.Name,
+            SailNumber = c.SailNumber,
+            AlternativeSailNumber = c.AlternativeSailNumber,
+            BoatName = c.BoatName,
+            HomeClubName = c.HomeClubName,
+            Notes = c.Notes,
+            IsActive = c.IsActive,
+            BoatClassId = c.BoatClassId,
+            UrlName = c.UrlName,
+            UrlId = c.UrlId,
+            Created = c.Created,
+            FleetIds = c.CompetitorFleets?.Select(cf => cf.FleetId).ToList() ?? new List<Guid>()
+        }).ToList();
 
         // Series with race associations
         var series = await _dbContext.Series
@@ -136,7 +197,34 @@ public class BackupService : IBackupService
             .AsSplitQuery()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Series = MapSeries(series, seasons, scoringSystems);
+        backup.Series = series.Select(s => new SeriesBackup
+        {
+            Id = s.Id,
+            Name = s.Name,
+            UrlName = s.UrlName,
+            Description = s.Description,
+            Type = s.Type,
+            IsImportantSeries = s.IsImportantSeries,
+            ResultsLocked = s.ResultsLocked,
+            UpdatedDate = s.UpdatedDate,
+            UpdatedBy = s.UpdatedBy,
+            ScoringSystemId = s.ScoringSystemId,
+            TrendOption = s.TrendOption,
+            FleetId = s.FleetId,
+            PreferAlternativeSailNumbers = s.PreferAlternativeSailNumbers,
+            ExcludeFromCompetitorStats = s.ExcludeFromCompetitorStats,
+            HideDncDiscards = s.HideDncDiscards,
+            ChildrenSeriesAsSingleRace = s.ChildrenSeriesAsSingleRace,
+            RaceCount = s.RaceCount,
+            DateRestricted = s.DateRestricted,
+            EnforcedStartDate = s.EnforcedStartDate,
+            EnforcedEndDate = s.EnforcedEndDate,
+            StartDate = s.StartDate,
+            EndDate = s.EndDate,
+            SeasonId = s.Season?.Id,
+            ChildrenSeriesIds = s.ChildLinks?.Select(cl => cl.ChildSeriesId).ToList() ?? new List<Guid>(),
+            ParentSeriesIds = s.ParentLinks?.Select(pl => pl.ParentSeriesId).ToList() ?? new List<Guid>()
+        }).ToList();
 
         // Races with scores, weather, and series associations
         var races = await _dbContext.Races
@@ -149,7 +237,50 @@ public class BackupService : IBackupService
             .AsSplitQuery()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Races = MapRaces(races, fleets, competitors, series, seasons);
+        backup.Races = races.Select(r => new RaceBackup
+        {
+            Id = r.Id,
+            Name = r.Name,
+            Date = r.Date,
+            State = r.State,
+            Order = r.Order,
+            Description = r.Description,
+            TrackingUrl = r.TrackingUrl,
+            UpdatedDate = r.UpdatedDate,
+            UpdatedBy = r.UpdatedBy,
+            StartTime = r.StartTime,
+            TrackTimes = r.TrackTimes,
+            FleetId = r.Fleet?.Id,
+            Weather = r.Weather != null ? new WeatherBackup
+            {
+                Id = r.Weather.Id,
+                Description = r.Weather.Description,
+                Icon = r.Weather.Icon,
+                TemperatureString = r.Weather.TemperatureString,
+                TemperatureDegreesKelvin = r.Weather.TemperatureDegreesKelvin,
+                WindSpeedString = r.Weather.WindSpeedString,
+                WindSpeedMeterPerSecond = r.Weather.WindSpeedMeterPerSecond,
+                WindDirectionString = r.Weather.WindDirectionString,
+                WindDirectionDegrees = r.Weather.WindDirectionDegrees,
+                WindGustString = r.Weather.WindGustString,
+                WindGustMeterPerSecond = r.Weather.WindGustMeterPerSecond,
+                Humidity = r.Weather.Humidity,
+                CloudCoverPercent = r.Weather.CloudCoverPercent,
+                CreatedDate = r.Weather.CreatedDate
+            } : null,
+            Scores = r.Scores?.Select(sc => new ScoreBackup
+            {
+                Id = sc.Id,
+                CompetitorId = sc.CompetitorId,
+                RaceId = sc.RaceId,
+                Place = sc.Place,
+                Code = sc.Code,
+                CodePoints = sc.CodePoints,
+                FinishTime = sc.FinishTime,
+                ElapsedTime = sc.ElapsedTime
+            }).ToList() ?? new List<ScoreBackup>(),
+            SeriesIds = r.SeriesRaces?.Select(sr => sr.SeriesId).ToList() ?? new List<Guid>()
+        }).ToList();
 
         // Regattas
         var regattas = await _dbContext.Regattas
@@ -161,7 +292,23 @@ public class BackupService : IBackupService
             .AsSplitQuery()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Regattas = MapRegattas(regattas, series, fleets, seasons, scoringSystems);
+        backup.Regattas = regattas.Select(r => new RegattaBackup
+        {
+            Id = r.Id,
+            Name = r.Name,
+            UrlName = r.UrlName,
+            Description = r.Description,
+            Url = r.Url,
+            StartDate = r.StartDate,
+            EndDate = r.EndDate,
+            UpdatedDate = r.UpdatedDate,
+            ScoringSystemId = r.ScoringSystemId,
+            PreferAlternateSailNumbers = r.PreferAlternateSailNumbers,
+            HideFromFrontPage = r.HideFromFrontPage,
+            SeasonId = r.Season?.Id,
+            SeriesIds = r.RegattaSeries?.Select(rs => rs.SeriesId).ToList() ?? new List<Guid>(),
+            FleetIds = r.RegattaFleet?.Select(rf => rf.FleetId).ToList() ?? new List<Guid>()
+        }).ToList();
 
         // Announcements (include CreatedBy/UpdatedBy as last modified user names)
         var announcements = await _dbContext.Announcements
@@ -169,7 +316,19 @@ public class BackupService : IBackupService
             .AsNoTracking()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Announcements = _mapper.Map<IList<Announcement>>(announcements);
+        backup.Announcements = announcements.Select(a => new AnnouncementBackup
+        {
+            Id = a.Id,
+            RegattaId = a.RegattaId,
+            Content = a.Content,
+            CreatedDate = a.CreatedDate,
+            CreatedLocalDate = a.CreatedLocalDate,
+            CreatedBy = a.CreatedBy,
+            UpdatedDate = a.UpdatedDate,
+            UpdatedLocalDate = a.UpdatedLocalDate,
+            UpdatedBy = a.UpdatedBy,
+            ArchiveAfter = a.ArchiveAfter
+        }).ToList();
 
         // Documents (include CreatedBy as last modified user name)
         var documents = await _dbContext.Documents
@@ -177,235 +336,19 @@ public class BackupService : IBackupService
             .AsNoTracking()
             .ToListAsync()
             .ConfigureAwait(false);
-        backup.Documents = _mapper.Map<IList<Document>>(documents);
+        backup.Documents = documents.Select(d => new DocumentBackup
+        {
+            Id = d.Id,
+            RegattaId = d.RegattaId,
+            Name = d.Name,
+            ContentType = d.ContentType,
+            FileContents = d.FileContents,
+            CreatedDate = d.CreatedDate,
+            CreatedLocalDate = d.CreatedLocalDate,
+            CreatedBy = d.CreatedBy
+        }).ToList();
 
         return backup;
-    }
-
-    private IList<Fleet> MapFleets(List<Db.Fleet> dbFleets, List<Db.BoatClass> allBoatClasses)
-    {
-        var fleets = new List<Fleet>();
-        var boatClassDict = allBoatClasses.ToDictionary(bc => bc.Id);
-
-        foreach (var dbFleet in dbFleets)
-        {
-            var fleet = _mapper.Map<Fleet>(dbFleet);
-            fleet.BoatClasses = new List<BoatClass>();
-
-            if (dbFleet.FleetBoatClasses != null)
-            {
-                foreach (var fbc in dbFleet.FleetBoatClasses)
-                {
-                    if (boatClassDict.TryGetValue(fbc.BoatClassId, out var bc))
-                    {
-                        fleet.BoatClasses.Add(_mapper.Map<BoatClass>(bc));
-                    }
-                }
-            }
-
-            fleets.Add(fleet);
-        }
-
-        return fleets;
-    }
-
-    private IList<Competitor> MapCompetitors(
-        List<Db.Competitor> dbCompetitors,
-        List<Db.BoatClass> allBoatClasses,
-        List<Db.Fleet> allFleets)
-    {
-        var competitors = new List<Competitor>();
-        var boatClassDict = allBoatClasses.ToDictionary(bc => bc.Id);
-        var fleetDict = allFleets.ToDictionary(f => f.Id);
-
-        foreach (var dbComp in dbCompetitors)
-        {
-            var comp = _mapper.Map<Competitor>(dbComp);
-
-            if (boatClassDict.TryGetValue(dbComp.BoatClassId, out var bc))
-            {
-                comp.BoatClass = _mapper.Map<BoatClass>(bc);
-            }
-
-            comp.Fleets = new List<Fleet>();
-            if (dbComp.CompetitorFleets != null)
-            {
-                foreach (var cf in dbComp.CompetitorFleets)
-                {
-                    if (fleetDict.TryGetValue(cf.FleetId, out var fleet))
-                    {
-                        comp.Fleets.Add(new Fleet { Id = fleet.Id, Name = fleet.Name, ShortName = fleet.ShortName });
-                    }
-                }
-            }
-
-            competitors.Add(comp);
-        }
-
-        return competitors;
-    }
-
-    private IList<Series> MapSeries(
-        List<Db.Series> dbSeries,
-        List<Db.Season> allSeasons,
-        List<Db.ScoringSystem> allScoringSystems)
-    {
-        var seriesList = new List<Series>();
-        var seasonDict = allSeasons.ToDictionary(s => s.Id);
-        var scoringDict = allScoringSystems.ToDictionary(ss => ss.Id);
-
-        foreach (var dbS in dbSeries)
-        {
-            var s = _mapper.Map<Series>(dbS);
-
-            if (dbS.Season != null)
-            {
-                s.Season = _mapper.Map<Season>(dbS.Season);
-            }
-
-            if (dbS.ScoringSystemId.HasValue && scoringDict.TryGetValue(dbS.ScoringSystemId.Value, out var ss))
-            {
-                s.ScoringSystem = new ScoringSystem { Id = ss.Id, Name = ss.Name };
-            }
-
-            // Store child/parent series links as Guids
-            s.ChildrenSeriesIds = dbS.ChildLinks?.Select(cl => cl.ChildSeriesId).ToList() ?? new List<Guid>();
-            s.ParentSeriesIds = dbS.ParentLinks?.Select(pl => pl.ParentSeriesId).ToList() ?? new List<Guid>();
-
-            seriesList.Add(s);
-        }
-
-        return seriesList;
-    }
-
-    private IList<Race> MapRaces(
-        List<Db.Race> dbRaces,
-        List<Db.Fleet> allFleets,
-        List<Db.Competitor> allCompetitors,
-        List<Db.Series> allSeries,
-        List<Db.Season> allSeasons)
-    {
-        var races = new List<Race>();
-        var fleetDict = allFleets.ToDictionary(f => f.Id);
-        var compDict = allCompetitors.ToDictionary(c => c.Id);
-        var seriesDict = allSeries.ToDictionary(s => s.Id);
-
-        foreach (var dbRace in dbRaces)
-        {
-            var race = _mapper.Map<Race>(dbRace);
-
-            if (dbRace.Fleet != null)
-            {
-                race.Fleet = new Fleet { Id = dbRace.Fleet.Id, Name = dbRace.Fleet.Name, ShortName = dbRace.Fleet.ShortName };
-            }
-
-            if (dbRace.Weather != null)
-            {
-                race.Weather = _mapper.Map<Weather>(dbRace.Weather);
-            }
-
-            // Map scores
-            race.Scores = new List<Score>();
-            if (dbRace.Scores != null)
-            {
-                foreach (var dbScore in dbRace.Scores)
-                {
-                    var score = new Score
-                    {
-                        Id = dbScore.Id,
-                        CompetitorId = dbScore.CompetitorId,
-                        RaceId = dbScore.RaceId,
-                        Place = dbScore.Place,
-                        Code = dbScore.Code,
-                        CodePoints = dbScore.CodePoints,
-                        FinishTime = dbScore.FinishTime,
-                        ElapsedTime = dbScore.ElapsedTime
-                    };
-
-                    if (compDict.TryGetValue(dbScore.CompetitorId, out var comp))
-                    {
-                        score.Competitor = new Competitor { Id = comp.Id, Name = comp.Name, SailNumber = comp.SailNumber };
-                    }
-
-                    race.Scores.Add(score);
-                }
-            }
-
-            // Map series associations
-            race.Series = new List<Series>();
-            if (dbRace.SeriesRaces != null)
-            {
-                foreach (var sr in dbRace.SeriesRaces)
-                {
-                    if (seriesDict.TryGetValue(sr.SeriesId, out var series))
-                    {
-                        race.Series.Add(new Series { Id = series.Id, Name = series.Name });
-                    }
-                }
-            }
-
-            races.Add(race);
-        }
-
-        return races;
-    }
-
-    private IList<Regatta> MapRegattas(
-        List<Db.Regatta> dbRegattas,
-        List<Db.Series> allSeries,
-        List<Db.Fleet> allFleets,
-        List<Db.Season> allSeasons,
-        List<Db.ScoringSystem> allScoringSystems)
-    {
-        var regattas = new List<Regatta>();
-        var seriesDict = allSeries.ToDictionary(s => s.Id);
-        var fleetDict = allFleets.ToDictionary(f => f.Id);
-        var scoringDict = allScoringSystems.ToDictionary(ss => ss.Id);
-
-        foreach (var dbRegatta in dbRegattas)
-        {
-            var regatta = _mapper.Map<Regatta>(dbRegatta);
-
-            if (dbRegatta.Season != null)
-            {
-                regatta.Season = _mapper.Map<Season>(dbRegatta.Season);
-            }
-
-            if (dbRegatta.ScoringSystemId.HasValue && scoringDict.TryGetValue(dbRegatta.ScoringSystemId.Value, out var ss))
-            {
-                regatta.ScoringSystem = new ScoringSystem { Id = ss.Id, Name = ss.Name };
-            }
-
-            // Map series
-            regatta.Series = new List<Series>();
-            if (dbRegatta.RegattaSeries != null)
-            {
-                foreach (var rs in dbRegatta.RegattaSeries)
-                {
-                    if (seriesDict.TryGetValue(rs.SeriesId, out var series))
-                    {
-                        regatta.Series.Add(new Series { Id = series.Id, Name = series.Name });
-                    }
-                }
-            }
-
-            // Map fleets
-            regatta.Fleets = new List<Fleet>();
-            if (dbRegatta.RegattaFleet != null)
-            {
-                foreach (var rf in dbRegatta.RegattaFleet)
-                {
-                    if (fleetDict.TryGetValue(rf.FleetId, out var fleet))
-                    {
-                        regatta.Fleets.Add(new Fleet { Id = fleet.Id, Name = fleet.Name, ShortName = fleet.ShortName });
-                    }
-                }
-            }
-
-            regattas.Add(regatta);
-        }
-
-        return regattas;
     }
 
     public BackupValidationResult ValidateBackup(ClubBackupData backup)
@@ -501,7 +444,7 @@ public class BackupService : IBackupService
         // Restore data in dependency order
 
         // 1. Boat Classes
-        foreach (var bc in backup.BoatClasses ?? Enumerable.Empty<BoatClass>())
+        foreach (var bc in backup.BoatClasses ?? Enumerable.Empty<BoatClassBackup>())
         {
             var dbBc = new Db.BoatClass
             {
@@ -514,7 +457,7 @@ public class BackupService : IBackupService
         }
 
         // 2. Seasons
-        foreach (var season in backup.Seasons ?? Enumerable.Empty<Season>())
+        foreach (var season in backup.Seasons ?? Enumerable.Empty<SeasonBackup>())
         {
             var dbSeason = new Db.Season
             {
@@ -530,7 +473,7 @@ public class BackupService : IBackupService
 
         // 3. Scoring Systems
         Guid? defaultScoringSystemId = null;
-        foreach (var ss in backup.ScoringSystems ?? Enumerable.Empty<ScoringSystem>())
+        foreach (var ss in backup.ScoringSystems ?? Enumerable.Empty<ScoringSystemBackup>())
         {
             var dbSs = new Db.ScoringSystem
             {
@@ -551,7 +494,7 @@ public class BackupService : IBackupService
             _dbContext.ScoringSystems.Add(dbSs);
 
             // Add score codes
-            foreach (var sc in ss.ScoreCodes ?? Enumerable.Empty<ScoreCode>())
+            foreach (var sc in ss.ScoreCodes ?? Enumerable.Empty<ScoreCodeBackup>())
             {
                 var dbSc = new Db.ScoreCode
                 {
@@ -577,7 +520,7 @@ public class BackupService : IBackupService
 
         // Update parent system references (second pass)
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-        foreach (var ss in backup.ScoringSystems ?? Enumerable.Empty<ScoringSystem>())
+        foreach (var ss in backup.ScoringSystems ?? Enumerable.Empty<ScoringSystemBackup>())
         {
             if (ss.ParentSystemId.HasValue)
             {
@@ -600,8 +543,8 @@ public class BackupService : IBackupService
             club.DefaultScoringSystemId = defaultScoringSystemId;
         }
 
-        // 4. Fleets (Fleet model doesn't have IsHidden, so we default to false)
-        foreach (var fleet in backup.Fleets ?? Enumerable.Empty<Fleet>())
+        // 4. Fleets
+        foreach (var fleet in backup.Fleets ?? Enumerable.Empty<FleetBackup>())
         {
             var dbFleet = new Db.Fleet
             {
@@ -618,9 +561,9 @@ public class BackupService : IBackupService
             _dbContext.Fleets.Add(dbFleet);
 
             // Fleet boat class associations
-            foreach (var bc in fleet.BoatClasses ?? Enumerable.Empty<BoatClass>())
+            foreach (var bcId in fleet.BoatClassIds ?? Enumerable.Empty<Guid>())
             {
-                var newBcId = GetNewGuidIfExists(bc.Id);
+                var newBcId = GetNewGuidIfExists(bcId);
                 if (newBcId.HasValue)
                 {
                     var fbc = new Db.FleetBoatClass
@@ -634,7 +577,7 @@ public class BackupService : IBackupService
         }
 
         // 5. Competitors
-        foreach (var comp in backup.Competitors ?? Enumerable.Empty<Competitor>())
+        foreach (var comp in backup.Competitors ?? Enumerable.Empty<CompetitorBackup>())
         {
             var newBoatClassId = GetNewGuidIfExists(comp.BoatClassId);
             var dbComp = new Db.Competitor
@@ -656,9 +599,9 @@ public class BackupService : IBackupService
             _dbContext.Competitors.Add(dbComp);
 
             // Competitor fleet associations
-            foreach (var fleet in comp.Fleets ?? Enumerable.Empty<Fleet>())
+            foreach (var fleetId in comp.FleetIds ?? Enumerable.Empty<Guid>())
             {
-                var newFleetId = GetNewGuidIfExists(fleet.Id);
+                var newFleetId = GetNewGuidIfExists(fleetId);
                 if (newFleetId.HasValue)
                 {
                     var cf = new Db.CompetitorFleet
@@ -672,9 +615,9 @@ public class BackupService : IBackupService
         }
 
         // 6. Series
-        foreach (var series in backup.Series ?? Enumerable.Empty<Series>())
+        foreach (var series in backup.Series ?? Enumerable.Empty<SeriesBackup>())
         {
-            var newSeasonId = series.Season != null ? GetNewGuidIfExists(series.Season.Id) : null;
+            var newSeasonId = series.SeasonId.HasValue ? GetNewGuidIfExists(series.SeasonId.Value) : null;
             var newScoringId = series.ScoringSystemId.HasValue ? GetNewGuidIfExists(series.ScoringSystemId.Value) : null;
 
             var dbSeries = new Db.Series
@@ -717,7 +660,7 @@ public class BackupService : IBackupService
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
         // Add series-to-series links (second pass after all series exist)
-        foreach (var series in backup.Series ?? Enumerable.Empty<Series>())
+        foreach (var series in backup.Series ?? Enumerable.Empty<SeriesBackup>())
         {
             var newSeriesId = GetNewGuidIfExists(series.Id);
             if (!newSeriesId.HasValue) continue;
@@ -738,9 +681,9 @@ public class BackupService : IBackupService
         }
 
         // 7. Races with Scores
-        foreach (var race in backup.Races ?? Enumerable.Empty<Race>())
+        foreach (var race in backup.Races ?? Enumerable.Empty<RaceBackup>())
         {
-            var newFleetId = race.Fleet != null ? GetNewGuidIfExists(race.Fleet.Id) : null;
+            var newFleetId = race.FleetId.HasValue ? GetNewGuidIfExists(race.FleetId.Value) : null;
 
             var dbRace = new Db.Race
             {
@@ -790,7 +733,7 @@ public class BackupService : IBackupService
             _dbContext.Races.Add(dbRace);
 
             // Scores
-            foreach (var score in race.Scores ?? Enumerable.Empty<Score>())
+            foreach (var score in race.Scores ?? Enumerable.Empty<ScoreBackup>())
             {
                 var newCompId = GetNewGuidIfExists(score.CompetitorId);
                 if (!newCompId.HasValue) continue;
@@ -810,9 +753,9 @@ public class BackupService : IBackupService
             }
 
             // Series-Race associations
-            foreach (var series in race.Series ?? Enumerable.Empty<Series>())
+            foreach (var seriesId in race.SeriesIds ?? Enumerable.Empty<Guid>())
             {
-                var newSeriesId = GetNewGuidIfExists(series.Id);
+                var newSeriesId = GetNewGuidIfExists(seriesId);
                 if (newSeriesId.HasValue)
                 {
                     var sr = new Db.SeriesRace
@@ -826,9 +769,9 @@ public class BackupService : IBackupService
         }
 
         // 8. Regattas
-        foreach (var regatta in backup.Regattas ?? Enumerable.Empty<Regatta>())
+        foreach (var regatta in backup.Regattas ?? Enumerable.Empty<RegattaBackup>())
         {
-            var newSeasonId = regatta.Season != null ? GetNewGuidIfExists(regatta.Season.Id) : null;
+            var newSeasonId = regatta.SeasonId.HasValue ? GetNewGuidIfExists(regatta.SeasonId.Value) : null;
             var newScoringId = regatta.ScoringSystemId.HasValue ? GetNewGuidIfExists(regatta.ScoringSystemId.Value) : null;
 
             var dbRegatta = new Db.Regatta
@@ -857,9 +800,9 @@ public class BackupService : IBackupService
             _dbContext.Regattas.Add(dbRegatta);
 
             // Regatta-Series associations
-            foreach (var series in regatta.Series ?? Enumerable.Empty<Series>())
+            foreach (var seriesId in regatta.SeriesIds ?? Enumerable.Empty<Guid>())
             {
-                var newSeriesId = GetNewGuidIfExists(series.Id);
+                var newSeriesId = GetNewGuidIfExists(seriesId);
                 if (newSeriesId.HasValue)
                 {
                     var rs = new Db.RegattaSeries
@@ -872,9 +815,9 @@ public class BackupService : IBackupService
             }
 
             // Regatta-Fleet associations
-            foreach (var fleet in regatta.Fleets ?? Enumerable.Empty<Fleet>())
+            foreach (var fleetId in regatta.FleetIds ?? Enumerable.Empty<Guid>())
             {
-                var newFleetId = GetNewGuidIfExists(fleet.Id);
+                var newFleetId = GetNewGuidIfExists(fleetId);
                 if (newFleetId.HasValue)
                 {
                     var rf = new Db.RegattaFleet
@@ -888,7 +831,7 @@ public class BackupService : IBackupService
         }
 
         // 9. Announcements
-        foreach (var ann in backup.Announcements ?? Enumerable.Empty<Announcement>())
+        foreach (var ann in backup.Announcements ?? Enumerable.Empty<AnnouncementBackup>())
         {
             var newRegattaId = ann.RegattaId.HasValue ? GetNewGuidIfExists(ann.RegattaId.Value) : null;
 
@@ -912,7 +855,7 @@ public class BackupService : IBackupService
         }
 
         // 10. Documents
-        foreach (var doc in backup.Documents ?? Enumerable.Empty<Document>())
+        foreach (var doc in backup.Documents ?? Enumerable.Empty<DocumentBackup>())
         {
             var newRegattaId = doc.RegattaId.HasValue ? GetNewGuidIfExists(doc.RegattaId.Value) : null;
 

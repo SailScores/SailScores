@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Core.Model;
 using SailScores.Web.Services.Interfaces;
 using System;
 using System.Threading.Tasks;

@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using SailScores.Core.Model;
+using SailScores.Core.Model.BackupEntities;
 
 namespace SailScores.Core.Services;
 
