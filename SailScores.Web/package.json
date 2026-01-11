@@ -5,6 +5,7 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
+    "@types/d3": "^7.4.3",
     "@types/jquery": "^3.5.33",
     "@types/node": "^18",
     "@types/select2": "^4.0.63",

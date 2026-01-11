@@ -12,13 +12,12 @@ import { getY, getDate } from './seriesChartUtils.js';
 
     var charts = document.getElementsByClassName("results-chart");
     for (var i = 0; i < charts.length; i++) {
-        drawChart(charts[i].dataset.seriesId, "#"+charts[i].id)
+        var el = charts[i];
+        drawChart((el.dataset && el.dataset.seriesId) || el.getAttribute('data-series-id') || '', "#" + el.id);
     }
 
 
     function drawChart(seriesId, elementId) {
-        //var chartElementId = elementId;
-
         var minDate;
         var maxDate;
 
@@ -28,28 +27,20 @@ import { getY, getDate } from './seriesChartUtils.js';
         }
 
         function responsivefy(svg) {
-            // get container + svg aspect ratio
             var container = d3.select(svg.node().parentNode),
                 width = parseInt(svg.style("width")),
                 height = parseInt(svg.style("height")),
                 aspect = width / height;
 
-            // add viewBox and preserveAspectRatio properties,
-            // and call resize so that svg resizes on inital page load
             svg.attr("viewBox", "0 0 " + width + " " + height)
                 .attr("preserveAspectRatio", "xMinYMid")
                 .call(resize);
 
-            // to register multiple listeners for same event type, 
-            // you need to add namespace, i.e., 'click.foo'
-            // necessary if you call invoke this function for multiple svgs
-            // api docs: https://github.com/mbostock/d3/wiki/Selections#on
             d3.select(window).on("resize." + container.attr("id"), resize);
 
-            // get width of container and resize svg to fit it
             function resize() {
                 var targetWidth = parseInt(container.style("width"));
-                if (targetWidth <= 100) {// assume percent
+                if (targetWidth <= 100) {
                     targetWidth = width;
                 }
                 svg.attr("width", targetWidth);
@@ -66,8 +57,8 @@ import { getY, getDate } from './seriesChartUtils.js';
                 return;
             }
             var dates = data.races.map(r => new Date(r.date));
-            minDate = new Date(Math.min.apply(null, dates));
-            maxDate = new Date(Math.max.apply(null, dates));
+            minDate = new Date(Math.min.apply(null, dates.map(function (d) { return d.getTime(); })));
+            maxDate = new Date(Math.max.apply(null, dates.map(function (d) { return d.getTime(); })));
             maxDate.setDate(maxDate.getDate() + 1);
 
             var xScale = d3.scaleTime()
@@ -104,7 +95,7 @@ import { getY, getDate } from './seriesChartUtils.js';
                     .attr("opacity", 1);
                 svgElement
                     .selectAll("g.legendEntry[data-compId='" + compId + "'] rect")
-                    .attr("stroke", (c) => color(c.id));
+                    .attr("stroke", function (c) { return color(c.id); });
                 svgElement.selectAll("circle")
                     .attr("opacity", .4);
                 svgElement
@@ -114,8 +105,8 @@ import { getY, getDate } from './seriesChartUtils.js';
             }
             function onMouseOverRace(d) {
                 tooltipGroup
-                    .attr("transform", "translate(" + xScale(getDate(d, data)) + ","
-                        + (getY(d, data, margin, chartOverallHeight) - legendLineHeight) + ")")
+                    .attr("transform", "translate(" + xScale(getDate(d, data)) + "," +
+                        (getY(d, data, margin, chartOverallHeight) - legendLineHeight) + ")")
                     .attr("opacity", 1)
                     .select("text")
                     .selectAll("*")
@@ -151,8 +142,8 @@ import { getY, getDate } from './seriesChartUtils.js';
                     .attr("stroke", "none");
                 tooltipGroup
                     .attr("opacity", 0)
-                    .attr("transform", "translate(" + chartOverallWidth + ","
-                        + chartOverallHeight + ")");
+                    .attr("transform", "translate(" + chartOverallWidth + "," +
+                        chartOverallHeight + ")");
 
                 svgElement
                     .selectAll("path.compLine")
@@ -172,13 +163,12 @@ import { getY, getDate } from './seriesChartUtils.js';
                 .enter()
                 .append("g")
                 .attr("class", "legendEntry")
-                .attr("data-compId", d => d.id)
+                .attr("data-compId", function (d) { return d.id; })
                 .attr("transform", function (d, i) {
                     var x = chartOverallWidth - legendWidth;
                     var y = (i * legendLineHeight) + legendMargin + 20;
                     return 'translate(' + x + ',' + y + ')';
-                }
-                )
+                })
                 .attr("opacity", 1)
                 .on("mouseover", onMouseOver)
                 .on("mouseout", onMouseOut);
@@ -192,7 +182,7 @@ import { getY, getDate } from './seriesChartUtils.js';
                 .attr('height', legendLineHeight - 2 * legendMargin)
                 .attr("x", legendMargin)
                 .attr("y", legendMargin)
-                .style('fill', (c) => color(c.id))
+                .style('fill', function (c) { return color(c.id); })
                 .style('stroke-width', 0);
             legend.append('text')
                 .attr('x', 20 + legendMargin)
@@ -202,15 +192,16 @@ import { getY, getDate } from './seriesChartUtils.js';
 
             var xAxis = d3.axisTop().scale(xScale);
             var language = d3.select("html").attr("lang").substring(0, 2);
-            if (((minDate - maxDate) < (10 * 24 * 60 * 60 * 1000)) || language !== "en") {
+            if (((minDate.getTime() - maxDate.getTime()) < (10 * 24 * 60 * 60 * 1000)) || language !== "en") {
                 xAxis = xAxis.tickFormat("");
             }
             svgElement.append("g").attr("id", "xAxisG")
                 .attr("transform", "translate(0,20)").call(xAxis);
 
             var lineData = d3.line()
-                .x(d => xScale(getDate(d, data)))
-                .y(d => getY(d, data, margin, chartOverallHeight));
+                .defined(function (d) { return getY(d, data, margin, chartOverallHeight) !== null; })
+                .x(function (d) { return xScale(getDate(d, data)); })
+                .y(function (d) { return getY(d, data, margin, chartOverallHeight); });
 
             svgElement
                 .selectAll("path.compLine")
@@ -218,26 +209,26 @@ import { getY, getDate } from './seriesChartUtils.js';
                 .enter()
                 .append("path")
                 .attr("class", "compLine")
-                .attr("d", d => lineData(data.entries.filter(e => e.competitorId === d.id)))
+                .attr("d", function (d) { return lineData(data.entries.filter(function (e) { return e.competitorId === d.id; })); })
                 .attr("fill", "none")
                 .attr("opacity", 1)
-                .attr("stroke", d => color(d.id))
+                .attr("stroke", function (d) { return color(d.id); })
                 .attr("stroke-width", 1)
                 .attr("stroke-linejoin", "round")
                 .attr("stroke-linecap", "round")
-                .attr("data-compId", d => d.id)
+                .attr("data-compId", function (d) { return d.id; })
                 .on("mouseover", onMouseOver)
                 .on("mouseout", onMouseOut);
 
             svgElement.selectAll("circle")
-                .data(data.entries)
+                .data(data.entries.filter(function (e) { return e.seriesPoints !== null; }))
                 .enter()
                 .append("circle")
                 .attr("r", 3)
-                .attr("cy", d => getY(d, data, margin, chartOverallHeight))
-                .attr("cx", d => xScale(getDate(d, data)))
-                .attr("data-compId", d => d.competitorId)
-                .attr("fill", d => color(d.competitorId))
+                .attr("cy", function (d) { return getY(d, data, margin, chartOverallHeight); })
+                .attr("cx", function (d) { return xScale(getDate(d, data)); })
+                .attr("data-compId", function (d) { return d.competitorId; })
+                .attr("fill", function (d) { return color(d.competitorId); })
                 .on("mouseover", onMouseOverRace)
                 .on("mouseout", onMouseOut);
 
@@ -257,7 +248,7 @@ import { getY, getDate } from './seriesChartUtils.js';
         }
     }
 
-    globalThis.drawChart = drawChart;
-    globalThis.getY = getY;
+    (globalThis).drawChart = drawChart;
+    (globalThis).getY = getY;
 
 })();

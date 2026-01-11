@@ -113,7 +113,7 @@ describe('getY function', () => {
         };
         const result = { raceId: 1, seriesPoints: null };
         const y = getY(result, allData, margin, chartOverallHeight);
-        // Null seriesPoints should be at the bottom
-        expect(y).toBe(30 + 540); // margin + height - 2*margin
+        // Null seriesPoints should return null to create a break in the line
+        expect(y).toBeNull();
     });
 });

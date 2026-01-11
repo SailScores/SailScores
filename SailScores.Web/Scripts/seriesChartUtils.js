@@ -9,6 +9,10 @@ function getDate(result, allData) {
 }
 
 function getY(result, allData, margin, chartOverallHeight) {
+    // Return null for null seriesPoints to create a break in the line
+    if (result.seriesPoints === null) {
+        return null;
+    }
 
     let maxScore = Math.max(...allData.entries
         .filter(e => e.raceId === result.raceId && e.seriesPoints !== null)
@@ -33,7 +37,7 @@ function getY(result, allData, margin, chartOverallHeight) {
     if (Number.isNaN(ratio)) {
         ratio = 0;
     }
-    if (result.seriesPoints === 0 || result.seriesPoints === null) {
+    if (result.seriesPoints === 0) {
         ratio = 1;
     }
     return margin + (ratio * (chartOverallHeight - margin - margin));

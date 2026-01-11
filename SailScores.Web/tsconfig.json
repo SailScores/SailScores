@@ -16,7 +16,7 @@
       "es5",
       "dom"
     ],
-    "types": [ "jquery", "select2" ],
+    "types": [ "jquery", "select2", "d3" ],
     "typeRoots": [
       "./node_modules/@types",
       "./Scripts/interfaces"
