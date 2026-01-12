@@ -25,6 +25,7 @@ public class ClubBackupData
     public int? DefaultRaceDateOffset { get; set; }
     public string StatisticsDescription { get; set; }
     public WeatherSettingsBackup WeatherSettings { get; set; }
+    public Guid? LogoFileId { get; set; }
 
     // Referenced data
     public IList<BoatClassBackup> BoatClasses { get; set; }
@@ -37,6 +38,13 @@ public class ClubBackupData
     public IList<RegattaBackup> Regattas { get; set; }
     public IList<AnnouncementBackup> Announcements { get; set; }
     public IList<DocumentBackup> Documents { get; set; }
+    public IList<ClubSequenceBackup> ClubSequences { get; set; }
+    public IList<CompetitorForwarderBackup> CompetitorForwarders { get; set; }
+    public IList<RegattaForwarderBackup> RegattaForwarders { get; set; }
+    public IList<SeriesForwarderBackup> SeriesForwarders { get; set; }
+    public IList<FileBackup> Files { get; set; }
+    public IList<SeriesChartResultsBackup> SeriesChartResults { get; set; }
+    public IList<HistoricalResultsBackup> HistoricalResults { get; set; }
 
     // Default scoring system name for reference
     public string DefaultScoringSystemName { get; set; }

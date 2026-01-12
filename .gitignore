@@ -310,3 +310,6 @@ SailScores.Web/wwwroot/js/ocrRaceEntry.min.js
 SailScores.Web/wwwroot/js/raceEditor.min.js
 
 SailScores.Web/appsettings.Development.json
+
+# SQL Server backup files (production data)
+*.bacpac

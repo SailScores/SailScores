@@ -345,35 +345,55 @@ public class SailScoresContext : DbContext, ISailScoresContext
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
         modelBuilder.Entity<CompetitorRankStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<ClubSeasonStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<SiteStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<AllCompHistogramStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<AllCompHistogramFields>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
+            });
+
+        modelBuilder.Entity<DeletableInfo>(
+            cs =>
+            {
+                cs.HasNoKey();
+                cs.ToTable((string)null);
+            });
+
+        modelBuilder.Entity<CompetitorActiveDates>(
+            cs =>
+            {
+                cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<ChangeType>().HasData(

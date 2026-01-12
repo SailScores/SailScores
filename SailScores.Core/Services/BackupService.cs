@@ -55,7 +55,8 @@ public class BackupService : IBackupService
             Url = club.Url,
             Locale = club.Locale,
             DefaultRaceDateOffset = club.DefaultRaceDateOffset,
-            StatisticsDescription = club.StatisticsDescription
+            StatisticsDescription = club.StatisticsDescription,
+            LogoFileId = club.LogoFileId
         };
 
         // Weather settings
@@ -112,6 +113,7 @@ public class BackupService : IBackupService
             DiscardPattern = ss.DiscardPattern,
             ParticipationPercent = ss.ParticipationPercent,
             ParentSystemId = ss.ParentSystemId,
+            IsSiteDefault = ss.IsSiteDefault,
             ScoreCodes = ss.ScoreCodes?.Select(sc => new ScoreCodeBackup
             {
                 Id = sc.Id,
@@ -348,6 +350,123 @@ public class BackupService : IBackupService
             CreatedBy = d.CreatedBy
         }).ToList();
 
+        // Club Sequences
+        var clubSequences = await _dbContext.ClubSequences
+            .Where(cs => cs.ClubId == clubId)
+            .AsNoTracking()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        backup.ClubSequences = clubSequences.Select(cs => new ClubSequenceBackup
+        {
+            Id = cs.Id,
+            NextValue = cs.NextValue,
+            SequenceType = cs.SequenceType,
+            SequencePrefix = cs.SequencePrefix,
+            SequenceSuffix = cs.SequenceSuffix
+        }).ToList();
+
+        // Competitor Forwarders
+        var competitorForwarders = await _dbContext.CompetitorForwarders
+            .Where(cf => cf.OldClubInitials == club.Initials)
+            .AsNoTracking()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        backup.CompetitorForwarders = competitorForwarders.Select(cf => new CompetitorForwarderBackup
+        {
+            Id = cf.Id,
+            OldClubInitials = cf.OldClubInitials,
+            OldCompetitorUrl = cf.OldCompetitorUrl,
+            CompetitorId = cf.CompetitorId,
+            Created = cf.Created
+        }).ToList();
+
+        // Regatta Forwarders
+        var regattaForwarders = await _dbContext.RegattaForwarders
+            .Where(rf => rf.OldClubInitials == club.Initials)
+            .AsNoTracking()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        backup.RegattaForwarders = regattaForwarders.Select(rf => new RegattaForwarderBackup
+        {
+            Id = rf.Id,
+            OldClubInitials = rf.OldClubInitials,
+            OldSeasonUrlName = rf.OldSeasonUrlName,
+            OldRegattaUrlName = rf.OldRegattaUrlName,
+            RegattaId = rf.NewRegattaId,
+            Created = rf.Created
+        }).ToList();
+
+        // Series Forwarders
+        var seriesForwarders = await _dbContext.SeriesForwarders
+            .Where(sf => sf.OldClubInitials == club.Initials)
+            .AsNoTracking()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        backup.SeriesForwarders = seriesForwarders.Select(sf => new SeriesForwarderBackup
+        {
+            Id = sf.Id,
+            OldClubInitials = sf.OldClubInitials,
+            OldSeasonUrlName = sf.OldSeasonUrlName,
+            OldSeriesUrlName = sf.OldSeriesUrlName,
+            SeriesId = sf.NewSeriesId,
+            Created = sf.Created
+        }).ToList();
+
+        // Files (for club logo)
+        if (club.LogoFileId.HasValue)
+        {
+            var logoFile = await _dbContext.Files
+                .Where(f => f.Id == club.LogoFileId.Value)
+                .AsNoTracking()
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+            
+            if (logoFile != null)
+            {
+                backup.Files = new List<FileBackup>
+                {
+                    new FileBackup
+                    {
+                        Id = logoFile.Id,
+                        FileContents = logoFile.FileContents,
+                        Created = logoFile.Created,
+                        ImportedTime = logoFile.ImportedTime
+                    }
+                };
+            }
+        }
+
+        // Series Chart Results
+        var seriesIds = series.Select(s => s.Id).ToList();
+        var seriesChartResults = await _dbContext.SeriesChartResults
+            .Where(scr => seriesIds.Contains(scr.SeriesId))
+            .AsNoTracking()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        backup.SeriesChartResults = seriesChartResults.Select(scr => new SeriesChartResultsBackup
+        {
+            Id = scr.Id,
+            SeriesId = scr.SeriesId,
+            IsCurrent = scr.IsCurrent,
+            Results = scr.Results,
+            Created = scr.Created
+        }).ToList();
+
+        // Historical Results
+        var historicalResults = await _dbContext.HistoricalResults
+            .Where(hr => seriesIds.Contains(hr.SeriesId))
+            .AsNoTracking()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        backup.HistoricalResults = historicalResults.Select(hr => new HistoricalResultsBackup
+        {
+            Id = hr.Id,
+            SeriesId = hr.SeriesId,
+            IsCurrent = hr.IsCurrent,
+            Results = hr.Results,
+            Created = hr.Created
+        }).ToList();
+
         return backup;
     }
 
@@ -481,8 +600,8 @@ public class BackupService : IBackupService
                 ClubId = targetClubId,
                 Name = ss.Name,
                 DiscardPattern = ss.DiscardPattern,
-                ParticipationPercent = ss.ParticipationPercent
-
+                ParticipationPercent = ss.ParticipationPercent,
+                IsSiteDefault = ss.IsSiteDefault
             };
 
             // Track default scoring system
@@ -875,6 +994,136 @@ public class BackupService : IBackupService
             _dbContext.Documents.Add(dbDoc);
         }
 
+        // 11. Files (for club logo)
+        foreach (var file in backup.Files ?? Enumerable.Empty<FileBackup>())
+        {
+            var dbFile = new Db.File
+            {
+                Id = GetNewGuid(file.Id),
+                FileContents = file.FileContents,
+                Created = file.Created,
+                ImportedTime = file.ImportedTime
+            };
+            _dbContext.Files.Add(dbFile);
+        }
+
+        // Update club logo file reference
+        if (backup.LogoFileId.HasValue)
+        {
+            var newLogoFileId = GetNewGuidIfExists(backup.LogoFileId.Value);
+            if (newLogoFileId.HasValue)
+            {
+                club.LogoFileId = newLogoFileId.Value;
+            }
+        }
+
+        // 12. Club Sequences
+        foreach (var sequence in backup.ClubSequences ?? Enumerable.Empty<ClubSequenceBackup>())
+        {
+            var dbSequence = new Db.ClubSequence
+            {
+                Id = GetNewGuid(sequence.Id),
+                ClubId = targetClubId,
+                NextValue = sequence.NextValue,
+                SequenceType = sequence.SequenceType,
+                SequencePrefix = sequence.SequencePrefix,
+                SequenceSuffix = sequence.SequenceSuffix
+            };
+            _dbContext.ClubSequences.Add(dbSequence);
+        }
+
+        // 13. Competitor Forwarders
+        foreach (var forwarder in backup.CompetitorForwarders ?? Enumerable.Empty<CompetitorForwarderBackup>())
+        {
+            var newCompetitorId = GetNewGuidIfExists(forwarder.CompetitorId);
+            if (newCompetitorId.HasValue)
+            {
+                var dbForwarder = new Db.CompetitorForwarder
+                {
+                    Id = GetNewGuid(forwarder.Id),
+                    OldClubInitials = forwarder.OldClubInitials,
+                    OldCompetitorUrl = forwarder.OldCompetitorUrl,
+                    CompetitorId = newCompetitorId.Value,
+                    Created = forwarder.Created
+                };
+                _dbContext.CompetitorForwarders.Add(dbForwarder);
+            }
+        }
+
+        // 14. Regatta Forwarders
+        foreach (var forwarder in backup.RegattaForwarders ?? Enumerable.Empty<RegattaForwarderBackup>())
+        {
+            var newRegattaId = GetNewGuidIfExists(forwarder.RegattaId);
+            if (newRegattaId.HasValue)
+            {
+                var dbForwarder = new Db.RegattaForwarder
+                {
+                    Id = GetNewGuid(forwarder.Id),
+                    OldClubInitials = forwarder.OldClubInitials,
+                    OldSeasonUrlName = forwarder.OldSeasonUrlName,
+                    OldRegattaUrlName = forwarder.OldRegattaUrlName,
+                    NewRegattaId = newRegattaId.Value,
+                    Created = forwarder.Created
+                };
+                _dbContext.RegattaForwarders.Add(dbForwarder);
+            }
+        }
+
+        // 15. Series Forwarders
+        foreach (var forwarder in backup.SeriesForwarders ?? Enumerable.Empty<SeriesForwarderBackup>())
+        {
+            var newSeriesId = GetNewGuidIfExists(forwarder.SeriesId);
+            if (newSeriesId.HasValue)
+            {
+                var dbForwarder = new Db.SeriesForwarder
+                {
+                    Id = GetNewGuid(forwarder.Id),
+                    OldClubInitials = forwarder.OldClubInitials,
+                    OldSeasonUrlName = forwarder.OldSeasonUrlName,
+                    OldSeriesUrlName = forwarder.OldSeriesUrlName,
+                    NewSeriesId = newSeriesId.Value,
+                    Created = forwarder.Created
+                };
+                _dbContext.SeriesForwarders.Add(dbForwarder);
+            }
+        }
+
+        // 16. Series Chart Results
+        foreach (var chartResult in backup.SeriesChartResults ?? Enumerable.Empty<SeriesChartResultsBackup>())
+        {
+            var newSeriesId = GetNewGuidIfExists(chartResult.SeriesId);
+            if (newSeriesId.HasValue)
+            {
+                var dbChartResult = new Db.SeriesChartResults
+                {
+                    Id = GetNewGuid(chartResult.Id),
+                    SeriesId = newSeriesId.Value,
+                    IsCurrent = chartResult.IsCurrent,
+                    Results = chartResult.Results,
+                    Created = chartResult.Created
+                };
+                _dbContext.SeriesChartResults.Add(dbChartResult);
+            }
+        }
+
+        // 17. Historical Results
+        foreach (var historicalResult in backup.HistoricalResults ?? Enumerable.Empty<HistoricalResultsBackup>())
+        {
+            var newSeriesId = GetNewGuidIfExists(historicalResult.SeriesId);
+            if (newSeriesId.HasValue)
+            {
+                var dbHistoricalResult = new Db.HistoricalResults
+                {
+                    Id = GetNewGuid(historicalResult.Id),
+                    SeriesId = newSeriesId.Value,
+                    IsCurrent = historicalResult.IsCurrent,
+                    Results = historicalResult.Results,
+                    Created = historicalResult.Created
+                };
+                _dbContext.HistoricalResults.Add(dbHistoricalResult);
+            }
+        }
+
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
         return true;
@@ -883,6 +1132,29 @@ public class BackupService : IBackupService
     private async Task DeleteExistingClubDataAsync(Guid clubId)
     {
         // Delete in reverse dependency order
+
+        // Series Chart Results (depends on series)
+        var seriesIds = await _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).ToListAsync().ConfigureAwait(false);
+        var seriesChartResults = await _dbContext.SeriesChartResults.Where(scr => seriesIds.Contains(scr.SeriesId)).ToListAsync().ConfigureAwait(false);
+        _dbContext.SeriesChartResults.RemoveRange(seriesChartResults);
+
+        // Historical Results (depends on series)
+        var historicalResults = await _dbContext.HistoricalResults.Where(hr => seriesIds.Contains(hr.SeriesId)).ToListAsync().ConfigureAwait(false);
+        _dbContext.HistoricalResults.RemoveRange(historicalResults);
+
+        // Competitor Forwarders
+        var competitorIds = await _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).ToListAsync().ConfigureAwait(false);
+        var competitorForwarders = await _dbContext.CompetitorForwarders.Where(cf => competitorIds.Contains(cf.CompetitorId)).ToListAsync().ConfigureAwait(false);
+        _dbContext.CompetitorForwarders.RemoveRange(competitorForwarders);
+
+        // Regatta Forwarders
+        var regattaIds = await _dbContext.Regattas.Where(r => r.ClubId == clubId).Select(r => r.Id).ToListAsync().ConfigureAwait(false);
+        var regattaForwarders = await _dbContext.RegattaForwarders.Where(rf => regattaIds.Contains(rf.NewRegattaId)).ToListAsync().ConfigureAwait(false);
+        _dbContext.RegattaForwarders.RemoveRange(regattaForwarders);
+
+        // Series Forwarders
+        var seriesForwarders = await _dbContext.SeriesForwarders.Where(sf => seriesIds.Contains(sf.NewSeriesId)).ToListAsync().ConfigureAwait(false);
+        _dbContext.SeriesForwarders.RemoveRange(seriesForwarders);
 
         // Documents
         var documents = await _dbContext.Documents.Where(d => d.ClubId == clubId).ToListAsync().ConfigureAwait(false);
@@ -898,7 +1170,6 @@ public class BackupService : IBackupService
         _dbContext.Scores.RemoveRange(scores);
 
         // SeriesRace links
-        var seriesIds = await _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).ToListAsync().ConfigureAwait(false);
         var seriesRaces = await _dbContext.SeriesRaces.Where(sr => seriesIds.Contains(sr.SeriesId)).ToListAsync().ConfigureAwait(false);
         _dbContext.SeriesRaces.RemoveRange(seriesRaces);
 
@@ -907,7 +1178,6 @@ public class BackupService : IBackupService
         _dbContext.Races.RemoveRange(races);
 
         // RegattaSeries and RegattaFleet links
-        var regattaIds = await _dbContext.Regattas.Where(r => r.ClubId == clubId).Select(r => r.Id).ToListAsync().ConfigureAwait(false);
         var regattaSeries = await _dbContext.RegattaSeries.Where(rs => regattaIds.Contains(rs.RegattaId)).ToListAsync().ConfigureAwait(false);
         _dbContext.RegattaSeries.RemoveRange(regattaSeries);
         var regattaFleets = await _dbContext.RegattaFleets.Where(rf => regattaIds.Contains(rf.RegattaId)).ToListAsync().ConfigureAwait(false);
@@ -928,8 +1198,8 @@ public class BackupService : IBackupService
         _dbContext.Series.RemoveRange(series);
 
         // CompetitorFleet links
-        var competitorIds = await _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).ToListAsync().ConfigureAwait(false);
-        var competitorFleets = await _dbContext.CompetitorFleets.Where(cf => competitorIds.Contains(cf.CompetitorId)).ToListAsync().ConfigureAwait(false);
+        var competitorIds2 = await _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).ToListAsync().ConfigureAwait(false);
+        var competitorFleets = await _dbContext.CompetitorFleets.Where(cf => competitorIds2.Contains(cf.CompetitorId)).ToListAsync().ConfigureAwait(false);
         _dbContext.CompetitorFleets.RemoveRange(competitorFleets);
 
         // Competitors
@@ -961,6 +1231,13 @@ public class BackupService : IBackupService
         // BoatClasses
         var boatClasses = await _dbContext.BoatClasses.Where(bc => bc.ClubId == clubId).ToListAsync().ConfigureAwait(false);
         _dbContext.BoatClasses.RemoveRange(boatClasses);
+
+        // Club Sequences
+        var clubSequences = await _dbContext.ClubSequences.Where(cs => cs.ClubId == clubId).ToListAsync().ConfigureAwait(false);
+        _dbContext.ClubSequences.RemoveRange(clubSequences);
+
+        // Note: Files (logo) are not deleted since they might be referenced elsewhere
+        // and club.LogoFileId will be cleared/updated separately
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }

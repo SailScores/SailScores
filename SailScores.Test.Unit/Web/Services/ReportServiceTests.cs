@@ -20,6 +20,8 @@ namespace SailScores.Test.Unit.Web.Services
         private readonly string _clubInitials = "TST";
         private readonly Guid _clubId = Guid.NewGuid();
 
+        private readonly Club _club;
+
         public ReportServiceTests()
         {
             _coreReportServiceMock = new Mock<CoreServices.IReportService>();
@@ -30,6 +32,17 @@ namespace SailScores.Test.Unit.Web.Services
             _clubServiceMock.Setup(s => s.GetClubName(_clubInitials))
                 .ReturnsAsync("Test Club");
 
+            _club = new Club
+            {
+                Id = _clubId,
+                Initials = _clubInitials
+            };
+
+            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
+                .ReturnsAsync(_club);
+            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubInitials))
+                .ReturnsAsync(_club);
+
             _service = new ReportService(
                 _coreReportServiceMock.Object,
                 _clubServiceMock.Object);
@@ -39,13 +52,8 @@ namespace SailScores.Test.Unit.Web.Services
         public async Task GetWindAnalysisAsync_NonAdvancedClub_LimitsDateRangeTo60Days()
         {
             // Arrange
-            var club = new Club 
-            { 
-                Id = _clubId, 
-                UseAdvancedFeatures = false 
-            };
-            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
-                .ReturnsAsync(club);
+            _club.UseAdvancedFeatures = false;
+
 
             var startDate = DateTime.Today.AddDays(-90);
             var endDate = DateTime.Today;
@@ -73,13 +81,7 @@ namespace SailScores.Test.Unit.Web.Services
         public async Task GetWindAnalysisAsync_AdvancedClub_DoesNotLimitDateRange()
         {
             // Arrange
-            var club = new Club 
-            { 
-                Id = _clubId, 
-                UseAdvancedFeatures = true 
-            };
-            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
-                .ReturnsAsync(club);
+            _club.UseAdvancedFeatures = true;
 
             var startDate = DateTime.Today.AddDays(-90);
             var endDate = DateTime.Today;
@@ -105,13 +107,8 @@ namespace SailScores.Test.Unit.Web.Services
         public async Task GetSkipperStatsAsync_NonAdvancedClub_LimitsDateRangeTo60Days()
         {
             // Arrange
-            var club = new Club 
-            { 
-                Id = _clubId, 
-                UseAdvancedFeatures = false 
-            };
-            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
-                .ReturnsAsync(club);
+
+            _club.UseAdvancedFeatures = false;
 
             var startDate = DateTime.Today.AddDays(-90);
             var endDate = DateTime.Today;
@@ -139,13 +136,8 @@ namespace SailScores.Test.Unit.Web.Services
         public async Task GetSkipperStatsAsync_AdvancedClub_DoesNotLimitDateRange()
         {
             // Arrange
-            var club = new Club 
-            { 
-                Id = _clubId, 
-                UseAdvancedFeatures = true 
-            };
-            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
-                .ReturnsAsync(club);
+
+            _club.UseAdvancedFeatures = true;
 
             var startDate = DateTime.Today.AddDays(-90);
             var endDate = DateTime.Today;
@@ -171,13 +163,8 @@ namespace SailScores.Test.Unit.Web.Services
         public async Task GetParticipationAsync_NonAdvancedClub_LimitsDateRangeTo60Days()
         {
             // Arrange
-            var club = new Club 
-            { 
-                Id = _clubId, 
-                UseAdvancedFeatures = false 
-            };
-            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
-                .ReturnsAsync(club);
+
+            _club.UseAdvancedFeatures = false;
 
             var startDate = DateTime.Today.AddDays(-120);
             var endDate = DateTime.Today;
@@ -207,13 +194,8 @@ namespace SailScores.Test.Unit.Web.Services
         public async Task GetParticipationAsync_AdvancedClub_DoesNotLimitDateRange()
         {
             // Arrange
-            var club = new Club 
-            { 
-                Id = _clubId, 
-                UseAdvancedFeatures = true 
-            };
-            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
-                .ReturnsAsync(club);
+
+            _club.UseAdvancedFeatures = true;
 
             var startDate = DateTime.Today.AddDays(-120);
             var endDate = DateTime.Today;
@@ -241,13 +223,8 @@ namespace SailScores.Test.Unit.Web.Services
         public async Task GetWindAnalysisAsync_NonAdvancedClubWithNoStartDate_SetsStartDateTo60DaysAgo()
         {
             // Arrange
-            var club = new Club 
-            { 
-                Id = _clubId, 
-                UseAdvancedFeatures = false 
-            };
-            _clubServiceMock.Setup(s => s.GetMinimalClub(_clubId))
-                .ReturnsAsync(club);
+
+            _club.UseAdvancedFeatures = false;
 
             var expectedStartDate = DateTime.Today.AddDays(-60);
 

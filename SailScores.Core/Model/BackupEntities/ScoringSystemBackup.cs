@@ -13,6 +13,7 @@ public class ScoringSystemBackup
     public string DiscardPattern { get; set; }
     public decimal? ParticipationPercent { get; set; }
     public Guid? ParentSystemId { get; set; }
+    public bool? IsSiteDefault { get; set; }
     
     public IList<ScoreCodeBackup> ScoreCodes { get; set; }
 }
