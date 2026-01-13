@@ -136,7 +136,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
                 return;
             }
 
-            var connectionString = _dbContainer.GetConnectionString();
+            var connectionString = _dbContainer.GetConnectionString().Replace("Database=master", "Database=sailscores");
             var importCommand = $"/Action:Import /SourceFile:\"{_bacpacPath}\" /TargetConnectionString:\"{connectionString}\"";
             
             var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
@@ -157,6 +157,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
             {
                 _output.WriteLine($"SqlPackage failed with exit code {process.ExitCode}");
                 _output.WriteLine($"Error: {error}");
+
                 throw new InvalidOperationException($"Failed to restore bacpac: {error}");
             }
 
@@ -650,7 +651,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         }
     }
 
-    [Fact(Skip = "Only run when testing with production data")]
+    [Fact] //[Fact(Skip = "Only run when testing with production data")]
     [Trait("Category", "Integration")]
     [Trait("Category", "Database")]
     [Trait("Category", "ProductionData")]
@@ -667,6 +668,11 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         }
 
         // Arrange
+        var testClubId = await _context.Clubs
+            .Where(c => c.Initials == "LHYC")
+            .Select(c => c.Id)
+            .FirstOrDefaultAsync();
+
         var clubCount = await _context.Clubs.CountAsync();
         _output.WriteLine($"Database has {clubCount} clubs");
 
@@ -678,28 +684,52 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
 
         var originalCounts = new
         {
-            Competitors = await _context.Competitors.CountAsync(c => c.ClubId == _testClubId),
-            Races = await _context.Races.CountAsync(r => r.ClubId == _testClubId),
-            Series = await _context.Series.CountAsync(s => s.ClubId == _testClubId),
-            Regattas = await _context.Regattas.CountAsync(r => r.ClubId == _testClubId)
+            Competitors = await _context.Competitors.CountAsync(c => c.ClubId == testClubId),
+            Races = await _context.Races.CountAsync(r => r.ClubId == testClubId),
+            Series = await _context.Series.CountAsync(s => s.ClubId == testClubId),
+            Regattas = await _context.Regattas.CountAsync(r => r.ClubId == testClubId)
         };
+        // grab dates of all series updates:
+        var originalSeriesUpdateDates = await _context.Series
+            .Where(s => s.ClubId == testClubId)
+            .Select(s => s.UpdatedDate)
+            .OrderBy(d => d)
+            .ToListAsync();
+
+
+        var raceToRemove = await _context.Races
+            .Where(r => r.ClubId == testClubId)
+            .OrderByDescending(r => r.Date)
+            .FirstOrDefaultAsync();
+        var seriesToRemove = await _context.Series
+            .Where(s => s.ClubId == testClubId)
+            .OrderBy(s => s.Name)
+            .FirstOrDefaultAsync();
 
         _output.WriteLine($"Original counts - Competitors: {originalCounts.Competitors}, Races: {originalCounts.Races}, Series: {originalCounts.Series}, Regattas: {originalCounts.Regattas}");
 
         // Act
-        var backup = await _backupService.CreateBackupAsync(_testClubId, "production-test");
+        var backup = await _backupService.CreateBackupAsync(testClubId, "production-test");
         _output.WriteLine("Production backup created successfully");
 
-        await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubSettings: true);
+        if(raceToRemove != null)
+        {
+            _context.Races.Remove(raceToRemove);
+            _context.SeriesRaces.RemoveRange(_context.SeriesRaces.Where(sr => seriesToRemove.Id == sr.SeriesId));
+            _context.Series.Remove(seriesToRemove);
+            await _context.SaveChangesAsync();
+        }
+
+        await _backupService.RestoreBackupAsync(testClubId, backup, preserveClubSettings: true);
         _output.WriteLine("Production backup restored successfully");
 
         // Assert
         var restoredCounts = new
         {
-            Competitors = await _context.Competitors.CountAsync(c => c.ClubId == _testClubId),
-            Races = await _context.Races.CountAsync(r => r.ClubId == _testClubId),
-            Series = await _context.Series.CountAsync(s => s.ClubId == _testClubId),
-            Regattas = await _context.Regattas.CountAsync(r => r.ClubId == _testClubId)
+            Competitors = await _context.Competitors.CountAsync(c => c.ClubId == testClubId),
+            Races = await _context.Races.CountAsync(r => r.ClubId == testClubId),
+            Series = await _context.Series.CountAsync(s => s.ClubId == testClubId),
+            Regattas = await _context.Regattas.CountAsync(r => r.ClubId == testClubId)
         };
 
         _output.WriteLine($"Restored counts - Competitors: {restoredCounts.Competitors}, Races: {restoredCounts.Races}, Series: {restoredCounts.Series}, Regattas: {restoredCounts.Regattas}");
@@ -708,6 +738,14 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         Assert.Equal(originalCounts.Races, restoredCounts.Races);
         Assert.Equal(originalCounts.Series, restoredCounts.Series);
         Assert.Equal(originalCounts.Regattas, restoredCounts.Regattas);
+
+        //compare series update dates
+        var restoredSeriesUpdateDates = await _context.Series
+            .Where(s => s.ClubId == testClubId)
+            .Select(s => s.UpdatedDate)
+            .OrderBy(d => d)
+            .ToListAsync();
+        Assert.Equal(originalSeriesUpdateDates, restoredSeriesUpdateDates);
     }
 
     #endregion

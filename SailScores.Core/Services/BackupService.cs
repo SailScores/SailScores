@@ -1157,11 +1157,11 @@ public class BackupService : IBackupService
         _dbContext.SeriesForwarders.RemoveRange(seriesForwarders);
 
         // Documents
-        var documents = await _dbContext.Documents.Where(d => d.ClubId == clubId).ToListAsync().ConfigureAwait(false);
+        var documents = await _dbContext.Documents.Where(d => d.ClubId == clubId || (d.RegattaId.HasValue && regattaIds.Contains(d.RegattaId.Value))).ToListAsync().ConfigureAwait(false);
         _dbContext.Documents.RemoveRange(documents);
 
         // Announcements
-        var announcements = await _dbContext.Announcements.Where(a => a.ClubId == clubId).ToListAsync().ConfigureAwait(false);
+        var announcements = await _dbContext.Announcements.IgnoreQueryFilters().Where(a => a.ClubId == clubId || (a.RegattaId.HasValue && regattaIds.Contains(a.RegattaId.Value))).ToListAsync().ConfigureAwait(false);
         _dbContext.Announcements.RemoveRange(announcements);
 
         // Scores (via races)
