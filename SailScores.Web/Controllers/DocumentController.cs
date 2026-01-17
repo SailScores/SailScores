@@ -1,4 +1,4 @@
-﻿using Ganss.Xss;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -113,7 +113,7 @@ public class DocumentController : Controller
         stream.Write(doc.FileContents, 0, doc.FileContents.Length);
         stream.Position = 0;
 
-        var extension = MimeTypes.GetMimeTypeExtensions(doc.ContentType).FirstOrDefault();
+        var extension = GetExtensionFromMimeType(doc.ContentType);
         if(extension == "jpe")
         {
             extension = "jpg";
@@ -127,6 +127,25 @@ public class DocumentController : Controller
         Response.Headers.Append("Content-Disposition", InlineAndEncodeFileNameRFC2231(doc.Name));
         return new FileStreamResult(stream, doc.ContentType);        
     }
+
+    private static string GetExtensionFromMimeType(string contentType)
+    {
+        return contentType?.ToLowerInvariant() switch
+        {
+            "image/jpeg" => "jpg",
+            "image/png" => "png",
+            "image/gif" => "gif",
+            "image/webp" => "webp",
+            "application/pdf" => "pdf",
+            "text/plain" => "txt",
+            "text/html" => "html",
+            "application/json" => "json",
+            "application/xml" => "xml",
+            "text/csv" => "csv",
+            _ => null
+        };
+    }
+
     private static string InlineAndEncodeFileNameRFC2231(string fileName)
     {
         if(String.IsNullOrWhiteSpace(fileName))

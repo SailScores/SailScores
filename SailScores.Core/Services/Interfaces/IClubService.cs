@@ -38,4 +38,5 @@ public interface IClubService
     Task SetSubscriptionTypeAsync(Guid clubId, string subscriptionType);
     Task SaveFileAsync(Entities.File file);
     Task<Entities.File> GetFileAsync(Guid id);
+    Task ResetClubAsync(Guid clubId, ResetLevel resetLevel);
 }
