@@ -248,10 +248,18 @@
                                 {
                                         tooltipText.Append("Participation: " + @String.Format("{0:0.#}%", compScore?.ParticipationPercent));
                                 }
-                                <span data-bs-toggle="tooltip" data-bs-trigger="manual focus hover" tabindex="0" title="@Html.Raw(tooltipText.ToString())">
-                                        @(compScore?.TotalScore != null
-                                            ? String.Format("{0:0.###}", compScore?.TotalScore)
-        : Html.Raw("&mdash;"))
+                                <span data-bs-toggle="tooltip" data-bs-trigger="manual focus hover"
+                                  tabindex="0" title="@Html.Raw(tooltipText.ToString())">
+                                        @if(compScore?.TotalScore != null)
+                                        {
+                                            @(String.Format("{0:0.###}", compScore.TotalScore))
+                                        }
+                                        else if (compScore?.Average != null)
+                                        {
+                                          <span class="text-muted">@(String.Format("{0:0.###}", compScore.Average))</span>
+                                        } else {
+                                            @Html.Raw("&mdash;")
+                                        }
 </span>
                             } else {
                                     @String.Format("{0:0.###}", compScore?.TotalScore)

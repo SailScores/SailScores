@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -9,10 +13,6 @@ using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using SailScores.Core.Utility;
 using SailScores.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using dbObj = SailScores.Database.Entities;
 
 namespace SailScores.Core.Services
@@ -616,6 +616,16 @@ namespace SailScores.Core.Services
         {
             if (series?.Results?.Results != null)
             {
+                decimal GetSecondarySortValue(Competitor c)
+                {
+                    if (!series.Results.Results.Keys.Contains(c))
+                    {
+                        return 0m;
+                    }
+                    var average = series.Results.Results[c].Average ?? 0m;
+                    return (series.Results.LowerScoreWins ?? true) ? average : 0 - average;
+                }
+
                 series.Competitors =
                     series.Competitors.OrderBy(c => series.Results.Results.Keys.Contains(c) ?
                         (series.Results.Results[c].Rank ?? int.MaxValue)
@@ -623,6 +633,7 @@ namespace SailScores.Core.Services
                     .ThenByDescending(c => series.Results.Results.Keys.Contains(c) ?
                                            (series.Results.Results[c].ParticipationPercent ?? 0m)
                                                                   : 0m)
+                    .ThenBy(c => GetSecondarySortValue(c))
                     .ToList();
 
             }

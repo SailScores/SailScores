@@ -479,6 +479,7 @@ namespace SailScores.Core.Scoring
 
         private static IList<Competitor> ReorderCompetitors(SeriesResults results)
         {
+            // The main ordering function is in Core.SeriesService FlattenResults.
             return results.Competitors.OrderBy(c => results.Results[c].Rank ?? int.MaxValue).ToList();
         }
 
