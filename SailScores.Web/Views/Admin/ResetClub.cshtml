@@ -1,0 +1,118 @@
+@model SailScores.Web.Models.SailScores.ResetClubViewModel
+
+@{
+    ViewData["Title"] = "Reset Club - " + Model.ClubName;
+    Layout = "_ClubLayout";
+}
+
+<h2>Reset Club Data</h2>
+
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Warning: Destructive Action</h4>
+    <p>You are about to reset data for <strong>@Model.ClubName</strong>. This action <strong>cannot be undone</strong>.</p>
+    <p class="mb-0">Please carefully review the reset options below and understand what data will be permanently deleted.</p>
+</div>
+
+<form asp-action="ResetClub" method="post">
+    <input type="hidden" asp-for="ClubId" />
+    <input type="hidden" asp-for="ClubName" />
+    <input type="hidden" asp-for="ClubInitials" />
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Select Reset Level</h5>
+        </div>
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" asp-for="ResetLevel" value="@SailScores.Core.Model.ResetLevel.RacesAndSeries" id="levelRacesAndSeries" />
+                    <label class="form-check-label" for="levelRacesAndSeries">
+                        <strong>Clear Races and Series</strong>
+                    </label>
+                    <div class="text-muted ms-4">
+                        <small>
+                            <strong>Deletes:</strong> All races, scores, series, and regattas<br />
+                            <strong>Keeps:</strong> Competitors, fleets, boat classes, seasons, and scoring systems
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" asp-for="ResetLevel" value="@SailScores.Core.Model.ResetLevel.RacesSeriesAndCompetitors" id="levelRacesSeriesCompetitors" />
+                    <label class="form-check-label" for="levelRacesSeriesCompetitors">
+                        <strong>Clear Races, Series, and Competitors</strong>
+                    </label>
+                    <div class="text-muted ms-4">
+                        <small>
+                            <strong>Deletes:</strong> All races, scores, series, regattas, and competitors<br />
+                            <strong>Keeps:</strong> Fleets, boat classes, seasons, and scoring systems
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" asp-for="ResetLevel" value="@SailScores.Core.Model.ResetLevel.FullReset" id="levelFullReset" />
+                    <label class="form-check-label" for="levelFullReset">
+                        <strong>Full Reset</strong>
+                    </label>
+                    <div class="text-muted ms-4">
+                        <small>
+                            <strong>Deletes:</strong> All club data (races, scores, series, regattas, competitors, fleets, boat classes, seasons, scoring systems)<br />
+                            <strong>Keeps:</strong> Club name, initials, website URL, and club settings<br />
+                            <strong>Note:</strong> Default scoring systems will be recreated
+                        </small>
+                    </div>
+                </div>
+
+                <span asp-validation-for="ResetLevel" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4 border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Confirmation Required</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="ConfirmReset" id="confirmReset" />
+                <label class="form-check-label" for="confirmReset">
+                    I understand that this action will permanently delete the selected data and <strong>cannot be undone</strong>.
+                </label>
+                <span asp-validation-for="ConfirmReset" class="text-danger d-block"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger" id="resetButton" disabled>
+            <i class="fas fa-exclamation-triangle"></i> Reset Club Data
+        </button>
+        <a asp-controller="Admin" asp-action="Edit" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmCheckbox = document.getElementById('confirmReset');
+            const resetButton = document.getElementById('resetButton');
+            const radioButtons = document.querySelectorAll('input[name="ResetLevel"]');
+
+            function updateButtonState() {
+                const anyRadioSelected = Array.from(radioButtons).some(r => r.checked);
+                resetButton.disabled = !(confirmCheckbox.checked && anyRadioSelected);
+            }
+
+            confirmCheckbox.addEventListener('change', updateButtonState);
+            radioButtons.forEach(r => r.addEventListener('change', updateButtonState));
+            
+            // Initial state check
+            updateButtonState();
+        });
+    </script>
+}

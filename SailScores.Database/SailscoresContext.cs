@@ -43,6 +43,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<SeriesForwarder> SeriesForwarders { get; set; }
     public DbSet<RegattaForwarder> RegattaForwarders { get; set; }
     public DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
+    public DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
 
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
@@ -257,6 +258,9 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
         modelBuilder.Entity<SeriesToSeriesLink>()
             .HasKey(sl => new { sl.ParentSeriesId, sl.ChildSeriesId });
+
+        modelBuilder.Entity<SeriesToSeriesLink>()
+            .ToTable("SeriesToSeriesLink");
 
         modelBuilder.Entity<SeriesToSeriesLink>()
             .HasOne(sl => sl.ParentSeries)

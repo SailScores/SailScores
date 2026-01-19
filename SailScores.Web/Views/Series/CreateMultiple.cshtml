@@ -225,10 +225,10 @@
                 </button>
             </div>
             <div class="col-10 d-none d-md-block">
-                <span class="small"><em>Paste cells from Excel or Google Sheets to add many at once.</em></span>
-                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#importIcalModal">
-                    Import from iCal
-                </button>
+                <span class="small"><em>Paste cells from Excel or Google Sheets into the rows above to add many at once or
+<a href="#" data-bs-toggle="modal" data-bs-target="#importIcalModal">import
+  from iCal.</a></em>
+</span>
             </div>
         </div>
 
@@ -256,33 +256,63 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <ul class="nav nav-tabs" id="importTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="file-tab" data-bs-toggle="tab" data-bs-target="#file" type="button" role="tab" aria-controls="file" aria-selected="true">File Upload</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url" type="button" role="tab" aria-controls="url" aria-selected="false">URL</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content mt-3" id="importTabsContent">
-                        <div class="tab-pane fade show active" id="file" role="tabpanel" aria-labelledby="file-tab">
-                            <div class="mb-3">
-                                <label for="icalFile" class="form-label">Select .ics file</label>
-                                <input class="form-control" type="file" id="icalFile" accept=".ics,text/calendar">
+                    <!-- Step 1: File/URL Selection -->
+                    <div id="importStep1">
+                        <ul class="nav nav-tabs" id="importTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="file-tab" data-bs-toggle="tab" data-bs-target="#file" type="button" role="tab" aria-controls="file" aria-selected="true">File Upload</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url" type="button" role="tab" aria-controls="url" aria-selected="false">URL</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content mt-3" id="importTabsContent">
+                            <div class="tab-pane fade show active" id="file" role="tabpanel" aria-labelledby="file-tab">
+                                <div class="mb-3">
+                                    <label for="icalFile" class="form-label">Select .ics file</label>
+                                    <input class="form-control" type="file" id="icalFile" accept=".ics,text/calendar">
+                                </div>
                             </div>
-                        </div>
-                        <div class="tab-pane fade" id="url" role="tabpanel" aria-labelledby="url-tab">
-                            <div class="mb-3">
-                                <label for="icalUrl" class="form-label">iCal URL</label>
-                                <input type="url" class="form-control" id="icalUrl" placeholder="https://example.com/calendar.ics">
+                            <div class="tab-pane fade" id="url" role="tabpanel" aria-labelledby="url-tab">
+                                <div class="mb-3">
+                                    <label for="icalUrl" class="form-label">iCal URL</label>
+                                    <input type="url" class="form-control" id="icalUrl" placeholder="https://example.com/calendar.ics">
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Step 2: Date Range Filter -->
+                    <div id="importStep2" class="d-none">
+                        <div class="alert alert-info">
+                            <span id="importEventCount">0</span> events found. Optionally filter by date range.
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="importStartDate" class="form-label">Start Date <span class="small text-muted">(Optional)</span></label>
+                                    <input type="date" class="form-control" id="importStartDate">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="importEndDate" class="form-label">End Date <span class="small text-muted">(Optional)</span></label>
+                                    <input type="date" class="form-control" id="importEndDate">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-muted small mb-2">
+                            <span id="filteredEventCount">0</span> events will be imported based on the current date range.
+                        </div>
+                    </div>
+
                     <div id="importError" class="alert alert-danger d-none mt-2"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="importIcal()">Import</button>
+                    <button type="button" class="btn btn-outline-secondary d-none" id="importBackBtn" onclick="importGoBack()">Back</button>
+                    <button type="button" class="btn btn-primary" id="importNextBtn" onclick="importLoadIcal()">Next</button>
+                    <button type="button" class="btn btn-primary d-none" id="importConfirmBtn" onclick="importConfirm()">Import</button>
                 </div>
             </div>
         </div>
@@ -290,8 +320,8 @@
 </div>
 
 @section Scripts {
-    <script type="text/javascript" src="~/js/createMultipleSeries.js"></script>
-    <script type="text/javascript" src="~/js/createMultipleSeriesSummary.js"></script>
-    <script type="text/javascript" src="~/js/seriesNameValidation.js"></script>
+    <script src="~/js/createMultipleSeries.js" asp-append-version="true"></script>
+    <script src="~/js/createMultipleSeriesSummary.js" asp-append-version="true"></script>
+    <script src="~/js/seriesNameValidation.js" asp-append-version="true"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

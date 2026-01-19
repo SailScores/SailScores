@@ -17,6 +17,7 @@ namespace SailScores.Core.Services
     {
         private readonly ISailScoresContext _dbContext;
         private readonly IMemoryCache _cache;
+        private readonly IScoringService _scoringService;
         private readonly IMapper _mapper;
 
         //used for copying club
@@ -25,10 +26,12 @@ namespace SailScores.Core.Services
         public ClubService(
             ISailScoresContext dbContext,
             IMemoryCache cache,
+            IScoringService scoringService,
             IMapper mapper)
         {
             _dbContext = dbContext;
             _cache = cache;
+            _scoringService = scoringService;
             _mapper = mapper;
         }
 
@@ -74,7 +77,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.CompetitorFleets)
                     .ThenInclude(cf => cf.Competitor)
                 .Where(f => f.ClubId == clubId && (f.IsActive ?? true))
-                .AsSingleQuery()
+                .AsSplitQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
 
@@ -705,6 +708,250 @@ namespace SailScores.Core.Services
         public async Task<Db.File> GetFileAsync(Guid id)
         {
             return await _dbContext.Files.FirstOrDefaultAsync(f => f.Id == id);
+        }
+
+        public async Task ResetClubAsync(Guid clubId, Model.ResetLevel resetLevel)
+        {
+            // Verify club exists
+            var club = await _dbContext.Clubs
+                .FirstOrDefaultAsync(c => c.Id == clubId)
+                .ConfigureAwait(false);
+            
+            if (club == null)
+            {
+                throw new InvalidOperationException("Club not found.");
+            }
+
+            // Level 1, 2, and 3: Clear scores first (foreign key to races and competitors)
+            var scores = await _dbContext.Scores
+                .Where(s => s.Race.ClubId == clubId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.Scores.RemoveRange(scores);
+
+            // Clear race-series relationships
+            var raceSeries = await _dbContext.Series
+                .Where(s => s.ClubId == clubId)
+                .SelectMany(s => s.RaceSeries)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            foreach (var rs in raceSeries)
+            {
+                rs.Race = null;
+            }
+
+            // Clear races
+            var races = await _dbContext.Races
+                .Where(r => r.ClubId == clubId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.Races.RemoveRange(races);
+
+            // Clear series chart results (via Series navigation)
+            var chartResults = await _dbContext.SeriesChartResults
+                .Where(scr => scr.Series.ClubId == clubId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.SeriesChartResults.RemoveRange(chartResults);
+
+            // Clear historical results (via Series navigation)
+            var historicalResults = await _dbContext.HistoricalResults
+                .Where(hr => hr.Series.ClubId == clubId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.HistoricalResults.RemoveRange(historicalResults);
+
+            // Get series IDs for this club
+            var seriesIds = await _dbContext.Series
+                .Where(s => s.ClubId == clubId)
+                .Select(s => s.Id)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            // Clear series-to-series links (parent or child relationships)
+            var seriesToSeriesLinks = await _dbContext.SeriesToSeriesLinks
+                .Where(ssl => seriesIds.Contains(ssl.ParentSeriesId) || seriesIds.Contains(ssl.ChildSeriesId))
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.SeriesToSeriesLinks.RemoveRange(seriesToSeriesLinks);
+
+            // Clear series forwarders (use NewSeriesId)
+            var seriesForwarders = await _dbContext.SeriesForwarders
+                .Where(sf => seriesIds.Contains(sf.NewSeriesId))
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.SeriesForwarders.RemoveRange(seriesForwarders);
+
+            // Clear series
+            var series = await _dbContext.Series
+                .Where(s => s.ClubId == clubId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.Series.RemoveRange(series);
+
+            // Get regatta IDs for this club (needed for announcements that reference regattas)
+            var regattaIds = await _dbContext.Regattas
+                .Where(r => r.ClubId == clubId)
+                .Select(r => r.Id)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            // Clear announcements (both by ClubId and those referencing the regattas being deleted)
+            // Must be done before deleting regattas due to foreign key constraint
+            var announcements = await _dbContext.Announcements
+                .Where(a => a.ClubId == clubId || regattaIds.Contains(a.RegattaId.Value))
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.Announcements.RemoveRange(announcements);
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            // Clear regatta forwarders (use NewRegattaId)
+            var regattaForwarders = await _dbContext.RegattaForwarders
+                .Where(rf => regattaIds.Contains(rf.NewRegattaId))
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.RegattaForwarders.RemoveRange(regattaForwarders);
+
+            // Clear regattas with their series and fleet relationships
+            var regattas = await _dbContext.Regattas
+                .Include(r => r.RegattaSeries)
+                .Include(r => r.RegattaFleet)
+                .Where(r => r.ClubId == clubId)
+                .AsSplitQuery()
+                .ToListAsync()
+                .ConfigureAwait(false);
+            
+            foreach (var regatta in regattas)
+            {
+                regatta.RegattaSeries.Clear();
+                regatta.RegattaFleet.Clear();
+            }
+
+            _dbContext.Regattas.RemoveRange(regattas);
+
+            // Level 2 and 3: Clear competitors
+            if (resetLevel >= Model.ResetLevel.RacesSeriesAndCompetitors)
+            {
+                // Get competitor IDs for this club
+                var competitorIds = await _dbContext.Competitors
+                    .Where(c => c.ClubId == clubId)
+                    .Select(c => c.Id)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+
+                // Clear competitor changes (use CompetitorId)
+                var competitorChanges = await _dbContext.CompetitorChanges
+                    .Where(cc => competitorIds.Contains(cc.CompetitorId))
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                _dbContext.CompetitorChanges.RemoveRange(competitorChanges);
+
+                // Clear competitor forwarders (use CompetitorId)
+                var competitorForwarders = await _dbContext.CompetitorForwarders
+                    .Where(cf => competitorIds.Contains(cf.CompetitorId))
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                _dbContext.CompetitorForwarders.RemoveRange(competitorForwarders);
+
+                // Clear competitor-fleet relationships
+                var competitors = await _dbContext.Competitors
+                    .Include(c => c.CompetitorFleets)
+                    .Where(c => c.ClubId == clubId)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                
+                foreach (var comp in competitors)
+                {
+                    comp.CompetitorFleets.Clear();
+                }
+
+                _dbContext.Competitors.RemoveRange(competitors);
+            }
+
+            // Level 3: Full reset - clear fleets, boat classes, seasons, scoring systems
+            if (resetLevel == Model.ResetLevel.FullReset)
+            {
+                // Clear fleet-boat class relationships and fleets
+                var fleets = await _dbContext.Fleets
+                    .Include(f => f.FleetBoatClasses)
+                    .Include(f => f.CompetitorFleets)
+                    .Where(f => f.ClubId == clubId)
+                    .AsSplitQuery()
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                
+                foreach (var fleet in fleets)
+                {
+                    fleet.FleetBoatClasses.Clear();
+                    fleet.CompetitorFleets.Clear();
+                }
+                _dbContext.Fleets.RemoveRange(fleets);
+
+                // Clear boat classes
+                var boatClasses = await _dbContext.BoatClasses
+                    .Where(bc => bc.ClubId == clubId)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                _dbContext.BoatClasses.RemoveRange(boatClasses);
+
+                // Clear seasons
+                var seasons = await _dbContext.Seasons
+                    .Where(s => s.ClubId == clubId)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                _dbContext.Seasons.RemoveRange(seasons);
+
+                // Clear documents
+                var documents = await _dbContext.Documents
+                    .Where(d => d.ClubId == clubId)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                _dbContext.Documents.RemoveRange(documents);
+
+                // Clear club scoring systems (not site-wide ones)
+                // First, clear the default scoring system reference
+                club.DefaultScoringSystemId = null;
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+                // Get scoring system IDs for this club
+                var scoringSystemIds = await _dbContext.ScoringSystems
+                    .Where(ss => ss.ClubId == clubId)
+                    .Select(ss => ss.Id)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+
+                // Clear score codes for club scoring systems (use ScoringSystemId)
+                var scoreCodes = await _dbContext.ScoreCodes
+                    .Where(sc => scoringSystemIds.Contains(sc.ScoringSystemId))
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                _dbContext.ScoreCodes.RemoveRange(scoreCodes);
+
+                // Clear club scoring systems
+                var scoringSystems = await _dbContext.ScoringSystems
+                    .Where(ss => ss.ClubId == clubId)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                _dbContext.ScoringSystems.RemoveRange(scoringSystems);
+
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+                // Create default scoring systems using the consolidated method
+                var createdSystems = await _scoringService.CreateDefaultScoringSystemsAsync(clubId, club.Initials)
+                    .ConfigureAwait(false);
+
+                if (createdSystems.Count > 0)
+                {
+                    // Set the first system (series default) as the club's default
+                    club.DefaultScoringSystemId = createdSystems[0].Id;
+                }
+            }
+
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            // Clear cache for this club
+            _cache.Remove($"ClubId_{club.Initials}");
         }
     }
 }

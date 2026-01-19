@@ -139,4 +139,63 @@ public class AdminController : Controller
         return result;
     }
 
+    // GET: Admin/ResetClub
+    public async Task<ActionResult> ResetClub(string clubInitials)
+    {
+        ViewData["ClubInitials"] = clubInitials;
+        if (!await _authService.CanUserEdit(User, clubInitials))
+        {
+            return Unauthorized();
+        }
+        var club = await _adminService.GetClub(clubInitials);
+        var vm = new ResetClubViewModel
+        {
+            ClubId = club.Id,
+            ClubName = club.Name,
+            ClubInitials = club.Initials
+        };
+        return View(vm);
+    }
+
+    // POST: Admin/ResetClub
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ResetClub(
+        string clubInitials,
+        ResetClubViewModel model)
+    {
+        ViewData["ClubInitials"] = clubInitials;
+        if (!await _authService.CanUserEdit(User, model.ClubId))
+        {
+            return Unauthorized();
+        }
+        if (!ModelState.IsValid || !model.ResetLevel.HasValue)
+        {
+            return View(model);
+        }
+
+        try
+        {
+            await _adminService.ResetClubAsync(model.ClubId, model.ResetLevel.Value);
+            TempData["SuccessMessage"] = $"Club data has been reset successfully using '{GetResetLevelDescription(model.ResetLevel.Value)}' option.";
+            return RedirectToAction(nameof(Index), "Admin", new { clubInitials });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, $"Error resetting club: {ex.Message}");
+            return View(model);
+        }
+    }
+
+    private static string GetResetLevelDescription(Core.Model.ResetLevel level)
+    {
+        return level switch
+        {
+            Core.Model.ResetLevel.RacesAndSeries => "Clear Races and Series",
+            Core.Model.ResetLevel.RacesSeriesAndCompetitors => "Clear Races, Series, and Competitors",
+            Core.Model.ResetLevel.FullReset => "Full Reset",
+            _ => level.ToString()
+        };
+    }
+
 }

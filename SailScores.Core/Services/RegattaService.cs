@@ -165,7 +165,18 @@ namespace SailScores.Core.Services
             Database.Entities.Regatta dbRegatta =
                 await _dbObjectBuilder.BuildDbRegattaAsync(regatta)
                 .ConfigureAwait(false);
-            dbRegatta.UrlName = UrlUtility.GetUrlName(dbRegatta.Name);
+            var baseUrlName = UrlUtility.GetUrlName(dbRegatta.Name);
+            var urlName = baseUrlName;
+            var counter = 1;
+            while (await _dbContext.Regattas.AnyAsync(s =>
+                s.ClubId == regatta.ClubId
+                && s.UrlName == urlName
+                && s.Season.Id == dbRegatta.Season.Id))
+            {
+                urlName = $"{baseUrlName}-{counter}";
+                counter++;
+            }
+            dbRegatta.UrlName = urlName;
             dbRegatta.Url = UrlUtility.EnsureHttpPrefix(dbRegatta.Url);
             dbRegatta.UpdatedDate = DateTime.UtcNow;
             if (dbRegatta.Season == null
@@ -180,16 +191,6 @@ namespace SailScores.Core.Services
             {
                 throw new InvalidOperationException(
                     "Could not find or create season for new Regatta.");
-            }
-
-            if (_dbContext.Regattas.Any(s =>
-                s.Id == regatta.Id
-                || (s.ClubId == regatta.ClubId
-                    && s.UrlName == regatta.UrlName
-                    && s.Season.Id == dbRegatta.Season.Id)))
-            {
-                throw new InvalidOperationException(
-                    "Cannot create regatta. A regatta with this name in this season already exists.");
             }
 
             _dbContext.Regattas.Add(dbRegatta);
@@ -209,15 +210,19 @@ namespace SailScores.Core.Services
 
         private async Task<Guid> UpdateInternalAsync(Regatta model)
         {
-            if (_dbContext.Regattas.Any(r =>
+            var baseUrlName = UrlUtility.GetUrlName(model.Name);
+            var newUrlName = baseUrlName;
+            var counter = 1;
+            while (await _dbContext.Regattas.AnyAsync(r =>
                 r.Id != model.Id
                 && r.ClubId == model.ClubId
-                && r.Name == model.Name
+                && r.UrlName == newUrlName
                 && r.Season.Id == model.Season.Id))
             {
-                throw new InvalidOperationException(
-                    "Cannot update Regatta. A regatta with this name in this season already exists.");
+                newUrlName = $"{baseUrlName}-{counter}";
+                counter++;
             }
+
             var existingRegatta = await _dbContext.Regattas
                 .Include(r => r.RegattaFleet)
                 .SingleAsync(c => c.Id == model.Id)
@@ -229,8 +234,7 @@ namespace SailScores.Core.Services
             }
 
             existingRegatta.Name = model.Name;
-            // Now that forwarders are in place, we can update the url name.
-            existingRegatta.UrlName = UrlUtility.GetUrlName(model.Name);
+            existingRegatta.UrlName = newUrlName;
             existingRegatta.Url = model.Url;
             existingRegatta.Description = model.Description;
             existingRegatta.StartDate = model.StartDate;
@@ -259,7 +263,7 @@ namespace SailScores.Core.Services
         {
             return model.Season.Id == existingRegatta.Season.Id
                 && model.ClubId == existingRegatta.ClubId
-                && model.Name == existingRegatta.Name;
+                && model.UrlName == existingRegatta.UrlName;
         }
 
         private static void CleanupFleets(Regatta model, dbObj.Regatta existingRegatta)

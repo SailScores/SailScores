@@ -112,6 +112,10 @@ public class ClubRequestService : IClubRequestService
             "HELP",
             "DOCS",
             "ADMIN",
+            "COMPETITOR",
+            "WHATIF",
+            "DOC",
+            "DOCUMENT",
 
             "CSS",
             "VENDOR",
@@ -136,6 +140,26 @@ public class ClubRequestService : IClubRequestService
             "REGATTA",
             "SERIES",
             "RACE",
+
+            "BOAT",
+            "BOATS",
+            "FLEET",
+            "FLEETS",
+            "SEASON",
+            "SEASONS",
+            "REPORT",
+            "REPORTS",
+            "DOWNLOAD",
+            "EXPORT",
+            "SETTINGS",
+            "DASHBOARD",
+            "PING",
+            "HEALTH",
+            "STATUS",
+            "METRICS",
+            "ROBOTS",
+            "SWAGGER",
+
             // Should obscenities be added here?
         };
 
@@ -162,34 +186,11 @@ public class ClubRequestService : IClubRequestService
         {
             newClubId = await CopyClub(copyFromClubId.Value, request, test);
             request.TestClubId = newClubId;
-            request.RequestApproved ??= DateTime.UtcNow;
+        request.RequestApproved ??= DateTime.UtcNow;
             await _coreClubRequestService.UpdateRequest(request);
         }
         else
         {
-            var scoringSystemList = new List<ScoringSystem>();
-            var baseScoringSystem = await _coreScoringService.GetSiteDefaultSystemAsync();
-
-            var newScoringSystem = new ScoringSystem
-            {
-                ParentSystemId = baseScoringSystem.Id,
-                Name = $"{request.ClubInitials} scoring based on App. A Rule 5.3",
-                DiscardPattern = "0"
-            };
-            scoringSystemList.Add(newScoringSystem);
-
-
-            var regattaScoringSystem = await _coreScoringService.GetBaseRegattaSystemAsync();
-            if (regattaScoringSystem != null)
-            {
-                scoringSystemList.Add(new ScoringSystem
-                {
-                    ParentSystemId = regattaScoringSystem.Id,
-                    Name = $"{request.ClubInitials} scoring based on App. A",
-                    DiscardPattern = "0,1"
-                });
-            }
-
             var initialsToUse = request.ClubInitials + (test ? "TEST" : "");
 
             var url = request.ClubWebsite;
@@ -201,14 +202,23 @@ public class ClubRequestService : IClubRequestService
                 Initials = initialsToUse,
                 IsHidden = true,
                 Url = url,
-                DefaultScoringSystem = newScoringSystem,
                 Description = (String.IsNullOrWhiteSpace(request.ClubLocation) ? (string)null : "_" + request.ClubLocation + "_"),
-                ScoringSystems = scoringSystemList,
                 Locale = "en-US"
             };
 
             newClubId = await _coreClubService.SaveNewClub(club);
             ClearClubMemoryCache();
+
+            // Create default scoring systems using the consolidated method
+            var createdSystems = await _coreScoringService.CreateDefaultScoringSystemsAsync(newClubId, initialsToUse);
+            
+            // Set the first system (series default) as the club's default
+            if (createdSystems.Count > 0)
+            {
+                club.Id = newClubId;
+                club.DefaultScoringSystemId = createdSystems[0].Id;
+                await _coreClubService.UpdateClub(club);
+            }
 
             if (club.IsHidden)
             {
