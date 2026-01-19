@@ -140,7 +140,10 @@ function formatDateForInput(val) {
     return val;
 }
 
-function importIcal() {
+// Store imported series data between steps
+let importedSeriesData = [];
+
+function importLoadIcal() {
     const seasonId = document.getElementById('SeasonId').value;
     if (!seasonId || seasonId === "Select a season...") {
         alert("Please select a season first.");
@@ -151,8 +154,192 @@ function importIcal() {
     if (!formData) return;
 
     const url = buildImportUrl();
-    performImport(url, formData);
+    
+    // Show loading state
+    const nextBtn = document.getElementById('importNextBtn');
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Loading...';
+
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text) });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.warning) {
+            alert(data.warning);
+        }
+        importedSeriesData = data.series || [];
+        showImportStep2();
+    })
+    .catch(error => handleImportError(error))
+    .finally(() => {
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Next';
+    });
 }
+
+function showImportStep2() {
+    // Hide step 1, show step 2
+    document.getElementById('importStep1').classList.add('d-none');
+    document.getElementById('importStep2').classList.remove('d-none');
+    
+    // Update button visibility
+    document.getElementById('importNextBtn').classList.add('d-none');
+    document.getElementById('importBackBtn').classList.remove('d-none');
+    document.getElementById('importConfirmBtn').classList.remove('d-none');
+    
+    // Calculate min and max dates from imported data using string comparison
+    let minDateStr = null;
+    let maxDateStr = null;
+    
+    for (const series of importedSeriesData) {
+        // Extract just the date portion (yyyy-MM-dd) from the date strings
+        const startDateStr = series.startDate ? series.startDate.substring(0, 10) : null;
+        const endDateStr = series.endDate ? series.endDate.substring(0, 10) : null;
+        
+        // For minDate, use the earliest start date (or end date if no start)
+        const minCandidate = startDateStr || endDateStr;
+        if (minCandidate) {
+            if (!minDateStr || minCandidate < minDateStr) {
+                minDateStr = minCandidate;
+            }
+        }
+        
+        // For maxDate, use the latest end date (or start date if no end)
+        const maxCandidate = endDateStr || startDateStr;
+        if (maxCandidate) {
+            if (!maxDateStr || maxCandidate > maxDateStr) {
+                maxDateStr = maxCandidate;
+            }
+        }
+    }
+    
+    // Set date inputs to min/max values (already in yyyy-MM-dd format)
+    const startDateInput = document.getElementById('importStartDate');
+    const endDateInput = document.getElementById('importEndDate');
+    
+    startDateInput.value = minDateStr || '';
+    endDateInput.value = maxDateStr || '';
+    
+    // Update event counts
+    document.getElementById('importEventCount').textContent = importedSeriesData.length;
+    updateFilteredEventCount();
+    
+    // Add event listeners for date changes
+    startDateInput.addEventListener('change', updateFilteredEventCount);
+    endDateInput.addEventListener('change', updateFilteredEventCount);
+}
+
+function updateFilteredEventCount() {
+    const filtered = getFilteredSeries();
+    document.getElementById('filteredEventCount').textContent = filtered.length;
+}
+
+function getFilteredSeries() {
+    const startDateInput = document.getElementById('importStartDate');
+    const endDateInput = document.getElementById('importEndDate');
+    
+    // Parse filter dates as date-only strings for comparison (avoid timezone issues)
+    const filterStartStr = startDateInput.value || null;
+    const filterEndStr = endDateInput.value || null;
+    
+    return importedSeriesData.filter(series => {
+        // Extract just the date portion (yyyy-MM-dd) from the event dates
+        const eventDateStr = series.startDate || series.endDate;
+        
+        if (!eventDateStr) {
+            // If no date at all, include the event (no date filtering possible)
+            return true;
+        }
+        
+        // Get just the date part (first 10 characters: yyyy-MM-dd)
+        const eventDateOnly = eventDateStr.substring(0, 10);
+        
+        // String comparison works for yyyy-MM-dd format (lexicographic order matches date order)
+        if (filterStartStr && eventDateOnly < filterStartStr) {
+            return false;
+        }
+        
+        // Inclusive end date: include events on the end date
+        if (filterEndStr && eventDateOnly > filterEndStr) {
+            return false;
+        }
+        
+        return true;
+    });
+}
+
+function importGoBack() {
+    // Show step 1, hide step 2
+    document.getElementById('importStep1').classList.remove('d-none');
+    document.getElementById('importStep2').classList.add('d-none');
+    
+    // Update button visibility
+    document.getElementById('importNextBtn').classList.remove('d-none');
+    document.getElementById('importBackBtn').classList.add('d-none');
+    document.getElementById('importConfirmBtn').classList.add('d-none');
+    
+    // Clear error
+    document.getElementById('importError').classList.add('d-none');
+}
+
+function importConfirm() {
+    const filteredSeries = getFilteredSeries();
+    
+    if (filteredSeries.length === 0) {
+        showImportError("No events to import with the selected date range.");
+        return;
+    }
+    
+    addImportedSeriesToRows(filteredSeries);
+    
+    // Close modal and reset
+    const modalEl = document.getElementById('importIcalModal');
+    let modal = bootstrap.Modal.getInstance(modalEl);
+    if (!modal) {
+        modal = new bootstrap.Modal(modalEl);
+    }
+    modal.hide();
+    
+    // Reset modal to step 1 for next use
+    resetImportModal();
+}
+
+function resetImportModal() {
+    importedSeriesData = [];
+    
+    // Reset to step 1
+    document.getElementById('importStep1').classList.remove('d-none');
+    document.getElementById('importStep2').classList.add('d-none');
+    
+    // Reset buttons
+    document.getElementById('importNextBtn').classList.remove('d-none');
+    document.getElementById('importBackBtn').classList.add('d-none');
+    document.getElementById('importConfirmBtn').classList.add('d-none');
+    
+    // Clear inputs
+    document.getElementById('icalFile').value = '';
+    document.getElementById('icalUrl').value = '';
+    document.getElementById('importStartDate').value = '';
+    document.getElementById('importEndDate').value = '';
+    
+    // Clear error
+    document.getElementById('importError').classList.add('d-none');
+}
+
+// Reset modal when it's closed
+document.addEventListener('DOMContentLoaded', function() {
+    const modalEl = document.getElementById('importIcalModal');
+    if (modalEl) {
+        modalEl.addEventListener('hidden.bs.modal', resetImportModal);
+    }
+});
 
 function prepareImportFormData() {
     const fileInput = document.getElementById('icalFile');
@@ -184,36 +371,6 @@ function buildImportUrl() {
     const pathParts = globalThis.location.pathname.split('/');
     const clubInitials = pathParts[1];
     return '/' + clubInitials + '/Series/ImportIcal';
-}
-
-function performImport(url, formData) {
-    fetch(url, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.text().then(text => { throw new Error(text) });
-        }
-        return response.json();
-    })
-    .then(data => handleImportSuccess(data))
-    .catch(error => handleImportError(error));
-}
-
-function handleImportSuccess(data) {
-    if (data.warning) {
-        alert(data.warning);
-    }
-
-    addImportedSeriesToRows(data.series);
-
-    const modalEl = document.getElementById('importIcalModal');
-    let modal = bootstrap.Modal.getInstance(modalEl);
-    if (!modal) {
-        modal = new bootstrap.Modal(modalEl);
-    }
-    modal.hide();
 }
 
 function handleImportError(error) {
