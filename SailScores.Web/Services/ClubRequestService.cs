@@ -112,6 +112,10 @@ public class ClubRequestService : IClubRequestService
             "HELP",
             "DOCS",
             "ADMIN",
+            "COMPETITOR",
+            "WHATIF",
+            "DOC",
+            "DOCUMENT",
 
             "CSS",
             "VENDOR",
@@ -136,6 +140,26 @@ public class ClubRequestService : IClubRequestService
             "REGATTA",
             "SERIES",
             "RACE",
+
+            "BOAT",
+            "BOATS",
+            "FLEET",
+            "FLEETS",
+            "SEASON",
+            "SEASONS",
+            "REPORT",
+            "REPORTS",
+            "DOWNLOAD",
+            "EXPORT",
+            "SETTINGS",
+            "DASHBOARD",
+            "PING",
+            "HEALTH",
+            "STATUS",
+            "METRICS",
+            "ROBOTS",
+            "SWAGGER",
+
             // Should obscenities be added here?
         };
 
