@@ -339,5 +339,42 @@ namespace SailScores.Core.Services
                 .FirstOrDefaultAsync().ConfigureAwait(false))
                 .DefaultScoringSystemId;
         }
+
+        public async Task<IList<ScoringSystem>> CreateDefaultScoringSystemsAsync(Guid clubId, string clubInitials)
+        {
+            var createdSystems = new List<ScoringSystem>();
+
+            var baseScoringSystem = await GetSiteDefaultSystemAsync().ConfigureAwait(false);
+            if (baseScoringSystem != null)
+            {
+                var newScoringSystem = new ScoringSystem
+                {
+                    Id = Guid.NewGuid(),
+                    ClubId = clubId,
+                    ParentSystemId = baseScoringSystem.Id,
+                    Name = $"{clubInitials} scoring based on App. A Rule 5.3",
+                    DiscardPattern = "0"
+                };
+                await SaveScoringSystemAsync(newScoringSystem).ConfigureAwait(false);
+                createdSystems.Add(newScoringSystem);
+            }
+
+            var regattaScoringSystem = await GetBaseRegattaSystemAsync().ConfigureAwait(false);
+            if (regattaScoringSystem != null)
+            {
+                var newRegattaScoringSystem = new ScoringSystem
+                {
+                    Id = Guid.NewGuid(),
+                    ClubId = clubId,
+                    ParentSystemId = regattaScoringSystem.Id,
+                    Name = $"{clubInitials} scoring based on App. A",
+                    DiscardPattern = "0,1"
+                };
+                await SaveScoringSystemAsync(newRegattaScoringSystem).ConfigureAwait(false);
+                createdSystems.Add(newRegattaScoringSystem);
+            }
+
+            return createdSystems;
+        }
     }
 }
