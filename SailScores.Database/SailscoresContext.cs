@@ -56,7 +56,6 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<FleetBoatClass> FleetBoatClasses { get; set; }
     public DbSet<RegattaSeries> RegattaSeries { get; set; }
     public DbSet<RegattaFleet> RegattaFleets { get; set; }
-    public DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
 
     // these sets below are not tables in the database 
     private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }

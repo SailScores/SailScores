@@ -799,8 +799,10 @@ namespace SailScores.Core.Services
 
             // Clear announcements (both by ClubId and those referencing the regattas being deleted)
             // Must be done before deleting regattas due to foreign key constraint
+            // Use IgnoreQueryFilters to include soft-deleted announcements
             var announcements = await _dbContext.Announcements
-                .Where(a => a.ClubId == clubId || regattaIds.Contains(a.RegattaId.Value))
+                .IgnoreQueryFilters()
+                .Where(a => a.ClubId == clubId || (a.RegattaId.HasValue && regattaIds.Contains(a.RegattaId.Value)))
                 .ToListAsync()
                 .ConfigureAwait(false);
             _dbContext.Announcements.RemoveRange(announcements);
@@ -812,6 +814,7 @@ namespace SailScores.Core.Services
                 .ToListAsync()
                 .ConfigureAwait(false);
             _dbContext.RegattaForwarders.RemoveRange(regattaForwarders);
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
             // Clear regattas with their series and fleet relationships
             var regattas = await _dbContext.Regattas
@@ -829,6 +832,7 @@ namespace SailScores.Core.Services
             }
 
             _dbContext.Regattas.RemoveRange(regattas);
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
             // Level 2 and 3: Clear competitors
             if (resetLevel >= Model.ResetLevel.RacesSeriesAndCompetitors)
