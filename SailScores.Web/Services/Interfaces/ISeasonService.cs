@@ -1,4 +1,5 @@
 using SailScores.Core.Model;
+using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Services.Interfaces;
 
@@ -11,5 +12,6 @@ public interface ISeasonService
         
     Task<IList<String>> GetSavingSeasonErrors(Season model);
 
-    Task<Season> GetSeasonSuggestion(Guid clubId);
+    Task<SeasonWithOptionsViewModel> GetSeasonSuggestion(Guid clubId);
+    Task<SeasonWithOptionsViewModel> GetSeasonForEdit(Guid clubId, Guid seasonId);
 }

@@ -102,7 +102,7 @@ public class SeriesService : ISeriesService
         scoringSystemOptions.Add(new ScoringSystem
         {
             Id = Guid.Empty,
-            Name = "<Use Club Default>"
+            Name = "<Use Default>"
         });
         vm.ScoringSystemOptions = scoringSystemOptions.OrderBy(s => s.Name).ToList();
 

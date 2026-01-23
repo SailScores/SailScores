@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
@@ -31,7 +31,7 @@ public class WhatIfService : IWhatIfService
         scoringSystemOptions.Add(new Core.Model.ScoringSystem
         {
             Id = Guid.Empty,
-            Name = "<Use Club Default>"
+            Name = "<Use Default>"
         });
         return scoringSystemOptions.OrderBy(s => s.Name).ToList();
     }

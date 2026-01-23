@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -27,6 +27,9 @@ namespace SailScores.Core.Model
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:Y}")]
         public DateTime End { get; set; }
+
+        public Guid? DefaultScoringSystemId { get; set; }
+        public ScoringSystem DefaultScoringSystem { get; set; }
 
         public IEnumerable<Series> Series { get; set; }
     }

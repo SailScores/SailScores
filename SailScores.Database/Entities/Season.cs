@@ -1,4 +1,4 @@
-﻿namespace SailScores.Database.Entities;
+namespace SailScores.Database.Entities;
 
 public class Season
 {
@@ -12,6 +12,9 @@ public class Season
     public String UrlName { get; set; }
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
+
+    public Guid? DefaultScoringSystemId { get; set; }
+    public ScoringSystem DefaultScoringSystem { get; set; }
 
     public IEnumerable<Series> Series { get; set; }
 }
