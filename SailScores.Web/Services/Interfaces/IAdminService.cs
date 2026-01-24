@@ -12,4 +12,5 @@ public interface IAdminService
     Task ProcessLogoFile(AdminEditViewModel model);
     Task<FileStreamResult> GetLogoAsync(Guid id);
     Task ResetClubAsync(Guid clubId, ResetLevel resetLevel);
+    Task<int> GetRaceCountAsync(Guid clubId);
 }

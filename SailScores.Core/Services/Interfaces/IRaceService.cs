@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Api.Dtos;
@@ -24,6 +24,7 @@ namespace SailScores.Core.Services
             Guid fleetId);
         Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId);
         Task<bool> HasRacesAsync(Guid clubId);
+        Task<int> GetRaceCountAsync(Guid clubId);
         Task<IList<Guid>> GetStatsExcludedRaces(Guid clubId, Guid seasonId);
         Task<int> GetNewRaceNumberAsync(Guid clubId, Guid fleetId, DateTime? date, Guid? regattaId);
     }

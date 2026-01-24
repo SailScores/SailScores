@@ -54,6 +54,7 @@ public class AdminController : Controller
         }
         var vm = await _adminService.GetClubForEdit(clubInitials);
         var editVm = _mapper.Map<AdminEditViewModel>(vm);
+        editVm.RaceCount = await _adminService.GetRaceCountAsync(vm.Id);
         return View(editVm);
     }
 
@@ -148,11 +149,13 @@ public class AdminController : Controller
             return Unauthorized();
         }
         var club = await _adminService.GetClub(clubInitials);
+        var raceCount = await _adminService.GetRaceCountAsync(club.Id);
         var vm = new ResetClubViewModel
         {
             ClubId = club.Id,
             ClubName = club.Name,
-            ClubInitials = club.Initials
+            ClubInitials = club.Initials,
+            RaceCount = raceCount
         };
         return View(vm);
     }
@@ -169,6 +172,18 @@ public class AdminController : Controller
         {
             return Unauthorized();
         }
+        
+        // Re-fetch race count to prevent manipulation
+        var raceCount = await _adminService.GetRaceCountAsync(model.ClubId);
+        model.RaceCount = raceCount;
+        
+        if (!model.CanSelfReset)
+        {
+            ModelState.AddModelError(string.Empty, 
+                $"This club has {raceCount} races which exceeds the self-service limit of {ResetClubViewModel.MaxSelfServiceRaceCount}. Please contact info@sailscores.com to request a reset.");
+            return View(model);
+        }
+        
         if (!ModelState.IsValid || !model.ResetLevel.HasValue)
         {
             return View(model);

@@ -5,11 +5,17 @@ namespace SailScores.Web.Models.SailScores;
 
 public class ResetClubViewModel
 {
+    public const int MaxSelfServiceRaceCount = 50;
+    
     public Guid ClubId { get; set; }
     
     public string ClubName { get; set; }
     
     public string ClubInitials { get; set; }
+    
+    public int RaceCount { get; set; }
+    
+    public bool CanSelfReset => RaceCount <= MaxSelfServiceRaceCount;
     
     [Required(ErrorMessage = "Please select a reset level")]
     [Display(Name = "Reset Level")]

@@ -228,6 +228,11 @@ public class AdminService : IAdminService
         }
     }
 
+    public async Task<int> GetRaceCountAsync(Guid clubId)
+    {
+        return await _coreRaceService.GetRaceCountAsync(clubId);
+    }
+
     private string DetermineContentType(byte[] fileContents)
     {
         if (fileContents == null || fileContents.Length < 4)

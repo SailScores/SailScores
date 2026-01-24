@@ -56,5 +56,9 @@ public class AdminEditViewModel
     public string Locale { get; set; }
     public IList<string> LocaleOptions { get; set; }
 
+    public int RaceCount { get; set; }
+    
+    public bool CanSelfReset => RaceCount <= ResetClubViewModel.MaxSelfServiceRaceCount;
+
 #pragma warning restore CA2227 // Collection properties should be read only
 }
