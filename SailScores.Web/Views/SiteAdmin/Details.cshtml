@@ -1,0 +1,174 @@
+@model SailScores.Web.Models.SailScores.SiteAdminClubDetailsViewModel
+
+@{
+    ViewData["Title"] = "Site Admin - " + Model.Name;
+    Layout = "_Layout";
+}
+
+<h1>Site Administration - @Model.Name</h1>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Site Admin</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name (@Model.Initials)</li>
+    </ol>
+</nav>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Club Information</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Club Name:</dt>
+                    <dd class="col-sm-9">@Model.Name</dd>
+
+                    <dt class="col-sm-3">Initials:</dt>
+                    <dd class="col-sm-9">@Model.Initials</dd>
+
+                    <dt class="col-sm-3">Visibility:</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.IsHidden)
+                        {
+                            <span class="badge bg-secondary">Hidden</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Visible</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">Latest Series Update:</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.LatestSeriesUpdate.HasValue)
+                        {
+                            @Model.LatestSeriesUpdate.Value.ToString("yyyy-MM-dd HH:mm:ss")
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">Latest Race Date:</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.LatestRaceDate.HasValue)
+                        {
+                            @Model.LatestRaceDate.Value.ToString("yyyy-MM-dd HH:mm:ss")
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">Total Races:</dt>
+                    <dd class="col-sm-9">@Model.RaceCount</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Club Management Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex">
+                    <form asp-action="Backup" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="clubId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-download"></i> Download Club Backup
+                        </button>
+                    </form>
+
+                    <form asp-action="Reset" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="clubId" value="@Model.Id" />
+                        <input type="hidden" name="clubInitials" value="@Model.Initials" />
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('WARNING: This will delete all races, scores, and competitors for this club. This action cannot be undone. Are you sure?');">
+                            <i class="fas fa-trash"></i> Reset Club (Delete All Data)
+                        </button>
+                    </form>
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <strong>Note:</strong> Reset club will remove all races, scores, and competitors but keep the club structure (fleets, boat classes, seasons).
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Series Management</h3>
+            </div>
+            <div class="card-body">
+                @if (Model.Series != null && Model.Series.Any())
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Series Name</th>
+                                <th>Season</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var series in Model.Series)
+                            {
+                                <tr>
+                                    <td>@series.Name</td>
+                                    <td>@series.Season?.Name</td>
+                                    <td>
+                                        <form asp-action="RecalculateSeries" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="seriesId" value="@series.Id" />
+                                            <input type="hidden" name="clubInitials" value="@Model.Initials" />
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-calculator"></i> Recalculate
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted">No series found for this club.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Site Admin
+        </a>
+        <a asp-controller="Admin" asp-action="Index" asp-route-clubInitials="@Model.Initials" class="btn btn-primary">
+            <i class="fas fa-cog"></i> Go to Club Admin
+        </a>
+    </div>
+</div>
