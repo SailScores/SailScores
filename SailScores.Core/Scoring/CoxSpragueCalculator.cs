@@ -229,7 +229,7 @@ public class CoxSpragueCalculator : BaseScoringCalculator
         foreach (var race in resultsWorkInProgress.Races)
         {
             var score = compResults.CalculatedScores[race];
-            if (score != null && IsAverage(score?.RawScore?.Code))
+            if (score != null && IsAverage(score.RawScore?.Code))
             {
                 score.ScoreValue = null;
                 // don't set as a discard: leave code not muted, since it

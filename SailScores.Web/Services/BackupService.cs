@@ -81,10 +81,10 @@ public class BackupService : Interfaces.IBackupService
 
             // Check if it's GZip compressed (magic bytes: 1f 8b)
             var header = new byte[2];
-            memoryStream.Read(header, 0, 2);
+            int bytesRead = await memoryStream.ReadAsync(header, 0, 2).ConfigureAwait(false);
             memoryStream.Position = 0;
 
-            if (header[0] == 0x1f && header[1] == 0x8b)
+            if (bytesRead == 2 && header[0] == 0x1f && header[1] == 0x8b)
             {
                 // GZip compressed
                 using var decompressedStream = new MemoryStream();

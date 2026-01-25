@@ -18,14 +18,15 @@ namespace SailScores.Core.Services
         Task<Race> GetRaceAsync(Guid raceId);
         Task<Guid> SaveAsync(RaceDto race);
         Task Delete(Guid raceId, string deletedBy);
+
+        Task<int> GetRaceCountAsync(Guid clubId);
         Task<int> GetRaceCountAsync(
             Guid clubId,
             DateTime? raceDate,
             Guid fleetId);
+        Task<int> GetNewRaceNumberAsync(Guid clubId, Guid fleetId, DateTime? date, Guid? regattaId);
         Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId);
         Task<bool> HasRacesAsync(Guid clubId);
-        Task<int> GetRaceCountAsync(Guid clubId);
         Task<IList<Guid>> GetStatsExcludedRaces(Guid clubId, Guid seasonId);
-        Task<int> GetNewRaceNumberAsync(Guid clubId, Guid fleetId, DateTime? date, Guid? regattaId);
     }
 }

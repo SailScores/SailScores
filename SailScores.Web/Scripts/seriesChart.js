@@ -2,32 +2,32 @@ import { getY, getDate } from './seriesChartUtils.js';
 
 (function () {
 
-    var chartOverallWidth = 960;
-    var chartOverallHeight = 600;
-    var margin = 30;
-    var legendWidth = 150;
-    var legendLineHeight = 16;
-    var legendMargin = 2;
+    const chartOverallWidth = 960;
+    let chartOverallHeight = 600;
+    const margin = 30;
+    const legendWidth = 150;
+    const legendLineHeight = 16;
+    const legendMargin = 2;
 
 
-    var charts = document.getElementsByClassName("results-chart");
-    for (var i = 0; i < charts.length; i++) {
-        var el = charts[i];
-        drawChart((el.dataset && el.dataset.seriesId) || el.getAttribute('data-series-id') || '', "#" + el.id);
+    const charts = document.getElementsByClassName("results-chart");
+    for (let i = 0; i < charts.length; i++) {
+        let el = charts[i];
+        drawChart(el.dataset.seriesId || '', "#" + el.id);
     }
 
 
     function drawChart(seriesId, elementId) {
-        var minDate;
-        var maxDate;
+        let minDate;
+        let maxDate;
 
-        var dataPath = "/series/chart?seriesId=" + seriesId;
+        const dataPath = "/series/chart?seriesId=" + seriesId;
         if (typeof (d3) != "undefined" && d3 != null) {
             d3.json(dataPath).then(processChartData);
         }
 
         function responsivefy(svg) {
-            var container = d3.select(svg.node().parentNode),
+            const container = d3.select(svg.node().parentNode),
                 width = parseInt(svg.style("width")),
                 height = parseInt(svg.style("height")),
                 aspect = width / height;
@@ -39,7 +39,7 @@ import { getY, getDate } from './seriesChartUtils.js';
             d3.select(window).on("resize." + container.attr("id"), resize);
 
             function resize() {
-                var targetWidth = parseInt(container.style("width"));
+                let targetWidth = parseInt(container.style("width"));
                 if (targetWidth <= 100) {
                     targetWidth = width;
                 }
@@ -56,19 +56,19 @@ import { getY, getDate } from './seriesChartUtils.js';
             if (data === null) {
                 return;
             }
-            var dates = data.races.map(r => new Date(r.date));
+            const dates = data.races.map(r => new Date(r.date));
             minDate = new Date(Math.min.apply(null, dates.map(function (d) { return d.getTime(); })));
             maxDate = new Date(Math.max.apply(null, dates.map(function (d) { return d.getTime(); })));
             maxDate.setDate(maxDate.getDate() + 1);
 
-            var xScale = d3.scaleTime()
+            const xScale = d3.scaleTime()
                 .domain([minDate, maxDate])
                 .range([margin, chartOverallWidth - margin - legendWidth]);
-            var color = d3.scaleOrdinal(d3.schemeDark2);
+            const color = d3.scaleOrdinal(d3.schemeDark2);
 
             chartOverallHeight = data.competitors.length * legendLineHeight + (2 * margin);
 
-            var svgElement = d3.select(elementId)
+            const svgElement = d3.select(elementId)
                 .attr("width", chartOverallWidth)
                 .attr("height", chartOverallHeight)
                 .call(responsivefy);
@@ -79,7 +79,7 @@ import { getY, getDate } from './seriesChartUtils.js';
             }
 
             function onMouseOver(d) {
-                var compId = d.competitorId || d.id;
+                const compId = d.competitorId || d.id;
                 svgElement
                     .selectAll("path.compLine")
                     .attr("opacity", .4);
@@ -156,7 +156,7 @@ import { getY, getDate } from './seriesChartUtils.js';
             }
 
 
-            var legend = d3.select(elementId)
+            const legend = d3.select(elementId)
                 .selectAll("g.legendEntry")
                 .attr("transform", "translate(" + (chartOverallWidth - legendWidth) + "," + (margin + legendMargin) + ")")
                 .data(data.competitors)
@@ -165,8 +165,8 @@ import { getY, getDate } from './seriesChartUtils.js';
                 .attr("class", "legendEntry")
                 .attr("data-compId", function (d) { return d.id; })
                 .attr("transform", function (d, i) {
-                    var x = chartOverallWidth - legendWidth;
-                    var y = (i * legendLineHeight) + legendMargin + 20;
+                    const x = chartOverallWidth - legendWidth;
+                    const y = (i * legendLineHeight) + legendMargin + 20;
                     return 'translate(' + x + ',' + y + ')';
                 })
                 .attr("opacity", 1)
@@ -190,15 +190,15 @@ import { getY, getDate } from './seriesChartUtils.js';
                 .style("font-size", "11px")
                 .text(function (d) { return d.name; });
 
-            var xAxis = d3.axisTop().scale(xScale);
-            var language = d3.select("html").attr("lang").substring(0, 2);
+            let xAxis = d3.axisTop().scale(xScale);
+            const language = d3.select("html").attr("lang").substring(0, 2);
             if (((minDate.getTime() - maxDate.getTime()) < (10 * 24 * 60 * 60 * 1000)) || language !== "en") {
                 xAxis = xAxis.tickFormat("");
             }
             svgElement.append("g").attr("id", "xAxisG")
                 .attr("transform", "translate(0,20)").call(xAxis);
 
-            var lineData = d3.line()
+            const lineData = d3.line()
                 .defined(function (d) { return getY(d, data, margin, chartOverallHeight) !== null; })
                 .x(function (d) { return xScale(getDate(d, data)); })
                 .y(function (d) { return getY(d, data, margin, chartOverallHeight); });
@@ -232,7 +232,7 @@ import { getY, getDate } from './seriesChartUtils.js';
                 .on("mouseover", onMouseOverRace)
                 .on("mouseout", onMouseOut);
 
-            var tooltipGroup = svgElement
+            const tooltipGroup = svgElement
                 .append("g")
                 .attr("opacity", 0);
             tooltipGroup.append("rect")

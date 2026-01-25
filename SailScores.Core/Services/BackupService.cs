@@ -521,21 +521,52 @@ public class BackupService : IBackupService
 
         _guidMap = new Dictionary<Guid, Guid>();
 
-        // Get target club
         var club = await _dbContext.Clubs
             .Include(c => c.WeatherSettings)
             .FirstOrDefaultAsync(c => c.Id == targetClubId)
-            .ConfigureAwait(false);
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Target club {targetClubId} not found.");
 
-        if (club == null)
-        {
-            throw new InvalidOperationException($"Target club {targetClubId} not found.");
-        }
-
-        // Delete existing data in reverse dependency order
         await DeleteExistingClubDataAsync(targetClubId).ConfigureAwait(false);
 
-        // Update club settings if not preserving
+        UpdateClubSettings(club, backup, preserveClubSettings);
+
+        RestoreBoatClasses(backup, targetClubId);
+        RestoreSeasons(backup, targetClubId);
+        var defaultScoringSystemId = RestoreScoringSystems(backup, targetClubId);
+        RestoreFleets(backup, targetClubId);
+        RestoreCompetitors(backup, targetClubId);
+
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        await UpdateScoringSystemParentReferencesAsync(backup).ConfigureAwait(false);
+
+        if (defaultScoringSystemId.HasValue)
+        {
+            club.DefaultScoringSystemId = defaultScoringSystemId;
+        }
+
+        await RestoreSeriesAsync(backup, targetClubId).ConfigureAwait(false);
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        RestoreSeriesLinks(backup);
+        await RestoreRacesAsync(backup, targetClubId).ConfigureAwait(false);
+        await RestoreRegattasAsync(backup, targetClubId).ConfigureAwait(false);
+
+        RestoreAnnouncements(backup, targetClubId);
+        RestoreDocuments(backup, targetClubId);
+        RestoreFiles(backup, club);
+        RestoreClubSequences(backup, targetClubId);
+        RestoreForwarders(backup);
+        RestoreSeriesResults(backup);
+
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        return true;
+    }
+
+    private void UpdateClubSettings(Db.Club club, ClubBackupData backup, bool preserveClubSettings)
+    {
         if (!preserveClubSettings)
         {
             club.Name = backup.Name;
@@ -544,7 +575,6 @@ public class BackupService : IBackupService
             club.Url = backup.Url;
         }
 
-        // Always restore these settings
         club.ShowClubInResults = backup.ShowClubInResults;
         club.ShowCalendarInNav = backup.ShowCalendarInNav;
         club.Locale = backup.Locale;
@@ -559,10 +589,10 @@ public class BackupService : IBackupService
             club.WeatherSettings.TemperatureUnits = backup.WeatherSettings.TemperatureUnits;
             club.WeatherSettings.WindSpeedUnits = backup.WeatherSettings.WindSpeedUnits;
         }
+    }
 
-        // Restore data in dependency order
-
-        // 1. Boat Classes
+    private void RestoreBoatClasses(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var bc in backup.BoatClasses ?? Enumerable.Empty<BoatClassBackup>())
         {
             var dbBc = new Db.BoatClass
@@ -574,8 +604,10 @@ public class BackupService : IBackupService
             };
             _dbContext.BoatClasses.Add(dbBc);
         }
+    }
 
-        // 2. Seasons
+    private void RestoreSeasons(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var season in backup.Seasons ?? Enumerable.Empty<SeasonBackup>())
         {
             var dbSeason = new Db.Season
@@ -589,9 +621,12 @@ public class BackupService : IBackupService
             };
             _dbContext.Seasons.Add(dbSeason);
         }
+    }
 
-        // 3. Scoring Systems
+    private Guid? RestoreScoringSystems(ClubBackupData backup, Guid targetClubId)
+    {
         Guid? defaultScoringSystemId = null;
+
         foreach (var ss in backup.ScoringSystems ?? Enumerable.Empty<ScoringSystemBackup>())
         {
             var dbSs = new Db.ScoringSystem
@@ -604,65 +639,65 @@ public class BackupService : IBackupService
                 IsSiteDefault = ss.IsSiteDefault
             };
 
-            // Track default scoring system
             if (ss.Name == backup.DefaultScoringSystemName)
             {
                 defaultScoringSystemId = dbSs.Id;
             }
 
             _dbContext.ScoringSystems.Add(dbSs);
-
-            // Add score codes
-            foreach (var sc in ss.ScoreCodes ?? Enumerable.Empty<ScoreCodeBackup>())
-            {
-                var dbSc = new Db.ScoreCode
-                {
-                    Id = GetNewGuid(sc.Id),
-                    ScoringSystemId = dbSs.Id,
-                    Name = sc.Name,
-                    Description = sc.Description,
-                    Formula = sc.Formula,
-                    FormulaValue = sc.FormulaValue,
-                    ScoreLike = sc.ScoreLike,
-                    Discardable = sc.Discardable,
-                    CameToStart = sc.CameToStart,
-                    Started = sc.Started,
-                    Finished = sc.Finished,
-                    PreserveResult = sc.PreserveResult,
-                    AdjustOtherScores = sc.AdjustOtherScores,
-                    CountAsParticipation = sc.CountAsParticipation
-                };
-                _dbContext.ScoreCodes.Add(dbSc);
-            }
+            RestoreScoreCodes(ss, dbSs.Id);
         }
 
+        return defaultScoringSystemId;
+    }
 
-        // Update parent system references (second pass)
-        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    private void RestoreScoreCodes(ScoringSystemBackup ss, Guid scoringSystemId)
+    {
+        foreach (var sc in ss.ScoreCodes ?? Enumerable.Empty<ScoreCodeBackup>())
+        {
+            var dbSc = new Db.ScoreCode
+            {
+                Id = GetNewGuid(sc.Id),
+                ScoringSystemId = scoringSystemId,
+                Name = sc.Name,
+                Description = sc.Description,
+                Formula = sc.Formula,
+                FormulaValue = sc.FormulaValue,
+                ScoreLike = sc.ScoreLike,
+                Discardable = sc.Discardable,
+                CameToStart = sc.CameToStart,
+                Started = sc.Started,
+                Finished = sc.Finished,
+                PreserveResult = sc.PreserveResult,
+                AdjustOtherScores = sc.AdjustOtherScores,
+                CountAsParticipation = sc.CountAsParticipation
+            };
+            _dbContext.ScoreCodes.Add(dbSc);
+        }
+    }
+
+    private async Task UpdateScoringSystemParentReferencesAsync(ClubBackupData backup)
+    {
         foreach (var ss in backup.ScoringSystems ?? Enumerable.Empty<ScoringSystemBackup>())
         {
-            if (ss.ParentSystemId.HasValue)
+            if (!ss.ParentSystemId.HasValue) continue;
+
+            var newId = GetNewGuidIfExists(ss.Id);
+            var newParentId = GetNewOrOldGuid(ss.ParentSystemId.Value);
+
+            if (newId.HasValue && newParentId.HasValue)
             {
-                var newId = GetNewGuidIfExists(ss.Id);
-                var newParentId = GetNewOrOldGuid(ss.ParentSystemId.Value);
-                if (newId.HasValue && newParentId.HasValue)
+                var dbSs = await _dbContext.ScoringSystems.FindAsync(newId.Value).ConfigureAwait(false);
+                if (dbSs != null)
                 {
-                    var dbSs = await _dbContext.ScoringSystems.FindAsync(newId.Value).ConfigureAwait(false);
-                    if (dbSs != null)
-                    {
-                        dbSs.ParentSystemId = newParentId.Value;
-                    }
+                    dbSs.ParentSystemId = newParentId.Value;
                 }
             }
         }
+    }
 
-        // Set default scoring system
-        if (defaultScoringSystemId.HasValue)
-        {
-            club.DefaultScoringSystemId = defaultScoringSystemId;
-        }
-
-        // 4. Fleets
+    private void RestoreFleets(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var fleet in backup.Fleets ?? Enumerable.Empty<FleetBackup>())
         {
             var dbFleet = new Db.Fleet
@@ -678,24 +713,29 @@ public class BackupService : IBackupService
                 FleetType = fleet.FleetType
             };
             _dbContext.Fleets.Add(dbFleet);
+            RestoreFleetBoatClasses(fleet, dbFleet.Id);
+        }
+    }
 
-            // Fleet boat class associations
-            foreach (var bcId in fleet.BoatClassIds ?? Enumerable.Empty<Guid>())
+    private void RestoreFleetBoatClasses(FleetBackup fleet, Guid fleetId)
+    {
+        foreach (var bcId in fleet.BoatClassIds ?? Enumerable.Empty<Guid>())
+        {
+            var newBcId = GetNewGuidIfExists(bcId);
+            if (newBcId.HasValue)
             {
-                var newBcId = GetNewGuidIfExists(bcId);
-                if (newBcId.HasValue)
+                var fbc = new Db.FleetBoatClass
                 {
-                    var fbc = new Db.FleetBoatClass
-                    {
-                        FleetId = dbFleet.Id,
-                        BoatClassId = newBcId.Value
-                    };
-                    _dbContext.FleetBoatClasses.Add(fbc);
-                }
+                    FleetId = fleetId,
+                    BoatClassId = newBcId.Value
+                };
+                _dbContext.FleetBoatClasses.Add(fbc);
             }
         }
+    }
 
-        // 5. Competitors
+    private void RestoreCompetitors(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var comp in backup.Competitors ?? Enumerable.Empty<CompetitorBackup>())
         {
             var newBoatClassId = GetNewGuidIfExists(comp.BoatClassId);
@@ -716,24 +756,29 @@ public class BackupService : IBackupService
                 Created = comp.Created
             };
             _dbContext.Competitors.Add(dbComp);
+            RestoreCompetitorFleets(comp, dbComp.Id);
+        }
+    }
 
-            // Competitor fleet associations
-            foreach (var fleetId in comp.FleetIds ?? Enumerable.Empty<Guid>())
+    private void RestoreCompetitorFleets(CompetitorBackup comp, Guid competitorId)
+    {
+        foreach (var fleetId in comp.FleetIds ?? Enumerable.Empty<Guid>())
+        {
+            var newFleetId = GetNewGuidIfExists(fleetId);
+            if (newFleetId.HasValue)
             {
-                var newFleetId = GetNewGuidIfExists(fleetId);
-                if (newFleetId.HasValue)
+                var cf = new Db.CompetitorFleet
                 {
-                    var cf = new Db.CompetitorFleet
-                    {
-                        CompetitorId = dbComp.Id,
-                        FleetId = newFleetId.Value
-                    };
-                    _dbContext.CompetitorFleets.Add(cf);
-                }
+                    CompetitorId = competitorId,
+                    FleetId = newFleetId.Value
+                };
+                _dbContext.CompetitorFleets.Add(cf);
             }
         }
+    }
 
-        // 6. Series
+    private async Task RestoreSeriesAsync(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var series in backup.Series ?? Enumerable.Empty<SeriesBackup>())
         {
             var newSeasonId = series.SeasonId.HasValue ? GetNewGuidIfExists(series.SeasonId.Value) : null;
@@ -766,7 +811,6 @@ public class BackupService : IBackupService
                 EndDate = series.EndDate
             };
 
-            // Set season - required field
             if (newSeasonId.HasValue)
             {
                 var season = await _dbContext.Seasons.FindAsync(newSeasonId.Value).ConfigureAwait(false);
@@ -775,10 +819,10 @@ public class BackupService : IBackupService
 
             _dbContext.Series.Add(dbSeries);
         }
+    }
 
-        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-
-        // Add series-to-series links (second pass after all series exist)
+    private void RestoreSeriesLinks(ClubBackupData backup)
+    {
         foreach (var series in backup.Series ?? Enumerable.Empty<SeriesBackup>())
         {
             var newSeriesId = GetNewGuidIfExists(series.Id);
@@ -798,158 +842,190 @@ public class BackupService : IBackupService
                 }
             }
         }
+    }
 
-        // 7. Races with Scores
+    private async Task RestoreRacesAsync(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var race in backup.Races ?? Enumerable.Empty<RaceBackup>())
         {
-            var newFleetId = race.FleetId.HasValue ? GetNewGuidIfExists(race.FleetId.Value) : null;
-
-            var dbRace = new Db.Race
-            {
-                Id = GetNewGuid(race.Id),
-                ClubId = targetClubId,
-                Name = race.Name,
-                Date = race.Date,
-                State = race.State,
-                Order = race.Order,
-                Description = race.Description,
-                TrackingUrl = race.TrackingUrl,
-                UpdatedDate = race.UpdatedDate,
-                UpdatedBy = race.UpdatedBy,
-                StartTime = race.StartTime,
-                TrackTimes = race.TrackTimes
-            };
-
-            // Set fleet
-            if (newFleetId.HasValue)
-            {
-                var fleet = await _dbContext.Fleets.FindAsync(newFleetId.Value).ConfigureAwait(false);
-                dbRace.Fleet = fleet;
-            }
-
-            // Weather
-            if (race.Weather != null)
-            {
-                dbRace.Weather = new Db.Weather
-                {
-                    Id = Guid.NewGuid(),
-                    Description = race.Weather.Description,
-                    Icon = race.Weather.Icon,
-                    TemperatureString = race.Weather.TemperatureString,
-                    TemperatureDegreesKelvin = race.Weather.TemperatureDegreesKelvin,
-                    WindSpeedString = race.Weather.WindSpeedString,
-                    WindSpeedMeterPerSecond = race.Weather.WindSpeedMeterPerSecond,
-                    WindDirectionString = race.Weather.WindDirectionString,
-                    WindDirectionDegrees = race.Weather.WindDirectionDegrees,
-                    WindGustString = race.Weather.WindGustString,
-                    WindGustMeterPerSecond = race.Weather.WindGustMeterPerSecond,
-                    Humidity = race.Weather.Humidity,
-                    CloudCoverPercent = race.Weather.CloudCoverPercent,
-                    CreatedDate = race.Weather.CreatedDate
-                };
-            }
-
+            var dbRace = await CreateRaceEntityAsync(race, targetClubId).ConfigureAwait(false);
             _dbContext.Races.Add(dbRace);
+            RestoreScores(race, dbRace.Id);
+            RestoreSeriesRaceLinks(race, dbRace.Id);
+        }
+    }
 
-            // Scores
-            foreach (var score in race.Scores ?? Enumerable.Empty<ScoreBackup>())
-            {
-                var newCompId = GetNewGuidIfExists(score.CompetitorId);
-                if (!newCompId.HasValue) continue;
+    private async Task<Db.Race> CreateRaceEntityAsync(RaceBackup race, Guid targetClubId)
+    {
+        var newFleetId = race.FleetId.HasValue ? GetNewGuidIfExists(race.FleetId.Value) : null;
 
-                var dbScore = new Db.Score
-                {
-                    Id = GetNewGuid(score.Id),
-                    CompetitorId = newCompId.Value,
-                    RaceId = dbRace.Id,
-                    Place = score.Place,
-                    Code = score.Code,
-                    CodePoints = score.CodePoints,
-                    FinishTime = score.FinishTime,
-                    ElapsedTime = score.ElapsedTime
-                };
-                _dbContext.Scores.Add(dbScore);
-            }
+        var dbRace = new Db.Race
+        {
+            Id = GetNewGuid(race.Id),
+            ClubId = targetClubId,
+            Name = race.Name,
+            Date = race.Date,
+            State = race.State,
+            Order = race.Order,
+            Description = race.Description,
+            TrackingUrl = race.TrackingUrl,
+            UpdatedDate = race.UpdatedDate,
+            UpdatedBy = race.UpdatedBy,
+            StartTime = race.StartTime,
+            TrackTimes = race.TrackTimes
+        };
 
-            // Series-Race associations
-            foreach (var seriesId in race.SeriesIds ?? Enumerable.Empty<Guid>())
-            {
-                var newSeriesId = GetNewGuidIfExists(seriesId);
-                if (newSeriesId.HasValue)
-                {
-                    var sr = new Db.SeriesRace
-                    {
-                        RaceId = dbRace.Id,
-                        SeriesId = newSeriesId.Value
-                    };
-                    _dbContext.SeriesRaces.Add(sr);
-                }
-            }
+        if (newFleetId.HasValue)
+        {
+            var fleet = await _dbContext.Fleets.FindAsync(newFleetId.Value).ConfigureAwait(false);
+            dbRace.Fleet = fleet;
         }
 
-        // 8. Regattas
+        if (race.Weather != null)
+        {
+            dbRace.Weather = CreateWeatherEntity(race.Weather);
+        }
+
+        return dbRace;
+    }
+
+    private static Db.Weather CreateWeatherEntity(WeatherBackup weather)
+    {
+        return new Db.Weather
+        {
+            Id = Guid.NewGuid(),
+            Description = weather.Description,
+            Icon = weather.Icon,
+            TemperatureString = weather.TemperatureString,
+            TemperatureDegreesKelvin = weather.TemperatureDegreesKelvin,
+            WindSpeedString = weather.WindSpeedString,
+            WindSpeedMeterPerSecond = weather.WindSpeedMeterPerSecond,
+            WindDirectionString = weather.WindDirectionString,
+            WindDirectionDegrees = weather.WindDirectionDegrees,
+            WindGustString = weather.WindGustString,
+            WindGustMeterPerSecond = weather.WindGustMeterPerSecond,
+            Humidity = weather.Humidity,
+            CloudCoverPercent = weather.CloudCoverPercent,
+            CreatedDate = weather.CreatedDate
+        };
+    }
+
+    private void RestoreScores(RaceBackup race, Guid raceId)
+    {
+        foreach (var score in race.Scores ?? Enumerable.Empty<ScoreBackup>())
+        {
+            var newCompId = GetNewGuidIfExists(score.CompetitorId);
+            if (!newCompId.HasValue) continue;
+
+            var dbScore = new Db.Score
+            {
+                Id = GetNewGuid(score.Id),
+                CompetitorId = newCompId.Value,
+                RaceId = raceId,
+                Place = score.Place,
+                Code = score.Code,
+                CodePoints = score.CodePoints,
+                FinishTime = score.FinishTime,
+                ElapsedTime = score.ElapsedTime
+            };
+            _dbContext.Scores.Add(dbScore);
+        }
+    }
+
+    private void RestoreSeriesRaceLinks(RaceBackup race, Guid raceId)
+    {
+        foreach (var seriesId in race.SeriesIds ?? Enumerable.Empty<Guid>())
+        {
+            var newSeriesId = GetNewGuidIfExists(seriesId);
+            if (newSeriesId.HasValue)
+            {
+                var sr = new Db.SeriesRace
+                {
+                    RaceId = raceId,
+                    SeriesId = newSeriesId.Value
+                };
+                _dbContext.SeriesRaces.Add(sr);
+            }
+        }
+    }
+
+    private async Task RestoreRegattasAsync(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var regatta in backup.Regattas ?? Enumerable.Empty<RegattaBackup>())
         {
-            var newSeasonId = regatta.SeasonId.HasValue ? GetNewGuidIfExists(regatta.SeasonId.Value) : null;
-            var newScoringId = regatta.ScoringSystemId.HasValue ? GetNewGuidIfExists(regatta.ScoringSystemId.Value) : null;
-
-            var dbRegatta = new Db.Regatta
-            {
-                Id = GetNewGuid(regatta.Id),
-                ClubId = targetClubId,
-                Name = regatta.Name,
-                UrlName = regatta.UrlName,
-                Description = regatta.Description,
-                Url = regatta.Url,
-                StartDate = regatta.StartDate,
-                EndDate = regatta.EndDate,
-                UpdatedDate = regatta.UpdatedDate,
-                ScoringSystemId = newScoringId,
-                PreferAlternateSailNumbers = regatta.PreferAlternateSailNumbers,
-                HideFromFrontPage = regatta.HideFromFrontPage
-            };
-
-            // Set season
-            if (newSeasonId.HasValue)
-            {
-                var season = await _dbContext.Seasons.FindAsync(newSeasonId.Value).ConfigureAwait(false);
-                dbRegatta.Season = season;
-            }
-
+            var dbRegatta = await CreateRegattaEntityAsync(regatta, targetClubId).ConfigureAwait(false);
             _dbContext.Regattas.Add(dbRegatta);
+            RestoreRegattaSeriesLinks(regatta, dbRegatta.Id);
+            RestoreRegattaFleetLinks(regatta, dbRegatta.Id);
+        }
+    }
 
-            // Regatta-Series associations
-            foreach (var seriesId in regatta.SeriesIds ?? Enumerable.Empty<Guid>())
-            {
-                var newSeriesId = GetNewGuidIfExists(seriesId);
-                if (newSeriesId.HasValue)
-                {
-                    var rs = new Db.RegattaSeries
-                    {
-                        RegattaId = dbRegatta.Id,
-                        SeriesId = newSeriesId.Value
-                    };
-                    _dbContext.RegattaSeries.Add(rs);
-                }
-            }
+    private async Task<Db.Regatta> CreateRegattaEntityAsync(RegattaBackup regatta, Guid targetClubId)
+    {
+        var newSeasonId = regatta.SeasonId.HasValue ? GetNewGuidIfExists(regatta.SeasonId.Value) : null;
+        var newScoringId = regatta.ScoringSystemId.HasValue ? GetNewGuidIfExists(regatta.ScoringSystemId.Value) : null;
 
-            // Regatta-Fleet associations
-            foreach (var fleetId in regatta.FleetIds ?? Enumerable.Empty<Guid>())
-            {
-                var newFleetId = GetNewGuidIfExists(fleetId);
-                if (newFleetId.HasValue)
-                {
-                    var rf = new Db.RegattaFleet
-                    {
-                        RegattaId = dbRegatta.Id,
-                        FleetId = newFleetId.Value
-                    };
-                    _dbContext.RegattaFleets.Add(rf);
-                }
-            }
+        var dbRegatta = new Db.Regatta
+        {
+            Id = GetNewGuid(regatta.Id),
+            ClubId = targetClubId,
+            Name = regatta.Name,
+            UrlName = regatta.UrlName,
+            Description = regatta.Description,
+            Url = regatta.Url,
+            StartDate = regatta.StartDate,
+            EndDate = regatta.EndDate,
+            UpdatedDate = regatta.UpdatedDate,
+            ScoringSystemId = newScoringId,
+            PreferAlternateSailNumbers = regatta.PreferAlternateSailNumbers,
+            HideFromFrontPage = regatta.HideFromFrontPage
+        };
+
+        if (newSeasonId.HasValue)
+        {
+            var season = await _dbContext.Seasons.FindAsync(newSeasonId.Value).ConfigureAwait(false);
+            dbRegatta.Season = season;
         }
 
-        // 9. Announcements
+        return dbRegatta;
+    }
+
+    private void RestoreRegattaSeriesLinks(RegattaBackup regatta, Guid regattaId)
+    {
+        foreach (var seriesId in regatta.SeriesIds ?? Enumerable.Empty<Guid>())
+        {
+            var newSeriesId = GetNewGuidIfExists(seriesId);
+            if (newSeriesId.HasValue)
+            {
+                var rs = new Db.RegattaSeries
+                {
+                    RegattaId = regattaId,
+                    SeriesId = newSeriesId.Value
+                };
+                _dbContext.RegattaSeries.Add(rs);
+            }
+        }
+    }
+
+    private void RestoreRegattaFleetLinks(RegattaBackup regatta, Guid regattaId)
+    {
+        foreach (var fleetId in regatta.FleetIds ?? Enumerable.Empty<Guid>())
+        {
+            var newFleetId = GetNewGuidIfExists(fleetId);
+            if (newFleetId.HasValue)
+            {
+                var rf = new Db.RegattaFleet
+                {
+                    RegattaId = regattaId,
+                    FleetId = newFleetId.Value
+                };
+                _dbContext.RegattaFleets.Add(rf);
+            }
+        }
+    }
+
+    private void RestoreAnnouncements(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var ann in backup.Announcements ?? Enumerable.Empty<AnnouncementBackup>())
         {
             var newRegattaId = ann.RegattaId.HasValue ? GetNewGuidIfExists(ann.RegattaId.Value) : null;
@@ -967,13 +1043,15 @@ public class BackupService : IBackupService
                 UpdatedLocalDate = ann.UpdatedLocalDate,
                 UpdatedBy = ann.UpdatedBy,
                 ArchiveAfter = ann.ArchiveAfter,
-                PreviousVersion = null, // Don't preserve version chain
+                PreviousVersion = null,
                 IsDeleted = false
             };
             _dbContext.Announcements.Add(dbAnn);
         }
+    }
 
-        // 10. Documents
+    private void RestoreDocuments(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var doc in backup.Documents ?? Enumerable.Empty<DocumentBackup>())
         {
             var newRegattaId = doc.RegattaId.HasValue ? GetNewGuidIfExists(doc.RegattaId.Value) : null;
@@ -989,12 +1067,14 @@ public class BackupService : IBackupService
                 CreatedDate = doc.CreatedDate,
                 CreatedLocalDate = doc.CreatedLocalDate,
                 CreatedBy = doc.CreatedBy,
-                PreviousVersion = null // Don't preserve version chain
+                PreviousVersion = null
             };
             _dbContext.Documents.Add(dbDoc);
         }
+    }
 
-        // 11. Files (for club logo)
+    private void RestoreFiles(ClubBackupData backup, Db.Club club)
+    {
         foreach (var file in backup.Files ?? Enumerable.Empty<FileBackup>())
         {
             var dbFile = new Db.File
@@ -1007,7 +1087,6 @@ public class BackupService : IBackupService
             _dbContext.Files.Add(dbFile);
         }
 
-        // Update club logo file reference
         if (backup.LogoFileId.HasValue)
         {
             var newLogoFileId = GetNewGuidIfExists(backup.LogoFileId.Value);
@@ -1016,8 +1095,10 @@ public class BackupService : IBackupService
                 club.LogoFileId = newLogoFileId.Value;
             }
         }
+    }
 
-        // 12. Club Sequences
+    private void RestoreClubSequences(ClubBackupData backup, Guid targetClubId)
+    {
         foreach (var sequence in backup.ClubSequences ?? Enumerable.Empty<ClubSequenceBackup>())
         {
             var dbSequence = new Db.ClubSequence
@@ -1031,8 +1112,17 @@ public class BackupService : IBackupService
             };
             _dbContext.ClubSequences.Add(dbSequence);
         }
+    }
 
-        // 13. Competitor Forwarders
+    private void RestoreForwarders(ClubBackupData backup)
+    {
+        RestoreCompetitorForwarders(backup);
+        RestoreRegattaForwarders(backup);
+        RestoreSeriesForwarders(backup);
+    }
+
+    private void RestoreCompetitorForwarders(ClubBackupData backup)
+    {
         foreach (var forwarder in backup.CompetitorForwarders ?? Enumerable.Empty<CompetitorForwarderBackup>())
         {
             var newCompetitorId = GetNewGuidIfExists(forwarder.CompetitorId);
@@ -1049,8 +1139,10 @@ public class BackupService : IBackupService
                 _dbContext.CompetitorForwarders.Add(dbForwarder);
             }
         }
+    }
 
-        // 14. Regatta Forwarders
+    private void RestoreRegattaForwarders(ClubBackupData backup)
+    {
         foreach (var forwarder in backup.RegattaForwarders ?? Enumerable.Empty<RegattaForwarderBackup>())
         {
             var newRegattaId = GetNewGuidIfExists(forwarder.RegattaId);
@@ -1068,8 +1160,10 @@ public class BackupService : IBackupService
                 _dbContext.RegattaForwarders.Add(dbForwarder);
             }
         }
+    }
 
-        // 15. Series Forwarders
+    private void RestoreSeriesForwarders(ClubBackupData backup)
+    {
         foreach (var forwarder in backup.SeriesForwarders ?? Enumerable.Empty<SeriesForwarderBackup>())
         {
             var newSeriesId = GetNewGuidIfExists(forwarder.SeriesId);
@@ -1087,8 +1181,16 @@ public class BackupService : IBackupService
                 _dbContext.SeriesForwarders.Add(dbForwarder);
             }
         }
+    }
 
-        // 16. Series Chart Results
+    private void RestoreSeriesResults(ClubBackupData backup)
+    {
+        RestoreSeriesChartResults(backup);
+        RestoreHistoricalResults(backup);
+    }
+
+    private void RestoreSeriesChartResults(ClubBackupData backup)
+    {
         foreach (var chartResult in backup.SeriesChartResults ?? Enumerable.Empty<SeriesChartResultsBackup>())
         {
             var newSeriesId = GetNewGuidIfExists(chartResult.SeriesId);
@@ -1105,8 +1207,10 @@ public class BackupService : IBackupService
                 _dbContext.SeriesChartResults.Add(dbChartResult);
             }
         }
+    }
 
-        // 17. Historical Results
+    private void RestoreHistoricalResults(ClubBackupData backup)
+    {
         foreach (var historicalResult in backup.HistoricalResults ?? Enumerable.Empty<HistoricalResultsBackup>())
         {
             var newSeriesId = GetNewGuidIfExists(historicalResult.SeriesId);
@@ -1123,10 +1227,6 @@ public class BackupService : IBackupService
                 _dbContext.HistoricalResults.Add(dbHistoricalResult);
             }
         }
-
-        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-
-        return true;
     }
 
     private async Task DeleteExistingClubDataAsync(Guid clubId)

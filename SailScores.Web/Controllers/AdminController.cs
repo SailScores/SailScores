@@ -11,7 +11,7 @@ namespace SailScores.Web.Controllers;
 [Authorize]
 public class AdminController : Controller
 {
-
+    private const string V = "ClubInitials";
     private readonly IAdminService _adminService;
     private readonly IAuthorizationService _authService;
     private readonly IAdminTipService _tipService;
@@ -32,7 +32,7 @@ public class AdminController : Controller
     // GET: Admin
     public async Task<ActionResult> Index(string clubInitials)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -47,7 +47,7 @@ public class AdminController : Controller
     // GET: Admin/Edit
     public async Task<ActionResult> Edit(string clubInitials)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -65,7 +65,7 @@ public class AdminController : Controller
         string clubInitials,
         AdminEditViewModel clubAdmin)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         try
         {
             if (!await _authService.CanUserEdit(User, clubAdmin.Id))
@@ -143,7 +143,7 @@ public class AdminController : Controller
     // GET: Admin/ResetClub
     public async Task<ActionResult> ResetClub(string clubInitials)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -167,7 +167,7 @@ public class AdminController : Controller
         string clubInitials,
         ResetClubViewModel model)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         if (!await _authService.CanUserEdit(User, model.ClubId))
         {
             return Unauthorized();

@@ -11,6 +11,9 @@ namespace SailScores.Web.Controllers;
 [Authorize]
 public class BackupController : Controller
 {
+
+    private const string CLUBINITIALS_FIELDNAME = "ClubInitials";
+    private const string ERROR_FIELDNAME = "Error";
     private readonly IBackupService _backupService;
     private readonly IAuthorizationService _authService;
     private readonly IClubService _clubService;
@@ -28,7 +31,7 @@ public class BackupController : Controller
     // GET: /{clubInitials}/Backup
     public async Task<IActionResult> Index(string clubInitials)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -62,7 +65,7 @@ public class BackupController : Controller
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Error creating backup: {ex.Message}";
+            TempData[ERROR_FIELDNAME] = $"Error creating backup: {ex.Message}";
             return RedirectToAction(nameof(Index), new { clubInitials });
         }
     }
@@ -70,7 +73,7 @@ public class BackupController : Controller
     // GET: /{clubInitials}/Backup/Upload
     public async Task<IActionResult> Upload(string clubInitials)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -89,7 +92,7 @@ public class BackupController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Upload(string clubInitials, IFormFile backupFile)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -97,7 +100,7 @@ public class BackupController : Controller
 
         if (backupFile == null || backupFile.Length == 0)
         {
-            TempData["Error"] = "Please select a backup file to upload.";
+            TempData[ERROR_FIELDNAME] = "Please select a backup file to upload.";
             return RedirectToAction(nameof(Upload), new { clubInitials });
         }
 
@@ -108,7 +111,7 @@ public class BackupController : Controller
 
             if (!validation.IsValid)
             {
-                TempData["Error"] = $"Invalid backup file: {validation.ErrorMessage}";
+                TempData[ERROR_FIELDNAME] = $"Invalid backup file: {validation.ErrorMessage}";
                 return RedirectToAction(nameof(Upload), new { clubInitials });
             }
 
@@ -128,7 +131,7 @@ public class BackupController : Controller
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Error reading backup file: {ex.Message}";
+            TempData[ERROR_FIELDNAME] = $"Error reading backup file: {ex.Message}";
             return RedirectToAction(nameof(Upload), new { clubInitials });
         }
     }
@@ -138,7 +141,7 @@ public class BackupController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Restore(string clubInitials, IFormFile backupFile, bool preserveClubSettings = true)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -146,7 +149,7 @@ public class BackupController : Controller
 
         if (backupFile == null || backupFile.Length == 0)
         {
-            TempData["Error"] = "Please select a backup file to restore.";
+            TempData[ERROR_FIELDNAME] = "Please select a backup file to restore.";
             return RedirectToAction(nameof(Upload), new { clubInitials });
         }
 
@@ -157,7 +160,7 @@ public class BackupController : Controller
 
             if (!validation.IsValid)
             {
-                TempData["Error"] = $"Invalid backup file: {validation.ErrorMessage}";
+                TempData[ERROR_FIELDNAME] = $"Invalid backup file: {validation.ErrorMessage}";
                 return RedirectToAction(nameof(Upload), new { clubInitials });
             }
 
@@ -170,13 +173,13 @@ public class BackupController : Controller
             }
             else
             {
-                TempData["Error"] = "Failed to restore backup.";
+                TempData[ERROR_FIELDNAME] = "Failed to restore backup.";
                 return RedirectToAction(nameof(Upload), new { clubInitials });
             }
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Error restoring backup: {ex.Message}";
+            TempData[ERROR_FIELDNAME] = $"Error restoring backup: {ex.Message}";
             return RedirectToAction(nameof(Upload), new { clubInitials });
         }
     }
