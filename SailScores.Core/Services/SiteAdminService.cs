@@ -1,34 +1,29 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using SailScores.Database;
-using SailScores.Web.Models.SailScores;
-using SailScores.Web.Services.Interfaces;
-using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
+using SailScores.Core.Model.Summary;
+using SailScores.Database;
 
-namespace SailScores.Web.Services;
+namespace SailScores.Core.Services;
 
 public class SiteAdminService : ISiteAdminService
 {
     private readonly ISailScoresContext _dbContext;
-    private readonly IMemoryCache _cache;
     private readonly IMapper _mapper;
-    private readonly CoreServices.ISeriesService _seriesService;
 
     public SiteAdminService(
         ISailScoresContext dbContext,
-        IMemoryCache cache,
-        IMapper mapper,
-        CoreServices.ISeriesService seriesService)
+        IMapper mapper)
     {
         _dbContext = dbContext;
-        _cache = cache;
         _mapper = mapper;
-        _seriesService = seriesService;
     }
 
-    public async Task<SiteAdminIndexViewModel> GetAllClubsAsync()
+    public async Task<IEnumerable<(ClubSummary club, DateTime? latestSeriesUpdate, DateTime? latestRaceDate)>> GetAllClubsWithDatesAsync()
     {
         var clubs = await _dbContext.Clubs
             .Select(c => new
@@ -49,75 +44,38 @@ public class SiteAdminService : ISiteAdminService
             .OrderBy(c => c.Name)
             .ToListAsync();
 
-        var clubSummaries = clubs.Select(c => new SiteAdminClubSummary
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Initials = c.Initials,
-            IsHidden = c.IsHidden,
-            LatestSeriesUpdate = c.LatestSeriesUpdate,
-            LatestRaceDate = c.LatestRaceDate
-        }).ToList();
-
-        return new SiteAdminIndexViewModel
-        {
-            Clubs = clubSummaries
-        };
+        return clubs.Select(c => (
+            club: new ClubSummary
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Initials = c.Initials,
+                IsHidden = c.IsHidden
+            },
+            latestSeriesUpdate: c.LatestSeriesUpdate,
+            latestRaceDate: c.LatestRaceDate
+        ));
     }
 
-    public async Task<SiteAdminClubDetailsViewModel> GetClubDetailsAsync(string clubInitials)
+    public async Task<Club> GetClubDetailsAsync(string clubInitials)
     {
-        var club = await _dbContext.Clubs
+        var dbClub = await _dbContext.Clubs
             .Include(c => c.Series)
                 .ThenInclude(s => s.Season)
             .Include(c => c.Races)
             .FirstOrDefaultAsync(c => c.Initials == clubInitials);
 
-        if (club == null)
+        if (dbClub == null)
         {
             return null;
         }
 
-        var series = _mapper.Map<IList<Series>>(club.Series);
-
-        var vm = new SiteAdminClubDetailsViewModel
-        {
-            Id = club.Id,
-            Name = club.Name,
-            Initials = club.Initials,
-            IsHidden = club.IsHidden,
-            Series = series,
-            LatestSeriesUpdate = club.Series
-                .OrderByDescending(s => s.UpdatedDate)
-                .Select(s => s.UpdatedDate)
-                .FirstOrDefault(),
-            LatestRaceDate = club.Races
-                .OrderByDescending(r => r.Date)
-                .Select(r => r.Date)
-                .FirstOrDefault(),
-            RaceCount = club.Races.Count
-        };
-
-        return vm;
+        return _mapper.Map<Club>(dbClub);
     }
 
-    public Task ResetClubInitialsCacheAsync()
+    public async Task<Club> GetFullClubForBackupAsync(Guid clubId)
     {
-        // Note: IMemoryCache doesn't provide a way to enumerate and selectively remove entries.
-        // In a production environment, consider using a distributed cache (like Redis) 
-        // which supports key pattern matching for selective invalidation.
-        // For now, we clear the entire cache as it will be rebuilt on demand.
-        if (_cache is MemoryCache memoryCache)
-        {
-            memoryCache.Compact(1.0); // Remove all entries
-        }
-        return Task.CompletedTask;
-    }
-
-    public async Task<string> BackupClubAsync(Guid clubId)
-    {
-        // Get complete club data
-        var club = await _dbContext.Clubs
+        var dbClub = await _dbContext.Clubs
             .Include(c => c.Fleets)
                 .ThenInclude(f => f.FleetBoatClasses)
             .Include(c => c.Competitors)
@@ -134,19 +92,12 @@ public class SiteAdminService : ISiteAdminService
             .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == clubId);
 
-        if (club == null)
+        if (dbClub == null)
         {
             return null;
         }
 
-        // Serialize to JSON
-        var settings = new JsonSerializerSettings
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            Formatting = Formatting.Indented
-        };
-
-        return JsonConvert.SerializeObject(club, settings);
+        return _mapper.Map<Club>(dbClub);
     }
 
     public async Task ResetClubAsync(Guid clubId)
@@ -193,17 +144,5 @@ public class SiteAdminService : ISiteAdminService
         _dbContext.Competitors.RemoveRange(competitors);
 
         await _dbContext.SaveChangesAsync();
-
-        // Clear cache for this club
-        var club = await _dbContext.Clubs.FindAsync(clubId);
-        if (club != null)
-        {
-            _cache.Remove($"ClubId_{club.Initials}");
-        }
-    }
-
-    public async Task RecalculateSeriesAsync(Guid seriesId, string updatedBy)
-    {
-        await _seriesService.UpdateSeriesResults(seriesId, updatedBy);
     }
 }

@@ -2,7 +2,7 @@ using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Services.Interfaces;
 
-public interface ISiteAdminService
+public interface IWebSiteAdminService
 {
     Task<SiteAdminIndexViewModel> GetAllClubsAsync();
     Task<SiteAdminClubDetailsViewModel> GetClubDetailsAsync(string clubInitials);

@@ -8,11 +8,11 @@ namespace SailScores.Web.Controllers;
 [Authorize]
 public class SiteAdminController : Controller
 {
-    private readonly ISiteAdminService _siteAdminService;
+    private readonly IWebSiteAdminService _siteAdminService;
     private readonly IAuthorizationService _authService;
 
     public SiteAdminController(
-        ISiteAdminService siteAdminService,
+        IWebSiteAdminService siteAdminService,
         IAuthorizationService authService)
     {
         _siteAdminService = siteAdminService;

@@ -44,7 +44,11 @@
                 @foreach (var club in Model.Clubs)
                 {
                     <tr>
-                        <td>@club.Name</td>
+                        <td>
+                            <a asp-controller="Club" asp-action="Index" asp-route-clubInitials="@club.Initials">
+                                @club.Name
+                            </a>
+                        </td>
                         <td>@club.Initials</td>
                         <td>
                             @if (club.IsHidden)

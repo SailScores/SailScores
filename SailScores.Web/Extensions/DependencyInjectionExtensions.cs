@@ -29,7 +29,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IClubRequestService, ClubRequestService>();
         services.AddScoped<IWeatherService, WeatherService>();
         services.AddScoped<IAdminService, AdminService>();
-        services.AddScoped<ISiteAdminService, SiteAdminService>();
+        services.AddScoped<IWebSiteAdminService, WebSiteAdminService>();
         services.AddScoped<ITemplateHelper, TemplateHelper>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ISpeechService, SpeechService>();
