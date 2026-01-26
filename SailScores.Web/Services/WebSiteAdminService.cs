@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Caching.Memory;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
-using Newtonsoft.Json;
 using AutoMapper;
-using SailScores.Core.Model;
 
 namespace SailScores.Web.Services;
 
@@ -13,17 +12,23 @@ public class WebSiteAdminService : IWebSiteAdminService
     private readonly IMapper _mapper;
     private readonly CoreServices.ISeriesService _seriesService;
     private readonly CoreServices.ISiteAdminService _coreSiteAdminService;
+    private readonly CoreServices.IClubService _coreClubService;
+    private readonly IBackupService _backupService;
 
     public WebSiteAdminService(
         IMemoryCache cache,
         IMapper mapper,
         CoreServices.ISeriesService seriesService,
-        CoreServices.ISiteAdminService coreSiteAdminService)
+        CoreServices.ISiteAdminService coreSiteAdminService,
+        CoreServices.IClubService coreClubService,
+        IBackupService backupService)
     {
         _cache = cache;
         _mapper = mapper;
         _seriesService = seriesService;
         _coreSiteAdminService = coreSiteAdminService;
+        _coreClubService = coreClubService;
+        _backupService = backupService;
     }
 
     public async Task<SiteAdminIndexViewModel> GetAllClubsAsync()
@@ -86,32 +91,16 @@ public class WebSiteAdminService : IWebSiteAdminService
         return Task.CompletedTask;
     }
 
-    public async Task<string> BackupClubAsync(Guid clubId)
+    public async Task<(byte[] Data, string FileName)> BackupClubAsync(string clubInitials, string createdBy)
     {
-        var club = await _coreSiteAdminService.GetFullClubForBackupAsync(clubId);
-
-        if (club == null)
-        {
-            return null;
-        }
-
-        // Serialize to JSON
-        var settings = new JsonSerializerSettings
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            Formatting = Formatting.Indented
-        };
-
-        return JsonConvert.SerializeObject(club, settings);
+        return await _backupService.CreateBackupFileAsync(clubInitials, createdBy);
     }
 
-    public async Task ResetClubAsync(Guid clubId)
+    public async Task ResetClubAsync(Guid clubId, ResetLevel resetLevel)
     {
-        await _coreSiteAdminService.ResetClubAsync(clubId);
+        await _coreClubService.ResetClubAsync(clubId, resetLevel);
 
-        // Clear cache for this club  
-        // Note: We need the club initials to clear the specific cache entry
-        // For now, clear entire cache
+        // Clear cache after reset
         if (_cache is MemoryCache memoryCache)
         {
             memoryCache.Compact(1.0);

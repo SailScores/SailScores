@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Model;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
@@ -66,35 +67,57 @@ public class SiteAdminController : Controller
     // POST: SiteAdmin/Backup
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Backup(Guid clubId)
+    public async Task<ActionResult> Backup(string clubInitials)
     {
         if (!await _authService.IsUserFullAdmin(User))
         {
             return Unauthorized();
         }
 
-        var backupData = await _siteAdminService.BackupClubAsync(clubId);
-        if (backupData == null)
+        try
         {
-            return NotFound();
-        }
+            var (data, fileName) = await _siteAdminService.BackupClubAsync(
+                clubInitials,
+                User.Identity?.Name ?? "Unknown");
 
-        var fileName = $"club-backup-{clubId}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.json";
-        return File(System.Text.Encoding.UTF8.GetBytes(backupData), "application/json", fileName);
+            return File(data, "application/gzip", fileName);
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Error creating backup: {ex.Message}";
+            return RedirectToAction(nameof(Details), new { clubInitials });
+        }
     }
 
     // POST: SiteAdmin/Reset
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Reset(Guid clubId, string clubInitials)
+    public async Task<ActionResult> Reset(Guid clubId, string clubInitials, ResetLevel resetLevel)
     {
         if (!await _authService.IsUserFullAdmin(User))
         {
             return Unauthorized();
         }
 
-        await _siteAdminService.ResetClubAsync(clubId);
-        TempData["Message"] = "Club has been reset successfully. All races, scores, and competitors have been removed.";
+        try
+        {
+            await _siteAdminService.ResetClubAsync(clubId, resetLevel);
+            
+            var levelDescription = resetLevel switch
+            {
+                ResetLevel.RacesAndSeries => "Races and series have been removed. Competitors, fleets, boat classes, seasons, and scoring systems were preserved.",
+                ResetLevel.RacesSeriesAndCompetitors => "Races, series, and competitors have been removed. Fleets, boat classes, seasons, and scoring systems were preserved.",
+                ResetLevel.FullReset => "Full reset completed. All data has been removed and scoring systems reset to defaults.",
+                _ => "Club has been reset successfully."
+            };
+            
+            TempData["Message"] = levelDescription;
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Error resetting club: {ex.Message}";
+        }
+
         return RedirectToAction(nameof(Details), new { clubInitials });
     }
 
