@@ -80,64 +80,7 @@
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h3>Club Management Actions</h3>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <form asp-action="Backup" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="clubInitials" value="@Model.Initials" />
-                        <button type="submit" class="btn btn-info">
-                            <i class="fas fa-download"></i> Download Club Backup (compressed .gz file)
-                        </button>
-                    </form>
 
-                    <div class="mt-3">
-                        <h5>Reset Club Data</h5>
-                        <p class="text-muted mb-2">Choose a reset level based on what data you want to preserve:</p>
-                        
-                        <form asp-action="Reset" method="post" class="mb-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="clubId" value="@Model.Id" />
-                            <input type="hidden" name="clubInitials" value="@Model.Initials" />
-                            <input type="hidden" name="resetLevel" value="1" />
-                            <button type="submit" class="btn btn-warning w-100 text-start" onclick="return confirm('Reset Level 1: Clear races, scores, series, and regattas.\n\nPreserves: Competitors, fleets, boat classes, seasons, and scoring systems.\n\nAre you sure?');">
-                                <i class="fas fa-broom"></i> <strong>Reset Level 1:</strong> Races and Series Only
-                                <br/><small class="ms-4">Preserves competitors, fleets, boat classes, seasons, scoring systems</small>
-                            </button>
-                        </form>
-
-                        <form asp-action="Reset" method="post" class="mb-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="clubId" value="@Model.Id" />
-                            <input type="hidden" name="clubInitials" value="@Model.Initials" />
-                            <input type="hidden" name="resetLevel" value="2" />
-                            <button type="submit" class="btn btn-warning w-100 text-start" onclick="return confirm('Reset Level 2: Clear races, scores, series, regattas, and competitors.\n\nPreserves: Fleets, boat classes, seasons, and scoring systems.\n\nAre you sure?');">
-                                <i class="fas fa-broom"></i> <strong>Reset Level 2:</strong> Races, Series, and Competitors
-                                <br/><small class="ms-4">Preserves fleets, boat classes, seasons, scoring systems</small>
-                            </button>
-                        </form>
-
-                        <form asp-action="Reset" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="clubId" value="@Model.Id" />
-                            <input type="hidden" name="clubInitials" value="@Model.Initials" />
-                            <input type="hidden" name="resetLevel" value="3" />
-                            <button type="submit" class="btn btn-danger w-100 text-start" onclick="return confirm('FULL RESET: This will clear ALL data and reset scoring systems to defaults.\n\nOnly preserves: Club name, initials, and website URL.\n\nTHIS ACTION CANNOT BE UNDONE. Are you absolutely sure?');">
-                                <i class="fas fa-trash"></i> <strong>Reset Level 3:</strong> Full Reset
-                                <br/><small class="ms-4">WARNING: Removes everything except club name, initials, and URL</small>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="row mb-3">
     <div class="col-12">
@@ -181,6 +124,66 @@
                 {
                     <p class="text-muted">No series found for this club.</p>
                 }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Club Management Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <form asp-action="Backup" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="clubInitials" value="@Model.Initials" />
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-download"></i> Download Club Backup (compressed .gz file)
+                        </button>
+                    </form>
+
+                    <div class="mt-3">
+                        <h5>Reset Club Data</h5>
+                        <p class="text-muted mb-2">Choose a reset level based on what data you want to preserve:</p>
+
+                        <form asp-action="Reset" method="post" class="mb-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="clubId" value="@Model.Id" />
+                            <input type="hidden" name="clubInitials" value="@Model.Initials" />
+                            <input type="hidden" name="resetLevel" value="1" />
+                            <button type="submit" class="btn btn-warning w-100 text-start" onclick="return confirm('Reset Level 1: Clear races, scores, series, and regattas.\n\nPreserves: Competitors, fleets, boat classes, seasons, and scoring systems.\n\nAre you sure?');">
+                                <i class="fas fa-broom"></i> <strong>Reset Level 1:</strong> Races and Series Only
+                                <br /><small class="ms-4">Preserves competitors, fleets, boat classes, seasons, scoring systems</small>
+                            </button>
+                        </form>
+
+                        <form asp-action="Reset" method="post" class="mb-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="clubId" value="@Model.Id" />
+                            <input type="hidden" name="clubInitials" value="@Model.Initials" />
+                            <input type="hidden" name="resetLevel" value="2" />
+                            <button type="submit" class="btn btn-warning w-100 text-start" onclick="return confirm('Reset Level 2: Clear races, scores, series, regattas, and competitors.\n\nPreserves: Fleets, boat classes, seasons, and scoring systems.\n\nAre you sure?');">
+                                <i class="fas fa-broom"></i> <strong>Reset Level 2:</strong> Races, Series, and Competitors
+                                <br /><small class="ms-4">Preserves fleets, boat classes, seasons, scoring systems</small>
+                            </button>
+                        </form>
+
+                        <form asp-action="Reset" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="clubId" value="@Model.Id" />
+                            <input type="hidden" name="clubInitials" value="@Model.Initials" />
+                            <input type="hidden" name="resetLevel" value="3" />
+                            <button type="submit" class="btn btn-danger w-100 text-start" onclick="return confirm('FULL RESET: This will clear ALL data and reset scoring systems to defaults.\n\nOnly preserves: Club name, initials, and website URL.\n\nTHIS ACTION CANNOT BE UNDONE. Are you absolutely sure?');">
+                                <i class="fas fa-trash"></i> <strong>Reset Level 3:</strong> Full Reset
+                                <br /><small class="ms-4">WARNING: Removes everything except club name, initials, and URL</small>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

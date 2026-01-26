@@ -63,6 +63,7 @@ public class SiteAdminService : ISiteAdminService
             .Include(c => c.Series)
                 .ThenInclude(s => s.Season)
             .Include(c => c.Races)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Initials == clubInitials);
 
         if (dbClub == null)
