@@ -558,14 +558,17 @@ public class CompetitorService : ICompetitorService
         return returnValue;
     }
 
-    public async Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId)
+    public async Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(
+        Guid clubId,
+        Guid fleetId,
+        bool includeInactive = false)
     {
         var fleetName = await _dbContext.Fleets
             .Where(f => f.Id == fleetId)
             .Select(f => f.Name)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
-        var comps = await GetCompetitorsAsync(clubId, fleetId, true);
+        var comps = await GetCompetitorsAsync(clubId, fleetId, includeInactive);
 
         return new Dictionary<string, IEnumerable<Competitor>>
         {
@@ -573,7 +576,10 @@ public class CompetitorService : ICompetitorService
         };
     }
 
-    public async Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId)
+    public async Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(
+        Guid clubId,
+        Guid regattaId,
+        bool includeInactive = false)
     {
         var fleets = await _dbContext.Regattas
             .Where(r => r.Id == regattaId)
@@ -586,7 +592,7 @@ public class CompetitorService : ICompetitorService
         foreach (var fleet in fleets)
         {
             // get all competitors in the club
-            var comps = await GetCompetitorsAsync(clubId, fleet.Id, false);
+            var comps = await GetCompetitorsAsync(clubId, fleet.Id, includeInactive);
             fleetCompList.Add(fleet.Name ?? fleet.ShortName ?? fleet.NickName, comps);
 
         }

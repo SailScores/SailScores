@@ -111,6 +111,7 @@ public class ClubRequestService : IClubRequestService
             "SITEMAP",
             "HELP",
             "DOCS",
+            "SITEADMIN",
             "ADMIN",
             "COMPETITOR",
             "WHATIF",

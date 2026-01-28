@@ -43,9 +43,12 @@
                     <tbody>
                         @foreach(var boatGroup in Model)
                         {
-                            <tr>
-                                <th colspan="6" class="text-center">@boatGroup.Key</th>
-                            </tr>
+                            @if (Model.Count > 1)
+                            {
+                                <tr>
+                                    <th colspan="6" class="text-center">@boatGroup.Key</th>
+                                </tr>
+                            }
 
                             @foreach (var comp in boatGroup.Value)
                             {

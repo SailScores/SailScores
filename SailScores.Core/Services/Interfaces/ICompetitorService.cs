@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Api.Dtos;
@@ -20,8 +20,14 @@ namespace SailScores.Core.Services
         Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonUrlName);
 #pragma warning restore CA1054 // Uri parameters should not be strings
         Task<Dictionary<Guid, DateTime?>> GetLastActiveDates(Guid clubId);
-        Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId);
-        Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId);
+        Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(
+            Guid clubId,
+            Guid fleetId,
+            bool includeInactive = false);
+        Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(
+            Guid clubId,
+            Guid regattaId,
+            bool includeInactive = false);
         Task<IList<Database.Entities.CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId);
         Task SetCompetitorActive(
             Guid clubId,

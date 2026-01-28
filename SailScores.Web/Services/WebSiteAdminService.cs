@@ -66,7 +66,10 @@ public class WebSiteAdminService : IWebSiteAdminService
             Name = club.Name,
             Initials = club.Initials,
             IsHidden = club.IsHidden,
-            Series = club.Series,
+            Series = club.Series?
+                .OrderByDescending(s => s.Season?.Start)
+                .ThenBy(s => s.Name)
+                .ToList(),
             LatestSeriesUpdate = club.Series?
                 .OrderByDescending(s => s.UpdatedDate)
                 .Select(s => s.UpdatedDate)
