@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -17,24 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="10.0.2" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.15.0" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="8.15.0" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.15.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore">
-      <HintPath>..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.identity.entityframeworkcore\2.1.1\lib\netstandard2.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore.Relational">
-      <HintPath>..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.relational\2.1.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-</Project>
+  </Project>
