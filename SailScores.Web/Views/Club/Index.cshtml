@@ -97,7 +97,7 @@
                 }
                 <h3>
                     <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.UrlName/@regatta.UrlName" style="text-wrap: pretty;">
-                        @regatta.Season.Name @regatta.Name
+                        @(regatta.Name.Contains(regatta.Season.Name, StringComparison.OrdinalIgnoreCase) ? regatta.Name : $"{regatta.Season.Name} {regatta.Name}")
                     </a>
                 </h3>
                 <br />
