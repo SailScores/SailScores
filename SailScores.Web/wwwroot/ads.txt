@@ -1,0 +1,7 @@
+# ads.txt file for sailscores.com
+# This file indicates that there are no authorized digital sellers for this site
+
+# No authorized resellers
+# Contact: https://www.sailscores.com
+
+# This site does not authorize any advertising resellers

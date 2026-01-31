@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -48,6 +48,7 @@ namespace SailScores.Core.Services
 
             dbSeason.Id = Guid.NewGuid();
             dbSeason.UrlName = UrlUtility.GetUrlName(season.Name);
+            dbSeason.DefaultScoringSystemId = season.DefaultScoringSystemId;
 
             if (String.IsNullOrEmpty(dbSeason.UrlName))
             {
@@ -92,6 +93,7 @@ namespace SailScores.Core.Services
             existingSeason.Name = season.Name;
             existingSeason.Start = season.Start;
             existingSeason.End = season.End;
+            existingSeason.DefaultScoringSystemId = season.DefaultScoringSystemId;
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
         }

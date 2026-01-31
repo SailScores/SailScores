@@ -1,6 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
+using SailScores.Core.Utility;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,8 @@ namespace SailScores.Core.Services
 
         public async Task<Guid> SaveNew(Fleet fleet)
         {
+            // Sanitize ShortName for URL safety
+            fleet.ShortName = UrlUtility.GetUrlName(fleet.ShortName);
 
             if (_dbContext.Fleets.Any(f =>
                 f.ClubId == fleet.ClubId
@@ -71,6 +74,9 @@ namespace SailScores.Core.Services
 
         public async Task Update(Fleet fleet)
         {
+            // Sanitize ShortName for URL safety
+            fleet.ShortName = UrlUtility.GetUrlName(fleet.ShortName);
+
             if (_dbContext.Fleets.Any(f =>
                 f.Id != fleet.Id
                 && f.ClubId == fleet.ClubId

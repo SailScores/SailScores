@@ -1,0 +1,85 @@
+@model SailScores.Web.Controllers.BackupIndexViewModel
+
+@{
+    ViewData["Title"] = "Backup & Restore";
+    Layout = "_ClubLayout";
+}
+
+<h2>Backup &amp; Restore</h2>
+<p class="lead">Create a backup of all @Model.ClubName data or restore from a previous backup.</p>
+
+<hr />
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-download me-2"></i>Download Backup</h5>
+            </div>
+            <div class="card-body">
+                <p>Download a complete backup of all club data including:</p>
+                <ul>
+                    <li>Boat classes, fleets, and competitors</li>
+                    <li>Seasons, series, and races with scores</li>
+                    <li>Regattas and announcements</li>
+                    <li>Scoring systems and settings</li>
+                    <li>Documents</li>
+                </ul>
+                <p class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Backups do not include scorekeeper user accounts or permissions.
+                </p>
+                <form asp-action="Download" method="post">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Download Backup
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-upload me-2"></i>Restore from Backup</h5>
+            </div>
+            <div class="card-body">
+                <p>Restore club data from a previously downloaded backup file.</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> Restoring a backup will <strong>replace all existing data</strong> in this club.
+                    This action cannot be undone.
+                </div>
+                <p class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Backups can be restored to a different club, allowing data to be moved between clubs.
+                </p>
+                <a asp-action="Upload" class="btn btn-warning">
+                    <i class="fas fa-upload me-2"></i>Upload Backup to Restore
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Admin
+    </a>
+</div>

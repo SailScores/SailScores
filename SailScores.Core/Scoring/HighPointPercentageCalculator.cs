@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -71,6 +71,7 @@ namespace SailScores.Core.Scoring
             IEnumerable<Score> scores)
         {
             results.IsPercentSystem = true;
+            results.LowerScoreWins = false;
             results.PercentRequired = ScoringSystem.ParticipationPercent;
             var raceCount = results.Races.Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                 || r.State == RaceState.Preliminary).Count();

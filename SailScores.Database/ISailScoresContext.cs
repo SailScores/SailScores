@@ -47,6 +47,14 @@ namespace SailScores.Database
         DbSet<ChangeType> ChangeTypes { get; set; }
         DbSet<CompetitorChange> CompetitorChanges { get; set; }
 
+        // Junction tables for backup/restore operations
+        DbSet<SeriesRace> SeriesRaces { get; set; }
+        DbSet<CompetitorFleet> CompetitorFleets { get; set; }
+        DbSet<FleetBoatClass> FleetBoatClasses { get; set; }
+        DbSet<RegattaSeries> RegattaSeries { get; set; }
+        DbSet<RegattaFleet> RegattaFleets { get; set; }
+        DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
+
         Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId);
 
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber);

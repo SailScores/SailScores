@@ -13,7 +13,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SailScores.Web.IntegrationTests.Services;
+namespace SailScores.Test.Integration.Services;
 
 public class OcrServiceUnitTests
 {

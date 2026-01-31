@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -75,6 +75,7 @@ public class TopXHighPointCalculator : BaseScoringCalculator
     {
         // badly named: this tells the UI to not use the score for first/second/third
         results.IsPercentSystem = true;
+        results.LowerScoreWins = false;
 
         // This line below needs a revamp if this system will be around for long (written Oct 2024...)
         // need to get it into a properly named field in the scoring system.

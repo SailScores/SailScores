@@ -216,6 +216,23 @@ public class AdminService : IAdminService
         return new FileStreamResult(stream, contentType);
     }
 
+    public async Task ResetClubAsync(Guid clubId, Core.Model.ResetLevel resetLevel)
+    {
+        await _coreClubService.ResetClubAsync(clubId, resetLevel);
+        
+        // Get club initials for cache invalidation
+        var club = await _coreClubService.GetMinimalClub(clubId);
+        if (club != null)
+        {
+            _webClubService.InvalidateClubCache(club.Initials);
+        }
+    }
+
+    public async Task<int> GetRaceCountAsync(Guid clubId)
+    {
+        return await _coreRaceService.GetRaceCountAsync(clubId);
+    }
+
     private string DetermineContentType(byte[] fileContents)
     {
         if (fileContents == null || fileContents.Length < 4)

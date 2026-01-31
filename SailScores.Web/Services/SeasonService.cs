@@ -1,4 +1,5 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
+using SailScores.Web.Models.SailScores;
 using ISeasonService = SailScores.Web.Services.Interfaces.ISeasonService;
 
 namespace SailScores.Web.Services;
@@ -6,13 +7,16 @@ namespace SailScores.Web.Services;
 public class SeasonService : ISeasonService
 {
     private readonly Core.Services.ISeasonService _coreSeasonService;
+    private readonly Core.Services.IScoringService _coreScoringService;
     private readonly IMapper _mapper;
 
     public SeasonService(
         Core.Services.ISeasonService seasonService,
+        Core.Services.IScoringService scoringService,
         IMapper mapper)
     {
         _coreSeasonService = seasonService;
+        _coreScoringService = scoringService;
         _mapper = mapper;
     }
 
@@ -26,39 +30,77 @@ public class SeasonService : ISeasonService
         return await _coreSeasonService.GetSavingSeasonErrors(model);
     }
 
-    public async Task<Season> GetSeasonSuggestion(Guid clubId)
+    public async Task<SeasonWithOptionsViewModel> GetSeasonSuggestion(Guid clubId)
     {
         var existingSeasons = await _coreSeasonService.GetSeasons(clubId);
 
-        if ((existingSeasons?.Count() ?? 0) == 0)
+        var today = DateTime.Today;
+        var vm = new SeasonWithOptionsViewModel
         {
-            var today = DateTime.Today;
-            return new Season
-            {
-                ClubId = clubId,
-                Name = today.Year.ToString(CultureInfo.InvariantCulture),
-                Start = new DateTime(today.Year, 1, 1),
-                End = new DateTime(today.Year, 12, 31)
-            };
-        }
-
-        var lastSeason = existingSeasons
-            .OrderByDescending(s => s.Start)
-            .First();
-
-        var season = new Season()
-        {
-            Start = lastSeason.Start.AddYears(1),
-            End = lastSeason.End.AddYears(1)
+            ClubId = clubId,
+            Name = today.Year.ToString(CultureInfo.InvariantCulture),
+            Start = new DateTime(today.Year, 1, 1),
+            End = new DateTime(today.Year, 12, 31)
         };
 
-        if (!existingSeasons.Any(s =>
-            s.Name == season.Start.Year.ToString(CultureInfo.InvariantCulture)))
+        if (existingSeasons?.Any() == true)
         {
-            season.Name = season.Start.Year.ToString(CultureInfo.InvariantCulture);
+            var lastSeason = existingSeasons
+                .OrderByDescending(s => s.Start)
+                .First();
+
+            vm.Start = lastSeason.Start.AddYears(1);
+            vm.End = lastSeason.End.AddYears(1);
+
+            if (!existingSeasons.Any(s =>
+                s.Name == vm.Start.Year.ToString(CultureInfo.InvariantCulture)))
+            {
+                vm.Name = vm.Start.Year.ToString(CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                vm.Name = string.Empty;
+            }
         }
 
-        return season;
+        vm.ScoringSystemOptions = await GetScoringSystemOptionsAsync(clubId);
+
+        return vm;
+    }
+
+    public async Task<SeasonWithOptionsViewModel> GetSeasonForEdit(Guid clubId, Guid seasonId)
+    {
+        var season = (await _coreSeasonService.GetSeasons(clubId))
+            .SingleOrDefault(s => s.Id == seasonId);
+        
+        if (season == null)
+        {
+            return null;
+        }
+
+        var vm = new SeasonWithOptionsViewModel
+        {
+            Id = season.Id,
+            ClubId = clubId,
+            Name = season.Name,
+            Start = season.Start,
+            End = season.End,
+            DefaultScoringSystemId = season.DefaultScoringSystemId,
+            ScoringSystemOptions = await GetScoringSystemOptionsAsync(clubId)
+        };
+
+        return vm;
+    }
+
+    private async Task<IList<ScoringSystem>> GetScoringSystemOptionsAsync(Guid clubId)
+    {
+        var scoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(clubId, false);
+        scoringSystemOptions.Add(new ScoringSystem
+        {
+            Id = Guid.Empty,
+            Name = "<Club Default>"
+        });
+        return scoringSystemOptions.OrderBy(s => s.Name).ToList();
     }
 
     public async Task<IList<Season>> GetSeasons(Guid clubId)

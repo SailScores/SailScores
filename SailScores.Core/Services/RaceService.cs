@@ -51,6 +51,8 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
         }
 
+
+
         public async Task<IList<Model.Race>> GetRacesAsync(Guid clubId)
         {
             var dbObjects = await _dbContext
@@ -405,6 +407,12 @@ namespace SailScores.Core.Services
                 await _seriesService.UpdateSeriesResults(seriesId, deletedBy)
                     .ConfigureAwait(false);
             }
+        }
+        public async Task<int> GetRaceCountAsync(Guid clubId)
+        {
+            return await _dbContext.Races
+                .CountAsync(r => r.ClubId == clubId)
+                .ConfigureAwait(false);
         }
 
         public async Task<int> GetRaceCountAsync(

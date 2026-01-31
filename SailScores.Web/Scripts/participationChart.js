@@ -46,7 +46,7 @@ function initParticipationChart(boatClasses, periods, participationData) {
         };
     });
     
-    const chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'line',
         data: {
             labels: periods,

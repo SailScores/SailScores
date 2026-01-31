@@ -161,7 +161,7 @@ namespace SailScores.Web.Services
                 return null;
             }
             var stream = new MemoryStream();
-            stream.Write(file.FileContents, 0, file.FileContents.Length);
+            await stream.WriteAsync(file.FileContents, 0, file.FileContents.Length);
             stream.Position = 0;
             return new FileStreamResult(stream, "image/png");
         }

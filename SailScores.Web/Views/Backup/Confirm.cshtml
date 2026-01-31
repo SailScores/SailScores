@@ -1,0 +1,72 @@
+@model SailScores.Web.Controllers.BackupConfirmViewModel
+
+@{
+    ViewData["Title"] = "Confirm Restore";
+    Layout = "_ClubLayout";
+}
+
+<h2>Confirm Restore</h2>
+<p class="lead">Review the backup details before restoring to @Model.ClubName.</p>
+
+<hr />
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-file-archive me-2"></i>Backup Details</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">File Name</dt>
+            <dd class="col-sm-9">@Model.FileName</dd>
+
+            <dt class="col-sm-3">Source Club</dt>
+            <dd class="col-sm-9">@Model.SourceClubName</dd>
+
+            <dt class="col-sm-3">Backup Date</dt>
+            <dd class="col-sm-9">@Model.BackupDate.ToString("f") UTC</dd>
+
+            <dt class="col-sm-3">Backup Version</dt>
+            <dd class="col-sm-9">@Model.BackupVersion</dd>
+
+            <dt class="col-sm-3">Target Club</dt>
+            <dd class="col-sm-9"><strong>@Model.ClubName</strong></dd>
+        </dl>
+    </div>
+</div>
+
+<div class="alert alert-danger">
+    <h5><i class="fas fa-exclamation-triangle me-2"></i>Final Warning</h5>
+    <p class="mb-0">
+        Clicking "Confirm Restore" will permanently delete <strong>all existing data</strong> in 
+        <strong>@Model.ClubName</strong> and replace it with the backup data from 
+        <strong>@Model.SourceClubName</strong>.
+        This action <strong>cannot be undone</strong>.
+    </p>
+</div>
+
+<form asp-action="Restore" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="backupFile" class="form-label">Re-select the backup file to confirm</label>
+        <input type="file" class="form-control" id="backupFile" name="backupFile" 
+               accept=".gz,.json" required />
+    </div>
+
+    <div class="mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="preserveClubSettings" 
+                   name="preserveClubSettings" value="true" checked />
+            <label class="form-check-label" for="preserveClubSettings">
+                Preserve current club name, initials, and URL
+            </label>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-check me-2"></i>Confirm Restore
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-2"></i>Cancel
+        </a>
+    </div>
+</form>

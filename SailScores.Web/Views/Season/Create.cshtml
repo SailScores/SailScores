@@ -1,4 +1,4 @@
-@model SailScores.Core.Model.Season
+@model SailScores.Web.Models.SailScores.SeasonWithOptionsViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,7 +10,7 @@
 <h4>Season</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
@@ -36,6 +36,37 @@
                 <input asp-for="End" class="form-control" />
                 <span asp-validation-for="End" class="text-danger"></span>
             </div>
+
+            <div id="advancedFields" role="tablist">
+                <div class="card">
+                    <div class="card-header" role="tab" id="advancedHeading">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-bs-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+                                Advanced <span class="fas fa-chevron-down"></span></a>
+                            <span class="small"><em>&ensp;Optional</em></span>
+                        </h5>
+                    </div>
+
+                    <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label asp-for="DefaultScoringSystemId" class="control-label">Default Scoring System</label>
+                                <select id="DefaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-select">
+                                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                                    {
+                                        <option value="@scoringSystem.Id">
+                                            @scoringSystem.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="DefaultScoringSystemId" class="text-danger"></span>
+                                <small class="form-text text-muted">Series in this season will use this scoring system by default if not explicitly set.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
             <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
                 <a asp-controller="Admin"

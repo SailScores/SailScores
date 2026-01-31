@@ -1,6 +1,7 @@
 @using Microsoft.Extensions.Localization;
 @using SailScores.Api.Enumerations
 @using SailScores.Core.Model
+@using SailScores.Core.Utility
 @using SailScores.Web.Resources;
 @using SailScores.Web.Services;
 
@@ -219,34 +220,36 @@
 {
     var counter = 1;
     var fleetHasResults = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id)?.FlatResults?.NumberOfSailedRaces > 0;
-    <div id="@fleet.ShortName">
+    // Sanitize ShortName for use in HTML IDs and URLs (backward compatibility for existing data)
+    var sanitizedShortName = UrlUtility.GetUrlName(fleet.ShortName);
+    <div id="@sanitizedShortName">
         <h3>@(fleet.NickName??fleet.Name??fleet.ShortName)</h3>
-        <ul class="nav nav-tabs" id="@($"Tab{fleet.ShortName}")" role="tablist">
+        <ul class="nav nav-tabs" id="@($"Tab{sanitizedShortName}")" role="tablist">
             <li class="nav-item">
-                <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{fleet.ShortName}-tab")" data-bs-toggle="tab"
-               href="@($"#Competitors{fleet.ShortName}")" role="tab"
-               aria-controls="@($"Competitors{fleet.ShortName}")" aria-selected="true">
+                <a class="nav-link @(fleetHasResults ? "" : "active")" id="@($"Competitors{sanitizedShortName}-tab")" data-bs-toggle="tab"
+               href="@($"#Competitors{sanitizedShortName}")" role="tab"
+               aria-controls="@($"Competitors{sanitizedShortName}")" aria-selected="true">
                     @localizer["CapCompetitors"]
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @(fleetHasResults ? "active" : "")" id="@($"Results{fleet.ShortName}-tab")" data-bs-toggle="tab"
-               href="@($"#Results{fleet.ShortName}")" role="tab"
-               aria-controls="@($"Results{fleet.ShortName}")" aria-selected="false">
+                <a class="nav-link @(fleetHasResults ? "active" : "")" id="@($"Results{sanitizedShortName}-tab")" data-bs-toggle="tab"
+               href="@($"#Results{sanitizedShortName}")" role="tab"
+               aria-controls="@($"Results{sanitizedShortName}")" aria-selected="false">
                     @localizer["Results"]
                 </a>
             </li>
             <li class="nav-item d-none d-sm-inline-flex">
-                <a class="nav-link" id="@($"Chart{fleet.ShortName}-tab")" data-bs-toggle="tab"
-               href="@($"#Chart{fleet.ShortName}")" role="tab"
-               aria-controls="@($"Chart{fleet.ShortName}")" aria-selected="false">
+                <a class="nav-link" id="@($"Chart{sanitizedShortName}-tab")" data-bs-toggle="tab"
+               href="@($"#Chart{sanitizedShortName}")" role="tab"
+               aria-controls="@($"Chart{sanitizedShortName}")" aria-selected="false">
                     @localizer["Chart"]
                 </a>
             </li>
         </ul>
-        <div class="tab-content" id="@($"Tab{fleet.ShortName}Content")">
-            <div class="tab-pane fade @(fleetHasResults ? "" : "show active")" id="@($"Competitors{fleet.ShortName}")" role="tabpanel"
-             aria-labelledby="@($"Competitors{fleet.ShortName}-tab")">
+        <div class="tab-content" id="@($"Tab{sanitizedShortName}Content")">
+            <div class="tab-pane fade @(fleetHasResults ? "" : "show active")" id="@($"Competitors{sanitizedShortName}")" role="tabpanel"
+             aria-labelledby="@($"Competitors{sanitizedShortName}-tab")">
                 @if (Model.CanEdit)
                 {
                     <div class="py-2">
@@ -282,8 +285,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="tab-pane fade @(fleetHasResults ? "show active" : "")" id="@($"Results{fleet.ShortName}")" role="tabpanel"
-             aria-labelledby="@($"Results{fleet.ShortName}-tab")">
+            <div class="tab-pane fade @(fleetHasResults ? "show active" : "")" id="@($"Results{sanitizedShortName}")" role="tabpanel"
+             aria-labelledby="@($"Results{sanitizedShortName}-tab")">
                 @{
                     var currentSeries = Model.Item.Series.FirstOrDefault(s => s.FleetId == fleet.Id);
                 }
@@ -318,12 +321,12 @@
                     <span>@localizer["No Results posted"]</span>
                 }
             </div>
-            <div class="tab-pane fade" id="@($"Chart{fleet.ShortName}")" role="tabpanel"
-                 aria-labelledby="@($"Chart{fleet.ShortName}-tab")">
+            <div class="tab-pane fade" id="@($"Chart{sanitizedShortName}")" role="tabpanel"
+                 aria-labelledby="@($"Chart{sanitizedShortName}-tab")">
                 @if (Model.Item.Series.Any(s => s.FleetId == fleet.Id))
                 {
                     <div class="container d-none d-sm-flex">
-                        <svg id="@($"chart{fleet.ShortName}")" class="results-chart" data-series-id="@Model.Item.Series.First(s => s.FleetId == fleet.Id).Id"></svg>
+                        <svg id="@($"chart{sanitizedShortName}")" class="results-chart" data-series-id="@Model.Item.Series.First(s => s.FleetId == fleet.Id).Id"></svg>
                     </div>
                 }
                 else
@@ -339,5 +342,20 @@
 
 @section Scripts {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
-<script src="~/js/seriesChart.js"></script>
+<script src="~/js/seriesChart.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr("href");
+                if (target && target.includes('Chart')) {
+                    var svg = $(target + ' svg.results-chart');
+                    if (svg.length > 0) {
+                        var seriesId = svg.attr('data-series-id');
+                        svg.empty();
+                        globalThis.drawChart(seriesId, '#' + svg.attr('id'));
+                    }
+                }
+            });
+        });
+    </script>
 }

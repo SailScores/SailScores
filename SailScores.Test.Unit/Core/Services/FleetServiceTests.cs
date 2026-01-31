@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Test.Unit.Utilities;
@@ -48,6 +48,52 @@ namespace SailScores.Test.Unit.Core.Services
                 .Where(f => f.Name == newFleet.Name));
             Assert.Equal(startingFleetCount + 1,
                 _context.Fleets.Count());
+        }
+
+        [Fact]
+        public async Task SaveNew_WithSpacesInShortName_SanitizesForUrl()
+        {
+            var startingFleetCount = _context.Fleets.Count();
+
+            var newFleet = new Fleet
+            {
+                Name = "My Fleet With Spaces",
+                ShortName = "My Fleet With Spaces",
+                NickName = "myFleet",
+                ClubId = _clubId
+            };
+
+            await _service.SaveNew(newFleet);
+
+            var savedFleet = _context.Fleets
+                .FirstOrDefault(f => f.Name == newFleet.Name);
+            
+            Assert.NotNull(savedFleet);
+            Assert.Equal("my-fleet-with-spaces", savedFleet.ShortName);
+            Assert.Equal(startingFleetCount + 1, _context.Fleets.Count());
+        }
+
+        [Fact]
+        public async Task SaveNew_WithSpecialCharsInShortName_SanitizesForUrl()
+        {
+            var startingFleetCount = _context.Fleets.Count();
+
+            var newFleet = new Fleet
+            {
+                Name = "My Fleet!@#$%",
+                ShortName = "Fleet!@#$%",
+                NickName = "myFleet",
+                ClubId = _clubId
+            };
+
+            await _service.SaveNew(newFleet);
+
+            var savedFleet = _context.Fleets
+                .FirstOrDefault(f => f.Name == newFleet.Name);
+            
+            Assert.NotNull(savedFleet);
+            Assert.Equal("fleet", savedFleet.ShortName);
+            Assert.Equal(startingFleetCount + 1, _context.Fleets.Count());
         }
 
         [Fact]
@@ -177,6 +223,31 @@ namespace SailScores.Test.Unit.Core.Services
 
             // Assert
             Assert.NotEmpty(returnedValue);
+        }
+
+        [Fact]
+        public async Task Update_WithSpacesInShortName_SanitizesForUrl()
+        {
+            // Arrange
+            var newFleet = new Fleet
+            {
+                Name = "Original Fleet",
+                ShortName = "originalfleet",
+                NickName = "Original",
+                ClubId = _clubId
+            };
+
+            await _service.SaveNew(newFleet);
+            var fleetId = _context.Fleets.First(f => f.Name == newFleet.Name).Id;
+
+            // Act
+            var fleetToUpdate = await _service.Get(fleetId);
+            fleetToUpdate.ShortName = "Updated Fleet Name";
+            await _service.Update(fleetToUpdate);
+
+            // Assert
+            var updatedFleet = await _service.Get(fleetId);
+            Assert.Equal("updated-fleet-name", updatedFleet.ShortName);
         }
     }
 }

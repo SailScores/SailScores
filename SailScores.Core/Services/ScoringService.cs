@@ -135,13 +135,23 @@ namespace SailScores.Core.Services
             scoringSystemId = regatta?.ScoringSystemId ?? scoringSystemId;
             if (scoringSystemId == null)
             {
+                // Check season default before club default
+                var seasonDefaultScoringSystemId = await _dbContext.Series
+                    .Where(s => s.Id == series.Id)
+                    .Select(s => s.Season.DefaultScoringSystemId)
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
+                scoringSystemId = seasonDefaultScoringSystemId;
+            }
+            if (scoringSystemId == null)
+            {
                 scoringSystemId = (await _dbContext.Clubs.Where(c => c.Id == series.ClubId)
                     .FirstOrDefaultAsync().ConfigureAwait(false))
                     .DefaultScoringSystemId;
             }
             if (scoringSystemId == null)
             {
-                throw new InvalidOperationException("Scoring system for series not found and club default scoring system not found.");
+                throw new InvalidOperationException("Scoring system for series not found and default scoring system not found.");
             }
             var system = await GetScoringSystemAsync(scoringSystemId.Value, false)
                 .ConfigureAwait(false);
@@ -230,6 +240,9 @@ namespace SailScores.Core.Services
                        .ConfigureAwait(false))
                 || (await _dbContext.Clubs.AnyAsync(c =>
                     c.DefaultScoringSystemId == scoringSystemId)
+                    .ConfigureAwait(false))
+                || (await _dbContext.Seasons.AnyAsync(s =>
+                    s.DefaultScoringSystemId == scoringSystemId)
                     .ConfigureAwait(false))
                 || (await _dbContext.ScoringSystems.AnyAsync(s =>
                     s.ParentSystemId == scoringSystemId)
@@ -338,6 +351,43 @@ namespace SailScores.Core.Services
             return (await _dbContext.Clubs.Where(c => c.Id == clubId)
                 .FirstOrDefaultAsync().ConfigureAwait(false))
                 .DefaultScoringSystemId;
+        }
+
+        public async Task<IList<ScoringSystem>> CreateDefaultScoringSystemsAsync(Guid clubId, string clubInitials)
+        {
+            var createdSystems = new List<ScoringSystem>();
+
+            var baseScoringSystem = await GetSiteDefaultSystemAsync().ConfigureAwait(false);
+            if (baseScoringSystem != null)
+            {
+                var newScoringSystem = new ScoringSystem
+                {
+                    Id = Guid.NewGuid(),
+                    ClubId = clubId,
+                    ParentSystemId = baseScoringSystem.Id,
+                    Name = $"{clubInitials} scoring based on App. A Rule 5.3",
+                    DiscardPattern = "0"
+                };
+                await SaveScoringSystemAsync(newScoringSystem).ConfigureAwait(false);
+                createdSystems.Add(newScoringSystem);
+            }
+
+            var regattaScoringSystem = await GetBaseRegattaSystemAsync().ConfigureAwait(false);
+            if (regattaScoringSystem != null)
+            {
+                var newRegattaScoringSystem = new ScoringSystem
+                {
+                    Id = Guid.NewGuid(),
+                    ClubId = clubId,
+                    ParentSystemId = regattaScoringSystem.Id,
+                    Name = $"{clubInitials} scoring based on App. A",
+                    DiscardPattern = "0,1"
+                };
+                await SaveScoringSystemAsync(newRegattaScoringSystem).ConfigureAwait(false);
+                createdSystems.Add(newRegattaScoringSystem);
+            }
+
+            return createdSystems;
         }
     }
 }

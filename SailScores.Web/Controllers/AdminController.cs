@@ -11,7 +11,7 @@ namespace SailScores.Web.Controllers;
 [Authorize]
 public class AdminController : Controller
 {
-
+    private const string V = "ClubInitials";
     private readonly IAdminService _adminService;
     private readonly IAuthorizationService _authService;
     private readonly IAdminTipService _tipService;
@@ -32,7 +32,7 @@ public class AdminController : Controller
     // GET: Admin
     public async Task<ActionResult> Index(string clubInitials)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -47,13 +47,14 @@ public class AdminController : Controller
     // GET: Admin/Edit
     public async Task<ActionResult> Edit(string clubInitials)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
         }
         var vm = await _adminService.GetClubForEdit(clubInitials);
         var editVm = _mapper.Map<AdminEditViewModel>(vm);
+        editVm.RaceCount = await _adminService.GetRaceCountAsync(vm.Id);
         return View(editVm);
     }
 
@@ -64,7 +65,7 @@ public class AdminController : Controller
         string clubInitials,
         AdminEditViewModel clubAdmin)
     {
-        ViewData["ClubInitials"] = clubInitials;
+        ViewData[V] = clubInitials;
         try
         {
             if (!await _authService.CanUserEdit(User, clubAdmin.Id))
@@ -137,6 +138,79 @@ public class AdminController : Controller
             return NotFound();
         }
         return result;
+    }
+
+    // GET: Admin/ResetClub
+    public async Task<ActionResult> ResetClub(string clubInitials)
+    {
+        ViewData[V] = clubInitials;
+        if (!await _authService.CanUserEdit(User, clubInitials))
+        {
+            return Unauthorized();
+        }
+        var club = await _adminService.GetClub(clubInitials);
+        var raceCount = await _adminService.GetRaceCountAsync(club.Id);
+        var vm = new ResetClubViewModel
+        {
+            ClubId = club.Id,
+            ClubName = club.Name,
+            ClubInitials = club.Initials,
+            RaceCount = raceCount
+        };
+        return View(vm);
+    }
+
+    // POST: Admin/ResetClub
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ResetClub(
+        string clubInitials,
+        ResetClubViewModel model)
+    {
+        ViewData[V] = clubInitials;
+        if (!await _authService.CanUserEdit(User, model.ClubId))
+        {
+            return Unauthorized();
+        }
+        
+        // Re-fetch race count to prevent manipulation
+        var raceCount = await _adminService.GetRaceCountAsync(model.ClubId);
+        model.RaceCount = raceCount;
+        
+        if (!model.CanSelfReset)
+        {
+            ModelState.AddModelError(string.Empty, 
+                $"This club has {raceCount} races which exceeds the self-service limit of {ResetClubViewModel.MaxSelfServiceRaceCount}. Please contact info@sailscores.com to request a reset.");
+            return View(model);
+        }
+        
+        if (!ModelState.IsValid || !model.ResetLevel.HasValue)
+        {
+            return View(model);
+        }
+
+        try
+        {
+            await _adminService.ResetClubAsync(model.ClubId, model.ResetLevel.Value);
+            TempData["SuccessMessage"] = $"Club data has been reset successfully using '{GetResetLevelDescription(model.ResetLevel.Value)}' option.";
+            return RedirectToAction(nameof(Index), "Admin", new { clubInitials });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, $"Error resetting club: {ex.Message}");
+            return View(model);
+        }
+    }
+
+    private static string GetResetLevelDescription(Core.Model.ResetLevel level)
+    {
+        return level switch
+        {
+            Core.Model.ResetLevel.RacesAndSeries => "Clear Races and Series",
+            Core.Model.ResetLevel.RacesSeriesAndCompetitors => "Clear Races, Series, and Competitors",
+            Core.Model.ResetLevel.FullReset => "Full Reset",
+            _ => level.ToString()
+        };
     }
 
 }

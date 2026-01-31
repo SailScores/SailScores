@@ -34,6 +34,7 @@ namespace SailScores.Core.Extensions
             services.AddScoped<ISupporterService, SupporterService>();
             services.AddScoped<ICoreCalendarService, CalendarService>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IBackupService, BackupService>();
 
         }
     }

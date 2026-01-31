@@ -14,6 +14,7 @@ namespace SailScores.Database;
 
 public class SailScoresContext : DbContext, ISailScoresContext
 {
+    private const string ClubIdParameterName = "ClubId";
     private readonly Assembly _executingAssembly;
 
     public DbSet<Club> Clubs { get; set; }
@@ -42,11 +43,19 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<SeriesForwarder> SeriesForwarders { get; set; }
     public DbSet<RegattaForwarder> RegattaForwarders { get; set; }
     public DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
+    public DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
 
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
     public DbSet<SystemAlert> SystemAlerts { get; set; }
     public DbSet<Supporter> Supporters { get; set; }
+
+    // Junction tables for relationships
+    public DbSet<SeriesRace> SeriesRaces { get; set; }
+    public DbSet<CompetitorFleet> CompetitorFleets { get; set; }
+    public DbSet<FleetBoatClass> FleetBoatClasses { get; set; }
+    public DbSet<RegattaSeries> RegattaSeries { get; set; }
+    public DbSet<RegattaFleet> RegattaFleets { get; set; }
 
     // these sets below are not tables in the database 
     private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
@@ -68,7 +77,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
         DateTime? endDate)
     {
         var query = await GetSqlQuery("AllCompHistogramFields");
-        var clubParam = new SqlParameter("ClubId", clubId);
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId);
         var startDateParam = new SqlParameter("StartDate", startDate ?? (object)DBNull.Value);
         var endDateParam = new SqlParameter("EndDate", endDate ?? (object)DBNull.Value);
         var result = await this.AllCompHistogramFields
@@ -83,7 +92,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
         DateTime? endDate)
     {
         var query = await GetSqlQuery("AllCompHistogram");
-        var clubParam = new SqlParameter("ClubId", clubId);
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId);
         var startDateParam = new SqlParameter("StartDate", startDate ?? (object)DBNull.Value);
         var endDateParam = new SqlParameter("EndDate", endDate ?? (object)DBNull.Value);
         var result = await this.AllCompHistogramStats
@@ -152,7 +161,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public async Task<IList<DeletableInfo>> GetDeletableInfoForCompetitorsAsync(Guid clubId)
     {
         var query = await GetSqlQuery("DeletableCompetitors");
-        var clubParam = new SqlParameter("ClubId", clubId); 
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId); 
         var result = await this.CompetitorDeletableInfo
             .FromSqlRaw(query, clubParam)
             .ToListAsync();
@@ -162,7 +171,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public async Task<IList<CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId)
     {
         var query = await GetSqlQuery("CompetitorActiveDates");
-        var clubParam = new SqlParameter("ClubId", clubId);
+        var clubParam = new SqlParameter(ClubIdParameterName, clubId);
         var result = await this.CompetitorActiveDates
             .FromSqlRaw(query, clubParam)
             .ToListAsync();
@@ -199,15 +208,22 @@ public class SailScoresContext : DbContext, ISailScoresContext
         }
 
         modelBuilder.Entity<CompetitorFleet>()
+            .ToTable("CompetitorFleet")
             .HasKey(x => new { x.CompetitorId, x.FleetId });
         modelBuilder.Entity<SeriesRace>()
+            .ToTable("SeriesRace")
             .HasKey(x => new { x.SeriesId, x.RaceId });
         modelBuilder.Entity<FleetBoatClass>()
+            .ToTable("FleetBoatClass")
             .HasKey(x => new { x.FleetId, x.BoatClassId });
         modelBuilder.Entity<RegattaFleet>()
+            .ToTable("RegattaFleet")
             .HasKey(x => new { x.RegattaId, x.FleetId });
         modelBuilder.Entity<RegattaSeries>()
+            .ToTable("RegattaSeries")
             .HasKey(x => new { x.RegattaId, x.SeriesId });
+        modelBuilder.Entity<SeriesToSeriesLink>()
+            .ToTable("SeriesToSeriesLink");
 
         modelBuilder.Entity<Club>()
             .HasOne(c => c.DefaultScoringSystem)
@@ -241,6 +257,9 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
         modelBuilder.Entity<SeriesToSeriesLink>()
             .HasKey(sl => new { sl.ParentSeriesId, sl.ChildSeriesId });
+
+        modelBuilder.Entity<SeriesToSeriesLink>()
+            .ToTable("SeriesToSeriesLink");
 
         modelBuilder.Entity<SeriesToSeriesLink>()
             .HasOne(sl => sl.ParentSeries)
@@ -329,35 +348,55 @@ public class SailScoresContext : DbContext, ISailScoresContext
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
         modelBuilder.Entity<CompetitorRankStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<ClubSeasonStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<SiteStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<AllCompHistogramStats>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<AllCompHistogramFields>(
             cs =>
             {
                 cs.HasNoKey();
+                cs.ToTable((string)null);
+            });
+
+        modelBuilder.Entity<DeletableInfo>(
+            cs =>
+            {
+                cs.HasNoKey();
+                cs.ToTable((string)null);
+            });
+
+        modelBuilder.Entity<CompetitorActiveDates>(
+            cs =>
+            {
+                cs.HasNoKey();
+                cs.ToTable((string)null);
             });
 
         modelBuilder.Entity<ChangeType>().HasData(

@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -479,6 +479,7 @@ namespace SailScores.Core.Scoring
 
         private static IList<Competitor> ReorderCompetitors(SeriesResults results)
         {
+            // The main ordering function is in Core.SeriesService FlattenResults.
             return results.Competitors.OrderBy(c => results.Results[c].Rank ?? int.MaxValue).ToList();
         }
 
@@ -783,7 +784,7 @@ namespace SailScores.Core.Scoring
             };
         }
 
-        private bool IsSeriesBasedScore(ScoreCode scoreCode)
+        protected virtual bool IsSeriesBasedScore(ScoreCode scoreCode)
         {
             // defaults to false if not a coded score.
             string formula = scoreCode?.Formula ?? String.Empty;

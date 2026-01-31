@@ -326,12 +326,13 @@ public class ReportService : Interfaces.IReportService
 
         private static string BuildCsvHeader(AllCompHistogramViewModel model)
         {
-            var header = "Competitor,Sail Number,Season,Aggregation";
+            var sb = new System.Text.StringBuilder();
+            sb.Append("Competitor,Sail Number,Season,Aggregation");
             if (model.Places != null && model.Places.Any())
             {
                 foreach (var p in model.Places)
                 {
-                    header += "," + $"Place {p}";
+                    sb.Append( "," + $"Place {p}");
                 }
             }
 
@@ -339,11 +340,11 @@ public class ReportService : Interfaces.IReportService
             {
                 foreach (var c in model.Codes)
                 {
-                    header += "," + c;
+                    sb.Append( "," + c);
                 }
             }
 
-            return header;
+            return sb.ToString();
         }
 
         private static string BuildCsvRow(AllCompHistogramRow row, AllCompHistogramViewModel model)

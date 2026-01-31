@@ -1,95 +1,46 @@
-﻿
+import { getY, getDate } from './seriesChartUtils.js';
+
 (function () {
 
-    var chartOverallWidth = 960;
-    var chartOverallHeight = 600;
-    var margin = 30;
-    var legendWidth = 150;
-    var legendLineHeight = 16;
-    var legendMargin = 2;
+    const chartOverallWidth = 960;
+    let chartOverallHeight = 600;
+    const margin = 30;
+    const legendWidth = 150;
+    const legendLineHeight = 16;
+    const legendMargin = 2;
 
 
-    var charts = document.getElementsByClassName("results-chart");
-    for (var i = 0; i < charts.length; i++) {
-        drawChart(charts[i].dataset.seriesId, "#"+charts[i].id)
+    const charts = document.getElementsByClassName("results-chart");
+    for (let i = 0; i < charts.length; i++) {
+        let el = charts[i];
+        drawChart(el.dataset.seriesId || '', "#" + el.id);
     }
 
 
     function drawChart(seriesId, elementId) {
-        //var chartElementId = elementId;
+        let minDate;
+        let maxDate;
 
-        var minDate;
-        var maxDate;
-
-        var dataPath = "/series/chart?seriesId=" + seriesId;
+        const dataPath = "/series/chart?seriesId=" + seriesId;
         if (typeof (d3) != "undefined" && d3 != null) {
             d3.json(dataPath).then(processChartData);
         }
 
-
-        function getDate(result, allData) {
-            var thisRace = allData.races.find(r => r.id === result.raceId);
-            var racesThisDate = allData.races.filter(r => r.date === thisRace.date);
-
-            var order = racesThisDate.findIndex(r => r.id === thisRace.id) + 1;
-
-            return new Date(new Date(thisRace.date).getTime()
-                + (order * 24 * 60 * 60 * 1000 / (racesThisDate.length + 1)));
-        }
-
-        function getY(result, allData) {
-
-            var maxScore = Math.max(...allData.entries
-                .filter(e => e.raceId === result.raceId)
-                .map(e => e.seriesPoints));
-            var minScore = Math.min(...allData.entries
-                .filter(e => e.raceId === result.raceId
-                    && e.seriesPoints !== 0)
-                .map(e => e.seriesPoints));
-            var minNonnullScore = Math.min(...allData.entries
-                .filter(e => e.raceId === result.raceId
-                    && e.seriesPoints !== 0
-                    && e.seriesPoints !== null)
-                .map(e => e.seriesPoints));
-
-            // This gives a better bottom of chart than 0 for Cox-Sprague
-            minScore = Math.max(minScore, minNonnullScore - 10)
-            var ratio = (Math.max(result.seriesPoints - minScore, 0 )) / (maxScore - minScore);
-            if (!allData.isLowPoints) {
-                ratio = 1.0 - ratio;
-            }
-            if (isNaN(ratio)) {
-                ratio = 0;
-            }
-            if (result.seriesPoints === 0) {
-                ratio = 1;
-            }
-            return margin + (ratio * (chartOverallHeight - margin - margin));
-        }
-
         function responsivefy(svg) {
-            // get container + svg aspect ratio
-            var container = d3.select(svg.node().parentNode),
+            const container = d3.select(svg.node().parentNode),
                 width = parseInt(svg.style("width")),
                 height = parseInt(svg.style("height")),
                 aspect = width / height;
 
-            // add viewBox and preserveAspectRatio properties,
-            // and call resize so that svg resizes on inital page load
             svg.attr("viewBox", "0 0 " + width + " " + height)
                 .attr("preserveAspectRatio", "xMinYMid")
                 .call(resize);
 
-            // to register multiple listeners for same event type, 
-            // you need to add namespace, i.e., 'click.foo'
-            // necessary if you call invoke this function for multiple svgs
-            // api docs: https://github.com/mbostock/d3/wiki/Selections#on
             d3.select(window).on("resize." + container.attr("id"), resize);
 
-            // get width of container and resize svg to fit it
             function resize() {
-                var targetWidth = parseInt(container.style("width"));
-                if (targetWidth <= 100) {// assume percent
+                let targetWidth = parseInt(container.style("width"));
+                if (targetWidth <= 100) {
                     targetWidth = width;
                 }
                 svg.attr("width", targetWidth);
@@ -105,19 +56,19 @@
             if (data === null) {
                 return;
             }
-            var dates = data.races.map(r => new Date(r.date));
-            minDate = new Date(Math.min.apply(null, dates));
-            maxDate = new Date(Math.max.apply(null, dates));
+            const dates = data.races.map(r => new Date(r.date));
+            minDate = new Date(Math.min.apply(null, dates.map(function (d) { return d.getTime(); })));
+            maxDate = new Date(Math.max.apply(null, dates.map(function (d) { return d.getTime(); })));
             maxDate.setDate(maxDate.getDate() + 1);
 
-            var xScale = d3.scaleTime()
+            const xScale = d3.scaleTime()
                 .domain([minDate, maxDate])
                 .range([margin, chartOverallWidth - margin - legendWidth]);
-            var color = d3.scaleOrdinal(d3.schemeDark2);
+            const color = d3.scaleOrdinal(d3.schemeDark2);
 
             chartOverallHeight = data.competitors.length * legendLineHeight + (2 * margin);
 
-            var svgElement = d3.select(elementId)
+            const svgElement = d3.select(elementId)
                 .attr("width", chartOverallWidth)
                 .attr("height", chartOverallHeight)
                 .call(responsivefy);
@@ -128,7 +79,7 @@
             }
 
             function onMouseOver(d) {
-                var compId = d.competitorId || d.id;
+                const compId = d.competitorId || d.id;
                 svgElement
                     .selectAll("path.compLine")
                     .attr("opacity", .4);
@@ -144,7 +95,7 @@
                     .attr("opacity", 1);
                 svgElement
                     .selectAll("g.legendEntry[data-compId='" + compId + "'] rect")
-                    .attr("stroke", (c) => color(c.id));
+                    .attr("stroke", function (c) { return color(c.id); });
                 svgElement.selectAll("circle")
                     .attr("opacity", .4);
                 svgElement
@@ -154,8 +105,8 @@
             }
             function onMouseOverRace(d) {
                 tooltipGroup
-                    .attr("transform", "translate(" + xScale(getDate(d, data)) + ","
-                        + (getY(d, data) - legendLineHeight) + ")")
+                    .attr("transform", "translate(" + xScale(getDate(d, data)) + "," +
+                        (getY(d, data, margin, chartOverallHeight) - legendLineHeight) + ")")
                     .attr("opacity", 1)
                     .select("text")
                     .selectAll("*")
@@ -191,8 +142,8 @@
                     .attr("stroke", "none");
                 tooltipGroup
                     .attr("opacity", 0)
-                    .attr("transform", "translate(" + chartOverallWidth + ","
-                        + chartOverallHeight + ")");
+                    .attr("transform", "translate(" + chartOverallWidth + "," +
+                        chartOverallHeight + ")");
 
                 svgElement
                     .selectAll("path.compLine")
@@ -205,20 +156,19 @@
             }
 
 
-            var legend = d3.select(elementId)
+            const legend = d3.select(elementId)
                 .selectAll("g.legendEntry")
                 .attr("transform", "translate(" + (chartOverallWidth - legendWidth) + "," + (margin + legendMargin) + ")")
                 .data(data.competitors)
                 .enter()
                 .append("g")
                 .attr("class", "legendEntry")
-                .attr("data-compId", d => d.id)
+                .attr("data-compId", function (d) { return d.id; })
                 .attr("transform", function (d, i) {
-                    var x = chartOverallWidth - legendWidth;
-                    var y = (i * legendLineHeight) + legendMargin + 20;
+                    const x = chartOverallWidth - legendWidth;
+                    const y = (i * legendLineHeight) + legendMargin + 20;
                     return 'translate(' + x + ',' + y + ')';
-                }
-                )
+                })
                 .attr("opacity", 1)
                 .on("mouseover", onMouseOver)
                 .on("mouseout", onMouseOut);
@@ -232,7 +182,7 @@
                 .attr('height', legendLineHeight - 2 * legendMargin)
                 .attr("x", legendMargin)
                 .attr("y", legendMargin)
-                .style('fill', (c) => color(c.id))
+                .style('fill', function (c) { return color(c.id); })
                 .style('stroke-width', 0);
             legend.append('text')
                 .attr('x', 20 + legendMargin)
@@ -240,17 +190,18 @@
                 .style("font-size", "11px")
                 .text(function (d) { return d.name; });
 
-            var xAxis = d3.axisTop().scale(xScale);
-            var language = d3.select("html").attr("lang").substring(0, 2);
-            if (((minDate - maxDate) < (10 * 24 * 60 * 60 * 1000)) || language !== "en") {
+            let xAxis = d3.axisTop().scale(xScale);
+            const language = d3.select("html").attr("lang").substring(0, 2);
+            if (((minDate.getTime() - maxDate.getTime()) < (10 * 24 * 60 * 60 * 1000)) || language !== "en") {
                 xAxis = xAxis.tickFormat("");
             }
             svgElement.append("g").attr("id", "xAxisG")
                 .attr("transform", "translate(0,20)").call(xAxis);
 
-            var lineData = d3.line()
-                .x(d => xScale(getDate(d, data)))
-                .y(d => getY(d, data));
+            const lineData = d3.line()
+                .defined(function (d) { return getY(d, data, margin, chartOverallHeight) !== null; })
+                .x(function (d) { return xScale(getDate(d, data)); })
+                .y(function (d) { return getY(d, data, margin, chartOverallHeight); });
 
             svgElement
                 .selectAll("path.compLine")
@@ -258,30 +209,30 @@
                 .enter()
                 .append("path")
                 .attr("class", "compLine")
-                .attr("d", d => lineData(data.entries.filter(e => e.competitorId === d.id)))
+                .attr("d", function (d) { return lineData(data.entries.filter(function (e) { return e.competitorId === d.id; })); })
                 .attr("fill", "none")
                 .attr("opacity", 1)
-                .attr("stroke", d => color(d.id))
+                .attr("stroke", function (d) { return color(d.id); })
                 .attr("stroke-width", 1)
                 .attr("stroke-linejoin", "round")
                 .attr("stroke-linecap", "round")
-                .attr("data-compId", d => d.id)
+                .attr("data-compId", function (d) { return d.id; })
                 .on("mouseover", onMouseOver)
                 .on("mouseout", onMouseOut);
 
             svgElement.selectAll("circle")
-                .data(data.entries)
+                .data(data.entries.filter(function (e) { return e.seriesPoints !== null; }))
                 .enter()
                 .append("circle")
                 .attr("r", 3)
-                .attr("cy", d => getY(d, data))
-                .attr("cx", d => xScale(getDate(d, data)))
-                .attr("data-compId", d => d.competitorId)
-                .attr("fill", d => color(d.competitorId))
+                .attr("cy", function (d) { return getY(d, data, margin, chartOverallHeight); })
+                .attr("cx", function (d) { return xScale(getDate(d, data)); })
+                .attr("data-compId", function (d) { return d.competitorId; })
+                .attr("fill", function (d) { return color(d.competitorId); })
                 .on("mouseover", onMouseOverRace)
                 .on("mouseout", onMouseOut);
 
-            var tooltipGroup = svgElement
+            const tooltipGroup = svgElement
                 .append("g")
                 .attr("opacity", 0);
             tooltipGroup.append("rect")
@@ -296,8 +247,8 @@
 
         }
     }
-    return {
-        drawChart: drawChart
-    };
+
+    (globalThis).drawChart = drawChart;
+    (globalThis).getY = getY;
 
 })();
