@@ -9,7 +9,6 @@ namespace SailScores.Web.Services;
 public class WebSiteAdminService : IWebSiteAdminService
 {
     private readonly IMemoryCache _cache;
-    private readonly IMapper _mapper;
     private readonly CoreServices.ISeriesService _seriesService;
     private readonly CoreServices.ISiteAdminService _coreSiteAdminService;
     private readonly CoreServices.IClubService _coreClubService;
@@ -17,14 +16,12 @@ public class WebSiteAdminService : IWebSiteAdminService
 
     public WebSiteAdminService(
         IMemoryCache cache,
-        IMapper mapper,
         CoreServices.ISeriesService seriesService,
         CoreServices.ISiteAdminService coreSiteAdminService,
         CoreServices.IClubService coreClubService,
         IBackupService backupService)
     {
         _cache = cache;
-        _mapper = mapper;
         _seriesService = seriesService;
         _coreSiteAdminService = coreSiteAdminService;
         _coreClubService = coreClubService;
