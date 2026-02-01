@@ -59,7 +59,7 @@ public class SupporterController : Controller
         if (User?.Identity?.IsAuthenticated == true)
         {
             var email = User.Identity.Name;
-            multipleClubs = await UserHasMultipleClubsAsync(email);
+            multipleClubs = await _stripeService.UserHasMultipleClubsAsync(email);
             var clubInfo = await _stripeService.GetFirstClubForUserEmailAsync(email);
             clubInitials = clubInfo.ClubInitials;
         }
@@ -72,7 +72,6 @@ public class SupporterController : Controller
         return View();
     }
 
-    private async Task<bool> UserHasMultipleClubsAsync(string email) => throw new NotImplementedException();
 
     public ActionResult Cancel()
     {
