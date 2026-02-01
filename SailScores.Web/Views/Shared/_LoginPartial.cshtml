@@ -6,6 +6,7 @@
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject AppSettingsService settingsService
+@inject SailScores.Web.Services.Interfaces.IAuthorizationService AuthService
 
 @inject IStringLocalizer<SharedResource> localizer
 
@@ -15,8 +16,15 @@
     var displayName = (!String.IsNullOrWhiteSpace(user.FirstName) && !String.IsNullOrWhiteSpace(user.LastName) )
         ? $"{user.FirstName} {user.LastName}"
         : user.Email;
+    var isFullAdmin = await AuthService.IsUserFullAdmin(User);
     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="float-end">
         <a class="float-end" href="/Identity/Account/Manage/UpdateProfile" title="Update User Info">@displayName</a><br />
+        @if (isFullAdmin)
+        {
+            <a class="float-end me-2" asp-controller="SiteAdmin" asp-action="Index" title="Site Administration">
+                <i class="fas fa-tools"></i> Site Admin
+            </a><br />
+        }
         <button type="submit" class="btn btn-link float-end" >@localizer["Log out"]</button>
     </form>
 }

@@ -260,16 +260,16 @@ public class CompetitorService : ICompetitorService
         }
     }
 
-    public async Task<IDictionary<string, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId)
+    public async Task<IDictionary<string, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId, bool includeInactive = false)
     {
-        var comps = await _coreCompetitorService.GetCompetitorsForFleetAsync(clubId, fleetId);
+        var comps = await _coreCompetitorService.GetCompetitorsForFleetAsync(clubId, fleetId, includeInactive);
 
         return comps;
     }
 
-    public async Task<IDictionary<string, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId)
+    public async Task<IDictionary<string, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId, bool includeInactive = false)
     {
-        var comps = await _coreCompetitorService.GetCompetitorsForRegattaAsync(clubId, regattaId);
+        var comps = await _coreCompetitorService.GetCompetitorsForRegattaAsync(clubId, regattaId, includeInactive);
 
         return comps;
     }

@@ -16,60 +16,100 @@
     Layout = "_ClubLayout";
 }
 <div class="container px-0 px-sm-2">
-    <div class="row">
-        <div class="col-12">
-            <h1>@localizer["Competitors"]</h1>
-        </div>
-    </div>
     @if (Model.CanEdit)
     {
         @Html.AntiForgeryToken()
-        <div class="row">
-            <div class="col-3">
-                <a class="btn btn-primary" asp-action="CreateMultiple" asp-controller="Competitor">
-                    Create
-                </a>
-            </div>
-            <div class="col-6 col-sm-4 col-md-3">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Utilities
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" asp-action="Options" asp-controller="MergeCompetitor">
-                            Merge Two Competitors
-                        </a>
-                        <a class="dropdown-item" asp-action="ClearAltNumbers" asp-controller="Competitor">
-                            Clear Alt Sail Numbers
-                        </a>
-                        @* <div class="dropdown-divider"></div> *@
-                        <a class="dropdown-item" asp-action="InactivateMultiple" asp-controller="Competitor">
-                            Bulk Inactivate
-                        </a>
+    }
+    <div class="row align-items-center mb-3">
+        <div class="col-12 col-lg-6">
+            <h1>@localizer["Competitors"]</h1>
+        </div>
+        @if (Model.CanEdit)
+        {
+            <div class="col-12 col-lg-6">
+                <div class="bg-almost border rounded p-3">
+                    <div class="row g-2">
+                        <div class="col-4 d-flex justify-content-center">
+                            <a class="btn btn-primary" asp-action="CreateMultiple" asp-controller="Competitor">
+                                Create
+                            </a>
+                        </div>
+                        <div class="col-4 d-flex justify-content-center">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Utilities
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-action="Options" asp-controller="MergeCompetitor">
+                                        Merge Two Competitors
+                                    </a>
+                                    <a class="dropdown-item" asp-action="ClearAltNumbers" asp-controller="Competitor">
+                                        Clear Alt Sail Numbers
+                                    </a>
+                                    @* <div class="dropdown-divider"></div> *@
+                                    <a class="dropdown-item" asp-action="InactivateMultiple" asp-controller="Competitor">
+                                        Bulk Inactivate
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 d-flex justify-content-center">
+                            <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
+                                Club Admin
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-3">
-                <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admin">
-                    Club Admin
-                </a>
+        }
+    </div>
+    <div class="row">
+        <div class="col-6 col-md-3 py-2">
+            <div class="row">
+                <label class="control-label col-form-label col-4"
+                       for="fleet-filter">Fleet </label>
+                <div class="col-8">
+                    <select id="fleet-filter"
+                            class="form-select"
+                            onchange="filterByFleet()">
+                        <option value="">All</option>
+                        @if (Model.FleetOptions != null)
+                        {
+                            foreach (var fleet in Model.FleetOptions)
+                            {
+                                @if (Model.SelectedFleetId == fleet.Id)
+                                {
+                                    <option value="@fleet.Id" selected>
+                                        @fleet.Name
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@fleet.Id">
+                                        @fleet.Name
+                                    </option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
             </div>
         </div>
-    }
-    <div class="row">
         @if (Model.CanEdit)
         {
-            <div class="col-6 px-md-5 pt-2">
-                <input type="checkbox" id="show-inactive" name="show-inactive"
-                       class="form-check-input"
-                       value="show-inactive"
-                       checked
-                       onchange="changeVisibility(300)">
-                <label for="show-inactive"
-                       class="form-check-label"> Show inactive</label>
+            <div class="col-12 col-md-4 px-md-5 py-2">
+                <div class="form-check" style="padding-top: 0.375rem;">
+                    <input type="checkbox" id="show-inactive" name="show-inactive"
+                           class="form-check-input"
+                           value="show-inactive"
+                           checked
+                           onchange="changeVisibility(300)">
+                    <label for="show-inactive"
+                           class="form-check-label"> Show inactive</label>
+                </div>
             </div>
         }
-        <div class="col-6 py-2">
+        <div class="col-6 col-md-3 py-2">
             <div class="row">
                 <label class="control-label col-form-label col-4"
                        for="sort-order">Sort </label>
@@ -83,6 +123,21 @@
                 </div>
             </div>
         </div>
+        @if (Model.CanEdit)
+        {
+            <div class="col-12 col-md-2 py-2 text-end">
+                <button class="btn btn-outline-secondary btn-sm"
+                onclick="exportCompetitors('html')"
+                title="Export as HTML">
+                    <span class="fas fa-2x fa-file-code"></span>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm"
+                onclick="exportCompetitors('csv')"
+                title="Export as CSV">
+                    <span class="fas fa-2x fa-file-csv"></span>
+                </button>
+            </div>
+        }
     </div>
     <br />
 
@@ -245,6 +300,41 @@
                 setCookie('showInactiveComps', false, 30);
             }
         }
+
+        function filterByFleet() {
+            const fleetId = $('#fleet-filter').val();
+            const showInactive = $('#show-inactive').is(":checked");
+            const clubInitials = '@Model.ClubInitials';
+            
+            let url = `/${clubInitials}/Competitor`;
+            if (fleetId) {
+                url += `?fleetId=${fleetId}`;
+            }
+            
+            window.location.href = url;
+        }
+
+        function exportCompetitors(format) {
+            const clubInitials = '@Model.ClubInitials';
+            const fleetId = $('#fleet-filter').val();
+            const includeInactive = $('#show-inactive').is(":checked");
+            
+            let url = `/${clubInitials}/Competitor/Export${format === 'html' ? 'Html' : 'Csv'}`;
+            const params = new URLSearchParams();
+            
+            if (fleetId) {
+                params.append('fleetId', fleetId);
+            }
+            params.append('includeInactive', includeInactive);
+            
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+            
+            window.location.href = url;
+        }
+
+
 
         function callAjaxCompActivate(
                 competitorId,

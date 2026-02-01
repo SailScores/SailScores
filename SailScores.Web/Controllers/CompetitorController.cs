@@ -47,20 +47,47 @@ public class CompetitorController : Controller
 
     [AllowAnonymous]
     // GET: Competitor
-    public async Task<ActionResult> Index(string clubInitials)
+    public async Task<ActionResult> Index(
+        string clubInitials,
+        Guid? fleetId = null)
     {
         if (String.IsNullOrWhiteSpace(clubInitials))
         {
             return new NotFoundResult();
         }
         var canEdit = await _authService.CanUserEdit(User, clubInitials);
-        var competitors = await _competitorService
-            .GetCompetitorsWithDeletableInfoAsync(clubInitials, canEdit);
+        var clubId = await _clubService.GetClubId(clubInitials);
+        
+        IList<CompetitorIndexViewModel> competitors;
+        
+        if (fleetId.HasValue)
+        {
+            var fleetCompetitors = await _competitorService.GetCompetitorsForFleetAsync(
+                clubId, 
+                fleetId.Value, 
+                canEdit);
+            var competitorList = fleetCompetitors.SelectMany(kvp => kvp.Value).ToList();
+            competitors = _mapper.Map<IList<CompetitorIndexViewModel>>(competitorList);
+        }
+        else
+        {
+            competitors = await _competitorService
+                .GetCompetitorsWithDeletableInfoAsync(clubInitials, canEdit);
+        }
+        
+        var fleets = (await _clubService.GetAllFleets(clubId))
+            .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats 
+                     || f.FleetType == Api.Enumerations.FleetType.SelectedClasses)
+            .OrderBy(f => f.Name)
+            .ToList();
+        
         var vm = new ClubCollectionViewModel<CompetitorIndexViewModel>
         {
             ClubInitials = clubInitials,
             List = competitors,
-            CanEdit = await _authService.CanUserEdit(User, clubInitials)
+            CanEdit = await _authService.CanUserEdit(User, clubInitials),
+            FleetOptions = _mapper.Map<List<FleetSummary>>(fleets),
+            SelectedFleetId = fleetId
         };
         return View(vm);
     }
@@ -557,7 +584,8 @@ public class CompetitorController : Controller
     public async Task<ActionResult> ExportCsv(
         string clubInitials,
         string fleetId = default,
-        string regattaId = default)
+        string regattaId = default,
+        bool includeInactive = false)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         IDictionary<string, IEnumerable<Competitor>> competitors = null;
@@ -565,11 +593,19 @@ public class CompetitorController : Controller
         {
             if (fleetId != default)
             {
-                competitors = await _competitorService.GetCompetitorsForFleetAsync(clubId, new Guid(fleetId));
+                competitors = await _competitorService.GetCompetitorsForFleetAsync(clubId, new Guid(fleetId), includeInactive);
             }
             else if (regattaId != default)
             {
-                competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId));
+                competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId), includeInactive);
+            }
+            else
+            {
+                var allCompetitors = await _competitorService.GetCompetitorsAsync(clubId, includeInactive);
+                competitors = new Dictionary<string, IEnumerable<Competitor>>
+                {
+                    { clubInitials, allCompetitors }
+                };
             }
         }
         catch (InvalidOperationException)
@@ -590,7 +626,8 @@ public class CompetitorController : Controller
     public async Task<ActionResult> ExportHtml(
         string clubInitials,
         string fleetId = default,
-        string regattaId = default)
+        string regattaId = default,
+        bool includeInactive = false)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         IDictionary<string, IEnumerable<Competitor>> competitors = null;
@@ -598,11 +635,19 @@ public class CompetitorController : Controller
         {
             if (fleetId != default)
             {
-                competitors = await _competitorService.GetCompetitorsForFleetAsync(clubId, new Guid(fleetId));
+                competitors = await _competitorService.GetCompetitorsForFleetAsync(clubId, new Guid(fleetId), includeInactive);
             }
             else if (regattaId != default)
             {
-                competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId));
+                competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId), includeInactive);
+            }
+            else
+            {
+                var allCompetitors = await _competitorService.GetCompetitorsAsync(clubId, includeInactive);
+                competitors = new Dictionary<string, IEnumerable<Competitor>>
+                {
+                    { clubInitials, allCompetitors }
+                };
             }
         }
         catch (InvalidOperationException)

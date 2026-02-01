@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Services.Interfaces;
@@ -33,8 +33,14 @@ public interface ICompetitorService
         bool includeInactive);
     Task ClearAltNumbers(Guid clubId);
     Task InactivateSince(Guid clubId, DateTime sinceDate);
-    Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(Guid clubId, Guid fleetId);
-    Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(Guid clubId, Guid regattaId);
+    Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(
+        Guid clubId,
+        Guid fleetId,
+        bool includeInactive = false);
+    Task<IDictionary<String, IEnumerable<Competitor>>> GetCompetitorsForRegattaAsync(
+        Guid clubId,
+        Guid regattaId,
+        bool includeInactive = false);
     Task SetCompetitorActive(
         Guid clubId,
         Guid competitorId,

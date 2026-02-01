@@ -97,7 +97,7 @@
                 }
                 <h3>
                     <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.UrlName/@regatta.UrlName" style="text-wrap: pretty;">
-                        @regatta.Season.Name @regatta.Name
+                        @(regatta.Name.Contains(regatta.Season.Name, StringComparison.OrdinalIgnoreCase) ? regatta.Name : $"{regatta.Season.Name} {regatta.Name}")
                     </a>
                 </h3>
                 <br />
@@ -115,7 +115,7 @@
                 {
                     <li style="text-wrap: pretty;">
                         <a href="~/@ViewData["ClubInitials"]/@series.Season.UrlName/@series.UrlName">
-                            @series.Season.Name @series.Name
+                            @(series.Name.Contains(series.Season.Name, StringComparison.OrdinalIgnoreCase) ? series.Name : $"{series.Season.Name} {series.Name}")
                         </a>
                         @if (series.UpdatedDate.HasValue && series.UpdatedDate > DateTime.Now.AddDays(-15))
                         {
