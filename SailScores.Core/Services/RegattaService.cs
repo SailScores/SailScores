@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -340,7 +341,26 @@ namespace SailScores.Core.Services
             if (series == null)
             {
                 // create a new series for this fleet.
-                var seriesName = $"{dbRegatta.Season.Name} {dbRegatta.Name} {dbFleet.NickName}";
+                var seriesNameBuilder = new StringBuilder();
+
+                if(!dbRegatta.Name.Contains(dbRegatta.Season.Name))
+                {
+                    seriesNameBuilder.Append(dbRegatta.Season.Name);
+                    seriesNameBuilder.Append(" ");
+                }
+                seriesNameBuilder.Append(dbRegatta.Name);
+
+                if(!String.IsNullOrWhiteSpace(dbFleet.NickName))
+                {
+                    seriesNameBuilder.Append(" ");
+                    seriesNameBuilder.Append(dbFleet.NickName);
+                } else
+                {
+                    seriesNameBuilder.Append(" ");
+                    seriesNameBuilder.Append(dbFleet.Name);
+                }
+
+                var seriesName = seriesNameBuilder.ToString();
 
                 DateOnly? startDate = DetermineStartDate(dbRegatta, race);
                 DateOnly? endDate = DetermineEndDate(dbRegatta, race);
