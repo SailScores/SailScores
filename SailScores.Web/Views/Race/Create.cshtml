@@ -479,6 +479,19 @@
         });
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Workaround for jQuery Validation error "Step attribute on input type time is not supported"
+        // This extends the step validator to ignore time inputs
+        if ($.validator && $.validator.methods.step) {
+            var originalStep = $.validator.methods.step;
+            $.validator.methods.step = function (value, element, param) {
+                if (element.type === "time") {
+                    return true;
+                }
+                return originalStep.call(this, value, element, param);
+            };
+        }
+    </script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
     <script>
         var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));

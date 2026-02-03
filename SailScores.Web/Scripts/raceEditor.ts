@@ -330,7 +330,12 @@ function setTimingFields(compListItem: HTMLLIElement) {
 
     const raceDateStr = $("#date").val() as string;
     const now = new Date();
-    const nowDateStr = now.toISOString().substring(0, 10);
+    // Use local time for date comparison to handle timezones correctly
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, "0");
+    const day = now.getDate().toString().padStart(2, "0");
+    const nowDateStr = `${year}-${month}-${day}`;
+
     if (raceDateStr === nowDateStr && trackTimesChecked) {
         if (finishInput) finishInput.value = now.toTimeString().slice(0, 8);
         const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
