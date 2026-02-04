@@ -21,6 +21,7 @@ function checkEnter(e: KeyboardEvent) {
 
 export function initialize() {
     document.querySelector('form')?.addEventListener('keypress', checkEnter);
+    document.getElementById('startNowButton')?.addEventListener('click', startNow);
     document.getElementById('fleetId')?.addEventListener('change', loadFleet);
     if ($("#defaultRaceDateOffset").val() == "") {
         $('#date').val('');
@@ -242,6 +243,7 @@ export function deleteResult() {
     calculatePlaces();
     initializeAutoComplete();
     updateButtonFooter();
+    updateStartNowVisibility();
     (<any>modal).modal("hide");
 }
 
@@ -369,6 +371,7 @@ function finalizeCompetitorAdd(compListItem: HTMLLIElement) {
     $('#newCompetitor').val("");
     initializeAutoComplete();
     updateButtonFooter();
+    updateStartNowVisibility();
 }
 
 function addScoresFieldsToForm(form: HTMLFormElement) {
@@ -753,6 +756,36 @@ function toggleTimingFields(show: boolean) {
         $(this).find('input[name="FinishTime"]').closest('div').css("display", display);
         $(this).find('input[name="ElapsedTime"]').closest('div').css("display", display);
     });
+    updateStartNowVisibility();
+}
+
+function startNow() {
+    const now = new Date();
+    const timeString = formatTimeForInput(now);
+    const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
+    if (startTimeInput) {
+        startTimeInput.value = timeString;
+        $(startTimeInput).trigger('change');
+    }
+}
+
+function updateStartNowVisibility() {
+    const trackTimesCheckbox = document.getElementById("trackTimesCheckbox") as HTMLInputElement;
+    const startNowButton = document.getElementById("startNowButton");
+    if (!startNowButton) return;
+
+    const show = trackTimesCheckbox?.checked ?? false;
+
+    // Check if any finishers (results list has items beyond template)
+    const resultList = document.getElementById("results");
+    // We assume the first li is the template
+    const count = (resultList?.querySelectorAll("li")?.length ?? 0) - 1;
+
+    if (show && count <= 0) {
+        startNowButton.style.display = "";
+    } else {
+        startNowButton.style.display = "none";
+    }
 }
 
 // Helper functions for time parsing and formatting
@@ -811,24 +844,44 @@ function updateAllScoreTimesForStartTimeChange() {
         const finishInput = $(this).find('input[name="FinishTime"]')[0] as HTMLInputElement;
         const elapsedInput = $(this).find('input[name="ElapsedTime"]')[0] as HTMLInputElement;
         if (!finishInput && !elapsedInput) return;
-        // If elapsed is set, recalc finish; else if finish is set, recalc elapsed
-        if (elapsedInput?.value) {
-            const elapsedMs = parseElapsedTimeString(elapsedInput.value);
-            if (elapsedMs !== null) {
-                let finish = new Date(start.getTime() + elapsedMs);
-                // Always ensure finish is after start (roll to next day if needed)
-                if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
-                finishInput.value = formatTimeForInput(finish);
+
+        const lastEdited = this.dataset.lastEditedField || "elapsed";
+        const hasElapsed = !!elapsedInput?.value;
+        const hasFinish = !!finishInput?.value;
+
+        if (lastEdited === "elapsed") {
+            if (hasElapsed) {
+                const elapsedMs = parseElapsedTimeString(elapsedInput.value);
+                if (elapsedMs !== null) {
+                    let finish = new Date(start.getTime() + elapsedMs);
+                    if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                    finishInput.value = formatTimeForInput(finish);
+                }
+            } else if (hasFinish) {
+                let finish = parseTimeStringToDate(finishInput.value, start);
+                if (finish) {
+                    if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                    const elapsedMs = finish.getTime() - start.getTime();
+                    elapsedInput.value = formatElapsedTime(elapsedMs);
+                    finishInput.value = formatTimeForInput(finish);
+                }
             }
-        } else if (finishInput?.value) {
-            let finish = parseTimeStringToDate(finishInput.value, start);
-            if (finish) {
-                // Always ensure finish is after start (roll to next day if needed)
-                if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
-                const elapsedMs = finish.getTime() - start.getTime();
-                elapsedInput.value = formatElapsedTime(elapsedMs);
-                // Also update finishInput in case we rolled to next day
-                finishInput.value = formatTimeForInput(finish);
+        } else { // lastEdited === "finish"
+            if (hasFinish) {
+                let finish = parseTimeStringToDate(finishInput.value, start);
+                if (finish) {
+                    if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                    const elapsedMs = finish.getTime() - start.getTime();
+                    elapsedInput.value = formatElapsedTime(elapsedMs);
+                    finishInput.value = formatTimeForInput(finish);
+                }
+            } else if (hasElapsed) {
+                const elapsedMs = parseElapsedTimeString(elapsedInput.value);
+                if (elapsedMs !== null) {
+                    let finish = new Date(start.getTime() + elapsedMs);
+                    if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
+                    finishInput.value = formatTimeForInput(finish);
+                }
             }
         }
     });
@@ -837,6 +890,7 @@ function updateAllScoreTimesForStartTimeChange() {
 function onFinishTimeChanged(this: HTMLInputElement) {
     const finishInput = this;
     const li = $(finishInput).closest('li');
+    li[0].dataset.lastEditedField = "finish";
     const elapsedInput = li.find('input[name="ElapsedTime"]')[0] as HTMLInputElement | undefined;
     const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
     if (!startTimeInput || !startTimeInput.value || !finishInput.value) return;
@@ -852,6 +906,7 @@ function onFinishTimeChanged(this: HTMLInputElement) {
 function onElapsedTimeChanged(this: HTMLInputElement) {
     const elapsedInput = this;
     const li = $(elapsedInput).closest('li');
+    li[0].dataset.lastEditedField = "elapsed";
     const finishInput = li.find('input[name="FinishTime"]')[0] as HTMLInputElement | undefined;
     const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
     if (!startTimeInput || !startTimeInput.value || !elapsedInput.value) return;
