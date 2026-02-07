@@ -178,6 +178,7 @@ namespace SailScores.Core.Services
                 _mapper.Map(scoringSystem, dbObject);
             }
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            InvalidateScoringSystemCache(scoringSystem.Id);
         }
 
         public async Task DeleteScoringSystemAsync(Guid systemId)
@@ -191,6 +192,7 @@ namespace SailScores.Core.Services
             _dbContext.ScoringSystems.Remove(system);
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+            InvalidateScoringSystemCache(systemId);
         }
 
         public async Task<ScoreCode> GetScoreCodeAsync(Guid id)
@@ -203,6 +205,7 @@ namespace SailScores.Core.Services
 
         public async Task SaveScoreCodeAsync(ScoreCode scoreCode)
         {
+            Guid? scoringSystemId = null;
             if (scoreCode.Id != default)
             {
                 Db.ScoreCode dbObject = await _dbContext
@@ -210,16 +213,22 @@ namespace SailScores.Core.Services
                     .Where(sc => sc.Id == scoreCode.Id)
                     .SingleAsync()
                     .ConfigureAwait(false);
+                scoringSystemId = dbObject.ScoringSystemId;
                 _mapper.Map(scoreCode, dbObject);
             }
             else
             {
                 Db.ScoreCode dbObject = _mapper.Map<Db.ScoreCode>(scoreCode);
                 dbObject.Id = Guid.NewGuid();
+                scoringSystemId = dbObject.ScoringSystemId;
                 _dbContext.ScoreCodes.Add(dbObject);
             }
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+            if (scoringSystemId.HasValue)
+            {
+                InvalidateScoringSystemCache(scoringSystemId.Value);
+            }
         }
 
         public async Task DeleteScoreCodeAsync(Guid id)
@@ -227,9 +236,11 @@ namespace SailScores.Core.Services
             var scoreCode = await _dbContext.ScoreCodes
                 .SingleAsync(s => s.Id == id)
                 .ConfigureAwait(false);
+            var scoringSystemId = scoreCode.ScoringSystemId;
             _dbContext.ScoreCodes.Remove(scoreCode);
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
+            InvalidateScoringSystemCache(scoringSystemId);
         }
 
         public async Task<bool> IsScoringSystemInUseAsync(
@@ -388,6 +399,12 @@ namespace SailScores.Core.Services
             }
 
             return createdSystems;
+        }
+
+        private void InvalidateScoringSystemCache(Guid scoringSystemId)
+        {
+            var cacheKey = $"ScoringSystem-{scoringSystemId}";
+            _cache.Remove(cacheKey);
         }
     }
 }
