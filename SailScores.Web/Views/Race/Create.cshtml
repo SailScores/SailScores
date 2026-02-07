@@ -260,7 +260,7 @@
                                     <label asp-for="StartTime" class="control-label col-3 col-md-4 col-form-label text-end">Start Time</label>
                                     <div class="col-9 col-md-8">
                                         <div class="input-group">
-                                            <input asp-for="StartTime" class="form-control" type="time" step="1" />
+                                            <input asp-for="StartTime" class="form-control time-picker" type="text" placeholder="HH:mm:ss" />
                                             <button type="button" class="btn btn-outline-secondary" id="startNowButton" style="display:none;">Start Now</button>
                                         </div>
                                         <span asp-validation-for="StartTime" class="text-danger"></span>
@@ -319,7 +319,7 @@
                                     </div>
                                                                         
                                     <div class="ms-2">
-                                        <input name="FinishTime" class="form-control form-control-sm finish-time-input" type="time" step="1"
+                                        <input name="FinishTime" class="form-control form-control-sm finish-time-input time-picker" type="text" placeholder="HH:mm:ss"
                                             value="@(score.FinishTime.HasValue ? score.FinishTime.Value.ToString(@"HH\:mm\:ss") : "")"/>
                                         <span class="text-danger finish-time-error"></span>
                                     </div>
@@ -478,7 +478,14 @@
     }
   <script>
         $(function () {
-            $('[data-bs-toggle="popover"]').popover()
+            $('[data-bs-toggle="popover"]').popover();
+            $(".time-picker").flatpickr({
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i:S",
+                time_24hr: true,
+                enableSeconds: true
+            });
         });
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

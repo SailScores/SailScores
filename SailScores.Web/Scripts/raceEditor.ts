@@ -288,6 +288,7 @@ function addNewCompetitor(competitor: competitorDto) {
     populateCompetitorInfo(compListItem, competitor, c);
     setTimingFields(compListItem);
     attachTimingEventHandlers(compListItem);
+    initTimePickers(compListItem);
 
     compListItem.style.display = "";
     if (!competitorIsInResults(competitor)) {
@@ -339,7 +340,7 @@ function setTimingFields(compListItem: HTMLLIElement) {
     const nowDateStr = `${year}-${month}-${day}`;
 
     if (raceDateStr === nowDateStr && trackTimesChecked) {
-        if (finishInput) finishInput.value = now.toTimeString().slice(0, 8);
+        if (finishInput) updateTimeInput(finishInput, now.toTimeString().slice(0, 8));
         const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
         if (startTimeInput?.value) {
             const start = parseTimeStringToDate(startTimeInput.value);
@@ -764,7 +765,7 @@ function startNow() {
     const timeString = formatTimeForInput(now);
     const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
     if (startTimeInput) {
-        startTimeInput.value = timeString;
+        updateTimeInput(startTimeInput, timeString);
         $(startTimeInput).trigger('change');
     }
 }
@@ -855,7 +856,7 @@ function updateAllScoreTimesForStartTimeChange() {
                 if (elapsedMs !== null) {
                     let finish = new Date(start.getTime() + elapsedMs);
                     if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
-                    finishInput.value = formatTimeForInput(finish);
+                    updateTimeInput(finishInput, formatTimeForInput(finish));
                 }
             } else if (hasFinish) {
                 let finish = parseTimeStringToDate(finishInput.value, start);
@@ -863,7 +864,7 @@ function updateAllScoreTimesForStartTimeChange() {
                     if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
                     const elapsedMs = finish.getTime() - start.getTime();
                     elapsedInput.value = formatElapsedTime(elapsedMs);
-                    finishInput.value = formatTimeForInput(finish);
+                    updateTimeInput(finishInput, formatTimeForInput(finish));
                 }
             }
         } else { // lastEdited === "finish"
@@ -873,14 +874,14 @@ function updateAllScoreTimesForStartTimeChange() {
                     if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
                     const elapsedMs = finish.getTime() - start.getTime();
                     elapsedInput.value = formatElapsedTime(elapsedMs);
-                    finishInput.value = formatTimeForInput(finish);
+                    updateTimeInput(finishInput, formatTimeForInput(finish));
                 }
             } else if (hasElapsed) {
                 const elapsedMs = parseElapsedTimeString(elapsedInput.value);
                 if (elapsedMs !== null) {
                     let finish = new Date(start.getTime() + elapsedMs);
                     if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
-                    finishInput.value = formatTimeForInput(finish);
+                    updateTimeInput(finishInput, formatTimeForInput(finish));
                 }
             }
         }
@@ -914,7 +915,25 @@ function onElapsedTimeChanged(this: HTMLInputElement) {
     const elapsedMs = parseElapsedTimeString(elapsedInput.value);
     if (!start || elapsedMs === null) return;
     const finish = new Date(start.getTime() + elapsedMs);
-    if (finishInput) finishInput.value = formatTimeForInput(finish);
+    if (finishInput) updateTimeInput(finishInput, formatTimeForInput(finish));
+}
+
+function initTimePickers(container: HTMLElement) {
+    ($(container).find(".time-picker") as any).flatpickr({
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i:S",
+        time_24hr: true,
+        enableSeconds: true
+    });
+}
+
+function updateTimeInput(input: HTMLInputElement, value: string) {
+    input.value = value;
+    const fp = (input as any)._flatpickr;
+    if (fp) {
+        fp.setDate(value);
+    }
 }
 
 
