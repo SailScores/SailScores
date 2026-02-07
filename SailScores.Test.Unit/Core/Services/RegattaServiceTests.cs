@@ -47,8 +47,8 @@ public class RegattaServiceTests
 
         // Fake competitor service: return competitors for a fleet from the in-memory context
         _mockCompetitorService
-            .Setup(m => m.GetCompetitorsForFleetAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .Returns((Guid clubId, Guid fleetId) =>
+            .Setup(m => m.GetCompetitorsForFleetAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<bool>()))
+            .Returns((Guid clubId, Guid fleetId, bool includeInactive) =>
             {
                 // find fleet or fall back to first
                 var fleet = _context.Fleets.FirstOrDefault(f => f.Id == fleetId) ?? _context.Fleets.First();
@@ -178,7 +178,7 @@ public class RegattaServiceTests
     }
 
     [Fact]
-    public async Task AddFleetTorRegattaAsync_AddsToDb()
+    public async Task AddFleetToRegattaAsync_AddsToDb()
     {
         var fleet = _context.Fleets
                 .ToList()

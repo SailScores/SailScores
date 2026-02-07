@@ -207,5 +207,247 @@ namespace SailScores.Test.Unit.Core.Services
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _service.ResetClubAsync(Guid.NewGuid(), SailScores.Core.Model.ResetLevel.RacesAndSeries));
         }
+
+        [Fact]
+        public async Task SaveNewClub_WithoutDefaultScoringSystem_CreatesClubWithDefaultFleet()
+        {
+            // Arrange
+            var newClub = new Club
+            {
+                Name = "New Test Club",
+                Initials = "NTC"
+            };
+
+            // Act
+            var clubId = await _service.SaveNewClub(newClub);
+
+            // Assert
+            Assert.NotEqual(Guid.Empty, clubId);
+            var savedClub = _context.Clubs.FirstOrDefault(c => c.Id == clubId);
+            Assert.NotNull(savedClub);
+            Assert.Equal("New Test Club", savedClub.Name);
+            Assert.Equal("NTC", savedClub.Initials);
+            Assert.Equal(clubId, newClub.Id);
+
+            // Verify default "All Boats in Club" fleet was created
+            var defaultFleet = _context.Fleets.FirstOrDefault(f => f.ClubId == clubId);
+            Assert.NotNull(defaultFleet);
+            Assert.Equal("All Boats in Club", defaultFleet.Name);
+            Assert.Equal("All", defaultFleet.ShortName);
+            Assert.Equal(Api.Enumerations.FleetType.AllBoatsInClub, defaultFleet.FleetType);
+        }
+
+        [Fact]
+        public async Task SaveNewClub_WithDefaultScoringSystem_CreatesClubWithScoringSystem()
+        {
+            // Arrange
+            var scoringSystem = new ScoringSystem
+            {
+                Name = "Test Scoring System",
+                DiscardPattern = "1"
+            };
+
+            var newClub = new Club
+            {
+                Name = "Club With Scoring",
+                Initials = "CWS",
+                DefaultScoringSystem = scoringSystem,
+                ScoringSystems = new List<ScoringSystem> { scoringSystem }
+            };
+
+            // Act
+            var clubId = await _service.SaveNewClub(newClub);
+
+            // Assert
+            var savedClub = _context.Clubs.FirstOrDefault(c => c.Id == clubId);
+            Assert.NotNull(savedClub);
+            Assert.NotNull(savedClub.DefaultScoringSystemId);
+
+            var savedScoringSystem = _context.ScoringSystems.FirstOrDefault(ss => ss.Id == savedClub.DefaultScoringSystemId);
+            Assert.NotNull(savedScoringSystem);
+            Assert.Equal("Test Scoring System", savedScoringSystem.Name);
+            Assert.Equal(clubId, savedScoringSystem.ClubId);
+        }
+
+        [Fact]
+        public async Task SaveNewClub_WithMultipleScoringSystemsAndDefault_CreatesAllSystems()
+        {
+            // Arrange
+            var defaultSystem = new ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Default Scoring System",
+                DiscardPattern = "2"
+            };
+
+            var additionalSystem = new ScoringSystem
+            {
+                Name = "Additional Scoring System",
+                DiscardPattern = "1"
+            };
+
+            var newClub = new Club
+            {
+                Name = "Club With Multiple Systems",
+                Initials = "CWMS",
+                DefaultScoringSystem = defaultSystem,
+                ScoringSystems = new List<ScoringSystem> { defaultSystem, additionalSystem }
+            };
+
+            // Act
+            var clubId = await _service.SaveNewClub(newClub);
+
+            // Assert
+            var savedClub = _context.Clubs.FirstOrDefault(c => c.Id == clubId);
+            Assert.NotNull(savedClub);
+            Assert.NotNull(savedClub.DefaultScoringSystemId);
+
+            var allSystems = _context.ScoringSystems.Where(ss => ss.ClubId == clubId).ToList();
+            Assert.Equal(2, allSystems.Count);
+
+            var savedDefaultSystem = allSystems.FirstOrDefault(ss => ss.Id == savedClub.DefaultScoringSystemId);
+            Assert.NotNull(savedDefaultSystem);
+            Assert.Equal("Default Scoring System", savedDefaultSystem.Name);
+        }
+
+        [Fact]
+        public async Task SaveNewClub_WithDuplicateInitials_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var newClub = new Club
+            {
+                Name = "Duplicate Club",
+                Initials = _clubInitials  // Use existing club's initials
+            };
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.SaveNewClub(newClub));
+            Assert.Contains("initials already exists", exception.Message);
+        }
+
+        [Fact]
+        public async Task SaveNewClub_SetsNewGuidForClub()
+        {
+            // Arrange
+            var newClub = new Club
+            {
+                Name = "Test Club",
+                Initials = "GUID"
+            };
+            var originalId = newClub.Id;
+
+            // Act
+            var returnedId = await _service.SaveNewClub(newClub);
+
+            // Assert
+            Assert.NotEqual(Guid.Empty, returnedId);
+            Assert.Equal(returnedId, newClub.Id);
+            Assert.NotEqual(originalId, returnedId);
+        }
+
+        [Fact]
+        public async Task SaveNewClub_WithScoringSystemWithScoreCodes_CreatesAllScoreCodes()
+        {
+            // Arrange
+            var scoringSystem = new ScoringSystem
+            {
+                Name = "System With Score Codes",
+                DiscardPattern = "1",
+                ScoreCodes = new List<ScoreCode>
+                {
+                    new ScoreCode { Name = "DNC", CameToStart = false },
+                    new ScoreCode { Name = "DNS", CameToStart = false },
+                    new ScoreCode { Name = "FIN", CameToStart = true, Finished = true }
+                }
+            };
+
+            var newClub = new Club
+            {
+                Name = "Club With Score Codes",
+                Initials = "CWSC",
+                DefaultScoringSystem = scoringSystem,
+                ScoringSystems = new List<ScoringSystem> { scoringSystem }
+            };
+
+            // Act
+            var clubId = await _service.SaveNewClub(newClub);
+
+            // Assert
+            var savedClub = _context.Clubs.FirstOrDefault(c => c.Id == clubId);
+            var savedSystem = _context.ScoringSystems.FirstOrDefault(ss => ss.Id == savedClub.DefaultScoringSystemId);
+            Assert.NotNull(savedSystem);
+
+            var scoreCodes = _context.ScoreCodes.Where(sc => sc.ScoringSystemId == savedSystem.Id).ToList();
+            Assert.Equal(3, scoreCodes.Count);
+            Assert.Contains(scoreCodes, sc => sc.Name == "DNC");
+            Assert.Contains(scoreCodes, sc => sc.Name == "DNS");
+            Assert.Contains(scoreCodes, sc => sc.Name == "FIN");
+        }
+
+        [Fact]
+        public async Task SaveNewClub_WithOptionalClubProperties_PersistsAllProperties()
+        {
+            // Arrange
+            var newClub = new Club
+            {
+                Name = "Full Property Club",
+                Initials = "FPC",
+                Description = "Test Description",
+                Url = "https://example.com",
+                IsHidden = false,
+                ShowClubInResults = true,
+                Locale = "en-US"
+            };
+
+            // Act
+            var clubId = await _service.SaveNewClub(newClub);
+
+            // Assert
+            var savedClub = _context.Clubs.FirstOrDefault(c => c.Id == clubId);
+            Assert.NotNull(savedClub);
+            Assert.Equal("Full Property Club", savedClub.Name);
+            Assert.Equal("FPC", savedClub.Initials);
+            Assert.Equal("Test Description", savedClub.Description);
+            Assert.Equal("https://example.com", savedClub.Url);
+            Assert.False(savedClub.IsHidden);
+            Assert.True(savedClub.ShowClubInResults);
+            Assert.Equal("en-US", savedClub.Locale);
+        }
+
+        [Fact]
+        public async Task SaveNewClub_DefaultScoringSystemIdsAreGenerated()
+        {
+            // Arrange
+            var system1 = new ScoringSystem
+            {
+                Name = "System 1",
+                DiscardPattern = "1"
+            };
+            var system2 = new ScoringSystem
+            {
+                Name = "System 2",
+                DiscardPattern = "2"
+            };
+
+            var newClub = new Club
+            {
+                Name = "Club Multiple Systems",
+                Initials = "CMS",
+                DefaultScoringSystem = system1,
+                ScoringSystems = new List<ScoringSystem> { system1, system2 }
+            };
+
+            // Act
+            var clubId = await _service.SaveNewClub(newClub);
+
+            // Assert
+            var savedClub = _context.Clubs.FirstOrDefault(c => c.Id == clubId);
+            var allSystems = _context.ScoringSystems.Where(ss => ss.ClubId == clubId).ToList();
+
+            // All systems should have generated IDs
+            Assert.True(allSystems.All(s => s.Id != Guid.Empty));
+            Assert.True(allSystems.Count == 2);
+        }
     }
 }
