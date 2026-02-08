@@ -46,7 +46,8 @@ public class PermissionService : IPermissionService
             EmailAddress = permission.UserEmail,
             Registered = false,
             Created = permission.Created ?? new DateTime(2019, 2, 25),
-            CreatedBy = permission.CreatedBy
+            CreatedBy = permission.CreatedBy,
+            PermissionLevel = permission.PermissionLevel
         };
 
         var identityObj = await _userManager.FindByEmailAsync(permission.UserEmail);
@@ -72,7 +73,8 @@ public class PermissionService : IPermissionService
                 EmailAddress = user.UserEmail,
                 Registered = false,
                 Created = user.Created ?? new DateTime(2019, 2, 25),
-                CreatedBy = user.CreatedBy
+                CreatedBy = user.CreatedBy,
+                PermissionLevel = user.PermissionLevel
             };
 
             var identityObj = await _userManager.FindByEmailAsync(user.UserEmail);
@@ -99,7 +101,7 @@ public class PermissionService : IPermissionService
             if (found) break;
         }
         if (!found) {
-            await _userService.AddPermission(clubId, userModel.EmailAddress, userModel.CreatedBy);
+            await _userService.AddPermission(clubId, userModel.EmailAddress, userModel.CreatedBy, userModel.PermissionLevel);
         }
 
     }

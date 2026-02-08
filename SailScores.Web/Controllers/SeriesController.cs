@@ -173,7 +173,7 @@ public class SeriesController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
+            if (!await _authService.CanUserEditSeries(User, clubId))
             {
                 return Unauthorized();
             }
@@ -257,7 +257,7 @@ public class SeriesController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditSeries(User, clubId))
         {
             return Unauthorized();
         }
@@ -296,7 +296,7 @@ public class SeriesController : Controller
         {
             ViewData["ReturnUrl"] = returnUrl;
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
+            if (!await _authService.CanUserEditSeries(User, clubId))
             {
                 return Unauthorized();
             }
@@ -337,7 +337,7 @@ public class SeriesController : Controller
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditSeries(User, clubId))
         {
             return Unauthorized();
         }
@@ -356,7 +356,7 @@ public class SeriesController : Controller
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditSeries(User, clubId))
         {
             return Unauthorized();
         }

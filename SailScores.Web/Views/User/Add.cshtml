@@ -38,6 +38,17 @@
                     <span asp-validation-for="EmailAddress" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
+                    <label asp-for="PermissionLevel" class="control-label"></label>
+                    <select asp-for="PermissionLevel" class="form-control" asp-items="Html.GetEnumSelectList<SailScores.Database.Entities.PermissionLevel>()">
+                    </select>
+                    <span asp-validation-for="PermissionLevel" class="text-danger"></span>
+                    <small class="form-text text-muted">
+                        <strong>Club Administrator:</strong> Full access to all club features.<br/>
+                        <strong>Series Scorekeeper:</strong> Can create/edit series and races, manage competitors.<br/>
+                        <strong>Race Scorekeeper:</strong> Can create/edit races and manage competitors only.
+                    </small>
+                </div>
+                <div class="mb-3">
                     <input type="submit" value="Add" class="btn btn-primary" />
                     <a asp-controller="Admin"
                        asp-action="Index"

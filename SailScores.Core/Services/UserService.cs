@@ -24,7 +24,8 @@ namespace SailScores.Core.Services
         public async Task AddPermission(
             Guid clubId,
             string userEmail,
-            string addedBy)
+            string addedBy,
+            Database.Entities.PermissionLevel permissionLevel = Database.Entities.PermissionLevel.ClubAdministrator)
         {
             var existingPermision = await _dbContext.UserPermissions
                 .FirstOrDefaultAsync(p => p.UserEmail == userEmail && p.ClubId == clubId)
@@ -38,6 +39,7 @@ namespace SailScores.Core.Services
                         ClubId = clubId,
                         UserEmail = userEmail,
                         CanEditAllClubs = false,
+                        PermissionLevel = permissionLevel,
                         Created = DateTime.UtcNow,
                         CreatedBy = addedBy
                     });
@@ -154,6 +156,73 @@ namespace SailScores.Core.Services
                     (permission, club) => club.Id)
                 .ToListAsync()
                 .ConfigureAwait(false);
+        }
+
+        public async Task<bool> CanEditSeries(string email, Guid clubId)
+        {
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
+            // Full admins can do everything
+            if (await IsUserFullAdmin(email))
+            {
+                return true;
+            }
+
+            var permission = await _dbContext.UserPermissions
+                .FirstOrDefaultAsync(u => u.UserEmail == email && u.ClubId == clubId)
+                .ConfigureAwait(false);
+
+            if (permission == null)
+            {
+                return false;
+            }
+
+            // ClubAdministrator and SeriesScorekeeper can edit series
+            return permission.PermissionLevel == Database.Entities.PermissionLevel.ClubAdministrator ||
+                   permission.PermissionLevel == Database.Entities.PermissionLevel.SeriesScorekeeper;
+        }
+
+        public async Task<bool> CanEditRaces(string email, Guid clubId)
+        {
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
+            // Full admins can do everything
+            if (await IsUserFullAdmin(email))
+            {
+                return true;
+            }
+
+            var permission = await _dbContext.UserPermissions
+                .FirstOrDefaultAsync(u => u.UserEmail == email && u.ClubId == clubId)
+                .ConfigureAwait(false);
+
+            if (permission == null)
+            {
+                return false;
+            }
+
+            // All permission levels can edit races
+            return true;
+        }
+
+        public async Task<Database.Entities.PermissionLevel?> GetPermissionLevel(string email, Guid clubId)
+        {
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                return null;
+            }
+
+            var permission = await _dbContext.UserPermissions
+                .FirstOrDefaultAsync(u => u.UserEmail == email && u.ClubId == clubId)
+                .ConfigureAwait(false);
+
+            return permission?.PermissionLevel;
         }
     }
 }

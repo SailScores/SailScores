@@ -29,7 +29,7 @@
     @foreach (var item in Model.OrderBy(f => f.Name))
     {
         <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
-            <div class="col-12 col-sm-6 col-md-4">
+            <div class="col-12 col-sm-6 col-md-3">
                 <a class="btn btn-sm btn-outline-danger"
                     asp-action="Delete"
                     asp-controller="User"
@@ -45,8 +45,22 @@
             <div class="col-12 col-sm-6 col-md-3">
                 @Html.DisplayFor(modelItem => item.EmailAddress)
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div class="col-12 col-sm-6 col-md-2">
                 @(!item.Registered ? "Not" : "") Registered
+            </div>
+            <div class="col-12 col-sm-6 col-md-2">
+                @switch (item.PermissionLevel)
+                {
+                    case SailScores.Database.Entities.PermissionLevel.ClubAdministrator:
+                        <span class="badge bg-primary">Club Admin</span>
+                        break;
+                    case SailScores.Database.Entities.PermissionLevel.SeriesScorekeeper:
+                        <span class="badge bg-info">Series Scorekeeper</span>
+                        break;
+                    case SailScores.Database.Entities.PermissionLevel.RaceScorekeeper:
+                        <span class="badge bg-secondary">Race Scorekeeper</span>
+                        break;
+                }
             </div>
         </div>
     }

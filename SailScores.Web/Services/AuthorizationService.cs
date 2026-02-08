@@ -80,4 +80,40 @@ public class AuthorizationService : IAuthorizationService
 
         return String.Empty;
     }
+
+    public async Task<bool> CanUserEditSeries(
+        ClaimsPrincipal claimsPrincipal,
+        Guid clubId)
+    {
+        var email = claimsPrincipal?.FindFirst("sub")?.Value;
+        if (String.IsNullOrWhiteSpace(email))
+        {
+            email = claimsPrincipal?.Identity?.Name;
+        }
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return false;
+        }
+
+        return await _userService.CanEditSeries(email, clubId);
+    }
+
+    public async Task<bool> CanUserEditRaces(
+        ClaimsPrincipal claimsPrincipal,
+        Guid clubId)
+    {
+        var email = claimsPrincipal?.FindFirst("sub")?.Value;
+        if (String.IsNullOrWhiteSpace(email))
+        {
+            email = claimsPrincipal?.Identity?.Name;
+        }
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return false;
+        }
+
+        return await _userService.CanEditRaces(email, clubId);
+    }
 }
