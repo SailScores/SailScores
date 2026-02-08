@@ -141,7 +141,7 @@ public class RaceController : Controller
             return View(race);
         }
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -171,7 +171,7 @@ public class RaceController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["ClubInitials"] = clubInitials;
         var club = await _clubService.GetMinimalClub(clubInitials);
-        if (!await _authService.CanUserEdit(User, club.Id))
+        if (!await _authService.CanUserEditRaces(User, club.Id))
         {
             return Unauthorized();
         }
@@ -205,7 +205,7 @@ public class RaceController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["ClubInitials"] = clubInitials;
 
-        if (!await _authService.CanUserEdit(User, race.ClubId))
+        if (!await _authService.CanUserEditRaces(User, race.ClubId))
         {
             return Unauthorized();
         }
@@ -231,7 +231,7 @@ public class RaceController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -256,7 +256,7 @@ public class RaceController : Controller
         try
         {
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
-            if (!await _authService.CanUserEdit(User, clubInitials)
+            if (!await _authService.CanUserEditRaces(User, clubInitials)
                 || race == null)
             {
                 return Unauthorized();

@@ -55,7 +55,7 @@ public class CompetitorController : Controller
         {
             return new NotFoundResult();
         }
-        var canEdit = await _authService.CanUserEdit(User, clubInitials);
+        var canEdit = await _authService.CanUserEditRaces(User, clubInitials);
         var clubId = await _clubService.GetClubId(clubInitials);
         
         IList<CompetitorIndexViewModel> competitors;
@@ -85,7 +85,7 @@ public class CompetitorController : Controller
         {
             ClubInitials = clubInitials,
             List = competitors,
-            CanEdit = await _authService.CanUserEdit(User, clubInitials),
+            CanEdit = await _authService.CanUserEditRaces(User, clubInitials),
             FleetOptions = _mapper.Map<List<FleetSummary>>(fleets),
             SelectedFleetId = fleetId
         };
@@ -174,7 +174,7 @@ public class CompetitorController : Controller
 
         var clubId = await _clubService.GetClubId(clubInitials);
             
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -300,7 +300,7 @@ public class CompetitorController : Controller
                     .OrderBy(c => c.Name);
                 return View(competitorsVm);
             }
-            if (!await _authService.CanUserEdit(User, clubId))
+            if (!await _authService.CanUserEditRaces(User, clubId))
             {
                 return Unauthorized();
             }
@@ -331,7 +331,7 @@ public class CompetitorController : Controller
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -366,7 +366,7 @@ public class CompetitorController : Controller
     {
         try
         {
-            if (!await _authService.CanUserEdit(User, competitor.ClubId))
+            if (!await _authService.CanUserEditRaces(User, competitor.ClubId))
             {
                 return Unauthorized();
             }
@@ -437,7 +437,7 @@ public class CompetitorController : Controller
         Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -463,7 +463,7 @@ public class CompetitorController : Controller
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             var competitor = await _competitorService.GetCompetitorAsync(id);
-            if (!await _authService.CanUserEdit(User, clubId)
+            if (!await _authService.CanUserEditRaces(User, clubId)
                 || competitor.ClubId != clubId)
             {
                 return Unauthorized();
@@ -485,7 +485,7 @@ public class CompetitorController : Controller
     // GET: Competitor/InactivateMultiple
     public async Task<ActionResult> InactivateMultiple(string clubInitials)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
+        if (!await _authService.CanUserEditRaces(User, clubInitials))
         {
             return Unauthorized();
         }
@@ -501,7 +501,7 @@ public class CompetitorController : Controller
         [FromForm] DateTime sinceDate)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -514,7 +514,7 @@ public class CompetitorController : Controller
 	// GET: Competitor/ClearAltNumbers
 	public async Task<ActionResult> ClearAltNumbers(string clubInitials)
 	{
-		if (!await _authService.CanUserEdit(User, clubInitials))
+		if (!await _authService.CanUserEditRaces(User, clubInitials))
 		{
 			return Unauthorized();
 		}
@@ -529,7 +529,7 @@ public class CompetitorController : Controller
 	{
 
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
 		{
 			return Unauthorized();
 		}
@@ -546,7 +546,7 @@ public class CompetitorController : Controller
         CompetitorActivateViewModel compActivate)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -565,7 +565,7 @@ public class CompetitorController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
 		var clubId = await _clubService.GetClubId(clubInitials);
-		if (!await _authService.CanUserEdit(User, clubId))
+		if (!await _authService.CanUserEditRaces(User, clubId))
         {
 			return Unauthorized();
 		}
@@ -576,7 +576,7 @@ public class CompetitorController : Controller
         {
 			ClubInitials = clubInitials,
 			List = compVm,
-			CanEdit = await _authService.CanUserEdit(User, clubInitials)
+			CanEdit = await _authService.CanUserEditRaces(User, clubInitials)
 		};
 		return View(vm);
 	}

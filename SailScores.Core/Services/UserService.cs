@@ -211,6 +211,24 @@ namespace SailScores.Core.Services
             return true;
         }
 
+        public async Task<bool> CanEditRaces(string email, string clubInitials)
+        {
+            var clubGuid = Guid.Empty;
+
+            if (!_cache.TryGetValue($"ClubId_{clubInitials}", out clubGuid))
+            {
+                clubGuid = await _dbContext.Clubs
+                    .Where(c => c.Initials == clubInitials)
+                    .Select(c => c.Id)
+                    .SingleOrDefaultAsync()
+                    .ConfigureAwait(false);
+                _cache.Set($"ClubId_{clubInitials}", clubGuid, TimeSpan.FromMinutes(30));
+            }
+
+            return await CanEditRaces(email, clubGuid)
+                .ConfigureAwait(false);
+        }
+
         public async Task<Database.Entities.PermissionLevel?> GetPermissionLevel(string email, Guid clubId)
         {
             if (String.IsNullOrWhiteSpace(email))
@@ -223,6 +241,26 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             return permission?.PermissionLevel;
+        }
+
+        public async Task<bool> IsUserClubAdministrator(string email, Guid clubId)
+        {
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
+            // Full admins are also club administrators
+            if (await IsUserFullAdmin(email))
+            {
+                return true;
+            }
+
+            var permission = await _dbContext.UserPermissions
+                .FirstOrDefaultAsync(u => u.UserEmail == email && u.ClubId == clubId)
+                .ConfigureAwait(false);
+
+            return permission?.PermissionLevel == Database.Entities.PermissionLevel.ClubAdministrator;
         }
     }
 }

@@ -32,7 +32,7 @@ public class ScoringSystemController : Controller
         string clubInitials)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -57,7 +57,7 @@ public class ScoringSystemController : Controller
         ScoringSystemWithOptionsViewModel model)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -79,7 +79,7 @@ public class ScoringSystemController : Controller
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -104,7 +104,7 @@ public class ScoringSystemController : Controller
         ScoringSystemWithOptionsViewModel model)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId)
+        if (!await _authService.IsUserClubAdministrator(User, clubId)
             || model.ClubId != clubId)
         {
             return Unauthorized();
@@ -129,7 +129,7 @@ public class ScoringSystemController : Controller
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -152,7 +152,7 @@ public class ScoringSystemController : Controller
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }

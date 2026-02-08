@@ -116,4 +116,48 @@ public class AuthorizationService : IAuthorizationService
 
         return await _userService.CanEditRaces(email, clubId);
     }
+
+    public async Task<bool> CanUserEditRaces(
+        ClaimsPrincipal claimsPrincipal,
+        string clubInitials)
+    {
+        var email = claimsPrincipal?.FindFirst("sub")?.Value;
+        if (String.IsNullOrWhiteSpace(email))
+        {
+            email = claimsPrincipal?.Identity?.Name;
+        }
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return false;
+        }
+
+        var cacheKey = $"CanEditRaces_{email}_{clubInitials}";
+        if (_cache.TryGetValue(cacheKey, out bool canEdit))
+        {
+            return canEdit;
+        }
+
+        canEdit = await _userService.CanEditRaces(email, clubInitials);
+        _cache.Set(cacheKey, canEdit, TimeSpan.FromMinutes(2));
+        return canEdit;
+    }
+
+    public async Task<bool> IsUserClubAdministrator(
+        ClaimsPrincipal claimsPrincipal,
+        Guid clubId)
+    {
+        var email = claimsPrincipal?.FindFirst("sub")?.Value;
+        if (String.IsNullOrWhiteSpace(email))
+        {
+            email = claimsPrincipal?.Identity?.Name;
+        }
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return false;
+        }
+
+        return await _userService.IsUserClubAdministrator(email, clubId);
+    }
 }

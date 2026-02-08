@@ -40,7 +40,7 @@ public class SeasonController : Controller
         try
         {
             var clubId = (await _clubService.GetClubId(clubInitials));
-            if (!await _authService.CanUserEdit(User, clubId))
+            if (!await _authService.IsUserClubAdministrator(User, clubId))
             {
                 return Unauthorized();
             }
@@ -78,7 +78,7 @@ public class SeasonController : Controller
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -100,7 +100,7 @@ public class SeasonController : Controller
             var clubId = await _clubService.GetClubId(clubInitials);
             var seasonFromDb = (await _seasonService.GetSeasons(clubId)
                 ).FirstOrDefault(s => s.Id == model.Id);
-            if (!await _authService.CanUserEdit(User, clubId)
+            if (!await _authService.IsUserClubAdministrator(User, clubId)
                 || seasonFromDb == null)
             {
                 return Unauthorized();
@@ -140,7 +140,7 @@ public class SeasonController : Controller
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -163,7 +163,7 @@ public class SeasonController : Controller
         var clubId = await _clubService.GetClubId(clubInitials);
         var seasonFromDb = (await _seasonService.GetSeasons(clubId)
             ).FirstOrDefault(s => s.Id == id);
-        if (!await _authService.CanUserEdit(User, clubId)
+        if (!await _authService.IsUserClubAdministrator(User, clubId)
             || seasonFromDb == null)
         {
             return Unauthorized();

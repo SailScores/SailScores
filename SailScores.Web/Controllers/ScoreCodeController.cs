@@ -83,7 +83,7 @@ public class ScoreCodeController : Controller
     {
 
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -111,7 +111,7 @@ public class ScoreCodeController : Controller
         string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -136,7 +136,7 @@ public class ScoreCodeController : Controller
         string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -164,7 +164,7 @@ public class ScoreCodeController : Controller
         string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -191,7 +191,7 @@ public class ScoreCodeController : Controller
         string returnUrl)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }

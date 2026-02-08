@@ -39,7 +39,7 @@ public class BoatClassController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
+            if (!await _authService.IsUserClubAdministrator(User, clubId))
             {
                 return Forbid();
             }
@@ -63,7 +63,7 @@ public class BoatClassController : Controller
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -81,7 +81,7 @@ public class BoatClassController : Controller
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             var boatClass = await _classService.GetClass(model.Id);
-            if (!await _authService.CanUserEdit(User, clubId)
+            if (!await _authService.IsUserClubAdministrator(User, clubId)
                 || boatClass.ClubId != clubId)
             {
                 return Unauthorized();
@@ -104,7 +104,7 @@ public class BoatClassController : Controller
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         var boatClass = await _classService.GetClassDeleteViewModel(id);
-        if (!await _authService.CanUserEdit(User, clubId)
+        if (!await _authService.IsUserClubAdministrator(User, clubId)
             || boatClass.ClubId != clubId)
         {
             return Unauthorized();
@@ -119,7 +119,7 @@ public class BoatClassController : Controller
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         var boatClass = await _classService.GetClassDeleteViewModel(id);
-        if (!await _authService.CanUserEdit(User, clubId)
+        if (!await _authService.IsUserClubAdministrator(User, clubId)
             || boatClass.ClubId != clubId
             || !boatClass.IsDeletable)
         {

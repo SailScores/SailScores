@@ -80,7 +80,7 @@ public class FleetController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
+            if (!await _authService.IsUserClubAdministrator(User, clubId))
             {
                 return Unauthorized();
             }
@@ -125,7 +125,7 @@ public class FleetController : Controller
         try
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (!await _authService.CanUserEdit(User, clubInitials))
+            if (!await _authService.IsUserClubAdministrator(User, clubInitials))
             {
                 return Unauthorized();
             }
@@ -157,7 +157,7 @@ public class FleetController : Controller
     {
         try
         {
-            if (!await _authService.CanUserEdit(User, clubInitials))
+            if (!await _authService.IsUserClubAdministrator(User, clubInitials))
             {
                 return Unauthorized();
             }
@@ -190,7 +190,7 @@ public class FleetController : Controller
     [Authorize]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
+        if (!await _authService.IsUserClubAdministrator(User, clubInitials))
         {
             return Unauthorized();
         }
@@ -207,7 +207,7 @@ public class FleetController : Controller
         Guid id,
         string returnUrl = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
+        if (!await _authService.IsUserClubAdministrator(User, clubInitials))
         {
             return Unauthorized();
         }
