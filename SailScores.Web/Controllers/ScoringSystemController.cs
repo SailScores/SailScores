@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
@@ -36,10 +36,14 @@ public class ScoringSystemController : Controller
         {
             return Unauthorized();
         }
+
+        var club = await _clubService.GetMinimalClub(clubId);
+
         var vm = new ScoringSystemWithOptionsViewModel
         {
             ClubId = clubId,
-            DiscardPattern = "0"
+            DiscardPattern = "0",
+            ParentSystemId = club.DefaultScoringSystemId
         };
         var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
         vm.ParentSystemOptions = potentialParents.ToList();
