@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
@@ -125,7 +125,9 @@ public class FleetController : Controller
         try
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (!await _authService.IsUserClubAdministrator(User, clubInitials))
+
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.IsUserClubAdministrator(User, clubId))
             {
                 return Unauthorized();
             }
@@ -157,7 +159,8 @@ public class FleetController : Controller
     {
         try
         {
-            if (!await _authService.IsUserClubAdministrator(User, clubInitials))
+            var clubId = await _clubService.GetClubId(clubInitials);
+            if (!await _authService.IsUserClubAdministrator(User, clubId))
             {
                 return Unauthorized();
             }
@@ -190,7 +193,8 @@ public class FleetController : Controller
     [Authorize]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
-        if (!await _authService.IsUserClubAdministrator(User, clubInitials))
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
@@ -207,7 +211,8 @@ public class FleetController : Controller
         Guid id,
         string returnUrl = null)
     {
-        if (!await _authService.IsUserClubAdministrator(User, clubInitials))
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!await _authService.IsUserClubAdministrator(User, clubId))
         {
             return Unauthorized();
         }
