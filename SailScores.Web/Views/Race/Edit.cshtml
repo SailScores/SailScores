@@ -442,9 +442,10 @@
             $(".time-picker").flatpickr({
                 enableTime: true,
                 noCalendar: true,
-                dateFormat: "H:i:S",
-                time_24hr: true,
-                enableSeconds: true
+                dateFormat: "h:i:S K",
+                time_24hr: false,
+                enableSeconds: true,
+                allowInput: true
             });
         });
     </script>
@@ -490,13 +491,16 @@
     <script>
         function isValidTimeFormat(time) {
             // Accepts hh:mm:ss or h:mm:ss, where hh is 0-23, mm and ss are 0-59
-            return /^([0-1]?\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(time);
+            // OR accepts 12-hour format with AM/PM: h:mm:ss AM/PM or hh:mm:ss AM/PM
+            const twentyFourHourFormat = /^([0-1]?\d|2[0-3]):[0-5]\d:[0-5]\d$/;
+            const twelveHourFormat = /^(0?[1-9]|1[0-2]):[0-5]\d:[0-5]\d\s(?:AM|PM)$/i;
+            return twentyFourHourFormat.test(time) || twelveHourFormat.test(time);
         }
 
         function validateTimes() {
             let isValid = true;
 
-            // Validate ElapsedTime fields
+            // Validate ElapsedTime fields (24-hour format only)
             $('.elapsed-time-input').each(function () {
                 const $input = $(this);
                 const value = $input.val().trim();

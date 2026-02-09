@@ -482,25 +482,66 @@
             $(".time-picker").flatpickr({
                 enableTime: true,
                 noCalendar: true,
-                dateFormat: "H:i:S",
-                time_24hr: true,
-                enableSeconds: true
+                dateFormat: "h:i:S K",
+                time_24hr: false,
+                enableSeconds: true,
+                allowInput: true
             });
         });
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        // Workaround for jQuery Validation error "Step attribute on input type time is not supported"
-        // This extends the step validator to ignore time inputs
-        if ($.validator && $.validator.methods.step) {
-            var originalStep = $.validator.methods.step;
-            $.validator.methods.step = function (value, element, param) {
-                if (element.type === "time") {
-                    return true;
-                }
-                return originalStep.call(this, value, element, param);
-            };
+        function isValidTimeFormat(time) {
+            // Accepts hh:mm:ss or h:mm:ss, where hh is 0-23, mm and ss are 0-59
+            // OR accepts 12-hour format with AM/PM: h:mm:ss AM/PM or hh:mm:ss AM/PM
+            const twentyFourHourFormat = /^([0-1]?\d|2[0-3]):[0-5]\d:[0-5]\d$/;
+            const twelveHourFormat = /^(0?[1-9]|1[0-2]):[0-5]\d:[0-5]\d\s(?:AM|PM)$/i;
+            return twentyFourHourFormat.test(time) || twelveHourFormat.test(time);
         }
+
+        function validateTimes() {
+            let isValid = true;
+
+            // Validate ElapsedTime fields (24-hour format only)
+            $('.elapsed-time-input').each(function () {
+                const $input = $(this);
+                const value = $input.val().trim();
+                const $error = $input.siblings('.elapsed-time-error');
+                if (value && !isValidTimeFormat(value)) {
+                    $error.text('Time must be hh:mm:ss');
+                    isValid = false;
+                } else {
+                    $error.text('');
+                }
+            });
+
+            // Validate FinishTime fields (if you want to enforce format, though type="time" usually handles this)
+            $('.finish-time-input').each(function () {
+                const $input = $(this);
+                const value = $input.val().trim();
+                const $error = $input.siblings('.finish-time-error');
+                if (value && !isValidTimeFormat(value)) {
+                    $error.text('Time must be hh:mm:ss');
+                    isValid = false;
+                } else {
+                    $error.text('');
+                }
+            });
+
+            return isValid;
+        }
+
+        $(function () {
+            $('#raceform').on('submit', function (e) {
+                if (!validateTimes()) {
+                    e.preventDefault();
+                }
+            });
+
+            $(document).on('blur', '.elapsed-time-input, .finish-time-input', function () {
+                validateTimes();
+            });
+        });
     </script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
     <script>
