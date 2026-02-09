@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Web.Authorization;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -25,6 +26,7 @@ public class BoatClassController : Controller
         _authService = authService;
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public ActionResult Create()
     {
         return View();
@@ -32,6 +34,7 @@ public class BoatClassController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         BoatClass model)
@@ -39,10 +42,6 @@ public class BoatClassController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.IsUserClubAdministrator(User, clubId))
-            {
-                return Forbid();
-            }
             model.ClubId = clubId;
             if (!ModelState.IsValid)
             {
@@ -60,19 +59,17 @@ public class BoatClassController : Controller
         }
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
         var boatClass = await _classService.GetClass(id);
         return View(boatClass);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         BoatClass model)
@@ -81,8 +78,7 @@ public class BoatClassController : Controller
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             var boatClass = await _classService.GetClass(model.Id);
-            if (!await _authService.IsUserClubAdministrator(User, clubId)
-                || boatClass.ClubId != clubId)
+            if (boatClass.ClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -100,6 +96,7 @@ public class BoatClassController : Controller
         }
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
@@ -115,12 +112,12 @@ public class BoatClassController : Controller
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         var boatClass = await _classService.GetClassDeleteViewModel(id);
-        if (!await _authService.IsUserClubAdministrator(User, clubId)
-            || boatClass.ClubId != clubId
+        if (boatClass.ClubId != clubId
             || !boatClass.IsDeletable)
         {
             return Unauthorized();

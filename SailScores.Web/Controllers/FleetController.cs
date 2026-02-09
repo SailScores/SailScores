@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -55,6 +56,7 @@ public class FleetController : Controller
         });
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid? regattaId,
@@ -71,6 +73,7 @@ public class FleetController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         FleetWithOptionsViewModel model,
@@ -80,10 +83,6 @@ public class FleetController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.IsUserClubAdministrator(User, clubId))
-            {
-                return Unauthorized();
-            }
             model.ClubId = clubId;
             if (!ModelState.IsValid)
             {

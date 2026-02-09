@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
@@ -11,7 +12,7 @@ namespace SailScores.Web.Controllers;
 [Authorize]
 public class AdminController : Controller
 {
-    private const string V = "ClubInitials";
+    private const string ClubInitialsVarName = "ClubInitials";
     private readonly IAdminService _adminService;
     private readonly IAuthorizationService _authService;
     private readonly IAdminTipService _tipService;
@@ -32,7 +33,7 @@ public class AdminController : Controller
     // GET: Admin
     public async Task<ActionResult> Index(string clubInitials)
     {
-        ViewData[V] = clubInitials;
+        ViewData[ClubInitialsVarName] = clubInitials;
         if (!await _authService.CanUserEdit(User, clubInitials))
         {
             return Unauthorized();
@@ -45,13 +46,10 @@ public class AdminController : Controller
 
 
     // GET: Admin/Edit
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(string clubInitials)
     {
-        ViewData[V] = clubInitials;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
+        ViewData[ClubInitialsVarName] = clubInitials;
         var vm = await _adminService.GetClubForEdit(clubInitials);
         var editVm = _mapper.Map<AdminEditViewModel>(vm);
         editVm.RaceCount = await _adminService.GetRaceCountAsync(vm.Id);
@@ -61,17 +59,14 @@ public class AdminController : Controller
     // POST: Admin/Edit
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         AdminEditViewModel clubAdmin)
     {
-        ViewData[V] = clubInitials;
+        ViewData[ClubInitialsVarName] = clubInitials;
         try
         {
-            if (!await _authService.CanUserEdit(User, clubAdmin.Id))
-            {
-                return Unauthorized();
-            }
             if (!ModelState.IsValid)
             {
                 var club = await _adminService.GetClubForEdit(clubInitials);
@@ -141,13 +136,10 @@ public class AdminController : Controller
     }
 
     // GET: Admin/ResetClub
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> ResetClub(string clubInitials)
     {
-        ViewData[V] = clubInitials;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
+        ViewData[ClubInitialsVarName] = clubInitials;
         var club = await _adminService.GetClub(clubInitials);
         var raceCount = await _adminService.GetRaceCountAsync(club.Id);
         var vm = new ResetClubViewModel
@@ -163,15 +155,12 @@ public class AdminController : Controller
     // POST: Admin/ResetClub
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> ResetClub(
         string clubInitials,
         ResetClubViewModel model)
     {
-        ViewData[V] = clubInitials;
-        if (!await _authService.CanUserEdit(User, model.ClubId))
-        {
-            return Unauthorized();
-        }
+        ViewData[ClubInitialsVarName] = clubInitials;
         
         // Re-fetch race count to prevent manipulation
         var raceCount = await _adminService.GetRaceCountAsync(model.ClubId);

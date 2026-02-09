@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using Microsoft.AspNetCore.Identity;
 using SailScores.Identity.Entities;
@@ -101,7 +102,7 @@ public class RaceController : Controller
         });
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid? regattaId,
@@ -126,7 +127,7 @@ public class RaceController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Create(
         string clubInitials,
         RaceWithOptionsViewModel race,
@@ -141,10 +142,6 @@ public class RaceController : Controller
             return View(race);
         }
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEditRaces(User, clubId))
-        {
-            return Unauthorized();
-        }
         race.ClubId = clubId;
         race.UpdatedBy = await GetUserStringAsync();
         await _raceService.SaveAsync(race);
@@ -162,7 +159,7 @@ public class RaceController : Controller
         return user.GetDisplayName();
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
@@ -171,10 +168,6 @@ public class RaceController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["ClubInitials"] = clubInitials;
         var club = await _clubService.GetMinimalClub(clubInitials);
-        if (!await _authService.CanUserEditRaces(User, club.Id))
-        {
-            return Unauthorized();
-        }
         var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
         if (race == null)
         {
@@ -193,7 +186,7 @@ public class RaceController : Controller
         return View(raceWithOptions);
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
@@ -205,10 +198,6 @@ public class RaceController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["ClubInitials"] = clubInitials;
 
-        if (!await _authService.CanUserEditRaces(User, race.ClubId))
-        {
-            return Unauthorized();
-        }
         if (!ModelState.IsValid)
         {
             race = await _raceService.FixupRaceWithOptions(clubInitials, race);
@@ -222,8 +211,8 @@ public class RaceController : Controller
         return RedirectToLocal(returnUrl);
     }
 
-    [Authorize]
     [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Delete(
         string clubInitials,
         Guid id,
@@ -231,10 +220,6 @@ public class RaceController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEditRaces(User, clubId))
-        {
-            return Unauthorized();
-        }
         var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
         if (race == null)
         {
@@ -247,17 +232,16 @@ public class RaceController : Controller
         return View(race);
     }
 
-    [Authorize]
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         try
         {
             var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
-            if (!await _authService.CanUserEditRaces(User, clubInitials)
-                || race == null)
+            if (race == null)
             {
                 return Unauthorized();
             }
@@ -271,10 +255,9 @@ public class RaceController : Controller
         }
     }
 
-
-    [Authorize]
     [HttpGet]
     [ActionName("SpeechInfo")]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<SpeechInfo> GetSpeechInfo()
     {
         var user = await _userManager.GetUserAsync(User);

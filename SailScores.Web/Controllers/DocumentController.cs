@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Identity.Entities;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using System.IO;
@@ -40,7 +41,7 @@ public class DocumentController : Controller
         _mapper = mapper;
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid regattaId,
@@ -56,7 +57,7 @@ public class DocumentController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Create(
         string clubInitials,
@@ -67,10 +68,6 @@ public class DocumentController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
             model.ClubId = clubId;
             if (!ModelState.IsValid)
             {
@@ -170,7 +167,7 @@ public class DocumentController : Controller
         return $"inline=true;filename*=UTF-8''{encodedFilename}";
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Update(
         string clubInitials,
         Guid id,
@@ -179,11 +176,6 @@ public class DocumentController : Controller
         try
         {
             ViewData["ReturnUrl"] = returnUrl;
-            
-            if (!await _authService.CanUserEdit(User, clubInitials))
-            {
-                return Unauthorized();
-            }
             var doc =
                 await _documentService.GetSkinnyDocument(id);
             return View(_mapper.Map<DocumentWithOptions>(doc));
@@ -196,7 +188,7 @@ public class DocumentController : Controller
     }
 
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     [HttpPost]
     [ActionName("Update")]
     [ValidateAntiForgeryToken]
@@ -212,10 +204,6 @@ public class DocumentController : Controller
             model.CreatedBy = await GetUserStringAsync();
             model.CreatedDate = DateTime.UtcNow;
             model.CreatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
-            if (!await _authService.CanUserEdit(User, clubInitials))
-            {
-                return Unauthorized();
-            }
             await _documentService.UpdateDocument(model);
 
             if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -232,22 +220,18 @@ public class DocumentController : Controller
     }
 
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(
         string clubInitials,
         Guid id,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
         var document = await _documentService.GetSkinnyDocument(id);
         return View(document);
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
@@ -256,10 +240,6 @@ public class DocumentController : Controller
         Guid id,
         string returnUrl = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
         try
         {
             await _documentService.Delete(id);

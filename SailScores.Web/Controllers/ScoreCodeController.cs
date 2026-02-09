@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
@@ -53,6 +54,7 @@ public class ScoreCodeController : Controller
         return View(vm);
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid scoringSystemId,
@@ -76,6 +78,7 @@ public class ScoreCodeController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         ScoreCodeWithOptionsViewModel model,
@@ -83,10 +86,6 @@ public class ScoreCodeController : Controller
     {
 
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
         var scoreSystem = await _scoringService.GetScoringSystemAsync(model.ScoringSystemId);
         if (scoreSystem.ClubId != clubId)
         {
@@ -105,16 +104,13 @@ public class ScoreCodeController : Controller
         return View(model);
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
         string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var scoreCode = await _scoringService.GetScoreCodeAsync(id);
 
@@ -130,16 +126,13 @@ public class ScoreCodeController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         ScoreCodeWithOptionsViewModel model,
         string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
         var scoreSystem = await _scoringService.GetScoringSystemAsync(model.ScoringSystemId);
         if (scoreSystem.ClubId != clubId)
         {
@@ -158,16 +151,13 @@ public class ScoreCodeController : Controller
         return View(model);
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(
         string clubInitials,
         Guid id,
         string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var scoreCode = await _scoringService.GetScoreCodeAsync(id);
 
@@ -184,6 +174,7 @@ public class ScoreCodeController : Controller
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostDelete(
         string clubInitials,
         Guid id,
@@ -191,10 +182,6 @@ public class ScoreCodeController : Controller
         string returnUrl)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
         var scoreSystem = await _scoringService.GetScoringSystemAsync(scoringSystemId);
         if (scoreSystem.ClubId != clubId)
         {

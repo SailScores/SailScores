@@ -40,6 +40,7 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 - **Core services** contain reusable business logic that could be used by different clients
 - **Web services** contain logic specific to web views and UI concerns
 - **Views** should focus on data presentation, not business logic
+- Users with `UserClubPermission.CanEditAllClubs` are treated as super-admins (full admin) who bypass normal club-specific permission checks.
 
 ## Development Setup
 

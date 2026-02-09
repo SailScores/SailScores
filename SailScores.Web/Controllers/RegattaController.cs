@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -82,13 +83,10 @@ public class RegattaController : Controller
     }
 
     [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(string clubInitials)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var vm = await _regattaService.GetBlankRegattaWithOptions(clubId);
 
@@ -97,7 +95,7 @@ public class RegattaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         RegattaWithOptionsViewModel model)
@@ -105,10 +103,6 @@ public class RegattaController : Controller
         var clubId = await _clubService.GetClubId(clubInitials);
         try
         {
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
             model.ClubId = clubId;
             if (!ModelState.IsValid)
             {
@@ -148,7 +142,7 @@ public class RegattaController : Controller
         return $"/{Uri.EscapeDataString(clubInitials)}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}";
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
@@ -156,10 +150,6 @@ public class RegattaController : Controller
         )
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
         ViewData["ReturnUrl"] = returnUrl;
         var regatta = await _regattaService.GetRegattaAsync(id);
         if (regatta == null)
@@ -177,7 +167,7 @@ public class RegattaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         RegattaWithOptionsViewModel model)
@@ -186,8 +176,7 @@ public class RegattaController : Controller
         try
         {
             var regatta = await _regattaService.GetRegattaAsync(model.Id);
-            if (!await _authService.CanUserEdit(User, clubId)
-                || regatta.ClubId != clubId)
+            if (regatta.ClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -212,13 +201,12 @@ public class RegattaController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         var regatta = await _regattaService.GetRegattaAsync(id);
-        if (!await _authService.CanUserEdit(User, clubId)
-            || regatta?.ClubId != clubId)
+        if (regatta?.ClubId != clubId)
         {
             return Unauthorized();
         }
@@ -229,13 +217,12 @@ public class RegattaController : Controller
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         var regatta = await _regattaService.GetRegattaAsync(id);
-        if (!await _authService.CanUserEdit(User, clubId)
-            || regatta?.ClubId != clubId)
+        if (regatta?.ClubId != clubId)
         {
             return Unauthorized();
         }
