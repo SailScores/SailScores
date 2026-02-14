@@ -10,7 +10,7 @@
                     data-bs-placement="top"
                     data-bs-trigger="focus hover"
                     data-bs-content="Allow other users to edit results. Scorekeepers
-                        may be added and removed, but not edited.">
+                        may be added, removed, and edited.">
                     <span class="far fa-question-circle"></span>
                 </a>
             </h3>
@@ -37,7 +37,11 @@
                     title="Delete">
                     <span class="fas fa-trash"></span>
                 </a> &nbsp;
-                <a class="btn btn-sm btn-outline-primary disabled">
+                <a class="btn btn-sm btn-outline-primary"
+                    asp-action="Edit"
+                    asp-controller="User"
+                    asp-route-id="@item.Id"
+                    title="Edit">
                     <span class="fas fa-pen"></span>
                 </a> &nbsp;
                 @Html.DisplayFor(modelItem => item.Name)
@@ -52,13 +56,13 @@
                 @switch (item.PermissionLevel)
                 {
                     case SailScores.Database.Entities.PermissionLevel.ClubAdministrator:
-                        <span class="badge bg-primary">Club Admin</span>
+                        <small class="text-muted">Club Admin</small>
                         break;
                     case SailScores.Database.Entities.PermissionLevel.SeriesScorekeeper:
-                        <span class="badge bg-info">Series Scorekeeper</span>
+                        <small class="text-muted">Series Scorekeeper</small>
                         break;
                     case SailScores.Database.Entities.PermissionLevel.RaceScorekeeper:
-                        <span class="badge bg-secondary">Race Scorekeeper</span>
+                        <small class="text-muted">Race Scorekeeper</small>
                         break;
                 }
             </div>

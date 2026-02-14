@@ -1,4 +1,4 @@
-﻿using SailScores.Web.Models.SailScores;
+using SailScores.Web.Models.SailScores;
 using SailScores.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using SailScores.Web.Services.Interfaces;
@@ -91,17 +91,22 @@ public class PermissionService : IPermissionService
 
     public async Task UpdatePermission(Guid clubId, UserViewModel userModel)
     {
+        if (userModel.Id != Guid.Empty)
+        {
+            await _userService.UpdatePermissionLevel(userModel.Id, userModel.PermissionLevel);
+            return;
+        }
 
         var permissions = await _userService.GetAllPermissionsForClub(clubId);
-        bool found = false;
-            
-        foreach(var permission in permissions)
+        var existing = permissions.FirstOrDefault(p => p.UserEmail.Equals(userModel.EmailAddress, StringComparison.InvariantCultureIgnoreCase));
+
+        if (existing == null)
         {
-            found = permission.UserEmail.Equals(userModel.EmailAddress, StringComparison.InvariantCultureIgnoreCase);
-            if (found) break;
-        }
-        if (!found) {
             await _userService.AddPermission(clubId, userModel.EmailAddress, userModel.CreatedBy, userModel.PermissionLevel);
+        }
+        else
+        {
+            await _userService.UpdatePermissionLevel(existing.Id, userModel.PermissionLevel);
         }
 
     }

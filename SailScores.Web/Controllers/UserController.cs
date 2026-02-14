@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Identity.Entities;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
@@ -9,6 +10,7 @@ using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationS
 
 namespace SailScores.Web.Controllers;
 
+[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
 public class UserController : Controller
 {
     private readonly IClubService _clubService;
@@ -51,10 +53,6 @@ public class UserController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -80,13 +78,8 @@ public class UserController : Controller
         }
     }
 
-    [Authorize]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
         var user = await _userManager.GetUserAsync(User);
         if (!(await _permissionService.CanDelete(user.Email, id)))
         {
@@ -96,7 +89,6 @@ public class UserController : Controller
         return View(permission);
     }
 
-    [Authorize]
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
@@ -105,10 +97,6 @@ public class UserController : Controller
         Guid id,
         string returnUrl = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
         try
         {
             await _permissionService.Delete(id);
@@ -129,6 +117,54 @@ public class UserController : Controller
             return View(permission);
         }
     }
+    public async Task<ActionResult> Edit(string clubInitials, Guid id, string returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        ViewData["ClubInitials"] = clubInitials.ToUpperInvariant();
+
+        var permission = await _permissionService.GetUserAsync(id);
+        if (permission == null)
+        {
+            return NotFound();
+        }
+
+        return View(permission);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Edit(string clubInitials, UserViewModel model, string returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        ViewData["ClubInitials"] = clubInitials.ToUpperInvariant();
+
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        try
+        {
+            var clubId = await _clubService.GetClubId(clubInitials);
+            await _permissionService.UpdatePermission(clubId, model);
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return Redirect(Url.RouteUrl(new
+            {
+                controller = "Admin",
+                action = "Index"
+            }) + "#scorekeepers");
+        }
+        catch
+        {
+            ModelState.AddModelError(String.Empty, "An error has occurred.");
+            return View(model);
+        }
+    }
+
     public async Task<ActionResult> Error(string clubInitials)
     {
         return View();

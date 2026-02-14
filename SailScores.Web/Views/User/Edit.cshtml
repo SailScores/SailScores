@@ -1,0 +1,47 @@
+@model UserViewModel
+
+@{
+    ViewData["Title"] = "Edit Scorekeeper";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+<div class="container-md">
+    <h1>Edit Scorekeeper</h1>
+    <hr />
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <p>
+                Change the permission level for this scorekeeper.
+            </p>
+        </div>
+        <div class="d-none d-lg-inline col-lg-6"></div>
+        <br />
+        <div class="col-lg-4 col-md-8">
+            <form asp-action="Edit"
+                  asp-route-returnurl="@ViewData["ReturnUrl"]">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="EmailAddress" />
+                <div class="mb-3">
+                    <label asp-for="EmailAddress" class="control-label"></label>
+                    <input class="form-control" value="@Model.EmailAddress" readonly disabled />
+                    <span class="form-text text-muted">Email address cannot be changed.</span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PermissionLevel" class="control-label"></label>
+                    <select asp-for="PermissionLevel" class="form-control" asp-items="Html.GetEnumSelectList<SailScores.Database.Entities.PermissionLevel>()">
+                    </select>
+                    <span asp-validation-for="PermissionLevel" class="text-danger"></span>
+                    <small class="form-text text-muted">
+                        <strong>Club Administrator:</strong> Full access to all club features.<br/>
+                        <strong>Series Scorekeeper:</strong> Can create/edit series and races, manage competitors.<br/>
+                        <strong>Race Scorekeeper:</strong> Can create/edit races and manage competitors only.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <a href="@(ViewData["ReturnUrl"] ?? Url.RouteUrl(new { controller = "Admin", action = "Index" }) + "#scorekeepers")" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -40,6 +40,12 @@ public class AdminController : Controller
         }
         var vm = await _adminService.GetClub(clubInitials);
 
+        // Set permission flags for UI visibility
+        vm.IsClubAdmin = await _authService.IsUserClubAdministrator(User, vm.Id)
+                         || await _authService.IsUserFullAdmin(User);
+        vm.CanEditSeries = await _authService.CanUserEditSeries(User, vm.Id)
+                           || vm.IsClubAdmin;
+
         _tipService.AddTips(ref vm);
         return View(vm);
     }

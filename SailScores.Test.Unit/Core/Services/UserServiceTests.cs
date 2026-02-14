@@ -4,6 +4,7 @@ using SailScores.Database;
 using SailScores.Database.Entities;
 using SailScores.Test.Unit.Utilities;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 

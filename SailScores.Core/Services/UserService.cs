@@ -63,6 +63,20 @@ namespace SailScores.Core.Services
             return _dbContext.UserPermissions.Where(p => p.ClubId == clubId);
         }
 
+        public async Task UpdatePermissionLevel(Guid permissionId, Database.Entities.PermissionLevel level)
+        {
+            var permission = await _dbContext.UserPermissions
+                .FirstOrDefaultAsync(p => p.Id == permissionId)
+                .ConfigureAwait(false);
+
+            if (permission != null)
+            {
+                permission.PermissionLevel = level;
+                await _dbContext.SaveChangesAsync()
+                    .ConfigureAwait(false);
+            }
+        }
+
         public async Task<IEnumerable<string>> GetClubInitials(string email)
         {
             var clubIds = await _dbContext.UserPermissions

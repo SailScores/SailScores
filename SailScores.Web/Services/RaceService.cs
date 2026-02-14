@@ -655,7 +655,7 @@ public class RaceService : IRaceService
         race.SeriesOptions = blankRace.SeriesOptions;
         race.WeatherIconOptions = blankRace.WeatherIconOptions;
         race.UseAdvancedFeatures = blankRace.UseAdvancedFeatures;
-        foreach (var score in race.Scores)
+        foreach (var score in race?.Scores ?? new List<ScoreViewModel>())
         {
             score.Competitor = race.CompetitorOptions.First(c => c.Id == score.CompetitorId);
         }
