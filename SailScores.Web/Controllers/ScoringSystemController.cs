@@ -56,9 +56,7 @@ public class ScoringSystemController : Controller
         ScoringSystemWithOptionsViewModel model)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        {
-            return Unauthorized();
-        }
+
         model.ClubId = clubId;
         model.Id = Guid.NewGuid();
         if (!ModelState.IsValid)

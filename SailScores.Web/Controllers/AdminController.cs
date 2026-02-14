@@ -31,13 +31,11 @@ public class AdminController : Controller
     }
 
     // GET: Admin
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Index(string clubInitials)
     {
         ViewData[ClubInitialsVarName] = clubInitials;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
+
         var vm = await _adminService.GetClub(clubInitials);
 
         // Set permission flags for UI visibility

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Identity.Entities;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -35,6 +36,7 @@ public class WhatIfController : Controller
         _mapper = mapper;
     }
 
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Options(
         string clubInitials,
         Guid seriesId,
@@ -42,10 +44,7 @@ public class WhatIfController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
+
         var series = await _seriesService.GetSeriesAsync(seriesId);
 
         var vm = new WhatIfViewModel
@@ -63,17 +62,13 @@ public class WhatIfController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Show(
         string clubInitials,
         WhatIfViewModel options,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
         var vm = await _whatIfService.GetResults(options);
         return View("Results", vm);
     }

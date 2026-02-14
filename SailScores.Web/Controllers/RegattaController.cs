@@ -83,7 +83,7 @@ public class RegattaController : Controller
     }
 
     [Authorize]
-    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Create(string clubInitials)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
@@ -95,7 +95,7 @@ public class RegattaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Create(
         string clubInitials,
         RegattaWithOptionsViewModel model)
@@ -142,7 +142,7 @@ public class RegattaController : Controller
         return $"/{Uri.EscapeDataString(clubInitials)}/Regatta/{regatta.Season.UrlName}/{regatta.UrlName}";
     }
 
-    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
@@ -167,7 +167,7 @@ public class RegattaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         RegattaWithOptionsViewModel model)

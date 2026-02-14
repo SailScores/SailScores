@@ -1,14 +1,16 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Web.Authorization;
 using SailScores.Web.Services.Interfaces;
-using System;
-using System.Threading.Tasks;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
 
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+
 public class BackupController : Controller
 {
 
@@ -32,10 +34,6 @@ public class BackupController : Controller
     public async Task<IActionResult> Index(string clubInitials)
     {
         ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var club = await _clubService.GetClubForClubHome(clubInitials);
         return View(new BackupIndexViewModel
@@ -50,10 +48,6 @@ public class BackupController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Download(string clubInitials)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         try
         {
@@ -74,10 +68,6 @@ public class BackupController : Controller
     public async Task<IActionResult> Upload(string clubInitials)
     {
         ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var club = await _clubService.GetClubForClubHome(clubInitials);
         return View(new BackupUploadViewModel
@@ -93,10 +83,6 @@ public class BackupController : Controller
     public async Task<IActionResult> Upload(string clubInitials, IFormFile backupFile)
     {
         ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         if (backupFile == null || backupFile.Length == 0)
         {
@@ -142,10 +128,6 @@ public class BackupController : Controller
     public async Task<IActionResult> Restore(string clubInitials, IFormFile backupFile, bool preserveClubSettings = true)
     {
         ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         if (backupFile == null || backupFile.Length == 0)
         {

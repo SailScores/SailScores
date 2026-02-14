@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SailScores.Web.Models.SailScores;
 using SailScores.Identity.Entities;
+using SailScores.Web.Authorization;
+using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
 
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
 public class MergeCompetitorController : Controller
 {
     private readonly Core.Services.IClubService _clubService;
@@ -34,10 +35,7 @@ public class MergeCompetitorController : Controller
     public async Task<ActionResult> Options(string clubInitials)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
+
         IList<Core.Model.Competitor> competitors = await _competitorService.GetCompetitorsAsync(clubId, false);
         var vm = new MergeCompetitorViewModel
         {
@@ -52,12 +50,6 @@ public class MergeCompetitorController : Controller
         string clubInitials,
         MergeCompetitorViewModel vm)
     {
-        var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
-
         vm.SourceCompetitorOptions = await _mergeService.GetSourceOptionsFor(vm.TargetCompetitorId);
         return View("SelectSource", vm);
     }
@@ -69,10 +61,6 @@ public class MergeCompetitorController : Controller
         MergeCompetitorViewModel vm)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         vm.SourceCompetitor = await _competitorService.GetCompetitorAsync(vm.SourceCompetitorId.Value);
         vm.TargetCompetitor = await _competitorService.GetCompetitorAsync(vm.TargetCompetitorId.Value);
@@ -97,10 +85,7 @@ public class MergeCompetitorController : Controller
         MergeCompetitorViewModel vm)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
+
         vm.SourceCompetitor = await _competitorService.GetCompetitorAsync(vm.SourceCompetitorId.Value);
         vm.TargetCompetitor = await _competitorService.GetCompetitorAsync(vm.TargetCompetitorId.Value);
         if (vm.SourceCompetitor.ClubId != clubId ||

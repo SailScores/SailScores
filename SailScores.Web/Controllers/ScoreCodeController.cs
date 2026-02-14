@@ -8,7 +8,7 @@ using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationS
 
 namespace SailScores.Web.Controllers;
 
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
 public class ScoreCodeController : Controller
 {
 

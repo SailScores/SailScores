@@ -115,7 +115,7 @@ public class FleetController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
@@ -125,11 +125,6 @@ public class FleetController : Controller
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.IsUserClubAdministrator(User, clubId))
-            {
-                return Unauthorized();
-            }
             var fleet =
                 await _fleetService.GetFleet(id);
             var vmOptions = await _fleetService.GetBlankFleetWithOptionsAsync(
@@ -151,6 +146,7 @@ public class FleetController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         FleetWithOptionsViewModel model,
@@ -158,11 +154,6 @@ public class FleetController : Controller
     {
         try
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.IsUserClubAdministrator(User, clubId))
-            {
-                return Unauthorized();
-            }
             if (!ModelState.IsValid)
             {
 
@@ -189,32 +180,23 @@ public class FleetController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
-        var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
         var fleet = await _fleetService.GetFleet(id);
         return View(fleet);
     }
 
-    [Authorize]
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostDelete(
         string clubInitials,
         Guid id,
         string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.IsUserClubAdministrator(User, clubId))
-        {
-            return Unauthorized();
-        }
         try
         {
             await _fleetService.Delete(id);
