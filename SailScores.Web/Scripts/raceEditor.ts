@@ -340,7 +340,7 @@ function setTimingFields(compListItem: HTMLLIElement) {
     const nowDateStr = `${year}-${month}-${day}`;
 
     if (raceDateStr === nowDateStr && trackTimesChecked) {
-        if (finishInput) updateTimeInput(finishInput, now.toTimeString().slice(0, 8));
+        if (finishInput) updateTimeInput(finishInput, formatTimeForInput(now));
         const startTimeInput = document.getElementById('StartTime') as HTMLInputElement | null;
         if (startTimeInput?.value) {
             const start = parseTimeStringToDate(startTimeInput.value);
@@ -791,13 +791,19 @@ function updateStartNowVisibility() {
 
 // Helper functions for time parsing and formatting
 function parseTimeStringToDate(timeString: string, baseDate?: Date): Date | null {
-    // timeString: "HH:mm:ss" or "HH:mm" or "hh:mm:ss" or "hh:mm"
+    // timeString: "HH:mm:ss", "HH:mm", "hh:mm:ss AM/PM", "hh:mm AM/PM"
     if (!timeString) return null;
-    const parts = timeString.split(":");
+    const isPM = /pm/i.test(timeString);
+    const isAM = /am/i.test(timeString);
+    const cleanTime = timeString.replace(/(am|pm)/i, "").trim();
+    const parts = cleanTime.split(":");
     if (parts.length < 2) return null;
     const d = baseDate ? new Date(baseDate) : new Date();
     d.setSeconds(0, 0);
-    d.setHours(parseInt(parts[0], 10));
+    let hours = parseInt(parts[0], 10);
+    if (isPM && hours < 12) hours += 12;
+    if (isAM && hours === 12) hours = 0;
+    d.setHours(hours);
     d.setMinutes(parseInt(parts[1], 10));
     if (parts.length > 2) d.setSeconds(parseInt(parts[2], 10));
     return d;
@@ -831,8 +837,14 @@ function parseElapsedTimeString(str: string): number | null {
 }
 
 function formatTimeForInput(date: Date): string {
-    // Returns "HH:mm:ss" for input[type=time]
-    return date.toTimeString().slice(0, 8);
+    // Returns "hh:mm:ss AM/PM" for time pickers
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    return `${hours.toString().padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
 }
 
 function updateAllScoreTimesForStartTimeChange() {
@@ -846,7 +858,7 @@ function updateAllScoreTimesForStartTimeChange() {
         const elapsedInput = $(this).find('input[name="ElapsedTime"]')[0] as HTMLInputElement;
         if (!finishInput && !elapsedInput) return;
 
-        const lastEdited = this.dataset.lastEditedField || "elapsed";
+        const lastEdited = this.dataset.lastEditedField || "finish";
         const hasElapsed = !!elapsedInput?.value;
         const hasFinish = !!finishInput?.value;
 
@@ -922,9 +934,42 @@ function initTimePickers(container: HTMLElement) {
     ($(container).find(".time-picker") as any).flatpickr({
         enableTime: true,
         noCalendar: true,
-        dateFormat: "H:i:S",
-        time_24hr: true,
-        enableSeconds: true
+        dateFormat: "h:i:S K",
+        time_24hr: false,
+        enableSeconds: true,
+        allowInput: true,
+        minuteIncrement: 1,
+        onReady: function (selectedDates: Date[], dateStr: string, instance: any) {
+            const handleWheel = (e: WheelEvent) => {
+                console.log("Flatpickr wheel event", { target: e.target, currentTarget: e.currentTarget, deltaY: e.deltaY });
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -1 : 1;
+                let current = instance.latestSelectedDateObj ? new Date(instance.latestSelectedDateObj) : new Date();
+                if (isNaN(current.getTime())) {
+                    current = new Date();
+                    current.setHours(0, 0, 0, 0);
+                }
+
+                if (e.currentTarget === instance.hourElement) {
+                    console.log("Changing hour", { from: current.getHours(), delta: delta });
+                    current.setHours(current.getHours() + delta);
+                    instance.setDate(current, true);
+                } else if (e.currentTarget === instance.minuteElement) {
+                    console.log("Changing minute", { from: current.getMinutes(), delta: delta });
+                    current.setMinutes(current.getMinutes() + delta);
+                    instance.setDate(current, true);
+                } else if (e.currentTarget === instance.secondElement) {
+                    console.log("Changing second", { from: current.getSeconds(), delta: delta });
+                    current.setSeconds(current.getSeconds() + delta);
+                    instance.setDate(current, true);
+                }
+            };
+            instance.hourElement.addEventListener("wheel", handleWheel);
+            instance.minuteElement.addEventListener("wheel", handleWheel);
+            if (instance.secondElement) {
+                instance.secondElement.addEventListener("wheel", handleWheel);
+            }
+        }
     });
 }
 
