@@ -58,6 +58,13 @@ public class UserController : Controller
                 return View(model);
             }
 
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (string.Equals(currentUser.Email, model.EmailAddress, StringComparison.OrdinalIgnoreCase))
+            {
+                ModelState.AddModelError(string.Empty, "You cannot modify your own permissions.");
+                return View(model);
+            }
+
             model.CreatedBy = await GetUserStringAsync();
             model.Created = DateTime.UtcNow;
             await _permissionService.UpdatePermission(clubId, model);
@@ -145,6 +152,22 @@ public class UserController : Controller
 
         try
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (model.Id != Guid.Empty)
+            {
+                var existingUser = await _permissionService.GetUserAsync(model.Id);
+                if (existingUser != null && string.Equals(existingUser.EmailAddress, user.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError(string.Empty, "You cannot modify your own permissions.");
+                    return View(model);
+                }
+            }
+            else if (string.Equals(model.EmailAddress, user.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                ModelState.AddModelError(string.Empty, "You cannot modify your own permissions.");
+                return View(model);
+            }
+
             var clubId = await _clubService.GetClubId(clubInitials);
             await _permissionService.UpdatePermission(clubId, model);
 
