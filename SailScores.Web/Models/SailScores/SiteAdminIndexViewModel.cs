@@ -2,7 +2,11 @@ namespace SailScores.Web.Models.SailScores;
 
 public class SiteAdminIndexViewModel
 {
-    public IList<SiteAdminClubSummary> Clubs { get; set; }
+    public IList<SiteAdminClubSummary> Clubs { get; set; } = new List<SiteAdminClubSummary>();
+    public string? UpdateSortParm { get; set; }
+    public string? NameSortParm { get; set; }
+    public string? RaceSortParm { get; set; }
+    public string? CurrentSort { get; set; }
 }
 
 public class SiteAdminClubSummary

@@ -26,14 +26,14 @@ public class SiteAdminController : Controller
     }
 
     // GET: SiteAdmin
-    public async Task<ActionResult> Index()
+    public async Task<ActionResult> Index(string? sortOrder)
     {
         if (!await _authService.IsUserFullAdmin(User))
         {
             return Unauthorized();
         }
 
-        var vm = await _siteAdminService.GetAllClubsAsync();
+        var vm = await _siteAdminService.GetAllClubsAsync(sortOrder);
         return View(vm);
     }
 

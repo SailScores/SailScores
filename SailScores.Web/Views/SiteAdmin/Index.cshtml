@@ -35,11 +35,23 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>Club Name</th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@Model.NameSortParm" class="text-decoration-none text-dark">
+                            Club Name @(Model.CurrentSort == null || Model.CurrentSort == "" ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.NameDesc ? "↓" : ""))
+                        </a>
+                    </th>
                     <th>Initials</th>
                     <th>Visibility</th>
-                    <th>Latest Series Update</th>
-                    <th>Latest Race Date</th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@Model.UpdateSortParm" class="text-decoration-none text-dark">
+                            Latest Series Update @(Model.CurrentSort == SiteAdminSortOrders.UpdateAsc ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.UpdateDesc ? "↓" : ""))
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@Model.RaceSortParm" class="text-decoration-none text-dark">
+                            Latest Race Date @(Model.CurrentSort == SiteAdminSortOrders.RaceAsc ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.RaceDesc ? "↓" : ""))
+                        </a>
+                    </th>
                     <th>Actions</th>
                 </tr>
             </thead>
