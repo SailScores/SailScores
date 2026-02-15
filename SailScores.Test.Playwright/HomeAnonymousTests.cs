@@ -19,19 +19,14 @@ public class HomeAnonymousTests : PageTest
 
     [Trait("Read Only", "True")]
     [Fact]
-    public async Task HomePage_HasDropdown()
+    public async Task HomePage_HasClubCards()
     {
         await Page.GotoAsync(configuration.BaseUrl);
 
-        // if logged in, log out
-        var logoutLink = Page.Locator("a:has-text('Log out')");
-        if (await logoutLink.CountAsync() > 0)
-        {
-            await logoutLink.ClickAsync();
-        }
+        await Page.EnsureLoggedOutAsync();
 
-        var clubSelector = Page.Locator("#clubSelect");
-        Assert.True(await clubSelector.CountAsync() > 0);
+        var lhycCard = Page.Locator(".club-card[data-club-name='lake harriet yacht club']");
+        await Expect(lhycCard).ToBeVisibleAsync();
     }
 
     [Trait("Read Only", "True")]
@@ -40,12 +35,7 @@ public class HomeAnonymousTests : PageTest
     {
         await Page.GotoAsync(configuration.BaseUrl);
 
-        // if logged in, log out
-        var logoutLink = Page.Locator("a:has-text('Log out')");
-        if (await logoutLink.CountAsync() > 0)
-        {
-            await logoutLink.ClickAsync();
-        }
+        await Page.EnsureLoggedOutAsync();
 
         await Page.Locator("a:has-text('About')").ClickAsync();
         var aboutHeading = Page.Locator("//h1[contains(.,'kept simple')]");
@@ -61,12 +51,7 @@ public class HomeAnonymousTests : PageTest
     {
         await Page.GotoAsync(configuration.BaseUrl);
 
-        // if logged in, log out
-        var logoutLink = Page.Locator("a:has-text('Log out')");
-        if (await logoutLink.CountAsync() > 0)
-        {
-            await logoutLink.ClickAsync();
-        }
+        await Page.EnsureLoggedOutAsync();
 
         int num = new Random().Next(1000);
         await Page.Locator("a:has-text('Try it out')").ClickAsync();

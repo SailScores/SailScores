@@ -106,12 +106,29 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task CanEditSeries_SeriesScorekeeper_ReturnsTrue()
+        public async Task CanEditRaces_SeriesScorekeeper_ReturnsTrue()
         {
             var seriesUserEmail = "series@example.com";
             await _service.AddPermission(_clubId, seriesUserEmail, "Test", PermissionLevel.SeriesScorekeeper);
-            
-            var result = await _service.CanEditSeries(seriesUserEmail, _clubId);
+
+            var result = await _service.CanEditRaces(seriesUserEmail, _clubId);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task IsUserAllowedToEdit_RaceScorekeeper_ReturnsTrue()
+        {
+            var result = await _service.IsUserAllowedToEdit(_testUserEmail, _clubId);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task IsUserAllowedToEdit_SeriesScorekeeper_ReturnsTrue()
+        {
+            var seriesUserEmail = "series@example.com";
+            await _service.AddPermission(_clubId, seriesUserEmail, "Test", PermissionLevel.SeriesScorekeeper);
+
+            var result = await _service.IsUserAllowedToEdit(seriesUserEmail, _clubId);
             Assert.True(result);
         }
 
@@ -120,8 +137,18 @@ namespace SailScores.Test.Unit.Core.Services
         {
             var clubAdminEmail = "clubadmin@example.com";
             await _service.AddPermission(_clubId, clubAdminEmail, "Test", PermissionLevel.ClubAdministrator);
-            
+
             var result = await _service.CanEditSeries(clubAdminEmail, _clubId);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task CanEditSeries_SeriesScorekeeper_ReturnsTrue()
+        {
+            var seriesUserEmail = "series_only@example.com";
+            await _service.AddPermission(_clubId, seriesUserEmail, "Test", PermissionLevel.SeriesScorekeeper);
+
+            var result = await _service.CanEditSeries(seriesUserEmail, _clubId);
             Assert.True(result);
         }
     }

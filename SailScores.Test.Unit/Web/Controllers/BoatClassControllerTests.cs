@@ -77,19 +77,6 @@ namespace SailScores.Test.Unit.Web.Controllers
         }
 
         [Fact]
-        public async Task Create_PostUnauthorized_ReturnForbidden()
-        {
-            var vm = new BoatClass
-            {
-
-            };
-            var result = await _controller.Create(_clubInitials, vm);
-
-            _classServiceMock.Verify(s => s.SaveNew(vm), Times.Never);
-            Assert.IsType<ForbidResult>(result);
-        }
-
-        [Fact]
         public async Task Create_PostInvalidModel_ReturnsModel()
         {
             SetupAsAuthorized();

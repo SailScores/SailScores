@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit;
 using SailScores.Test.Playwright.Utilities;
 using System;
@@ -26,13 +26,7 @@ public class TestClubTests
 
     private async Task LoginAndGoToHiddenTestClubAsync(IPage page)
     {
-
-        await page.GotoAsync(configuration.BaseUrl);
-
-        await page.Locator("a:has-text('Log in')").ClickAsync();
-        await page.Locator("#Email").FillAsync(configuration.TestEmail);
-        await page.Locator("#Password").FillAsync(configuration.TestPassword);
-        await page.Locator("form input[type='submit'], form button[type='submit']").ClickAsync();
+        await page.LoginAsync(configuration.BaseUrl, configuration.TestEmail, configuration.TestPassword);
         await page.GotoAsync(UrlCombine(configuration.BaseUrl, configuration.TestClubInitials));
     }
 
@@ -116,10 +110,9 @@ public class TestClubTests
         await page.Locator("#Name").FillAsync(fleetName);
         await page.Locator("#NickName").FillAsync(fleetName);
         await page.Locator("#fleetType").SelectOptionAsync(new SelectOptionValue { Label = "Selected Boats" });
-        await page.Locator("#CompetitorIds").SelectOptionAsync(new[] {
-            new SelectOptionValue { Label = "11111 - Alice (Test Boat Class)" },
-            new SelectOptionValue { Label = "22222 - Bob (Test Boat Class)" }
-        });
+        await page.SelectOptionsByLabelHiddenAsync("#competitorIds", 
+            "11111 - Alice (Test Boat Class)", 
+            "22222 - Bob (Test Boat Class)");
         var submitButton = page.Locator("input[value='Create']");
         await submitButton.ScrollIntoViewIfNeededAsync();
         await submitButton.ClickAsync();
@@ -146,13 +139,14 @@ public class TestClubTests
         await page.Locator($"#{sectionName}").ClickAsync();
         var createLink = page.Locator("a:has-text('New Season')");
         await createLink.ClickAsync();
-        var startDate = DateTime.Today.AddYears(-5);
-        var finishDate = DateTime.Today.AddDays(1).AddYears(-5);
+        var startDate = DateTime.Today.AddYears(1);
+        var finishDate = DateTime.Today.AddDays(1).AddYears(1);
         var seasonName = $"Test {startDate.Year}";
         await page.Locator("#Name").FillAsync(seasonName);
-        await page.Locator("#Start").FillAsync(startDate.ToString("MM/dd/yyyy"));
-        await page.Locator("#End").FillAsync(finishDate.ToString("MM/dd/yyyy"));
+        await page.Locator("#Start").FillAsync(startDate.ToString("yyyy-MM-dd"));
+        await page.Locator("#End").FillAsync(finishDate.ToString("yyyy-MM-dd"));
         await page.Locator("input[value='Create']").ClickAsync();
+        // Redirects to Admin Index
         await page.Locator($"#{sectionName}").ClickAsync();
         var editButton = await GetEditButtonForRowAsync(page, sectionName, seasonName);
         await editButton.ClickAsync();
@@ -206,8 +200,8 @@ public class TestClubTests
         var createLink = page.Locator("a:has-text('New Regatta')");
         await createLink.ClickAsync();
         await page.Locator("#Name").FillAsync(regattaName);
-        await page.Locator("[name='StartDate']").FillAsync(DateTime.Today.AddDays(-1).ToString("MM/dd/yyyy"));
-        await page.Locator("[name='EndDate']").FillAsync(DateTime.Today.AddDays(1).ToString("MM/dd/yyyy"));
+        await page.Locator("[name='StartDate']").FillAsync(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        await page.Locator("[name='EndDate']").FillAsync(DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"));
         await page.Locator("input[value='Create']").ClickAsync();
         await page.Locator("a:has-text('Edit Regatta')").ClickAsync();
         await page.Locator("input[value='Save']").ClickAsync();
@@ -234,14 +228,14 @@ public class TestClubTests
             serieslink = await page.Locator("a:has-text('Series')").AllAsync();
         }
         await serieslink[0].ClickAsync();
-        var testSeriesLink = page.Locator($"a:has-text('{year} Test Series')");
+        var testSeriesLink = page.Locator($"a:has-text('{year} Test Series')").First;
         await testSeriesLink.ClickAsync();
         var headerlinks = await page.Locator("th a").AllAsync();
         int raceCount = headerlinks.Count;
-        await page.Locator("a:has-text('TEST')").ClickAsync();
+        await page.Locator(".navbar-brand:has-text('TEST')").ClickAsync();
         await page.Locator("a:has-text('New Race')").ClickAsync();
         await page.Locator("#fleetId").SelectOptionAsync(new SelectOptionValue { Label = "Test Boat Class Fleet" });
-        await page.Locator("#seriesIds").SelectOptionAsync(new SelectOptionValue { Label = $"{year} Test Series" });
+        await page.SelectOptionsByLabelHiddenAsync("#SeriesIds", $"{year} Test Series");
         await page.Locator("a:has-text('Optional Fields')").ClickAsync();
         int order = ++raceCount;
         var orderField = page.Locator("#InitialOrder");
@@ -252,7 +246,7 @@ public class TestClubTests
         await addCompElement.FillAsync("222");
         await addCompElement.PressAsync("Enter");
         await page.Locator("input[value='Create']").ClickAsync();
-        await page.Locator("a:has-text('TEST')").ClickAsync();
+        await page.Locator(".navbar-brand:has-text('TEST')").ClickAsync();
         await Task.Delay(1000);
         await page.Locator($"a:has-text('{year} Test Series')").ClickAsync();
         var linkText = $"{DateTime.Today.ToString("M/d")} R{order}";
@@ -266,7 +260,7 @@ public class TestClubTests
         string sectionId,
         string itemName)
     {
-        return page.Locator(GetButtonSelector(page, "Delete", sectionId, itemName));
+        return page.Locator($"#{sectionId}div .row").Filter(new() { HasText = itemName }).First.Locator("a[title='Delete']");
     }
 
     private async Task<ILocator> GetEditButtonForRowAsync(
@@ -274,15 +268,6 @@ public class TestClubTests
         string sectionId,
         string itemName)
     {
-        return page.Locator(GetButtonSelector(page, "Edit", sectionId, itemName));
-    }
-
-    private string GetButtonSelector(
-        IPage page,
-        string buttonTitle,
-        string sectionId,
-        string itemInRowText)
-    {
-        return $"//div[@id=\"{sectionId}div\"]//div[contains(string(), \"{itemInRowText}\")]//a[@title=\"{buttonTitle}\"]";
+        return page.Locator($"#{sectionId}div .row").Filter(new() { HasText = itemName }).First.Locator("a[title='Edit']");
     }
 }

@@ -28,11 +28,10 @@ public class LhycAnonymousTests
         var page = await browser.NewPageAsync();
         await page.GotoAsync(configuration.BaseUrl);
 
-        // JavaScript should navigate automatically
-        await page.Locator("#clubSelect").SelectOptionAsync(new SelectOptionValue { Label = "Lake Harriet Yacht Club" });
-        await page.Locator("a:text-matches('LHYC', 'i')").First.WaitForAsync();
+        await page.GetByText("Lake Harriet Yacht Club").First.ClickAsync(new() { Force = true });
+        await page.WaitForURLAsync("**/LHYC");
 
-        Assert.Equal(configuration.BaseUrl + "LHYC", page.Url);
+        Assert.EndsWith("/LHYC", page.Url);
 
         await page.GetByRole(AriaRole.Link, new() { Name = "Series", Exact = true }).ClickAsync();
         await page.Locator("a[href*='LHYC/2019/MC Season Champ']").ClickAsync();
@@ -52,10 +51,10 @@ public class LhycAnonymousTests
         var page = await browser.NewPageAsync();
         await page.GotoAsync(configuration.BaseUrl);
 
-        await page.Locator("#clubSelect").SelectOptionAsync(new SelectOptionValue { Label = "Lake Harriet Yacht Club" });
-        await page.Locator("a:text-matches('LHYC', 'i')").First.WaitForAsync();
+        await page.GetByText("Lake Harriet Yacht Club").First.ClickAsync(new() { Force = true });
+        await page.WaitForURLAsync("**/LHYC");
 
-        Assert.Equal(configuration.BaseUrl + "LHYC", page.Url);
+        Assert.EndsWith("/LHYC", page.Url);
         await Task.Delay(300);
 
         await page.GetByText("Races", new() { Exact = true }).ClickAsync();
@@ -76,10 +75,10 @@ public class LhycAnonymousTests
         var page = await browser.NewPageAsync();
         await page.GotoAsync(configuration.BaseUrl);
 
-        await page.Locator("#clubSelect").SelectOptionAsync(new SelectOptionValue { Label = "Lake Harriet Yacht Club" });
-        await page.Locator("a:text-matches('LHYC', 'i')").First.WaitForAsync();
+        await page.GetByText("Lake Harriet Yacht Club").First.ClickAsync(new() { Force = true });
+        await page.WaitForURLAsync("**/LHYC");
 
-        Assert.Equal(configuration.BaseUrl + "LHYC", page.Url);
+        Assert.EndsWith("/LHYC", page.Url);
         await Task.Delay(300);
 
         await page.Locator("a:has-text('Regattas')").ClickAsync();
