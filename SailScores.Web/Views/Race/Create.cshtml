@@ -259,7 +259,10 @@
                                 <div class="row">
                                     <label asp-for="StartTime" class="control-label col-3 col-md-4 col-form-label text-end">Start Time</label>
                                     <div class="col-9 col-md-8">
-                                        <input asp-for="StartTime" class="form-control" type="time" step="1" />
+                                        <div class="input-group">
+                                            <input asp-for="StartTime" class="form-control time-picker" type="text" placeholder="hh:mm:ss AM/PM" />
+                                            <button type="button" class="btn btn-outline-secondary" id="startNowButton" style="display:none;">Start Now</button>
+                                        </div>
                                         <span asp-validation-for="StartTime" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -316,8 +319,8 @@
                                     </div>
                                                                         
                                     <div class="ms-2">
-                                        <input name="FinishTime" class="form-control form-control-sm finish-time-input" type="time" step="1"
-                                            value="@(score.FinishTime.HasValue ? score.FinishTime.Value.ToString(@"HH\:mm\:ss") : "")"/>
+                                        <input name="FinishTime" class="form-control form-control-sm finish-time-input time-picker" type="text" placeholder="hh:mm:ss AM/PM"
+                                            value="@(score.FinishTime.HasValue ? score.FinishTime.Value.ToString(@"hh\:mm\:ss tt") : "")"/>
                                         <span class="text-danger finish-time-error"></span>
                                     </div>
                                     <div class="ms-2">
@@ -475,10 +478,103 @@
     }
   <script>
         $(function () {
-            $('[data-bs-toggle="popover"]').popover()
+            $('[data-bs-toggle="popover"]').popover();
+            $(".time-picker").flatpickr({
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "h:i:S K",
+                time_24hr: false,
+                enableSeconds: true,
+                allowInput: true,
+                minuteIncrement: 1,
+                onReady: function (selectedDates, dateStr, instance) {
+                    const handleWheel = (e) => {
+                        console.log("Flatpickr wheel event", { target: e.target, currentTarget: e.currentTarget, deltaY: e.deltaY });
+                        e.preventDefault();
+                        const delta = e.deltaY > 0 ? -1 : 1;
+                        let current = instance.latestSelectedDateObj ? new Date(instance.latestSelectedDateObj) : new Date();
+                        if (isNaN(current.getTime())) {
+                            current = new Date();
+                            current.setHours(0, 0, 0, 0);
+                        }
+
+                        if (e.currentTarget === instance.hourElement) {
+                            console.log("Changing hour", { from: current.getHours(), delta: delta });
+                            current.setHours(current.getHours() + delta);
+                            instance.setDate(current, true);
+                        } else if (e.currentTarget === instance.minuteElement) {
+                            console.log("Changing minute", { from: current.getMinutes(), delta: delta });
+                            current.setMinutes(current.getMinutes() + delta);
+                            instance.setDate(current, true);
+                        } else if (e.currentTarget === instance.secondElement) {
+                            console.log("Changing second", { from: current.getSeconds(), delta: delta });
+                            current.setSeconds(current.getSeconds() + delta);
+                            instance.setDate(current, true);
+                        }
+                    };
+                    instance.hourElement.addEventListener("wheel", handleWheel);
+                    instance.minuteElement.addEventListener("wheel", handleWheel);
+                    if (instance.secondElement) {
+                        instance.secondElement.addEventListener("wheel", handleWheel);
+                    }
+                }
+            });
         });
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function isValidTimeFormat(time) {
+            // Accepts hh:mm:ss or h:mm:ss, where hh is 0-23, mm and ss are 0-59
+            // OR accepts 12-hour format with AM/PM: h:mm:ss AM/PM or hh:mm:ss AM/PM
+            const twentyFourHourFormat = /^([0-1]?\d|2[0-3]):[0-5]\d:[0-5]\d$/;
+            const twelveHourFormat = /^(0?[1-9]|1[0-2]):[0-5]\d:[0-5]\d\s(?:AM|PM)$/i;
+            return twentyFourHourFormat.test(time) || twelveHourFormat.test(time);
+        }
+
+        function validateTimes() {
+            let isValid = true;
+
+            // Validate ElapsedTime fields (24-hour format only)
+            $('.elapsed-time-input').each(function () {
+                const $input = $(this);
+                const value = $input.val().trim();
+                const $error = $input.siblings('.elapsed-time-error');
+                if (value && !isValidTimeFormat(value)) {
+                    $error.text('Time must be hh:mm:ss');
+                    isValid = false;
+                } else {
+                    $error.text('');
+                }
+            });
+
+            // Validate FinishTime fields (if you want to enforce format, though type="time" usually handles this)
+            $('.finish-time-input').each(function () {
+                const $input = $(this);
+                const value = $input.val().trim();
+                const $error = $input.siblings('.finish-time-error');
+                if (value && !isValidTimeFormat(value)) {
+                    $error.text('Time must be hh:mm:ss');
+                    isValid = false;
+                } else {
+                    $error.text('');
+                }
+            });
+
+            return isValid;
+        }
+
+        $(function () {
+            $('#raceform').on('submit', function (e) {
+                if (!validateTimes()) {
+                    e.preventDefault();
+                }
+            });
+
+            $(document).on('blur', '.elapsed-time-input, .finish-time-input', function () {
+                validateTimes();
+            });
+        });
+    </script>
     <script src="~/vendor/devbridge-autocomplete/jquery.autocomplete.js"></script>
     <script>
         var scoreCodes = @Html.Raw(Json.Serialize(Model.ScoreCodeOptions));
@@ -516,54 +612,4 @@
     {
         <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.40.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle.min.js"></script>
     }
-    <script>
-    function isValidTimeFormat(time) {
-        // Accepts hh:mm:ss or h:mm:ss, where hh is 0-23, mm and ss are 0-59
-        return /^([0-1]?\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(time);
-    }
-
-    function validateTimes() {
-        let isValid = true;
-
-        // Validate ElapsedTime fields
-        $('.elapsed-time-input').each(function () {
-            const $input = $(this);
-            const value = $input.val().trim();
-            const $error = $input.siblings('.elapsed-time-error');
-            if (value && !isValidTimeFormat(value)) {
-                $error.text('Time must be hh:mm:ss');
-                isValid = false;
-            } else {
-                $error.text('');
-            }
-        });
-
-        // Validate FinishTime fields (if you want to enforce format, though type="time" usually handles this)
-        $('.finish-time-input').each(function () {
-            const $input = $(this);
-            const value = $input.val().trim();
-            const $error = $input.siblings('.finish-time-error');
-            if (value && !isValidTimeFormat(value)) {
-                $error.text('Time must be hh:mm:ss');
-                isValid = false;
-            } else {
-                $error.text('');
-            }
-        });
-
-        return isValid;
-    }
-
-    $(function () {
-        $('#raceform').on('submit', function (e) {
-            if (!validateTimes()) {
-                e.preventDefault();
-            }
-        });
-        
-        $(document).on('blur', '.elapsed-time-input, .finish-time-input', function () {
-            validateTimes();
-        });
-    });
-</script>
 }

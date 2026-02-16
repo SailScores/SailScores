@@ -28,7 +28,7 @@ public class WebSiteAdminService : IWebSiteAdminService
         _backupService = backupService;
     }
 
-    public async Task<SiteAdminIndexViewModel> GetAllClubsAsync()
+    public async Task<SiteAdminIndexViewModel> GetAllClubsAsync(string? sortOrder = null)
     {
         var clubsWithDates = await _coreSiteAdminService.GetAllClubsWithDatesAsync();
 
@@ -42,10 +42,26 @@ public class WebSiteAdminService : IWebSiteAdminService
             LatestRaceDate = c.latestRaceDate
         }).ToList();
 
-        return new SiteAdminIndexViewModel
+        var viewModel = new SiteAdminIndexViewModel
         {
+            CurrentSort = sortOrder,
+            NameSortParm = string.IsNullOrEmpty(sortOrder) ? SiteAdminSortOrders.NameDesc : "",
+            UpdateSortParm = sortOrder == SiteAdminSortOrders.UpdateAsc ? SiteAdminSortOrders.UpdateDesc : SiteAdminSortOrders.UpdateAsc,
+            RaceSortParm = sortOrder == SiteAdminSortOrders.RaceAsc ? SiteAdminSortOrders.RaceDesc : SiteAdminSortOrders.RaceAsc,
             Clubs = clubSummaries
         };
+
+        viewModel.Clubs = sortOrder switch
+        {
+            SiteAdminSortOrders.NameDesc => viewModel.Clubs.OrderByDescending(c => c.Name).ToList(),
+            SiteAdminSortOrders.UpdateAsc => viewModel.Clubs.OrderBy(c => c.LatestSeriesUpdate).ToList(),
+            SiteAdminSortOrders.UpdateDesc => viewModel.Clubs.OrderByDescending(c => c.LatestSeriesUpdate).ToList(),
+            SiteAdminSortOrders.RaceAsc => viewModel.Clubs.OrderBy(c => c.LatestRaceDate).ToList(),
+            SiteAdminSortOrders.RaceDesc => viewModel.Clubs.OrderByDescending(c => c.LatestRaceDate).ToList(),
+            _ => viewModel.Clubs.OrderBy(c => c.Name).ToList(),
+        };
+
+        return viewModel;
     }
 
     public async Task<SiteAdminClubDetailsViewModel> GetClubDetailsAsync(string clubInitials)

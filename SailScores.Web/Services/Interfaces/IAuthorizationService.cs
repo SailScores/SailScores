@@ -10,6 +10,18 @@ public interface IAuthorizationService
     Task<bool> CanUserEdit(
         ClaimsPrincipal claimsPrincipal,
         Guid clubId);
+    Task<bool> CanUserEditSeries(
+        ClaimsPrincipal claimsPrincipal,
+        Guid clubId);
+    Task<bool> CanUserEditRaces(
+        ClaimsPrincipal claimsPrincipal,
+        Guid clubId);
+    Task<bool> CanUserEditRaces(
+        ClaimsPrincipal claimsPrincipal,
+        string clubInitials);
+    Task<bool> IsUserClubAdministrator(
+        ClaimsPrincipal claimsPrincipal,
+        Guid clubId);
     Task<bool> IsUserFullAdmin(ClaimsPrincipal user);
     Task<string> GetHomeClub(string email);
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Identity.Entities;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -55,7 +56,7 @@ public class CompetitorController : Controller
         {
             return new NotFoundResult();
         }
-        var canEdit = await _authService.CanUserEdit(User, clubInitials);
+        var canEdit = await _authService.CanUserEditRaces(User, clubInitials);
         var clubId = await _clubService.GetClubId(clubInitials);
         
         IList<CompetitorIndexViewModel> competitors;
@@ -85,7 +86,7 @@ public class CompetitorController : Controller
         {
             ClubInitials = clubInitials,
             List = competitors,
-            CanEdit = await _authService.CanUserEdit(User, clubInitials),
+            CanEdit = await _authService.CanUserEditRaces(User, clubInitials),
             FleetOptions = _mapper.Map<List<FleetSummary>>(fleets),
             SelectedFleetId = fleetId
         };
@@ -136,6 +137,7 @@ public class CompetitorController : Controller
 
 
     // GET: Competitor/Create
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Create(
         string clubInitials,
         string returnUrl = null)
@@ -164,6 +166,7 @@ public class CompetitorController : Controller
     // POST: Competitor/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Create(
         string clubInitials,
         CompetitorWithOptionsViewModel competitor,
@@ -173,11 +176,6 @@ public class CompetitorController : Controller
         ViewData["ReturnUrl"] = returnUrl;
 
         var clubId = await _clubService.GetClubId(clubInitials);
-            
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
         competitor.ClubId = clubId;
         try
         {
@@ -225,6 +223,7 @@ public class CompetitorController : Controller
     }
 
     // GET: Competitor/CreateMultiple
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> CreateMultiple(
         string clubInitials,
         string returnUrl = null)
@@ -251,6 +250,7 @@ public class CompetitorController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> CreateMultiple(
         string clubInitials,
         MultipleCompetitorsWithOptionsViewModel competitorsVm,
@@ -300,10 +300,6 @@ public class CompetitorController : Controller
                     .OrderBy(c => c.Name);
                 return View(competitorsVm);
             }
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
 
             string username = await GetUserStringAsync();
             await _competitorService.SaveAsync(competitorsVm, clubId, username);
@@ -328,13 +324,10 @@ public class CompetitorController : Controller
     }
 
     // GET: Competitor/Edit/5
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var compWithOptions = await _competitorService.GetCompetitorWithHistoryAsync(id);
         if (compWithOptions == null)
@@ -360,16 +353,13 @@ public class CompetitorController : Controller
     // POST: Competitor/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Edit(
         Guid id,
         CompetitorWithOptionsViewModel competitor)
     {
         try
         {
-            if (!await _authService.CanUserEdit(User, competitor.ClubId))
-            {
-                return Unauthorized();
-            }
 
             IEnumerable<KeyValuePair<string, string>> errors =
                 await _competitorService.GetSaveErrors(competitor);
@@ -432,15 +422,12 @@ public class CompetitorController : Controller
 
     [HttpGet]
     // GET: Competitor/Delete/5
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Delete(
         string clubInitials,
         Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
         var competitor = await _competitorService.GetCompetitorAsync(id);
         if (competitor == null)
         {
@@ -457,14 +444,14 @@ public class CompetitorController : Controller
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             var competitor = await _competitorService.GetCompetitorAsync(id);
-            if (!await _authService.CanUserEdit(User, clubId)
-                || competitor.ClubId != clubId)
+            if (competitor.ClubId != clubId)
             {
                 return Unauthorized();
             }
@@ -482,13 +469,10 @@ public class CompetitorController : Controller
     }
 
     [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     // GET: Competitor/InactivateMultiple
     public async Task<ActionResult> InactivateMultiple(string clubInitials)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
         return View();
     }
 
@@ -496,12 +480,13 @@ public class CompetitorController : Controller
     [HttpPost]
     [ActionName("InactivateAll")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostInactivateMultiple(
         string clubInitials,
         [FromForm] DateTime sinceDate)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
+        if (!await _authService.CanUserEditRaces(User, clubId))
         {
             return Unauthorized();
         }
@@ -511,13 +496,10 @@ public class CompetitorController : Controller
     }
 
 	[HttpGet]
-	// GET: Competitor/ClearAltNumbers
-	public async Task<ActionResult> ClearAltNumbers(string clubInitials)
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
+    // GET: Competitor/ClearAltNumbers
+    public async Task<ActionResult> ClearAltNumbers(string clubInitials)
 	{
-		if (!await _authService.CanUserEdit(User, clubInitials))
-		{
-			return Unauthorized();
-		}
 		return View();
 	}
 
@@ -525,14 +507,11 @@ public class CompetitorController : Controller
 	[HttpPost]
 	[ActionName("ClearAltNumbers")]
 	[ValidateAntiForgeryToken]
-	public async Task<ActionResult> PostClearAltNumbers(string clubInitials)
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
+    public async Task<ActionResult> PostClearAltNumbers(string clubInitials)
 	{
-
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-		{
-			return Unauthorized();
-		}
+
         await _competitorService.ClearAltNumbers(clubId);
 
 		return RedirectToAction("Index", "Competitor");
@@ -541,15 +520,13 @@ public class CompetitorController : Controller
     [HttpPost]
     [ActionName("SetCompActive")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> PostCompActive(
         string clubInitials,
         CompetitorActivateViewModel compActivate)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
+
         await _competitorService.SetCompetitorActive(clubId, 
             compActivate.CompetitorId,
             compActivate.Active,
@@ -559,16 +536,14 @@ public class CompetitorController : Controller
     }
 
 	[HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Utilities(
         		string clubInitials,
                 		string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
 		var clubId = await _clubService.GetClubId(clubInitials);
-		if (!await _authService.CanUserEdit(User, clubId))
-        {
-			return Unauthorized();
-		}
+
 		var competitors = await _competitorService
 			.GetCompetitorsAsync(clubInitials, true);
         var compVm = _mapper.Map<List<CompetitorIndexViewModel>>(competitors);
@@ -576,7 +551,7 @@ public class CompetitorController : Controller
         {
 			ClubInitials = clubInitials,
 			List = compVm,
-			CanEdit = await _authService.CanUserEdit(User, clubInitials)
+			CanEdit = await _authService.CanUserEditRaces(User, clubInitials)
 		};
 		return View(vm);
 	}

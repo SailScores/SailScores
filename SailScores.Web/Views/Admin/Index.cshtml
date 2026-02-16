@@ -14,18 +14,24 @@
     <nav class="col-md-2 d-none d-md-block bg-almost sidebar">
         <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="#classes">Classes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#fleets">Fleets</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#seasons">Seasons</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#series">Series</a>
-                </li>
+                @if (Model.IsClubAdmin)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="#classes">Classes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#fleets">Fleets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#seasons">Seasons</a>
+                    </li>
+                }
+                @if (Model.CanEditSeries)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="#series">Series</a>
+                    </li>
+                }
                 <li class="nav-item">
                     <a class="nav-link" asp-controller="Competitor"
                        asp-action="index">Competitors</a>
@@ -34,15 +40,18 @@
                     <a class="nav-link" asp-controller="Race"
                        asp-action="index">Races</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#scoring">Scoring</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#regattas">Regattas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#scorekeepers">Scorekeepers</a>
-                </li>
+                @if (Model.IsClubAdmin)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="#scoring">Scoring</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#regattas">Regattas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#scorekeepers">Scorekeepers</a>
+                    </li>
+                }
                 <li class="nav-item">
                     <a class="nav-link" asp-controller="Reports"
                        asp-action="Index">Reports</a>
@@ -64,11 +73,14 @@
            asp-action="Create"
            class="btn btn-outline-primary btn-sm">@localizer["New Race"]</a>
     </div>
-    <div class="col-6 col-sm-4">
-        <a asp-controller="Admin"
-           asp-action="Edit"
-           class="btn btn-outline-primary btn-sm">@localizer["Edit Club Info"]</a>
-    </div>
+    @if (Model.IsClubAdmin)
+    {
+        <div class="col-6 col-sm-4">
+            <a asp-controller="Admin"
+               asp-action="Edit"
+               class="btn btn-outline-primary btn-sm">@localizer["Edit Club Info"]</a>
+        </div>
+    }
 </div>
 <hr />
 <div class="row d-none d-md-inline">
@@ -102,18 +114,24 @@
 </div>
 <div class="d-md-none">
     <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link" href="#classes">Classes</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#fleets">Fleets</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#seasons">Seasons</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#series">Series</a>
-        </li>
+        @if (Model.IsClubAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="#classes">Classes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#fleets">Fleets</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#seasons">Seasons</a>
+            </li>
+        }
+        @if (Model.CanEditSeries)
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="#series">Series</a>
+            </li>
+        }
         <li class="nav-item">
             <a class="nav-link" asp-controller="Competitor"
                asp-action="index">Competitors</a>
@@ -122,12 +140,15 @@
             <a class="nav-link" asp-controller="Race"
                asp-action="index">Races</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#scoring">Scoring</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#regattas">Regattas</a>
-        </li>
+        @if (Model.IsClubAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="#scoring">Scoring</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#regattas">Regattas</a>
+            </li>
+        }
         <li class="nav-item">
             <a class="nav-link" asp-controller="Reports"
                asp-action="Index">Reports</a>
@@ -135,23 +156,32 @@
     </ul>
 </div>
 <br />
-@await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
-<br />
-@await Html.PartialAsync("_FleetList", Model.Fleets)
-<br />
-@await Html.PartialAsync("_SeasonList", Model.Seasons)
-<br />
-@await Html.PartialAsync("_SeriesList", Model.Series)
-<br />
+@if (Model.IsClubAdmin)
+{
+    @await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
+    <br />
+    @await Html.PartialAsync("_FleetList", Model.Fleets)
+    <br />
+    @await Html.PartialAsync("_SeasonList", Model.Seasons)
+    <br />
+}
+@if (Model.CanEditSeries)
+{
+    @await Html.PartialAsync("_SeriesList", Model.Series)
+    <br />
+}
 @await Html.PartialAsync("_CompetitorList")
 <br />
 @await Html.PartialAsync("_RaceList", Model)
 <br />
-@await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
-<br />
-@await Html.PartialAsync("_RegattaList", Model.Regattas)
-<br />
-@await Html.PartialAsync("_UserList", Model.Users)
+@if (Model.IsClubAdmin)
+{
+    @await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
+    <br />
+    @await Html.PartialAsync("_RegattaList", Model.Regattas)
+    <br />
+    @await Html.PartialAsync("_UserList", Model.Users)
+}
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

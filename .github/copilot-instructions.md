@@ -40,6 +40,8 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 - **Core services** contain reusable business logic that could be used by different clients
 - **Web services** contain logic specific to web views and UI concerns
 - **Views** should focus on data presentation, not business logic
+- Users with `UserClubPermission.CanEditAllClubs` are treated as super-admins (full admin) who bypass normal club-specific permission checks.
+- **Administrative features** must always use restrictive authorization policies (e.g., `[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]`).
 
 ## Development Setup
 
@@ -180,6 +182,44 @@ The project uses libman for client-side libraries (Bootstrap, jQuery). Build err
 - Integration tests use actual database connections
 - Test naming: `MethodName_StateUnderTest_ExpectedBehavior`
 - Use xUnit for test framework
+
+## CI/CD
+
+The project uses Azure Pipelines for continuous integration and deployment:
+
+- **Production Pipeline**: `azure-pipeline-prod-deploy.yml` - Deploys to production on main branch
+- **Test Pipeline**: `azure-pipeline-test-deploy.yml` - Deploys to test environment
+- **SonarQube Analysis**: `azure-pipeline-SQAnalysis.yml` - Code quality and security analysis
+
+Pipelines automatically:
+- Build the solution in Release configuration
+- Run npm install for client dependencies
+- Publish the web application
+- Deploy to Azure App Service Linux
+
+## Troubleshooting
+
+### Common Issues
+
+**Database Connection Errors**
+- Ensure SQL Server Docker container is running: `docker ps`
+- Check connection string in `appsettings.json` matches your database setup
+- For first run, click "Apply Migrations" button to initialize database
+
+**libman Errors (LIB002)**
+- These are usually network-related and can be ignored for backend changes
+- The web application will still build and run successfully
+- Client libraries (Bootstrap, jQuery) are already in the repository
+
+**Entity Framework Migrations**
+- Always use `dotnet ef` CLI to create migrations, never manually
+- If migration fails, ensure SailScores.Database and SailScores.Web projects build successfully
+- Check that `dotnet-ef` tool version matches EF Core package versions
+
+**Build Errors After Pulling Changes**
+- Run `dotnet restore` to update NuGet packages
+- Run `npm install` in SailScores.Web directory for client dependencies
+- Clean and rebuild solution if issues persist
 
 ## Additional Resources
 

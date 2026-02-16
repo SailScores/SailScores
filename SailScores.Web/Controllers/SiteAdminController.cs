@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Identity.Entities;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
@@ -11,24 +13,27 @@ public class SiteAdminController : Controller
 {
     private readonly IWebSiteAdminService _siteAdminService;
     private readonly IAuthorizationService _authService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public SiteAdminController(
         IWebSiteAdminService siteAdminService,
-        IAuthorizationService authService)
+        IAuthorizationService authService,
+        UserManager<ApplicationUser> userManager)
     {
         _siteAdminService = siteAdminService;
         _authService = authService;
+        _userManager = userManager;
     }
 
     // GET: SiteAdmin
-    public async Task<ActionResult> Index()
+    public async Task<ActionResult> Index(string? sortOrder)
     {
         if (!await _authService.IsUserFullAdmin(User))
         {
             return Unauthorized();
         }
 
-        var vm = await _siteAdminService.GetAllClubsAsync();
+        var vm = await _siteAdminService.GetAllClubsAsync(sortOrder);
         return View(vm);
     }
 
@@ -131,9 +136,15 @@ public class SiteAdminController : Controller
             return Unauthorized();
         }
 
-        var email = User.FindFirst("sub")?.Value ?? User.Identity?.Name;
-        await _siteAdminService.RecalculateSeriesAsync(seriesId, email);
+        var userName = await GetUserStringAsync();
+        await _siteAdminService.RecalculateSeriesAsync(seriesId, userName);
         TempData["Message"] = "Series has been recalculated successfully.";
         return RedirectToAction(nameof(Details), new { clubInitials });
+    }
+
+    private async Task<string> GetUserStringAsync()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        return user.GetDisplayName();
     }
 }

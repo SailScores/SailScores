@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -55,6 +56,7 @@ public class FleetController : Controller
         });
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid? regattaId,
@@ -71,6 +73,7 @@ public class FleetController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         FleetWithOptionsViewModel model,
@@ -80,10 +83,6 @@ public class FleetController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
             model.ClubId = clubId;
             if (!ModelState.IsValid)
             {
@@ -116,7 +115,7 @@ public class FleetController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
@@ -125,10 +124,7 @@ public class FleetController : Controller
         try
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (!await _authService.CanUserEdit(User, clubInitials))
-            {
-                return Unauthorized();
-            }
+
             var fleet =
                 await _fleetService.GetFleet(id);
             var vmOptions = await _fleetService.GetBlankFleetWithOptionsAsync(
@@ -150,6 +146,7 @@ public class FleetController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         FleetWithOptionsViewModel model,
@@ -157,10 +154,6 @@ public class FleetController : Controller
     {
         try
         {
-            if (!await _authService.CanUserEdit(User, clubInitials))
-            {
-                return Unauthorized();
-            }
             if (!ModelState.IsValid)
             {
 
@@ -187,30 +180,23 @@ public class FleetController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
         var fleet = await _fleetService.GetFleet(id);
         return View(fleet);
     }
 
-    [Authorize]
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostDelete(
         string clubInitials,
         Guid id,
         string returnUrl = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
+        var clubId = await _clubService.GetClubId(clubInitials);
         try
         {
             await _fleetService.Delete(id);

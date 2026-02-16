@@ -36,6 +36,14 @@
         "jquery.autocomplete.js",
         "jquery.autocomplete.min.js"
       ]
+    },
+    {
+      "library": "flatpickr@4.6.13",
+      "destination": "wwwroot/vendor/flatpickr",
+      "files": [
+        "flatpickr.min.js",
+        "flatpickr.min.css"
+      ]
     }
   ]
 }

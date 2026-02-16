@@ -33,6 +33,7 @@ using MailChimp.Net;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using SailScores.Web.Resources;
+using SailScores.Web.Authorization;
 
 namespace SailScores.Web;
 
@@ -120,6 +121,19 @@ public class Startup
                 };
             });
 
+        // Register authorization handler and policies for club permissions
+        services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, SailScores.Web.Authorization.ClubPermissionHandler>();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthorizationPolicies.ClubAdmin, policy =>
+                policy.Requirements.Add(new SailScores.Web.Authorization.ClubPermissionRequirement(SailScores.Database.Entities.PermissionLevel.ClubAdministrator)));
+
+            options.AddPolicy(AuthorizationPolicies.SeriesScorekeeper, policy =>
+                policy.Requirements.Add(new SailScores.Web.Authorization.ClubPermissionRequirement(SailScores.Database.Entities.PermissionLevel.SeriesScorekeeper)));
+
+            options.AddPolicy(AuthorizationPolicies.RaceScorekeeper, policy =>
+                policy.Requirements.Add(new SailScores.Web.Authorization.ClubPermissionRequirement(SailScores.Database.Entities.PermissionLevel.RaceScorekeeper)));
+        });
 
         // Make sure API calls that require auth return 401, not redirect on auth failure.
         services.ConfigureApplicationCookie(options =>

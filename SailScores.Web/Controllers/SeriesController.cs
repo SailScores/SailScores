@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Services;
 using SailScores.Identity.Entities;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
@@ -57,13 +58,15 @@ public class SeriesController : Controller
 
         var series = await _seriesService.GetNonRegattaSeriesSummariesAsync(clubInitials);
         var clubName = await _clubService.GetClubName(clubInitials);
+        var clubId = await _clubService.GetClubId(clubInitials);
 
         return View(new ClubCollectionViewModel<SeriesSummary>
         {
             List = series,
             ClubInitials = clubInitials,
             ClubName = clubName,
-            CanEdit = await _authService.CanUserEdit(User, clubInitials)
+            CanEdit = await _authService.CanUserEdit(User, clubId),
+            CanEditSeries = await _authService.CanUserEditSeries(User, clubId)
         });
     }
 
@@ -89,17 +92,20 @@ public class SeriesController : Controller
             }
         }
         var canEdit = false;
+        var canEditSeries = false;
         if (User != null && (User.Identity?.IsAuthenticated ?? false))
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             canEdit = await _authService.CanUserEdit(User, clubId);
+            canEditSeries = await _authService.CanUserEditSeries(User, clubId);
         }
 
         return View(new ClubItemViewModel<Core.Model.Series>
         {
             Item = series,
             ClubInitials = clubInitials,
-            CanEdit = canEdit
+            CanEdit = canEdit,
+            CanEditSeries = canEditSeries
         });
     }
 
@@ -152,7 +158,7 @@ public class SeriesController : Controller
     }
 
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Create(string clubInitials)
     {
         var vm = await _seriesService.GetBlankVmForCreate(clubInitials);
@@ -167,16 +173,12 @@ public class SeriesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Create(string clubInitials, SeriesWithOptionsViewModel model)
     {
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
             model.ClubId = clubId;
 
             if (!ModelState.IsValid)
@@ -250,6 +252,7 @@ public class SeriesController : Controller
     }
 
     [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
@@ -257,10 +260,6 @@ public class SeriesController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
         var series = await _seriesService.GetSeriesAsync(id);
         if (series == null)
         {
@@ -286,7 +285,7 @@ public class SeriesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         SeriesWithOptionsViewModel model,
@@ -296,10 +295,6 @@ public class SeriesController : Controller
         {
             ViewData["ReturnUrl"] = returnUrl;
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
             model.ClubId = clubId;
 
             if (!ModelState.IsValid)
@@ -333,14 +328,10 @@ public class SeriesController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
         var series = await _seriesService.GetSeriesAsync(id);
         if (series == null)
         {
@@ -352,14 +343,10 @@ public class SeriesController : Controller
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
         try
         {
             await _seriesService.DeleteAsync(id);
@@ -375,14 +362,10 @@ public class SeriesController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> CreateMultiple(string clubInitials)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var vm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
         return View(vm);
@@ -390,16 +373,12 @@ public class SeriesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> CreateMultiple(
         string clubInitials,
         MultipleSeriesWithOptionsViewModel model)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         if (!ModelState.IsValid)
         {
@@ -436,14 +415,10 @@ public class SeriesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<IActionResult> ImportIcal(string clubInitials, Guid seasonId, IFormFile file, string url)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         try
         {
@@ -470,17 +445,13 @@ public class SeriesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<IActionResult> CheckSeriesNamesUnique(
         string clubInitials,
         Guid seasonId,
         [FromBody] List<string> names)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var existingNames = await _seriesService.GetSeriesNamesAsync(clubId, seasonId);
         var existingNamesSet = new HashSet<string>(

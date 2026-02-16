@@ -104,17 +104,6 @@ namespace SailScores.Test.Unit.Web.Controllers
         }
 
         [Fact]
-        public async Task Create_PostUnauthorized_ReturnForbidden()
-        {
-
-            var vm = new CompetitorWithOptionsViewModel();
-            var result = await _controller.Create(_clubInitials, vm);
-
-            _competitorServiceMock.Verify(s => s.SaveAsync(vm, string.Empty), Times.Never);
-            Assert.IsType<UnauthorizedResult>(result);
-        }
-
-        [Fact]
         public async Task Create_PostInvalidModel_ReturnsModel()
         {
             SetupAsAuthorized();

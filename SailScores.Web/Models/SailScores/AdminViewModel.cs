@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
@@ -54,6 +54,10 @@ public class AdminViewModel
 
     public bool HasRaces { get; set; }
     public bool HasCompetitors { get; internal set; }
+
+    // Permission properties for UI visibility
+    public bool IsClubAdmin { get; set; }
+    public bool CanEditSeries { get; set; }
 
 #pragma warning restore CA2227 // Collection properties should be read only
 }

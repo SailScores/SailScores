@@ -2,12 +2,14 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Web.Authorization;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
 
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
+
 public class ReportsController : Controller
 {
     private readonly IReportService _reportService;
@@ -29,10 +31,6 @@ public class ReportsController : Controller
 
     public async Task<ActionResult> Index(string clubInitials)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var clubId = await _clubService.GetClubId(clubInitials);
         var club = await _clubService.GetMinimalClub(clubId);
@@ -72,10 +70,6 @@ public class ReportsController : Controller
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var model = await _reportService.GetSkipperStatsAsync(clubInitials, startDate, endDate);
         model.CanEdit = true;
@@ -90,10 +84,6 @@ public class ReportsController : Controller
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var model = await _reportService.GetParticipationAsync(clubInitials, groupBy, startDate, endDate);
         model.CanEdit = true;
@@ -104,10 +94,6 @@ public class ReportsController : Controller
 
     public async Task<ActionResult> ClubStats(string clubInitials)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         ViewData["ClubInitials"] = clubInitials;
 
@@ -121,10 +107,6 @@ public class ReportsController : Controller
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var model = await _reportService.GetWindAnalysisAsync(clubInitials, startDate, endDate);
         
@@ -153,10 +135,6 @@ public class ReportsController : Controller
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var model = await _reportService.GetParticipationAsync(clubInitials, groupBy, startDate, endDate);
         
@@ -178,10 +156,6 @@ public class ReportsController : Controller
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var model = await _reportService.GetSkipperStatsAsync(clubInitials, startDate, endDate);
         
@@ -200,10 +174,6 @@ public class ReportsController : Controller
 
     public async Task<ActionResult> ClubStatsExport(string clubInitials)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var stats = await _webClubService.GetClubStats(clubInitials);
 
@@ -239,10 +209,6 @@ public class ReportsController : Controller
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var model = await _reportService.GetAllCompHistogramAsync(clubInitials, startDate, endDate);
         ViewData["ClubInitials"] = clubInitials;
@@ -254,10 +220,6 @@ public class ReportsController : Controller
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
 
         var model = await _reportService.GetAllCompHistogramAsync(clubInitials, startDate, endDate);
 

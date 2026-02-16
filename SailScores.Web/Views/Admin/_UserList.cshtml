@@ -10,7 +10,7 @@
                     data-bs-placement="top"
                     data-bs-trigger="focus hover"
                     data-bs-content="Allow other users to edit results. Scorekeepers
-                        may be added and removed, but not edited.">
+                        may be added, removed, and edited.">
                     <span class="far fa-question-circle"></span>
                 </a>
             </h3>
@@ -37,7 +37,11 @@
                     title="Delete">
                     <span class="fas fa-trash"></span>
                 </a> &nbsp;
-                <a class="btn btn-sm btn-outline-primary disabled">
+                <a class="btn btn-sm btn-outline-primary"
+                    asp-action="Edit"
+                    asp-controller="User"
+                    asp-route-id="@item.Id"
+                    title="Edit">
                     <span class="fas fa-pen"></span>
                 </a> &nbsp;
                 @Html.DisplayFor(modelItem => item.Name)
@@ -45,8 +49,22 @@
             <div class="col-12 col-sm-6 col-md-3">
                 @Html.DisplayFor(modelItem => item.EmailAddress)
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div class="col-12 col-sm-6 col-md-2">
                 @(!item.Registered ? "Not" : "") Registered
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                @switch (item.PermissionLevel)
+                {
+                    case SailScores.Database.Entities.PermissionLevel.ClubAdministrator:
+                        <small class="text-muted">Club Admin</small>
+                        break;
+                    case SailScores.Database.Entities.PermissionLevel.SeriesScorekeeper:
+                        <small class="text-muted">Series Scorekeeper</small>
+                        break;
+                    case SailScores.Database.Entities.PermissionLevel.RaceScorekeeper:
+                        <small class="text-muted">Race Scorekeeper</small>
+                        break;
+                }
             </div>
         </div>
     }

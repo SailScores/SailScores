@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Ganss.Xss;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Identity.Entities;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
-using Ganss.Xss;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
@@ -36,6 +37,7 @@ public class AnnouncementController : Controller
         _mapper = mapper;
     }
 
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Create(
         string clubInitials,
         Guid regattaId,
@@ -52,6 +54,7 @@ public class AnnouncementController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Create(
         string clubInitials,
         AnnouncementWithOptions model,
@@ -61,10 +64,7 @@ public class AnnouncementController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
+
             model.ClubId = clubId;
             if (!ModelState.IsValid)
             {
@@ -100,6 +100,7 @@ public class AnnouncementController : Controller
     }
 
     [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
@@ -108,10 +109,7 @@ public class AnnouncementController : Controller
         try
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (!await _authService.CanUserEdit(User, clubInitials))
-            {
-                return Unauthorized();
-            }
+
             var announcement =
                 await _announcementService.GetAnnouncement(id);
             return View(announcement);
@@ -125,6 +123,7 @@ public class AnnouncementController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         AnnouncementWithOptions model,
@@ -132,10 +131,6 @@ public class AnnouncementController : Controller
     {
         try
         {
-            if (!await _authService.CanUserEdit(User, clubInitials))
-            {
-                return Unauthorized();
-            }
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -159,34 +154,27 @@ public class AnnouncementController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> Delete(
         string clubInitials,
         Guid id,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
+
         var announcement = await _announcementService.GetAnnouncement(id);
         return View(announcement);
     }
 
-    [Authorize]
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> PostDelete(
         string clubInitials,
         Guid id,
         string returnUrl = null)
     {
-        if (!await _authService.CanUserEdit(User, clubInitials))
-        {
-            return Unauthorized();
-        }
         try
         {
             await _announcementService.Delete(id);

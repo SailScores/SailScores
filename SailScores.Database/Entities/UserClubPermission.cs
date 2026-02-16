@@ -1,4 +1,6 @@
-﻿namespace SailScores.Database.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SailScores.Database.Entities;
 
 public class UserClubPermission
 {
@@ -7,6 +9,7 @@ public class UserClubPermission
     public string UserEmail { get; set; }
     public Guid? ClubId { get; set; }
     public bool CanEditAllClubs { get; set; }
+    public PermissionLevel PermissionLevel { get; set; }
     public DateTime? Created { get; set; }
         
     [StringLength(200)]

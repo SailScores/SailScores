@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
@@ -28,18 +29,19 @@ public class ScoringSystemController : Controller
         _mapper = mapper;
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
+
+        var club = await _clubService.GetMinimalClub(clubId);
+
         var vm = new ScoringSystemWithOptionsViewModel
         {
             ClubId = clubId,
-            DiscardPattern = "0"
+            DiscardPattern = "0",
+            ParentSystemId = club.DefaultScoringSystemId
         };
         var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
         vm.ParentSystemOptions = potentialParents.ToList();
@@ -48,15 +50,13 @@ public class ScoringSystemController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(
         string clubInitials,
         ScoringSystemWithOptionsViewModel model)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
+
         model.ClubId = clubId;
         model.Id = Guid.NewGuid();
         if (!ModelState.IsValid)
@@ -72,13 +72,10 @@ public class ScoringSystemController : Controller
         return RedirectToAction("Edit", "ScoringSystem", new { id = model.Id });
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
         if (scoringSystem.ClubId != clubId)
@@ -95,13 +92,13 @@ public class ScoringSystemController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(
         string clubInitials,
         ScoringSystemWithOptionsViewModel model)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId)
-            || model.ClubId != clubId)
+        if (model.ClubId != clubId)
         {
             return Unauthorized();
         }
@@ -122,13 +119,10 @@ public class ScoringSystemController : Controller
 
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
         if (scoringSystem.ClubId != clubId)
@@ -145,13 +139,10 @@ public class ScoringSystemController : Controller
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var scoringSystem = await _scoringService.GetScoringSystemAsync(id);
         if (scoringSystem.ClubId != clubId)

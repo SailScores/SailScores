@@ -415,16 +415,17 @@ namespace SailScores.Core.Services
 
 
             var defaultSystem = club.DefaultScoringSystem;
-            if (defaultSystem.Id == default)
-            {
-                defaultSystem.Id = Guid.NewGuid();
-            }
+
             if (defaultSystem != null)
             {
                 club.ScoringSystems ??= new List<ScoringSystem>();
                 if (!club.ScoringSystems.Any(ss => ss == defaultSystem))
                 {
                     club.ScoringSystems.Add(defaultSystem);
+                }
+                if (defaultSystem.Id == default)
+                {
+                    defaultSystem.Id = Guid.NewGuid();
                 }
             }
             if ((club.ScoringSystems?.Count ?? 0) > 0)
@@ -456,9 +457,12 @@ namespace SailScores.Core.Services
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
             // save twice here to avoid circular reference.
-            dbClub.DefaultScoringSystemId = defaultSystem.Id;
-            await _dbContext.SaveChangesAsync()
-                .ConfigureAwait(false);
+            if (defaultSystem != null)
+            {
+                dbClub.DefaultScoringSystemId = defaultSystem.Id;
+                await _dbContext.SaveChangesAsync()
+                    .ConfigureAwait(false);
+            }
             return club.Id;
         }
 
@@ -508,10 +512,10 @@ namespace SailScores.Core.Services
             dbClub.ShowCalendarInNav = club.ShowCalendarInNav;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
-            dbClub.WeatherSettings.Latitude = club.WeatherSettings.Latitude;
-            dbClub.WeatherSettings.Longitude = club.WeatherSettings.Longitude;
-            dbClub.WeatherSettings.TemperatureUnits = club.WeatherSettings.TemperatureUnits;
-            dbClub.WeatherSettings.WindSpeedUnits = club.WeatherSettings.WindSpeedUnits;
+            dbClub.WeatherSettings.Latitude = club.WeatherSettings?.Latitude;
+            dbClub.WeatherSettings.Longitude = club.WeatherSettings?.Longitude;
+            dbClub.WeatherSettings.TemperatureUnits = club.WeatherSettings?.TemperatureUnits;
+            dbClub.WeatherSettings.WindSpeedUnits = club.WeatherSettings?.WindSpeedUnits;
 
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);

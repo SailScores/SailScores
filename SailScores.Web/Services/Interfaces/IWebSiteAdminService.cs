@@ -5,7 +5,7 @@ namespace SailScores.Web.Services.Interfaces;
 
 public interface IWebSiteAdminService
 {
-    Task<SiteAdminIndexViewModel> GetAllClubsAsync();
+    Task<SiteAdminIndexViewModel> GetAllClubsAsync(string? sortOrder = null);
     Task<SiteAdminClubDetailsViewModel> GetClubDetailsAsync(string clubInitials);
     Task ResetClubInitialsCacheAsync();
     Task<(byte[] Data, string FileName)> BackupClubAsync(string clubInitials, string createdBy);

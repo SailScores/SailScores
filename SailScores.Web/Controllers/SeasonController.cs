@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -25,6 +26,7 @@ public class SeasonController : Controller
         _authService = authService;
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(string clubInitials)
     {
 
@@ -35,15 +37,12 @@ public class SeasonController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Create(string clubInitials, SeasonWithOptionsViewModel model)
     {
         try
         {
             var clubId = (await _clubService.GetClubId(clubInitials));
-            if (!await _authService.CanUserEdit(User, clubId))
-            {
-                return Unauthorized();
-            }
             
             var season = new Season
             {
@@ -75,13 +74,10 @@ public class SeasonController : Controller
         }
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var season = await _seasonService.GetSeasonForEdit(clubId, id);
         if (season == null)
@@ -93,6 +89,7 @@ public class SeasonController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Edit(string clubInitials, SeasonWithOptionsViewModel model)
     {
         try
@@ -100,8 +97,7 @@ public class SeasonController : Controller
             var clubId = await _clubService.GetClubId(clubInitials);
             var seasonFromDb = (await _seasonService.GetSeasons(clubId)
                 ).FirstOrDefault(s => s.Id == model.Id);
-            if (!await _authService.CanUserEdit(User, clubId)
-                || seasonFromDb == null)
+            if (seasonFromDb == null)
             {
                 return Unauthorized();
             }
@@ -137,13 +133,10 @@ public class SeasonController : Controller
         }
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        if (!await _authService.CanUserEdit(User, clubId))
-        {
-            return Unauthorized();
-        }
 
         var season = (await _seasonService.GetSeasons(clubId)
             ).FirstOrDefault(s => s.Id == id);
@@ -158,13 +151,13 @@ public class SeasonController : Controller
     [HttpPost]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         var seasonFromDb = (await _seasonService.GetSeasons(clubId)
             ).FirstOrDefault(s => s.Id == id);
-        if (!await _authService.CanUserEdit(User, clubId)
-            || seasonFromDb == null)
+        if (seasonFromDb == null)
         {
             return Unauthorized();
         }

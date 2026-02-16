@@ -1,4 +1,4 @@
-﻿using SailScores.Web.Models.SailScores;
+using SailScores.Web.Models.SailScores;
 using SailScores.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using SailScores.Web.Services.Interfaces;
@@ -46,7 +46,8 @@ public class PermissionService : IPermissionService
             EmailAddress = permission.UserEmail,
             Registered = false,
             Created = permission.Created ?? new DateTime(2019, 2, 25),
-            CreatedBy = permission.CreatedBy
+            CreatedBy = permission.CreatedBy,
+            PermissionLevel = permission.PermissionLevel
         };
 
         var identityObj = await _userManager.FindByEmailAsync(permission.UserEmail);
@@ -72,7 +73,8 @@ public class PermissionService : IPermissionService
                 EmailAddress = user.UserEmail,
                 Registered = false,
                 Created = user.Created ?? new DateTime(2019, 2, 25),
-                CreatedBy = user.CreatedBy
+                CreatedBy = user.CreatedBy,
+                PermissionLevel = user.PermissionLevel
             };
 
             var identityObj = await _userManager.FindByEmailAsync(user.UserEmail);
@@ -89,17 +91,22 @@ public class PermissionService : IPermissionService
 
     public async Task UpdatePermission(Guid clubId, UserViewModel userModel)
     {
+        if (userModel.Id != Guid.Empty)
+        {
+            await _userService.UpdatePermissionLevel(userModel.Id, userModel.PermissionLevel);
+            return;
+        }
 
         var permissions = await _userService.GetAllPermissionsForClub(clubId);
-        bool found = false;
-            
-        foreach(var permission in permissions)
+        var existing = permissions.FirstOrDefault(p => p.UserEmail.Equals(userModel.EmailAddress, StringComparison.InvariantCultureIgnoreCase));
+
+        if (existing == null)
         {
-            found = permission.UserEmail.Equals(userModel.EmailAddress, StringComparison.InvariantCultureIgnoreCase);
-            if (found) break;
+            await _userService.AddPermission(clubId, userModel.EmailAddress, userModel.CreatedBy, userModel.PermissionLevel);
         }
-        if (!found) {
-            await _userService.AddPermission(clubId, userModel.EmailAddress, userModel.CreatedBy);
+        else
+        {
+            await _userService.UpdatePermissionLevel(existing.Id, userModel.PermissionLevel);
         }
 
     }
