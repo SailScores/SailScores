@@ -1,9 +1,12 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SailScores.Core.Services;
 using SailScores.Database;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,7 +79,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
             await CreateFreshDatabaseAsync();
         }
 
-        _backupService = new BackupService(_context);
+        _backupService = new BackupService(_context, NullLogger<BackupService>.Instance);
     }
 
     public async Task DisposeAsync()
@@ -515,7 +518,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         _output.WriteLine("Backup created");
 
         // Act - Restore backup
-        var restoreResult = await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubSettings: true);
+        var restoreResult = await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubName: true);
         _output.WriteLine("Backup restored");
 
         // Assert
@@ -558,7 +561,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
 
             // Act
             var backup = await _backupService.CreateBackupAsync(_testClubId, "integration-test");
-            await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubSettings: true);
+            await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubName: true);
 
             // Assert - Verify relationships restored
             var restoredFleet = await _context.Fleets
@@ -592,7 +595,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
 
             // Act
             var backup = await _backupService.CreateBackupAsync(_testClubId, "integration-test");
-            await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubSettings: true);
+            await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubName: true);
 
             // Assert - Verify parent/child relationship preserved
             var restoredChild = await _context.ScoringSystems
@@ -630,7 +633,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
 
             // Act
             var backup = await _backupService.CreateBackupAsync(_testClubId, "integration-test");
-            await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubSettings: true);
+            await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubName: true);
 
             // Assert
             var restoredRace = await _context.Races
@@ -720,7 +723,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
             await _context.SaveChangesAsync();
         }
 
-        await _backupService.RestoreBackupAsync(testClubId, backup, preserveClubSettings: true);
+        await _backupService.RestoreBackupAsync(testClubId, backup, preserveClubName: true);
         _output.WriteLine("Production backup restored successfully");
 
         // Assert
@@ -746,6 +749,174 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
             .OrderBy(d => d)
             .ToListAsync();
         Assert.Equal(originalSeriesUpdateDates, restoredSeriesUpdateDates);
+    }
+
+    [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Database")]
+    [Trait("Category", "ProductionData")]
+    public async Task BackupAndRestore_AllClubs_RoundTripPreservesData()
+    {
+        if (!_useProductionData)
+        {
+            _output.WriteLine("Skipping - UseProductionData is false");
+            return;
+        }
+
+        var clubs = await _context.Clubs
+            .Select(c => new { c.Id, c.Name, c.Initials })
+            .ToListAsync();
+
+        _output.WriteLine($"Testing round-trip backup for {clubs.Count} clubs");
+        var failures = new List<string>();
+
+        foreach (var club in clubs)
+        {
+            try
+            {
+                _output.WriteLine($"--- Testing club: {club.Name} ({club.Initials}) ---");
+                var before = await TakeClubSnapshotAsync(club.Id);
+
+                var backup = await _backupService.CreateBackupAsync(club.Id, "multi-club-test");
+
+                // Validate metadata counts match the backup content
+                Assert.Equal(backup.BoatClasses?.Count ?? 0, backup.Metadata.BoatClassCount);
+                Assert.Equal(backup.Competitors?.Count ?? 0, backup.Metadata.CompetitorCount);
+                Assert.Equal(backup.Races?.Count ?? 0, backup.Metadata.RaceCount);
+                Assert.Equal(backup.Series?.Count ?? 0, backup.Metadata.SeriesCount);
+
+                await _backupService.RestoreBackupAsync(club.Id, backup, preserveClubName: true);
+                var after = await TakeClubSnapshotAsync(club.Id);
+
+                var diffs = CompareSnapshots(before, after);
+                if (diffs.Count > 0)
+                {
+                    foreach (var diff in diffs)
+                    {
+                        _output.WriteLine($"  DIFF: {diff}");
+                    }
+                    failures.Add($"{club.Name} ({club.Initials}): {string.Join("; ", diffs)}");
+                }
+                else
+                {
+                    _output.WriteLine($"  OK - all counts match");
+                }
+            }
+            catch (Exception ex)
+            {
+                var msg = $"{club.Name} ({club.Initials}): Exception - {ex.Message}";
+                _output.WriteLine($"  FAIL: {msg}");
+                failures.Add(msg);
+            }
+        }
+
+        if (failures.Count > 0)
+        {
+            Assert.Fail($"Round-trip failures in {failures.Count} club(s):\n" +
+                string.Join("\n", failures));
+        }
+    }
+
+    #endregion
+
+    #region Snapshot Helpers
+
+    private record ClubSnapshot(
+        int BoatClassCount,
+        int SeasonCount,
+        int FleetCount,
+        int CompetitorCount,
+        int ScoringSystemCount,
+        int SeriesCount,
+        int RaceCount,
+        int ScoreCount,
+        int RegattaCount,
+        int AnnouncementCount,
+        int DocumentCount,
+        List<string> CompetitorNames,
+        List<string> SeriesNames,
+        List<DateTime?> RaceDates,
+        List<DateTime?> SeriesUpdateDates);
+
+    private async Task<ClubSnapshot> TakeClubSnapshotAsync(Guid clubId)
+    {
+        var raceIds = await _context.Races
+            .Where(r => r.ClubId == clubId)
+            .Select(r => r.Id)
+            .ToListAsync();
+
+        return new ClubSnapshot(
+            BoatClassCount: await _context.BoatClasses.CountAsync(bc => bc.ClubId == clubId),
+            SeasonCount: await _context.Seasons.CountAsync(s => s.ClubId == clubId),
+            FleetCount: await _context.Fleets.CountAsync(f => f.ClubId == clubId),
+            CompetitorCount: await _context.Competitors.CountAsync(c => c.ClubId == clubId),
+            ScoringSystemCount: await _context.ScoringSystems.CountAsync(ss => ss.ClubId == clubId),
+            SeriesCount: await _context.Series.CountAsync(s => s.ClubId == clubId),
+            RaceCount: raceIds.Count,
+            ScoreCount: await _context.Scores.CountAsync(s => raceIds.Contains(s.RaceId)),
+            RegattaCount: await _context.Regattas.CountAsync(r => r.ClubId == clubId),
+            AnnouncementCount: await _context.Announcements.CountAsync(a => a.ClubId == clubId),
+            DocumentCount: await _context.Documents.CountAsync(d => d.ClubId == clubId),
+            CompetitorNames: await _context.Competitors
+                .Where(c => c.ClubId == clubId)
+                .OrderBy(c => c.Name)
+                .Select(c => c.Name)
+                .ToListAsync(),
+            SeriesNames: await _context.Series
+                .Where(s => s.ClubId == clubId)
+                .OrderBy(s => s.Name)
+                .Select(s => s.Name)
+                .ToListAsync(),
+            RaceDates: await _context.Races
+                .Where(r => r.ClubId == clubId)
+                .OrderBy(r => r.Date)
+                .Select(r => r.Date)
+                .ToListAsync(),
+            SeriesUpdateDates: await _context.Series
+                .Where(s => s.ClubId == clubId)
+                .OrderBy(s => s.UpdatedDate)
+                .Select(s => s.UpdatedDate)
+                .ToListAsync()
+        );
+    }
+
+    private static List<string> CompareSnapshots(ClubSnapshot before, ClubSnapshot after)
+    {
+        var diffs = new List<string>();
+
+        if (before.BoatClassCount != after.BoatClassCount)
+            diffs.Add($"BoatClasses: {before.BoatClassCount} -> {after.BoatClassCount}");
+        if (before.SeasonCount != after.SeasonCount)
+            diffs.Add($"Seasons: {before.SeasonCount} -> {after.SeasonCount}");
+        if (before.FleetCount != after.FleetCount)
+            diffs.Add($"Fleets: {before.FleetCount} -> {after.FleetCount}");
+        if (before.CompetitorCount != after.CompetitorCount)
+            diffs.Add($"Competitors: {before.CompetitorCount} -> {after.CompetitorCount}");
+        if (before.ScoringSystemCount != after.ScoringSystemCount)
+            diffs.Add($"ScoringSystems: {before.ScoringSystemCount} -> {after.ScoringSystemCount}");
+        if (before.SeriesCount != after.SeriesCount)
+            diffs.Add($"Series: {before.SeriesCount} -> {after.SeriesCount}");
+        if (before.RaceCount != after.RaceCount)
+            diffs.Add($"Races: {before.RaceCount} -> {after.RaceCount}");
+        if (before.ScoreCount != after.ScoreCount)
+            diffs.Add($"Scores: {before.ScoreCount} -> {after.ScoreCount}");
+        if (before.RegattaCount != after.RegattaCount)
+            diffs.Add($"Regattas: {before.RegattaCount} -> {after.RegattaCount}");
+        if (before.AnnouncementCount != after.AnnouncementCount)
+            diffs.Add($"Announcements: {before.AnnouncementCount} -> {after.AnnouncementCount}");
+        if (before.DocumentCount != after.DocumentCount)
+            diffs.Add($"Documents: {before.DocumentCount} -> {after.DocumentCount}");
+
+        if (!before.CompetitorNames.SequenceEqual(after.CompetitorNames))
+            diffs.Add("CompetitorNames differ");
+        if (!before.SeriesNames.SequenceEqual(after.SeriesNames))
+            diffs.Add("SeriesNames differ");
+        if (!before.RaceDates.SequenceEqual(after.RaceDates))
+            diffs.Add("RaceDates differ");
+        if (!before.SeriesUpdateDates.SequenceEqual(after.SeriesUpdateDates))
+            diffs.Add("SeriesUpdateDates differ");
+
+        return diffs;
     }
 
     #endregion

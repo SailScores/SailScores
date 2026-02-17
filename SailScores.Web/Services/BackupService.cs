@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using SailScores.Core.Model.BackupEntities;
 using SailScores.Core.Services;
@@ -26,13 +27,15 @@ public class BackupService : Interfaces.IBackupService
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        MaxDepth = 128
+        MaxDepth = 128,
+        Converters = { new JsonStringEnumConverter() }
     };
 
     private static readonly JsonSerializerOptions _jsonReadOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() }
     };
 
     public BackupService(
@@ -43,10 +46,10 @@ public class BackupService : Interfaces.IBackupService
         _clubService = clubService;
     }
 
-    public async Task<(byte[] Data, string FileName)> CreateBackupFileAsync(string clubInitials, string createdBy)
+    public async Task<(byte[] Data, string FileName)> CreateBackupFileAsync(string clubInitials, string createdBy, CancellationToken cancellationToken = default)
     {
         var clubId = await _clubService.GetClubId(clubInitials).ConfigureAwait(false);
-        var backup = await _coreBackupService.CreateBackupAsync(clubId, createdBy).ConfigureAwait(false);
+        var backup = await _coreBackupService.CreateBackupAsync(clubId, createdBy, cancellationToken).ConfigureAwait(false);
 
         // Serialize to JSON
         var json = JsonSerializer.Serialize(backup, _jsonOptions);
@@ -56,7 +59,7 @@ public class BackupService : Interfaces.IBackupService
         using var outputStream = new MemoryStream();
         using (var gzipStream = new GZipStream(outputStream, CompressionLevel.Optimal, leaveOpen: true))
         {
-            await gzipStream.WriteAsync(jsonBytes, 0, jsonBytes.Length).ConfigureAwait(false);
+            await gzipStream.WriteAsync(jsonBytes, cancellationToken).ConfigureAwait(false);
         }
 
         var compressedData = outputStream.ToArray();
@@ -68,20 +71,20 @@ public class BackupService : Interfaces.IBackupService
         return (compressedData, fileName);
     }
 
-    public async Task<(ClubBackupData Backup, BackupValidationResult Validation)> ReadBackupFileAsync(Stream stream)
+    public async Task<(ClubBackupData Backup, BackupValidationResult Validation)> ReadBackupFileAsync(Stream stream, CancellationToken cancellationToken = default)
     {
         try
         {
             // Read and decompress
             using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
+            await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
             memoryStream.Position = 0;
 
             byte[] jsonBytes;
 
             // Check if it's GZip compressed (magic bytes: 1f 8b)
             var header = new byte[2];
-            int bytesRead = await memoryStream.ReadAsync(header, 0, 2).ConfigureAwait(false);
+            int bytesRead = await memoryStream.ReadAsync(header, cancellationToken).ConfigureAwait(false);
             memoryStream.Position = 0;
 
             if (bytesRead == 2 && header[0] == 0x1f && header[1] == 0x8b)
@@ -90,7 +93,7 @@ public class BackupService : Interfaces.IBackupService
                 using var decompressedStream = new MemoryStream();
                 using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
                 {
-                    await gzipStream.CopyToAsync(decompressedStream).ConfigureAwait(false);
+                    await gzipStream.CopyToAsync(decompressedStream, cancellationToken).ConfigureAwait(false);
                 }
                 jsonBytes = decompressedStream.ToArray();
             }
@@ -133,9 +136,15 @@ public class BackupService : Interfaces.IBackupService
         }
     }
 
-    public async Task<bool> RestoreBackupAsync(string clubInitials, ClubBackupData backup, bool preserveClubSettings = true)
+    public async Task<bool> RestoreBackupAsync(string clubInitials, ClubBackupData backup, bool preserveClubName = true, CancellationToken cancellationToken = default)
     {
         var clubId = await _clubService.GetClubId(clubInitials).ConfigureAwait(false);
-        return await _coreBackupService.RestoreBackupAsync(clubId, backup, preserveClubSettings).ConfigureAwait(false);
+        return await _coreBackupService.RestoreBackupAsync(clubId, backup, preserveClubName, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<BackupDryRunResult> ValidateBackupAsync(string clubInitials, ClubBackupData backup, CancellationToken cancellationToken = default)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials).ConfigureAwait(false);
+        return await _coreBackupService.ValidateBackupAsync(clubId, backup, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using SailScores.Database.Entities;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,11 @@ namespace SailScores.Database
 {
     public interface ISailScoresContext : IDisposable
     {
+        /// <summary>
+        /// Provides access to database-level operations including transactions and command timeouts.
+        /// </summary>
+        DatabaseFacade Database { get; }
+
         DbSet<Club> Clubs { get; set; }
 
         DbSet<BoatClass> BoatClasses { get; set; }
