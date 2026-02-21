@@ -21,7 +21,7 @@
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["Success"]
+        <strong>@TempData["Success"]</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
@@ -68,7 +68,7 @@
                 </div>
                 <p class="text-muted small">
                     <i class="fas fa-info-circle me-1"></i>
-                    Backups can be restored to a different club, allowing data to be moved between clubs, but will overwrite the destination club data.
+                    Backups can be restored to a different club, allowing data to be moved between clubs, but will overwrite all destination club data.
                 </p>
                 <a asp-action="Upload" class="btn btn-warning">
                     <i class="fas fa-upload me-2"></i>Upload Backup to Restore
