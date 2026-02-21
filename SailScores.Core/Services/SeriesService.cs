@@ -27,6 +27,7 @@ namespace SailScores.Core.Services
         private readonly ISailScoresContext _dbContext;
         private readonly IMemoryCache _cache;
         private readonly IMapper _mapper;
+        private readonly IIndexNowService _indexNowService;
 
         public SeriesService(
             IScoringCalculatorFactory scoringCalculatorFactory,
@@ -36,7 +37,8 @@ namespace SailScores.Core.Services
             IDbObjectBuilder dbObjBuilder,
             ISailScoresContext dbContext,
             IMemoryCache cache,
-            IMapper mapper)
+            IMapper mapper,
+            IIndexNowService indexNowService)
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
             _scoringService = scoringService;
@@ -46,6 +48,7 @@ namespace SailScores.Core.Services
             _dbContext = dbContext;
             _cache = cache;
             _mapper = mapper;
+            _indexNowService = indexNowService;
         }
 
         public async Task<IList<Series>> GetAllSeriesAsync(
@@ -205,6 +208,10 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             await SaveChartData(fullSeries)
+                .ConfigureAwait(false);
+
+            // Notify search engines about the series update
+            await NotifyIndexNow(dbSeries.ClubId, seriesId)
                 .ConfigureAwait(false);
 
             if(calculateParents)
@@ -1185,6 +1192,37 @@ namespace SailScores.Core.Services
                 return null;
             }
             return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatChartData>(dbRow.Results);
+        }
+
+        private async Task NotifyIndexNow(Guid clubId, Guid seriesId)
+        {
+            try
+            {
+                var series = await _dbContext.Series
+                    .Include(s => s.Season)
+                    .FirstOrDefaultAsync(s => s.Id == seriesId)
+                    .ConfigureAwait(false);
+
+                if (series == null) return;
+
+                var club = await _dbContext.Clubs
+                    .FirstOrDefaultAsync(c => c.Id == clubId)
+                    .ConfigureAwait(false);
+
+                if (club == null) return;
+
+                await _indexNowService.NotifySeriesUpdate(
+                    clubId,
+                    club.Initials,
+                    series.Season.UrlName,
+                    series.UrlName,
+                    club.IsHidden);
+            }
+            catch (Exception)
+            {
+                // Log but don't fail the update - IndexNow is non-critical
+                // Logging is handled within the IndexNowService
+            }
         }
     }
 }

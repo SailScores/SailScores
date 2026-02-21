@@ -29,6 +29,7 @@ public class SeriesServiceTests
     private readonly Mock<IScoringService> _mockScoringService;
     private readonly Mock<IForwarderService> _mockForwarderService;
     private readonly Mock<IConversionService> _mockConversionService;
+    private readonly Mock<IIndexNowService> _mockIndexNowService;
     private readonly IMemoryCache _realCache;
 
     public SeriesServiceTests()
@@ -44,6 +45,7 @@ public class SeriesServiceTests
         _mockScoringService = new Mock<IScoringService>();
         _mockForwarderService = new Mock<IForwarderService>();
         _mockConversionService = new Mock<IConversionService>();
+        _mockIndexNowService = new Mock<IIndexNowService>();
         _realCache = new MemoryCache(new MemoryCacheOptions());
 
         _context = Utilities.InMemoryContextBuilder.GetContext();
@@ -76,7 +78,8 @@ public class SeriesServiceTests
             _dbObjectBuilder,
             _context,
             _realCache,
-            _mapper
+            _mapper,
+            _mockIndexNowService.Object
             );
 
     }
