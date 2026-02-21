@@ -135,6 +135,26 @@ public class CompetitorController : Controller
         return Json(ranks);
     }
 
+    [AllowAnonymous]
+    [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "competitorId", "seasonName", "groupByDirection" })]
+    public async Task<JsonResult> WindStats(
+        Guid competitorId,
+        string seasonName = null,
+        bool groupByDirection = false)
+    {
+        var stats = await _competitorService.GetCompetitorWindStatsAsync(
+            competitorId,
+            seasonName,
+            groupByDirection);
+
+        if (stats == null || !stats.Any())
+        {
+            return Json(Array.Empty<object>());
+        }
+
+        return Json(stats);
+    }
+
 
     // GET: Competitor/Create
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]

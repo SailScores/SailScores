@@ -702,4 +702,121 @@ public class CompetitorService : ICompetitorService
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
+
+    public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
+        Guid competitorId,
+        string seasonUrlName = null,
+        bool groupByDirection = false)
+    {
+        // Get all races for this competitor with weather data
+        var racesQuery = _dbContext.Scores
+            .AsNoTracking()
+            .Where(s => s.CompetitorId == competitorId)
+            .Where(s => s.Race.Weather != null)
+            .Where(s => s.Race.Weather.WindSpeedMeterPerSecond != null)
+            .Where(s => s.Place != null); // Only races where they finished
+
+        // Filter by season if specified
+        if (!string.IsNullOrEmpty(seasonUrlName))
+        {
+            racesQuery = racesQuery.Where(s =>
+                s.Race.SeriesRaces.Any(sr =>
+                    sr.Series.Season.UrlName == seasonUrlName));
+        }
+
+        var raceData = await racesQuery
+            .Select(s => new
+            {
+                s.Place,
+                s.Race.Weather.WindSpeedMeterPerSecond,
+                s.Race.Weather.WindDirectionDegrees,
+                TotalStarters = s.Race.Scores.Count(sc => sc.Place != null)
+            })
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        if (!raceData.Any())
+        {
+            return new List<CompetitorWindStats>();
+        }
+
+        // Define wind speed ranges (in m/s) with knot labels
+        var windRanges = new[]
+        {
+            new { Min = 0m, Max = 2.5m, Label = "0-5 kts", Midpoint = 1.25m },
+            new { Min = 2.5m, Max = 5.1m, Label = "5-10 kts", Midpoint = 3.8m },
+            new { Min = 5.1m, Max = 7.7m, Label = "10-15 kts", Midpoint = 6.4m },
+            new { Min = 7.7m, Max = 10.3m, Label = "15-20 kts", Midpoint = 9.0m },
+            new { Min = 10.3m, Max = 999m, Label = "20+ kts", Midpoint = 12.0m }
+        };
+
+        // Transform data with wind range and direction
+        var transformedData = raceData
+            .Select(r =>
+            {
+                var windRange = windRanges.FirstOrDefault(wr =>
+                    r.WindSpeedMeterPerSecond >= wr.Min &&
+                    r.WindSpeedMeterPerSecond < wr.Max) ?? windRanges.Last();
+
+                return new
+                {
+                    r.Place,
+                    r.TotalStarters,
+                    WindRange = windRange.Label,
+                    Midpoint = windRange.Midpoint,
+                    Direction = groupByDirection ? GetWindDirectionLabel(r.WindDirectionDegrees) : null,
+                    GroupKey = groupByDirection
+                        ? $"{windRange.Label}_{GetWindDirectionLabel(r.WindDirectionDegrees)}"
+                        : windRange.Label
+                };
+            })
+            .ToList();
+
+        // Group by key and calculate stats
+        var stats = transformedData
+            .GroupBy(x => x.GroupKey)
+            .Select(group =>
+            {
+                var races = group.ToList();
+                var firstRace = races.First();
+                var parts = group.Key.Split('_');
+
+                return new CompetitorWindStats
+                {
+                    WindSpeedRange = parts[0],
+                    WindDirection = parts.Length > 1 ? parts[1] : null,
+                    WindSpeedMidpoint = firstRace.Midpoint,
+                    RaceCount = races.Count,
+                    AveragePercentPlace = races.Average(r =>
+                        r.TotalStarters > 1
+                            ? ((decimal)r.TotalStarters - r.Place.Value) / (r.TotalStarters - 1) * 100
+                            : 100),
+                    AverageFinish = races.Average(r => (decimal)r.Place.Value),
+                    BestFinish = races.Min(r => r.Place),
+                    WinCount = races.Count(r => r.Place == 1),
+                    PodiumCount = races.Count(r => r.Place <= 3)
+                };
+            })
+            .OrderBy(s => s.WindSpeedMidpoint)
+            .ThenBy(s => s.WindDirection)
+            .ToList();
+
+        return stats;
+    }
+
+    private static string GetWindDirectionLabel(decimal? degrees)
+    {
+        if (!degrees.HasValue) return "Unknown";
+
+        var deg = (double)degrees.Value;
+        if (deg >= 337.5 || deg < 22.5) return "N";
+        if (deg >= 22.5 && deg < 67.5) return "NE";
+        if (deg >= 67.5 && deg < 112.5) return "E";
+        if (deg >= 112.5 && deg < 157.5) return "SE";
+        if (deg >= 157.5 && deg < 202.5) return "S";
+        if (deg >= 202.5 && deg < 247.5) return "SW";
+        if (deg >= 247.5 && deg < 292.5) return "W";
+        if (deg >= 292.5 && deg < 337.5) return "NW";
+        return "Unknown";
+    }
 }
