@@ -1646,9 +1646,17 @@ public class BackupService : IBackupService
         var seriesRaces = await _dbContext.SeriesRaces.Where(sr => seriesIds.Contains(sr.SeriesId)).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.SeriesRaces.RemoveRange(seriesRaces);
 
-        // Races
+        // Races and orphaned Weather entities
         var races = await _dbContext.Races.Where(r => r.ClubId == clubId).Include(r => r.Weather).ToListAsync(cancellationToken).ConfigureAwait(false);
+        var weatherIds = races.Where(r => r.Weather != null).Select(r => r.Weather.Id).ToList();
         _dbContext.Races.RemoveRange(races);
+
+        // Delete orphaned Weather entities (those that were associated with the deleted races)
+        if (weatherIds.Any())
+        {
+            var weatherEntities = await _dbContext.Weather.Where(w => weatherIds.Contains(w.Id)).ToListAsync(cancellationToken).ConfigureAwait(false);
+            _dbContext.Weather.RemoveRange(weatherEntities);
+        }
 
         // RegattaSeries and RegattaFleet links
         var regattaSeries = await _dbContext.RegattaSeries.Where(rs => regattaIds.Contains(rs.RegattaId)).ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -1709,8 +1717,43 @@ public class BackupService : IBackupService
         var clubSequences = await _dbContext.ClubSequences.Where(cs => cs.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.ClubSequences.RemoveRange(clubSequences);
 
-        // Note: Files (logo) are not deleted since they might be referenced elsewhere
-        // and club.LogoFileId will be cleared/updated separately
+        // Orphaned Files cleanup (only delete club logo files that are not referenced elsewhere)
+        var club = await _dbContext.Clubs
+            .AsNoTracking()
+            .Where(c => c.Id == clubId)
+            .Select(c => new { c.LogoFileId })
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (club?.LogoFileId.HasValue == true)
+        {
+            var logoFileId = club.LogoFileId.Value;
+
+            // Check if this file is referenced by any other club or supporter
+            var isReferencedByOtherClub = await _dbContext.Clubs
+                .AsNoTracking()
+                .AnyAsync(c => c.Id != clubId && c.LogoFileId == logoFileId, cancellationToken)
+                .ConfigureAwait(false);
+
+            var isReferencedBySupporter = await _dbContext.Supporters
+                .AsNoTracking()
+                .AnyAsync(s => s.LogoFileId == logoFileId, cancellationToken)
+                .ConfigureAwait(false);
+
+            // Only delete if not referenced elsewhere
+            if (!isReferencedByOtherClub && !isReferencedBySupporter)
+            {
+                var fileToDelete = await _dbContext.Files
+                    .Where(f => f.Id == logoFileId)
+                    .FirstOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (fileToDelete != null)
+                {
+                    _dbContext.Files.Remove(fileToDelete);
+                }
+            }
+        }
 
         await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
