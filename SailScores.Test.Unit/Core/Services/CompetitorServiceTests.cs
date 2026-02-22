@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using SailScores.Core.Model;
@@ -18,32 +18,38 @@ namespace SailScores.Test.Unit.Core.Services
     public class CompetitorServiceTests
     {
         private readonly CompetitorService _service;
-        private readonly Mock<IScoringCalculator> _mockCalculator;
-        private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
-        private readonly Mock<IForwarderService> _mockForwarder;
-        private readonly IMapper _mapper;
-        private readonly ISailScoresContext _context;
-        private readonly Guid _clubId;
+            private readonly Mock<IScoringCalculator> _mockCalculator;
+            private readonly Mock<IScoringCalculatorFactory> _mockScoringCalculatorFactory;
+            private readonly Mock<IForwarderService> _mockForwarder;
+            private readonly Mock<IClubService> _mockClubService;
+            private readonly Mock<IConversionService> _mockConversionService;
+            private readonly IMapper _mapper;
+            private readonly ISailScoresContext _context;
+            private readonly Guid _clubId;
 
-        public CompetitorServiceTests()
-        {
-            _mockCalculator = new Mock<IScoringCalculator>();
-            _mockCalculator.Setup(c => c.CalculateResults(It.IsAny<Series>())).Returns(new SeriesResults());
-            _mockScoringCalculatorFactory = new Mock<IScoringCalculatorFactory>();
-            _mockScoringCalculatorFactory.Setup(f => f.CreateScoringCalculatorAsync(It.IsAny<SailScores.Core.Model.ScoringSystem>()))
-                .ReturnsAsync(_mockCalculator.Object);
-            _mockForwarder = new Mock<IForwarderService>();
+            public CompetitorServiceTests()
+            {
+                _mockCalculator = new Mock<IScoringCalculator>();
+                _mockCalculator.Setup(c => c.CalculateResults(It.IsAny<Series>())).Returns(new SeriesResults());
+                _mockScoringCalculatorFactory = new Mock<IScoringCalculatorFactory>();
+                _mockScoringCalculatorFactory.Setup(f => f.CreateScoringCalculatorAsync(It.IsAny<SailScores.Core.Model.ScoringSystem>()))
+                    .ReturnsAsync(_mockCalculator.Object);
+                _mockForwarder = new Mock<IForwarderService>();
+                _mockClubService = new Mock<IClubService>();
+                _mockConversionService = new Mock<IConversionService>();
 
-            _context = Utilities.InMemoryContextBuilder.GetContext();
-            _clubId = _context.Clubs.First().Id;
-            _mapper = MapperBuilder.GetSailScoresMapper();
+                _context = Utilities.InMemoryContextBuilder.GetContext();
+                _clubId = _context.Clubs.First().Id;
+                _mapper = MapperBuilder.GetSailScoresMapper();
 
-            _service = new SailScores.Core.Services.CompetitorService(
-                _context,
-                _mockForwarder.Object,
-                _mapper
-                );
-        }
+                _service = new SailScores.Core.Services.CompetitorService(
+                    _context,
+                    _mockForwarder.Object,
+                    _mapper,
+                    _mockClubService.Object,
+                    _mockConversionService.Object
+                    );
+            }
 
         [Fact]
         public async Task GetIncludeInactive_ReturnsSomeInactive()
