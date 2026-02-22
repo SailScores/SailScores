@@ -1,9 +1,11 @@
 // Competitor Wind Statistics Chart
 let windStatsChart = null;
+let currentWindSpeedUnits = 'kts'; // Default to knots
 
-function initCompetitorWindStats(competitorId) {
+function initCompetitorWindStats(competitorId, windSpeedUnits = 'kts') {
+    currentWindSpeedUnits = windSpeedUnits || 'kts';
     loadWindStats(competitorId);
-    
+
     // Add event listeners
     const seasonSelect = document.getElementById('windSeasonSelect');
     if (seasonSelect) {
@@ -11,7 +13,7 @@ function initCompetitorWindStats(competitorId) {
             loadWindStats(competitorId, this.value);
         });
     }
-    
+
     const directionCheckbox = document.getElementById('groupByDirection');
     if (directionCheckbox) {
         directionCheckbox.addEventListener('change', function() {
@@ -58,9 +60,9 @@ function renderWindStatsChart(data, groupByDirection) {
     // Prepare data - higher percent is better (100% = beat all competitors)
     const labels = data.map(d => {
         if (groupByDirection && d.windDirection) {
-            return `${d.windSpeedRange} ${d.windDirection}`;
+            return `${d.windSpeedRange} ${currentWindSpeedUnits} ${d.windDirection}`;
         }
-        return d.windSpeedRange;
+        return `${d.windSpeedRange} ${currentWindSpeedUnits}`;
     });
 
     const percentPlaces = data.map(d => d.averagePercentPlace);
@@ -101,7 +103,7 @@ function renderWindStatsChart(data, groupByDirection) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Wind Conditions'
+                        text: `Wind Conditions (${currentWindSpeedUnits})`
                     }
                 }
             },
@@ -136,7 +138,7 @@ function renderWindStatsTable(data, groupByDirection) {
 
     let html = '<div class="table-responsive"><table class="table table-sm table-striped">';
     html += '<thead><tr>';
-    html += '<th>Wind Speed</th>';
+    html += `<th>Wind Speed (${currentWindSpeedUnits})</th>`;
     if (groupByDirection) {
         html += '<th>Direction</th>';
     }

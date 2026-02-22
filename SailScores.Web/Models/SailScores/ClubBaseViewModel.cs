@@ -9,4 +9,6 @@ public abstract class ClubBaseViewModel
     public bool CanEdit { get; set; }
 
     public bool CanEditSeries { get; set; }
+
+    public string WindSpeedUnits { get; set; }
 }

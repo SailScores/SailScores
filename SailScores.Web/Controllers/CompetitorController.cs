@@ -111,10 +111,17 @@ public class CompetitorController : Controller
             }
             return NotFound();
         }
+
+        // Get club weather settings for wind speed units
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var club = await _clubService.GetFullClubExceptScores(clubId);
+        var windSpeedUnits = club?.WeatherSettings?.WindSpeedUnits ?? "kts";
+
         var vm = new ClubItemViewModel<CompetitorStatsViewModel>
         {
             ClubInitials = clubInitials.ToUpperInvariant(),
-            Item = competitorStats
+            Item = competitorStats,
+            WindSpeedUnits = windSpeedUnits
         };
         return View(vm);
     }

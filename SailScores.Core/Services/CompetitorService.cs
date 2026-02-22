@@ -18,17 +18,23 @@ public class CompetitorService : ICompetitorService
     private readonly ISailScoresContext _dbContext;
     private readonly IForwarderService _forwarderService;
     private readonly IMapper _mapper;
+    private readonly IClubService _clubService;
+    private readonly IConversionService _conversionService;
 
     public string CompetitorSequenceName = "Competitor";
 
     public CompetitorService(
         ISailScoresContext dbContext,
         IForwarderService forwarderService,
-        IMapper mapper)
+        IMapper mapper,
+        IClubService clubService,
+        IConversionService conversionService)
     {
         _dbContext = dbContext;
         _forwarderService = forwarderService;
         _mapper = mapper;
+        _clubService = clubService;
+        _conversionService = conversionService;
     }
 
 
@@ -708,6 +714,23 @@ public class CompetitorService : ICompetitorService
         string seasonUrlName = null,
         bool groupByDirection = false)
     {
+        // Get the competitor's club to determine wind speed units
+        var competitor = await _dbContext.Competitors
+            .AsNoTracking()
+            .Where(c => c.Id == competitorId)
+            .Select(c => new { c.ClubId })
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
+
+        if (competitor == null)
+        {
+            return new List<CompetitorWindStats>();
+        }
+
+        // Get club's preferred wind speed units
+        var club = await _clubService.GetMinimalClub(competitor.ClubId);
+        var preferredUnits = club?.WeatherSettings?.WindSpeedUnits ?? "kts";
+
         // Get all races for this competitor with weather data
         var racesQuery = _dbContext.Scores
             .AsNoTracking()
@@ -740,23 +763,26 @@ public class CompetitorService : ICompetitorService
             return new List<CompetitorWindStats>();
         }
 
-        // Define wind speed ranges (in m/s) with knot labels
-        var windRanges = new[]
-        {
-            new { Min = 0m, Max = 2.5m, Label = "0-5 kts", Midpoint = 1.25m },
-            new { Min = 2.5m, Max = 5.1m, Label = "5-10 kts", Midpoint = 3.8m },
-            new { Min = 5.1m, Max = 7.7m, Label = "10-15 kts", Midpoint = 6.4m },
-            new { Min = 7.7m, Max = 10.3m, Label = "15-20 kts", Midpoint = 9.0m },
-            new { Min = 10.3m, Max = 999m, Label = "20+ kts", Midpoint = 12.0m }
-        };
+        // Define dynamic wind speed ranges based on preferred units
+        var windRanges = GetWindSpeedRanges(preferredUnits);
 
         // Transform data with wind range and direction
         var transformedData = raceData
             .Select(r =>
             {
+                // Convert wind speed from m/s to preferred units
+                var windSpeedInPreferredUnits = _conversionService.Convert(
+                    r.WindSpeedMeterPerSecond,
+                    _conversionService.MeterPerSecond,
+                    preferredUnits);
+
                 var windRange = windRanges.FirstOrDefault(wr =>
-                    r.WindSpeedMeterPerSecond >= wr.Min &&
-                    r.WindSpeedMeterPerSecond < wr.Max) ?? windRanges.Last();
+                    windSpeedInPreferredUnits >= wr.Min &&
+                    windSpeedInPreferredUnits < wr.Max);
+                if(windRange == default)
+                {
+                    windRange = windRanges.Last();
+                }
 
                 return new
                 {
@@ -802,6 +828,62 @@ public class CompetitorService : ICompetitorService
             .ToList();
 
         return stats;
+    }
+
+    private List<(decimal Min, decimal Max, string Label, decimal Midpoint)> GetWindSpeedRanges(string units)
+    {
+        // Normalize unit strings
+        var unitUpper = units?.ToUpperInvariant() ?? "KTS";
+
+        // Define ranges based on unit type
+        if (unitUpper.Contains("MPH"))
+        {
+            // Miles per hour ranges
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 6m, "0-6", 3m),
+                (6m, 12m, "6-12", 9m),
+                (12m, 18m, "12-18", 15m),
+                (18m, 24m, "18-24", 21m),
+                (24m, 999m, "24+", 28m)
+            };
+        }
+        else if (unitUpper.Contains("KPH") || unitUpper.Contains("KM/H") || unitUpper.Contains("KMPH"))
+        {
+            // Kilometers per hour ranges
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 10m, "0-10", 5m),
+                (10m, 20m, "10-20", 15m),
+                (20m, 30m, "20-30", 25m),
+                (30m, 40m, "30-40", 35m),
+                (40m, 999m, "40+", 45m)
+            };
+        }
+        else if (unitUpper.Contains("M/S") || unitUpper.Contains("METER"))
+        {
+            // Meters per second ranges
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 2.5m, "0-2.5", 1.25m),
+                (2.5m, 5m, "2.5-5", 3.75m),
+                (5m, 7.5m, "5-7.5", 6.25m),
+                (7.5m, 10m, "7.5-10", 8.75m),
+                (10m, 999m, "10+", 12m)
+            };
+        }
+        else // Default to knots
+        {
+            // Knots ranges (default)
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 5m, "0-5", 2.5m),
+                (5m, 10m, "5-10", 7.5m),
+                (10m, 15m, "10-15", 12.5m),
+                (15m, 20m, "15-20", 17.5m),
+                (20m, 999m, "20+", 25m)
+            };
+        }
     }
 
     private static string GetWindDirectionLabel(decimal? degrees)

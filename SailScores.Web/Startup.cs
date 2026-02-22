@@ -160,6 +160,9 @@ public class Startup
                 Configuration.GetConnectionString("DefaultConnection")));
         services.AddDatabaseDeveloperPageExceptionFilter();
 
+        // Add response caching services (required for VaryByQueryKeys)
+        services.AddResponseCaching();
+
         services
             .AddMvc(option =>
             {
@@ -277,6 +280,10 @@ public class Startup
         app.UseRequestLocalization();
 
         app.UseHttpsRedirection();
+
+        // Add response caching middleware (must be before UseStaticFiles)
+        app.UseResponseCaching();
+
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = ctx =>

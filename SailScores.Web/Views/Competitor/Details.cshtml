@@ -28,10 +28,25 @@
         }
     </div>
 </div>
+
+@if (Model.Item.SeasonStats != null && Model.Item.SeasonStats.Any())
+{
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-light py-2">
+                @foreach (var SeasonStats in Model.Item.SeasonStats.Where(s => s.RaceCount > 0).TakeLast(5))
+                {
+                    <a href="#season-@(SeasonStats.SeasonUrlName)" class="alert-link me-3">@SeasonStats.SeasonName</a>
+                }
+                <a href="#wind-stats" class="alert-link me-3">Wind Stats</a>
+            </div>
+        </div>
+    </div>
+}
 <div class="row">
     @foreach (var SeasonStats in Model.Item.SeasonStats.Where(s => s.RaceCount > 0).TakeLast(5))
     {
-    <div class="col-12">
+    <div class="col-12" id="season-@(SeasonStats.SeasonUrlName)">
         <h4>@SeasonStats.SeasonName</h4>
         <strong>@SeasonStats.RaceCount</strong> races
         @if (SeasonStats.DaysRaced.HasValue)
@@ -62,11 +77,14 @@
 
 @if (Model.Item.SeasonStats != null && Model.Item.SeasonStats.Any())
 {
-    <div class="row mt-4">
+    <div class="row mt-4" id="wind-stats">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Performance by Wind Conditions</h5>
+                    <h5 class="card-title mb-0">
+                        Performance by Wind Conditions
+                        <a href="#" class="float-end text-muted" title="Back to top"><i class="fas fa-arrow-up"></i></a>
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
@@ -112,8 +130,9 @@
     <script>
         (function() {
             const competitorId = '@Model.Item.Id';
+            const windSpeedUnits = '@(Model.WindSpeedUnits ?? "kts")';
             if (typeof initCompetitorWindStats === 'function') {
-                initCompetitorWindStats(competitorId);
+                initCompetitorWindStats(competitorId, windSpeedUnits);
             }
         })();
     </script>
