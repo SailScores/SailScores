@@ -117,7 +117,7 @@ a full restore.
 | `nickName` | string? | Informal name. |
 | `description` | string? | Description. |
 | `isActive` | bool? | Whether the fleet is active. |
-| `fleetType` | string | `"SelectedBoats"` or `"AllBoatsInClub"`. |
+| `fleetType` | string | `"SelectedBoats"`, `"SelectedClasses"` or `"AllBoatsInClub"`. |
 | `boatClassIds` | guid[] | References to boat classes in this fleet. |
 
 ### Competitor

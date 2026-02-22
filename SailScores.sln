@@ -49,6 +49,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.DocScreenshots",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Test.Integration", "SailScores.Test.Integration\SailScores.Test.Integration.csproj", "{4E90643D-B4DF-6085-2E94-B0A85F45AA9A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0479EE24-287C-45F1-80D5-75B5EFFD67D1}"
+	ProjectSection(SolutionItems) = preProject
+		docs\ApplicationInsights-Implementation-Summary.md = docs\ApplicationInsights-Implementation-Summary.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -244,6 +249,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{545CCFAD-2FF1-4173-92A2-C053667A9D10} = {AE2F13E0-64D0-43D5-8D31-B6BDEAFA5B73}
 		{44E40ED6-F350-4A0C-B0FE-7AF8A7289508} = {545CCFAD-2FF1-4173-92A2-C053667A9D10}
+		{0479EE24-287C-45F1-80D5-75B5EFFD67D1} = {AE2F13E0-64D0-43D5-8D31-B6BDEAFA5B73}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4AEBBD0-18D9-4D6C-BDA9-8F4B186A62D7}
