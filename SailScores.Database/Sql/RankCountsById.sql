@@ -50,44 +50,67 @@ Results AS
         ) 
         AND r.Date >= @SeasonStart
         AND r.Date <= @SeasonEnd
- ) ,
-    Ranks
-    AS
-    (
-       SELECT 0 AS [Rank]
-
-        UNION ALL
-            SELECT [Rank] +1
-            FROM Ranks
-            WHERE Ranks.[Rank] < 100
-    ),
-    JoinedWithResults
-    AS
-    (
-        SELECT
-            Ranks.Rank,
-            Results.Place,
-            Results.Code,
-            count(results.CompetitorId) AS Count
-        FROM
-            Ranks
-            LEFT OUTER JOIN
-            Results
-            ON ( results.Place = Ranks.Rank OR ( ISNULL(Code, '') <> '' AND Ranks.Rank =0))
-        GROUP BY
-            Ranks.Rank ,
-            Results.Place ,
-            results.Code
-    )
+),
+MaxPlace AS
+(
+    -- Find the maximum place/rank that was achieved
+    SELECT ISNULL(MAX(Place)+5, 10) AS MaxRank
+    FROM Results
+    WHERE Place IS NOT NULL
+),
+RankGenerator AS
+(
+    -- Generate all ranks from 1 to MaxRank
+    SELECT 1 AS Rank
+    UNION ALL
+    SELECT Rank + 1
+    FROM RankGenerator
+    WHERE Rank < (SELECT MaxRank FROM MaxPlace)
+),
+AllRanks AS
+(
+    -- Select from the rank generator CTE
+    SELECT Rank
+    FROM RankGenerator
+),
+PlaceGroups AS
+(
+    -- Aggregate results by Place/Code
+    SELECT
+        ISNULL(Place, 0) AS PlaceOrCode,
+        Place,
+        Code,
+        COUNT(*) AS Count
+    FROM Results
+    GROUP BY Place, Code
+),
+AllPlacesWithCounts AS
+(
+    -- Left join all ranks with actual results to include zero counts
+    SELECT
+        ar.Rank,
+        pg.Place,
+        pg.Code,
+        ISNULL(pg.Count, 0) AS Count
+    FROM AllRanks ar
+    LEFT JOIN PlaceGroups pg ON ar.Rank = pg.Place
+    UNION ALL
+    -- Include special codes (DNF, DNC, etc.) that don't have a numeric place
+    SELECT
+        NULL,
+        NULL,
+        pg.Code,
+        pg.Count
+    FROM PlaceGroups pg
+    WHERE pg.Place IS NULL
+)
 SELECT
-    @SeasonName2 As SeasonName ,
-    @SeasonStart AS SeasonStart ,
-    CASE WHEN Rank = 0 then null else rank END as Place ,
-    Code ,
+    @SeasonName2 AS SeasonName,
+    @SeasonStart AS SeasonStart,
+    NULLIF(Rank, 0) AS Place,
+    Code,
     Count
-FROM JoinedWithResults
-WHERE
- Rank <= (SELECT MAX(Place)
-    FROM JoinedWithResults)
+FROM AllPlacesWithCounts
 ORDER BY
-  Rank
+    CASE WHEN Rank IS NULL THEN 100 ELSE Rank END,
+    Code

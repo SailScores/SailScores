@@ -29,7 +29,7 @@
     </div>
 </div>
 <div class="row">
-    @foreach (var SeasonStats in Model.Item.SeasonStats)
+    @foreach (var SeasonStats in Model.Item.SeasonStats.Where(s => s.RaceCount > 0).TakeLast(5))
     {
     <div class="col-12">
         <h4>@SeasonStats.SeasonName</h4>

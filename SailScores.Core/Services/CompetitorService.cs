@@ -93,16 +93,31 @@ public class CompetitorService : ICompetitorService
 
     public async Task<Competitor> GetCompetitorByUrlNameAsync(Guid clubId, string urlName)
     {
-        var comps = await GetCompetitorsAsync(clubId, null, true);
+        // First try to find by UrlName (active preferred)
+        var dbCompetitor = await _dbContext.Competitors
+            .Where(c => c.ClubId == clubId && c.UrlName == urlName && (c.IsActive ?? true))
+            .Include(c => c.BoatClass)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
 
-        var comp = comps.Where(c => c.IsActive)
-            .FirstOrDefault(c => c.UrlName == urlName);
-        comp ??= comps.Where(c => !c.IsActive)
-            .FirstOrDefault(c => c.UrlName == urlName);
-        comp ??= comps.FirstOrDefault(c =>
-            String.Equals(UrlUtility.GetUrlName(c.SailNumber), urlName, StringComparison.OrdinalIgnoreCase));
+        // Try inactive competitors if not found
+        dbCompetitor ??= await _dbContext.Competitors
+            .Where(c => c.ClubId == clubId && c.UrlName == urlName && !(c.IsActive ?? true))
+            .Include(c => c.BoatClass)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
 
-        return comp;
+        // Fallback: try UrlId if it exists and matches the URL name
+        if (dbCompetitor == null && urlName.Length <= 20)
+        {
+            dbCompetitor = await _dbContext.Competitors
+                .Where(c => c.ClubId == clubId && c.UrlId == urlName)
+                .Include(c => c.BoatClass)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+        }
+
+        return _mapper.Map<Competitor>(dbCompetitor);
     }
 
     public async Task<Competitor> GetCompetitorBySailNumberAsync(Guid clubId, string sailNumber)
