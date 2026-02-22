@@ -47,4 +47,10 @@ public interface ICompetitorService
         bool active,
         string userName = "");
     Task AddCompetitorNote(Guid id, string newNote, string v);
+#pragma warning disable CA1054 // Uri parameters should not be strings
+    Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
+        Guid competitorId,
+        string seasonUrlName = null,
+        bool groupByDirection = false);
+#pragma warning restore CA1054 // Uri parameters should not be strings
 }

@@ -327,4 +327,15 @@ public class CompetitorService : ICompetitorService
     {
         await _coreCompetitorService.AddHistoryElement(competitorId, newNote, userName);
     }
+
+    public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
+        Guid competitorId,
+        string seasonUrlName = null,
+        bool groupByDirection = false)
+    {
+        return await _coreCompetitorService.GetCompetitorWindStatsAsync(
+            competitorId,
+            seasonUrlName,
+            groupByDirection);
+    }
 }
