@@ -567,6 +567,35 @@ public class BackupService : IBackupService
             Created = hr.Created
         }).ToList();
 
+        // Change Types
+        var changeTypes = await _dbContext.ChangeTypes
+            .AsNoTracking()
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        backup.ChangeTypes = changeTypes.Select(ct => new ChangeTypeBackup
+        {
+            Id = ct.Id,
+            Name = ct.Name
+        }).ToList();
+
+        // Competitor Changes
+        var competitorIds = competitors.Select(c => c.Id).ToList();
+        var competitorChanges = await _dbContext.CompetitorChanges
+            .Where(cc => competitorIds.Contains(cc.CompetitorId))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        backup.CompetitorChanges = competitorChanges.Select(cc => new CompetitorChangeBackup
+        {
+            Id = cc.Id,
+            CompetitorId = cc.CompetitorId,
+            ChangeTypeId = cc.ChangeTypeId,
+            ChangedBy = cc.ChangedBy,
+            ChangeTimeStamp = cc.ChangeTimeStamp,
+            NewValue = cc.NewValue,
+            Summary = cc.Summary
+        }).ToList();
+
         // Populate entity counts for validation
         backup.Metadata.BoatClassCount = backup.BoatClasses?.Count ?? 0;
         backup.Metadata.CompetitorCount = backup.Competitors?.Count ?? 0;
@@ -895,6 +924,8 @@ public class BackupService : IBackupService
             RestoreClubSequences(backup, targetClubId);
             RestoreForwarders(backup);
             RestoreSeriesResults(backup);
+            RestoreChangeTypes(backup);
+            RestoreCompetitorChanges(backup);
 
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -1582,28 +1613,318 @@ public class BackupService : IBackupService
         }
     }
 
-    private void RestoreHistoricalResults(ClubBackupData backup)
+     private void RestoreHistoricalResults(ClubBackupData backup)
+     {
+         foreach (var historicalResult in backup.HistoricalResults ?? Enumerable.Empty<HistoricalResultsBackup>())
+         {
+             var newSeriesId = GetNewGuidIfExists(historicalResult.SeriesId);
+             if (newSeriesId.HasValue)
+             {
+                 var dbHistoricalResult = new Db.HistoricalResults
+                 {
+                     Id = GetNewGuid(historicalResult.Id),
+                     SeriesId = newSeriesId.Value,
+                     IsCurrent = historicalResult.IsCurrent,
+                     Results = historicalResult.Results,
+                     Created = historicalResult.Created
+                 };
+                 _dbContext.HistoricalResults.Add(dbHistoricalResult);
+             }
+         }
+     }
+
+     private void RestoreChangeTypes(ClubBackupData backup)
+     {
+         foreach (var changeType in backup.ChangeTypes ?? Enumerable.Empty<ChangeTypeBackup>())
+         {
+             var dbChangeType = new Db.ChangeType
+             {
+                 Id = GetNewGuid(changeType.Id),
+                 Name = changeType.Name
+             };
+             _dbContext.ChangeTypes.Add(dbChangeType);
+         }
+     }
+
+     private void RestoreCompetitorChanges(ClubBackupData backup)
+     {
+         foreach (var competitorChange in backup.CompetitorChanges ?? Enumerable.Empty<CompetitorChangeBackup>())
+         {
+             var newCompetitorId = GetNewGuidIfExists(competitorChange.CompetitorId);
+             var newChangeTypeId = GetNewGuidIfExists(competitorChange.ChangeTypeId);
+
+             if (newCompetitorId.HasValue && newChangeTypeId.HasValue)
+             {
+                 var dbCompetitorChange = new Db.CompetitorChange
+                 {
+                     Id = GetNewGuid(competitorChange.Id),
+                     CompetitorId = newCompetitorId.Value,
+                     ChangeTypeId = newChangeTypeId.Value,
+                     ChangedBy = competitorChange.ChangedBy,
+                     ChangeTimeStamp = competitorChange.ChangeTimeStamp,
+                     NewValue = competitorChange.NewValue,
+                     Summary = competitorChange.Summary
+                 };
+                 _dbContext.CompetitorChanges.Add(dbCompetitorChange);
+             }
+         }
+     }
+
+    private async Task DeleteExistingClubDataAsync(Guid clubId, CancellationToken cancellationToken = default)
     {
-        foreach (var historicalResult in backup.HistoricalResults ?? Enumerable.Empty<HistoricalResultsBackup>())
+        // Delete in reverse dependency order using ExecuteDeleteAsync() for relational providers.
+        // For InMemory/other providers that don't support ExecuteDeleteAsync, fall back to load-then-remove.
+        // ExecuteDeleteAsync() avoids:
+        // - DbUpdateConcurrencyException when entities have optimistic concurrency tokens
+        // - Memory overhead of loading large datasets
+        // - Stale concurrency tokens from time gaps between entity load and SaveChangesAsync()
+
+        var isRelational = _dbContext.Database.ProviderName?.Contains("InMemory") != true;
+
+        if (isRelational)
         {
-            var newSeriesId = GetNewGuidIfExists(historicalResult.SeriesId);
-            if (newSeriesId.HasValue)
+            await DeleteExistingClubDataUsingExecuteDeleteAsync(clubId, cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            await DeleteExistingClubDataUsingLoadAndRemove(clubId, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private async Task DeleteExistingClubDataUsingExecuteDeleteAsync(Guid clubId, CancellationToken cancellationToken = default)
+    {
+        // Direct SQL delete operations - no entity loading, avoiding concurrency token issues
+
+        // SeriesChartResults (depends on series)
+        await _dbContext.SeriesChartResults
+            .Where(scr => _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).Contains(scr.SeriesId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Historical Results (depends on series)
+        await _dbContext.HistoricalResults
+            .Where(hr => _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).Contains(hr.SeriesId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Competitor Forwarders
+        await _dbContext.CompetitorForwarders
+            .Where(cf => _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).Contains(cf.CompetitorId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Regatta Forwarders
+        await _dbContext.RegattaForwarders
+            .Where(rf => _dbContext.Regattas.Where(r => r.ClubId == clubId).Select(r => r.Id).Contains(rf.NewRegattaId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Series Forwarders
+        await _dbContext.SeriesForwarders
+            .Where(sf => _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).Contains(sf.NewSeriesId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Competitor Changes (depends on competitors)
+        await _dbContext.CompetitorChanges
+            .Where(cc => _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).Contains(cc.CompetitorId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Change Types
+        await _dbContext.ChangeTypes
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Documents (can be club-owned or regatta-owned)
+        await _dbContext.Documents
+            .Where(d => d.ClubId == clubId || 
+                       (d.RegattaId.HasValue && _dbContext.Regattas.Where(r => r.ClubId == clubId).Select(r => r.Id).Contains(d.RegattaId.Value)))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Announcements (can be club-owned or regatta-owned, respecting query filters)
+        await _dbContext.Announcements
+            .IgnoreQueryFilters()
+            .Where(a => a.ClubId == clubId || 
+                       (a.RegattaId.HasValue && _dbContext.Regattas.Where(r => r.ClubId == clubId).Select(r => r.Id).Contains(a.RegattaId.Value)))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Scores (depends on races)
+        await _dbContext.Scores
+            .Where(s => _dbContext.Races.Where(r => r.ClubId == clubId).Select(r => r.Id).Contains(s.RaceId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // SeriesRace links
+        await _dbContext.SeriesRaces
+            .Where(sr => _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).Contains(sr.SeriesId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Races (and we'll handle their associated weather separately)
+        await _dbContext.Races
+            .Where(r => r.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Orphaned Weather entities (not referenced by any race after race deletion)
+        // Need to still load IDs since we can't easily express "not referenced" in a single query
+        var referencedWeatherIds = await _dbContext.Races
+            .Where(r => r.Weather != null)
+            .Select(r => r.Weather.Id)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (referencedWeatherIds.Count == 0)
+        {
+            // All weather is orphaned, delete it all
+            await _dbContext.Weather
+                .ExecuteDeleteAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+        else
+        {
+            // Delete only truly orphaned weather
+            await _dbContext.Weather
+                .Where(w => !referencedWeatherIds.Contains(w.Id))
+                .ExecuteDeleteAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        // RegattaSeries links
+        await _dbContext.RegattaSeries
+            .Where(rs => _dbContext.Regattas.Where(r => r.ClubId == clubId).Select(r => r.Id).Contains(rs.RegattaId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // RegattaFleet links
+        await _dbContext.RegattaFleets
+            .Where(rf => _dbContext.Regattas.Where(r => r.ClubId == clubId).Select(r => r.Id).Contains(rf.RegattaId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Regattas
+        await _dbContext.Regattas
+            .Where(r => r.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // SeriesToSeriesLinks (both parent and child sides)
+        await _dbContext.SeriesToSeriesLinks
+            .Where(l => _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).Contains(l.ParentSeriesId) ||
+                       _dbContext.Series.Where(s => s.ClubId == clubId).Select(s => s.Id).Contains(l.ChildSeriesId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Series
+        await _dbContext.Series
+            .Where(s => s.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // CompetitorFleet links
+        await _dbContext.CompetitorFleets
+            .Where(cf => _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).Contains(cf.CompetitorId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Competitors
+        await _dbContext.Competitors
+            .Where(c => c.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // FleetBoatClass links
+        await _dbContext.FleetBoatClasses
+            .Where(fbc => _dbContext.Fleets.Where(f => f.ClubId == clubId).Select(f => f.Id).Contains(fbc.FleetId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Fleets
+        await _dbContext.Fleets
+            .Where(f => f.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // ScoreCodes (via scoring systems)
+        await _dbContext.ScoreCodes
+            .Where(sc => _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).Select(ss => ss.Id).Contains(sc.ScoringSystemId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Clear DefaultScoringSystemId on the club before deleting ScoringSystems
+        // This prevents FK constraint violation: FK_Clubs_ScoringSystems_DefaultScoringSystemId
+        await _dbContext.Clubs
+            .Where(c => c.Id == clubId)
+            .ExecuteUpdateAsync(u => u.SetProperty(c => c.DefaultScoringSystemId, (Guid?)null), cancellationToken)
+            .ConfigureAwait(false);
+
+        // ScoringSystems
+        await _dbContext.ScoringSystems
+            .Where(ss => ss.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Seasons
+        await _dbContext.Seasons
+            .Where(s => s.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // BoatClasses
+        await _dbContext.BoatClasses
+            .Where(bc => bc.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // ClubSequences
+        await _dbContext.ClubSequences
+            .Where(cs => cs.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Orphaned Files cleanup (only delete club logo files that are not referenced elsewhere)
+        var club = await _dbContext.Clubs
+            .AsNoTracking()
+            .Where(c => c.Id == clubId)
+            .Select(c => new { c.LogoFileId })
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (club?.LogoFileId.HasValue == true)
+        {
+            var logoFileId = club.LogoFileId.Value;
+
+            // Check if this file is referenced by any other club or supporter
+            var isReferencedByOtherClub = await _dbContext.Clubs
+                .AsNoTracking()
+                .AnyAsync(c => c.Id != clubId && c.LogoFileId == logoFileId, cancellationToken)
+                .ConfigureAwait(false);
+
+            var isReferencedBySupporter = await _dbContext.Supporters
+                .AsNoTracking()
+                .AnyAsync(s => s.LogoFileId == logoFileId, cancellationToken)
+                .ConfigureAwait(false);
+
+            // Only delete if not referenced elsewhere
+            if (!isReferencedByOtherClub && !isReferencedBySupporter)
             {
-                var dbHistoricalResult = new Db.HistoricalResults
-                {
-                    Id = GetNewGuid(historicalResult.Id),
-                    SeriesId = newSeriesId.Value,
-                    IsCurrent = historicalResult.IsCurrent,
-                    Results = historicalResult.Results,
-                    Created = historicalResult.Created
-                };
-                _dbContext.HistoricalResults.Add(dbHistoricalResult);
+                await _dbContext.Files
+                    .Where(f => f.Id == logoFileId)
+                    .ExecuteDeleteAsync(cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
     }
 
-    private async Task DeleteExistingClubDataAsync(Guid clubId, CancellationToken cancellationToken = default)
+    private async Task DeleteExistingClubDataUsingLoadAndRemove(Guid clubId, CancellationToken cancellationToken = default)
     {
+        // Fallback for InMemory and other providers that don't support ExecuteDeleteAsync.
+        // Uses the traditional load-then-remove pattern. Note: This may have concurrency issues
+        // with production relational databases due to stale tokens, but is necessary for InMemory.
+
         // Delete in reverse dependency order
 
         // Series Chart Results (depends on series)
@@ -1628,6 +1949,14 @@ public class BackupService : IBackupService
         // Series Forwarders
         var seriesForwarders = await _dbContext.SeriesForwarders.Where(sf => seriesIds.Contains(sf.NewSeriesId)).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.SeriesForwarders.RemoveRange(seriesForwarders);
+
+        // Competitor Changes (depends on competitors)
+        var competitorChanges = await _dbContext.CompetitorChanges.Where(cc => competitorIds.Contains(cc.CompetitorId)).ToListAsync(cancellationToken).ConfigureAwait(false);
+        _dbContext.CompetitorChanges.RemoveRange(competitorChanges);
+
+        // Change Types
+        var changeTypes = await _dbContext.ChangeTypes.ToListAsync(cancellationToken).ConfigureAwait(false);
+        _dbContext.ChangeTypes.RemoveRange(changeTypes);
 
         // Documents
         var documents = await _dbContext.Documents.Where(d => d.ClubId == clubId || (d.RegattaId.HasValue && regattaIds.Contains(d.RegattaId.Value))).ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -1656,6 +1985,15 @@ public class BackupService : IBackupService
         {
             var weatherEntities = await _dbContext.Weather.Where(w => weatherIds.Contains(w.Id)).ToListAsync(cancellationToken).ConfigureAwait(false);
             _dbContext.Weather.RemoveRange(weatherEntities);
+        }
+
+        // Also delete any Weather records that are not referenced by any race (orphaned from failed operations)
+        var allRaces = await _dbContext.Races.Include(r => r.Weather).Where(r => r.Weather != null).ToListAsync(cancellationToken).ConfigureAwait(false);
+        var allReferencedWeatherIds = allRaces.Where(r => r.Weather != null).Select(r => r.Weather.Id).ToHashSet();
+        var orphanedWeather = await _dbContext.Weather.Where(w => !allReferencedWeatherIds.Contains(w.Id)).ToListAsync(cancellationToken).ConfigureAwait(false);
+        if (orphanedWeather.Any())
+        {
+            _dbContext.Weather.RemoveRange(orphanedWeather);
         }
 
         // RegattaSeries and RegattaFleet links
@@ -1701,6 +2039,10 @@ public class BackupService : IBackupService
         var scoreCodes = await _dbContext.ScoreCodes.Where(sc => scoringSystemIds.Contains(sc.ScoringSystemId)).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.ScoreCodes.RemoveRange(scoreCodes);
 
+        // Clear DefaultScoringSystemId on the club before deleting ScoringSystems
+        var club = await _dbContext.Clubs.Where(c => c.Id == clubId).FirstAsync(cancellationToken).ConfigureAwait(false);
+        club.DefaultScoringSystemId = null;
+
         // ScoringSystems
         var scoringSystems = await _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.ScoringSystems.RemoveRange(scoringSystems);
@@ -1718,16 +2060,16 @@ public class BackupService : IBackupService
         _dbContext.ClubSequences.RemoveRange(clubSequences);
 
         // Orphaned Files cleanup (only delete club logo files that are not referenced elsewhere)
-        var club = await _dbContext.Clubs
+        var clubInfo = await _dbContext.Clubs
             .AsNoTracking()
             .Where(c => c.Id == clubId)
             .Select(c => new { c.LogoFileId })
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        if (club?.LogoFileId.HasValue == true)
+        if (clubInfo?.LogoFileId.HasValue == true)
         {
-            var logoFileId = club.LogoFileId.Value;
+            var logoFileId = clubInfo.LogoFileId.Value;
 
             // Check if this file is referenced by any other club or supporter
             var isReferencedByOtherClub = await _dbContext.Clubs
