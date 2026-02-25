@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
 using System;
 using System.Collections.Generic;
@@ -23,19 +23,39 @@ namespace SailScores.Core.Model
             var minDate = childSeries.Races.Count > 0 ? childSeries.Races.Min(r => r.Date) : null;
 
             var state = RaceState.Scheduled;
-            if (childSeries.Races
-                .Any(r => r.State == RaceState.Raced))
+            if (childSeries.Races.Count > 0)
             {
-                state = RaceState.Raced;
-            } else if(childSeries.Races.All(r => r.State == RaceState.Abandoned))
+                // Series has races - determine state based on race states
+                if (childSeries.Races.Any(r => r.State == RaceState.Raced))
+                {
+                    state = RaceState.Raced;
+                }
+                else if (childSeries.Races.All(r => r.State == RaceState.Abandoned))
+                {
+                    state = RaceState.Abandoned;
+                }
+                else if (childSeries.Races.All(r => r.State == RaceState.Scheduled))
+                {
+                    state = RaceState.Scheduled;
+                }
+                else if (minDate.HasValue && minDate < DateTime.UtcNow)
+                {
+                    state = RaceState.Raced;
+                }
+            }
+            else
             {
-                state = RaceState.Abandoned;
-            } else if(childSeries.Races.All(r => r.State == RaceState.Scheduled))
-            {
-                state = RaceState.Scheduled;
-            } else if(minDate.HasValue && minDate < DateTime.UtcNow)
-            {
-                state = RaceState.Raced;
+                // Series has no races - determine state based on StartDate
+                if (childSeries.StartDate.HasValue && childSeries.StartDate.Value >= DateOnly.FromDateTime(DateTime.UtcNow))
+                {
+                    // Start date is today or in the future - mark as Scheduled
+                    state = RaceState.Scheduled;
+                }
+                else
+                {
+                    // No start date or start date is in the past - mark as Abandoned
+                    state = RaceState.Abandoned;
+                }
             }
 
             this.Id = childSeries.Id;
