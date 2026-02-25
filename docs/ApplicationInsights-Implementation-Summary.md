@@ -6,30 +6,33 @@ This document summarizes the Application Insights optimization implemented for S
 
 ## Files Added
 
-1. **SailScores.Web/Services/SailScoresTelemetryInitializer.cs**
+1. **SailScores.Web/Services/SailScoresTelemetryInitializer.cs** ✅ COMPLETE
    - Custom telemetry initializer that enriches telemetry with SailScores-specific context
    - Adds cloud role name, club context, and user information
-   - Filters static file requests
+   - Adds authenticated user context when available
 
-2. **SailScores.Web/Services/SailScoresTelemetryProcessor.cs**
+2. **SailScores.Web/Services/SailScoresTelemetryProcessor.cs** ✅ COMPLETE
    - Custom telemetry processor for intelligent filtering
-   - Always tracks exceptions and failures
+   - Always tracks exceptions and failures (not sampled)
    - Filters successful static file requests to reduce volume
+   - Allows failed requests and dependencies to pass through
 
-3. **SailScores.Web/appsettings.ApplicationInsights.json**
+3. **SailScores.Web/appsettings.ApplicationInsights.json** ⏳ IN PROGRESS
    - Detailed sampling configuration
    - MaxTelemetryItemsPerSecond: 5 (adjustable based on needs)
    - Exception types excluded from sampling
+   - Status: Configuration structure needs to be populated
 
-4. **docs/ApplicationInsights-BestPractices.md**
+4. **docs/ApplicationInsights-BestPractices.md** ⏳ IN PROGRESS
    - Comprehensive documentation
    - Configuration guidelines
-   - Monitoring queries
+   - Monitoring queries with Kusto examples
    - Troubleshooting guide
+   - Status: Documentation structure needs to be created
 
 ## Files Modified
 
-1. **SailScores.Web/Startup.cs**
+1. **SailScores.Web/Startup.cs** ✅ COMPLETE
    - Enhanced Application Insights configuration with:
      - Adaptive sampling enabled
      - Performance counter collection
@@ -38,15 +41,16 @@ This document summarizes the Application Insights optimization implemented for S
    - Added custom telemetry initializer and processor
    - Added health check endpoint at `/health`
 
-2. **SailScores.Web/appsettings.json**
+2. **SailScores.Web/appsettings.json** ✅ COMPLETE
    - Optimized logging configuration
    - Proper log levels for Application Insights
    - Entity Framework logging configured
+   - Note: Additional Application Insights-specific settings should be in appsettings.ApplicationInsights.json
 
-3. **SailScores.Web/Controllers/ErrorController.cs**
+3. **SailScores.Web/Controllers/ErrorController.cs** ✅ COMPLETE
    - Refactored to use ILogger instead of TelemetryClient
    - Follows ASP.NET Core best practices
-   - Structured logging implementation
+   - Structured logging implementation for 404 and unhandled exceptions
 
 ## Key Features
 
@@ -200,18 +204,37 @@ exceptions
 
 ## Next Steps
 
-1. Deploy to Azure App Service
-2. Configure connection string in Application Settings
-3. Monitor Live Metrics for 24 hours
-4. Adjust sampling settings if needed (see appsettings.ApplicationInsights.json)
-5. Set up alerts for critical metrics
-6. Create custom dashboards for key scenarios
+1. **Complete Configuration Files** (In Progress)
+   - Populate `appsettings.ApplicationInsights.json` with sampling settings
+   - Create `ApplicationInsights-BestPractices.md` with detailed guidelines
+
+2. **Deploy to Azure App Service**
+   - Ensure Application Insights resource is created in Azure Portal
+   - Configure connection string in Application Settings
+
+3. **Configure Connection String in Azure Portal**
+   - App Service > Configuration > Application Settings
+   - Add `APPLICATIONINSIGHTS_CONNECTION_STRING`
+
+4. **Monitor Live Metrics**
+   - Monitor for 24 hours after deployment
+   - Watch for any unexpected telemetry patterns
+
+5. **Adjust Sampling Settings**
+   - Monitor ingestion rates in Application Insights
+   - Adjust MaxTelemetryItemsPerSecond if needed (appsettings.ApplicationInsights.json)
+
+6. **Set Up Alerts and Dashboards**
+   - Create custom dashboards for key scenarios
+   - Set up alerts for critical metrics (exceptions, failures, performance degradation)
 
 ## Support
 
-- Review docs/ApplicationInsights-BestPractices.md for detailed information
+- Review docs/ApplicationInsights-BestPractices.md for detailed information (being created)
 - Check Azure Monitor documentation: https://docs.microsoft.com/azure/azure-monitor/
 - Monitor Application Insights in Azure Portal
+- See appsettings.ApplicationInsights.json for sampling configuration
+- Current implementation uses ILogger for all logging - see Usage Guidelines above
 
 ## Version
 

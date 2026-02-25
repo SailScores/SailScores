@@ -111,10 +111,17 @@ public class CompetitorController : Controller
             }
             return NotFound();
         }
+
+        // Get club weather settings for wind speed units
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var club = await _clubService.GetFullClubExceptScores(clubId);
+        var windSpeedUnits = club?.WeatherSettings?.WindSpeedUnits ?? "kts";
+
         var vm = new ClubItemViewModel<CompetitorStatsViewModel>
         {
             ClubInitials = clubInitials.ToUpperInvariant(),
-            Item = competitorStats
+            Item = competitorStats,
+            WindSpeedUnits = windSpeedUnits
         };
         return View(vm);
     }
@@ -133,6 +140,26 @@ public class CompetitorController : Controller
             return Json(String.Empty);
         }
         return Json(ranks);
+    }
+
+    [AllowAnonymous]
+    [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "competitorId", "seasonName", "groupByDirection" })]
+    public async Task<JsonResult> WindStats(
+        Guid competitorId,
+        string seasonName = null,
+        bool groupByDirection = false)
+    {
+        var stats = await _competitorService.GetCompetitorWindStatsAsync(
+            competitorId,
+            seasonName,
+            groupByDirection);
+
+        if (stats == null || !stats.Any())
+        {
+            return Json(Array.Empty<object>());
+        }
+
+        return Json(stats);
     }
 
 

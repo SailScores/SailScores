@@ -18,17 +18,23 @@ public class CompetitorService : ICompetitorService
     private readonly ISailScoresContext _dbContext;
     private readonly IForwarderService _forwarderService;
     private readonly IMapper _mapper;
+    private readonly IClubService _clubService;
+    private readonly IConversionService _conversionService;
 
     public string CompetitorSequenceName = "Competitor";
 
     public CompetitorService(
         ISailScoresContext dbContext,
         IForwarderService forwarderService,
-        IMapper mapper)
+        IMapper mapper,
+        IClubService clubService,
+        IConversionService conversionService)
     {
         _dbContext = dbContext;
         _forwarderService = forwarderService;
         _mapper = mapper;
+        _clubService = clubService;
+        _conversionService = conversionService;
     }
 
 
@@ -93,16 +99,31 @@ public class CompetitorService : ICompetitorService
 
     public async Task<Competitor> GetCompetitorByUrlNameAsync(Guid clubId, string urlName)
     {
-        var comps = await GetCompetitorsAsync(clubId, null, true);
+        // First try to find by UrlName (active preferred)
+        var dbCompetitor = await _dbContext.Competitors
+            .Where(c => c.ClubId == clubId && c.UrlName == urlName && (c.IsActive ?? true))
+            .Include(c => c.BoatClass)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
 
-        var comp = comps.Where(c => c.IsActive)
-            .FirstOrDefault(c => c.UrlName == urlName);
-        comp ??= comps.Where(c => !c.IsActive)
-            .FirstOrDefault(c => c.UrlName == urlName);
-        comp ??= comps.FirstOrDefault(c =>
-            String.Equals(UrlUtility.GetUrlName(c.SailNumber), urlName, StringComparison.OrdinalIgnoreCase));
+        // Try inactive competitors if not found
+        dbCompetitor ??= await _dbContext.Competitors
+            .Where(c => c.ClubId == clubId && c.UrlName == urlName && !(c.IsActive ?? true))
+            .Include(c => c.BoatClass)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
 
-        return comp;
+        // Fallback: try UrlId if it exists and matches the URL name
+        if (dbCompetitor == null && urlName.Length <= 20)
+        {
+            dbCompetitor = await _dbContext.Competitors
+                .Where(c => c.ClubId == clubId && c.UrlId == urlName)
+                .Include(c => c.BoatClass)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+        }
+
+        return _mapper.Map<Competitor>(dbCompetitor);
     }
 
     public async Task<Competitor> GetCompetitorBySailNumberAsync(Guid clubId, string sailNumber)
@@ -686,5 +707,198 @@ public class CompetitorService : ICompetitorService
         }).ConfigureAwait(false);
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
+        Guid competitorId,
+        string seasonUrlName = null,
+        bool groupByDirection = false)
+    {
+        // Get the competitor's club to determine wind speed units
+        var competitor = await _dbContext.Competitors
+            .AsNoTracking()
+            .Where(c => c.Id == competitorId)
+            .Select(c => new { c.ClubId })
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
+
+        if (competitor == null)
+        {
+            return new List<CompetitorWindStats>();
+        }
+
+        // Get club's preferred wind speed units
+        var club = await _clubService.GetMinimalClub(competitor.ClubId);
+        var preferredUnits = club?.WeatherSettings?.WindSpeedUnits ?? "kts";
+
+        // Get all races for this competitor with weather data
+        var racesQuery = _dbContext.Scores
+            .AsNoTracking()
+            .Where(s => s.CompetitorId == competitorId)
+            .Where(s => s.Race.Weather != null)
+            .Where(s => s.Race.Weather.WindSpeedMeterPerSecond != null)
+            .Where(s => s.Place != null); // Only races where they finished
+
+        // Filter by season if specified
+        if (!string.IsNullOrEmpty(seasonUrlName))
+        {
+            racesQuery = racesQuery.Where(s =>
+                s.Race.SeriesRaces.Any(sr =>
+                    sr.Series.Season.UrlName == seasonUrlName));
+        }
+
+        var raceData = await racesQuery
+            .Select(s => new
+            {
+                s.Place,
+                s.Race.Weather.WindSpeedMeterPerSecond,
+                s.Race.Weather.WindDirectionDegrees,
+                TotalStarters = s.Race.Scores.Count(sc => sc.Place != null)
+            })
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        if (!raceData.Any())
+        {
+            return new List<CompetitorWindStats>();
+        }
+
+        // Define dynamic wind speed ranges based on preferred units
+        var windRanges = GetWindSpeedRanges(preferredUnits);
+
+        // Transform data with wind range and direction
+        var transformedData = raceData
+            .Select(r =>
+            {
+                // Convert wind speed from m/s to preferred units
+                var windSpeedInPreferredUnits = _conversionService.Convert(
+                    r.WindSpeedMeterPerSecond,
+                    _conversionService.MeterPerSecond,
+                    preferredUnits);
+
+                var windRange = windRanges.FirstOrDefault(wr =>
+                    windSpeedInPreferredUnits >= wr.Min &&
+                    windSpeedInPreferredUnits < wr.Max);
+                if(windRange == default)
+                {
+                    windRange = windRanges.Last();
+                }
+
+                return new
+                {
+                    r.Place,
+                    r.TotalStarters,
+                    WindRange = windRange.Label,
+                    Midpoint = windRange.Midpoint,
+                    Direction = groupByDirection ? GetWindDirectionLabel(r.WindDirectionDegrees) : null,
+                    GroupKey = groupByDirection
+                        ? $"{windRange.Label}_{GetWindDirectionLabel(r.WindDirectionDegrees)}"
+                        : windRange.Label
+                };
+            })
+            .ToList();
+
+        // Group by key and calculate stats
+        var stats = transformedData
+            .GroupBy(x => x.GroupKey)
+            .Select(group =>
+            {
+                var races = group.ToList();
+                var firstRace = races.First();
+                var parts = group.Key.Split('_');
+
+                return new CompetitorWindStats
+                {
+                    WindSpeedRange = parts[0],
+                    WindDirection = parts.Length > 1 ? parts[1] : null,
+                    WindSpeedMidpoint = firstRace.Midpoint,
+                    RaceCount = races.Count,
+                    AveragePercentPlace = races.Average(r =>
+                        r.TotalStarters > 1
+                            ? ((decimal)r.TotalStarters - r.Place.Value) / (r.TotalStarters - 1) * 100
+                            : 100),
+                    AverageFinish = races.Average(r => (decimal)r.Place.Value),
+                    BestFinish = races.Min(r => r.Place),
+                    WinCount = races.Count(r => r.Place == 1),
+                    PodiumCount = races.Count(r => r.Place <= 3)
+                };
+            })
+            .OrderBy(s => s.WindSpeedMidpoint)
+            .ThenBy(s => s.WindDirection)
+            .ToList();
+
+        return stats;
+    }
+
+    private List<(decimal Min, decimal Max, string Label, decimal Midpoint)> GetWindSpeedRanges(string units)
+    {
+        // Normalize unit strings
+        var unitUpper = units?.ToUpperInvariant() ?? "KTS";
+
+        // Define ranges based on unit type
+        if (unitUpper.Contains("MPH"))
+        {
+            // Miles per hour ranges
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 6m, "0-6", 3m),
+                (6m, 12m, "6-12", 9m),
+                (12m, 18m, "12-18", 15m),
+                (18m, 24m, "18-24", 21m),
+                (24m, 999m, "24+", 28m)
+            };
+        }
+        else if (unitUpper.Contains("KPH") || unitUpper.Contains("KM/H") || unitUpper.Contains("KMPH"))
+        {
+            // Kilometers per hour ranges
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 10m, "0-10", 5m),
+                (10m, 20m, "10-20", 15m),
+                (20m, 30m, "20-30", 25m),
+                (30m, 40m, "30-40", 35m),
+                (40m, 999m, "40+", 45m)
+            };
+        }
+        else if (unitUpper.Contains("M/S") || unitUpper.Contains("METER"))
+        {
+            // Meters per second ranges
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 2.5m, "0-2.5", 1.25m),
+                (2.5m, 5m, "2.5-5", 3.75m),
+                (5m, 7.5m, "5-7.5", 6.25m),
+                (7.5m, 10m, "7.5-10", 8.75m),
+                (10m, 999m, "10+", 12m)
+            };
+        }
+        else // Default to knots
+        {
+            // Knots ranges (default)
+            return new List<(decimal, decimal, string, decimal)>
+            {
+                (0m, 5m, "0-5", 2.5m),
+                (5m, 10m, "5-10", 7.5m),
+                (10m, 15m, "10-15", 12.5m),
+                (15m, 20m, "15-20", 17.5m),
+                (20m, 999m, "20+", 25m)
+            };
+        }
+    }
+
+    private static string GetWindDirectionLabel(decimal? degrees)
+    {
+        if (!degrees.HasValue) return "Unknown";
+
+        var deg = (double)degrees.Value;
+        if (deg >= 337.5 || deg < 22.5) return "N";
+        if (deg >= 22.5 && deg < 67.5) return "NE";
+        if (deg >= 67.5 && deg < 112.5) return "E";
+        if (deg >= 112.5 && deg < 157.5) return "SE";
+        if (deg >= 157.5 && deg < 202.5) return "S";
+        if (deg >= 202.5 && deg < 247.5) return "SW";
+        if (deg >= 247.5 && deg < 292.5) return "W";
+        if (deg >= 292.5 && deg < 337.5) return "NW";
+        return "Unknown";
     }
 }

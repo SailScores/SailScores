@@ -1,11 +1,18 @@
 using System;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using SailScores.Core.Model.BackupEntities;
+using SailScores.Core.Services;
 using SailScores.Web.Authorization;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
+using IBackupService = SailScores.Web.Services.Interfaces.IBackupService;
+using IClubService = SailScores.Web.Services.Interfaces.IClubService;
 
 namespace SailScores.Web.Controllers;
 
@@ -16,18 +23,24 @@ public class BackupController : Controller
 
     private const string CLUBINITIALS_FIELDNAME = "ClubInitials";
     private const string ERROR_FIELDNAME = "Error";
+    private const string BACKUP_CACHE_PREFIX = "backup_";
+    private const int BACKUP_CACHE_MINUTES = 30;
+
     private readonly IBackupService _backupService;
     private readonly IAuthorizationService _authService;
     private readonly IClubService _clubService;
+    private readonly IDistributedCache _cache;
 
     public BackupController(
         IBackupService backupService,
         IAuthorizationService authService,
-        IClubService clubService)
+        IClubService clubService,
+        IDistributedCache cache)
     {
         _backupService = backupService;
         _authService = authService;
         _clubService = clubService;
+        _cache = cache;
     }
 
     // GET: /{clubInitials}/Backup
@@ -101,8 +114,20 @@ public class BackupController : Controller
                 return RedirectToAction(nameof(Upload), new { clubInitials });
             }
 
+            // Perform comprehensive dry-run validation
+            var dryRunResult = await _backupService.ValidateBackupAsync(clubInitials, backup);
+
+            // Cache the backup data temporarily (30 minutes)
+            var cacheToken = Guid.NewGuid().ToString();
+            var cacheKey = $"{BACKUP_CACHE_PREFIX}{cacheToken}";
+            var json = JsonSerializer.Serialize(backup);
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(BACKUP_CACHE_MINUTES)
+            };
+            await _cache.SetStringAsync(cacheKey, json, cacheOptions);
+
             // Store backup in TempData for confirmation step
-            // Since ClubBackupData can be large, we'll re-read on restore
             var club = await _clubService.GetClubForClubHome(clubInitials);
 
             return View("Confirm", new BackupConfirmViewModel
@@ -112,7 +137,9 @@ public class BackupController : Controller
                 SourceClubName = validation.SourceClubName,
                 BackupDate = validation.CreatedDateUtc,
                 BackupVersion = validation.Version,
-                FileName = backupFile.FileName
+                FileName = backupFile.FileName,
+                DryRunResult = dryRunResult,
+                BackupCacheToken = cacheToken
             });
         }
         catch (Exception ex)
@@ -125,28 +152,51 @@ public class BackupController : Controller
     // POST: /{clubInitials}/Backup/Restore
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Restore(string clubInitials, IFormFile backupFile, bool preserveClubSettings = true)
+    public async Task<IActionResult> Restore(string clubInitials, string backupCacheToken, bool preserveClubName = true)
     {
         ViewData[CLUBINITIALS_FIELDNAME] = clubInitials;
 
-        if (backupFile == null || backupFile.Length == 0)
+        if (string.IsNullOrEmpty(backupCacheToken))
         {
-            TempData[ERROR_FIELDNAME] = "Please select a backup file to restore.";
+            TempData[ERROR_FIELDNAME] = "Backup session expired. Please upload the file again.";
             return RedirectToAction(nameof(Upload), new { clubInitials });
         }
 
         try
         {
-            using var stream = backupFile.OpenReadStream();
-            var (backup, validation) = await _backupService.ReadBackupFileAsync(stream);
+            // Retrieve backup from cache
+            var cacheKey = $"{BACKUP_CACHE_PREFIX}{backupCacheToken}";
+            var cachedJson = await _cache.GetStringAsync(cacheKey);
 
-            if (!validation.IsValid)
+            if (string.IsNullOrEmpty(cachedJson))
             {
-                TempData[ERROR_FIELDNAME] = $"Invalid backup file: {validation.ErrorMessage}";
+                TempData[ERROR_FIELDNAME] = "Backup session expired. Please upload the file again.";
                 return RedirectToAction(nameof(Upload), new { clubInitials });
             }
 
-            var success = await _backupService.RestoreBackupAsync(clubInitials, backup, preserveClubSettings);
+            var backup = JsonSerializer.Deserialize<ClubBackupData>(cachedJson);
+
+            if (backup == null)
+            {
+                TempData[ERROR_FIELDNAME] = "Failed to deserialize backup data. Please upload the file again.";
+                return RedirectToAction(nameof(Upload), new { clubInitials });
+            }
+
+            // Perform comprehensive dry-run validation before restoring
+            var dryRunResult = await _backupService.ValidateBackupAsync(clubInitials, backup);
+
+            if (!dryRunResult.CanRestore)
+            {
+                // Show errors to user without attempting restore
+                var errorList = string.Join("; ", dryRunResult.Errors);
+                TempData[ERROR_FIELDNAME] = $"Cannot restore backup due to validation errors: {errorList}";
+                return RedirectToAction(nameof(Upload), new { clubInitials });
+            }
+
+            var success = await _backupService.RestoreBackupAsync(clubInitials, backup, preserveClubName);
+
+            // Clear cache after successful restore
+            await _cache.RemoveAsync(cacheKey);
 
             if (success)
             {
@@ -187,4 +237,12 @@ public class BackupConfirmViewModel
     public DateTime BackupDate { get; set; }
     public int BackupVersion { get; set; }
     public string FileName { get; set; }
+
+    // Dry-run validation results
+    public BackupDryRunResult DryRunResult { get; set; }
+    public bool HasValidationIssues => DryRunResult?.ReferenceIssues?.HasIssues == true || (DryRunResult?.Warnings?.Count ?? 0) > 0;
+    public bool CanProceedWithRestore => DryRunResult?.CanRestore == true;
+
+    // Cache token for storing backup data temporarily between validation and restore
+    public string BackupCacheToken { get; set; }
 }

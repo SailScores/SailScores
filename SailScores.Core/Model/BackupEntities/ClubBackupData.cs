@@ -45,6 +45,8 @@ public class ClubBackupData
     public IList<FileBackup> Files { get; set; }
     public IList<SeriesChartResultsBackup> SeriesChartResults { get; set; }
     public IList<HistoricalResultsBackup> HistoricalResults { get; set; }
+    public IList<ChangeTypeBackup> ChangeTypes { get; set; }
+    public IList<CompetitorChangeBackup> CompetitorChanges { get; set; }
 
     // Default scoring system name for reference
     public string DefaultScoringSystemName { get; set; }

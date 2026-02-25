@@ -6,7 +6,7 @@
 }
 
 <h2>Confirm Restore</h2>
-<p class="lead">Review the backup details before restoring to @Model.ClubName.</p>
+<p class="lead">Review the backup details and validation results before restoring to @Model.ClubName.</p>
 
 <hr />
 
@@ -34,39 +34,138 @@
     </div>
 </div>
 
+@if (Model.DryRunResult != null)
+{
+    <!-- Validation Results -->
+    @if (Model.DryRunResult.Errors.Any())
+    {
+        <div class="alert alert-danger" role="alert">
+            <h5><i class="fas fa-times-circle me-2"></i>Validation Errors</h5>
+            <p class="mb-2">The following errors prevent restoring this backup:</p>
+            <ul class="mb-0">
+                @foreach (var error in Model.DryRunResult.Errors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (Model.DryRunResult.ReferenceIssues?.HasIssues == true)
+    {
+        <div class="alert alert-warning" role="alert">
+            <h5><i class="fas fa-exclamation-circle me-2"></i>Reference Issues Found</h5>
+            <p class="mb-2">The backup contains the following reference issues (restore will still proceed):</p>
+            <ul class="mb-0">
+                @if (Model.DryRunResult.ReferenceIssues.OrphanedScoreCompetitors.Any())
+                {
+                    <li><strong>Orphaned Score References:</strong> @Model.DryRunResult.ReferenceIssues.OrphanedScoreCompetitors.Count issue(s)</li>
+                }
+                @if (Model.DryRunResult.ReferenceIssues.OrphanedCompetitorBoatClasses.Any())
+                {
+                    <li><strong>Orphaned Competitor Boat Classes:</strong> @Model.DryRunResult.ReferenceIssues.OrphanedCompetitorBoatClasses.Count issue(s)</li>
+                }
+                @if (Model.DryRunResult.ReferenceIssues.OrphanedFleetBoatClasses.Any())
+                {
+                    <li><strong>Orphaned Fleet Boat Classes:</strong> @Model.DryRunResult.ReferenceIssues.OrphanedFleetBoatClasses.Count issue(s)</li>
+                }
+                @if (Model.DryRunResult.ReferenceIssues.OrphanedSeriesSeasons.Any())
+                {
+                    <li><strong>Orphaned Series Seasons:</strong> @Model.DryRunResult.ReferenceIssues.OrphanedSeriesSeasons.Count issue(s)</li>
+                }
+                @if (Model.DryRunResult.ReferenceIssues.OrphanedSeriesFleets.Any())
+                {
+                    <li><strong>Orphaned Series Fleets:</strong> @Model.DryRunResult.ReferenceIssues.OrphanedSeriesFleets.Count issue(s)</li>
+                }
+                @if (Model.DryRunResult.ReferenceIssues.OrphanedSeriesScoringSystems.Any())
+                {
+                    <li><strong>Orphaned Series Scoring Systems:</strong> @Model.DryRunResult.ReferenceIssues.OrphanedSeriesScoringSystems.Count issue(s)</li>
+                }
+                @if (Model.DryRunResult.ReferenceIssues.UnresolvableParentScoringSystems.Any())
+                {
+                    <li><strong>Unresolvable Parent Scoring Systems:</strong> @Model.DryRunResult.ReferenceIssues.UnresolvableParentScoringSystems.Count issue(s)</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (Model.DryRunResult.Warnings.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <h5><i class="fas fa-info-circle me-2"></i>Validation Warnings</h5>
+            <ul class="mb-0">
+                @foreach (var warning in Model.DryRunResult.Warnings)
+                {
+                    <li>@warning</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (Model.DryRunResult.IsValid && !Model.DryRunResult.ReferenceIssues?.HasIssues == true)
+    {
+        <div class="alert alert-success" role="alert">
+            <h5><i class="fas fa-check-circle me-2"></i>Validation Passed</h5>
+            <p class="mb-0">The backup has been validated and is ready for restore.</p>
+        </div>
+    }
+}
+
 <div class="alert alert-danger">
     <h5><i class="fas fa-exclamation-triangle me-2"></i>Final Warning</h5>
     <p class="mb-0">
-        Clicking "Confirm Restore" will permanently delete <strong>all existing data</strong> in 
-        <strong>@Model.ClubName</strong> and replace it with the backup data from 
-        <strong>@Model.SourceClubName</strong>.
+        @if (Model.ClubName == Model.SourceClubName)
+        {
+          @:Clicking "Confirm Restore" will permanently delete all existing data in
+          @:<strong> @Model.ClubName </strong> and replace it with the backup data.
+        } else
+        {
+          @:Clicking "Confirm Restore" will permanently delete all existing data in
+          @:<strong> @Model.ClubName </strong> and replace it with the backup data from
+          @:<strong> @Model.SourceClubName </strong>.
+        }
+
         This action <strong>cannot be undone</strong>.
     </p>
 </div>
 
-<form asp-action="Restore" method="post" enctype="multipart/form-data">
-    <div class="mb-3">
-        <label for="backupFile" class="form-label">Re-select the backup file to confirm</label>
-        <input type="file" class="form-control" id="backupFile" name="backupFile" 
-               accept=".gz,.json" required />
-    </div>
+@if (Model.CanProceedWithRestore)
+{
+    <form asp-action="Restore" method="post">
+        <input type="hidden" name="backupCacheToken" value="@Model.BackupCacheToken" />
 
-    <div class="mb-3">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="preserveClubSettings" 
-                   name="preserveClubSettings" value="true" checked />
-            <label class="form-check-label" for="preserveClubSettings">
-                Preserve current club name, initials, and URL
-            </label>
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="preserveClubName" 
+                       name="preserveClubName" value="true" checked />
+                <label class="form-check-label" for="preserveClubName">
+                    Preserve current club name
+                </label>
+            </div>
+            <div class="form-text">
+                The club initials will always be preserved and not taken from the backup. This option only affects the club name.
+            </div>
         </div>
-    </div>
 
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-danger">
-            <i class="fas fa-check me-2"></i>Confirm Restore
-        </button>
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            <i class="fas fa-times me-2"></i>Cancel
-        </a>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-check me-2"></i>Confirm Restore
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-danger">
+        <p class="mb-0">
+            <i class="fas fa-lock me-2"></i>
+            <strong>Cannot proceed:</strong> This backup cannot be restored due to validation errors shown above.
+        </p>
     </div>
-</form>
+    <a asp-action="Upload" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Choose Different File
+    </a>
+}

@@ -36,5 +36,11 @@ namespace SailScores.Core.Services
             string userName = "");
         Task<List<HistoricalNote>> GetCompetitorParticipationAsync(Guid competitorId);
         Task AddHistoryElement(Guid competitorId, string note, string userName);
+#pragma warning disable CA1054 // Uri parameters should not be strings
+        Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
+            Guid competitorId,
+            string seasonUrlName = null,
+            bool groupByDirection = false);
+#pragma warning restore CA1054 // Uri parameters should not be strings
     }
 }
