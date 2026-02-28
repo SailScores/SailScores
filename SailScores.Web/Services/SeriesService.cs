@@ -76,6 +76,15 @@ public class SeriesService : ISeriesService
             .ThenBy(s => s.Name);
     }
 
+    private async Task<IEnumerable<SeriesSummary>> GetSummarySeriesBySeasonAsync(Guid clubId, Guid seasonId)
+    {
+        var allSummaries = await GetSummarySeriesAsync(clubId);
+        return allSummaries
+            .Where(s => s.Season?.Id == seasonId)
+            .OrderBy(s => s.Name);
+    }
+
+
 
     public async Task<SeriesWithOptionsViewModel> GetBlankVmForCreate(string clubInitials)
     {
@@ -116,8 +125,9 @@ public class SeriesService : ISeriesService
     public async Task<MultipleSeriesWithOptionsViewModel> GetBlankVmForCreateMultiple(string clubInitials)
     {
         var blankSingle = await GetBlankVmForCreate(clubInitials);
+        var clubId = await _coreClubService.GetClubId(clubInitials);
 
-        return new MultipleSeriesWithOptionsViewModel
+        var vm = new MultipleSeriesWithOptionsViewModel
         {
             SeasonId = blankSingle.SeasonId,
             SeasonOptions = blankSingle.SeasonOptions,
@@ -128,8 +138,17 @@ public class SeriesService : ISeriesService
             Series = new List<MultipleSeriesRowViewModel>
             {
                 new()
-            }
+            },
+            SummarySummaryOption = "none"
         };
+
+        // Load summary series for the selected season if available
+        if (vm.SeasonId != Guid.Empty)
+        {
+            vm.SummarySeriesOptions = await GetSummarySeriesBySeasonAsync(clubId, vm.SeasonId);
+        }
+
+        return vm;
     }
 
     public async Task<IList<Guid>> CreateMultipleAsync(
@@ -157,10 +176,14 @@ public class SeriesService : ISeriesService
             createdIds.Add(id);
         }
 
-        if (model.CreateSummarySeries)
+        if (model.SummarySummaryOption == "create")
         {
             var summaryId = await CreateSummarySeriesAsync(model, clubId, season, createdIds, updatedBy);
             createdIds.Add(summaryId);
+        }
+        else if (model.SummarySummaryOption == "existing" && model.ExistingSummarySeriesId.HasValue && model.ExistingSummarySeriesId != Guid.Empty)
+        {
+            await AddSeriesToExistingSummaryAsync(model.ExistingSummarySeriesId.Value, createdIds, updatedBy);
         }
 
         return createdIds;
@@ -598,5 +621,48 @@ public class SeriesService : ISeriesService
         };
 
         return await _coreSeriesService.SaveNewSeries(summaryVm);
+    }
+
+    private async Task AddSeriesToExistingSummaryAsync(Guid summarySeriesId, List<Guid> newSeriesIds, string updatedBy)
+    {
+        var summarySeries = await _coreSeriesService.GetOneSeriesAsync(summarySeriesId);
+        if (summarySeries == null)
+        {
+            throw new InvalidOperationException("The selected summary series was not found.");
+        }
+
+        if (summarySeries.Type != SeriesType.Summary)
+        {
+            throw new InvalidOperationException("The selected series is not a summary series.");
+        }
+
+        // Add new series to existing children
+        var existingChildren = summarySeries.ChildrenSeriesIds?.ToList() ?? new List<Guid>();
+        existingChildren.AddRange(newSeriesIds);
+
+        var vmToUpdate = new SeriesWithOptionsViewModel
+        {
+            Id = summarySeries.Id,
+            ClubId = summarySeries.ClubId,
+            Name = summarySeries.Name,
+            SeasonId = summarySeries.Season.Id,
+            Season = summarySeries.Season,
+            Description = summarySeries.Description,
+            Type = SeriesType.Summary,
+            ScoringSystemId = summarySeries.ScoringSystem?.Id,
+            TrendOption = summarySeries.TrendOption,
+            HideDncDiscards = summarySeries.HideDncDiscards,
+            ExcludeFromCompetitorStats = summarySeries.ExcludeFromCompetitorStats,
+            IsImportantSeries = summarySeries.IsImportantSeries,
+            ParentSeriesIds = null,
+            ChildrenSeriesAsSingleRace = summarySeries.ChildrenSeriesAsSingleRace,
+            ChildrenSeriesIds = existingChildren,
+            DateRestricted = false,
+            EnforcedStartDate = null,
+            EnforcedEndDate = null,
+            UpdatedBy = updatedBy
+        };
+
+        await Update(vmToUpdate);
     }
 }

@@ -368,6 +368,7 @@ public class SeriesController : Controller
         var clubId = await _clubService.GetClubId(clubInitials);
 
         var vm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
+        vm.ClubId = clubId;
         return View(vm);
     }
 
@@ -385,6 +386,7 @@ public class SeriesController : Controller
             var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
             return View(model);
         }
 
@@ -398,6 +400,7 @@ public class SeriesController : Controller
             var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
 
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
@@ -407,6 +410,7 @@ public class SeriesController : Controller
             var blankVm = await _seriesService.GetBlankVmForCreateMultiple(clubInitials);
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
+            model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
 
             ModelState.AddModelError(string.Empty, "A problem occurred creating these series. Check" +
                 " for duplicate names within the selected season or invalid date ranges.");

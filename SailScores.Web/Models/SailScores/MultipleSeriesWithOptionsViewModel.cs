@@ -6,6 +6,8 @@ namespace SailScores.Web.Models.SailScores;
 
 public class MultipleSeriesWithOptionsViewModel
 {
+    public Guid ClubId { get; set; }
+
     [Display(Name = "Season")]
     [Required]
     public Guid SeasonId { get; set; }
@@ -25,14 +27,26 @@ public class MultipleSeriesWithOptionsViewModel
 
     public IList<MultipleSeriesRowViewModel> Series { get; set; } = new List<MultipleSeriesRowViewModel>();
 
-    [Display(Name = "Create summary series")]
-    public bool CreateSummarySeries { get; set; }
+    [Display(Name = "Add series to summary series")]
+    public string? SummarySummaryOption { get; set; } = "none"; // "none", "create", or "existing"
 
     [Display(Name = "Summary series name")]
     public string? SummarySeriesName { get; set; }
 
+    [Display(Name = "Use existing summary series")]
+    public Guid? ExistingSummarySeriesId { get; set; }
+
+    public IEnumerable<SeriesSummary> SummarySeriesOptions { get; set; } = new List<SeriesSummary>();
+
     [Display(Name = "Children series each count as a single race")]
     public bool SummaryChildrenSeriesAsSingleRace { get; set; }
+
+    [Obsolete("Use SummarySummaryOption instead")]
+    public bool CreateSummarySeries 
+    { 
+        get => SummarySummaryOption == "create";
+        set => SummarySummaryOption = value ? "create" : "none";
+    }
 }
 
 public class MultipleSeriesRowViewModel
