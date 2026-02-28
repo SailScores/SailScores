@@ -35,6 +35,8 @@ FROM Races r WITH (NOLOCK)
     ON c.Id = r.ClubId
 WHERE c.Id = @ClubId
     AND ISNULL(r.[State],'Raced') = 'Raced'
+    AND (@StartDate IS NULL OR r.Date >= @StartDate)
+    AND (@EndDate IS NULL OR r.Date <= @EndDate)
 
 GROUP BY
 c.Name,

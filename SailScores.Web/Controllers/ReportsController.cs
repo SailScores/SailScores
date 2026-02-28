@@ -92,12 +92,15 @@ public class ReportsController : Controller
         return View(model);
     }
 
-    public async Task<ActionResult> ClubStats(string clubInitials)
+    public async Task<ActionResult> ClubStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
     {
 
         ViewData["ClubInitials"] = clubInitials;
 
-        var stats = await _webClubService.GetClubStats(clubInitials);
+        var stats = await _webClubService.GetClubStats(clubInitials, startDate, endDate);
         stats.CanEdit = true;
         return View(stats);
     }
@@ -172,10 +175,13 @@ public class ReportsController : Controller
         return File(bytes, "text/csv", fileName);
     }
 
-    public async Task<ActionResult> ClubStatsExport(string clubInitials)
+    public async Task<ActionResult> ClubStatsExport(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
     {
 
-        var stats = await _webClubService.GetClubStats(clubInitials);
+        var stats = await _webClubService.GetClubStats(clubInitials, startDate, endDate);
 
         var csv = new System.Text.StringBuilder();
         csv.AppendLine("Season,Boat Class,Distinct Competitors,Races,Total Starts,Race Days,Average Competitors Per Race,First Race,Last Race");

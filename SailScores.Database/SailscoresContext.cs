@@ -140,12 +140,16 @@ public class SailScoresContext : DbContext, ISailScoresContext
     }
 
     public async Task<IList<ClubSeasonStats>> GetClubStats(
-        string clubInitials)
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
     {
         var query = await GetSqlQuery("ClubStats");
         var clubParam = new SqlParameter("ClubInitials", clubInitials);
+        var startDateParam = new SqlParameter("StartDate", (object)startDate ?? DBNull.Value);
+        var endDateParam = new SqlParameter("EndDate", (object)endDate ?? DBNull.Value);
         var result = await this.ClubSeasonStats
-            .FromSqlRaw(query, clubParam)
+            .FromSqlRaw(query, clubParam, startDateParam, endDateParam)
             .ToListAsync();
         return result;
     }

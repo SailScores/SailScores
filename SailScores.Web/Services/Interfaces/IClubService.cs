@@ -6,7 +6,10 @@ namespace SailScores.Web.Services.Interfaces;
 public interface IClubService
 {
     Task<Club> GetClubForClubHome(string clubInitials);
-    Task<ClubStatsViewModel> GetClubStats(string clubInitials);
+    Task<ClubStatsViewModel> GetClubStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null);
     Task<IEnumerable<AllClubStatsViewModel>> GetAllClubStats();
 
     Task<Guid> GetClubId(string initials);
