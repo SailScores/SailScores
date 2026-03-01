@@ -968,6 +968,8 @@ namespace SailScores.Core.Services
             existingSeries.DateRestricted = model.DateRestricted;
             existingSeries.EnforcedStartDate = model.EnforcedStartDate;
             existingSeries.EnforcedEndDate = model.EnforcedEndDate;
+            existingSeries.FleetId = model.FleetId;
+            existingSeries.UseFullRaceScores = model.UseFullRaceScores;
         }
 
         private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)

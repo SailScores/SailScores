@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,18 +25,31 @@ public class AppAAltFirstIsPoint7 : AppendixACalculator
             throw new ArgumentNullException(nameof(currentScore));
         }
 
-        decimal? returnScore =
-            Convert.ToDecimal(allScores
-                .Count(s =>
-                    currentScore.Place.HasValue
-                    && s.Race == currentScore.Race
-                    && s.Place < currentScore.Place
-                    && !ShouldAdjustOtherScores(s)
-                    ) + 1);
+        decimal? returnScore;
 
-        // usually if one of these conditions is true, the other is true as well,
-        // but this might catch some edge cases.
-        if (currentScore.Place == 1 && returnScore == 1)
+        if (_useOriginalPlace
+            && currentScore.Place.HasValue
+            && string.IsNullOrEmpty(currentScore.Code))
+        {
+            // UseFullRaceScores=true or no fleet: preserve the original race place as the score.
+            // GetTiedScore below may still override this for tied boats.
+            returnScore = Convert.ToDecimal(currentScore.Place.Value);
+        }
+        else
+        {
+            returnScore =
+                Convert.ToDecimal(allScores
+                    .Count(s =>
+                        currentScore.Place.HasValue
+                        && s.Race == currentScore.Race
+                        && s.Place < currentScore.Place
+                        && !ShouldAdjustOtherScores(s)
+                        ) + 1);
+        }
+
+        // used to check both place and returnScore, but that breaks fleet filtering, so now
+        // only checkign if returnScore is 1.
+        if (returnScore == 1)
         {
             returnScore = 0.7m;
         }

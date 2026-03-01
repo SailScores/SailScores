@@ -36,6 +36,12 @@ namespace SailScores.Core.Scoring
 
         protected IComparer<SeriesCompetitorResults> CompetitorComparer { get; set; }
 
+        // When true, GetBasicScore implementations should use the score's original Place value
+        // as the base rather than computing a rank from allScores.  This is set for:
+        //   - series with no fleet filter (standard scoring, place = score)
+        //   - series with UseFullRaceScores = true (preserve full-race positions)
+        protected bool _useOriginalPlace;
+
         protected BaseScoringCalculator(ScoringSystem scoringSystem)
         {
             ScoringSystem = scoringSystem;
@@ -385,16 +391,31 @@ namespace SailScores.Core.Scoring
         }
 
         // Ensure consistency of submitted results for calculations.
+        // Only scores belonging to series competitors are validated; non-fleet reference
+        // scores (included when UseFullRaceScores=true for correct position counting) are
+        // intentionally skipped.
         protected void ValidateSeries(SeriesResults results, IEnumerable<Score> scores)
         {
-            bool allRacesFound = scores.All(s => results.Races.Any(
-                r => r.Id == s.RaceId
-                    || r == s.Race));
-            bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
-                c => c.Id == s.CompetitorId
-                    || c == s.Competitor));
+            var seriesCompetitorIds = results.Competitors.Select(c => c.Id).ToHashSet();
+            var seriesCompetitorRefs = new HashSet<Competitor>(results.Competitors);
 
-            //Used to check and make sure all score codes were found. but no more.
+            // Filter to only the scores that belong to series competitors.
+            var seriesScores = scores
+                .Where(s => seriesCompetitorIds.Contains(s.CompetitorId)
+                    || seriesCompetitorRefs.Contains(s.Competitor))
+                .ToList();
+
+            var raceIds = results.Races.Select(r => r.Id).ToHashSet();
+            var raceRefs = new HashSet<Race>(results.Races, ReferenceEqualityComparer.Instance);
+
+            bool allRacesFound = seriesScores.All(s =>
+                raceIds.Contains(s.RaceId)
+                || raceRefs.Contains(s.Race)
+                || (s.Race != null && raceIds.Contains(s.Race.Id)));
+
+            bool allCompetitorsFound = seriesScores.All(s =>
+                seriesCompetitorIds.Contains(s.CompetitorId)
+                || seriesCompetitorRefs.Contains(s.Competitor));
 
             if (!allRacesFound)
             {
@@ -459,7 +480,13 @@ namespace SailScores.Core.Scoring
 
             if (returnScoreCode == null)
             {
-                returnScoreCode = GetScoreCode(DEFAULT_CODE);
+                // Only fall back to DEFAULT_CODE if we are not already looking it up,
+                // to prevent infinite recursion when DEFAULT_CODE itself is missing.
+                if (!scoreCodeName.Equals(DEFAULT_CODE, CASE_INSENSITIVE))
+                {
+                    returnScoreCode = GetScoreCode(DEFAULT_CODE);
+                }
+
                 if (returnScoreCode == null)
                 {
                     returnScoreCode = new ScoreCode
@@ -578,16 +605,32 @@ namespace SailScores.Core.Scoring
 
         private SeriesResults GetResults(Series series)
         {
+            // Use original race place values when there is no fleet filter (standard scoring)
+            // or when the series is configured to preserve full-race positions.
+            _useOriginalPlace = series.FleetId == null || series.UseFullRaceScores == true;
+
             SeriesResults returnResults = GatherInitialResults(series);
 
-            SetScores(returnResults,
-                series
-                .Races
-                .SelectMany(
-                    r => r
-                        .Scores));
+            SetScores(returnResults, GetScoresForCalculation(series));
 
             return returnResults;
+        }
+
+        // Returns all race scores for non-fleet-filtered series; when a fleet is selected, returns only
+        // the scores belonging to fleet competitors.  The distinction between UseFullRaceScores
+        // true/false is handled inside GetBasicScore via the _useOriginalPlace flag:
+        //   - UseFullRaceScores = false  → GetBasicScore counts fleet competitors ahead → fleet rank
+        //   - UseFullRaceScores = true   → GetBasicScore uses score.Place directly → original position
+        // Race scores in the database are never modified.
+        private IEnumerable<Score> GetScoresForCalculation(Series series)
+        {
+            var allScores = series.Races.SelectMany(r => r.Scores);
+
+            if (series.FleetId == null)
+                return allScores;
+
+            var fleetCompetitorIds = series.Competitors.Select(c => c.Id).ToHashSet();
+            return allScores.Where(s => fleetCompetitorIds.Contains(s.CompetitorId));
         }
 
         private void AddTrend(SeriesResults results, Series series)
@@ -668,19 +711,21 @@ namespace SailScores.Core.Scoring
 
         private SeriesResults GatherInitialResults(Series series)
         {
+            // When PopulateCompetitorsAsync has already built the competitor list (e.g. with
+            // fleet filtering), use it directly. Otherwise derive from race scores as before.
+            var competitors = series.Competitors?.Any() == true
+                ? series.Competitors.ToList()
+                : series.Races
+                    .SelectMany(r => r.Scores.Select(s => s.Competitor))
+                    .Distinct()
+                    .ToList();
+
             var returnResults = new SeriesResults
             {
                 Races = series.Races
                     .OrderBy(r => r.Date)
                     .ThenBy(r => r.Order).ToList(),
-                Competitors = series
-                    .Races
-                    .SelectMany(
-                        r => r
-                            .Scores
-                            .Select(s => s.Competitor))
-                    .Distinct()
-                    .ToList(),
+                Competitors = competitors,
                 Results = new Dictionary<Competitor, SeriesCompetitorResults>()
             };
 

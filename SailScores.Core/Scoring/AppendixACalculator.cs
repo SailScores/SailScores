@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +21,27 @@ public class AppendixACalculator : BaseScoringCalculator
             throw new ArgumentNullException(nameof(currentScore));
         }
 
-        decimal? returnScore =
-            Convert.ToDecimal(allScores
-                .Count(s =>
-                    currentScore.Place.HasValue
-                    && s.Race == currentScore.Race
-                    && s.Place < currentScore.Place
-                    && !ShouldAdjustOtherScores(s)
-                    ) + 1);
+        decimal? returnScore;
+
+        if (_useOriginalPlace
+            && currentScore.Place.HasValue
+            && string.IsNullOrEmpty(currentScore.Code))
+        {
+            // UseFullRaceScores=true or no fleet: preserve the original race place as the score.
+            // GetTiedScore below may still override this for tied boats.
+            returnScore = Convert.ToDecimal(currentScore.Place.Value);
+        }
+        else
+        {
+            returnScore =
+                Convert.ToDecimal(allScores
+                    .Count(s =>
+                        currentScore.Place.HasValue
+                        && s.Race == currentScore.Race
+                        && s.Place < currentScore.Place
+                        && !ShouldAdjustOtherScores(s)
+                        ) + 1);
+        }
 
         returnScore = GetTiedScore(allScores, currentScore) ?? returnScore;
 

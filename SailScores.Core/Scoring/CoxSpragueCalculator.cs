@@ -19,23 +19,36 @@ public class CoxSpragueCalculator : BaseScoringCalculator
 
     protected override decimal? GetBasicScore(IEnumerable<Score> allScores, Score currentScore)
     {
-        int starters = allScores.Count(s =>
-            s.Race == currentScore.Race
-             && CountsAsStarted(s));
+        if (_useOriginalPlace
+            && currentScore.Place.HasValue
+            && string.IsNullOrEmpty(currentScore.Code))
+        {
+            // Use original race data: full starters count and original place
+            var fullRaceScores = currentScore.Race.Scores;
+            int starters = fullRaceScores.Count(s => CountsAsStarted(s));
+            int baseScore = fullRaceScores.Count(s =>
+                currentScore.Place.HasValue
+                && s.Place <= currentScore.Place
+                && !ShouldAdjustOtherScores(s));
 
+            return CoxSpragueTable.GetScore(baseScore, starters);
+        }
+        else
+        {
+            int starters = allScores.Count(s =>
+                s.Race == currentScore.Race
+                && CountsAsStarted(s));
 
-        int baseScore =
-            allScores
-                .Count(s =>
-                    currentScore.Place.HasValue
-                    && s.Race == currentScore.Race
-                    && s.Place <= currentScore.Place
-                    && !ShouldAdjustOtherScores(s)
-                    );
+            int baseScore = allScores.Count(s =>
+                currentScore.Place.HasValue
+                && s.Race == currentScore.Race
+                && s.Place <= currentScore.Place
+                && !ShouldAdjustOtherScores(s));
 
-        // removed code to handle race result ties: this should treat both as the same place.
+            // removed code to handle race result ties: this should treat both as the same place.
 
-        return CoxSpragueTable.GetScore( baseScore, starters);
+            return CoxSpragueTable.GetScore(baseScore, starters);
+        }
     }
 
     protected override decimal? GetPerfectScore(IEnumerable<Score> allScores, Score currentScore)

@@ -56,7 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0479EE24-2
 		docs\BackupSchema.md = docs\BackupSchema.md
 		docs\DatabaseSchema-QuickRef.md = docs\DatabaseSchema-QuickRef.md
 		docs\DatabaseSchema.md = docs\DatabaseSchema.md
-		Features-SeriesFleetOption.md = Features-SeriesFleetOption.md
+		docs\Features-SeriesFleetOption.md = docs\Features-SeriesFleetOption.md
 		docs\README-SCHEMA.md = docs\README-SCHEMA.md
 		docs\SCHEMA_ENHANCEMENTS.md = docs\SCHEMA_ENHANCEMENTS.md
 	EndProjectSection

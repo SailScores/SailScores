@@ -21,6 +21,7 @@ public class SeriesBackup
     public Guid? ScoringSystemId { get; set; }
     public TrendOption? TrendOption { get; set; }
     public Guid? FleetId { get; set; }
+    public bool? UseFullRaceScores { get; set; }
     public bool? PreferAlternativeSailNumbers { get; set; }
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }
