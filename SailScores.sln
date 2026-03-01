@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		azure-pipeline-prod-deploy.yml = azure-pipeline-prod-deploy.yml
 		azure-pipeline-SQAnalysis.yml = azure-pipeline-SQAnalysis.yml
 		azure-pipeline-test-deploy.yml = azure-pipeline-test-deploy.yml
+		.github\copilot-instructions.md = .github\copilot-instructions.md
 		ef.json = ef.json
 		README.md = README.md
 		SonarQube.Analysis.xml = SonarQube.Analysis.xml
@@ -52,6 +53,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0479EE24-287C-45F1-80D5-75B5EFFD67D1}"
 	ProjectSection(SolutionItems) = preProject
 		docs\ApplicationInsights-Implementation-Summary.md = docs\ApplicationInsights-Implementation-Summary.md
+		docs\BackupSchema.md = docs\BackupSchema.md
+		docs\DatabaseSchema-QuickRef.md = docs\DatabaseSchema-QuickRef.md
+		docs\DatabaseSchema.md = docs\DatabaseSchema.md
+		Features-SeriesFleetOption.md = Features-SeriesFleetOption.md
+		docs\README-SCHEMA.md = docs\README-SCHEMA.md
+		docs\SCHEMA_ENHANCEMENTS.md = docs\SCHEMA_ENHANCEMENTS.md
 	EndProjectSection
 EndProject
 Global

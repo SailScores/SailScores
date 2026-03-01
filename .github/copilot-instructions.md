@@ -241,6 +241,10 @@ Pipelines automatically:
 - Run `npm install` in SailScores.Web directory for client dependencies
 - Clean and rebuild solution if issues persist
 
+## Active Features in Development
+
+- **Series Fleet Options** ([Issue #150](https://github.com/SailScores/SailScores/issues/150)): Adds optional fleet association to series with fleet-based competitor filtering and race score recalculation. See `docs/Features-SeriesFleetOption.md` for details.
+
 ## Additional Resources
 
 - Full development guide: `docs/Development.md`

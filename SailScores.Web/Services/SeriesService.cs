@@ -17,6 +17,7 @@ public class SeriesService : ISeriesService
     private readonly Core.Services.ISeriesService _coreSeriesService;
     private readonly IScoringService _coreScoringService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
+    private readonly Core.Services.IFleetService _coreFleetService;
     private readonly IMapper _mapper;
 
     // Validation error messages for date restrictions
@@ -30,12 +31,14 @@ public class SeriesService : ISeriesService
         Core.Services.ISeriesService seriesService,
         Core.Services.IScoringService scoringService,
         Core.Services.ISeasonService seasonService,
+        Core.Services.IFleetService fleetService,
         IMapper mapper)
     {
         _coreClubService = clubService;
         _coreSeriesService = seriesService;
         _coreScoringService = scoringService;
         _coreSeasonService = seasonService;
+        _coreFleetService = fleetService;
         _mapper = mapper;
     }
 
@@ -118,6 +121,10 @@ public class SeriesService : ISeriesService
         // Get summary series options
         vm.SummarySeriesOptions = (await GetSummarySeriesAsync(clubId)).ToList();
 
+        // Get fleet options - include active fleets and any currently selected fleet
+        var allFleets = await _coreFleetService.GetAllFleetsForClub(clubId);
+        vm.FleetOptions = allFleets.Where(f => f.IsActive || f.Id == vm.FleetId).OrderBy(f => f.Name).ToList();
+
         return vm;
 
     }
@@ -135,6 +142,7 @@ public class SeriesService : ISeriesService
             ScoringSystemOptions = blankSingle.ScoringSystemOptions,
             TrendOption = blankSingle.TrendOption,
             HideDncDiscards = blankSingle.HideDncDiscards,
+            FleetOptions = blankSingle.FleetOptions,
             Series = new List<MultipleSeriesRowViewModel>
             {
                 new()
@@ -566,6 +574,8 @@ public class SeriesService : ISeriesService
             Name = row.Name.Trim(),
             SeasonId = model.SeasonId,
             ScoringSystemId = model.ScoringSystemId,
+            FleetId = model.FleetId,
+            UseFullRaceScores = model.UseFullRaceScores,
             TrendOption = model.TrendOption,
             HideDncDiscards = model.HideDncDiscards,
 

@@ -19,6 +19,14 @@ public class MultipleSeriesWithOptionsViewModel
 
     public IList<ScoringSystem> ScoringSystemOptions { get; set; } = new List<ScoringSystem>();
 
+    [Display(Name = "Fleet")]
+    public Guid? FleetId { get; set; }
+
+    public IList<Fleet> FleetOptions { get; set; } = new List<Fleet>();
+
+    [Display(Name = "Use Original Race Positions")]
+    public bool? UseFullRaceScores { get; set; }
+
     [Display(Name = "Calculate Rank Trend")]
     public TrendOption? TrendOption { get; set; } = Api.Enumerations.TrendOption.None;
 

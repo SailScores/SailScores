@@ -272,6 +272,7 @@ public class SeriesController : Controller
         seriesWithOptions.SeasonOptions = blankVm.SeasonOptions;
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
         seriesWithOptions.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+        seriesWithOptions.FleetOptions = blankVm.FleetOptions;
         if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
         {
             seriesWithOptions.SeriesOptions =
@@ -387,6 +388,7 @@ public class SeriesController : Controller
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+            model.FleetOptions = blankVm.FleetOptions;
             return View(model);
         }
 
@@ -401,6 +403,7 @@ public class SeriesController : Controller
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+            model.FleetOptions = blankVm.FleetOptions;
 
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
@@ -411,6 +414,7 @@ public class SeriesController : Controller
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+            model.FleetOptions = blankVm.FleetOptions;
 
             ModelState.AddModelError(string.Empty, "A problem occurred creating these series. Check" +
                 " for duplicate names within the selected season or invalid date ranges.");

@@ -1,5 +1,6 @@
 @using SailScores.Web.Services
 @using SailScores.Api.Enumerations
+@using SailScores.Core.Model
 
 @model SailScores.Web.Models.SailScores.SeriesWithOptionsViewModel
 
@@ -144,6 +145,51 @@
                                 <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
+                                <label asp-for="FleetId" class="control-label">
+                                    Fleet 
+                                    <span class="text-muted" style="font-size: 0.85em;">Competitor Filter</span>
+                                    <a class="text-primary"
+                                       data-bs-container="body"
+                                       data-bs-toggle="popover"
+                                       data-bs-placement="top"
+                                       data-bs-trigger="focus hover"
+                                       data-bs-content="Limit series results to include only competitors of a specific fleet. E.g., create a Women's Series from races that include all sailors. (Race should be assigned to multiple series.)">
+                                        <span class="far fa-question-circle"></span>
+                                    </a>
+                                </label>
+                                <select id="FleetId" asp-for="FleetId" class="form-select">
+                                    <option value="">-Allow any competitors-</option>
+                                    @if (Model.FleetOptions != null)
+                                    {
+                                        @foreach (var fleet in Model.FleetOptions)
+                                        {
+                                            <option value="@fleet.Id">
+                                                @fleet.Name @(fleet.IsActive ? "" : " (Inactive)")
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="FleetId" class="text-danger"></span>
+                                <span class="small">Only competitors in this fleet will appear in series standings.</span>
+                            </div>
+                            <div id="useFullRaceScoresField" class="mb-3" style="display: @(Model.FleetId.HasValue && Model.FleetId != Guid.Empty ? "block" : "none"); margin-left: 2rem;">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="UseFullRaceScores" name="UseFullRaceScores" @(Model.UseFullRaceScores == true ? "checked" : "") />
+                                    <label class="form-check-label" for="UseFullRaceScores">
+                                        Use Original Race Positions
+                                        <a class="text-primary"
+                                               data-bs-container="body"
+                                               data-bs-toggle="popover"
+                                               data-bs-placement="top"
+                                               data-bs-trigger="focus hover"
+                                               data-bs-content="Unchecked (default): Rank competitors only against others in the fleet. Checked: Use original race ranking even if non-fleet competitors placed higher.">
+                                            <span class="far fa-question-circle"></span>
+                                        </a>
+                                    </label>
+                                    <small class="form-text text-muted d-block">Finishing positions include all race competitors if selected.</small>
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 <label>Scoring "What If"</label>
                                 <a class="form-control btn btn-secondary"
                                    asp-route="WhatIf"
@@ -172,6 +218,23 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/seriesDateRestriction.js"></script>
     <script>
+        function toggleUseFullRaceScores() {
+            var fleetIdSelect = document.getElementById('FleetId');
+            var useFullRaceScoresField = document.getElementById('useFullRaceScoresField');
+            if (fleetIdSelect.value) {
+                useFullRaceScoresField.style.display = 'block';
+            } else {
+                useFullRaceScoresField.style.display = 'none';
+            }
+        }
+
+        document.getElementById('FleetId').addEventListener('change', toggleUseFullRaceScores);
+
+        // help popovers (to be touch screen friendly.)
+        $(function () {
+            $('[data-bs-toggle="popover"]').popover();
+        })
+
         var dateRestrictedCheckbox = document.getElementById('DateRestricted');
         if (dateRestrictedCheckbox) {
             dateRestrictedCheckbox.addEventListener('change', toggleDateRestrictionFields);

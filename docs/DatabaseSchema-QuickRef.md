@@ -9,9 +9,9 @@ A fast lookup guide for the SailScores database schema.
 | **Club** | Top-level organization | Id, Initials, Name |
 | **Season** | Time period containing series | Id, ClubId, Start, End |
 | **Series** | Collection of races scored together | Id, ClubId, SeasonId, Type, FleetId (regatta only) |
-| **Race** | Individual race event | Id, ClubId, Date, FleetId, State |
+| **Races** | Individual race event | Id, ClubId, Date, FleetId, State |
 | **SeriesRace** | Links races to series | SeriesId, RaceId (junction) |
-| **Fleet** | Group of competitors | Id, ClubId, Name, IsActive |
+| **Fleets** | Group of competitors | Id, ClubId, Name, IsActive |
 | **ScoringSystem** | Scoring rules | Id, ClubId, Name, IsDefault |
 | **Score** | Competitor's score in a race | Id, RaceId, CompetitorId, ScoreValue |
 | **SeriesToSeriesLink** | Summary → Standard series | ParentSeriesId, ChildSeriesId |
@@ -24,11 +24,11 @@ Club
  ├── Season
  │    └── Series
  │         ├── SeriesRace
- │         │    └── Race ─→ Fleet
+ │         │    └── Races ─→ Fleets
  │         └── SeriesToSeriesLink (parent/child)
  │
- ├── Fleet
- │    ├── Race
+ ├── Fleets
+ │    ├── Races
  │    ├── CompetitorFleet
  │    └── FleetBoatClass
  │
@@ -48,8 +48,8 @@ Club
 ```sql
 SELECT DISTINCT f.Name
 FROM SeriesRace sr
-INNER JOIN Race r ON sr.RaceId = r.Id
-INNER JOIN Fleet f ON r.FleetId = f.Id
+INNER JOIN Races r ON sr.RaceId = r.Id
+INNER JOIN Fleets f ON r.FleetId = f.Id
 WHERE sr.SeriesId = @SeriesId
 ```
 **Key**: A series can have races from multiple fleets
@@ -69,7 +69,7 @@ WHERE ParentSeriesId = @SummarySeriesId
 ### "I need competitor results in a fleet for a race"
 **Query**:
 ```sql
-SELECT s.* FROM Score s
+SELECT s.* FROM Scores s
 WHERE s.RaceId = @RaceId
   AND EXISTS (
     SELECT 1 FROM CompetitorFleet cf
@@ -120,7 +120,7 @@ A **multi-fleet series** is a series containing races assigned to different flee
 ```sql
 SELECT sr.SeriesId, COUNT(DISTINCT r.FleetId) AS FleetCount
 FROM SeriesRace sr
-INNER JOIN Race r ON sr.RaceId = r.Id
+INNER JOIN Races r ON sr.RaceId = r.Id
 GROUP BY sr.SeriesId
 HAVING COUNT(DISTINCT r.FleetId) > 1
 ```

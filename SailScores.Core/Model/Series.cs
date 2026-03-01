@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Scoring;
 using System;
 using System.Collections.Generic;
@@ -61,6 +61,10 @@ public class Series
 
     // used for connecting series to correct fleet. Particularly for Regatta use.
     public Guid? FleetId { get; set; }
+
+    // When fleet is selected, determines whether to use full race scores (true)
+    // or recalculate positions based only on fleet competitors (false)
+    public bool? UseFullRaceScores { get; set; }
 
     public bool? PreferAlternativeSailNumbers { get; set; }
 
