@@ -396,6 +396,7 @@ namespace SailScores.Core.Scoring
         // intentionally skipped.
         protected void ValidateSeries(SeriesResults results, IEnumerable<Score> scores)
         {
+            // now that series might filter by fleet, null competitors are possible, so filter them out before validation.
             var seriesCompetitorIds = results.Competitors.Select(c => c.Id).ToHashSet();
             var seriesCompetitorRefs = new HashSet<Competitor>(results.Competitors);
 
@@ -717,6 +718,7 @@ namespace SailScores.Core.Scoring
                 ? series.Competitors.ToList()
                 : series.Races
                     .SelectMany(r => r.Scores.Select(s => s.Competitor))
+                    .Where(c => c != null && c.Id != default)
                     .Distinct()
                     .ToList();
 

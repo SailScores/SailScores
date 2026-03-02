@@ -81,7 +81,7 @@
             {
                 var startDate = series.Races?.Where(r => r.Date.HasValue).Min(r => r.Date);
                 var endDate = series.Races?.Where(r => r.Date.HasValue).Max(r => r.Date);
-                <div class="row border-bottom mb-1 pb-1 mx-2 series-row" 
+                <div class="row border-bottom mb-1 pb-1 ms-2 series-row" 
                      data-name="@series.Name" 
                      data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")" 
                      data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
@@ -95,10 +95,16 @@
                     <div class="col-md-4">
                         <span class="small-on-small">@series.DateString</span>
                     </div>
-                    <div class="col-md-3">
+                        <div class="d-none d-md-flex col-md-3 align-items-center">
                         @if (series.UpdatedDate.HasValue)
                         {
-                            <span class="d-none d-md-table-cell updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
+                            <span class="updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
+                        }
+                        @if (series.Type == SeriesType.Summary)
+                        {
+                            <span class="badge bg-light text-muted small ms-auto" title="@localizer["Summary"]">
+                              Σ<span class="visually-hidden">@localizer["Summary"]</span>
+                            </span>
                         }
                     </div>
                     <div class="col-12 ms-3">

@@ -123,7 +123,7 @@
 <header class="bg-dark">
     @if (!wideLayout)
     {
-        @Html.Raw("<div class=\"container-sm py-0\">");
+        @Html.Raw("<div class=\"container-lg py-0\">");
     }
     <nav class="navbar navbar-expand-md navbar-dark bg-dark @(wideLayout? "py-0 px-3" : "p-0")">
         <a asp-area="" asp-controller="Club" asp-action="Index"
@@ -202,7 +202,7 @@
 @inject SailScores.Web.Services.Interfaces.ISystemAlertService SystemAlertService
 @await Html.PartialAsync("_SystemAlerts", await SystemAlertService.GetActiveAlertsAsync())
 
-<div class=" @(wideLayout? "container-fluid" : "container") body-content">
+<div class=" @(wideLayout? "container-fluid" : "container-lg") body-content">
     <div class="row">
         @if (IsSectionDefined("Sidebar"))
         {

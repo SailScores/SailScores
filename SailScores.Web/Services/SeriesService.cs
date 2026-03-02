@@ -206,15 +206,36 @@ public class SeriesService : ISeriesService
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
         var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, true);
-
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(coreObject);
+
+        // For summary series, determine fleet name from child series races
         foreach (var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
         {
             var races = coreObject.Where(s => summaryTypeSeries.ChildrenSeriesIds.Contains(s.Id)).SelectMany(s => s.Races).ToList();
             seriesSummaries.Single(ss => ss.Id == summaryTypeSeries.Id).FleetName = GetFleetsString(races);
         }
 
+        // If a series explicitly has a FleetId, prefer that fleet's name regardless of races
+        var fleets = (await _coreFleetService.GetAllFleetsForClub(clubId)).ToDictionary(f => f.Id, f => f.Name);
+        foreach (var s in coreObject)
+        {
+            if (s.FleetId.HasValue)
+            {
+                var summary = seriesSummaries.Single(ss => ss.Id == s.Id);
+                if (fleets.TryGetValue(s.FleetId.Value, out var fleetName))
+                {
+                    summary.FleetName = fleetName;
+                }
+                else
+                {
+                    summary.FleetName = "No Fleet";
+                }
+            }
+        }
+
         return seriesSummaries.OrderByDescending(s => s.Season.Start)
+            // Put series with no fleet at the end
+            .ThenBy(s => s.FleetName == "No Fleet")
             .ThenBy(s => s.FleetName)
             .ThenBy(s => s.Name);
     }
@@ -247,6 +268,8 @@ public class SeriesService : ISeriesService
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(eligibleSeries);
 
         return seriesSummaries.OrderByDescending(s => s.Season.Start)
+            // Put series with no fleet at the end
+            .ThenBy(s => s.FleetName == "No Fleet")
             .ThenBy(s => s.FleetName)
             .ThenBy(s => s.Name);
     }

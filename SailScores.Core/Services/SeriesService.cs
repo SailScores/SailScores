@@ -760,8 +760,16 @@ namespace SailScores.Core.Services
 
             if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out List<dbObj.Competitor> dbCompetitors))
             {
-                dbCompetitors = await _dbContext.Competitors
-                    .Where(c => compIds.Contains(c.Id)).ToListAsync()
+                var query = _dbContext.Competitors
+                    .Where(c => compIds.Contains(c.Id));
+
+                // Filter by fleet if series has FleetId set
+                if (series.FleetId.HasValue)
+                {
+                    query = query.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == series.FleetId.Value));
+                }
+
+                dbCompetitors = await query.ToListAsync()
                     .ConfigureAwait(false);
 
                 _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
@@ -772,6 +780,12 @@ namespace SailScores.Core.Services
                 // historical results for charts)
                 // so we need to refilter the competitors.
                 dbCompetitors = dbCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
+
+                // Also apply fleet filtering to cached results
+                if (series.FleetId.HasValue)
+                {
+                    dbCompetitors = dbCompetitors.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == series.FleetId.Value)).ToList();
+                }
             }
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
@@ -782,13 +796,29 @@ namespace SailScores.Core.Services
                 var competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
                 if(competitor == null)
                 {
-                    dbCompetitors = await _dbContext.Competitors
-                    .Where(c => compIds.Contains(c.Id)).ToListAsync()
-                    .ConfigureAwait(false);
+                    var query = _dbContext.Competitors
+                        .Where(c => compIds.Contains(c.Id));
 
+                    // Filter by fleet if series has FleetId set
+                    if (series.FleetId.HasValue)
+                    {
+                        query = query.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == series.FleetId.Value));
+                    }
+
+                    dbCompetitors = await query.ToListAsync()
+                        .ConfigureAwait(false);
+                    competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
+                    if (competitor == null)
+                    {
+                        // Skip scores for competitors not in the fleet
+                        continue;
+                    }
+
+                    // seems we have a score for a competitor not in the series competitor list. Add them and the new list to the cache.
                     _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
                     series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
-                    competitor = series.Competitors.First(c => c.Id == score.CompetitorId);
+                    competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
+
                 }
                 score.Competitor = competitor;
             }
