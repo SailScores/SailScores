@@ -56,6 +56,10 @@
         {
             @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
         }
+        @if (!String.IsNullOrWhiteSpace(ViewData["FleetName"]?.ToString()))
+        {
+            <small class="text-muted">Filtered to @ViewData["FleetName"] competitors.</small>
+        }
         @if (Model.Item.ExcludeFromCompetitorStats)
         {
             <br />@:<small>This series is excluded from competitor stats.</small>

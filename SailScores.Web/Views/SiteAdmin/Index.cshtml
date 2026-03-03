@@ -36,19 +36,19 @@
             <thead>
                 <tr>
                     <th>
-                        <a asp-action="Index" asp-route-sortOrder="@Model.NameSortParm" class="text-decoration-none text-dark">
+                        <a asp-action="Index" asp-route-sortOrder="@Model.NameSortParm" class="text-decoration-none">
                             Club Name @(Model.CurrentSort == null || Model.CurrentSort == "" ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.NameDesc ? "↓" : ""))
                         </a>
                     </th>
                     <th>Initials</th>
                     <th>Visibility</th>
                     <th>
-                        <a asp-action="Index" asp-route-sortOrder="@Model.UpdateSortParm" class="text-decoration-none text-dark">
+                        <a asp-action="Index" asp-route-sortOrder="@Model.UpdateSortParm" class="text-decoration-none">
                             Latest Series Update @(Model.CurrentSort == SiteAdminSortOrders.UpdateAsc ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.UpdateDesc ? "↓" : ""))
                         </a>
                     </th>
                     <th>
-                        <a asp-action="Index" asp-route-sortOrder="@Model.RaceSortParm" class="text-decoration-none text-dark">
+                        <a asp-action="Index" asp-route-sortOrder="@Model.RaceSortParm" class="text-decoration-none">
                             Latest Race Date @(Model.CurrentSort == SiteAdminSortOrders.RaceAsc ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.RaceDesc ? "↓" : ""))
                         </a>
                     </th>

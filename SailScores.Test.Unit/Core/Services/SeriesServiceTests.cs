@@ -825,4 +825,447 @@ public class SeriesServiceTests
         Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp2.Id);
         Assert.Contains(result.FlatResults.Competitors, c => c.Id == comp3.Id);
     }
+
+    [Fact]
+    public async Task UpdateSeriesResults_SeriesWithFleetIdAndDNCScores_DNCEquals2()
+    {
+        // Arrange - Setup test data with two fleets where some competitors have DNC scores
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+        var boatClass = _context.BoatClasses.First();
+
+        // Create two fleets
+        var fleet1 = new Database.Entities.Fleet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet A",
+            FleetType = Api.Enumerations.FleetType.SelectedBoats,
+            ClubId = clubId
+        };
+        var fleet2 = new Database.Entities.Fleet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet B",
+            FleetType = Api.Enumerations.FleetType.SelectedBoats,
+            ClubId = clubId
+        };
+        _context.Fleets.Add(fleet1);
+        _context.Fleets.Add(fleet2);
+
+        // Create competitors - some in fleet1, some in fleet2
+        var comp1 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 1",
+            BoatName = "Boat 1",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet1.Id }
+            }
+        };
+        var comp2 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 2",
+            BoatName = "Boat 2",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet1.Id }
+            }
+        };
+        var comp3 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 3",
+            BoatName = "Boat 3",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet2.Id }
+            }
+        };
+
+        _context.Competitors.Add(comp1);
+        _context.Competitors.Add(comp2);
+        _context.Competitors.Add(comp3);
+
+        // Create race with mixed scores: some with places, some with DNC code
+        var race1 = new Database.Entities.Race
+        {
+            Id = Guid.NewGuid(),
+            Name = "Race 1",
+            Date = season.Start.AddDays(1),
+            ClubId = clubId,
+            Fleet = fleet1,
+            Scores = new List<Database.Entities.Score>
+            {
+                new Database.Entities.Score { CompetitorId = comp1.Id, Place = 1 },
+                new Database.Entities.Score { CompetitorId = comp2.Id, Code = "DNC" }
+            }
+        };
+
+        var race2 = new Database.Entities.Race
+        {
+            Id = Guid.NewGuid(),
+            Name = "Race 2",
+            Date = season.Start.AddDays(2),
+            ClubId = clubId,
+            Fleet = fleet2,
+            Scores = new List<Database.Entities.Score>
+            {
+                new Database.Entities.Score { CompetitorId = comp3.Id, Code = "DNC" }
+            }
+        };
+
+        // Add DNC score for a Fleet 2 competitor in Race 1 (should be excluded from fleet-filtered series)
+        race1.Scores.Add(new Database.Entities.Score { CompetitorId = comp3.Id, Code = "DNC" });
+
+        _context.Races.Add(race1);
+        _context.Races.Add(race2);
+
+        // Create series with FleetId set to fleet1 and UseFullRaceScores = false
+        var series = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet A Series",
+            UrlName = "fleet-a-series",
+            ClubId = clubId,
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            FleetId = fleet1.Id,
+            UseFullRaceScores = false,
+            RaceSeries = new List<Database.Entities.SeriesRace>
+            {
+                new Database.Entities.SeriesRace { RaceId = race1.Id },
+                new Database.Entities.SeriesRace { RaceId = race2.Id }
+            }
+        };
+
+        _context.Series.Add(series);
+        await _context.SaveChangesAsync();
+
+        // Act - Update series results which calls PopulateCompetitorsAsync
+        await _service.UpdateSeriesResults(series.Id, "test");
+
+        // Assert - Only Fleet A competitors (comp1, comp2) should be in results
+        // Comp3's DNC in fleet2's race and DNC in fleet1's race should both be excluded
+        var result = await _service.GetOneSeriesAsync(series.Id);
+
+        Assert.NotNull(result);
+        Assert.NotNull(result.FlatResults);
+
+        // ROOT CAUSE: PopulateCompetitorsAsync reassigns series.Competitors on line 828,
+        // which breaks object reference matching in BaseScoringCalculator.CalculateSimpleScores (line 93).
+        // When a score's Competitor property is matched against loop variable comp using ==,
+        // they're comparing object references. If series.Competitors is reassigned mid-function,
+        // previous references become stale and don't match, resulting in 0 calculated scores.
+        //
+        // Test the actual bug: CalculatedScores should have results for fleet competitors
+        // This test CURRENTLY FAILS with 0 CalculatedScores instead of the expected 2
+        // Expected: 2 calculated scores (one for comp1, one for comp2)
+        // Actual: 0 calculated scores (BUG - showing coded scores are not being scored for filtered fleets)
+        Assert.NotEmpty(result.FlatResults.CalculatedScores);
+        Assert.Equal(2, result.FlatResults.CalculatedScores.Count());
+        // FlatResult for the competitor with a DNC should be 2
+        Assert.Equal(2, result.FlatResults.CalculatedScores.Single(s => s.CompetitorId == comp2.Id).TotalScore);
+        Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp3.Id);
+    }
+
+    [Fact]
+    public async Task UpdateSeriesResults_SeriesWithFleetIdUseFullRaceScoresTrueAndDNCScores_OnlyIncludesFleetCompetitorsWithDNC()
+    {
+        // Arrange - Setup test data with two fleets where competitors have DNC codes
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+        var boatClass = _context.BoatClasses.First();
+
+        // Create two fleets
+        var fleet1 = new Database.Entities.Fleet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet A",
+            FleetType = Api.Enumerations.FleetType.SelectedBoats,
+            ClubId = clubId
+        };
+        var fleet2 = new Database.Entities.Fleet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet B",
+            FleetType = Api.Enumerations.FleetType.SelectedBoats,
+            ClubId = clubId
+        };
+        _context.Fleets.Add(fleet1);
+        _context.Fleets.Add(fleet2);
+
+        // Create competitors
+        var comp1 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 1",
+            BoatName = "Boat 1",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet1.Id }
+            }
+        };
+        var comp2 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 2",
+            BoatName = "Boat 2",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet1.Id }
+            }
+        };
+        var comp3 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 3",
+            BoatName = "Boat 3",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet2.Id }
+            }
+        };
+
+        _context.Competitors.Add(comp1);
+        _context.Competitors.Add(comp2);
+        _context.Competitors.Add(comp3);
+
+        // Create races with DNC codes
+        var race1 = new Database.Entities.Race
+        {
+            Id = Guid.NewGuid(),
+            Name = "Race 1",
+            Date = season.Start.AddDays(1),
+            ClubId = clubId,
+            Fleet = fleet1,
+            Scores = new List<Database.Entities.Score>
+            {
+                new Database.Entities.Score { CompetitorId = comp1.Id, Place = 1 },
+                new Database.Entities.Score { CompetitorId = comp2.Id, Code = "DNC" },
+                new Database.Entities.Score { CompetitorId = comp3.Id, Code = "DNC" }
+            }
+        };
+
+        var race2 = new Database.Entities.Race
+        {
+            Id = Guid.NewGuid(),
+            Name = "Race 2",
+            Date = season.Start.AddDays(2),
+            ClubId = clubId,
+            Fleet = fleet2,
+            Scores = new List<Database.Entities.Score>
+            {
+                new Database.Entities.Score { CompetitorId = comp3.Id, Place = 1 }
+            }
+        };
+
+        _context.Races.Add(race1);
+        _context.Races.Add(race2);
+
+        // Create series with FleetId set to fleet1 and UseFullRaceScores = true
+        var series = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet A Series",
+            UrlName = "fleet-a-series",
+            ClubId = clubId,
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            FleetId = fleet1.Id,
+            UseFullRaceScores = true,
+            RaceSeries = new List<Database.Entities.SeriesRace>
+            {
+                new Database.Entities.SeriesRace { RaceId = race1.Id },
+                new Database.Entities.SeriesRace { RaceId = race2.Id }
+            }
+        };
+
+        _context.Series.Add(series);
+        await _context.SaveChangesAsync();
+
+        // Act - Update series results
+        await _service.UpdateSeriesResults(series.Id, "test");
+
+        // Assert - Only Fleet A competitors (comp1, comp2) should be in results
+        // Comp3's DNC in fleet1's race and place in fleet2's race should both be excluded
+        var result = await _service.GetOneSeriesAsync(series.Id);
+
+        Assert.NotNull(result);
+        Assert.NotNull(result.FlatResults);
+
+        // Should only have 2 competitors (from fleet1), not 3
+        Assert.Equal(2, result.FlatResults.Competitors.Count());
+        Assert.Equal(2, result.FlatResults.CalculatedScores.Count());
+        Assert.Contains(result.FlatResults.Competitors, c => c.Id == comp1.Id);
+        Assert.Contains(result.FlatResults.Competitors, c => c.Id == comp2.Id);
+        Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp3.Id);
+    }
+
+    [Fact]
+    public async Task UpdateSeriesResults_SeriesWithFleetIdAndMixedCodedScores_OnlyIncludesFleetCompetitors()
+    {
+        // Arrange - Setup test data with two fleets and various coded scores (DNC, OCS, BFD)
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+        var boatClass = _context.BoatClasses.First();
+
+        // Create two fleets
+        var fleet1 = new Database.Entities.Fleet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet A",
+            FleetType = Api.Enumerations.FleetType.SelectedBoats,
+            ClubId = clubId
+        };
+        var fleet2 = new Database.Entities.Fleet
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet B",
+            FleetType = Api.Enumerations.FleetType.SelectedBoats,
+            ClubId = clubId
+        };
+        _context.Fleets.Add(fleet1);
+        _context.Fleets.Add(fleet2);
+
+        // Create competitors
+        var comp1 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 1",
+            BoatName = "Boat 1",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet1.Id }
+            }
+        };
+        var comp2 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 2",
+            BoatName = "Boat 2",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet1.Id }
+            }
+        };
+        var comp3 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 3",
+            BoatName = "Boat 3",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet2.Id }
+            }
+        };
+        var comp4 = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Competitor 4",
+            BoatName = "Boat 4",
+            ClubId = clubId,
+            BoatClassId = boatClass.Id,
+            CompetitorFleets = new List<Database.Entities.CompetitorFleet>
+            {
+                new Database.Entities.CompetitorFleet { FleetId = fleet2.Id }
+            }
+        };
+
+        _context.Competitors.Add(comp1);
+        _context.Competitors.Add(comp2);
+        _context.Competitors.Add(comp3);
+        _context.Competitors.Add(comp4);
+
+        // Create race with mixed coded scores across fleets
+        var race1 = new Database.Entities.Race
+        {
+            Id = Guid.NewGuid(),
+            Name = "Race 1",
+            Date = season.Start.AddDays(1),
+            ClubId = clubId,
+            Fleet = fleet1,
+            Scores = new List<Database.Entities.Score>
+            {
+                new Database.Entities.Score { CompetitorId = comp1.Id, Place = 1 },
+                new Database.Entities.Score { CompetitorId = comp2.Id, Code = "OCS" },
+                new Database.Entities.Score { CompetitorId = comp3.Id, Code = "DNC" },
+                new Database.Entities.Score { CompetitorId = comp4.Id, Code = "BFD" }
+            }
+        };
+
+        var race2 = new Database.Entities.Race
+        {
+            Id = Guid.NewGuid(),
+            Name = "Race 2",
+            Date = season.Start.AddDays(2),
+            ClubId = clubId,
+            Fleet = fleet2,
+            Scores = new List<Database.Entities.Score>
+            {
+                new Database.Entities.Score { CompetitorId = comp3.Id, Place = 1 },
+                new Database.Entities.Score { CompetitorId = comp4.Id, Code = "DNC" }
+            }
+        };
+
+        _context.Races.Add(race1);
+        _context.Races.Add(race2);
+
+        // Create series with FleetId set to fleet1 and UseFullRaceScores = false
+        var series = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleet A Series",
+            UrlName = "fleet-a-series",
+            ClubId = clubId,
+            Season = season,
+            Type = Database.Entities.SeriesType.Standard,
+            FleetId = fleet1.Id,
+            UseFullRaceScores = false,
+            RaceSeries = new List<Database.Entities.SeriesRace>
+            {
+                new Database.Entities.SeriesRace { RaceId = race1.Id },
+                new Database.Entities.SeriesRace { RaceId = race2.Id }
+            }
+        };
+
+        _context.Series.Add(series);
+        await _context.SaveChangesAsync();
+
+        // Act - Update series results
+        await _service.UpdateSeriesResults(series.Id, "test");
+
+        // Assert - Only Fleet A competitors (comp1, comp2) should be in results
+        // comp3 and comp4 are in Fleet B, so all their scores should be excluded
+        var result = await _service.GetOneSeriesAsync(series.Id);
+
+        Assert.NotNull(result);
+        Assert.NotNull(result.FlatResults);
+
+        // Should only have 2 competitors (from fleet1), not 4
+        Assert.Equal(2, result.FlatResults.Competitors.Count());
+        Assert.Contains(result.FlatResults.Competitors, c => c.Id == comp1.Id);
+        Assert.Contains(result.FlatResults.Competitors, c => c.Id == comp2.Id);
+        Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp3.Id);
+        Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp4.Id);
+    }
 }

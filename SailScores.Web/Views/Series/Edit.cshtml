@@ -153,7 +153,7 @@
                                        data-bs-toggle="popover"
                                        data-bs-placement="top"
                                        data-bs-trigger="focus hover"
-                                       data-bs-content="Limit series results to include only competitors of a specific fleet. E.g., create a Women's Series from races that include all sailors. (Race should be assigned to multiple series.)">
+                                       data-bs-content="Limit series results to include only competitors of a specific fleet. E.g., create a Women's Series from races that include all sailors. (Race could be assigned to multiple series.)">
                                         <span class="far fa-question-circle"></span>
                                     </a>
                                 </label>
@@ -174,7 +174,8 @@
                             </div>
                             <div id="useFullRaceScoresField" class="mb-3" style="display: @(Model.FleetId.HasValue && Model.FleetId != Guid.Empty ? "block" : "none"); margin-left: 2rem;">
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="UseFullRaceScores" name="UseFullRaceScores" @(Model.UseFullRaceScores == true ? "checked" : "") />
+                                    <input type="checkbox" class="form-check-input" id="UseFullRaceScores" name="UseFullRaceScores" value="true" @(Model.UseFullRaceScores == true ? "checked" : "") />
+                                    <input type="hidden" name="UseFullRaceScores" value="false" />
                                     <label class="form-check-label" for="UseFullRaceScores">
                                         Use Original Race Positions
                                         <a class="text-primary"

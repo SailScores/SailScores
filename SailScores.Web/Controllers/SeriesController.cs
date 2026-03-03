@@ -29,6 +29,7 @@ public class SeriesController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
     private readonly IForwarderService _forwarderService;
+    private readonly Core.Services.IFleetService _fleetService;
 
     public SeriesController(
         ISeriesService seriesService,
@@ -37,6 +38,7 @@ public class SeriesController : Controller
         IAdminTipService adminTipService,
         ICsvService csvService,
         IForwarderService forwarderService,
+        Core.Services.IFleetService fleetService,
         UserManager<ApplicationUser> userManager,
         IMapper mapper)
     {
@@ -46,6 +48,7 @@ public class SeriesController : Controller
         _adminTipService = adminTipService;
         _csvService = csvService;
         _forwarderService = forwarderService;
+        _fleetService = fleetService;
         _userManager = userManager;
         _mapper = mapper;
     }
@@ -91,6 +94,17 @@ public class SeriesController : Controller
                 return NotFound();
             }
         }
+
+        // Get fleet name if series has a fleet assigned
+        if (series.FleetId.HasValue)
+        {
+            var fleet = await _fleetService.Get(series.FleetId.Value);
+            if (fleet != null)
+            {
+                ViewData["FleetName"] = fleet.Name;
+            }
+        }
+
         var canEdit = false;
         var canEditSeries = false;
         if (User != null && (User.Identity?.IsAuthenticated ?? false))
@@ -187,6 +201,15 @@ public class SeriesController : Controller
                 model.SeasonOptions = blankVm.SeasonOptions;
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+                model.FleetOptions = blankVm.FleetOptions;
+
+                // Log model state errors for debugging
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ModelState Error: {error.ErrorMessage}");
+                }
+
                 return View(model);
             }
 
@@ -212,6 +235,7 @@ public class SeriesController : Controller
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+            model.FleetOptions = blankVm.FleetOptions;
 
             // Clear parent series IDs for Summary Series since they can't have parents
             // probably redundant with above, but doesn't hurt.
@@ -230,6 +254,7 @@ public class SeriesController : Controller
             model.SeasonOptions = blankVm.SeasonOptions;
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+            model.FleetOptions = blankVm.FleetOptions;
 
             // Clear parent series IDs for Summary Series since they can't have parents
             if (model.Type == Core.Model.SeriesType.Summary)
@@ -304,17 +329,26 @@ public class SeriesController : Controller
                 model.SeasonOptions = blankVm.SeasonOptions;
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
+                model.FleetOptions = blankVm.FleetOptions;
+
+                // Log model state errors for debugging (visible in browser dev tools if using this pattern)
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ModelState Error: {error.ErrorMessage}");
+                }
+
                 return View(model);
             }
 
             model.UpdatedBy = await GetUserStringAsync();
-            
+
             // Clear parent series IDs for Summary Series since they can't have parents
             if (model.Type == Core.Model.SeriesType.Summary)
             {
                 model.ParentSeriesIds = null;
             }
-            
+
             await _seriesService.Update(model);
 
             if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -389,6 +423,14 @@ public class SeriesController : Controller
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
             model.FleetOptions = blankVm.FleetOptions;
+
+            // Log model state errors for debugging
+            var errors = ModelState.Values.SelectMany(v => v.Errors);
+            foreach (var error in errors)
+            {
+                System.Diagnostics.Debug.WriteLine($"ModelState Error: {error.ErrorMessage}");
+            }
+
             return View(model);
         }
 
