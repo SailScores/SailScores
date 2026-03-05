@@ -188,16 +188,16 @@ namespace SailScores.Core.Scoring
             return seriesResults.Competitors.Count;
         }
 
-        protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+        protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
         {
-            var dnfScore = GetDnfScore(race) ?? 1;
+            var dnfScore = GetDnfScore(race, seriesResults) ?? 1;
             var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
             var percent = Math.Round(dnfScore * percentAdjustment / 100m, 1, MidpointRounding.AwayFromZero);
 
             return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
         }
 
-        protected decimal? GetDnfScore(Race race)
+        protected decimal? GetDnfScore(Race race, SeriesResults seriesResults = null)
         {
             var dnfCode = GetScoreCode(DNF_SCORENAME);
             if (IsTrivialCalculation(dnfCode))
@@ -212,12 +212,14 @@ namespace SailScores.Core.Scoring
                 return CalculateRaceBasedValue(new CalculatedScore
                 {
                     RawScore = new Score { Code = dnfCode.Name }
-                }, race);
+                }, race, seriesResults);
             }
 
-            return race.Scores
-                       .Count(s => CountsAsStarted(s)) +
-                        dnfCode.FormulaValue;
+            var relevantScores = seriesResults != null
+                ? race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId))
+                : race.Scores;
+
+            return relevantScores.Count(s => CountsAsStarted(s)) + dnfCode.FormulaValue;
         }
 
         protected virtual decimal? GetDefaultScore(Race race, SeriesResults resultsWorkInProgress)
@@ -235,7 +237,7 @@ namespace SailScores.Core.Scoring
                 return CalculateRaceBasedValue(new CalculatedScore
                 {
                     RawScore = new Score { Code = defaultCode.Name }
-                }, race);
+                }, race, resultsWorkInProgress);
             }
             if (IsSeriesBasedScore(defaultCode))
             {
@@ -243,8 +245,12 @@ namespace SailScores.Core.Scoring
                 // the competitors average, but that would create all sort of problems, I think.
                 return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0);
             }
-            return race.Scores.Count(s => CountsAsStarted(s)) +
-                        defaultCode.FormulaValue;
+
+            var relevantScores = resultsWorkInProgress != null
+                ? race.Scores.Where(s => resultsWorkInProgress.Competitors.Any(c => c.Id == s.CompetitorId))
+                : race.Scores;
+
+            return relevantScores.Count(s => CountsAsStarted(s)) + defaultCode.FormulaValue;
         }
 
         protected bool IsAverage(string code)
@@ -775,7 +781,7 @@ namespace SailScores.Core.Scoring
                     }
                     else if (IsRaceBasedValue(scoreCode))
                     {
-                        score.ScoreValue = CalculateRaceBasedValue(score, race);
+                        score.ScoreValue = CalculateRaceBasedValue(score, race, resultsWorkInProgress);
                     }
                 }
             }
@@ -877,19 +883,24 @@ namespace SailScores.Core.Scoring
                 || scoreCode.Formula.Equals(CAMETOSTARTPLUS_FORMULANAME, CASE_INSENSITIVE);
         }
 
-        private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race)
+        private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race, SeriesResults seriesResults = null)
         {
             var scoreCode = GetScoreCode(score.RawScore);
+
+            var relevantScores = seriesResults != null
+                ? race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId))
+                : race.Scores;
+
             return (scoreCode.Formula.ToUpperInvariant()) switch
             {
                 FINISHERSPLUS_FORMULANAME =>
-                    race.Scores.Count(s => CountsAsFinished(s)) +
+                    relevantScores.Count(s => CountsAsFinished(s)) +
                         scoreCode.FormulaValue,
                 CAMETOSTARTPLUS_FORMULANAME =>
-                    race.Scores.Count(s => CameToStart(s)) +
+                    relevantScores.Count(s => CameToStart(s)) +
                         scoreCode.FormulaValue,
                 PLACEPLUSPERCENT_FORMULANAME =>
-                    GetPenaltyScore(score, race, scoreCode),
+                    GetPenaltyScore(score, race, scoreCode, seriesResults),
                 _ =>
                     throw new InvalidOperationException(
                         "Score code definition issue with race based score code."),

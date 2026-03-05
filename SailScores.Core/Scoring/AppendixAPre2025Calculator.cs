@@ -53,9 +53,9 @@ public class AppendixAPre2025Calculator : BaseScoringCalculator
         return 1;
     }
 
-    protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+    protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
     {
-        var dnfScore = GetDnfScore(race) ?? 1;
+        var dnfScore = GetDnfScore(race, seriesResults) ?? 1;
         var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
         var percent = Math.Round(dnfScore * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
 

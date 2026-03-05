@@ -183,10 +183,15 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+        protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
         {
-            var dnfScore = GetDnfScore(race) ?? 0;
-            var fleetSize = race.Scores.Where(s => CameToStart(s)).Count();
+            var dnfScore = GetDnfScore(race, seriesResults) ?? 0;
+
+            var relevantScores = seriesResults != null
+                ? race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId))
+                : race.Scores;
+
+            var fleetSize = relevantScores.Count(s => CameToStart(s));
             var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
             var percent = Math.Round(fleetSize * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
 

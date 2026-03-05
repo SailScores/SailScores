@@ -62,7 +62,7 @@ public class CoxSpragueCalculator : BaseScoringCalculator
     // for Cox-Sprague this is most coded results: they depend on number of starters
     protected override void CalculateRaceDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
     {
-        
+
         foreach (var race in resultsWorkInProgress.SailedRaces)
         {
             var score = compResults.CalculatedScores[race];
@@ -70,7 +70,8 @@ public class CoxSpragueCalculator : BaseScoringCalculator
             if (scoreCode != null && CameToStart(score.RawScore)
                 && scoreCode.Formula != TIE_FORMULANAME)
             {
-                var starters = race.Scores.Count(s => CountsAsStarted(s));
+                var relevantScores = race.Scores.Where(s => resultsWorkInProgress.Competitors.Any(c => c.Id == s.CompetitorId));
+                var starters = relevantScores.Count(s => CountsAsStarted(s));
                 score.ScoreValue = CoxSpragueTable.GetScore(starters + 1, starters);
             }
         }
@@ -94,7 +95,8 @@ public class CoxSpragueCalculator : BaseScoringCalculator
         Dictionary<Guid, int> starterCounts = new Dictionary<Guid, int>();
         foreach (Race r in results.SailedRaces)
         {
-            starterCounts[r.Id] = r.Scores.Count(s => CountsAsStarted(s));
+            var relevantScores = r.Scores.Where(s => results.Competitors.Any(c => c.Id == s.CompetitorId));
+            starterCounts[r.Id] = relevantScores.Count(s => CountsAsStarted(s));
         }
         foreach (var comp in results.Competitors)
         {
@@ -251,10 +253,15 @@ public class CoxSpragueCalculator : BaseScoringCalculator
         }
     }
 
-    protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+    protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
     {
-        var dnfScore = GetDnfScore(race) ?? 0;
-        var fleetSize = race.Scores.Where(s => CameToStart(s)).Count();
+        var dnfScore = GetDnfScore(race, seriesResults) ?? 0;
+
+        var relevantScores = seriesResults != null
+            ? race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId))
+            : race.Scores;
+
+        var fleetSize = relevantScores.Count(s => CameToStart(s));
         var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
         var percent = Math.Round(fleetSize * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
 
