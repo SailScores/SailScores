@@ -215,9 +215,9 @@ namespace SailScores.Core.Scoring
                 }, race, seriesResults);
             }
 
-            var relevantScores = seriesResults != null
-                ? race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId))
-                : race.Scores;
+            var relevantScores = (_useOriginalPlace || seriesResults == null)
+                ? race.Scores
+                : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
 
             return relevantScores.Count(s => CountsAsStarted(s)) + dnfCode.FormulaValue;
         }
@@ -246,9 +246,9 @@ namespace SailScores.Core.Scoring
                 return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0);
             }
 
-            var relevantScores = resultsWorkInProgress != null
-                ? race.Scores.Where(s => resultsWorkInProgress.Competitors.Any(c => c.Id == s.CompetitorId))
-                : race.Scores;
+            var relevantScores = (_useOriginalPlace || resultsWorkInProgress == null)
+                ? race.Scores
+                : race.Scores.Where(s => resultsWorkInProgress.Competitors.Any(c => c.Id == s.CompetitorId));
 
             return relevantScores.Count(s => CountsAsStarted(s)) + defaultCode.FormulaValue;
         }
@@ -887,9 +887,11 @@ namespace SailScores.Core.Scoring
         {
             var scoreCode = GetScoreCode(score.RawScore);
 
-            var relevantScores = seriesResults != null
-                ? race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId))
-                : race.Scores;
+            // When _useOriginalPlace is true (UseFullRaceScores=true or no fleet), use all race scores.
+            // When _useOriginalPlace is false (fleet filtering with recalculation), filter to fleet competitors.
+            var relevantScores = (_useOriginalPlace || seriesResults == null)
+                ? race.Scores
+                : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
 
             return (scoreCode.Formula.ToUpperInvariant()) switch
             {

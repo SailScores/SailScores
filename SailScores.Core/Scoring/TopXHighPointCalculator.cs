@@ -171,9 +171,9 @@ public class TopXHighPointCalculator : BaseScoringCalculator
     {
         var dnfScore = GetDnfScore(race, seriesResults) ?? 0;
 
-        var relevantScores = seriesResults != null
-            ? race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId))
-            : race.Scores;
+        var relevantScores = (_useOriginalPlace || seriesResults == null)
+            ? race.Scores
+            : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
 
         var fleetSize = relevantScores.Count(s => CameToStart(s));
         var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
