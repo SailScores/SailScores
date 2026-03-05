@@ -1,7 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <Configurations>Debug;Release;Tests</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -10,6 +11,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CodeAnalysisRuleSet>SailScores.Core.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1701;1702;CS1998</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Tests|AnyCPU'">
     <CodeAnalysisRuleSet>SailScores.Core.ruleset</CodeAnalysisRuleSet>
     <NoWarn>1701;1702;CS1998</NoWarn>
   </PropertyGroup>
@@ -23,11 +29,7 @@
     <ProjectReference Include="..\SailScores.Database\SailScores.Database.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.EntityFrameworkCore">
-      <HintPath>..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore\2.1.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+  <!-- EF Core comes from NuGet packages, not hard-coded references -->
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />

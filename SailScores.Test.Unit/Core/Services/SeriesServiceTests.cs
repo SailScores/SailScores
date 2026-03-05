@@ -959,18 +959,17 @@ public class SeriesServiceTests
         Assert.NotNull(result);
         Assert.NotNull(result.FlatResults);
 
-        // ROOT CAUSE: PopulateCompetitorsAsync reassigns series.Competitors on line 828,
-        // which breaks object reference matching in BaseScoringCalculator.CalculateSimpleScores (line 93).
-        // When a score's Competitor property is matched against loop variable comp using ==,
-        // they're comparing object references. If series.Competitors is reassigned mid-function,
-        // previous references become stale and don't match, resulting in 0 calculated scores.
-        //
-        // Test the actual bug: CalculatedScores should have results for fleet competitors
-        // This test CURRENTLY FAILS with 0 CalculatedScores instead of the expected 2
-        // Expected: 2 calculated scores (one for comp1, one for comp2)
-        // Actual: 0 calculated scores (BUG - showing coded scores are not being scored for filtered fleets)
+        // FlatResults should have race data (historical results)
+        Assert.NotEmpty(result.FlatResults.Races);
+
+        // DIAGNOSTIC: Check if competitors are populated
+        Assert.NotEmpty(result.FlatResults.Competitors);
+        Assert.Equal(2, result.FlatResults.Competitors.Count());
+
+        // Check if calculated scores exist
         Assert.NotEmpty(result.FlatResults.CalculatedScores);
         Assert.Equal(2, result.FlatResults.CalculatedScores.Count());
+
         // FlatResult for the competitor with a DNC should be 2
         Assert.Equal(2, result.FlatResults.CalculatedScores.Single(s => s.CompetitorId == comp2.Id).TotalScore);
         Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp3.Id);

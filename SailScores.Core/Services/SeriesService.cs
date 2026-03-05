@@ -760,38 +760,38 @@ namespace SailScores.Core.Services
 
     if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out List<dbObj.Competitor> dbCompetitors) || dbCompetitors == null)
     {
-        var query = _dbContext.Competitors
-            .Include(c => c.CompetitorFleets)
-            .Where(c => compIds.Contains(c.Id));
+                var query = _dbContext.Competitors
+                    .Include(c => c.CompetitorFleets)
+                    .Where(c => compIds.Contains(c.Id));
 
-        // Filter by fleet if series has FleetId set
-        if (series.FleetId.HasValue)
-        {
-            query = query.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == series.FleetId.Value));
-        }
+                // Filter by fleet if series has FleetId set
+                if (series.FleetId.HasValue)
+                {
+                    query = query.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == series.FleetId.Value));
+                }
 
-        dbCompetitors = await query.ToListAsync()
-            .ConfigureAwait(false);
+                dbCompetitors = await query.ToListAsync()
+                    .ConfigureAwait(false);
 
-        // Only cache non-null results
-        if (dbCompetitors != null)
-        {
-            _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
-        }
-    }
-    else
-    {
-        // this method is called with series that may be missing races (creating
-        // historical results for charts)
-        // so we need to refilter the competitors.
-        dbCompetitors = dbCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
+                // Only cache non-null results
+                if (dbCompetitors != null)
+                {
+                    _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+                }
+            }
+            else
+            {
+                // this method is called with series that may be missing races (creating
+                // historical results for charts)
+                // so we need to refilter the competitors.
+                dbCompetitors = dbCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
 
-        // Also apply fleet filtering to cached results
-        if (series.FleetId.HasValue)
-        {
-            dbCompetitors = dbCompetitors.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == series.FleetId.Value)).ToList();
-        }
-    }
+                // Also apply fleet filtering to cached results
+                if (series.FleetId.HasValue)
+                {
+                    dbCompetitors = dbCompetitors.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == series.FleetId.Value)).ToList();
+                }
+            }
 
     series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
 

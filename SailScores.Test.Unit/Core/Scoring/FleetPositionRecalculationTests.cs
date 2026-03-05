@@ -68,7 +68,7 @@ public class FleetPositionRecalculationTests
         };
     }
 
-    [Fact(DisplayName = "PHASE 3 TODO: Scoring calculator must recalculate positions based on fleet competitors only when UseFullRaceScores=false")]
+    [Fact]
     public void ScoringCalculator_WithFleetAndUseFullRaceScoresFalse_RecalculatesPositionsByFleet()
     {
         // This test SPECIFIES what the scoring calculator MUST do in Phase 3
@@ -136,7 +136,7 @@ public class FleetPositionRecalculationTests
         Assert.Equal(3m, compCResult.TotalScore); // Was 6th overall, now 3rd among women
     }
 
-    [Fact(DisplayName = "PHASE 3 TODO: Scoring calculator must use original positions when UseFullRaceScores=true")]
+    [Fact]
     public void ScoringCalculator_WithFleetAndUseFullRaceScoresTrue_UsesOriginalPositions()
     {
         // This test SPECIFIES that when UseFullRaceScores=true, original positions should be used
@@ -199,7 +199,7 @@ public class FleetPositionRecalculationTests
         Assert.Equal(6m, compCResult.TotalScore); // Stays 6th (original position)
     }
 
-    [Fact(DisplayName = "PHASE 3 TODO: Scoring calculator must ignore UseFullRaceScores when series has no fleet")]
+    [Fact]
     public void ScoringCalculator_WithoutFleet_IgnoresUseFullRaceScoresSetting()
     {
         // This test SPECIFIES that UseFullRaceScores has no effect when FleetId is null
@@ -252,7 +252,7 @@ public class FleetPositionRecalculationTests
         Assert.Equal(4m, comp1Result.TotalScore); // Still scored at position 4
     }
 
-    [Fact(DisplayName = "PHASE 3 TODO: Scoring calculator must handle races with no fleet competitors gracefully")]
+    [Fact]
     public void ScoringCalculator_RaceWithNoFleetCompetitors_HandlesGracefully()
     {
         // A race is part of the series but has no fleet competitors.
@@ -301,7 +301,7 @@ public class FleetPositionRecalculationTests
         Assert.Null(exception);
     }
 
-    [Fact(DisplayName = "PHASE 3 TODO: Scoring calculator must correctly rank fleet competitors in mixed race")]
+    [Fact]
     public void ScoringCalculator_MixedFleetRace_RanksOnlyFleetCompetitors()
     {
         // Complex scenario: 4 women and 3 men interleaved in one race.

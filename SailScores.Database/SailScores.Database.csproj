@@ -1,7 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <Configurations>Debug;Release;Tests</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -14,17 +15,12 @@
     <NoWarn>1701;1702;</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Migrations\20190808010919_CreateRegatta.cs" />
-    <Compile Remove="Migrations\20190808010919_CreateRegatta.Designer.cs" />
-    <Compile Remove="Migrations\20190808011642_CreateRegatta.cs" />
-    <Compile Remove="Migrations\20190808011642_CreateRegatta.Designer.cs" />
-    <Compile Remove="Migrations\20191219184130_weather.cs" />
-    <Compile Remove="Migrations\20191219184130_weather.Designer.cs" />
-    <Compile Remove="Migrations\20200923212129_isPreliminary.cs" />
-    <Compile Remove="Migrations\20200923212129_isPreliminary.Designer.cs" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Tests|AnyCPU'">
+    <CodeAnalysisRuleSet>SailScores.Database.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1701;1702;</NoWarn>
+  </PropertyGroup>
 
+  <!-- Removed obsolete migration files - these no longer exist and were causing unnecessary rebuilds -->
   <ItemGroup>
     <None Remove="Sql\ClubStats.sql" />
     <None Remove="Sql\DeletableCompetitors.sql" />
@@ -58,11 +54,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Annotations">
-      <HintPath>..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1\System.ComponentModel.Annotations.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+  <!-- System.ComponentModel.Annotations is included in .NET 10.0 and EF Core packages; no explicit reference needed -->
 
   <ItemGroup>
     <Folder Include="Enumerations\" />
