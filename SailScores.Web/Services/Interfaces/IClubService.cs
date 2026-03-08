@@ -10,6 +10,10 @@ public interface IClubService
         string clubInitials,
         DateTime? startDate = null,
         DateTime? endDate = null);
+    Task<ClubStatsViewModel> GetSummarySeriesStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null);
     Task<IEnumerable<AllClubStatsViewModel>> GetAllClubStats();
 
     Task<Guid> GetClubId(string initials);

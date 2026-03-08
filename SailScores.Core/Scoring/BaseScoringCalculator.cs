@@ -996,5 +996,4 @@ namespace SailScores.Core.Scoring
 
         }
     }
-
 }

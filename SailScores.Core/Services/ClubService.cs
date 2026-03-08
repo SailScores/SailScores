@@ -642,6 +642,14 @@ namespace SailScores.Core.Services
             return await _dbContext.GetClubStats(clubInitials, startDate, endDate).ConfigureAwait(false);
         }
 
+        public async Task<IList<Db.ClubSeasonStats>> GetSummarySeriesStats(
+            string clubInitials,
+            DateTime? startDate = null,
+            DateTime? endDate = null)
+        {
+            return await _dbContext.GetSummarySeriesStats(clubInitials, startDate, endDate).ConfigureAwait(false);
+        }
+
         public async Task<IList<Db.SiteStats>> GetAllStats()
         {
             return await _dbContext.GetSiteStats().ConfigureAwait(false);

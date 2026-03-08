@@ -33,6 +33,10 @@ public interface IClubService
         string clubInitials,
         DateTime? startDate = null,
         DateTime? endDate = null);
+    Task<IList<Entities.ClubSeasonStats>> GetSummarySeriesStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null);
     Task<IList<Entities.SiteStats>> GetAllStats();
     Task UpdateStatsDescription(Guid clubId, string statisticsDescription);
     Task<string> GetClubName(string clubInitials);

@@ -85,6 +85,41 @@ public class ClubService : IClubService
         return returnObj;
     }
 
+    public async Task<ClubStatsViewModel> GetSummarySeriesStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
+    {
+        var seasonStats = await _coreClubService.GetSummarySeriesStats(clubInitials, startDate, endDate);
+        var firstSeason = seasonStats.FirstOrDefault();
+        var club = await _coreClubService.GetMinimalClub(clubInitials);
+
+        ClubStatsViewModel returnObj;
+        if (seasonStats != null && firstSeason != null)
+        {
+            returnObj = new ClubStatsViewModel
+            {
+                Initials = firstSeason.ClubInitials,
+                Name = firstSeason.ClubName,
+                StartDate = startDate,
+                EndDate = endDate,
+                SeasonStats = _mapper.Map<IEnumerable<ClubSeasonStatsViewModel>>(seasonStats)
+            };
+        }
+        else
+        {
+            returnObj = new ClubStatsViewModel
+            {
+                Initials = club.Initials,
+                Name = club.Name,
+                StartDate = startDate,
+                EndDate = endDate,
+                SeasonStats = new List<ClubSeasonStatsViewModel>()
+            };
+        }
+        return returnObj;
+    }
+
     public Task<System.Guid> GetClubId(string initials)
     {
         return _coreClubService.GetClubId(initials);
