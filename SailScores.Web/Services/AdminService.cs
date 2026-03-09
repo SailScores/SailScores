@@ -91,7 +91,7 @@ public class AdminService : IAdminService
         {
             var delInfo = fleetDeleteInfo.FirstOrDefault(fdi => fdi.Id == fleet.Id);
             fleet.IsDeletable = delInfo.IsDeletable;
-            fleet.PreventDeleteReason = delInfo.IsDeletable ? string.Empty : "Fleet has races assigned.";
+            fleet.PreventDeleteReason = delInfo.Reason;
             fleet.IsRegattaFleet = fleetRegattaInfo.Any(f => f.Key == fleet.Id);
         }
 
