@@ -709,11 +709,23 @@ namespace SailScores.Core.Scoring
             {
                 return new List<Race>();
             }
-            var lastRaceId = races
+            var lastRace = races
                 .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                     || r.State == RaceState.Preliminary)
-                .OrderBy(r => r.Date).ThenBy(r => r.Order).Last().Id;
-            return races.Where(r => r.Id != lastRaceId).ToList();
+                .OrderBy(r => r.Date).ThenBy(r => r.Order).LastOrDefault();
+            Guid? lastRaceId;
+            if(lastRace == default)
+            {
+                lastRace = races
+                    .Where(r => r.State == RaceState.Abandoned)
+                    .OrderBy(r => r.Date).ThenBy(r => r.Order).LastOrDefault();
+            }
+            if(lastRace == default)
+            {
+                return new List<Race>();
+            }
+
+            return races.Where(r => r.Id != lastRace.Id).ToList();
         }
 
         private SeriesResults GatherInitialResults(Series series)

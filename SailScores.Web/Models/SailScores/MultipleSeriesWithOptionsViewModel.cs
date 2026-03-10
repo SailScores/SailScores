@@ -65,4 +65,7 @@ public class MultipleSeriesRowViewModel
     public DateOnly? EnforcedStartDate { get; set; }
 
     public DateOnly? EnforcedEndDate { get; set; }
+
+    [Display(Name = "Summary Series")]
+    public Guid? SummarySeriesId { get; set; }
 }

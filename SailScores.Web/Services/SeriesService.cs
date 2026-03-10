@@ -177,13 +177,38 @@ public class SeriesService : ISeriesService
         var season = seasons.Single(s => s.Id == model.SeasonId);
         PreValidateRows(rows, season);
 
+        // Group rows by their per-row summary series assignment
+        var rowsWithPerRowSummary = rows.Where(r => r.SummarySeriesId.HasValue && r.SummarySeriesId != Guid.Empty)
+            .GroupBy(r => r.SummarySeriesId.Value)
+            .ToDictionary(g => g.Key, g => new List<Guid>());
+
         foreach (var row in rows)
         {
             var vm = CreateVmFromRow(row, model, clubId, updatedBy);
             var id = await SaveNew(vm);
             createdIds.Add(id);
+
+            // Track series for per-row summary series assignment
+            if (row.SummarySeriesId.HasValue && row.SummarySeriesId != Guid.Empty)
+            {
+                if (!rowsWithPerRowSummary.ContainsKey(row.SummarySeriesId.Value))
+                {
+                    rowsWithPerRowSummary[row.SummarySeriesId.Value] = new List<Guid>();
+                }
+                rowsWithPerRowSummary[row.SummarySeriesId.Value].Add(id);
+            }
         }
 
+        // Add series to their per-row assigned summary series
+        foreach (var kvp in rowsWithPerRowSummary)
+        {
+            if (kvp.Value.Any())
+            {
+                await AddSeriesToExistingSummaryAsync(kvp.Key, kvp.Value, updatedBy);
+            }
+        }
+
+        // Handle bulk summary series options (create new or add all to existing)
         if (model.SummarySummaryOption == "create")
         {
             var summaryId = await CreateSummarySeriesAsync(model, clubId, season, createdIds, updatedBy);
