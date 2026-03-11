@@ -695,7 +695,8 @@ namespace SailScores.Core.Services
                     Code = s.Value.RawScore.Code,
                     ScoreValue = s.Value.ScoreValue,
                     PerfectScoreValue = s.Value.PerfectScoreValue,
-                    Discard = s.Value.Discard
+                    Discard = s.Value.Discard,
+                    ElapsedTime = s.Value.RawScore.ElapsedTime
                 });
         }
 
@@ -716,6 +717,7 @@ namespace SailScores.Core.Services
                         Description = r.Description,
                         IsSeries = r.IsSeriesSummary,
                         State = r.State,
+                        TrackTimes = r.TrackTimes,
                         WeatherIcon = r.Weather?.Icon,
                         WindSpeedMeterPerSecond = r.Weather?.WindSpeedMeterPerSecond,
                         WindDirectionDegrees = r.Weather?.WindDirectionDegrees,
