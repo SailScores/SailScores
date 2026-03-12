@@ -32,6 +32,7 @@
         @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
     }
 </p>
+
 @{
     var previewModel = new ResultsTableViewModel
         {
@@ -67,6 +68,7 @@
         @:% participation required for ranking
     }
 </p>
+
 @{
     var currentResults = new ResultsTableViewModel
         {
@@ -84,7 +86,92 @@
 }
 @await Html.PartialAsync("_ResultsTable", currentResults)
 
+<hr />
+
+<!-- Charts Section -->
+@if (Model.AlternateChartData != null)
+{
+    <h3>
+        <span class="text-muted">Preview Chart</span>
+        @if (!String.IsNullOrWhiteSpace(@alternateResults.ScoringSystemName))
+        {
+            @alternateResults.ScoringSystemName
+        }
+        &ndash; @alternateResults.NumberOfDiscards @localizer["discards"]
+    </h3>
+    <p class="lead">
+        @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
+        {
+            @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
+        }
+    </p>
+    <div class="row">
+        <div class="col-12">
+            <svg id="alternateChart" class="results-chart"></svg>
+        </div>
+    </div>
+    <hr />
+}
+
+@if (Model.OriginalChartData != null)
+{
+    <h3>
+        <span class="text-muted">Currently shared Chart</span>
+        @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
+        {
+            @results.ScoringSystemName
+        }
+        &ndash; @results.NumberOfDiscards @localizer["discards"]
+    </h3>
+    <p class="lead">
+        @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
+        {
+            @results.PercentRequired.Value.ToString("G5")
+
+            @:% participation required for ranking
+        }
+    </p>
+    <div class="row">
+        <div class="col-12">
+            <svg id="originalChart" class="results-chart"></svg>
+        </div>
+    </div>
+}
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
+    <script src="~/js/seriesChart.min.js"></script>
+
+    @if (Model.AlternateChartData != null)
+    {
+        <script>
+            // Alternate chart data
+            var alternateChartData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.AlternateChartData, new Newtonsoft.Json.JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() }));
+        </script>
+    }
+
+    @if (Model.OriginalChartData != null)
+    {
+        <script>
+            // Original chart data
+            var originalChartData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.OriginalChartData, new Newtonsoft.Json.JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() }));
+        </script>
+    }
+
+    <script>
+        // Initialize charts with inline data
+        if (typeof(d3) !== "undefined" && d3 != null) {
+            if (typeof alternateChartData !== "undefined" && alternateChartData !== null) {
+                drawChartFromData(alternateChartData, "#alternateChart");
+            }
+
+            if (typeof originalChartData !== "undefined" && originalChartData !== null) {
+                drawChartFromData(originalChartData, "#originalChart");
+            }
+        }
+    </script>
 }
+
+

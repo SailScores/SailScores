@@ -49,14 +49,22 @@ public class WhatIfService : IWhatIfService
             options.SelectedScoringSystemId ?? default,
             options.Discards, 
             options.ParticipationPercent);
-        
+
         FillInChanges(newSeries, series);
+
+        // Get original chart data
+        var originalChartData = await _coreSeriesService.GetChartData(seriesId);
+
+        // Calculate alternate chart data
+        var alternateChartData = await _coreSeriesService.CalculateChartDataForSeries(newSeries);
 
         var vm = new WhatIfResultsViewModel
         {
             SeriesId = seriesId,
             Series = series,
             AlternateResults = newSeries.FlatResults,
+            OriginalChartData = originalChartData,
+            AlternateChartData = alternateChartData
         };
         return vm;
     }

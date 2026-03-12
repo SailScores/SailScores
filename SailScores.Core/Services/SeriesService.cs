@@ -1346,6 +1346,11 @@ namespace SailScores.Core.Services
             return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatChartData>(dbRow.Results);
         }
 
+        public async Task<FlatChartData> CalculateChartDataForSeries(Series series)
+        {
+            return await CalculateChartData(series).ConfigureAwait(false);
+        }
+
         private async Task NotifyIndexNow(Guid clubId, Guid seriesId)
         {
             try

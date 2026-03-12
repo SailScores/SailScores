@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Core.Model;
@@ -28,6 +28,7 @@ namespace SailScores.Core.Services
         Task UpdateParentSeriesResults(Guid seriesId, string updatedBy);
         Task<FlatModel.FlatResults> GetHistoricalResults(Series series);
         Task<FlatModel.FlatChartData> GetChartData(Guid seriesId);
+        Task<FlatModel.FlatChartData> CalculateChartDataForSeries(Series series);
         Task<Model.Series> CalculateWhatIfScoresAsync(
             Guid seriesId,
             Guid scoringSystemId,
