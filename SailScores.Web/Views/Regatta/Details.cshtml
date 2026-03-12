@@ -340,6 +340,35 @@
     </div>
 }
 
+@{
+    // Check if at least one fleet has races with results
+    var anyFleetHasResults = Model.Item.Fleets.Any(f => 
+        Model.Item.Series.Any(s => s.FleetId == f.Id && 
+                              s.FlatResults?.NumberOfSailedRaces > 0));
+}
+
+@if (anyFleetHasResults)
+{
+            <div class="row mt-4">
+        <div class="col-12">
+            <hr />
+            <div class="d-flex justify-content-end">
+                <a class="btn btn-outline-secondary d-flex flex-column align-items-center"
+                   style="width:130px;"
+                   asp-action="ExportAllSeriesHtml"
+                   asp-controller="Regatta"
+                   asp-route-clubInitials="@Model.ClubInitials"
+                   asp-route-season="@Model.Item.Season.UrlName"
+                   asp-route-regattaName="@Model.Item.UrlName"
+                   title="Export All to HTML">
+                    <span class="fas fa-2x fa-file-code mb-1"></span>
+                    <span>Export All to HTML</span>
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js" integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
 <script src="~/js/seriesChart.min.js"></script>

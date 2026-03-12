@@ -238,4 +238,23 @@ public class RegattaController : Controller
             return View(regatta);
         }
     }
+
+    public async Task<ActionResult> ExportAllSeriesHtml(
+        string clubInitials,
+        string season,
+        string regattaName)
+    {
+        var regatta = await _regattaService.GetRegattaAsync(clubInitials, season, regattaName);
+        if (regatta == null)
+        {
+            return NotFound();
+        }
+
+        var filename = System.Web.HttpUtility.UrlEncode($"{regatta.Name}.html", System.Text.Encoding.UTF8);
+        filename = filename.Replace("+", " ");
+        var disposition = $"attachment; filename=\"{filename}\"; filename*=UTF-8''{filename}";
+        Response.Headers["content-disposition"] = disposition;
+
+        return View(regatta);
+    }
 }

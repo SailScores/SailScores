@@ -243,7 +243,13 @@ public class CoxSpragueCalculator : BaseScoringCalculator
         // some day, might culculate these by using percent in competed races.
         foreach (var race in resultsWorkInProgress.Races)
         {
-            var score = compResults.CalculatedScores[race];
+
+            CalculatedScore score = null;
+            if (compResults.CalculatedScores.ContainsKey(race))
+            {
+                score = compResults.CalculatedScores[race];
+            }
+
             if (score != null && IsAverage(score.RawScore?.Code))
             {
                 score.ScoreValue = null;
