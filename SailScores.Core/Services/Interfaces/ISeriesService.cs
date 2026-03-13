@@ -34,5 +34,11 @@ namespace SailScores.Core.Services
             Guid scoringSystemId,
             int discards,
             decimal? participationPercent);
+
+        /// <summary>
+        /// Populates the Fleet navigation property for series that don't have a direct FleetId
+        /// by loading the most recent race's fleet. Efficient for clubs with many races.
+        /// </summary>
+        Task PopulateSeriesFleets(IList<Model.Series> series, Guid clubId);
     }
 }

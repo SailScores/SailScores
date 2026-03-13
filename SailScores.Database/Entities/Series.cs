@@ -44,6 +44,7 @@ public class Series
 
     // used for connecting series to correct fleet. Particularly for Regatta use.
     public Guid? FleetId { get; set; }
+    public Fleet Fleet { get; set; }
 
     // When fleet is selected, determines whether to use full race scores (true)
     // or recalculate positions based only on fleet competitors (false)

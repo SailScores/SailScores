@@ -1381,5 +1381,60 @@ namespace SailScores.Core.Services
                 // Logging is handled within the IndexNowService
             }
         }
+
+        public async Task PopulateSeriesFleets(IList<Model.Series> series, Guid clubId)
+        {
+            if (series == null || series.Count == 0)
+            {
+                return;
+            }
+
+            // Find series that:
+            // 1. Are not Summary series (Summary series don't get grouped by fleet)
+            // 2. Don't have a direct FleetId assignment
+            var seriesWithoutDirectFleet = series
+                .Where(s => s.Type != SeriesType.Summary 
+                    && (s.FleetId == null || s.Fleet == null))
+                .ToList();
+
+            if (seriesWithoutDirectFleet.Count == 0)
+            {
+                return;
+            }
+
+            // Get all series IDs that need fleet determination
+            var seriesIds = seriesWithoutDirectFleet.Select(s => s.Id).ToList();
+
+            // Batch query to get the most recent race's fleet for each series
+            // This is more efficient than loading all races
+            var recentRaceFleets = await _dbContext.Series
+                .Where(s => seriesIds.Contains(s.Id))
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Fleet)
+                .AsNoTracking()
+                .Select(s => new
+                {
+                    SeriesId = s.Id,
+                    RecentFleet = s.RaceSeries
+                        .Select(rs => rs.Race)
+                        .Where(r => r.Date.HasValue)
+                        .OrderByDescending(r => r.Date)
+                        .FirstOrDefault()
+                        .Fleet
+                })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            // Map the fleets back to the series objects
+            foreach (var item in recentRaceFleets)
+            {
+                var seriesItem = series.FirstOrDefault(s => s.Id == item.SeriesId);
+                if (seriesItem != null && item.RecentFleet != null)
+                {
+                    seriesItem.Fleet = _mapper.Map<Model.Fleet>(item.RecentFleet);
+                }
+            }
+        }
     }
 }

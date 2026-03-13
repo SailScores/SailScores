@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 
 namespace SailScores.Database.Entities;
 
@@ -26,4 +26,5 @@ public class Fleet
     public FleetType FleetType { get; set; }
     public IList<FleetBoatClass> FleetBoatClasses { get; set; }
     public IList<CompetitorFleet> CompetitorFleets { get; set; }
+
 }
