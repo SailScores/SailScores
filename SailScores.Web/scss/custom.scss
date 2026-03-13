@@ -1219,7 +1219,7 @@ form label.required:not(.custom-control-label)::after {
     /* Subtle hover effect for interactive cards */
     .card {
         transition: all 0.2s ease-in-out;
-        
+
         &:hover {
             box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
@@ -1233,4 +1233,10 @@ form label.required:not(.custom-control-label)::after {
         position: relative;
         z-index: 2;
     }
+}
+
+/* Subtle accordion header styling */
+.accordion-button:not(.collapsed) {
+    background-color: transparent;
+    box-shadow: none;
 }

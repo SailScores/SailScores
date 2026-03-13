@@ -17,19 +17,19 @@
                 @if (Model.IsClubAdmin)
                 {
                     <li class="nav-item">
-                        <a class="nav-link" href="#classes">Classes</a>
+                        <a class="nav-link accordion-nav" href="#collapseClasses" data-section="classes">Classes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#fleets">Fleets</a>
+                        <a class="nav-link accordion-nav" href="#collapseFleets" data-section="fleets">Fleets</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#seasons">Seasons</a>
+                        <a class="nav-link accordion-nav" href="#collapseSeasons" data-section="seasons">Seasons</a>
                     </li>
                 }
                 @if (Model.CanEditSeries)
                 {
                     <li class="nav-item">
-                        <a class="nav-link" href="#series">Series</a>
+                        <a class="nav-link accordion-nav" href="#collapseSeries" data-section="series">Series</a>
                     </li>
                 }
                 <li class="nav-item">
@@ -43,13 +43,13 @@
                 @if (Model.IsClubAdmin)
                 {
                     <li class="nav-item">
-                        <a class="nav-link" href="#scoring">Scoring</a>
+                        <a class="nav-link accordion-nav" href="#collapseScoring" data-section="scoring">Scoring</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#regattas">Regattas</a>
+                        <a class="nav-link accordion-nav" href="#collapseRegattas" data-section="regattas">Regattas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#scorekeepers">Scorekeepers</a>
+                        <a class="nav-link accordion-nav" href="#collapseScorekeepers" data-section="scorekeepers">Scorekeepers</a>
                     </li>
 @*                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Backup"
@@ -86,106 +86,218 @@
         </div>
     }
 </div>
-<hr />
 <div class="row d-none d-md-inline">
-    <div class="col-lg-8">
-        <div class="row">
-            <div class="col-md-2">
-                <span class="fst-italic">@Html.DisplayNameFor(model => model.Description)</span>
-            </div>
-            <div class="col-md-10">
-                @Html.Raw(String.IsNullOrWhiteSpace(Model.Description) ? "" : Markdig.Markdown.ToHtml(Model.Description))
-            </div>
+    <div class="row">
+        <div class="col-4 col-md-3">
+            <span class="fst-italic">Default Scoring</span>
         </div>
-        <div class="row">
-            <div class="col-4 col-md-2">
-                <span class="fst-italic">Default Scoring</span>
-            </div>
-            <div class="col-8 col-md-10">
-                @Model.DefaultScoringSystemName
-            </div>
+        <div class="col-8 col-md-9">
+            @Model.DefaultScoringSystemName
         </div>
-        <div class="row">
-            <div class="col-4 col-md-2"></div>
-            <div class="col-8 col-md-10">
-                @if (Model.IsHidden)
-                {
-                    <span class="text-warning">Not listed on SailScores front page.</span>
-                }
-            </div>
+    </div>
+    <div class="row">
+        <div class="col-4 col-md-3"></div>
+        <div class="col-8 col-md-9">
+            @if (Model.IsHidden)
+            {
+                <span class="text-warning">Not listed on SailScores front page.</span>
+            }
         </div>
     </div>
 </div>
-<div class="d-md-none">
-    <ul class="nav flex-column">
-        @if (Model.IsClubAdmin)
-        {
-            <li class="nav-item">
-                <a class="nav-link" href="#classes">Classes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#fleets">Fleets</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#seasons">Seasons</a>
-            </li>
-        }
-        @if (Model.CanEditSeries)
-        {
-            <li class="nav-item">
-                <a class="nav-link" href="#series">Series</a>
-            </li>
-        }
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="Competitor"
-               asp-action="index">Competitors</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="Race"
-               asp-action="index">Races</a>
-        </li>
-        @if (Model.IsClubAdmin)
-        {
-            <li class="nav-item">
-                <a class="nav-link" href="#scoring">Scoring</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#regattas">Regattas</a>
-            </li>
-        }
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="Reports"
-               asp-action="Index">Reports</a>
-        </li>
-    </ul>
+
+
+@{
+    bool isSetupComplete = Model.Tips == null || (Model.Tips != null && Model.Tips.Count == 0);
+}
+
+<div class="accordion mt-2" id="adminAccordion">
+    @if (Model.IsClubAdmin)
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseClasses" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseClasses">
+                    <h4 class="mb-0">
+                        Classes
+                        <a class="text-primary accordion-help-icon"
+                            data-bs-container="body"
+                            data-bs-toggle="popover"
+                            data-bs-placement="top"
+                            data-bs-trigger="focus hover"
+                            data-bs-content="Class refers to the type of boat. A competitor can only belong to one class.">
+                            <span class="far fa-question-circle"></span>
+                        </a>
+                    </h4>
+                </button>
+            </h2>
+            <div id="collapseClasses" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+                <div class="accordion-body">
+                    @await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFleets" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseFleets">
+                    <h4 class="mb-0">
+                        Fleets
+                        <a class="text-primary accordion-help-icon"
+                            data-bs-container="body"
+                            data-bs-toggle="popover"
+                            data-bs-placement="top"
+                            data-bs-trigger="focus hover"
+                            data-bs-content="Fleets group boats that race against each other. Competitors can belong to multiple fleets.">
+                            <span class="far fa-question-circle"></span>
+                        </a>
+                    </h4>
+                </button>
+            </h2>
+            <div id="collapseFleets" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+                <div class="accordion-body">
+                    @await Html.PartialAsync("_FleetList", Model.Fleets)
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeasons" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseSeasons">
+                    <h4 class="mb-0">
+                        Seasons
+                        <a class="text-primary accordion-help-icon"
+                            data-bs-container="body"
+                            data-bs-toggle="popover"
+                            data-bs-placement="top"
+                            data-bs-trigger="focus hover"
+                            data-bs-content="Seasons typically repeat each year. Every series must belong to a season. They help with links and statistics.">
+                            <span class="far fa-question-circle"></span>
+                        </a>
+                    </h4>
+                </button>
+            </h2>
+            <div id="collapseSeasons" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+                <div class="accordion-body">
+                    @await Html.PartialAsync("_SeasonList", Model.Seasons)
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.CanEditSeries)
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeries" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseSeries">
+                    <h4 class="mb-0">
+                        Series
+                        <a class="text-primary accordion-help-icon"
+                            data-bs-container="body"
+                            data-bs-toggle="popover"
+                            data-bs-placement="top"
+                            data-bs-trigger="focus hover"
+                            data-bs-content="Series are groups of races to be scored together. A race can belong to multiple series.">
+                            <span class="far fa-question-circle"></span>
+                        </a>
+                    </h4>
+                </button>
+            </h2>
+            <div id="collapseSeries" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+                <div class="accordion-body">
+                    @await Html.PartialAsync("_SeriesList", Model.Series)
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCompetitors" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseCompetitors">
+                <h4 class="mb-0">Competitors</h4>
+            </button>
+        </h2>
+        <div id="collapseCompetitors" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+            <div class="accordion-body">
+                @await Html.PartialAsync("_CompetitorList")
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRaces" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseRaces">
+                <h4 class="mb-0">Races</h4>
+            </button>
+        </h2>
+        <div id="collapseRaces" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+            <div class="accordion-body">
+                @await Html.PartialAsync("_RaceList", Model)
+            </div>
+        </div>
+    </div>
+
+    @if (Model.IsClubAdmin)
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScoring" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseScoring">
+                    <h4 class="mb-0">Scoring Systems</h4>
+                </button>
+            </h2>
+            <div id="collapseScoring" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+                <div class="accordion-body">
+                    @await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRegattas" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseRegattas">
+                    <h4 class="mb-0">
+                        Regattas
+                        <a class="text-primary accordion-help-icon"
+                            data-bs-container="body"
+                            data-bs-toggle="popover"
+                            data-bs-placement="top"
+                            data-bs-trigger="focus hover"
+                            data-bs-content="Regattas are an event over one or a few days. A regatta can involve multiple fleets.">
+                            <span class="far fa-question-circle"></span>
+                        </a>
+                    </h4>
+                </button>
+            </h2>
+            <div id="collapseRegattas" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+                <div class="accordion-body">
+                    @await Html.PartialAsync("_RegattaList", Model.Regattas)
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScorekeepers" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseScorekeepers">
+                    <h4 class="mb-0">
+                        Scorekeepers
+                        <a class="text-primary accordion-help-icon"
+                            data-bs-container="body"
+                            data-bs-toggle="popover"
+                            data-bs-placement="top"
+                            data-bs-trigger="focus hover"
+                            data-bs-content="Allow other users to edit results. Scorekeepers may be added, removed, and edited.">
+                            <span class="far fa-question-circle"></span>
+                        </a>
+                    </h4>
+                </button>
+            </h2>
+            <div id="collapseScorekeepers" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
+                <div class="accordion-body">
+                    @await Html.PartialAsync("_UserList", Model.Users)
+                </div>
+            </div>
+        </div>
+    }
 </div>
-<br />
-@if (Model.IsClubAdmin)
-{
-    @await Html.PartialAsync("_BoatClassList", Model.BoatClasses)
-    <br />
-    @await Html.PartialAsync("_FleetList", Model.Fleets)
-    <br />
-    @await Html.PartialAsync("_SeasonList", Model.Seasons)
-    <br />
-}
-@if (Model.CanEditSeries)
-{
-    @await Html.PartialAsync("_SeriesList", Model.Series)
-    <br />
-}
-@await Html.PartialAsync("_CompetitorList")
-<br />
-@await Html.PartialAsync("_RaceList", Model)
-<br />
-@if (Model.IsClubAdmin)
-{
-    @await Html.PartialAsync("_ScoringSystems", Model.ScoringSystems)
-    <br />
-    @await Html.PartialAsync("_RegattaList", Model.Regattas)
-    <br />
-    @await Html.PartialAsync("_UserList", Model.Users)
-}
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -202,5 +314,52 @@
           return new bootstrap.Popover(popoverTriggerEl)
         })
 
+        // Prevent accordion help icons from triggering collapse
+        document.querySelectorAll('.accordion-help-icon').forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        // Accordion navigation: expand clicked section and collapse others
+        document.querySelectorAll('.accordion-nav').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetCollapse = document.getElementById(targetId);
+
+                if (targetCollapse) {
+                    // Use Bootstrap's collapse API to show this section
+                    const bsCollapse = new bootstrap.Collapse(targetCollapse, { toggle: false });
+                    bsCollapse.show();
+
+                    // Scroll to the accordion header (the h2 that precedes the collapse div)
+                    setTimeout(() => {
+                        const accordionHeader = targetCollapse.previousElementSibling;
+                        if (accordionHeader && accordionHeader.classList.contains('accordion-header')) {
+                            accordionHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        } else {
+                            // Fallback: scroll to the collapse div if header not found
+                            targetCollapse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }, 300);
+                }
+            });
+        });
+
+        // Handle hash navigation (e.g., page loaded with #collapseSeries)
+        window.addEventListener('hashchange', expandSectionFromHash);
+        document.addEventListener('DOMContentLoaded', expandSectionFromHash);
+
+        function expandSectionFromHash() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const element = document.getElementById(hash);
+                if (element && element.classList.contains('accordion-collapse')) {
+                    const bsCollapse = new bootstrap.Collapse(element, { toggle: false });
+                    bsCollapse.show();
+                }
+            }
+        }
     </script>
 }
