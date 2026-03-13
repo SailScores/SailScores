@@ -13,13 +13,19 @@ import { getY, getDate } from './seriesChartUtils.js';
     const charts = document.getElementsByClassName("results-chart");
     for (let i = 0; i < charts.length; i++) {
         let el = charts[i];
-        if (el.dataset.seriesId) {
-            drawChart(el.dataset.seriesId || '', "#" + el.id);
+        // Only initialize charts that have a non-empty series id and an element id
+        const seriesId = el.dataset.seriesId;
+        if (typeof seriesId !== 'undefined' && seriesId !== null && String(seriesId).trim().length > 0 && el.id) {
+            drawChart(seriesId, "#" + el.id);
         }
     }
 
 
     function drawChart(seriesId, elementId) {
+        // Defensive: do nothing if no seriesId provided
+        if (!seriesId || String(seriesId).trim().length === 0) {
+            return;
+        }
         const dataPath = "/series/chart?seriesId=" + seriesId;
         if (typeof (d3) != "undefined" && d3 != null) {
             d3.json(dataPath).then(data => processChartData(data, elementId));
