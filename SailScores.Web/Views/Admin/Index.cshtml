@@ -10,61 +10,6 @@
     Layout = "_ClubLayout";
 }
 
-@section Sidebar {
-    <nav class="col-md-2 d-none d-md-block bg-almost sidebar">
-        <div class="sidebar-sticky sticky-top">
-            <ul class="nav flex-column">
-                @if (Model.IsClubAdmin)
-                {
-                    <li class="nav-item">
-                        <a class="nav-link accordion-nav" href="#collapseClasses" data-section="classes">Classes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link accordion-nav" href="#collapseFleets" data-section="fleets">Fleets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link accordion-nav" href="#collapseSeasons" data-section="seasons">Seasons</a>
-                    </li>
-                }
-                @if (Model.CanEditSeries)
-                {
-                    <li class="nav-item">
-                        <a class="nav-link accordion-nav" href="#collapseSeries" data-section="series">Series</a>
-                    </li>
-                }
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Competitor"
-                       asp-action="index">Competitors</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Race"
-                       asp-action="index">Races</a>
-                </li>
-                @if (Model.IsClubAdmin)
-                {
-                    <li class="nav-item">
-                        <a class="nav-link accordion-nav" href="#collapseScoring" data-section="scoring">Scoring</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link accordion-nav" href="#collapseRegattas" data-section="regattas">Regattas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link accordion-nav" href="#collapseScorekeepers" data-section="scorekeepers">Scorekeepers</a>
-                    </li>
-@*                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Backup"
-                           asp-action="Index">Backup &amp; Restore</a>
-                    </li> *@
-                }
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Reports"
-                       asp-action="Index">Reports</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-}
-
 <h2>@Model.Name Admin</h2>
 <hr />
 @if (Model.Tips != null)
@@ -72,19 +17,24 @@
     @await Html.PartialAsync("_AdminToDoList", Model.Tips)
 }
 <div class="row">
-    <div class="col-6 col-md-5 col-lg-4">
+    <div class="col-4">
         <a asp-controller="Race"
            asp-action="Create"
            class="btn btn-outline-primary btn-sm">@localizer["New Race"]</a>
     </div>
     @if (Model.IsClubAdmin)
     {
-        <div class="col-6 col-sm-4">
+        <div class="col-4">
             <a asp-controller="Admin"
                asp-action="Edit"
                class="btn btn-outline-primary btn-sm">@localizer["Edit Club Info"]</a>
         </div>
     }
+    <div class="col-4">
+        <a asp-controller="Reports"
+           asp-action="Index"
+           class="btn btn-outline-primary btn-sm">@localizer["Reports"]</a>
+    </div>
 </div>
 <div class="row d-none d-md-inline">
     <div class="row">
