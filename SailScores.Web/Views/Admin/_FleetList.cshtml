@@ -15,7 +15,7 @@
                 </a>
             </h3>
         </div>
-        <div class="col-2 col-sm-4">
+        <div class="col-2 col-sm-4 col-md-3">
             <a class="btn btn-primary"
                 asp-action="Create"
                 asp-controller="Fleet">
@@ -25,10 +25,16 @@
                 </span>
             </a>
         </div>
+        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end mt-2 mt-md-0">
+          <div class="form-check d-flex align-items-center">
+            <input id="admin-show-inactive" class="form-check-input" type="checkbox" /> <label for="admin-show-inactive" class="form-check-label ms-2 mb-0">Show Inactive</label>
+          </div>
+        </div>
     </div>
     @foreach (var item in Model.OrderBy(f => f.Name))
     {
-        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
+        var inactiveClass = item.IsActive ? "" : " fleet-inactive d-none";
+        <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2@(inactiveClass)">
             <div class="col-12 col-sm-6 col-md-6">
 
                 @if(!item.IsDeletable)
@@ -69,3 +75,35 @@
         </div>
     }
 </div>
+
+<script>
+    function initFleetInactiveToggle() {
+        var checkbox = document.getElementById('admin-show-inactive');
+        if (!checkbox) return;
+
+        // Remove any existing listener to avoid duplicates
+        checkbox.removeEventListener('change', toggleInactiveFleets);
+
+        // default unchecked - inactive rows are hidden by d-none on load
+        checkbox.addEventListener('change', toggleInactiveFleets);
+    }
+
+    function toggleInactiveFleets() {
+        var checkbox = document.getElementById('admin-show-inactive');
+        var inactiveRows = document.querySelectorAll('#fleetsdiv .fleet-inactive');
+        inactiveRows.forEach(function(r) {
+            if (checkbox.checked) {
+                r.classList.remove('d-none');
+            } else {
+                r.classList.add('d-none');
+            }
+        });
+    }
+
+    // Initialize on DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFleetInactiveToggle);
+    } else {
+        initFleetInactiveToggle();
+    }
+</script>
