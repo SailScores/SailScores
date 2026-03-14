@@ -1,4 +1,4 @@
-﻿using Humanizer;
+using Humanizer;
 using SailScores.Core.Model;
 
 namespace SailScores.Web.Models.SailScores;
@@ -30,6 +30,63 @@ public class SeriesSummary
     public DateTime? UpdatedDate { get; set; }
     public String UpdatedBy { get; set; }
 
+    public String StartDateString
+    {
+        get {
+            if (StartDate.HasValue)
+            {
+                return StartDate.Value.ToString("M");
+            }
+            if (Races?.Count == 0)
+            {
+                return "No Races";
+            }
+            else if (Races?.Count == 1)
+            {
+                return Races[0]?.Date?.ToString("M") ?? String.Empty;
+            }
+
+            var maxDate = Races.Max(r => r.Date);
+            var minDate = Races.Min(r => r.Date);
+            // if one has a value, they should both have values, but for completeness sake:
+            if (maxDate.HasValue && minDate.HasValue)
+            {
+                return minDate?.ToString("M");
+            }
+            // no max
+            return String.Empty;
+        }
+    }
+
+    public String EndDateString
+    {
+        get {
+            if (StartDate.HasValue && EndDate.HasValue)
+            {
+                if (StartDate == EndDate)
+                {
+                    return String.Empty;
+                }
+                else
+                {
+                    return EndDate.Value.ToString("M");
+                }
+            }
+            if (Races?.Count == 0 || Races?.Count == 1)
+            {
+                return String.Empty;
+            }
+
+            var maxDate = Races.Max(r => r.Date);
+            var minDate = Races.Min(r => r.Date);
+            // if one has a value, they should both have values, but for completeness sake:
+            if (maxDate.HasValue && minDate.HasValue && maxDate != minDate)
+            {
+                return maxDate?.ToString("M");
+            }
+            return String.Empty;
+        }
+    }
     public String DateString
     {
         get

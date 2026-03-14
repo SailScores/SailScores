@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Extensions;
 using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
@@ -40,7 +40,29 @@ public class RaceSummaryViewModel
 
     public bool ExcludeFromCompStats { get; set; }
 
-    public String CalculatedName
+    public String CalculatedMediumName
+    {
+        get
+        {
+            var raceWord = "Race";
+            if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "fi")
+            {
+                raceWord = "Purjehdukset";
+            }
+            if (Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "sv")
+            {
+                raceWord = "Seglingar";
+            }
+            if (String.IsNullOrEmpty(this.Name))
+            {
+                return $"{Date.ToMediumString()} {raceWord} {Order}";
+            } else
+            {
+                return $"{this.Name} ({Date.ToMediumString()} {raceWord} {Order})";
+            }
+        }
+    }
+    public string CalculatedShortName
     {
         get
         {
@@ -56,13 +78,14 @@ public class RaceSummaryViewModel
             if (String.IsNullOrEmpty(this.Name))
             {
                 return $"{Date.ToShortString()} {raceWord} {Order}";
-            } else
+            }
+            else
             {
                 return $"{this.Name} ({Date.ToShortString()} {raceWord} {Order})";
             }
         }
     }
-    public string ShortName
+    public string SuperShortName
     {
         get
         {

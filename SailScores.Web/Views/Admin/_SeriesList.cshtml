@@ -65,58 +65,7 @@
                 <div class="admin-series-list">
                 @foreach (var item in seasonGroup)
                 {
-                    // Use Series StartDate/EndDate if available, otherwise calculate from Races
-                    // but races will probably be null here: they aren't loaded by default for club
-                    // admin.
-                    DateTime? startDate = item.StartDate.HasValue 
-                        ? item.StartDate.Value.ToDateTime(TimeOnly.MinValue) 
-                        : item.Races?.Where(r => r != null && r.Date.HasValue).Min(r => r.Date);
-                    DateTime? endDate = item.EndDate.HasValue 
-                        ? item.EndDate.Value.ToDateTime(TimeOnly.MinValue) 
-                        : item.Races?.Where(r => r != null && r.Date.HasValue).Max(r => r.Date);
-                    <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2 admin-series-row"
-                         data-name="@item.Name"
-                         data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")"
-                         data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
-                        <div class="col-sm-9 col-md-7 col-xl-6">
-                            <a class="btn btn-sm btn-outline-danger"
-                                asp-action="Delete"
-                                asp-controller="Series"
-                                asp-route-id="@item.Id"
-                                title="Delete">
-                                <span class="fas fa-trash"></span>
-                            </a> &nbsp;
-                            <a class="btn btn-sm btn-outline-primary"
-                                asp-action="Edit"
-                                asp-controller="Series"
-                                asp-route-id="@item.Id"
-                                title="Edit">
-                                <span class="fas fa-pen"></span>
-                            </a>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </div>
-                        <div class="d-none d-sm-inline col-sm-3 col-md-2 text-sm-end text-md-start">
-                            @if(item.Type == SailScores.Core.Model.SeriesType.Summary)
-                            {
-                                @:<span class="small muted">Summary</span>
-                            } else
-                            {
-                                @Html.DisplayFor(modelItem => item.Races.Count)
-                                @:Races
-                            }
-                        </div>
-                        <div class="d-none d-md-inline col-md-3 col-xl-4">
-                            @Html.DisplayFor(modelItem => item.Description)
-                            @if(item.StartDate.HasValue && item.EndDate.HasValue &&
-                            item.StartDate != item.EndDate) {
-                                @:(@item.StartDate - @item.EndDate)
-                            } else if (item.StartDate.HasValue && item.EndDate.HasValue &&
-                                item.StartDate == item.EndDate
-                            ){
-                                @:(@item.StartDate)
-                            }
-                        </div>
-                    </div>
+                    @await Html.PartialAsync("_SeriesRow", item)
                 }
                 </div>
                 <br />
@@ -162,55 +111,7 @@
                         <div class="admin-series-list-fleet">
                         @foreach (var item in fleetGroup)
                         {
-                            DateTime? startDate = item.StartDate.HasValue 
-                                ? item.StartDate.Value.ToDateTime(TimeOnly.MinValue) 
-                                : item.Races?.Where(r => r != null && r.Date.HasValue).Min(r => r.Date);
-                            DateTime? endDate = item.EndDate.HasValue 
-                                ? item.EndDate.Value.ToDateTime(TimeOnly.MinValue) 
-                                : item.Races?.Where(r => r != null && r.Date.HasValue).Max(r => r.Date);
-                            <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2 admin-series-row"
-                                 data-name="@item.Name"
-                                 data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")"
-                                 data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
-                                <div class="col-sm-9 col-md-7 col-xl-6">
-                                    <a class="btn btn-sm btn-outline-danger"
-                                        asp-action="Delete"
-                                        asp-controller="Series"
-                                        asp-route-id="@item.Id"
-                                        title="Delete">
-                                        <span class="fas fa-trash"></span>
-                                    </a> &nbsp;
-                                    <a class="btn btn-sm btn-outline-primary"
-                                        asp-action="Edit"
-                                        asp-controller="Series"
-                                        asp-route-id="@item.Id"
-                                        title="Edit">
-                                        <span class="fas fa-pen"></span>
-                                    </a>
-                                    @Html.DisplayFor(modelItem => item.Name)
-                                </div>
-                                <div class="d-none d-sm-inline col-sm-3 col-md-2 text-sm-end text-md-start">
-                                    @if(item.Type == SailScores.Core.Model.SeriesType.Summary)
-                                    {
-                                        @:<span class="small muted">Summary</span>
-                                    } else
-                                    {
-                                        @Html.DisplayFor(modelItem => item.Races.Count)
-                                        @:Races
-                                    }
-                                </div>
-                                <div class="d-none d-md-inline col-md-3 col-xl-4">
-                                    @Html.DisplayFor(modelItem => item.Description)
-                                    @if(item.StartDate.HasValue && item.EndDate.HasValue &&
-                                    item.StartDate != item.EndDate) {
-                                        @:(@item.StartDate - @item.EndDate)
-                                    } else if (item.StartDate.HasValue && item.EndDate.HasValue &&
-                                        item.StartDate == item.EndDate
-                                    ){
-                                        @:(@item.StartDate)
-                                    }
-                                </div>
-                            </div>
+                            @await Html.PartialAsync("_SeriesRow", item)
                         }
                         </div>
                         <br />
