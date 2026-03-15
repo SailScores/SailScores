@@ -76,7 +76,7 @@ namespace SailScores.Database
             string clubInitials,
             DateTime? startDate = null,
             DateTime? endDate = null);
-        Task<IList<ClubSeasonStats>> GetSummarySeriesStats(
+        Task<IList<SeriesParticipationStats>> GetSeriesParticipationStats(
             string clubInitials,
             DateTime? startDate = null,
             DateTime? endDate = null);

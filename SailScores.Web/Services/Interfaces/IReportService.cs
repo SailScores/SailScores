@@ -27,5 +27,11 @@ public interface IReportService
         DateTime? startDate = null,
         DateTime? endDate = null);
 
+    Task<SeriesParticipationStatsViewModel> SeriesParticipationStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        bool summaryOnly = false);
+
     string BuildAllCompPlacesCsv(AllCompHistogramViewModel model);
 }

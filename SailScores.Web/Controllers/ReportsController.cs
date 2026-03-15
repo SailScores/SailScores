@@ -105,14 +105,14 @@ public class ReportsController : Controller
         return View(stats);
     }
 
-    public async Task<ActionResult> SummarySeriesParticipation(
+    public async Task<ActionResult> SeriesParticipation(
         string clubInitials,
         DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTime? endDate = null,
+        bool? summaryOnly = null)
     {
         ViewData["ClubInitials"] = clubInitials;
-        var stats = await _webClubService.GetSummarySeriesStats(clubInitials, startDate, endDate);
-        stats.CanEdit = true;
+        var stats = await _reportService.SeriesParticipationStats(clubInitials, startDate, endDate, summaryOnly ?? false);
         return View(stats);
     }
 
@@ -221,21 +221,24 @@ public class ReportsController : Controller
         return File(bytes, "text/csv", fileName);
     }
 
-    public async Task<ActionResult> SummarySeriesParticipationExport(
+    public async Task<ActionResult> SeriesParticipationExport(
         string clubInitials,
         DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTime? endDate = null,
+        bool? summaryOnly = null)
     {
-        var stats = await _webClubService.GetSummarySeriesStats(clubInitials, startDate, endDate);
+        var stats = await _reportService.SeriesParticipationStats(clubInitials, startDate, endDate, summaryOnly ?? false);
 
         var csv = new System.Text.StringBuilder();
-        csv.AppendLine("Season,Boat Class,Distinct Competitors,Races,Total Starts,Race Days,Average Competitors Per Race,First Race,Last Race");
+        csv.AppendLine("Season,Series,Series Type,Boat Class,Distinct Competitors,Races,Total Starts,Race Days,Average Competitors Per Race,First Race,Last Race");
 
-        if (stats?.SeasonStats != null)
+        if (stats?.Rows != null)
         {
-            foreach (var item in stats.SeasonStats)
+            foreach (var item in stats.Rows)
             {
                 var season = item.SeasonName ?? string.Empty;
+                var series = item.SeriesName ?? string.Empty;
+                var seriesType = item.SeriesType ?? string.Empty;
                 var boatClass = item.ClassName ?? string.Empty;
                 var distinctCompetitors = item.DistinctCompetitorsStarted?.ToString() ?? string.Empty;
                 var races = item.RaceCount?.ToString() ?? string.Empty;
@@ -245,12 +248,12 @@ public class ReportsController : Controller
                 var firstRace = item.FirstRace.HasValue ? item.FirstRace.Value.ToString("yyyy-MM-dd") : string.Empty;
                 var lastRace = item.LastRace.HasValue ? item.LastRace.Value.ToString("yyyy-MM-dd") : string.Empty;
 
-                csv.AppendLine($"\"{season}\",\"{boatClass}\",{distinctCompetitors},{races},{totalStarts},{raceDays},{avg},{firstRace},{lastRace}");
+                csv.AppendLine($"\"{season}\",\"{series}\",\"{seriesType}\",\"{boatClass}\",{distinctCompetitors},{races},{totalStarts},{raceDays},{avg},{firstRace},{lastRace}");
             }
         }
 
         var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
-        var fileName = $"{clubInitials}_SummarySeriesStats_{DateTime.Now:yyyyMMdd}.csv";
+        var fileName = $"{clubInitials}_SeriesStats_{DateTime.Now:yyyyMMdd}.csv";
         return File(bytes, "text/csv", fileName);
     }
 

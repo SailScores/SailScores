@@ -42,6 +42,7 @@
     <EmbeddedResource Include="Sql\ClubStats.sql" />
     <EmbeddedResource Include="Sql\RankCountsById.sql" />
     <EmbeddedResource Include="Sql\RankCounts.sql" />
+    <EmbeddedResource Include="Sql\SeriesParticipationStats.sql" />
   </ItemGroup>
 
   <ItemGroup>

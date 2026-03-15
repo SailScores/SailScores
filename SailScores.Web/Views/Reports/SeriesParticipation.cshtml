@@ -1,0 +1,116 @@
+@using Microsoft.Extensions.Localization;
+@using SailScores.Web.Resources;
+@using SailScores.Web.Services;
+
+@inject IStringLocalizer<SharedResource> localizer
+@inject AppSettingsService settingsService
+
+@model SailScores.Web.Models.SailScores.SeriesParticipationStatsViewModel
+@{
+    ViewBag.Title = Model.ClubName + " Series Participation";
+    Layout = "_ClubLayout";
+    ViewData["MetaDescription"] = $"Sailing results and scores for racing at {Model.ClubName} ({Model.ClubInitials})";
+}
+
+<div class="container p-0 p-md-2">
+    <div class="row mb-3">
+        <div class="col-12 col-md-8">
+            <h1>Series Participation</h1>
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
+            <a href="~/@Model.ClubInitials/Reports" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back to Reports</a>
+        </div>
+    </div>
+
+    <form method="get" class="row mb-4 g-3 align-items-end">
+        <div class="col-12 col-sm-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <label for="startDate" class="form-label mb-0 text-lg-end text-nowrap">Start Date</label>
+            <input type="date" class="form-control" id="startDate" name="startDate"
+                   value="@(Model.StartDate?.ToString("yyyy-MM-dd") ?? (Model.Rows?.Any() == true ? Model.Rows.Min(s => s.FirstRace)?.ToString("yyyy-MM-dd") : ""))" />
+        </div>
+        <div class="col-12 col-sm-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <label for="endDate" class="form-label mb-0 text-lg-end text-nowrap">End Date</label>
+            <input type="date" class="form-control" id="endDate" name="endDate"
+                   value="@(Model.EndDate?.ToString("yyyy-MM-dd") ?? (Model.Rows?.Any() == true ? Model.Rows.Max(s => s.LastRace)?.ToString("yyyy-MM-dd") : ""))" />
+        </div>
+        <div class="col-12 col-sm-auto">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="true" id="summaryOnly" name="summaryOnly" @(Model.SummaryOnly ? "checked" : "") />
+                <label class="form-check-label" for="summaryOnly">Show summary series only</label>
+            </div>
+        </div>
+        <div class="col-12 col-sm-auto d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="~/@Model.ClubInitials/Reports/SeriesParticipation" class="btn btn-outline-secondary">Clear</a>
+        </div>
+    </form>
+
+    <div class="row">
+        <div class="col-12">
+            @if (Model.Rows != null && Model.Rows.Any())
+            {
+                <div class="mb-2 d-flex justify-content-end">
+                    <a href="~/@Model.ClubInitials/Reports/SeriesParticipationExport?startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")&summaryOnly=@Model.SummaryOnly" class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Export as CSV
+                    </a>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Series</th>
+                            <th scope="col">Series Type</th>
+                            <th scope="col">Class</th>
+                            <th scope="col">Competitors</th>
+                            <th scope="col">Races</th>
+                            <th scope="col">Total Starts</th>
+                            <th scope="col">Race Days</th>
+                            <th scope="col">Ave Comp / race</th>
+                            <th scope="col">Dates</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var seasonGroup in Model.Rows.OrderBy(s => s.SeasonStart).GroupBy(s => s.SeasonName).OrderByDescending(g => g.Max(e => e.SeasonStart)))
+                    {
+                        // render season as a section header row (not a table column)
+                        <tr>
+                            <th colspan="9" class="bg-light">
+                                <h3 class="mb-0">@seasonGroup.Key</h3>
+                            </th>
+                        </tr>
+
+                        // Group by class grouping; if a series spans multiple classes, place under "Multiple"
+                        var classGroups = seasonGroup.GroupBy(r => (r.ClassCount.HasValue && r.ClassCount.Value > 1) ? "Multiple" : (r.ClassName ?? "")).OrderBy(g => g.Key);
+                        foreach (var classGroup in classGroups)
+                        {
+                            // render class subgroup header
+                            <tr>
+                                <td colspan="9" class="ps-4">
+                                    <strong>@(String.IsNullOrWhiteSpace(classGroup.Key) ? "(Unspecified)" : classGroup.Key)</strong>
+                                </td>
+                            </tr>
+
+                            foreach (var stat in classGroup)
+                            {
+                                <tr>
+                                    <td>@stat.SeriesName</td>
+                                    <td>@stat.SeriesType</td>
+                                    <td>@stat.ClassName</td>
+                                    <td>@stat.DistinctCompetitorsStarted</td>
+                                    <td>@stat.RaceCount</td>
+                                    <td>@stat.CompetitorsStarted</td>
+                                    <td>@stat.DistinctDaysRaced</td>
+                                    <td>@String.Format(System.Globalization.CultureInfo.CurrentCulture, "{0:0.0}", stat.AverageCompetitorsPerRace)</td>
+                                    <td>@stat.FirstRace?.ToString("M") &ndash; @stat.LastRace?.ToString("M")</td>
+                                </tr>
+                            }
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
