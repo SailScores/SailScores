@@ -10,6 +10,139 @@
     Layout = "_ClubLayout";
 }
 
+<style>
+    /* Remove borders on accordion items in the admin page */
+    #adminAccordion .accordion-item {
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+
+    /* Make accordion headers look like links but underline only the title text */
+    #adminAccordion .accordion-button {
+        box-shadow: none !important;
+        background: transparent !important;
+        color: var(--bs-link-color) !important;
+        text-decoration: none !important; /* don't underline whole button */
+        padding: .5rem 1rem !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+        /* Underline only the title text so whitespace and icons are not underlined */
+        #adminAccordion .accordion-button .accordion-title {
+            text-decoration: underline !important;
+            display: inline !important;
+            color: inherit !important;
+        }
+
+        /* Use emphasized color when expanded but keep the same font weight */
+        #adminAccordion .accordion-button:not(.collapsed) {
+            /* keep button un-underlined; do not change weight */
+            text-decoration: none !important;
+            color: var(--bs-primary-text-emphasis) !important;
+        }
+
+            /* Remove underline from the title when expanded and use emphasized color without bolding */
+            #adminAccordion .accordion-button:not(.collapsed) .accordion-title {
+                text-decoration: none !important;
+                font-weight: 500 !important;
+                color: var(--bs-primary-text-emphasis) !important;
+            }
+
+        /* Prevent the help icon from inheriting underline and match link text color */
+        #adminAccordion .accordion-button .accordion-help-icon {
+            text-decoration: none !important;
+            margin-left: .5rem;
+            color: var(--bs-link-color) !important;
+            display: inline-block;
+        }
+
+        /* Keep the collapse chevron visible but subtle and move it left of the title */
+        #adminAccordion .accordion-button::after {
+            opacity: .85;
+            /* place the pseudo before the button content */
+            order: -1;
+            margin-left: 0;
+            margin-right: .75rem; /* space between chevron and title */
+            transform: rotate(-90deg) !important;
+            transition: transform 0.35s ease !important;
+        }
+
+        /* Rotate 90 degrees when expanded (pointing down) */
+        #adminAccordion .accordion-button:not(.collapsed)::after {
+            transform: rotate(0deg) !important;
+        }
+
+    /* Slightly increase left padding so the chevron isn't flush to the edge */
+    #adminAccordion .accordion-button {
+        padding-left: 1rem !important;
+    }
+
+    /* Side navigation for xxl+ screens */
+    .admin-side-nav {
+        padding-top: 1rem;
+        padding-right: 1rem;
+        border-right: 1px solid rgba(0,0,0,0.06);
+        /* run along the side from the top of the viewport */
+        position: sticky;
+        height: 80vh;
+        overflow-y: auto;
+    }
+
+        .admin-side-nav .nav-link {
+            color: var(--bs-link-color) !important;
+            padding: .25rem 0 !important;
+            display: block;
+        }
+
+            .admin-side-nav .nav-link:hover,
+            .admin-side-nav .nav-link:focus,
+            .admin-side-nav .nav-link.active {
+                color: var(--bs-primary-text-emphasis) !important;
+                text-decoration: none !important;
+            }
+
+        /* Keep the inner wrapper static when the nav itself is sticky */
+        .admin-side-nav .sticky-offset {
+            position: static;
+        }
+</style>
+
+<div class="row">
+    <aside class="col-2 d-none d-xxl-block">
+        <nav class="admin-side-nav">
+            <div class="sticky-offset">
+                <ul class="nav flex-column">
+                    @if (Model.IsClubAdmin)
+                    {
+                        <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseClasses">Classes</a></li>
+                        <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseFleets">Fleets</a></li>
+                        <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseSeasons">Seasons</a></li>
+                    }
+
+                    @if (Model.CanEditSeries)
+                    {
+                        <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseSeries">Series</a></li>
+                    }
+
+                    <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseCompetitors">Competitors</a></li>
+                    <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseRaces">Races</a></li>
+
+                    @if (Model.IsClubAdmin)
+                    {
+                        <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseScoring">Scoring Systems</a></li>
+                        <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseRegattas">Regattas</a></li>
+                        <li class="nav-item"><a class="nav-link accordion-nav" href="#collapseScorekeepers">Scorekeepers</a></li>
+                    }
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="col-12 col-xxl-10">
+
 <h2>@Model.Name Admin</h2>
 <hr />
 @if (Model.Tips != null)
@@ -35,10 +168,10 @@
            asp-action="Index"
            class="btn btn-outline-primary btn-sm">@localizer["Reports"]</a>
     </div>
-</div>
+    </div>
 <div class="row d-none d-md-inline">
     <div class="row">
-        <div class="col-4 col-md-3">
+        <div class="col-4 col-md-auto">
             <span class="fst-italic">Default Scoring</span>
         </div>
         <div class="col-8 col-md-9">
@@ -61,22 +194,22 @@
     bool isSetupComplete = Model.Tips == null || (Model.Tips != null && Model.Tips.Count == 0);
 }
 
-<div class="accordion mt-2" id="adminAccordion">
+
+
+        <div class="accordion mt-2" id="adminAccordion">
     @if (Model.IsClubAdmin)
     {
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseClasses" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseClasses">
                     <h4 class="mb-0">
-                        Classes
-                        <a class="text-primary accordion-help-icon"
+                        <span class="accordion-title">Classes</span>
+                        <a class="accordion-help-icon"
                             data-bs-container="body"
                             data-bs-toggle="popover"
                             data-bs-placement="top"
                             data-bs-trigger="focus hover"
-                            data-bs-content="Class refers to the type of boat. A competitor can only belong to one class.">
-                            <span class="far fa-question-circle"></span>
-                        </a>
+                            data-bs-content="Class refers to the type of boat. A competitor can only belong to one class."><span class="far fa-question-circle"></span></a>
                     </h4>
                 </button>
             </h2>
@@ -91,15 +224,12 @@
             <h2 class="accordion-header">
                 <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFleets" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseFleets">
                     <h4 class="mb-0">
-                        Fleets
-                        <a class="text-primary accordion-help-icon"
+                        <span class="accordion-title">Fleets</span><a class="accordion-help-icon"
                             data-bs-container="body"
                             data-bs-toggle="popover"
                             data-bs-placement="top"
                             data-bs-trigger="focus hover"
-                            data-bs-content="Fleets group boats that race against each other. Competitors can belong to multiple fleets.">
-                            <span class="far fa-question-circle"></span>
-                        </a>
+                            data-bs-content="Fleets group boats that race against each other. Competitors can belong to multiple fleets."><span class="far fa-question-circle"></span></a>
                     </h4>
                 </button>
             </h2>
@@ -114,15 +244,12 @@
             <h2 class="accordion-header">
                 <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeasons" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseSeasons">
                     <h4 class="mb-0">
-                        Seasons
-                        <a class="text-primary accordion-help-icon"
+                        <span class="accordion-title">Seasons</span><a class="accordion-help-icon"
                             data-bs-container="body"
                             data-bs-toggle="popover"
                             data-bs-placement="top"
                             data-bs-trigger="focus hover"
-                            data-bs-content="Seasons typically repeat each year. Every series must belong to a season. They help with links and statistics.">
-                            <span class="far fa-question-circle"></span>
-                        </a>
+                            data-bs-content="Seasons typically repeat each year. Every series must belong to a season. They help with links and statistics."><span class="far fa-question-circle"></span></a>
                     </h4>
                 </button>
             </h2>
@@ -140,15 +267,12 @@
             <h2 class="accordion-header">
                 <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeries" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseSeries">
                     <h4 class="mb-0">
-                        Series
-                        <a class="text-primary accordion-help-icon"
+                        <span class="accordion-title">Series</span><a class="accordion-help-icon"
                             data-bs-container="body"
                             data-bs-toggle="popover"
                             data-bs-placement="top"
                             data-bs-trigger="focus hover"
-                            data-bs-content="Series are groups of races to be scored together. A race can belong to multiple series.">
-                            <span class="far fa-question-circle"></span>
-                        </a>
+                            data-bs-content="Series are groups of races to be scored together. A race can belong to multiple series."><span class="far fa-question-circle"></span></a>
                     </h4>
                 </button>
             </h2>
@@ -163,7 +287,7 @@
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCompetitors" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseCompetitors">
-                <h4 class="mb-0">Competitors</h4>
+                <h4 class="mb-0"><span class="accordion-title">Competitors</span></h4>
             </button>
         </h2>
         <div id="collapseCompetitors" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
@@ -176,7 +300,7 @@
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRaces" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseRaces">
-                <h4 class="mb-0">Races</h4>
+                <h4 class="mb-0"><span class="accordion-title">Races</span></h4>
             </button>
         </h2>
         <div id="collapseRaces" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
@@ -191,7 +315,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScoring" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseScoring">
-                    <h4 class="mb-0">Scoring Systems</h4>
+                    <h4 class="mb-0"><span class="accordion-title">Scoring Systems</span></h4>
                 </button>
             </h2>
             <div id="collapseScoring" class="accordion-collapse collapse @(isSetupComplete ? "" : "show")">
@@ -205,15 +329,12 @@
             <h2 class="accordion-header">
                 <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRegattas" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseRegattas">
                     <h4 class="mb-0">
-                        Regattas
-                        <a class="text-primary accordion-help-icon"
+                        <span class="accordion-title">Regattas</span><a class="accordion-help-icon"
                             data-bs-container="body"
                             data-bs-toggle="popover"
                             data-bs-placement="top"
                             data-bs-trigger="focus hover"
-                            data-bs-content="Regattas are an event over one or a few days. A regatta can involve multiple fleets.">
-                            <span class="far fa-question-circle"></span>
-                        </a>
+                            data-bs-content="Regattas are an event over one or a few days. A regatta can involve multiple fleets."><span class="far fa-question-circle"></span></a>
                     </h4>
                 </button>
             </h2>
@@ -228,15 +349,12 @@
             <h2 class="accordion-header">
                 <button class="accordion-button @(isSetupComplete ? "collapsed" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScorekeepers" aria-expanded="@(isSetupComplete ? "false" : "true")" aria-controls="collapseScorekeepers">
                     <h4 class="mb-0">
-                        Scorekeepers
-                        <a class="text-primary accordion-help-icon"
+                        <span class="accordion-title">Scorekeepers</span><a class="accordion-help-icon"
                             data-bs-container="body"
                             data-bs-toggle="popover"
                             data-bs-placement="top"
                             data-bs-trigger="focus hover"
-                            data-bs-content="Allow other users to edit results. Scorekeepers may be added, removed, and edited.">
-                            <span class="far fa-question-circle"></span>
-                        </a>
+                            data-bs-content="Allow other users to edit results. Scorekeepers may be added, removed, and edited."><span class="far fa-question-circle"></span></a>
                     </h4>
                 </button>
             </h2>
@@ -247,6 +365,9 @@
             </div>
         </div>
     }
+</div>
+
+    </main>
 </div>
 
 @section Scripts {
