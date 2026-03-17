@@ -1,0 +1,226 @@
+/* Utility Classes & Page-Specific Overrides
+ * Misc utilities, help navigation, system alerts, footer positioning
+ * Mixed light/dark; component-specific overrides belong in _dark-mode.scss
+ */
+
+/* Body and HTML base */
+body {
+    padding-bottom: 20px;
+    /* Margin bottom by footer height */
+    margin-bottom: 130px;
+}
+
+/* Prevent layout shift when pages gain/lose a vertical scrollbar */
+html {
+    /* modern browsers will reserve space for the scrollbar */
+    scrollbar-gutter: stable;
+}
+
+/* Fallback for browsers that don't support `scrollbar-gutter` - always show a vertical scrollbar */
+@supports not (scrollbar-gutter: stable) {
+    html {
+        overflow-y: scroll;
+    }
+}
+
+/* Footer header separator */
+.footer-header {
+    height: 20px;
+}
+
+/* Bottom-positioned column */
+.bottom-column {
+    position: absolute;
+    left: 5%;
+    bottom: 0;
+}
+
+/* Sticky top element */
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Help/FAQ navigation sidebar
+ * Light mode: light blue background with shadow
+ * Dark mode: dark background (see _dark-mode.scss)
+ */
+.help-side-nav .nav-link {
+    padding: .25rem .5rem;
+    font-size: .95rem;
+    border-radius: .25rem;
+}
+
+.help-nav {
+    position: sticky;
+    top: 1rem;
+    align-self: flex-start;
+}
+
+/* Help side nav active link styling (Light mode)
+ * Dark-mode override is in _dark-mode.scss
+ */
+.help-side-nav .nav-link.active {
+    /* Light mode styles */
+    background-color: #e9f1fb;
+    color: #0d3a6b;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 4px rgba(13, 58, 107, 0.06);
+}
+
+/* FAQ page collapse styling */
+.faq-page [data-bs-toggle="collapse"]::before {
+    content: "▸";
+    display: inline-block;
+    font-size: 1.75rem;
+    line-height: 1;
+    width: 1.75rem;
+    margin-right: .25rem;
+    transform-origin: center;
+    transition: transform .2s ease-in-out;
+}
+
+.faq-page [data-bs-toggle="collapse"][aria-expanded="true"]::before {
+    content: "▾";
+}
+
+/* Mobile: help nav switches to static positioning */
+@media (max-width: 767.98px) {
+    .help-nav {
+        position: static;
+        margin-bottom: 1rem;
+    }
+}
+
+/* System Alert Banner Styles */
+.system-alert {
+    margin-bottom: 0;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.system-alert .container-lg {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.system-alert .alert-content {
+    flex: 1;
+}
+
+.system-alert .alert-content > *:last-child {
+    margin-bottom: 0;
+}
+
+.system-alert .btn-close {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+/* Supporter/Partner logo container */
+.supporter-logo-container {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.supporter-logo {
+    max-height: 120px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.supporter-logo-preview {
+    max-width: 200px;
+}
+
+/* Form control responsive padding */
+@media (max-width: 767.98px) {
+    .form-control {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+}
+
+/* Input group z-index management on race create page */
+#raceform .input-group {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure the floating/hideable footer panel stays above */
+#scoreButtonFooter,
+.score-entry {
+    z-index: 10;
+}
+
+/* Print styles: collapse expanded content and hide collapse toggles */
+@media print {
+    .faq-page .collapse {
+        display: block !important;
+        height: auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .faq-page .collapse:not(.show) {
+        display: block !important;
+    }
+
+    .faq-page [data-bs-toggle="collapse"]::before {
+        content: "" !important;
+    }
+}
+
+/* FAQ Details Element Styling
+ * HTML5 <details>/<summary> element styling for FAQ pages
+ */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .faq-page [data-bs-toggle="collapse"]::before {
+        transition: none;
+    }
+}
+
+/* FAQ details container */
+.faq-details {
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+/* FAQ details content with expand/collapse animation */
+.faq-details-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease;
+    opacity: 0;
+}
+
+.faq-details[open] .faq-details-content {
+    max-height: 1000px; /* Large enough for content */
+    opacity: 1;
+}
+
+/* FAQ summary (clickable header) */
+.faq-details > summary {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.faq-details > summary:hover {
+    color: $primary;
+}

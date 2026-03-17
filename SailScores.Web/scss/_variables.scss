@@ -1,0 +1,43 @@
+/* Project Variables & Theme Configuration
+ * Defines custom color tokens, typography, and Bootstrap overrides
+ * These variables cascade through the build and can be referenced in all partials
+ */
+
+/* Theme mode configuration */
+$color-mode-type: media-query;
+
+/* Primary colors */
+$my-link-color: #0063CC;
+$primary: #0063CC;
+
+/* Dark mode color palette */
+$body-bg-dark: #222222;
+$my-nav-bg-dark: #051154;
+$bg-darker: #191919;
+
+/* Typography */
+$font-family-sans-serif: "Open Sans", "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+/* Dark-mode specific color tokens (used in _dark-mode.scss) */
+$dark-primary: #266FAE;
+$almost-dark-primary: #367FCE;
+$secondary-background: #3B3B3B;
+$almost-background: #2A2A2A;
+
+/* OCR table colors (dark mode) */
+$ocr-table-bg: #274032;
+$ocr-table-border: #395243;
+$ocr-table-striped: #2b4a3b;
+$ocr-table-hover: #2c4f3c;
+$ocr-table-active: #2f553f;
+$ocr-table-color: #e6efe8;
+
+/* Finish place background colors (light mode defined in _components.scss) */
+$finish-first-light: #ffe974;
+$finish-second-light: #dfdfdf;
+$finish-third-light: #f3cf9b;
+
+/* Finish place background colors (dark mode) */
+$finish-first-dark: #473F24;
+$finish-second-dark: #393939;
+$finish-third-dark: #473829;

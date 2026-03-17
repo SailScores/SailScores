@@ -1,0 +1,291 @@
+/* Dark Mode Color System
+ * Comprehensive dark-mode overrides using CSS custom properties and explicit selectors
+ * 
+ * Strategy:
+ * 1. Define CSS variables at :root for dark mode that override Bootstrap defaults
+ * 2. Use @media (prefers-color-scheme: dark) to scope all dark-mode rules
+ * 3. Selectors respect Bootstrap's dark-mode architecture
+ * 4. Theme colors, backgrounds, text, and component-specific overrides grouped by category
+ */
+
+@media (prefers-color-scheme: dark) {
+    /* Bootstrap CSS variable overrides for dark mode
+     * These cascade to all components that use var(--bs-*) 
+     */
+    :root {
+        --bs-primary: #{$dark-primary};
+        --bs-primary-rgb: 38, 111, 200;
+        --bs-primary-bg-subtle: #{$dark-primary};
+        --bs-primary-bg-subtle-dark: #{$dark-primary};
+        --bs-btn-bg: #{$dark-primary};
+        --bs-btn-border-color: #{$dark-primary};
+        --bs-btn-color: #{$dark-primary};
+
+        /* Set CSS custom properties for OCR table colors */
+        --bs-table-bg: #{$ocr-table-bg};
+        --bs-table-border-color: #{$ocr-table-border};
+        --bs-table-striped-bg: #{$ocr-table-striped};
+        --bs-table-active-bg: #{$ocr-table-active};
+        --bs-table-hover-bg: #{$ocr-table-hover};
+        --bs-table-color: #{$ocr-table-color};
+    }
+
+    /* Button variants */
+    .btn-primary {
+        --bs-btn-bg: #{$dark-primary};
+        --bs-btn-border-color: #{$dark-primary};
+    }
+
+    .btn-outline-primary {
+        --bs-btn-color: #{$almost-dark-primary};
+        --bs-btn-border-color: #{$almost-dark-primary};
+    }
+
+    /* Navigation */
+    header.bg-dark,
+    nav.bg-dark {
+        background-color: $secondary-background !important;
+    }
+
+    .navbar-dark .navbar-brand.active,
+    .navbar-dark .nav-link.active {
+        color: rgba(255, 255, 255, 1) !important;
+        font-weight: 500;
+    }
+
+    /* SVG text (charts, diagrams) */
+    svg text {
+        color: $white;
+        fill: $white;
+    }
+
+    /* Background colors */
+    .bg-dark {
+        background-color: $secondary-background !important;
+    }
+
+    .bg-almost {
+        background: $almost-background;
+    }
+
+    .bg-secondary {
+        background: $secondary-background !important;
+    }
+
+    /* Light mode buttons */
+    .btn-light {
+        color: #B1B1B1;
+        background: $secondary-background !important;
+    }
+
+    /* Finish place colors (match light mode semantics) */
+    .finish-first {
+        background: #{$finish-first-dark} !important;
+    }
+
+    .finish-second {
+        background: #{$finish-second-dark} !important;
+    }
+
+    .finish-third {
+        background: #{$finish-third-dark} !important;
+    }
+
+    /* Race status colors */
+    span.discardmuted {
+        color: #909090 !important;
+    }
+
+    .abandoned {
+        background: #3B2121 !important;
+    }
+
+    .scheduled {
+        background: #424242 !important;
+    }
+
+    /* Form elements */
+    .form-control {
+        background-color: $bg-darker !important;
+    }
+
+    .form-select {
+        color: #B1B1B1;
+        background-color: $bg-darker !important;
+    }
+
+    /* Dropdown menu */
+    .dropdown-item {
+        color: #B1B1B1;
+    }
+
+    .dropdown-item:hover {
+        background: #CECECE;
+        color: $dark;
+    }
+
+    /* Autocomplete suggestions */
+    .autocomplete-suggestions {
+        background: $secondary-background;
+    }
+
+    .autocomplete-suggestion {
+        background: $secondary-background;
+    }
+
+    .autocomplete-selected {
+        color: $black;
+        background: #CECECE;
+    }
+
+    /* Select elements */
+    option {
+        color: #B1B1B1;
+    }
+
+    /* Score entry panel */
+    .score-entry {
+        background-color: $secondary-background;
+    }
+
+    /* Browser autofill (password manager, etc) */
+    input:-internal-autofill-selected,
+    input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 30px #3b3b3b inset !important;
+    }
+
+    /* Waiting/loading modal */
+    .waitingModal {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Select2 Bootstrap-5 theme overrides */
+    .select2-container--default .selection span.select2-selection--single {
+        background-color: $bg-darker !important;
+    }
+
+    .select2-results__option.select2-results__option--selectable.select2-results__option--selected {
+        background-color: $bg-darker !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection,
+    .select2-container--default .select2-selection {
+        background-color: $bg-darker !important;
+        border: 1px solid #495057;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #dee2e6 !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+        color: #dee2e6 !important;
+        border: 1px solid var(--bs-gray-600);
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered .select2-selection__placeholder {
+        color: #dee2e6 !important;
+    }
+
+    .select2-container--default .select2-dropdown .select2-search .select2-search__field {
+        background-color: $bg-darker !important;
+        color: #dee2e6 !important;
+    }
+
+    .select2-container--default .select2-dropdown {
+        color: #dee2e6 !important;
+        border: 1px solid #495057 !important;
+        background-color: $bg-darker !important;
+    }
+
+    .select2-container--default .select2-dropdown .select2-results__options .select2-results__option[role="group"] .select2-results__group {
+        color: var(--bs-secondary-color) !important;
+    }
+
+    /* OCR preview and results */
+    .ocr-cropped-preview {
+        background-color: $secondary-background;
+        overflow: hidden;
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    /* OCR results table with high specificity */
+    #ocrResultsTable {
+        background-color: transparent !important;
+        color: $ocr-table-color !important;
+
+        /* Table header */
+        thead {
+            background-color: $ocr-table-bg !important;
+
+            th {
+                background-color: $ocr-table-bg !important;
+                color: $ocr-table-color !important;
+                border-color: $ocr-table-border !important;
+            }
+        }
+
+        /* Table body base styles */
+        tbody {
+            background-color: transparent !important;
+
+            tr {
+                background-color: $ocr-table-bg !important;
+                color: $ocr-table-color !important;
+
+                td,
+                th {
+                    background-color: inherit !important;
+                    color: $ocr-table-color !important;
+                    border-color: $ocr-table-border !important;
+                }
+            }
+
+            tr:hover {
+                background-color: $ocr-table-hover !important;
+
+                td,
+                th {
+                    background-color: inherit !important;
+                }
+            }
+
+            tr.table-active,
+            tr.active {
+                background-color: $ocr-table-active !important;
+
+                td,
+                th {
+                    background-color: inherit !important;
+                }
+            }
+        }
+    }
+
+    /* Help side navigation active link */
+    .help-side-nav .nav-link.active {
+        background-color: #222b38;
+        color: #fff;
+        box-shadow: none;
+    }
+
+    /* Display utilities for dark mode specific visibility */
+    .d-dark-none {
+        display: none !important;
+    }
+
+    .d-dark-inline {
+        display: inline !important;
+    }
+
+    .d-dark-block {
+        display: block !important;
+    }
+}
