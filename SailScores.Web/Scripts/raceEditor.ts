@@ -61,6 +61,13 @@ export function initialize() {
     $('#results').on('click', '.move-down', moveDown);
     $('#results').on('click', '.delete-button', confirmDelete);
     $('#scoreButtonDiv').on('click', '.add-comp-enabled', addNewCompetitorFromButton);
+    $('#scoreButtonDiv').on('contextmenu', '.quick-comp', openAltSailNumberEditorFromButton);
+    $('#results').on('contextmenu', '.sail-number-display', openAltSailNumberEditorFromResultRow);
+    $('#scoreButtonDiv').on('touchstart', '.quick-comp', startAltEditLongPressFromButton);
+    $('#scoreButtonDiv').on('touchend touchcancel touchmove', '.quick-comp', clearAltEditLongPress);
+    $('#results').on('touchstart', '.sail-number-display', startAltEditLongPressFromResultRow);
+    $('#results').on('touchend touchcancel touchmove', '.sail-number-display', clearAltEditLongPress);
+    $('#altSailNumberSaveButton').on('click', saveAlternativeSailNumber);
     $('#deleteConfirmed').click(deleteResult);
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
@@ -267,11 +274,53 @@ export function hideScoreButtonFooter() {
     $('#scoreButtonFooter').hide();
 }
 
-export function addNewCompetitorFromButton(event: Event) {
-    if (!(event.target instanceof HTMLButtonElement)) {
+let altEditLongPressTimer: number | null = null;
+
+function clearAltEditLongPress() {
+    if (altEditLongPressTimer !== null) {
+        window.clearTimeout(altEditLongPressTimer);
+        altEditLongPressTimer = null;
+    }
+}
+
+function startAltEditLongPressFromButton(event: Event) {
+    const button = (event.target as HTMLElement)?.closest('button.quick-comp') as HTMLButtonElement | null;
+    if (!button) {
         return;
     }
-    let competitorId = event.target.dataset['competitorId'];
+
+    clearAltEditLongPress();
+    altEditLongPressTimer = window.setTimeout(() => {
+        button.dataset.altEditTriggered = 'true';
+        openAltSailNumberEditorForCompetitor(button.dataset.competitorId ?? null);
+    }, 1500);
+}
+
+function startAltEditLongPressFromResultRow(event: Event) {
+    const sailDisplay = (event.target as HTMLElement)?.closest('.sail-number-display') as HTMLElement | null;
+    const row = sailDisplay?.closest('li') as HTMLLIElement | null;
+    if (!row?.dataset?.competitorId) {
+        return;
+    }
+
+    clearAltEditLongPress();
+    altEditLongPressTimer = window.setTimeout(() => {
+        openAltSailNumberEditorForCompetitor(row.dataset.competitorId ?? null);
+    }, 1500);
+}
+
+export function addNewCompetitorFromButton(event: Event) {
+    const button = (event.target as HTMLElement)?.closest('button') as HTMLButtonElement | null;
+    if (!button) {
+        return;
+    }
+
+    if (button.dataset.altEditTriggered === 'true') {
+        button.dataset.altEditTriggered = 'false';
+        return;
+    }
+
+    let competitorId = button.dataset['competitorId'];
     let comp = allCompetitors.find(c => c.id.toString() === competitorId);
     addNewCompetitor(comp);
 }
@@ -306,10 +355,16 @@ function populateCompetitorInfo(compListItem: HTMLLIElement, competitor: competi
 
     span = compListItem.getElementsByClassName("sail-number")[0] as HTMLElement | undefined;
     span?.appendChild(document.createTextNode(competitor.sailNumber ?? ""));
-    if (competitor.alternativeSailNumber) {
-        span = compListItem.getElementsByClassName("alt-sail-number")[0] as HTMLElement | undefined;
-        span?.appendChild(document.createTextNode(" ("+competitor.alternativeSailNumber+")"));
-        if (span) span.style.display = "";
+
+    span = compListItem.getElementsByClassName("alt-sail-number")[0] as HTMLElement | undefined;
+    if (span) {
+        if (competitor.alternativeSailNumber) {
+            span.appendChild(document.createTextNode(" (" + competitor.alternativeSailNumber + ")"));
+            span.style.display = "";
+        } else {
+            span.textContent = "";
+            span.style.display = "none";
+        }
     }
 
     span = compListItem.getElementsByClassName("race-place")[0] as HTMLElement | undefined;
@@ -333,7 +388,6 @@ function setTimingFields(compListItem: HTMLLIElement) {
 
     const raceDateStr = $("#date").val() as string;
     const now = new Date();
-    // Use local time for date comparison to handle timezones correctly
     const year = now.getFullYear();
     const month = (now.getMonth() + 1).toString().padStart(2, "0");
     const day = now.getDate().toString().padStart(2, "0");
@@ -362,6 +416,96 @@ function attachTimingEventHandlers(compListItem: HTMLLIElement) {
     let elapsedInput = compListItem.getElementsByClassName("elapsed-time-input")[0] as HTMLInputElement | undefined;
     finishInput?.addEventListener('change', onFinishTimeChanged);
     elapsedInput?.addEventListener('change', onElapsedTimeChanged);
+}
+
+function openAltSailNumberEditorFromButton(event: Event) {
+    event.preventDefault();
+    const button = (event.target as HTMLElement)?.closest('button.quick-comp') as HTMLButtonElement | null;
+    openAltSailNumberEditorForCompetitor(button?.dataset.competitorId ?? null);
+}
+
+function openAltSailNumberEditorFromResultRow(event: Event) {
+    event.preventDefault();
+    const sailDisplay = (event.target as HTMLElement)?.closest('.sail-number-display') as HTMLElement | null;
+    const row = sailDisplay?.closest('li') as HTMLLIElement | null;
+    openAltSailNumberEditorForCompetitor(row?.dataset.competitorId ?? null);
+}
+
+function openAltSailNumberEditorForCompetitor(competitorId: string | null) {
+    if (!competitorId) {
+        return;
+    }
+
+    const competitor = allCompetitors?.find(c => c.id.toString() === competitorId);
+    if (!competitor) {
+        return;
+    }
+
+    $('#altSailNumberCompetitorId').val(competitor.id.toString());
+    $('#altSailNumberCompetitorName').text(competitor.name ?? '');
+    $('#altSailNumberSailNumber').text(competitor.sailNumber ?? '');
+    $('#altSailNumberInput').val(competitor.alternativeSailNumber ?? '');
+
+    const modal = $('#editAltSailNumberModal');
+    (<any>modal).modal('show');
+}
+
+function saveAlternativeSailNumber() {
+    const competitorId = ($('#altSailNumberCompetitorId').val() as string) ?? '';
+    if (!competitorId) {
+        return;
+    }
+
+    const alternativeSailNumber = (($('#altSailNumberInput').val() as string) ?? '').trim();
+    const clubInitials = ($('#clubInitials').val() as string) ?? '';
+    const token = ($('input:hidden[name="__RequestVerificationToken"]').val() as string) ?? '';
+
+    $.ajax({
+        type: 'POST',
+        url: `/${clubInitials}/Competitor/SetAlternativeSailNumber`,
+        data: {
+            CompetitorId: competitorId,
+            AlternativeSailNumber: alternativeSailNumber
+        },
+        headers: {
+            RequestVerificationToken: token
+        }
+    }).done(function (data: any) {
+        const updatedComp = allCompetitors.find(c => c.id.toString() === competitorId);
+        if (updatedComp) {
+            updatedComp.alternativeSailNumber = data?.alternativeSailNumber ?? null;
+            updateButtonFooter();
+            initializeAutoComplete();
+            updateResultRowSailNumber(updatedComp);
+        }
+
+        const modal = $('#editAltSailNumberModal');
+        (<any>modal).modal('hide');
+    });
+}
+
+function updateResultRowSailNumber(competitor: competitorDto) {
+    const resultItem = document.querySelector(`#results li[data-competitor-id='${competitor.id.toString()}']`) as HTMLLIElement | null;
+    if (!resultItem) {
+        return;
+    }
+
+    const sailNumberSpan = resultItem.getElementsByClassName('sail-number')[0] as HTMLElement | undefined;
+    const altSailNumberSpan = resultItem.getElementsByClassName('alt-sail-number')[0] as HTMLElement | undefined;
+
+    if (sailNumberSpan) {
+        sailNumberSpan.textContent = competitor.sailNumber ?? '';
+    }
+
+    if (altSailNumberSpan) {
+        if (competitor.alternativeSailNumber) {
+            altSailNumberSpan.textContent = ` (${competitor.alternativeSailNumber})`;
+            altSailNumberSpan.style.display = '';
+        } else {
+            altSailNumberSpan.textContent = '';
+            altSailNumberSpan.style.display = 'none';
+        }
+    }
 }
 
 function finalizeCompetitorAdd(compListItem: HTMLLIElement) {
@@ -645,7 +789,7 @@ function initializeButtonFooter() {
         }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitor-id="' + c.id + '" > ' +
-            (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
+            getCompetitorButtonDisplay(c) + ' </button>');
     };
 }
 
@@ -660,9 +804,28 @@ function updateButtonFooter() {
         }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitor-id="' + c.id + '" > ' +
-            (c.sailNumber || c.alternativeSailNumber || c.name) + ' </button>');
+            getCompetitorButtonDisplay(c) + ' </button>');
 
     }
+}
+
+function getCompetitorButtonDisplay(c: competitorDto): string {
+    const sail = c.sailNumber?.trim();
+    const alt = c.alternativeSailNumber?.trim();
+
+    if (sail && alt) {
+        return `${sail} - ${alt}`;
+    }
+
+    if (sail) {
+        return sail;
+    }
+
+    if (alt) {
+        return alt;
+    }
+
+    return c.name ?? '';
 }
 
 function getCompetitorCode(compListItem: HTMLLIElement) {

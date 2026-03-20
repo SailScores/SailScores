@@ -545,6 +545,50 @@ public class CompetitorController : Controller
 	}
 
     [HttpPost]
+    [ActionName("SetAlternativeSailNumber")]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> PostSetAlternativeSailNumber(
+        string clubInitials,
+        CompetitorAlternativeSailNumberUpdateViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
+        if (competitor == null)
+        {
+            return NotFound();
+        }
+
+        var canEdit = await _authService.CanUserEditRaces(User, competitor.ClubId)
+            || await _authService.CanUserEditSeries(User, competitor.ClubId)
+            || await _authService.IsUserClubAdministrator(User, competitor.ClubId)
+            || await _authService.IsUserFullAdmin(User);
+
+        if (!canEdit)
+        {
+            return Unauthorized();
+        }
+
+        await _competitorService.SetAlternativeSailNumber(
+            model.CompetitorId,
+            model.AlternativeSailNumber,
+            await GetUserStringAsync());
+
+        var normalizedAlt = string.IsNullOrWhiteSpace(model.AlternativeSailNumber)
+            ? null
+            : model.AlternativeSailNumber.Trim();
+
+        return new JsonResult(new
+        {
+            competitorId = model.CompetitorId,
+            alternativeSailNumber = normalizedAlt
+        });
+    }
+
+    [HttpPost]
     [ActionName("SetCompActive")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]

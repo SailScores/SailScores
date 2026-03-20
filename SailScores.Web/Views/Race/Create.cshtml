@@ -292,7 +292,7 @@
                                 <div>
                                     <span class="badge text-bg-secondary rounded-pill race-place"></span>
                                 </div>
-                                <div>
+                                <div class="sail-number-display">
                                     <span class="sail-number">@score.Competitor.SailNumber</span>
                                     @if (!String.IsNullOrWhiteSpace(score.Competitor.AlternativeSailNumber))
                                     {
@@ -452,6 +452,7 @@
 </div>
 
 @await Html.PartialAsync("_competitorCreate", Model)
+@await Html.PartialAsync("_editAltSailNumberModal")
 
 @if(Model.UseAdvancedFeatures) {
   @await Html.PartialAsync("_OcrUploadModal")
