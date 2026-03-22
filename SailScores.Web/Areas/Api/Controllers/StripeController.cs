@@ -5,6 +5,7 @@ using SailScores.Web.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Stripe;
+using SailScores.Web.Authorization;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -15,12 +16,14 @@ namespace SailScores.Web.Areas.Api.Controllers
         private readonly IStripeService _stripeService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<StripeController> _logger;
+        private readonly AppSettingsService _appSettingsService;
 
-        public StripeController(IStripeService stripeService, IConfiguration configuration, ILogger<StripeController> logger)
+        public StripeController(IStripeService stripeService, IConfiguration configuration, ILogger<StripeController> logger, AppSettingsService appSettingsService)
         {
             _stripeService = stripeService;
             _configuration = configuration;
             _logger = logger;
+            _appSettingsService = appSettingsService;
         }
 
         public class CreateCheckoutSessionRequest
@@ -29,6 +32,20 @@ namespace SailScores.Web.Areas.Api.Controllers
             public string ClubId { get; set; }
             public string ClubInitials { get; set; }
             public string UserEmail { get; set; }
+        }
+
+        [HttpGet("validate-configuration")]
+        [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+        public async Task<IActionResult> ValidateConfiguration()
+        {
+            var validationResult = await _stripeService.ValidateConfigurationAsync();
+
+            if (validationResult.IsValid)
+            {
+                return Ok(validationResult);
+            }
+
+            return StatusCode(500, validationResult);
         }
 
         [HttpPost("create-checkout-session")]
@@ -46,7 +63,7 @@ namespace SailScores.Web.Areas.Api.Controllers
                 email = request.UserEmail;
             }
 
-            var domain = _configuration["App:BaseUrl"] ?? (Request.Scheme + "://" + Request.Host.Value);
+            var domain = _appSettingsService.GetPreferredBase(Request);
             try
             {
                 var session = await _stripeService.CreateCheckoutSessionAsync(

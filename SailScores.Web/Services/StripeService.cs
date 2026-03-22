@@ -8,12 +8,41 @@ using SailScores.Core.Services;
 
 namespace SailScores.Web.Services;
 
+public class StripeConfigurationValidationResult
+{
+    public bool HasPublishableKey { get; set; }
+    public bool HasSecretKey { get; set; }
+    public bool HasMonthlyPriceId { get; set; }
+    public bool HasYearlyPriceId { get; set; }
+    public bool HasCustomPriceId { get; set; }
+
+    public bool CanAuthenticateWithStripeApi { get; set; }
+    public bool MonthlyPriceIsValid { get; set; }
+    public bool YearlyPriceIsValid { get; set; }
+    public bool CustomPriceIsValid { get; set; }
+
+    public bool IsValid =>
+        HasPublishableKey &&
+        HasSecretKey &&
+        HasMonthlyPriceId &&
+        HasYearlyPriceId &&
+        HasCustomPriceId &&
+        CanAuthenticateWithStripeApi &&
+        MonthlyPriceIsValid &&
+        YearlyPriceIsValid &&
+        CustomPriceIsValid;
+
+    public List<string> Errors { get; set; } = new();
+}
+
 public interface IStripeService
 {
     Task<Session> CreateCheckoutSessionAsync(
         string plan,
         string userEmail,
         string domain);
+
+    Task<StripeConfigurationValidationResult> ValidateConfigurationAsync();
 
     Task HandleStripeWebhookAsync(string json, string stripeSignature, ILogger logger);
 
@@ -553,5 +582,105 @@ public class StripeService : IStripeService
 
         var clubIds = await _userService.GetClubIdsForUserEmailAsync(userEmail);
         return clubIds.Count > 1;
+    }
+
+    public async Task<StripeConfigurationValidationResult> ValidateConfigurationAsync()
+    {
+        var result = new StripeConfigurationValidationResult();
+
+        var publishableKey = _configuration["Stripe:PublishableKey"];
+        var secretKey = _configuration["Stripe:SecretKey"];
+        var monthlyPriceId = _configuration["Stripe:MonthlyPriceId"];
+        var yearlyPriceId = _configuration["Stripe:YearlyPriceId"];
+        var customPriceId = _configuration["Stripe:UserSelectsPriceId"];
+
+        result.HasPublishableKey = !string.IsNullOrWhiteSpace(publishableKey);
+        result.HasSecretKey = !string.IsNullOrWhiteSpace(secretKey);
+        result.HasMonthlyPriceId = !string.IsNullOrWhiteSpace(monthlyPriceId);
+        result.HasYearlyPriceId = !string.IsNullOrWhiteSpace(yearlyPriceId);
+        result.HasCustomPriceId = !string.IsNullOrWhiteSpace(customPriceId);
+
+        if (!result.HasPublishableKey)
+        {
+            result.Errors.Add("Missing configuration: Stripe:PublishableKey");
+        }
+
+        if (!result.HasSecretKey)
+        {
+            result.Errors.Add("Missing configuration: Stripe:SecretKey");
+            return result;
+        }
+
+        if (!result.HasMonthlyPriceId)
+        {
+            result.Errors.Add("Missing configuration: Stripe:MonthlyPriceId");
+        }
+
+        if (!result.HasYearlyPriceId)
+        {
+            result.Errors.Add("Missing configuration: Stripe:YearlyPriceId");
+        }
+
+        if (!result.HasCustomPriceId)
+        {
+            result.Errors.Add("Missing configuration: Stripe:UserSelectsPriceId");
+        }
+
+        try
+        {
+            StripeConfiguration.ApiKey = secretKey;
+            var balanceService = new BalanceService();
+            await balanceService.GetAsync();
+            result.CanAuthenticateWithStripeApi = true;
+        }
+        catch (StripeException ex)
+        {
+            result.Errors.Add($"Stripe authentication failed: {ex.StripeError?.Code ?? ex.GetType().Name} - {ex.StripeError?.Message ?? ex.Message}");
+            return result;
+        }
+
+        var priceService = new PriceService();
+
+        if (result.HasMonthlyPriceId)
+        {
+            result.MonthlyPriceIsValid = await ValidatePriceAsync(priceService, monthlyPriceId, "Stripe:MonthlyPriceId", result.Errors);
+        }
+
+        if (result.HasYearlyPriceId)
+        {
+            result.YearlyPriceIsValid = await ValidatePriceAsync(priceService, yearlyPriceId, "Stripe:YearlyPriceId", result.Errors);
+        }
+
+        if (result.HasCustomPriceId)
+        {
+            result.CustomPriceIsValid = await ValidatePriceAsync(priceService, customPriceId, "Stripe:UserSelectsPriceId", result.Errors);
+        }
+
+        return result;
+    }
+
+    private static async Task<bool> ValidatePriceAsync(
+        PriceService priceService,
+        string priceId,
+        string configKey,
+        List<string> errors)
+    {
+        try
+        {
+            var price = await priceService.GetAsync(priceId);
+
+            if (!price.Active)
+            {
+                errors.Add($"Configured price is inactive: {configKey} ({priceId})");
+                return false;
+            }
+
+            return true;
+        }
+        catch (StripeException ex)
+        {
+            errors.Add($"Invalid configured price: {configKey} ({priceId}) - {ex.StripeError?.Message ?? ex.Message}");
+            return false;
+        }
     }
 }

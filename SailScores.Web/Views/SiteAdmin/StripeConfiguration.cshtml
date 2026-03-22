@@ -1,0 +1,122 @@
+@model SailScores.Web.Services.StripeConfigurationValidationResult
+
+@{
+    ViewData["Title"] = "Site Admin - Stripe Configuration";
+    Layout = "_Layout";
+}
+
+<h1>Stripe Configuration Validation</h1>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Site Admin</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Stripe Configuration</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col-12">
+        @if (Model.IsValid)
+        {
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle"></i> Stripe configuration is valid.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> Stripe configuration has issues.
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Validation Checks</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Check</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Stripe:PublishableKey configured</td>
+                            <td>@(Model.HasPublishableKey ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Stripe:SecretKey configured</td>
+                            <td>@(Model.HasSecretKey ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Stripe:MonthlyPriceId configured</td>
+                            <td>@(Model.HasMonthlyPriceId ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Stripe:YearlyPriceId configured</td>
+                            <td>@(Model.HasYearlyPriceId ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Stripe:UserSelectsPriceId configured</td>
+                            <td>@(Model.HasCustomPriceId ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Stripe API authentication</td>
+                            <td>@(Model.CanAuthenticateWithStripeApi ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Monthly price ID valid and active</td>
+                            <td>@(Model.MonthlyPriceIsValid ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Yearly price ID valid and active</td>
+                            <td>@(Model.YearlyPriceIsValid ? "✅" : "❌")</td>
+                        </tr>
+                        <tr>
+                            <td>Custom price ID valid and active</td>
+                            <td>@(Model.CustomPriceIsValid ? "✅" : "❌")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Errors != null && Model.Errors.Any())
+{
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Errors</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        @foreach (var error in Model.Errors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <a asp-action="StripeConfiguration" class="btn btn-primary">
+            <i class="fas fa-sync"></i> Refresh Validation
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Site Admin
+        </a>
+    </div>
+</div>
