@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SailScores.Web.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Stripe;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
@@ -46,12 +47,25 @@ namespace SailScores.Web.Areas.Api.Controllers
             }
 
             var domain = _configuration["App:BaseUrl"] ?? (Request.Scheme + "://" + Request.Host.Value);
-            var session = await _stripeService.CreateCheckoutSessionAsync(
-                request.Plan,
-                email,
-                domain
-            );
-            return new JsonResult(new { id = session.Id });
+            try
+            {
+                var session = await _stripeService.CreateCheckoutSessionAsync(
+                    request.Plan,
+                    email,
+                    domain
+                );
+                return new JsonResult(new { id = session.Id });
+            }
+            catch (StripeException ex)
+            {
+                _logger.LogError(ex, "Stripe API error while creating checkout session for plan '{Plan}'.", request.Plan);
+                return StatusCode(502, new { error = "Payment provider error. Please try again later." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, "Stripe configuration error while creating checkout session.");
+                return StatusCode(500, new { error = "Payment configuration error. Please contact support." });
+            }
         }
     }
 }

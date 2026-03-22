@@ -316,7 +316,11 @@ public class SeriesService : ISeriesService
     public async Task<Guid> SaveNew(SeriesWithOptionsViewModel model)
     {
         var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
-        var season = seasons.Single(s => s.Id == model.SeasonId);
+        var season = seasons.FirstOrDefault(s => s.Id == model.SeasonId);
+        if (season == null)
+        {
+            throw new InvalidOperationException($"Season with ID {model.SeasonId} not found.");
+        }
         model.Season = season;
         if (model.ScoringSystemId == Guid.Empty)
         {
@@ -356,7 +360,11 @@ public class SeriesService : ISeriesService
             {
                 // Use the season from the model
                 var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
-                season = seasons.Single(s => s.Id == model.SeasonId);
+                season = seasons.FirstOrDefault(s => s.Id == model.SeasonId);
+                if (season == null)
+                {
+                    throw new InvalidOperationException($"Season with ID {model.SeasonId} not found.");
+                }
             }
             else
             {

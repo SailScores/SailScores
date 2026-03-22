@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -126,7 +126,8 @@ public class AccountController : Controller
 
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load two-factor authentication user.");
+            _logger.LogWarning("Two-factor authentication attempted without prior authentication");
+            return RedirectToAction(nameof(Login));
         }
 
         var model = new LoginWith2faViewModel { RememberMe = rememberMe };
@@ -148,7 +149,8 @@ public class AccountController : Controller
         var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            _logger.LogWarning("Two-factor authentication POST attempted without prior authentication");
+            return RedirectToAction(nameof(Login));
         }
 
         var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
@@ -181,7 +183,8 @@ public class AccountController : Controller
         var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load two-factor authentication user.");
+            _logger.LogWarning("Recovery code login attempted without prior authentication");
+            return RedirectToAction(nameof(Login));
         }
 
         ViewData["ReturnUrl"] = returnUrl;
@@ -202,7 +205,8 @@ public class AccountController : Controller
         var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load two-factor authentication user.");
+            _logger.LogWarning("Recovery code login POST attempted without prior authentication");
+            return RedirectToAction(nameof(Login));
         }
 
         var recoveryCode = model.RecoveryCode.Replace(" ", string.Empty);
@@ -348,7 +352,9 @@ public class AccountController : Controller
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                throw new ApplicationException("Error loading external login information during confirmation.");
+                _logger.LogWarning("External login confirmation attempted with missing provider information");
+                ErrorMessage = "Error loading external login information. Please try again.";
+                return RedirectToAction(nameof(Login));
             }
             var user = new ApplicationUser
             {
@@ -383,7 +389,10 @@ public class AccountController : Controller
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{userId}'.");
+            // Don't throw exception - handle gracefully
+            // Could be invalid ID, expired link, or malicious request
+            _logger.LogWarning("Email confirmation attempted with invalid user ID: '{UserId}'", userId);
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
         var result = await _userManager.ConfirmEmailAsync(user, code);
         return View(result.Succeeded ? "ConfirmEmail" : "Error");
@@ -436,7 +445,8 @@ public class AccountController : Controller
     {
         if (code == null)
         {
-            throw new ApplicationException("A code must be supplied for password reset.");
+            _logger.LogWarning("Password reset attempted without reset code");
+            return RedirectToAction(nameof(ForgotPassword));
         }
         var model = new ResetPasswordViewModel { Code = code };
         return View(model);

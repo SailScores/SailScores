@@ -216,7 +216,9 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to create checkout session');
+                    return response.json().catch(() => ({})).then(err => {
+                        throw new Error(err.error || 'Failed to create checkout session');
+                    });
                 }
                 return response.json();
             })
