@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
@@ -12,6 +12,8 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
     public IList<SeriesSummary> SeriesOptions { get; set; }
 
     public IList<SeriesSummary> SummarySeriesOptions { get; set; }
+
+    public IList<Fleet> FleetOptions { get; set; }
 
     private Guid _seasonId;
 

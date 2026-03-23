@@ -17,6 +17,7 @@ public class SeriesService : ISeriesService
     private readonly Core.Services.ISeriesService _coreSeriesService;
     private readonly IScoringService _coreScoringService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
+    private readonly Core.Services.IFleetService _coreFleetService;
     private readonly IMapper _mapper;
 
     // Validation error messages for date restrictions
@@ -30,12 +31,14 @@ public class SeriesService : ISeriesService
         Core.Services.ISeriesService seriesService,
         Core.Services.IScoringService scoringService,
         Core.Services.ISeasonService seasonService,
+        Core.Services.IFleetService fleetService,
         IMapper mapper)
     {
         _coreClubService = clubService;
         _coreSeriesService = seriesService;
         _coreScoringService = scoringService;
         _coreSeasonService = seasonService;
+        _coreFleetService = fleetService;
         _mapper = mapper;
     }
 
@@ -76,6 +79,15 @@ public class SeriesService : ISeriesService
             .ThenBy(s => s.Name);
     }
 
+    private async Task<IEnumerable<SeriesSummary>> GetSummarySeriesBySeasonAsync(Guid clubId, Guid seasonId)
+    {
+        var allSummaries = await GetSummarySeriesAsync(clubId);
+        return allSummaries
+            .Where(s => s.Season?.Id == seasonId)
+            .OrderBy(s => s.Name);
+    }
+
+
 
     public async Task<SeriesWithOptionsViewModel> GetBlankVmForCreate(string clubInitials)
     {
@@ -109,6 +121,10 @@ public class SeriesService : ISeriesService
         // Get summary series options
         vm.SummarySeriesOptions = (await GetSummarySeriesAsync(clubId)).ToList();
 
+        // Get fleet options - include active fleets and any currently selected fleet
+        var allFleets = await _coreFleetService.GetAllFleetsForClub(clubId);
+        vm.FleetOptions = allFleets.Where(f => f.IsActive || f.Id == vm.FleetId).OrderBy(f => f.Name).ToList();
+
         return vm;
 
     }
@@ -116,8 +132,9 @@ public class SeriesService : ISeriesService
     public async Task<MultipleSeriesWithOptionsViewModel> GetBlankVmForCreateMultiple(string clubInitials)
     {
         var blankSingle = await GetBlankVmForCreate(clubInitials);
+        var clubId = await _coreClubService.GetClubId(clubInitials);
 
-        return new MultipleSeriesWithOptionsViewModel
+        var vm = new MultipleSeriesWithOptionsViewModel
         {
             SeasonId = blankSingle.SeasonId,
             SeasonOptions = blankSingle.SeasonOptions,
@@ -125,11 +142,21 @@ public class SeriesService : ISeriesService
             ScoringSystemOptions = blankSingle.ScoringSystemOptions,
             TrendOption = blankSingle.TrendOption,
             HideDncDiscards = blankSingle.HideDncDiscards,
+            FleetOptions = blankSingle.FleetOptions,
             Series = new List<MultipleSeriesRowViewModel>
             {
                 new()
-            }
+            },
+            SummarySummaryOption = "none"
         };
+
+        // Load summary series for the selected season if available
+        if (vm.SeasonId != Guid.Empty)
+        {
+            vm.SummarySeriesOptions = await GetSummarySeriesBySeasonAsync(clubId, vm.SeasonId);
+        }
+
+        return vm;
     }
 
     public async Task<IList<Guid>> CreateMultipleAsync(
@@ -150,17 +177,46 @@ public class SeriesService : ISeriesService
         var season = seasons.Single(s => s.Id == model.SeasonId);
         PreValidateRows(rows, season);
 
+        // Group rows by their per-row summary series assignment
+        var rowsWithPerRowSummary = rows.Where(r => r.SummarySeriesId.HasValue && r.SummarySeriesId != Guid.Empty)
+            .GroupBy(r => r.SummarySeriesId.Value)
+            .ToDictionary(g => g.Key, g => new List<Guid>());
+
         foreach (var row in rows)
         {
             var vm = CreateVmFromRow(row, model, clubId, updatedBy);
             var id = await SaveNew(vm);
             createdIds.Add(id);
+
+            // Track series for per-row summary series assignment
+            if (row.SummarySeriesId.HasValue && row.SummarySeriesId != Guid.Empty)
+            {
+                if (!rowsWithPerRowSummary.ContainsKey(row.SummarySeriesId.Value))
+                {
+                    rowsWithPerRowSummary[row.SummarySeriesId.Value] = new List<Guid>();
+                }
+                rowsWithPerRowSummary[row.SummarySeriesId.Value].Add(id);
+            }
         }
 
-        if (model.CreateSummarySeries)
+        // Add series to their per-row assigned summary series
+        foreach (var kvp in rowsWithPerRowSummary)
+        {
+            if (kvp.Value.Any())
+            {
+                await AddSeriesToExistingSummaryAsync(kvp.Key, kvp.Value, updatedBy);
+            }
+        }
+
+        // Handle bulk summary series options (create new or add all to existing)
+        if (model.SummarySummaryOption == "create")
         {
             var summaryId = await CreateSummarySeriesAsync(model, clubId, season, createdIds, updatedBy);
             createdIds.Add(summaryId);
+        }
+        else if (model.SummarySummaryOption == "existing" && model.ExistingSummarySeriesId.HasValue && model.ExistingSummarySeriesId != Guid.Empty)
+        {
+            await AddSeriesToExistingSummaryAsync(model.ExistingSummarySeriesId.Value, createdIds, updatedBy);
         }
 
         return createdIds;
@@ -175,15 +231,36 @@ public class SeriesService : ISeriesService
     {
         var clubId = await _coreClubService.GetClubId(clubInitials);
         var coreObject = await _coreSeriesService.GetAllSeriesAsync(clubId, null, false, true);
-
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(coreObject);
+
+        // For summary series, determine fleet name from child series races
         foreach (var summaryTypeSeries in coreObject.Where(s => s.Type == SeriesType.Summary))
         {
             var races = coreObject.Where(s => summaryTypeSeries.ChildrenSeriesIds.Contains(s.Id)).SelectMany(s => s.Races).ToList();
             seriesSummaries.Single(ss => ss.Id == summaryTypeSeries.Id).FleetName = GetFleetsString(races);
         }
 
+        // If a series explicitly has a FleetId, prefer that fleet's name regardless of races
+        var fleets = (await _coreFleetService.GetAllFleetsForClub(clubId)).ToDictionary(f => f.Id, f => f.Name);
+        foreach (var s in coreObject)
+        {
+            if (s.FleetId.HasValue)
+            {
+                var summary = seriesSummaries.Single(ss => ss.Id == s.Id);
+                if (fleets.TryGetValue(s.FleetId.Value, out var fleetName))
+                {
+                    summary.FleetName = fleetName;
+                }
+                else
+                {
+                    summary.FleetName = "No Fleet";
+                }
+            }
+        }
+
         return seriesSummaries.OrderByDescending(s => s.Season.Start)
+            // Put series with no fleet at the end
+            .ThenBy(s => s.FleetName == "No Fleet")
             .ThenBy(s => s.FleetName)
             .ThenBy(s => s.Name);
     }
@@ -216,6 +293,8 @@ public class SeriesService : ISeriesService
         var seriesSummaries = _mapper.Map<IList<SeriesSummary>>(eligibleSeries);
 
         return seriesSummaries.OrderByDescending(s => s.Season.Start)
+            // Put series with no fleet at the end
+            .ThenBy(s => s.FleetName == "No Fleet")
             .ThenBy(s => s.FleetName)
             .ThenBy(s => s.Name);
     }
@@ -237,7 +316,11 @@ public class SeriesService : ISeriesService
     public async Task<Guid> SaveNew(SeriesWithOptionsViewModel model)
     {
         var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
-        var season = seasons.Single(s => s.Id == model.SeasonId);
+        var season = seasons.FirstOrDefault(s => s.Id == model.SeasonId);
+        if (season == null)
+        {
+            throw new InvalidOperationException($"Season with ID {model.SeasonId} not found.");
+        }
         model.Season = season;
         if (model.ScoringSystemId == Guid.Empty)
         {
@@ -277,7 +360,11 @@ public class SeriesService : ISeriesService
             {
                 // Use the season from the model
                 var seasons = await _coreSeasonService.GetSeasons(model.ClubId);
-                season = seasons.Single(s => s.Id == model.SeasonId);
+                season = seasons.FirstOrDefault(s => s.Id == model.SeasonId);
+                if (season == null)
+                {
+                    throw new InvalidOperationException($"Season with ID {model.SeasonId} not found.");
+                }
             }
             else
             {
@@ -543,6 +630,8 @@ public class SeriesService : ISeriesService
             Name = row.Name.Trim(),
             SeasonId = model.SeasonId,
             ScoringSystemId = model.ScoringSystemId,
+            FleetId = model.FleetId,
+            UseFullRaceScores = model.UseFullRaceScores,
             TrendOption = model.TrendOption,
             HideDncDiscards = model.HideDncDiscards,
 
@@ -598,5 +687,48 @@ public class SeriesService : ISeriesService
         };
 
         return await _coreSeriesService.SaveNewSeries(summaryVm);
+    }
+
+    private async Task AddSeriesToExistingSummaryAsync(Guid summarySeriesId, List<Guid> newSeriesIds, string updatedBy)
+    {
+        var summarySeries = await _coreSeriesService.GetOneSeriesAsync(summarySeriesId);
+        if (summarySeries == null)
+        {
+            throw new InvalidOperationException("The selected summary series was not found.");
+        }
+
+        if (summarySeries.Type != SeriesType.Summary)
+        {
+            throw new InvalidOperationException("The selected series is not a summary series.");
+        }
+
+        // Add new series to existing children
+        var existingChildren = summarySeries.ChildrenSeriesIds?.ToList() ?? new List<Guid>();
+        existingChildren.AddRange(newSeriesIds);
+
+        var vmToUpdate = new SeriesWithOptionsViewModel
+        {
+            Id = summarySeries.Id,
+            ClubId = summarySeries.ClubId,
+            Name = summarySeries.Name,
+            SeasonId = summarySeries.Season.Id,
+            Season = summarySeries.Season,
+            Description = summarySeries.Description,
+            Type = SeriesType.Summary,
+            ScoringSystemId = summarySeries.ScoringSystem?.Id,
+            TrendOption = summarySeries.TrendOption,
+            HideDncDiscards = summarySeries.HideDncDiscards,
+            ExcludeFromCompetitorStats = summarySeries.ExcludeFromCompetitorStats,
+            IsImportantSeries = summarySeries.IsImportantSeries,
+            ParentSeriesIds = null,
+            ChildrenSeriesAsSingleRace = summarySeries.ChildrenSeriesAsSingleRace,
+            ChildrenSeriesIds = existingChildren,
+            DateRestricted = false,
+            EnforcedStartDate = null,
+            EnforcedEndDate = null,
+            UpdatedBy = updatedBy
+        };
+
+        await Update(vmToUpdate);
     }
 }

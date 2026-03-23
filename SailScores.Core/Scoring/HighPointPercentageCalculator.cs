@@ -19,37 +19,67 @@ namespace SailScores.Core.Scoring
 
         protected override decimal? GetBasicScore(IEnumerable<Score> allScores, Score currentScore)
         {
-            int competitorsInRace = allScores.Count(s =>
-                s.Race == currentScore.Race
-                 && CameToStart(s));
-
-
-            decimal? baseScore =
-                Convert.ToDecimal(allScores
-                    .Count(s =>
-                        currentScore.Place.HasValue
-                        && s.Race == currentScore.Race
-                        && s.Place < currentScore.Place
-                        && !ShouldAdjustOtherScores(s)
-                        ));
-
-            // if this is one, no tie. (if zero Place doesn't have a value (= coded.))
-            int numTied = allScores.Count(s =>
-                currentScore.Place.HasValue
-                && s.Race == currentScore.Race
-                && s.Place == currentScore.Place
-                && !ShouldAdjustOtherScores(s));
-            if (numTied > 1)
+            if (_useOriginalPlace
+                && currentScore.Place.HasValue
+                && string.IsNullOrEmpty(currentScore.Code))
             {
-                int total = 0;
-                for (int i = 0; i < numTied; i++)
-                {
-                    total += ((int)currentScore.Place + i);
-                }
-                baseScore = ((decimal)total / (decimal)numTied) - 1;
-            }
+                var fullRaceScores = currentScore.Race.Scores;
+                int competitorsInRace = fullRaceScores.Count(s => CameToStart(s));
 
-            return competitorsInRace - baseScore;
+                decimal? baseScore = Convert.ToDecimal(fullRaceScores.Count(s =>
+                    currentScore.Place.HasValue
+                    && s.Place < currentScore.Place
+                    && !ShouldAdjustOtherScores(s)));
+
+                int numTied = fullRaceScores.Count(s =>
+                    currentScore.Place.HasValue
+                    && s.Place == currentScore.Place
+                    && !ShouldAdjustOtherScores(s));
+
+                if (numTied > 1)
+                {
+                    int total = 0;
+                    for (int i = 0; i < numTied; i++)
+                    {
+                        total += ((int)currentScore.Place + i);
+                    }
+                    baseScore = ((decimal)total / (decimal)numTied) - 1;
+                }
+
+                return competitorsInRace - baseScore;
+            }
+            else
+            {
+                int competitorsInRace = allScores.Count(s =>
+                    s.Race == currentScore.Race
+                     && CameToStart(s));
+
+                decimal? baseScore =
+                    Convert.ToDecimal(allScores
+                        .Count(s =>
+                            currentScore.Place.HasValue
+                            && s.Race == currentScore.Race
+                            && s.Place < currentScore.Place
+                            && !ShouldAdjustOtherScores(s)
+                            ));
+
+                int numTied = allScores.Count(s =>
+                    currentScore.Place.HasValue
+                    && s.Race == currentScore.Race
+                    && s.Place == currentScore.Place
+                    && !ShouldAdjustOtherScores(s));
+                if (numTied > 1)
+                {
+                    int total = 0;
+                    for (int i = 0; i < numTied; i++)
+                    {
+                        total += ((int)currentScore.Place + i);
+                    }
+                    baseScore = ((decimal)total / (decimal)numTied) - 1;
+                }
+
+                return competitorsInRace - baseScore;
+            }
         }
 
         protected override decimal? GetPerfectScore(IEnumerable<Score> allScores, Score currentScore)
@@ -153,10 +183,15 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+        protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
         {
-            var dnfScore = GetDnfScore(race) ?? 0;
-            var fleetSize = race.Scores.Where(s => CameToStart(s)).Count();
+            var dnfScore = GetDnfScore(race, seriesResults) ?? 0;
+
+            var relevantScores = (_useOriginalPlace || seriesResults == null)
+                ? race.Scores
+                : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
+
+            var fleetSize = relevantScores.Count(s => CameToStart(s));
             var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
             var percent = Math.Round(fleetSize * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
 

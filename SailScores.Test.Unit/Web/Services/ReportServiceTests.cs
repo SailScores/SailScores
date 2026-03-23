@@ -15,6 +15,7 @@ namespace SailScores.Test.Unit.Web.Services
     {
         private readonly Mock<CoreServices.IReportService> _coreReportServiceMock;
         private readonly Mock<CoreServices.IClubService> _clubServiceMock;
+        private readonly Mock<AutoMapper.IMapper> _mapperMock;
         private readonly ReportService _service;
 
         private readonly string _clubInitials = "TST";
@@ -26,6 +27,7 @@ namespace SailScores.Test.Unit.Web.Services
         {
             _coreReportServiceMock = new Mock<CoreServices.IReportService>();
             _clubServiceMock = new Mock<CoreServices.IClubService>();
+            _mapperMock = new Mock<AutoMapper.IMapper>();
 
             _clubServiceMock.Setup(s => s.GetClubId(_clubInitials))
                 .ReturnsAsync(_clubId);
@@ -45,7 +47,9 @@ namespace SailScores.Test.Unit.Web.Services
 
             _service = new ReportService(
                 _coreReportServiceMock.Object,
-                _clubServiceMock.Object);
+                _clubServiceMock.Object,
+                _mapperMock.Object);
+
         }
 
         [Fact]

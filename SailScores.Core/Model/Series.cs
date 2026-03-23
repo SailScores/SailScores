@@ -1,9 +1,10 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Scoring;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace SailScores.Core.Model;
 
@@ -59,8 +60,12 @@ public class Series
 
     public TrendOption? TrendOption { get; set; }
 
-    // used for connecting series to correct fleet. Particularly for Regatta use.
     public Guid? FleetId { get; set; }
+    public Fleet Fleet { get; set; }
+
+    // When fleet is selected, determines whether to use full race scores (true)
+    // or recalculate positions based only on fleet competitors (false)
+    public bool? UseFullRaceScores { get; set; }
 
     public bool? PreferAlternativeSailNumbers { get; set; }
 
@@ -78,6 +83,33 @@ public class Series
 
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
+
+    /// <summary>
+    /// Gets the effective fleet for this series.
+    /// For admin views, PopulateSeriesFleets() should be called first to populate
+    /// the Fleet navigation property from the most recent race's fleet.
+    /// </summary>
+    public Fleet GetEffectiveFleet()
+    {
+        // Return the direct fleet assignment (which may have been populated by PopulateSeriesFleets)
+        return Fleet;
+    }
+
+    /// <summary>
+    /// Gets the display name of the effective fleet for this series.
+    /// Summary series return "Summary", others return their fleet name or "No Fleet".
+    /// </summary>
+    public String GetEffectiveFleetName()
+    {
+        // Summary series are grouped separately
+        if (Type == SeriesType.Summary)
+        {
+            return "Summary";
+        }
+
+        var fleet = GetEffectiveFleet();
+        return fleet?.Name ?? "No Fleet";
+    }
 
     public Series ShallowCopy()
     {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text;
 
@@ -12,6 +12,7 @@ public class FlatCalculatedScore
     public Decimal? ScoreValue { get; set; }
     public Decimal? PerfectScoreValue { get; set; }
     public bool Discard { get; set; }
+    public TimeSpan? ElapsedTime { get; set; }
 
     public override string ToString()
     {

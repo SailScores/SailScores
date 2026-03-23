@@ -1,4 +1,4 @@
-﻿using Humanizer;
+using Humanizer;
 using Microsoft.Extensions.Localization;
 using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
@@ -70,6 +70,11 @@ public class CsvService : ICsvService, IDisposable
         {
             sb.Append(GetEscapedValue(_sailscoresLocalizer.GetShortName(race)));
             sb.Append(_separator);
+            if (race.TrackTimes)
+            {
+                sb.Append(GetEscapedValue(_sailscoresLocalizer.GetShortName(race) + " - " + GetEscapedLocalizedValue("Elapsed")));
+                sb.Append(_separator);
+            }
         }
 
         return sb.ToString();
@@ -131,6 +136,14 @@ public class CsvService : ICsvService, IDisposable
                 }
             }
             sb.Append(_separator);
+
+            if (race.TrackTimes)
+            {
+                var raceScore = series.FlatResults.GetScore(comp, race);
+                var elapsedTimeString = FormatElapsedTime(raceScore?.ElapsedTime);
+                sb.Append(GetEscapedValue(elapsedTimeString));
+                sb.Append(_separator);
+            }
         }
 
         return sb.ToString();
@@ -213,6 +226,24 @@ public class CsvService : ICsvService, IDisposable
     private string GetEscapedLocalizedValue(string s)
     {
         return GetEscapedValue(_stringLocalizer[s]);
+    }
+
+    private static string FormatElapsedTime(TimeSpan? elapsedTime)
+    {
+        if (!elapsedTime.HasValue)
+        {
+            return string.Empty;
+        }
+
+        var ts = elapsedTime.Value;
+        if (ts.Days > 0)
+        {
+            return $"{ts.Days}d {ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+        }
+        else
+        {
+            return $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+        }
     }
 
     private static string GetEscapedValue(string s)

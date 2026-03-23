@@ -19,6 +19,7 @@ public class AdminService : IAdminService
     private readonly CoreServices.IBoatClassService _coreBoatClassService;
     private readonly CoreServices.IFleetService _coreFleetService;
     private readonly CoreServices.ISeasonService _coreSeasonService;
+    private readonly CoreServices.ISeriesService _coreSeriesService;
     private readonly IWeatherService _weatherService;
     private readonly IPermissionService _permissionService;
     private readonly ILocalizerService _localizerService;
@@ -33,6 +34,7 @@ public class AdminService : IAdminService
         CoreServices.IBoatClassService boatClassService,
         CoreServices.IFleetService fleetService,
         CoreServices.ISeasonService seasonService,
+        CoreServices.ISeriesService seriesService,
         IWeatherService weatherService,
         IPermissionService permissionService,
         ILocalizerService localizerService,
@@ -46,6 +48,7 @@ public class AdminService : IAdminService
         _coreBoatClassService = boatClassService;
         _coreFleetService = fleetService;
         _coreSeasonService = seasonService;
+        _coreSeriesService = seriesService;
         _weatherService = weatherService;
         _permissionService = permissionService;
         _localizerService = localizerService;
@@ -76,6 +79,14 @@ public class AdminService : IAdminService
     public async Task<AdminViewModel> GetClub(string clubInitials)
     {
         var club = await _coreClubService.GetClubForAdmin(clubInitials);
+
+        // Populate fleet information for series that don't have a direct fleet assignment
+        // by loading only the most recent race's fleet (efficient for clubs with many races)
+        if (club.Series != null && club.Series.Count > 0)
+        {
+            await _coreSeriesService.PopulateSeriesFleets(club.Series, club.Id);
+        }
+
         var vm = _mapper.Map<AdminViewModel>(club);
 
         foreach (var boatClass in vm.BoatClasses ?? new List<BoatClassDeleteViewModel>())
@@ -91,7 +102,7 @@ public class AdminService : IAdminService
         {
             var delInfo = fleetDeleteInfo.FirstOrDefault(fdi => fdi.Id == fleet.Id);
             fleet.IsDeletable = delInfo.IsDeletable;
-            fleet.PreventDeleteReason = delInfo.IsDeletable ? string.Empty : "Fleet has races assigned.";
+            fleet.PreventDeleteReason = delInfo.Reason;
             fleet.IsRegattaFleet = fleetRegattaInfo.Any(f => f.Key == fleet.Id);
         }
 

@@ -26,6 +26,14 @@ public class ReportService : IReportService
         _clubService = clubService;
     }
 
+    public async Task<IList<SeriesParticipationStats>> GetSeriesParticipationStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
+    {
+        return await _dbContext.GetSeriesParticipationStats(clubInitials, startDate, endDate).ConfigureAwait(false);
+    }
+
     public async Task<IList<WindDataPoint>> GetWindDataAsync(
         Guid clubId,
         DateTime? startDate = null,

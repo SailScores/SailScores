@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Db = SailScores.Database.Entities;
@@ -1625,13 +1627,43 @@ public class BackupService : IBackupService
                      Id = GetNewGuid(historicalResult.Id),
                      SeriesId = newSeriesId.Value,
                      IsCurrent = historicalResult.IsCurrent,
-                     Results = historicalResult.Results,
+                    Results = ReplaceGuidsInJson(historicalResult.Results),
                      Created = historicalResult.Created
                  };
                  _dbContext.HistoricalResults.Add(dbHistoricalResult);
              }
          }
      }
+
+    // Replace GUID strings in JSON payload with their remapped GUIDs from _guidMap (creating mappings when necessary).
+    private string ReplaceGuidsInJson(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return json;
+
+        try
+        {
+            // Replace all GUID-like tokens in the JSON using regex. This avoids manipulating JsonNode trees
+            // and ensures any GUIDs stored as strings are remapped consistently via GetNewGuid.
+            var guidPattern = new System.Text.RegularExpressions.Regex(@"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+            var replaced = guidPattern.Replace(json, m =>
+            {
+                if (Guid.TryParse(m.Value, out var oldGuid))
+                {
+                    var newGuid = GetNewGuid(oldGuid);
+                    return newGuid.ToString();
+                }
+                return m.Value;
+            });
+
+            return replaced;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to replace GUIDs in historical results JSON; leaving original payload unchanged.");
+            return json;
+        }
+    }
 
      private void RestoreChangeTypes(ClubBackupData backup)
      {

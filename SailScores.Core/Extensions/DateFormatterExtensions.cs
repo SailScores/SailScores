@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 
@@ -8,8 +8,12 @@ namespace SailScores.Core.Extensions
     {
         public static string ToShortString(this DateTime? date)
         {
-            return date?.ToString("ddd", CultureInfo.CurrentCulture) +
-                ", " + date?.ToString("M", CultureInfo.CurrentCulture);
+            return date?.ToString("ddd dd MMM", CultureInfo.CurrentCulture);
+        }
+        public static string ToMediumString(this DateTime? date)
+        {
+            return date?.ToString("ddd", CultureInfo.CurrentCulture) + ", " +
+                date?.ToString("M", CultureInfo.CurrentCulture);
         }
         public static string ToSuperShortString(this DateTime? date)
         {

@@ -61,7 +61,12 @@ namespace SailScores.Core.Model
             this.Id = childSeries.Id;
             this.ClubId = childSeries.ClubId;
             this.Name = childSeries.Name;
-            this.Date = minDate;
+
+            // Use the actual race date if available, otherwise fall back to series StartDate
+            this.Date = minDate ?? (childSeries.StartDate.HasValue 
+                ? childSeries.StartDate.Value.ToDateTime(TimeOnly.MinValue) 
+                : null);
+
             this.Order = 1;
             this.Description = childSeries.Description;
             this.State = state;
@@ -71,9 +76,25 @@ namespace SailScores.Core.Model
             this.UpdatedDate = DateTime.UtcNow;
             this.UpdatedBy = "System";
             this.IsSeriesSummary = true;
+
             // Set the start and end dates for the series
-            this.StartDate = childSeries.Races.Count > 0 ? childSeries.Races.Min(r => r.Date) : null;
-            this.EndDate = childSeries.Races.Count > 0 ? childSeries.Races.Max(r => r.Date) : null;
+            // If series has races, use race dates; otherwise use series dates
+            if (childSeries.Races.Count > 0)
+            {
+                this.StartDate = childSeries.Races.Min(r => r.Date);
+                this.EndDate = childSeries.Races.Max(r => r.Date);
+            }
+            else
+            {
+                // For series with no races, use the series StartDate and EndDate
+                this.StartDate = childSeries.StartDate.HasValue 
+                    ? childSeries.StartDate.Value.ToDateTime(TimeOnly.MinValue) 
+                    : null;
+                this.EndDate = childSeries.EndDate.HasValue 
+                    ? childSeries.EndDate.Value.ToDateTime(TimeOnly.MinValue) 
+                    : null;
+            }
+
             this.TotalChildRaceCount = childSeries.Races.Count;
             this.SeriesUrl = childSeries.Season.UrlName + UrlSeparator + childSeries.UrlName;
 

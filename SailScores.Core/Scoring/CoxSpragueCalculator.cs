@@ -19,23 +19,36 @@ public class CoxSpragueCalculator : BaseScoringCalculator
 
     protected override decimal? GetBasicScore(IEnumerable<Score> allScores, Score currentScore)
     {
-        int starters = allScores.Count(s =>
-            s.Race == currentScore.Race
-             && CountsAsStarted(s));
+        if (_useOriginalPlace
+            && currentScore.Place.HasValue
+            && string.IsNullOrEmpty(currentScore.Code))
+        {
+            // Use original race data: full starters count and original place
+            var fullRaceScores = currentScore.Race.Scores;
+            int starters = fullRaceScores.Count(s => CountsAsStarted(s));
+            int baseScore = fullRaceScores.Count(s =>
+                currentScore.Place.HasValue
+                && s.Place <= currentScore.Place
+                && !ShouldAdjustOtherScores(s));
 
+            return CoxSpragueTable.GetScore(baseScore, starters);
+        }
+        else
+        {
+            int starters = allScores.Count(s =>
+                s.Race == currentScore.Race
+                && CountsAsStarted(s));
 
-        int baseScore =
-            allScores
-                .Count(s =>
-                    currentScore.Place.HasValue
-                    && s.Race == currentScore.Race
-                    && s.Place <= currentScore.Place
-                    && !ShouldAdjustOtherScores(s)
-                    );
+            int baseScore = allScores.Count(s =>
+                currentScore.Place.HasValue
+                && s.Race == currentScore.Race
+                && s.Place <= currentScore.Place
+                && !ShouldAdjustOtherScores(s));
 
-        // removed code to handle race result ties: this should treat both as the same place.
+            // removed code to handle race result ties: this should treat both as the same place.
 
-        return CoxSpragueTable.GetScore( baseScore, starters);
+            return CoxSpragueTable.GetScore(baseScore, starters);
+        }
     }
 
     protected override decimal? GetPerfectScore(IEnumerable<Score> allScores, Score currentScore)
@@ -49,7 +62,7 @@ public class CoxSpragueCalculator : BaseScoringCalculator
     // for Cox-Sprague this is most coded results: they depend on number of starters
     protected override void CalculateRaceDependentScores(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
     {
-        
+
         foreach (var race in resultsWorkInProgress.SailedRaces)
         {
             var score = compResults.CalculatedScores[race];
@@ -57,7 +70,8 @@ public class CoxSpragueCalculator : BaseScoringCalculator
             if (scoreCode != null && CameToStart(score.RawScore)
                 && scoreCode.Formula != TIE_FORMULANAME)
             {
-                var starters = race.Scores.Count(s => CountsAsStarted(s));
+                var relevantScores = race.Scores.Where(s => resultsWorkInProgress.Competitors.Any(c => c.Id == s.CompetitorId));
+                var starters = relevantScores.Count(s => CountsAsStarted(s));
                 score.ScoreValue = CoxSpragueTable.GetScore(starters + 1, starters);
             }
         }
@@ -81,7 +95,8 @@ public class CoxSpragueCalculator : BaseScoringCalculator
         Dictionary<Guid, int> starterCounts = new Dictionary<Guid, int>();
         foreach (Race r in results.SailedRaces)
         {
-            starterCounts[r.Id] = r.Scores.Count(s => CountsAsStarted(s));
+            var relevantScores = r.Scores.Where(s => results.Competitors.Any(c => c.Id == s.CompetitorId));
+            starterCounts[r.Id] = relevantScores.Count(s => CountsAsStarted(s));
         }
         foreach (var comp in results.Competitors)
         {
@@ -228,7 +243,13 @@ public class CoxSpragueCalculator : BaseScoringCalculator
         // some day, might culculate these by using percent in competed races.
         foreach (var race in resultsWorkInProgress.Races)
         {
-            var score = compResults.CalculatedScores[race];
+
+            CalculatedScore score = null;
+            if (compResults.CalculatedScores.ContainsKey(race))
+            {
+                score = compResults.CalculatedScores[race];
+            }
+
             if (score != null && IsAverage(score.RawScore?.Code))
             {
                 score.ScoreValue = null;
@@ -238,10 +259,15 @@ public class CoxSpragueCalculator : BaseScoringCalculator
         }
     }
 
-    protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+    protected override decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
     {
-        var dnfScore = GetDnfScore(race) ?? 0;
-        var fleetSize = race.Scores.Where(s => CameToStart(s)).Count();
+        var dnfScore = GetDnfScore(race, seriesResults) ?? 0;
+
+        var relevantScores = (_useOriginalPlace || seriesResults == null)
+            ? race.Scores
+            : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
+
+        var fleetSize = relevantScores.Count(s => CameToStart(s));
         var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
         var percent = Math.Round(fleetSize * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
 

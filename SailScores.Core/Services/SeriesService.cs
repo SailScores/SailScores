@@ -695,7 +695,8 @@ namespace SailScores.Core.Services
                     Code = s.Value.RawScore.Code,
                     ScoreValue = s.Value.ScoreValue,
                     PerfectScoreValue = s.Value.PerfectScoreValue,
-                    Discard = s.Value.Discard
+                    Discard = s.Value.Discard,
+                    ElapsedTime = s.Value.RawScore.ElapsedTime
                 });
         }
 
@@ -716,6 +717,7 @@ namespace SailScores.Core.Services
                         Description = r.Description,
                         IsSeries = r.IsSeriesSummary,
                         State = r.State,
+                        TrackTimes = r.TrackTimes,
                         WeatherIcon = r.Weather?.Icon,
                         WindSpeedMeterPerSecond = r.Weather?.WindSpeedMeterPerSecond,
                         WindDirectionDegrees = r.Weather?.WindDirectionDegrees,
@@ -758,13 +760,36 @@ namespace SailScores.Core.Services
                 .Select(s => s.CompetitorId)
                 .Distinct();
 
-            if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out List<dbObj.Competitor> dbCompetitors))
+            if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out List<dbObj.Competitor> dbCompetitors) || dbCompetitors == null)
             {
-                dbCompetitors = await _dbContext.Competitors
-                    .Where(c => compIds.Contains(c.Id)).ToListAsync()
+                var query = _dbContext.Competitors
+                    .Include(c => c.CompetitorFleets)
+                    .Include(c => c.BoatClass)
+                    .Where(c => compIds.Contains(c.Id));
+
+                // Filter by fleet if series has FleetId set
+                if (series.FleetId.HasValue)
+                {
+                    // Load the fleet to check its type
+                    var fleet = await _dbContext.Fleets
+                        .Include(f => f.FleetBoatClasses)
+                        .FirstOrDefaultAsync(f => f.Id == series.FleetId.Value)
+                        .ConfigureAwait(false);
+
+                    if (fleet != null)
+                    {
+                        query = ApplyFleetFilter(query, fleet);
+                    }
+                }
+
+                dbCompetitors = await query.ToListAsync()
                     .ConfigureAwait(false);
 
-                _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+                // Only cache non-null results
+                if (dbCompetitors != null)
+                {
+                    _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+                }
             }
             else
             {
@@ -772,6 +797,20 @@ namespace SailScores.Core.Services
                 // historical results for charts)
                 // so we need to refilter the competitors.
                 dbCompetitors = dbCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
+
+                // Also apply fleet filtering to cached results
+                if (series.FleetId.HasValue)
+                {
+                    var fleet = await _dbContext.Fleets
+                        .Include(f => f.FleetBoatClasses)
+                        .FirstOrDefaultAsync(f => f.Id == series.FleetId.Value)
+                        .ConfigureAwait(false);
+
+                    if (fleet != null)
+                    {
+                        dbCompetitors = ApplyFleetFilterToList(dbCompetitors, fleet);
+                    }
+                }
             }
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
@@ -782,15 +821,92 @@ namespace SailScores.Core.Services
                 var competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
                 if(competitor == null)
                 {
-                    dbCompetitors = await _dbContext.Competitors
-                    .Where(c => compIds.Contains(c.Id)).ToListAsync()
-                    .ConfigureAwait(false);
+                    var query = _dbContext.Competitors
+                        .Include(c => c.CompetitorFleets)
+                        .Include(c => c.BoatClass)
+                        .Where(c => compIds.Contains(c.Id));
 
-                    _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+                    // Filter by fleet if series has FleetId set
+                    if (series.FleetId.HasValue)
+                    {
+                        var fleet = await _dbContext.Fleets
+                            .Include(f => f.FleetBoatClasses)
+                            .FirstOrDefaultAsync(f => f.Id == series.FleetId.Value)
+                            .ConfigureAwait(false);
+
+                        if (fleet != null)
+                        {
+                            query = ApplyFleetFilter(query, fleet);
+                        }
+                    }
+
+                    dbCompetitors = await query.ToListAsync()
+                        .ConfigureAwait(false);
+                    competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
+                    if (competitor == null)
+                    {
+                        // Skip scores for competitors not in the fleet
+                        continue;
+                    }
+
+                    // seems we have a score for a competitor not in the series competitor list. Add them and the new list to the cache.
+                    if (dbCompetitors != null)
+                    {
+                        _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
+                    }
                     series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
-                    competitor = series.Competitors.First(c => c.Id == score.CompetitorId);
+                    competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
+
                 }
                 score.Competitor = competitor;
+            }
+        }
+
+        private IQueryable<dbObj.Competitor> ApplyFleetFilter(IQueryable<dbObj.Competitor> query, dbObj.Fleet fleet)
+        {
+            switch (fleet.FleetType)
+            {
+                case Api.Enumerations.FleetType.AllBoatsInClub:
+                    // No filtering - include all competitors
+                    return query;
+
+                case Api.Enumerations.FleetType.SelectedClasses:
+                    // Filter by boat classes associated with the fleet
+                    if (fleet.FleetBoatClasses != null && fleet.FleetBoatClasses.Any())
+                    {
+                        var boatClassIds = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClassId).ToList();
+                        return query.Where(c => boatClassIds.Contains(c.BoatClassId));
+                    }
+                    return query.Where(c => false); // No classes selected, so no competitors match
+
+                case Api.Enumerations.FleetType.SelectedBoats:
+                default:
+                    // Filter by explicit fleet membership (CompetitorFleets)
+                    return query.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleet.Id));
+            }
+        }
+
+        private List<dbObj.Competitor> ApplyFleetFilterToList(List<dbObj.Competitor> competitors, dbObj.Fleet fleet)
+        {
+            switch (fleet.FleetType)
+            {
+                case Api.Enumerations.FleetType.AllBoatsInClub:
+                    // No filtering - include all competitors
+                    return competitors;
+
+                case Api.Enumerations.FleetType.SelectedClasses:
+                    // Filter by boat classes associated with the fleet
+                    if (fleet.FleetBoatClasses != null && fleet.FleetBoatClasses.Any())
+                    {
+                        var boatClassIds = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClassId).ToList();
+                        return competitors.Where(c => boatClassIds.Contains(c.BoatClassId)).ToList();
+                    }
+                    return new List<dbObj.Competitor>(); // No classes selected, so no competitors match
+
+                case Api.Enumerations.FleetType.SelectedBoats:
+                default:
+                    // Filter by explicit fleet membership (CompetitorFleets)
+                    return competitors.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleet.Id)).ToList();
             }
         }
 
@@ -968,6 +1084,8 @@ namespace SailScores.Core.Services
             existingSeries.DateRestricted = model.DateRestricted;
             existingSeries.EnforcedStartDate = model.EnforcedStartDate;
             existingSeries.EnforcedEndDate = model.EnforcedEndDate;
+            existingSeries.FleetId = model.FleetId;
+            existingSeries.UseFullRaceScores = model.UseFullRaceScores;
         }
 
         private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)
@@ -1228,6 +1346,11 @@ namespace SailScores.Core.Services
             return Newtonsoft.Json.JsonConvert.DeserializeObject<FlatChartData>(dbRow.Results);
         }
 
+        public async Task<FlatChartData> CalculateChartDataForSeries(Series series)
+        {
+            return await CalculateChartData(series).ConfigureAwait(false);
+        }
+
         private async Task NotifyIndexNow(Guid clubId, Guid seriesId)
         {
             try
@@ -1256,6 +1379,61 @@ namespace SailScores.Core.Services
             {
                 // Log but don't fail the update - IndexNow is non-critical
                 // Logging is handled within the IndexNowService
+            }
+        }
+
+        public async Task PopulateSeriesFleets(IList<Model.Series> series, Guid clubId)
+        {
+            if (series == null || series.Count == 0)
+            {
+                return;
+            }
+
+            // Find series that:
+            // 1. Are not Summary series (Summary series don't get grouped by fleet)
+            // 2. Don't have a direct FleetId assignment
+            var seriesWithoutDirectFleet = series
+                .Where(s => s.Type != SeriesType.Summary 
+                    && (s.FleetId == null || s.Fleet == null))
+                .ToList();
+
+            if (seriesWithoutDirectFleet.Count == 0)
+            {
+                return;
+            }
+
+            // Get all series IDs that need fleet determination
+            var seriesIds = seriesWithoutDirectFleet.Select(s => s.Id).ToList();
+
+            // Batch query to get the most recent race's fleet for each series
+            // This is more efficient than loading all races
+            var recentRaceFleets = await _dbContext.Series
+                .Where(s => seriesIds.Contains(s.Id))
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Fleet)
+                .AsNoTracking()
+                .Select(s => new
+                {
+                    SeriesId = s.Id,
+                    RecentFleet = s.RaceSeries
+                        .Select(rs => rs.Race)
+                        .Where(r => r.Date.HasValue)
+                        .OrderByDescending(r => r.Date)
+                        .FirstOrDefault()
+                        .Fleet
+                })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            // Map the fleets back to the series objects
+            foreach (var item in recentRaceFleets)
+            {
+                var seriesItem = series.FirstOrDefault(s => s.Id == item.SeriesId);
+                if (seriesItem != null && item.RecentFleet != null)
+                {
+                    seriesItem.Fleet = _mapper.Map<Model.Fleet>(item.RecentFleet);
+                }
             }
         }
     }

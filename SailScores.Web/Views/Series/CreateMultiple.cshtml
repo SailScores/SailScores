@@ -1,5 +1,6 @@
 @using SailScores.Web.Services
 @using SailScores.Api.Enumerations
+@using SailScores.Core.Model
 
 @model SailScores.Web.Models.SailScores.MultipleSeriesWithOptionsViewModel
 
@@ -16,8 +17,9 @@
     <div id="seriesNameValidationErrors" class="alert alert-danger d-none mb-3"></div>
 
     <form asp-action="CreateMultiple">
+        <input type="hidden" asp-for="ClubId" />
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-10 col-lg-8">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <div class="mb-3">
@@ -56,6 +58,54 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label asp-for="FleetId" class="control-label">
+                                        Fleet 
+                                        <span class="text-muted" style="font-size: 0.85em;">Competitor Filter</span>
+                                        <a class="text-primary"
+                                               data-bs-container="body"
+                                               data-bs-toggle="popover"
+                                               data-bs-placement="top"
+                                               data-bs-trigger="focus hover"
+                                               data-bs-content="Limit series results to include only competitors of a specific fleet. E.g., create a Women's Series from races that include all sailors. (Race could be assigned to multiple series.)">
+                                            <span class="far fa-question-circle"></span>
+                                        </a>
+                                    </label>
+                                    <select id="FleetId" asp-for="FleetId" class="form-select">
+                                        <option value="">-Allow any competitors-</option>
+                                        @if (Model.FleetOptions != null)
+                                        {
+                                            @foreach (var fleet in Model.FleetOptions)
+                                            {
+                                                <option value="@fleet.Id">
+                                                    @fleet.Name @(fleet.IsActive ? "" : " (Inactive)")
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="FleetId" class="text-danger"></span>
+                                    <span class="small">Only competitors in this fleet will appear in series standings.</span>
+                                </div>
+
+                                <div id="useFullRaceScoresField" class="mb-3" style="display: none; margin-left: 2rem;">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="UseFullRaceScores" name="UseFullRaceScores" value="true" @(Model.UseFullRaceScores == true ? "checked" : "") />
+                                        <input type="hidden" name="UseFullRaceScores" value="false" />
+                                        <label class="form-check-label" for="UseFullRaceScores">
+                                            Use Original Race Positions
+                                            <a class="text-primary"
+                                                   data-bs-container="body"
+                                                   data-bs-toggle="popover"
+                                                   data-bs-placement="top"
+                                                   data-bs-trigger="focus hover"
+                                                   data-bs-content="Unchecked (default): Rank competitors only against others in the fleet. Checked: Use original race ranking even if non-fleet competitors placed higher.">
+                                                <span class="far fa-question-circle"></span>
+                                            </a>
+                                        </label>
+                                        <small class="form-text text-muted d-block">Finishing positions include all race competitors if selected.</small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
                                     <label asp-for="TrendOption">Calculate Rank Trend</label>
                                     <select asp-for="TrendOption" class="form-select">
                                         @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
@@ -72,18 +122,35 @@
                                         <label class="form-check-label" asp-for="HideDncDiscards">Hide discarded DNC scores (Show as blank)</label>
                                     </div>
                                 </div>
+
+                                <div class="mb-3">
+                                    <label>Add to Summary Series <span class="small text-muted">(Optional)</span></label>
+                                </div>
+
                                 <div class="mb-3">
                                     <div class="form-check">
-                                        <input class="form-check-input" asp-for="CreateSummarySeries" />
-                                        <label class="form-check-label" asp-for="CreateSummarySeries">Create summary series for these new series</label>
-                                        <span class="small"><br />Creates a summary series that groups the series created below.</span>
+                                        <input class="form-check-input" type="radio" name="SummarySummaryOption" value="none" id="summaryNone" @(Model.SummarySummaryOption == "none" ? "checked" : "checked") />
+                                        <label class="form-check-label" for="summaryNone">None (set individually if needed.)</label>
                                     </div>
                                 </div>
 
-                                <div id="summarySeriesFields" style="display: @(Model.CreateSummarySeries ? "block" : "none");">
+                                <div class="mb-3" style="margin-left: 2rem;">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleSummaryColumnBtn" onclick="toggleSummaryColumn()">
+                                        <span class="fas fa-plus"></span> Show Summary Series Column
+                                    </button>
+                                    <span class="small text-muted ms-2">Assign each series to an existing summary</span>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="SummarySummaryOption" value="create" id="summaryCreate" @(Model.SummarySummaryOption == "create" ? "checked" : "") />
+                                        <label class="form-check-label" for="summaryCreate">Create a new summary including all these series</label>
+                                    </div>
+                                </div>
+
+                                <div id="createSummarySeriesFields" style="display: @(Model.SummarySummaryOption == "create" ? "block" : "none"); margin-left: 2rem;">
                                     <div class="mb-3">
                                         <label asp-for="SummarySeriesName" class="control-label"></label>
-                                        <input asp-for="SummarySeriesName" class="form-control" />
+                                        <input asp-for="SummarySeriesName" class="form-control" placeholder="e.g., 2024 Fleet Championship" />
                                         <span asp-validation-for="SummarySeriesName" class="text-danger"></span>
                                     </div>
 
@@ -93,6 +160,38 @@
                                             <label class="form-check-label" asp-for="SummaryChildrenSeriesAsSingleRace">Children series each count as a single race</label>
                                             <span class="small"><br />If not checked, all races will be counted in this summary series as individual races.</span>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="SummarySummaryOption" value="existing" id="summaryExisting" @(Model.SummarySummaryOption == "existing" ? "checked" : "") />
+                                        <label class="form-check-label" for="summaryExisting">Add all to an existing summary series</label>
+                                    </div>
+                                </div>
+
+                                <div id="existingSummarySeriesFields" style="display: @(Model.SummarySummaryOption == "existing" ? "block" : "none"); margin-left: 2rem;">
+                                    <div class="mb-3">
+                                        <label asp-for="ExistingSummarySeriesId" class="control-label">Select Summary Series</label>
+                                        <select asp-for="ExistingSummarySeriesId" class="form-select" id="ExistingSummarySeriesId">
+                                            <option value="">Select a summary series...</option>
+                                            @if (Model.SummarySeriesOptions != null && Model.SummarySeriesOptions.Any())
+                                            {
+                                                @foreach (var series in Model.SummarySeriesOptions)
+                                                {
+                                                    if (Model.ExistingSummarySeriesId == series.Id)
+                                                    {
+                                                        <option value="@series.Id" selected>@series.Name</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@series.Id">@series.Name</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                        <span asp-validation-for="ExistingSummarySeriesId" class="text-danger"></span>
+                                        <span class="small">Only summary series for the selected season are shown.</span>
                                     </div>
                                 </div>
                             </div>
@@ -107,35 +206,46 @@
             <div class="col-12">
                 <div id="allSeries">
                     <div class="row d-none d-md-flex mt-4">
-                        <div class="col-md-5">
-                            <div class="mb-3">Name <span class="small muted"><em>Must be unique in Season</em></span></div>
+                        <div class="col-md-4">
+                            <div class="mb-3">Name <span class="small muted"><em>Must be unique within Season</em></span></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="mb-3">Series Start Date <span class="small muted"><em>Optional</em></span></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="mb-3">Series End Date <span class="small muted"><em>Optional</em></span></div>
+                        </div>
+                        <div class="col-md-3 summary-column-header d-none">
+                            <div class="mb-3">Summary Series <span class="small muted"><em>Optional</em></span></div>
                         </div>
                         <div class="col-md-1"></div>
                     </div>
 
                     <div class="row" id="seriesRowTemplate" style="display: none">
                         <div class="col-3 d-md-none">Name</div>
-                        <div class="col-9 col-md-5">
+                        <div class="col-9 col-md-4">
                             <div class="mb-3">
                                 <input type="text" name="template.Name" class="form-control" data-column="0" />
                             </div>
                         </div>
                         <div class="col-3 d-md-none">Start</div>
-                        <div class="col-9 col-md-3">
+                        <div class="col-9 col-md-2">
                             <div class="mb-3">
                                 <input type="date" name="template.EnforcedStartDate" class="form-control" data-column="1" />
                             </div>
                         </div>
                         <div class="col-3 d-md-none">End</div>
-                        <div class="col-9 col-md-3">
+                        <div class="col-9 col-md-2">
                             <div class="mb-3">
                                 <input type="date" name="template.EnforcedEndDate" class="form-control" data-column="2" />
+                            </div>
+                        </div>
+                        <div class="col-3 d-md-none summary-column d-none">Summary</div>
+                        <div class="col-9 col-md-3 summary-column d-none">
+                            <div class="mb-3">
+                                <select name="template.SummarySeriesId" class="form-control summary-series-select" data-column="3">
+                                    <option value="">-None-</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-12 col-md-1">
@@ -154,24 +264,47 @@
                         {
                             <div class="row series-row">
                                 <div class="col-3 d-md-none">Name</div>
-                                <div class="col-9 col-md-5">
+                                <div class="col-9 col-md-4">
                                     <div class="mb-3">
                                         <input type="text" name="series[@i].Name" class="form-control" value="@Model.Series[i].Name" data-column="0" data-row="@i" />
                                         <span asp-validation-for="Series[i].Name" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-3 d-md-none">Optional Start</div>
-                                <div class="col-9 col-md-3">
+                                <div class="col-9 col-md-2">
                                     <div class="mb-3">
                                         <input type="date" name="series[@i].EnforcedStartDate" class="form-control" value="@(Model.Series[i].EnforcedStartDate?.ToString("yyyy-MM-dd"))" data-column="1" data-row="@i" />
                                         <span asp-validation-for="Series[i].EnforcedStartDate" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-3 d-md-none">Optional End</div>
-                                <div class="col-9 col-md-3">
+                                <div class="col-9 col-md-2">
                                     <div class="mb-3">
                                         <input type="date" name="series[@i].EnforcedEndDate" class="form-control" value="@(Model.Series[i].EnforcedEndDate?.ToString("yyyy-MM-dd"))" data-column="2" data-row="@i" />
                                         <span asp-validation-for="Series[i].EnforcedEndDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-3 d-md-none summary-column d-none">Summary</div>
+                                <div class="col-9 col-md-3 summary-column d-none">
+                                    <div class="mb-3">
+                                        <select name="series[@i].SummarySeriesId" class="form-control summary-series-select" data-column="3" data-row="@i">
+                                            <option value="">-None-</option>
+                                            @if (Model.SummarySeriesOptions != null)
+                                            {
+                                                @foreach (var summary in Model.SummarySeriesOptions)
+                                                {
+                                                    if (Model.Series[i].SummarySeriesId == summary.Id)
+                                                    {
+                                                        <option value="@summary.Id" selected>@summary.Name</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@summary.Id">@summary.Name</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                        <span asp-validation-for="Series[i].SummarySeriesId" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-1">
@@ -189,21 +322,36 @@
                     {
                         <div class="row series-row">
                             <div class="col-3 d-md-none">Name</div>
-                            <div class="col-9 col-md-5">
+                            <div class="col-9 col-md-4">
                                 <div class="mb-3">
                                     <input type="text" name="series[0].Name" class="form-control" data-column="0" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">Optional Start</div>
-                            <div class="col-9 col-md-3">
+                            <div class="col-9 col-md-2">
                                 <div class="mb-3">
                                     <input type="date" name="series[0].EnforcedStartDate" class="form-control" data-column="1" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">Optional End</div>
-                            <div class="col-9 col-md-3">
+                            <div class="col-9 col-md-2">
                                 <div class="mb-3">
                                     <input type="date" name="series[0].EnforcedEndDate" class="form-control" data-column="2" data-row="0" />
+                                </div>
+                            </div>
+                            <div class="col-3 d-md-none summary-column d-none">Summary</div>
+                            <div class="col-9 col-md-3 summary-column d-none">
+                                <div class="mb-3">
+                                    <select name="series[0].SummarySeriesId" class="form-control summary-series-select" data-column="3" data-row="0">
+                                        <option value="">-None-</option>
+                                        @if (Model.SummarySeriesOptions != null)
+                                        {
+                                            @foreach (var summary in Model.SummarySeriesOptions)
+                                            {
+                                                <option value="@summary.Id">@summary.Name</option>
+                                            }
+                                        }
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-12 col-md-1">
@@ -324,4 +472,189 @@
     <script src="~/js/createMultipleSeriesSummary.js" asp-append-version="true"></script>
     <script src="~/js/seriesNameValidation.js" asp-append-version="true"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function toggleUseFullRaceScores() {
+            var fleetIdSelect = document.getElementById('FleetId');
+            var useFullRaceScoresField = document.getElementById('useFullRaceScoresField');
+            if (fleetIdSelect.value) {
+                useFullRaceScoresField.style.display = 'block';
+            } else {
+                useFullRaceScoresField.style.display = 'none';
+            }
+        }
+
+        document.getElementById('FleetId').addEventListener('change', toggleUseFullRaceScores);
+        toggleUseFullRaceScores();
+
+        (function () {
+            function clearSummaryOptions(select) {
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                select.value = '';
+            }
+
+            function showSummarySeriesOptions() {
+                const existingOption = document.getElementById('summaryExisting');
+                const existingFields = document.getElementById('existingSummarySeriesFields');
+                const toggleBtn = document.getElementById('toggleSummaryColumnBtn');
+
+                if (existingOption && existingOption.parentElement) {
+                    existingOption.parentElement.style.display = 'block';
+                }
+                if (toggleBtn && toggleBtn.parentElement) {
+                    toggleBtn.parentElement.style.display = 'block';
+                }
+            }
+
+            function hideSummarySeriesOptions() {
+                const existingOption = document.getElementById('summaryExisting');
+                const existingFields = document.getElementById('existingSummarySeriesFields');
+                const toggleBtn = document.getElementById('toggleSummaryColumnBtn');
+
+                if (existingOption && existingOption.parentElement) {
+                    existingOption.parentElement.style.display = 'none';
+                }
+                if (existingFields) {
+                    existingFields.style.display = 'none';
+                }
+                if (toggleBtn && toggleBtn.parentElement) {
+                    toggleBtn.parentElement.style.display = 'none';
+                }
+
+                // Also ensure the summary column is hidden and the button text is reset
+                const summaryColumns = document.querySelectorAll('.summary-column, .summary-column-header');
+                summaryColumns.forEach(col => col.classList.add('d-none'));
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = '<span class="fas fa-plus"></span> Select Summary per Series';
+                }
+
+                // Switch to "none" radio option if existing was selected
+                const summaryNoneRadio = document.getElementById('summaryNone');
+                if (existingOption && existingOption.checked && summaryNoneRadio) {
+                    summaryNoneRadio.checked = true;
+                    toggleSummaryFields();
+                }
+            }
+
+            async function refreshSummarySeriesOptions() {
+                const seasonSelect = document.getElementById('SeasonId');
+                const summarySelect = document.getElementById('ExistingSummarySeriesId');
+                const clubIdEl = document.getElementById('ClubId');
+
+                if (!seasonSelect || !summarySelect || !clubIdEl) {
+                    return;
+                }
+
+                const clubId = clubIdEl.value;
+                const seasonId = seasonSelect.value;
+
+                if (!seasonId || !clubId) {
+                    clearSummaryOptions(summarySelect);
+                    hideSummarySeriesOptions();
+                    return;
+                }
+
+                const url = '/api/series/summary?clubId=' + encodeURIComponent(clubId) + '&seasonId=' + encodeURIComponent(seasonId);
+                try {
+                    const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    if (!resp.ok) {
+                        hideSummarySeriesOptions();
+                        return;
+                    }
+
+                    const data = await resp.json();
+                    clearSummaryOptions(summarySelect);
+
+                    if (!Array.isArray(data) || data.length === 0) {
+                        hideSummarySeriesOptions();
+                        return;
+                    }
+
+                    data.forEach(function (item) {
+                        const opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.name;
+                        summarySelect.appendChild(opt);
+                    });
+
+                    // Show the existing summary series options
+                    showSummarySeriesOptions();
+
+                    // Also refresh all row-level summary series dropdowns
+                    await refreshRowSummaryDropdowns(data);
+                } catch (e) {
+                    console.error('Error loading summary series:', e);
+                    hideSummarySeriesOptions();
+                }
+            }
+
+            async function refreshRowSummaryDropdowns(summarySeriesData) {
+                const rowSelects = document.querySelectorAll('.summary-series-select');
+
+                rowSelects.forEach(function(select) {
+                    const currentValue = select.value;
+
+                    // Clear existing options except the first one
+                    while (select.options.length > 1) {
+                        select.remove(1);
+                    }
+
+                    // Add new options
+                    if (Array.isArray(summarySeriesData)) {
+                        summarySeriesData.forEach(function(item) {
+                            const opt = document.createElement('option');
+                            opt.value = item.id;
+                            opt.textContent = item.name;
+                            select.appendChild(opt);
+                        });
+                    }
+
+                    // Restore previous value if it still exists
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                });
+            }
+
+            function toggleSummaryFields() {
+                const selectedOption = document.querySelector('input[name="SummarySummaryOption"]:checked')?.value || 'none';
+                const createFields = document.getElementById('createSummarySeriesFields');
+                const existingFields = document.getElementById('existingSummarySeriesFields');
+
+                if (createFields) {
+                    createFields.style.display = selectedOption === 'create' ? 'block' : 'none';
+                }
+                if (existingFields) {
+                    existingFields.style.display = selectedOption === 'existing' ? 'block' : 'none';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // Add event listeners to radio buttons
+                const radioButtons = document.querySelectorAll('input[name="SummarySummaryOption"]');
+                radioButtons.forEach(radio => {
+                    radio.addEventListener('change', toggleSummaryFields);
+                });
+
+                // Add event listener to season select
+                const seasonSelect = document.getElementById('SeasonId');
+                if (seasonSelect) {
+                    seasonSelect.addEventListener('change', refreshSummarySeriesOptions);
+                }
+
+                // Initialize on load
+                toggleSummaryFields();
+                refreshSummarySeriesOptions();
+            });
+        })();
+
+        // help popovers (to be touch screen friendly.)
+        $(function () {
+            $('[data-bs-toggle="popover"]').popover();
+        })
+    </script>
 }
+
+
+

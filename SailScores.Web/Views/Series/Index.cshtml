@@ -31,7 +31,7 @@
     </nav>
 }
 
-<div class="container p-0 p-md-2">
+<div class="container-lg p-0 p-md-2">
     @if (Model.CanEditSeries)
     {
         <div class="row bg-almost">
@@ -49,21 +49,19 @@
     }
     @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
     {
-        <div class="row">
-            <div class="col-12 col-md-8 mx-n2" id="@item.FirstOrDefault()?.Season?.UrlName">
+        <div class="row align-items-center">
+            <div class="col-6 col-md-8 mx-n2" id="@item.FirstOrDefault()?.Season?.UrlName">
                 <h2 class="h1">@item.Key<small> season</small></h2>
             </div>
             @if (firstSeason)
             {
-                <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end">
-                    <div class="form-row w-100">
-                        <label class="control-label col-form-label col-5 col-md-4 text-md-right" for="sort-order">Sort </label>
-                        <select id="sort-order" class="form-control col-7 col-md-8" onchange="sortSeries()">
-                            <option value="name">Name</option>
-                            <option value="startdate">Start Date</option>
-                            <option value="enddate">End Date</option>
-                        </select>
-                    </div>
+                <div class="col-6 col-md-4 d-flex justify-content-end">
+                    <select id="sort-order" class="form-select form-select-sm" onchange="sortSeries()">
+                        <option selected disabled>Sort by</option>
+                        <option value="name">Name</option>
+                        <option value="startdate">Start Date</option>
+                        <option value="enddate">End Date</option>
+                    </select>
                 </div>
                 firstSeason = false;
             }
@@ -81,28 +79,44 @@
             {
                 var startDate = series.Races?.Where(r => r.Date.HasValue).Min(r => r.Date);
                 var endDate = series.Races?.Where(r => r.Date.HasValue).Max(r => r.Date);
-                <div class="row border-bottom mb-1 pb-1 mx-2 series-row" 
+                <div class="row border-bottom mb-1 pb-1 ms-2 series-row" 
                      data-name="@series.Name" 
                      data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")" 
                      data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
-                    <div class="col-md-5">
+                    <div class="col-md-5 col-lg-7">
                         <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
                         @if(series.RaceCount.HasValue) {
-                            <span class="avoidwrap">(@series.RaceCount @localizer["Races"])</span>
+                            <span class="avoidwrap">(@series.RaceCount @(series.RaceCount == 1 ? localizer["Race"] : localizer["Races"]))</span>
+                        }
+                        @if (!string.IsNullOrEmpty(series.Description))
+                        {
+                            <div><em>@Html.DisplayFor(modelItem => series.Description)</em></div>
                         }
                     </div>
 
-                    <div class="col-md-4">
-                        <span class="small-on-small">@series.DateString</span>
+                    <div class="col-md-4 col-lg-3">
+                        <span class="small-on-small"><span class="avoidwrap">@series.StartDateString</span>
+                                @{
+                                    var endDateString = series.EndDateString;
+                                }
+                                @if (!String.IsNullOrWhiteSpace(endDateString))
+                                {
+                                   @: -
+                                   <span class="avoidwrap">@endDateString</span>
+                                }
+                      </span>
                     </div>
-                    <div class="col-md-3">
+                        <div class="d-none d-md-flex col-md-3 col-lg-2 align-items-center">
                         @if (series.UpdatedDate.HasValue)
                         {
-                            <span class="d-none d-md-table-cell updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
+                            <span class="updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
                         }
-                    </div>
-                    <div class="col-12 ms-3">
-                        @Html.DisplayFor(modelItem => series.Description)
+                        @if (series.Type == SeriesType.Summary)
+                        {
+                            <span class="badge bg-almost text-muted small ms-auto" title="@localizer["Summary"]">
+                              Σ<span class="visually-hidden">@localizer["Summary"]</span>
+                            </span>
+                        }
                     </div>
                 </div>
             }

@@ -1,0 +1,105 @@
+/* Admin Page Styles
+ * Handles all accordion, sidebar navigation, and admin-specific layout styling
+ * Dark-mode support: Uses Bootstrap CSS variables; see _dark-mode.scss for overrides
+ */
+
+/* Admin accordion & side-nav styles */
+#adminAccordion .accordion-item {
+    border: 0;
+    box-shadow: none;
+}
+
+#adminAccordion .accordion-button {
+    box-shadow: none;
+    background: transparent;
+    color: var(--bs-link-color);
+    text-decoration: none; /* underline only on title */
+    padding: .5rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding-left: 1rem; /* keep chevron spacing */
+}
+
+/* Underline only the title text so whitespace and icons are not underlined */
+#adminAccordion .accordion-button .accordion-title {
+    text-decoration: underline;
+    display: inline;
+    color: inherit;
+}
+
+/* Use emphasized color when expanded but keep the same font weight */
+#adminAccordion .accordion-button:not(.collapsed) {
+    text-decoration: none;
+    color: var(--bs-primary-text-emphasis);
+}
+
+/* Remove underline from the title when expanded and use emphasized color without bolding */
+#adminAccordion .accordion-button:not(.collapsed) .accordion-title {
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--bs-primary-text-emphasis);
+}
+
+/* Help icon: prevent underline and match link text color */
+#adminAccordion .accordion-button .accordion-help-icon {
+    margin-left: .5rem;
+    color: var(--bs-link-color);
+    display: inline-block;
+    text-decoration: none;
+}
+
+/* Chevron rotation: quarter-turn (90 degrees) */
+#adminAccordion .accordion-button::after {
+    opacity: .85;
+    order: -1; /* place chevron before title */
+    margin-left: 0;
+    margin-right: .75rem; /* space between chevron and title */
+    transform: rotate(-90deg);
+    transition: transform .35s ease;
+}
+
+/* Rotate 90 degrees when expanded (pointing down) */
+#adminAccordion .accordion-button:not(.collapsed)::after {
+    transform: rotate(0deg);
+}
+
+/* Side navigation for xxl+ screens
+ * Sticky from top of viewport, responsive width, scrollable content
+ */
+.admin-side-nav {
+    padding-top: 1rem;
+    padding-right: 1rem;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    /* Run along the side from the top of the viewport */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.admin-side-nav .nav-link {
+    color: var(--bs-link-color);
+    padding: .25rem 0;
+    display: block;
+}
+
+.admin-side-nav .nav-link:hover,
+.admin-side-nav .nav-link:focus,
+.admin-side-nav .nav-link.active {
+    color: var(--bs-primary-text-emphasis);
+    text-decoration: none;
+}
+
+/* Keep the inner wrapper static when the nav itself is sticky */
+.admin-side-nav .sticky-offset {
+    position: static;
+}
+
+/* Dark-mode border color override */
+@media (prefers-color-scheme: dark) {
+    .admin-side-nav {
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+}

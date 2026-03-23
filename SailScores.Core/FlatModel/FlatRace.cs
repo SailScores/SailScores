@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using System;
 
 namespace SailScores.Core.FlatModel
@@ -28,6 +28,7 @@ namespace SailScores.Core.FlatModel
         public Decimal? WindDirectionDegrees { get; set; }
         public String WeatherIcon { get; set; }
 
+        public bool TrackTimes { get; set; }
 
         public string WindSpeed { get; internal set; }
         public string WindGust { get; internal set; }

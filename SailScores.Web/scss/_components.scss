@@ -1,0 +1,285 @@
+/* Component Overrides
+ * Bootstrap component customizations and shared styling
+ * Light mode only; dark-mode overrides in _dark-mode.scss
+ */
+
+/* Links and buttons */
+a,
+button.btn-link {
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        text-decoration: underline;
+    }
+}
+
+a.btn,
+button.btn {
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        text-decoration: none !important;
+    }
+}
+
+nav a {
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        text-decoration: none;
+    }
+}
+
+/* Card headers with collapsible icon */
+.card-header .fas {
+    transition: .3s transform ease-in-out;
+}
+
+.card-header .collapsed .fas {
+    transform: rotate(-90deg);
+}
+
+/* Horizontal rules */
+hr {
+    opacity: .1;
+}
+
+/* Select2 theme overrides */
+.select2-search {
+    display: none !important;
+}
+
+li.select2-selection__choice {
+    padding-top: .15rem !important;
+    padding-bottom: .15rem !important;
+    margin-top: .15rem !important;
+    margin-bottom: .15rem !important;
+}
+
+.select2-selection__arrow {
+    right: 15px !important;
+    top: 6px !important;
+}
+
+.select2-selection,
+.select2-selection--single {
+    border: var(--bs-border-width) solid var(--bs-border-color) !important;
+    border-radius: var(--bs-border-radius) !important;
+    min-height: 38px !important;
+    padding: 0px 0px !important;
+}
+
+.select2-container--default .select2-selection--multiple {
+    background-color: var(--bs-body-bg) !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: var(--bs-body-bg) !important;
+}
+
+#weatherIcon + span .select2-selection,
+#weatherIcon + span .select2-selection--single {
+    padding: 5px !important;
+}
+
+/* Navigation and branding */
+header.bg-dark,
+nav.bg-dark {
+    background-color: $my-nav-bg-dark !important;
+}
+
+.navbar-dark .navbar-brand.active,
+.navbar-dark .nav-link.active {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 500;
+}
+
+.sailscores-brand {
+    margin-top: -.24rem;
+}
+
+.faded-logo {
+    opacity: .5;
+
+    &:hover {
+        opacity: .8;
+    }
+}
+
+/* Finish place colors (light mode) */
+.finish-first {
+    background: #{$finish-first-light} !important;
+}
+
+.finish-second {
+    background: #{$finish-second-light} !important;
+}
+
+.finish-third {
+    background: #{$finish-third-light} !important;
+}
+
+/* Race status */
+span.discardmuted {
+    color: #6c757d !important;
+}
+
+.abandoned {
+    background: #FFBBBB !important;
+    align-content: center !important;
+    text-align: center !important;
+
+    span {
+        writing-mode: vertical-lr !important;
+        text-orientation: upright !important;
+    }
+}
+
+.scheduled {
+    background: #DDDDDD;
+    align-content: center;
+    text-align: center;
+
+    span {
+        writing-mode: vertical-lr;
+        text-orientation: upright;
+    }
+}
+
+/* Required field indicator */
+form label.required:not(.custom-control-label)::after {
+    content: "*";
+    position: relative;
+    font-size: 120%;
+    line-height: 65%;
+    top: .1em;
+    padding-left: .4rem;
+    color: $danger !important;
+}
+
+/* Autocomplete styling */
+.autocomplete-suggestion {
+    background: #ffffff;
+    z-index: 2;
+}
+
+.autocomplete-selected {
+    background: #fbef97;
+    z-index: 2;
+}
+
+/* General layout */
+.body-content {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+.table-not-wide {
+    width: auto;
+}
+
+.bg-almost {
+    background: #f8f9fa;
+}
+
+span.avoidwrap {
+    display: inline-block;
+}
+
+/* Dropdown and menu items */
+.dropdown-item .wi {
+    font-size: 1.4rem;
+}
+
+/* Weather icons */
+.weather .wi {
+    vertical-align: bottom;
+}
+
+.ss-wi-large {
+    font-size: 2em;
+}
+
+.ss-wi {
+    font-size: 1.4em;
+}
+
+/* Updated date/timestamp */
+.updated-date {
+    font-size: 80%;
+    font-style: italic;
+}
+
+/* Responsive sizing */
+.small-on-small {
+    font-size: 80%;
+}
+
+@include media-breakpoint-up(md) {
+    .small-on-small {
+        font-size: 100%;
+    }
+}
+
+/* Close button styling */
+button.close {
+    padding-right: 10px;
+    padding-left: 10px;
+    font-size: 2rem;
+}
+
+/* Quick buttons */
+button.quick-comp {
+    margin: 3px;
+}
+
+/* SVG text rendering */
+svg text {
+    font-family: "Open Sans", "Segoe UI", sans-serif;
+}
+
+/* Waiting/loading modal */
+.waitingModal {
+    position: fixed;
+    z-index: 9999;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: none;
+    text-align: center;
+    transition: all ease .4s;
+}
+
+.waitingModal span {
+    padding: 25px 5px 5px 5px;
+    margin-top: 15px;
+    position: relative;
+    top: 35%;
+}
+
+/* Collapsible data toggle (legacy) */
+[data-toggle="collapse"]:after {
+    display: inline-block;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f054";
+    transform: rotate(90deg);
+    transition: all linear 0.25s;
+}
+
+[data-toggle="collapse"].collapsed:after {
+    transform: rotate(0deg);
+}

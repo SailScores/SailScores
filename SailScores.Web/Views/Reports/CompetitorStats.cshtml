@@ -24,20 +24,20 @@
         </div>
     </div>
 
-    <form method="get" class="row mb-4">
-        <div class="col-md-4">
-            <label for="startDate" class="form-label">Start Date</label>
+    <form method="get" class="row mb-4 g-3 align-items-end">
+        <div class="col-12 col-sm-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <label for="startDate" class="form-label mb-0 text-lg-end text-nowrap">Start Date</label>
             <input type="date" class="form-control" id="startDate" name="startDate"
                    value="@(Model.StartDate?.ToString("yyyy-MM-dd") ?? (Model.SkipperStats?.Any() == true ? Model.SkipperStats.Min(s => s.FirstRaceDate)?.ToString("yyyy-MM-dd") : ""))"
                    @(!Model.UseAdvancedFeatures ? $"min={DateTime.Today.AddDays(-60):yyyy-MM-dd}" : "") />
         </div>
-        <div class="col-md-4">
-            <label for="endDate" class="form-label">End Date</label>
+        <div class="col-12 col-sm-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <label for="endDate" class="form-label mb-0 text-lg-end text-nowrap">End Date</label>
             <input type="date" class="form-control" id="endDate" name="endDate"
                    value="@(Model.EndDate?.ToString("yyyy-MM-dd") ?? (Model.SkipperStats?.Any() == true ? Model.SkipperStats.Max(s => s.LastRaceDate)?.ToString("yyyy-MM-dd") : ""))" />
         </div>
-        <div class="col-md-4 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary me-2">Update</button>
+        <div class="col-12 col-sm-auto d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Update</button>
             <a href="~/@Model.ClubInitials/Reports/CompetitorStats" class="btn btn-outline-secondary">Clear</a>
         </div>
     </form>

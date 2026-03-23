@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -14,6 +14,9 @@ public class ClubStatsViewModel
     public String Initials { get; set; }
 
     public String StatisticsDescription { get; set; }
+
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
     public IEnumerable<ClubSeasonStatsViewModel> SeasonStats { get; set; }
 

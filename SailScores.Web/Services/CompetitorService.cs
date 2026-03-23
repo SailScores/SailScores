@@ -328,6 +328,21 @@ public class CompetitorService : ICompetitorService
         await _coreCompetitorService.AddHistoryElement(competitorId, newNote, userName);
     }
 
+    public async Task SetAlternativeSailNumber(Guid competitorId, string alternativeSailNumber, string userName = "")
+    {
+        var competitor = await _coreCompetitorService.GetCompetitorAsync(competitorId);
+        if (competitor == null)
+        {
+            return;
+        }
+
+        competitor.AlternativeSailNumber = string.IsNullOrWhiteSpace(alternativeSailNumber)
+            ? null
+            : alternativeSailNumber.Trim();
+
+        await _coreCompetitorService.SaveAsync(competitor, userName);
+    }
+
     public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
         Guid competitorId,
         string seasonUrlName = null,

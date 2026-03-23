@@ -1,0 +1,219 @@
+/* Table Styles & OCR Components
+ * Includes AllCompHistogram sticky headers, OCR results tables, score entry rows
+ * Light mode styles; dark-mode overrides in _dark-mode.scss
+ */
+
+/* AllCompHistogram report table with sticky headers */
+.allcomp-table {
+    thead {
+        th {
+            position: sticky;
+            top: 0; /* header reaches top of viewport (navbar not fixed) */
+            background-color: var(--bs-tertiary-bg, #f8f9fa);
+            z-index: 1100;
+            border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+        }
+    }
+
+    /* Center all cells in the table */
+    th,
+    td {
+        text-align: center;
+        vertical-align: middle;
+    }
+}
+
+/* Ensure table-responsive does not clip sticky headers vertically */
+.table-responsive {
+    overflow: visible;
+}
+
+/* Score entry footer panel */
+.score-entry {
+    max-height: 45%;
+    overflow-y: auto;
+    position: fixed;
+    padding-bottom: 10px;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    line-height: 40px; /* Vertically center the text there */
+    background-color: #f5f5f5;
+    z-index: 1;
+}
+
+@include media-breakpoint-up(sm) {
+    .score-entry {
+        max-height: 25%;
+    }
+}
+
+/* Score row borders at different breakpoints */
+@media (min-width: 576px) {
+    .score-row:not(:last-child) {
+        border-bottom: 1px solid var(--bs-table-border-color);
+    }
+}
+
+/* Secondary rows: border except last on xs screens */
+@media (max-width: 575.98px) {
+    .score-row-secondary:not(:last-child) {
+        border-bottom: 1px solid var(--bs-table-border-color);
+    }
+
+    .score-row {
+        border-bottom: 1px none;
+    }
+}
+
+/* Results list (legacy) */
+#results {
+    padding: 0;
+
+    li {
+        padding: 4px 0px;
+        margin: 1px 0;
+
+        .btn {
+            padding: 4px 6px 4px 6px;
+        }
+    }
+
+    div {
+        padding: 0px 5px 0px 5px;
+    }
+}
+
+#raceform #results .list-group-item {
+    border-style: none;
+}
+
+/* OCR component styling */
+.ocr-cropped-preview {
+    position: relative;
+    overflow: hidden;
+}
+
+.ocr-cropped-preview img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+#ocrBoundingBoxOverlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#ocrProgressBar {
+    height: 6px;
+}
+
+.cropper-container-wrapper {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+/* Insert row button in OCR table */
+.insert-row-btn {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.35rem;
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+    position: relative;
+    top: -8px;
+}
+
+.insert-row-btn:hover {
+    opacity: 0.8;
+}
+
+.insert-row-btn i {
+    font-size: 0.65rem;
+}
+
+#ocrResultsTable tbody tr:hover .insert-row-btn {
+    opacity: 0.6;
+}
+
+/* OCR results styling */
+#ocrResultsTable .table-success {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+#ocrResultsTable .table-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+/* Mobile breakpoint: OCR containers */
+@media (max-width: 767.98px) {
+    .ocr-results-container {
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+
+    cropper-canvas {
+        height: 60vh;
+        max-height: 90vh;
+        min-height: 300px;
+    }
+
+    /* Always limit preview height on mobile, even before expand */
+    .ocr-cropped-preview {
+        max-height: 200px;
+        transition: max-height 0.2s;
+        overflow-y: auto; /* Allow finger/touch scrolling */
+        overflow-x: hidden;
+    }
+
+    /* Chevron right when collapsed, down when expanded */
+    #ocrStepResults h6 a .chevron {
+        transition: transform 0.2s;
+        display: inline-block;
+    }
+
+    #ocrImagePreviewCollapse:not(.show) ~ .ocr-cropped-preview,
+    #ocrStepResults h6 a[aria-expanded="false"] .chevron {
+        transform: rotate(0deg); /* right */
+    }
+
+    #ocrStepResults h6 a[aria-expanded="true"] .chevron {
+        transform: rotate(90deg); /* down */
+    }
+
+    .form-control {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+}
+
+/* Desktop breakpoint: OCR containers */
+@media (min-width: 768px) {
+    .ocr-results-container {
+        overflow-y: auto;
+    }
+
+    .ocr-cropped-preview {
+        max-height: 70vh;
+        min-height: 400px;
+        transition: max-height 0.2s;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    cropper-canvas {
+        height: 75vh;
+        max-height: 90vh;
+        min-height: 300px;
+    }
+
+    .ocr-tip-list {
+        list-style-position: inside;
+    }
+}

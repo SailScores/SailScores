@@ -29,7 +29,11 @@ public interface IClubService
     Task<IEnumerable<BoatClass>> GetAllBoatClasses(Guid clubId);
     Task<bool> DoesClubHaveCompetitors(Guid clubId);
     Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId);
-    Task<IList<Entities.ClubSeasonStats>> GetClubStats(string clubInitials);
+    Task<IList<Entities.ClubSeasonStats>> GetClubStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null);
+
     Task<IList<Entities.SiteStats>> GetAllStats();
     Task UpdateStatsDescription(Guid clubId, string statisticsDescription);
     Task<string> GetClubName(string clubInitials);

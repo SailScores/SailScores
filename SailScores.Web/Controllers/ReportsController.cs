@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Web.Authorization;
@@ -92,13 +90,27 @@ public class ReportsController : Controller
         return View(model);
     }
 
-    public async Task<ActionResult> ClubStats(string clubInitials)
+    public async Task<ActionResult> ClubStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
     {
 
         ViewData["ClubInitials"] = clubInitials;
 
-        var stats = await _webClubService.GetClubStats(clubInitials);
+        var stats = await _webClubService.GetClubStats(clubInitials, startDate, endDate);
         stats.CanEdit = true;
+        return View(stats);
+    }
+
+    public async Task<ActionResult> SeriesParticipation(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        bool? summaryOnly = null)
+    {
+        ViewData["ClubInitials"] = clubInitials;
+        var stats = await _reportService.SeriesParticipationStats(clubInitials, startDate, endDate, summaryOnly ?? false);
         return View(stats);
     }
 
@@ -172,10 +184,13 @@ public class ReportsController : Controller
         return File(bytes, "text/csv", fileName);
     }
 
-    public async Task<ActionResult> ClubStatsExport(string clubInitials)
+    public async Task<ActionResult> ClubStatsExport(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
     {
 
-        var stats = await _webClubService.GetClubStats(clubInitials);
+        var stats = await _webClubService.GetClubStats(clubInitials, startDate, endDate);
 
         var csv = new System.Text.StringBuilder();
         csv.AppendLine("Season,Boat Class,Distinct Competitors,Races,Total Starts,Race Days,Average Competitors Per Race,First Race,Last Race");
@@ -201,6 +216,42 @@ public class ReportsController : Controller
 
         var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
         var fileName = $"{clubInitials}_ClubStats_{DateTime.Now:yyyyMMdd}.csv";
+        return File(bytes, "text/csv", fileName);
+    }
+
+    public async Task<ActionResult> SeriesParticipationExport(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        bool? summaryOnly = null)
+    {
+        var stats = await _reportService.SeriesParticipationStats(clubInitials, startDate, endDate, summaryOnly ?? false);
+
+        var csv = new System.Text.StringBuilder();
+        csv.AppendLine("Season,Series,Series Type,Boat Class,Distinct Competitors,Races,Total Starts,Race Days,Average Competitors Per Race,First Race,Last Race");
+
+        if (stats?.Rows != null)
+        {
+            foreach (var item in stats.Rows)
+            {
+                var season = item.SeasonName ?? string.Empty;
+                var series = item.SeriesName ?? string.Empty;
+                var seriesType = item.SeriesType ?? string.Empty;
+                var boatClass = item.ClassName ?? string.Empty;
+                var distinctCompetitors = item.DistinctCompetitorsStarted?.ToString() ?? string.Empty;
+                var races = item.RaceCount?.ToString() ?? string.Empty;
+                var totalStarts = item.CompetitorsStarted?.ToString() ?? string.Empty;
+                var raceDays = item.DistinctDaysRaced?.ToString() ?? string.Empty;
+                var avg = item.AverageCompetitorsPerRace.HasValue ? item.AverageCompetitorsPerRace.Value.ToString("F1") : string.Empty;
+                var firstRace = item.FirstRace.HasValue ? item.FirstRace.Value.ToString("yyyy-MM-dd") : string.Empty;
+                var lastRace = item.LastRace.HasValue ? item.LastRace.Value.ToString("yyyy-MM-dd") : string.Empty;
+
+                csv.AppendLine($"\"{season}\",\"{series}\",\"{seriesType}\",\"{boatClass}\",{distinctCompetitors},{races},{totalStarts},{raceDays},{avg},{firstRace},{lastRace}");
+            }
+        }
+
+        var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+        var fileName = $"{clubInitials}_SeriesStats_{DateTime.Now:yyyyMMdd}.csv";
         return File(bytes, "text/csv", fileName);
     }
 

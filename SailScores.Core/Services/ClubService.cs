@@ -273,6 +273,8 @@ namespace SailScores.Core.Services
                 .ThenInclude(s => s.RaceSeries)
                 .Include(c => c.Series)
                 .ThenInclude(s => s.Season)
+                .Include(c => c.Series)
+                .ThenInclude(s => s.Fleet)
                 .Include(c => c.BoatClasses)
                 .Include(c => c.DefaultScoringSystem)
                 .Include(c => c.ScoringSystems)
@@ -632,10 +634,15 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
         }
 
-        public async Task<IList<Db.ClubSeasonStats>> GetClubStats(string clubInitials)
+        public async Task<IList<Db.ClubSeasonStats>> GetClubStats(
+            string clubInitials,
+            DateTime? startDate = null,
+            DateTime? endDate = null)
         {
-            return await _dbContext.GetClubStats(clubInitials).ConfigureAwait(false);
+            return await _dbContext.GetClubStats(clubInitials, startDate, endDate).ConfigureAwait(false);
         }
+
+
 
         public async Task<IList<Db.SiteStats>> GetAllStats()
         {

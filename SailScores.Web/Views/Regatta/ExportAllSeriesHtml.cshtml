@@ -1,0 +1,180 @@
+@using SailScores.Api.Enumerations
+@using SailScores.Core.Model
+@using SailScores.Core.Scoring
+@using Microsoft.Extensions.Localization
+@using SailScores.Web.Extensions
+@using SailScores.Web.Resources
+
+@inject IStringLocalizer<SharedResource> localizer
+
+@model Regatta
+
+@{
+    ViewBag.Title = Model.Name;
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>@Model.Name - SailScores</title>
+    @await Html.EmbedCss($"css{System.IO.Path.DirectorySeparatorChar}site.min.css")
+    <meta name="robots" content="noindex">
+</head>
+<body>
+    <div class="body-content">
+        <main class="col-12 col-lg-9 py-md-3 ps-md-5 bd-content" role="main">
+            <div class="row">
+                <div class="col-12">
+                    <h1>@Model.Name</h1>
+                    @if (Model.StartDate.HasValue)
+                    {
+                        <h5>
+                            @Model.StartDate.Value.ToString("D")
+                            @if (Model.StartDate != Model.EndDate && Model.EndDate.HasValue)
+                            {
+                                @:- @Model.EndDate.Value.ToString("D")
+                            }
+                        </h5>
+                    }
+                    @if (!String.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p>@Html.Raw(Markdig.Markdown.ToHtml(Model.Description))</p>
+                    }
+                </div>
+            </div>
+            <hr />
+            @if (Model.Series != null && Model.Series.Any())
+            {
+                Series firstSeriesWithResults = null;
+                var mergedScoreCodes = new Dictionary<string, ScoreCodeSummary>();
+                var allScoringSystemNames = new HashSet<string>();
+
+                @foreach (var series in Model.Series.OrderBy(s => s.FleetId))
+                {
+                    var results = series.FlatResults;
+                    if (results != null && results.Races.Any())
+                    {
+                        if (firstSeriesWithResults == null)
+                        {
+                            firstSeriesWithResults = series;
+                        }
+
+                        // Collect all score codes from all series
+                        if (results.ScoreCodesUsed != null)
+                        {
+                            foreach (var code in results.ScoreCodesUsed)
+                            {
+                                if (!mergedScoreCodes.ContainsKey(code.Key))
+                                {
+                                    mergedScoreCodes[code.Key] = code.Value;
+                                }
+                            }
+                            if (!String.IsNullOrWhiteSpace(results.ScoringSystemName))
+                            {
+                                allScoringSystemNames.Add(results.ScoringSystemName);
+                            }
+                        }
+
+                        var raceLabel = results.NumberOfSailedRaces == 1 ? localizer["race sailed"] : localizer["races sailed"];
+                        var discardLabel = results.NumberOfDiscards == 1 ? localizer["discard"] : localizer["discards"];
+                        var competitorLabel = results.Competitors.Count() == 1 ? localizer["competitor"] : localizer["competitors"];
+
+                        ViewData["IsExport"] = true;
+                        string trendLegend = series.TrendOption.HasValue ?
+                            localizer["Rank change from"] + " " +
+                            localizer[EnumHelper<TrendOption>
+                            .GetDisplayValue(series.TrendOption.Value)]
+                            : "";
+                        var tableModel = new ResultsTableViewModel
+                            {
+                                SeriesId = series.Id,
+                                Results = series.FlatResults,
+                                ShowTrend = false,
+                                ShowCompetitorClub = series.ShowCompetitorClub ?? false,
+                                IsExport = true,
+                                ShowExportButtons = false,
+                                ExcludeCompetitorLinks = true,
+                                PreferAlternativeSailNumbers = series.PreferAlternativeSailNumbers ?? false,
+                                TrendLegend = trendLegend,
+                                HideDncDiscards = series.HideDncDiscards,
+                                UpdatedDate = series.UpdatedDate
+                            };
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h2>@series.Name</h2>
+                                @if (!String.IsNullOrWhiteSpace(series.Description))
+                                {
+                                    <h5>@series.Description</h5>
+                                }
+                                @results.NumberOfSailedRaces @raceLabel with @results.NumberOfDiscards @discardLabel,
+                                @results.Competitors.Count() @competitorLabel
+                                @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
+                                {
+                                    @:&ndash; @results.ScoringSystemName
+                                }
+                                @if (results.IsPercentSystem && results.PercentRequired.HasValue)
+                                {
+                                    @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
+                                }
+                            </div>
+                        </div>
+
+                        @await Html.PartialAsync("_ResultsTable", tableModel)
+                        <hr />
+                    }
+                }
+
+                @if (firstSeriesWithResults != null && mergedScoreCodes.Count > 0)
+                {
+                    <div class="container">
+                        Scored using @String.Join(", ", allScoringSystemNames)
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Code</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var code in mergedScoreCodes.OrderBy(c => c.Key))
+                                {
+                                    <tr>
+                                        <th scope="row">@code.Key</th>
+                                        <td>@code.Value.Description</td>
+                                        <td>@code.Value.Formula</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                }
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <p>@localizer["No Results posted"]</p>
+                    </div>
+                </div>
+            }
+            <div class="row">
+                @if (Model.UpdatedDate.HasValue)
+                {
+                    <div class="col-md-6">
+                        <span class="fst-italic">@localizer["Updated"] @(Model.UpdatedDate.Value.ToString("f")) UTC</span>
+                    </div>
+                }
+                <div class="col-md-6">
+                    Exported from <a href="https://sailscores.com">SailScores.com</a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

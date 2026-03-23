@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -44,6 +44,7 @@ namespace SailScores.Core.Model
         [Display(Name = "Boat Classes")]
         public IList<BoatClass> BoatClasses { get; set; }
         public IList<Competitor> Competitors { get; set; }
+        public IList<Series> Series { get; set; }
 
         public Regatta Regatta { get; set; }
         public Guid? RegattaId { get; set; }

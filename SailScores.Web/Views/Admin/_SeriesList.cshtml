@@ -1,26 +1,13 @@
 @model IEnumerable<SailScores.Core.Model.Series>
 <div id="seriesdiv">
     <div class="row">
-        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
-            <h3 class="float-start">
-                <a id="series">Series</a>
-                <a class="text-primary"
-                    data-bs-container="body"
-                    data-bs-toggle="popover"
-                    data-bs-placement="top"
-                    data-bs-trigger="focus hover"
-                    data-bs-content="Series are groups of races to be scored together. A race can belong to multiple series.">
-                    <span class="far fa-question-circle"></span>
-                </a>
-            </h3>
-        </div>
-        <div class="col-2 col-sm-4 col-md-3 col-lg-2">
+        <div class="col-12 col-sm-6 col-md-4">
             <div class="btn-group">
                 <a class="btn btn-primary"
                    asp-action="Create"
                    asp-controller="Series">
                     <span class="fas fa-plus"></span>
-                    <span class="d-none d-sm-inline">
+                    <span class="">
                         New Series
                     </span>
                 </a>
@@ -38,94 +25,101 @@
                 </ul>
             </div>
         </div>
-        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end mt-2 mt-md-0">
-            <div class="form-row w-100">
-                <label class="control-label col-form-label col-5 col-md-4 text-md-right" for="admin-sort-order">Sort </label>
-                <select id="admin-sort-order" class="form-control col-7 col-md-8" onchange="sortAdminSeries()">
-                    <option value="name">Name</option>
-                    <option value="startdate">Start Date</option>
-                    <option value="enddate">End Date</option>
-                </select>
+        <div class="col-12 col-sm-6 col-md-8 d-flex align-items-center justify-content-end mt-2 mt-md-0 gap-2">
+            <div class="form-check flex-shrink-0">
+                <input class="form-check-input" type="checkbox" id="admin-group-by-fleet" onchange="toggleAdminFleetGrouping()">
+                <label class="form-check-label" for="admin-group-by-fleet">
+                    Group by Fleet
+                </label>
             </div>
+            <div style="width: 1px; height: 20px; background-color: #ddd;"></div>
+            <label class="control-label col-form-label flex-shrink-0" for="admin-sort-order">Sort</label>
+            <select id="admin-sort-order" class="form-control flex-grow-1 flex-sm-grow-0" style="max-width: 150px;" onchange="sortAdminSeries()">
+                <option value="name">Name</option>
+                <option value="startdate">Start Date</option>
+                <option value="enddate">End Date</option>
+            </select>
         </div>
     </div>
     @{
         var firstSeason = true;
     }
-    @foreach (var seasonGroup in Model.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
-    {
-        var season = seasonGroup.First().Season;
-        var initCollapsed = season.End >= DateTime.Today.AddDays(-30);
-        <div class="row">
-            <div class="col-12" id="header-@season?.UrlName">
-                <a class="@(initCollapsed ? "" : "collapsed")" data-bs-toggle="collapse" href="#content-@season?.UrlName" role="button"
-                    aria-expanded="true"
-                    aria-controls="content-@season?.UrlName">
-                    <h4 class="float-start">@seasonGroup.Key Series&nbsp;</h4>
-                </a>
-            </div>
-        </div>
-        <div class="collapse @((initCollapsed) ? " show":"")" id="content-@season?.UrlName">
-            <div class="admin-series-list">
-            @foreach (var item in seasonGroup)
-            {
-                // Use Series StartDate/EndDate if available, otherwise calculate from Races
-                // but races will probably be null here: they aren't loaded by default for club
-                // admin.
-                DateTime? startDate = item.StartDate.HasValue 
-                    ? item.StartDate.Value.ToDateTime(TimeOnly.MinValue) 
-                    : item.Races?.Where(r => r != null && r.Date.HasValue).Min(r => r.Date);
-                DateTime? endDate = item.EndDate.HasValue 
-                    ? item.EndDate.Value.ToDateTime(TimeOnly.MinValue) 
-                    : item.Races?.Where(r => r != null && r.Date.HasValue).Max(r => r.Date);
-                <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2 admin-series-row"
-                     data-name="@item.Name"
-                     data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")"
-                     data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
-                    <div class="col-md-6 col-lg-5">
-                        <a class="btn btn-sm btn-outline-danger"
-                            asp-action="Delete"
-                            asp-controller="Series"
-                            asp-route-id="@item.Id"
-                            title="Delete">
-                            <span class="fas fa-trash"></span>
-                        </a> &nbsp;
-                        <a class="btn btn-sm btn-outline-primary"
-                            asp-action="Edit"
-                            asp-controller="Series"
-                            asp-route-id="@item.Id"
-                            title="Edit">
-                            <span class="fas fa-pen"></span>
-                        </a>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </div>
-                    <div class="d-none d-sm-inline col-sm-4 col-md-2">
-                        @if(item.Type == SailScores.Core.Model.SeriesType.Summary)
-                        {
-                            @:Summary
-                        } else
-                        {
-                            @Html.DisplayFor(modelItem => item.Races.Count)
-                            @:Races
-                        }
-                    </div>
-                    <div class="d-none d-md-inline col-md-3 col-lg-4">
-                        @Html.DisplayFor(modelItem => item.Description)
-                        @if(item.StartDate.HasValue && item.EndDate.HasValue &&
-                        item.StartDate != item.EndDate) {
-                            @:( @item.StartDate - @item.EndDate )
-                        } else if (item.StartDate.HasValue && item.EndDate.HasValue &&
-                            item.StartDate == item.EndDate
-                        ){
-                            @:( @item.StartDate )
-                        }
-                    </div>
+    <!-- Ungrouped view (by season only) -->
+    <div id="admin-series-ungrouped">
+        @foreach (var seasonGroup in Model.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+        {
+            var season = seasonGroup.First().Season;
+            var initCollapsed = season.End >= DateTime.Today.AddDays(-30);
+            <div class="row">
+                <div class="col-12" id="header-@season?.UrlName">
+                    <a class="@(initCollapsed ? "" : "collapsed")" data-bs-toggle="collapse" href="#content-@season?.UrlName" role="button"
+                        aria-expanded="@(initCollapsed ? "true" : "false")"
+                        aria-controls="content-@season?.UrlName"
+                        style="display: flex; align-items: center; text-decoration: none;">
+                        <span class="fa fa-chevron-right me-2" style="display: inline-block; transition: transform 0.2s ease; flex-shrink: 0;"></span>
+                        <h4 class="mb-0">@seasonGroup.Key Series&nbsp;</h4>
+                    </a>
                 </div>
-            }
             </div>
-            <br />
-        </div>
-    }
+            <div class="collapse @((initCollapsed) ? " show":"")" id="content-@season?.UrlName">
+                <div class="admin-series-list">
+                @foreach (var item in seasonGroup)
+                {
+                    @await Html.PartialAsync("_SeriesRow", item)
+                }
+                </div>
+                <br />
+            </div>
+        }
+    </div>
+
+    <!-- Grouped by Fleet view -->
+    <div id="admin-series-grouped" style="display: none;">
+        @foreach (var seasonGroup in Model.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
+        {
+            var season = seasonGroup.First().Season;
+            var initCollapsed = season.End >= DateTime.Today.AddDays(-30);
+            <div class="row">
+                <div class="col-12" id="header-fleet-@season?.UrlName">
+                    <a class="@(initCollapsed ? "" : "collapsed")" data-bs-toggle="collapse" href="#content-fleet-@season?.UrlName" role="button"
+                        aria-expanded="@(initCollapsed ? "true" : "false")"
+                        aria-controls="content-fleet-@season?.UrlName">
+                        <h4 class="float-start">@seasonGroup.Key Series&nbsp;</h4>
+                    </a>
+                </div>
+            </div>
+            <div class="collapse @((initCollapsed) ? " show":"")" id="content-fleet-@season?.UrlName">
+                @{
+                    var fleetGroups = seasonGroup.GroupBy(s => s.GetEffectiveFleetName(), s => s)
+                        .OrderBy(g => g.Key == "Summary" ? 0 : 1)  // Summary first, then others
+                        .ThenBy(g => g.Key);  // Then alphabetical
+                }
+                @foreach (var fleetGroup in fleetGroups)
+                {
+                    <div class="row ms-2">
+                        <div class="col-12">
+                            <a class="fleet-group-header" data-bs-toggle="collapse" href="#fleet-@(fleetGroup.Key.Replace(" ", "-"))-@season?.UrlName" role="button"
+                                aria-expanded="false"
+                                aria-controls="fleet-@(fleetGroup.Key.Replace(" ", "-"))-@season?.UrlName"
+                                style="display: flex; align-items: center; text-decoration: none;">
+                                <span class="fa fa-chevron-right me-2" style="display: inline-block; transition: transform 0.2s ease; flex-shrink: 0;"></span>
+                                <h5 class="mb-0">@fleetGroup.Key</h5>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="collapse" id="fleet-@(fleetGroup.Key.Replace(" ", "-"))-@season?.UrlName">
+                        <div class="admin-series-list-fleet">
+                        @foreach (var item in fleetGroup)
+                        {
+                            @await Html.PartialAsync("_SeriesRow", item)
+                        }
+                        </div>
+                        <br />
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
 
 <script>
@@ -139,7 +133,7 @@
         }
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
-    
+
     function getAdminSeriesCookie(name) {
         var nameEQ = name + "=";
         var ca = document.cookie.split(';');
@@ -150,10 +144,29 @@
         }
         return null;
     }
-    
+
+    function toggleAdminFleetGrouping() {
+        var isGrouped = $('#admin-group-by-fleet').is(':checked');
+
+        // Save preference to cookie
+        setAdminSeriesCookie('adminSeriesGroupByFleet', isGrouped ? 'true' : '', isGrouped ? 365 : -1);
+
+        // Toggle visibility
+        if (isGrouped) {
+            $('#admin-series-ungrouped').hide();
+            $('#admin-series-grouped').show();
+        } else {
+            $('#admin-series-grouped').hide();
+            $('#admin-series-ungrouped').show();
+        }
+
+        // Re-apply sort to the visible view
+        sortAdminSeries();
+    }
+
     function sortAdminSeries() {
         var selectedSort = $('#admin-sort-order').val();
-        
+
         // Save sort preference to cookie (only if not 'name')
         if (selectedSort !== 'name') {
             setAdminSeriesCookie('adminSeriesSortPreference', selectedSort, 365);
@@ -161,22 +174,22 @@
             // Remove cookie if sorting by name (default)
             setAdminSeriesCookie('adminSeriesSortPreference', '', -1);
         }
-        
+
         // Sort each admin-series-list container independently
-        $('.admin-series-list').each(function() {
+        $('.admin-series-list, .admin-series-list-fleet').each(function() {
             var container = $(this);
             var result = container.find('.admin-series-row').sort(function (a, b) {
                 var contentA, contentB;
-                
+
                 if (selectedSort === 'startdate' || selectedSort === 'enddate') {
                     contentA = $(a).data(selectedSort);
                     contentB = $(b).data(selectedSort);
-                    
+
                     // Handle empty dates (series with no races)
                     if (!contentA && !contentB) return 0;
                     if (!contentA) return 1;
                     if (!contentB) return -1;
-                    
+
                     // Compare dates as strings in yyyy-MM-dd format
                     return contentA.localeCompare(contentB);
                 } else {
@@ -186,20 +199,62 @@
                     return String(contentA).localeCompare(contentB);
                 }
             });
-            
+
             container.empty();
             container.append(result);
         });
     }
-    
-    // Load sort preference from cookie and apply on page load
+
+    // Load preferences from cookies and apply on page load
     document.addEventListener("DOMContentLoaded", function() {
+        // Load and apply sort preference
         var savedSort = getAdminSeriesCookie('adminSeriesSortPreference');
         if (savedSort) {
             $('#admin-sort-order').val(savedSort);
         }
-        
+
+        // Load and apply grouping preference
+        var savedGrouping = getAdminSeriesCookie('adminSeriesGroupByFleet');
+        if (savedGrouping === 'true') {
+            $('#admin-group-by-fleet').prop('checked', true);
+            $('#admin-series-ungrouped').hide();
+            $('#admin-series-grouped').show();
+        }
+
         // Initial sort
         sortAdminSeries();
+
+        // Add event listeners to collapse triggers to update chevron rotation
+        document.querySelectorAll('a[data-bs-toggle="collapse"]').forEach(function(element) {
+            element.addEventListener('click', function() {
+                // Bootstrap updates aria-expanded after the click, but we'll use a slight delay
+                // to ensure the attribute has been updated
+                setTimeout(function() {
+                    // The CSS will handle the rotation based on aria-expanded attribute
+                }, 0);
+            });
+        });
     });
 </script>
+
+<style>
+    /* Remove underline from collapse toggle links */
+    a[data-bs-toggle="collapse"] {
+        text-decoration: none !important;
+    }
+
+    a[data-bs-toggle="collapse"]:hover {
+        text-decoration: none !important;
+    }
+
+    /* Rotate chevron icons based on aria-expanded state */
+    /* When expanded (aria-expanded="true"), arrow points down */
+    a[data-bs-toggle="collapse"][aria-expanded="true"] .fa-chevron-right {
+        transform: rotate(90deg);
+    }
+
+    /* When collapsed (aria-expanded="false"), arrow points right */
+    a[data-bs-toggle="collapse"][aria-expanded="false"] .fa-chevron-right {
+        transform: rotate(0deg);
+    }
+</style>

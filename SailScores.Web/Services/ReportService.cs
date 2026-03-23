@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
+using AutoMapper;
 
 namespace SailScores.Web.Services;
 
@@ -12,13 +13,16 @@ public class ReportService : Interfaces.IReportService
     {
         private readonly CoreServices.IReportService _coreReportService;
         private readonly CoreServices.IClubService _clubService;
+        private readonly IMapper _mapper;
 
         public ReportService(
             CoreServices.IReportService coreReportService,
-            CoreServices.IClubService clubService)
+            CoreServices.IClubService clubService,
+            IMapper mapper)
         {
             _coreReportService = coreReportService;
             _clubService = clubService;
+            _mapper = mapper;
         }
 
         public async Task<WindAnalysisViewModel> GetWindAnalysisAsync(
@@ -69,6 +73,76 @@ public class ReportService : Interfaces.IReportService
                     RaceCount = w.RaceCount
                 }).ToList()
             };
+        }
+
+        public async Task<SeriesParticipationStatsViewModel> SeriesParticipationStats(
+            string clubInitials,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            bool summaryOnly = false)
+        {
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            var useAdvancedFeatures = club?.UseAdvancedFeatures ?? false;
+            var originalStartDate = startDate;
+
+            // Enforce 90-day limit for non-advanced clubs
+            if (!useAdvancedFeatures)
+            {
+                var ninetyDaysAgo = DateTime.Today.AddDays(-90);
+                if (!startDate.HasValue || startDate.Value < ninetyDaysAgo)
+                {
+                    startDate = ninetyDaysAgo;
+                }
+            }
+
+            var seasonStats = await _coreReportService.GetSeriesParticipationStats(clubInitials, startDate, endDate);
+
+            // Determine display dates: if no dates were provided, show full range for advanced clubs, smaller range otherwise
+            DateTime? displayStartDate = originalStartDate;
+            DateTime? displayEndDate = endDate;
+            if (!originalStartDate.HasValue && !endDate.HasValue && seasonStats != null && seasonStats.Any())
+            {
+                if (useAdvancedFeatures)
+                {
+                    displayStartDate = seasonStats.Min(s => s.FirstRace);
+                    displayEndDate = seasonStats.Max(s => s.LastRace);
+                }
+                else
+                {
+                    displayStartDate = DateTime.Today.AddDays(-90);
+                    displayEndDate = DateTime.Today;
+                }
+            }
+
+            var vm = new SeriesParticipationStatsViewModel
+            {
+                ClubInitials = club.Initials,
+                ClubName = club.Name,
+                StartDate = displayStartDate,
+                EndDate = displayEndDate,
+                SummaryOnly = summaryOnly,
+                Rows = (seasonStats ?? new List<SailScores.Database.Entities.SeriesParticipationStats>())
+                    .Where(s => !summaryOnly || (s.SeriesType != null && s.SeriesType.Equals("Summary", StringComparison.OrdinalIgnoreCase)))
+                    .Select(s => new SeriesParticipationStatsViewModel.SeriesParticipationStatsRow
+                    {
+                        SeasonName = s.SeasonName,
+                        SeasonUrlName = null,
+                        SeasonStart = s.SeasonStart,
+                        SeriesName = s.SeriesName,
+                        SeriesType = s.SeriesType,
+                        ClassCount = s.ClassCount,
+                        ClassName = s.ClassName,
+                        RaceCount = s.RaceCount,
+                        CompetitorsStarted = s.CompetitorsStarted,
+                        DistinctCompetitorsStarted = s.DistinctCompetitorsStarted,
+                        AverageCompetitorsPerRace = s.AverageCompetitorsPerRace.HasValue ? (double?)s.AverageCompetitorsPerRace.Value : null,
+                        DistinctDaysRaced = s.DistinctDaysRaced,
+                        FirstRace = s.FirstRace,
+                        LastRace = s.LastRace
+                    }).ToList()
+            };
+
+            return vm;
         }
 
         public async Task<SkipperStatsViewModel> GetSkipperStatsAsync(

@@ -1,20 +1,6 @@
 @model IEnumerable<SailScores.Web.Models.SailScores.UserViewModel>
 <div id="usersdiv">
     <div class="row">
-        <div class="col-10 col-sm-8 col-md-5 col-lg-4">
-            <h3 class="float-start">
-                <a id="scorekeepers">Scorekeepers</a>
-                <a class="text-primary"
-                    data-bs-container="body"
-                    data-bs-toggle="popover"
-                    data-bs-placement="top"
-                    data-bs-trigger="focus hover"
-                    data-bs-content="Allow other users to edit results. Scorekeepers
-                        may be added, removed, and edited.">
-                    <span class="far fa-question-circle"></span>
-                </a>
-            </h3>
-        </div>
         <div class="col-2 col-sm-4">
             <a class="btn btn-primary"
                 asp-action="Add"
@@ -29,7 +15,7 @@
     @foreach (var item in Model.OrderBy(f => f.Name))
     {
         <div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2">
-            <div class="col-12 col-sm-6 col-md-4">
+            <div class="col-7 col-sm-6 col-md-6 col-lg-4">
                 <a class="btn btn-sm btn-outline-danger"
                     asp-action="Delete"
                     asp-controller="User"
@@ -44,15 +30,15 @@
                     title="Edit">
                     <span class="fas fa-pen"></span>
                 </a> &nbsp;
-                @Html.DisplayFor(modelItem => item.Name)
+                <span class="text-truncate">@Html.DisplayFor(modelItem => item.Name)</span>
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
-                @Html.DisplayFor(modelItem => item.EmailAddress)
+            <div class="col-5 col-sm-6 col-md-4 col-lg-3">
+                <span class="text-truncate d-inline-block w-100">@Html.DisplayFor(modelItem => item.EmailAddress)</span>
             </div>
-            <div class="col-12 col-sm-6 col-md-2">
+            <div class="col-6 col-md-2">
                 @(!item.Registered ? "Not" : "") Registered
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div class="col-6 col-lg-3 ms-auto ms-lg-0 text-end text-lg-start">
                 @switch (item.PermissionLevel)
                 {
                     case SailScores.Database.Entities.PermissionLevel.ClubAdministrator:

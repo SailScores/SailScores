@@ -110,6 +110,26 @@ dotnet test SailScores.ImportExport.Test/SailScores.ImportExport.Test.csproj
 
 The project uses libman for client-side libraries (Bootstrap, jQuery). Build errors related to libman (e.g., `LIB002`) are network-related and can be safely ignored for backend/core changes. The web application will still build successfully.
 
+## Database Schema
+
+**For detailed schema documentation, see `docs/DatabaseSchema.md`** which includes:
+- Complete entity relationship diagrams
+- All table definitions with columns, types, and constraints
+- Enum types and validation rules
+- Key business rules and relationships
+- Common query patterns
+- Migration guidance
+
+**Quick reference guides:**
+- `docs/DatabaseSchema-QuickRef.md` - Quick lookup for common operations
+
+### Key Business Rules
+
+- **Multi-fleet Series**: A single series can contain races from different fleets
+- **SeriesRace junction table**: Always use `SeriesRace` to link races to series, not direct `Series → Races` navigation
+- **Race → Fleet**: Each race belongs to exactly one fleet (non-nullable `FleetId`)
+- **Series types**: Standard (individual races), Summary (aggregates child series), Regatta (associated with a single fleet)
+
 ## Important File Locations
 
 - **Controllers**: `SailScores.Web/Controllers/`
@@ -220,6 +240,10 @@ Pipelines automatically:
 - Run `dotnet restore` to update NuGet packages
 - Run `npm install` in SailScores.Web directory for client dependencies
 - Clean and rebuild solution if issues persist
+
+## Active Features in Development
+
+- **Series Fleet Options** ([Issue #150](https://github.com/SailScores/SailScores/issues/150)): Adds optional fleet association to series with fleet-based competitor filtering and race score recalculation. See `docs/Features-SeriesFleetOption.md` for details.
 
 ## Additional Resources
 

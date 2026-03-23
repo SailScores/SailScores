@@ -72,7 +72,14 @@ namespace SailScores.Database
 
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-        Task<IList<ClubSeasonStats>> GetClubStats(string clubInitials);
+        Task<IList<ClubSeasonStats>> GetClubStats(
+            string clubInitials,
+            DateTime? startDate = null,
+            DateTime? endDate = null);
+        Task<IList<SeriesParticipationStats>> GetSeriesParticipationStats(
+            string clubInitials,
+            DateTime? startDate = null,
+            DateTime? endDate = null);
         Task<IList<SiteStats>> GetSiteStats();
         Task<IList<DeletableInfo>> GetDeletableInfoForCompetitorsAsync(Guid clubId);
         Task<IList<CompetitorActiveDates>> GetCompetitorActiveDates(Guid clubId);

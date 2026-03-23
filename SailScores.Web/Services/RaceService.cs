@@ -289,7 +289,12 @@ public class RaceService : IRaceService
             }
         }
 
-        if (series.Races.Any())
+        // If the series explicitly specifies a fleet, prefer that.
+        if (series.FleetId.HasValue)
+        {
+            model.FleetId = series.FleetId.Value;
+        }
+        else if (series.Races.Any())
         {
             model.FleetId = series.Races.OrderByDescending(r => r.Date)
                                     .ThenByDescending(r => r.Order).First().Fleet?.Id

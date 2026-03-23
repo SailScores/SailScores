@@ -17,12 +17,14 @@ var paths = {
 
 paths.js = paths.webroot + "js/**/*.js";
 paths.minJs = paths.webroot + "js/**/*.min.js";
+paths.testJs = paths.webroot + "js/**/*.test.js";
+paths.specJs = paths.webroot + "js/**/*.spec.js";
 paths.css = paths.webroot + "css/**/*.css";
 paths.minCss = paths.webroot + "css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "js/**/*";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.jsDir = paths.webroot + "js/";
-paths.scriptsSrc = "Scripts/**/*.js";
+paths.scriptsSrc = ["Scripts/**/*.js", "!Scripts/**/*.test.js", "!Scripts/**/*.spec.js"];
 
 gulp.task("clean:js", function () {
     return del(paths.concatJsDest);
@@ -40,7 +42,7 @@ gulp.task("copy:scripts", function () {
 });
 
 gulp.task("min:js", function () {
-    return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
+    return gulp.src([paths.js, "!" + paths.minJs, "!" + paths.testJs, "!" + paths.specJs], { base: "." })
         .pipe(named())
         .pipe(webpack({
             mode: "production",

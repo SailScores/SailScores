@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SailScores.Core.Model;
@@ -28,10 +28,17 @@ namespace SailScores.Core.Services
         Task UpdateParentSeriesResults(Guid seriesId, string updatedBy);
         Task<FlatModel.FlatResults> GetHistoricalResults(Series series);
         Task<FlatModel.FlatChartData> GetChartData(Guid seriesId);
+        Task<FlatModel.FlatChartData> CalculateChartDataForSeries(Series series);
         Task<Model.Series> CalculateWhatIfScoresAsync(
             Guid seriesId,
             Guid scoringSystemId,
             int discards,
             decimal? participationPercent);
+
+        /// <summary>
+        /// Populates the Fleet navigation property for series that don't have a direct FleetId
+        /// by loading the most recent race's fleet. Efficient for clubs with many races.
+        /// </summary>
+        Task PopulateSeriesFleets(IList<Model.Series> series, Guid clubId);
     }
 }

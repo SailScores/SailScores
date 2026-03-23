@@ -23,13 +23,29 @@
         </div>
     </div>
 
+    <form method="get" class="row mb-4 g-3 align-items-end">
+        <div class="col-12 col-sm-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <label for="startDate" class="form-label mb-0 text-lg-end text-nowrap">Start Date</label>
+            <input type="date" class="form-control" id="startDate" name="startDate"
+                   value="@(Model.StartDate?.ToString("yyyy-MM-dd") ?? (Model.SeasonStats?.Any() == true ? Model.SeasonStats.Min(s => s.FirstRace)?.ToString("yyyy-MM-dd") : ""))" />
+        </div>
+        <div class="col-12 col-sm-auto d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <label for="endDate" class="form-label mb-0 text-lg-end text-nowrap">End Date</label>
+            <input type="date" class="form-control" id="endDate" name="endDate"
+                   value="@(Model.EndDate?.ToString("yyyy-MM-dd") ?? (Model.SeasonStats?.Any() == true ? Model.SeasonStats.Max(s => s.LastRace)?.ToString("yyyy-MM-dd") : ""))" />
+        </div>
+        <div class="col-12 col-sm-auto d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="~/@Model.Initials/Reports/ClubStats" class="btn btn-outline-secondary">Clear</a>
+        </div>
+    </form>
 
     <div class="row">
         <div class="col-12">
             @if (Model.SeasonStats != null && Model.SeasonStats.Any())
             {
                 <div class="mb-2 d-flex justify-content-end">
-                    <a href="~/@Model.Initials/Reports/ClubStatsExport" class="btn btn-outline-primary">
+                    <a href="~/@Model.Initials/Reports/ClubStatsExport?startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-primary">
                         <i class="bi bi-download"></i> Export as CSV
                     </a>
                 </div>

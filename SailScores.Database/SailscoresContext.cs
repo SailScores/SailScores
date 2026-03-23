@@ -63,6 +63,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
     private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
     private DbSet<ClubSeasonStats> ClubSeasonStats { get; set; }
+    private DbSet<SeriesParticipationStats> SeriesParticipationStats { get; set; }
     private DbSet<SiteStats> SiteStats { get; set; }
     private DbSet<DeletableInfo> CompetitorDeletableInfo { get; set; }
     private DbSet<CompetitorActiveDates> CompetitorActiveDates { get; set; }
@@ -140,12 +141,31 @@ public class SailScoresContext : DbContext, ISailScoresContext
     }
 
     public async Task<IList<ClubSeasonStats>> GetClubStats(
-        string clubInitials)
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
     {
         var query = await GetSqlQuery("ClubStats");
         var clubParam = new SqlParameter("ClubInitials", clubInitials);
+        var startDateParam = new SqlParameter("StartDate", (object)startDate ?? DBNull.Value);
+        var endDateParam = new SqlParameter("EndDate", (object)endDate ?? DBNull.Value);
         var result = await this.ClubSeasonStats
-            .FromSqlRaw(query, clubParam)
+            .FromSqlRaw(query, clubParam, startDateParam, endDateParam)
+            .ToListAsync();
+        return result;
+    }
+
+    public async Task<IList<SeriesParticipationStats>> GetSeriesParticipationStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null)
+    {
+        var query = await GetSqlQuery("SeriesParticipationStats");
+        var clubParam = new SqlParameter("ClubInitials", clubInitials);
+        var startDateParam = new SqlParameter("StartDate", (object)startDate ?? DBNull.Value);
+        var endDateParam = new SqlParameter("EndDate", (object)endDate ?? DBNull.Value);
+        var result = await this.SeriesParticipationStats
+            .FromSqlRaw(query, clubParam, startDateParam, endDateParam)
             .ToListAsync();
         return result;
     }
@@ -360,6 +380,13 @@ public class SailScoresContext : DbContext, ISailScoresContext
             });
 
         modelBuilder.Entity<ClubSeasonStats>(
+            cs =>
+            {
+                cs.HasNoKey();
+                cs.ToTable((string)null);
+            });
+
+        modelBuilder.Entity<SeriesParticipationStats>(
             cs =>
             {
                 cs.HasNoKey();

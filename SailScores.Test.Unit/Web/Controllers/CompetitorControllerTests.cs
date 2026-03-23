@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SailScores.Web.Controllers;
-using SailScores.Web.Services;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,9 +13,7 @@ using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService
 using SailScores.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using SailScores.Identity.Entities;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+using SailScores.Core.Model;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {
@@ -140,6 +137,107 @@ namespace SailScores.Test.Unit.Web.Controllers
             Assert.Equal(vm, viewresult.Model);
         }
 
+        [Fact]
+        public async Task PostSetAlternativeSailNumber_InvalidModel_ReturnsBadRequest()
+        {
+            var model = new CompetitorAlternativeSailNumberUpdateViewModel
+            {
+                CompetitorId = Guid.NewGuid(),
+                AlternativeSailNumber = "ALT-1"
+            };
+            _controller.ModelState.AddModelError("AlternativeSailNumber", "invalid");
+
+            var result = await _controller.PostSetAlternativeSailNumber(_clubInitials, model);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task PostSetAlternativeSailNumber_CompetitorMissing_ReturnsNotFound()
+        {
+            var model = new CompetitorAlternativeSailNumberUpdateViewModel
+            {
+                CompetitorId = Guid.NewGuid(),
+                AlternativeSailNumber = "ALT-1"
+            };
+
+            _competitorServiceMock
+                .Setup(s => s.GetCompetitorAsync(model.CompetitorId))
+                .ReturnsAsync((Competitor)null);
+
+            var result = await _controller.PostSetAlternativeSailNumber(_clubInitials, model);
+
+            Assert.IsType<NotFoundResult>(result);
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task PostSetAlternativeSailNumber_Unauthorized_ReturnsUnauthorized()
+        {
+            var competitorId = Guid.NewGuid();
+            var clubId = Guid.NewGuid();
+            var model = new CompetitorAlternativeSailNumberUpdateViewModel
+            {
+                CompetitorId = competitorId,
+                AlternativeSailNumber = "ALT-1"
+            };
+
+            _competitorServiceMock
+                .Setup(s => s.GetCompetitorAsync(competitorId))
+                .ReturnsAsync(new Competitor { Id = competitorId, ClubId = clubId });
+
+            SetupAltSailPermissions(clubId, canEdit: false);
+
+            var result = await _controller.PostSetAlternativeSailNumber(_clubInitials, model);
+
+            Assert.IsType<UnauthorizedResult>(result);
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task PostSetAlternativeSailNumber_Authorized_ReturnsJsonAndCallsService()
+        {
+            var competitorId = Guid.NewGuid();
+            var clubId = Guid.NewGuid();
+            var model = new CompetitorAlternativeSailNumberUpdateViewModel
+            {
+                CompetitorId = competitorId,
+                AlternativeSailNumber = " ALT-77 "
+            };
+
+            _competitorServiceMock
+                .Setup(s => s.GetCompetitorAsync(competitorId))
+                .ReturnsAsync(new Competitor { Id = competitorId, ClubId = clubId });
+
+            SetupAltSailPermissions(clubId, canEdit: true);
+
+            var result = await _controller.PostSetAlternativeSailNumber(_clubInitials, model);
+
+            var json = Assert.IsType<JsonResult>(result);
+            Assert.NotNull(json.Value);
+
+            var payloadType = json.Value.GetType();
+            var responseCompetitorId = (Guid)payloadType.GetProperty("competitorId")!.GetValue(json.Value)!;
+            var responseAltSailNumber = (string)payloadType.GetProperty("alternativeSailNumber")!.GetValue(json.Value)!;
+
+            Assert.Equal(competitorId, responseCompetitorId);
+            Assert.Equal("ALT-77", responseAltSailNumber);
+
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(competitorId, " ALT-77 ", "Test User"), Times.Once);
+        }
+
+        private void SetupAltSailPermissions(Guid clubId, bool canEdit)
+        {
+            _authServiceMock.Setup(s => s.CanUserEditRaces(It.IsAny<ClaimsPrincipal>(), clubId))
+                .ReturnsAsync(canEdit);
+            _authServiceMock.Setup(s => s.CanUserEditSeries(It.IsAny<ClaimsPrincipal>(), clubId))
+                .ReturnsAsync(canEdit);
+            _authServiceMock.Setup(s => s.IsUserClubAdministrator(It.IsAny<ClaimsPrincipal>(), clubId))
+                .ReturnsAsync(canEdit);
+            _authServiceMock.Setup(s => s.IsUserFullAdmin(It.IsAny<ClaimsPrincipal>()))
+                .ReturnsAsync(canEdit);
+        }
 
         private void SetupAsAuthorized()
         {

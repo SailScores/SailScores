@@ -10,244 +10,323 @@ using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Model;
 using Xunit;
 
-namespace SailScores.Test.Unit.Core.Services
+namespace SailScores.Test.Unit.Core.Services;
+
+public class FleetServiceTests
 {
-    public class FleetServiceTests
+    FleetService _service;
+
+    private readonly ISailScoresContext _context;
+    private readonly Guid _clubId;
+    private readonly IMapper _mapper;
+
+    public FleetServiceTests()
     {
-        FleetService _service;
+        _context = InMemoryContextBuilder.GetContext();
+        _clubId = _context.Clubs.First().Id;
+        _mapper = MapperBuilder.GetSailScoresMapper();
+        _service = new FleetService(
+            _context,
+            _mapper);
+    }
 
-        private readonly ISailScoresContext _context;
-        private readonly Guid _clubId;
-        private readonly IMapper _mapper;
+    [Fact]
+    public async Task SaveNew_Always_SavesToDb()
+    {
+        var startingFleetCount = _context.Fleets.Count();
 
-        public FleetServiceTests()
+        var newFleet = new Fleet
         {
-            _context = InMemoryContextBuilder.GetContext();
-            _clubId = _context.Clubs.First().Id;
-            _mapper = MapperBuilder.GetSailScoresMapper();
-            _service = new FleetService(
-                _context,
-                _mapper);
-        }
+            Name = "myFleet",
+            ShortName = "myFleet",
+            NickName = "myFleet",
+        };
 
-        [Fact]
-        public async Task SaveNew_Always_SavesToDb()
+        await _service.SaveNew(newFleet);
+
+        Assert.NotEmpty(_context.Fleets
+            .Where(f => f.Name == newFleet.Name));
+        Assert.Equal(startingFleetCount + 1,
+            _context.Fleets.Count());
+    }
+
+    [Fact]
+    public async Task SaveNew_WithSpacesInShortName_SanitizesForUrl()
+    {
+        var startingFleetCount = _context.Fleets.Count();
+
+        var newFleet = new Fleet
         {
-            var startingFleetCount = _context.Fleets.Count();
+            Name = "My Fleet With Spaces",
+            ShortName = "My Fleet With Spaces",
+            NickName = "myFleet",
+            ClubId = _clubId
+        };
 
-            var newFleet = new Fleet
+        await _service.SaveNew(newFleet);
+
+        var savedFleet = _context.Fleets
+            .FirstOrDefault(f => f.Name == newFleet.Name);
+        
+        Assert.NotNull(savedFleet);
+        Assert.Equal("my-fleet-with-spaces", savedFleet.ShortName);
+        Assert.Equal(startingFleetCount + 1, _context.Fleets.Count());
+    }
+
+    [Fact]
+    public async Task SaveNew_WithSpecialCharsInShortName_SanitizesForUrl()
+    {
+        var startingFleetCount = _context.Fleets.Count();
+
+        var newFleet = new Fleet
+        {
+            Name = "My Fleet!@#$%",
+            ShortName = "Fleet!@#$%",
+            NickName = "myFleet",
+            ClubId = _clubId
+        };
+
+        await _service.SaveNew(newFleet);
+
+        var savedFleet = _context.Fleets
+            .FirstOrDefault(f => f.Name == newFleet.Name);
+        
+        Assert.NotNull(savedFleet);
+        Assert.Equal("fleet", savedFleet.ShortName);
+        Assert.Equal(startingFleetCount + 1, _context.Fleets.Count());
+    }
+
+    [Fact]
+    public async Task Delete_Fleet_RemovesFromDb()
+    {
+        // Arrange
+        var boatClass = await _context.BoatClasses.FirstAsync();
+        var comp = await _context.Competitors.FirstAsync();
+        var newFleet = new Fleet
+        {
+            Name = "myFleet",
+            ShortName = "myFleet",
+            NickName ="myFleet",
+            BoatClasses = new List<BoatClass>
             {
-                Name = "myFleet",
-                ShortName = "myFleet",
-                NickName = "myFleet",
-            };
-
-            await _service.SaveNew(newFleet);
-
-            Assert.NotEmpty(_context.Fleets
-                .Where(f => f.Name == newFleet.Name));
-            Assert.Equal(startingFleetCount + 1,
-                _context.Fleets.Count());
-        }
-
-        [Fact]
-        public async Task SaveNew_WithSpacesInShortName_SanitizesForUrl()
-        {
-            var startingFleetCount = _context.Fleets.Count();
-
-            var newFleet = new Fleet
-            {
-                Name = "My Fleet With Spaces",
-                ShortName = "My Fleet With Spaces",
-                NickName = "myFleet",
-                ClubId = _clubId
-            };
-
-            await _service.SaveNew(newFleet);
-
-            var savedFleet = _context.Fleets
-                .FirstOrDefault(f => f.Name == newFleet.Name);
-            
-            Assert.NotNull(savedFleet);
-            Assert.Equal("my-fleet-with-spaces", savedFleet.ShortName);
-            Assert.Equal(startingFleetCount + 1, _context.Fleets.Count());
-        }
-
-        [Fact]
-        public async Task SaveNew_WithSpecialCharsInShortName_SanitizesForUrl()
-        {
-            var startingFleetCount = _context.Fleets.Count();
-
-            var newFleet = new Fleet
-            {
-                Name = "My Fleet!@#$%",
-                ShortName = "Fleet!@#$%",
-                NickName = "myFleet",
-                ClubId = _clubId
-            };
-
-            await _service.SaveNew(newFleet);
-
-            var savedFleet = _context.Fleets
-                .FirstOrDefault(f => f.Name == newFleet.Name);
-            
-            Assert.NotNull(savedFleet);
-            Assert.Equal("fleet", savedFleet.ShortName);
-            Assert.Equal(startingFleetCount + 1, _context.Fleets.Count());
-        }
-
-        [Fact]
-        public async Task Delete_Fleet_RemovesFromDb()
-        {
-            // Arrange
-            var boatClass = await _context.BoatClasses.FirstAsync();
-            var comp = await _context.Competitors.FirstAsync();
-            var newFleet = new Fleet
-            {
-                Name = "myFleet",
-                ShortName = "myFleet",
-                NickName ="myFleet",
-                BoatClasses = new List<BoatClass>
+                new BoatClass
                 {
-                    new BoatClass
-                    {
-                        Id = boatClass.Id,
-                        ClubId = boatClass.ClubId,
-                        Name = boatClass.Name
-                    }
-                },
-                Competitors = new List<Competitor>
-                {
-                    new Competitor
-                    {
-                        Id = comp.Id,
-                        ClubId = comp.ClubId,
-                        Name = comp.Name
-                    }
+                    Id = boatClass.Id,
+                    ClubId = boatClass.ClubId,
+                    Name = boatClass.Name
                 }
-            };
-
-            await _service.SaveNew(newFleet);
-
-            Assert.NotEmpty(_context.Fleets
-                .Where(f => f.Name == newFleet.Name).SelectMany(
-                f => f.FleetBoatClasses));
-
-            var newFleetId = _context.Fleets
-                .Where(f => f.Name == newFleet.Name).First().Id;
-
-            //Act 
-            await _service.Delete(newFleetId);
-
-            // Assert
-            Assert.Empty(_context.Fleets
-                .Where(f => f.Name == newFleet.Name));
-
-        }
-
-
-        [Fact]
-        public async Task Get_Fleet_ReturnsFromDb()
-        {
-            // Arrange
-            var boatClass = await _context.BoatClasses.FirstAsync();
-            var newFleet = new Fleet
+            },
+            Competitors = new List<Competitor>
             {
-                Name = "myFleet",
-                ShortName = "myFleet",
-                NickName = "myFleet",
-                BoatClasses = new List<BoatClass>
+                new Competitor
                 {
-                    new BoatClass
-                    {
-                        Id = boatClass.Id,
-                        ClubId = boatClass.ClubId,
-                        Name = boatClass.Name
-                    }
+                    Id = comp.Id,
+                    ClubId = comp.ClubId,
+                    Name = comp.Name
                 }
+            }
+        };
 
-            };
+        await _service.SaveNew(newFleet);
 
-            await _service.SaveNew(newFleet);
+        Assert.NotEmpty(_context.Fleets
+            .Where(f => f.Name == newFleet.Name).SelectMany(
+            f => f.FleetBoatClasses));
 
-            Assert.NotEmpty(_context.Fleets
-                .Where(f => f.Name == newFleet.Name).SelectMany(
-                f => f.FleetBoatClasses));
+        var newFleetId = _context.Fleets
+            .Where(f => f.Name == newFleet.Name).First().Id;
 
-            var newFleetId = _context.Fleets
-                .Where(f => f.Name == newFleet.Name).First().Id;
+        //Act 
+        await _service.Delete(newFleetId);
 
-            //Act 
-            var testresult = await _service.Get(newFleetId);
+        // Assert
+        Assert.Empty(_context.Fleets
+            .Where(f => f.Name == newFleet.Name));
 
-            // Assert
-            Assert.Equal(newFleet.Name, testresult.Name);
+    }
 
-        }
 
-        [Fact]
-        public async Task GetAllFleetsForClub_ReturnFromDb()
+    [Fact]
+    public async Task Get_Fleet_ReturnsFromDb()
+    {
+        // Arrange
+        var boatClass = await _context.BoatClasses.FirstAsync();
+        var newFleet = new Fleet
         {
-            // Arrange
-
-            // Act
-            var fleets = await _service.GetAllFleetsForClub(_clubId);
-
-            // Assert
-            Assert.NotEmpty(fleets);
-
-        }
-
-        [Fact]
-        public async Task GetSeriesForFleet_returnsFromDb()
-        {
-            //Arrange
-            var race = await _context.Races.FirstAsync();
-            var fleet = await _context.Fleets.FirstAsync();
-            var series = await _context.Series.FirstAsync();
-
-            race.Fleet = fleet;
-            series.RaceSeries = new List<Database.Entities.SeriesRace>
+            Name = "myFleet",
+            ShortName = "myFleet",
+            NickName = "myFleet",
+            BoatClasses = new List<BoatClass>
             {
-                new Database.Entities.SeriesRace
+                new BoatClass
                 {
-                    RaceId = race.Id,
-                    SeriesId = series.Id
-
+                    Id = boatClass.Id,
+                    ClubId = boatClass.ClubId,
+                    Name = boatClass.Name
                 }
-            };
-            await _context.SaveChangesAsync();
+            }
 
-            // Act
-            var returnedValue = await _service.GetSeriesForFleet(fleet.Id) ;
+        };
 
-            // Assert
-            Assert.NotEmpty(returnedValue);
-        }
+        await _service.SaveNew(newFleet);
 
-        [Fact]
-        public async Task Update_WithSpacesInShortName_SanitizesForUrl()
+        Assert.NotEmpty(_context.Fleets
+            .Where(f => f.Name == newFleet.Name).SelectMany(
+            f => f.FleetBoatClasses));
+
+        var newFleetId = _context.Fleets
+            .Where(f => f.Name == newFleet.Name).First().Id;
+
+        //Act 
+        var testresult = await _service.Get(newFleetId);
+
+        // Assert
+        Assert.Equal(newFleet.Name, testresult.Name);
+
+    }
+
+    [Fact]
+    public async Task GetAllFleetsForClub_ReturnFromDb()
+    {
+        // Arrange
+
+        // Act
+        var fleets = await _service.GetAllFleetsForClub(_clubId);
+
+        // Assert
+        Assert.NotEmpty(fleets);
+
+    }
+
+    [Fact]
+    public async Task GetSeriesForFleet_returnsFromDb()
+    {
+        //Arrange
+        var race = await _context.Races.FirstAsync();
+        var fleet = await _context.Fleets.FirstAsync();
+        var series = await _context.Series.FirstAsync();
+
+        race.Fleet = fleet;
+        series.RaceSeries = new List<Database.Entities.SeriesRace>
         {
-            // Arrange
-            var newFleet = new Fleet
+            new Database.Entities.SeriesRace
             {
-                Name = "Original Fleet",
-                ShortName = "originalfleet",
-                NickName = "Original",
-                ClubId = _clubId
-            };
+                RaceId = race.Id,
+                SeriesId = series.Id
 
-            await _service.SaveNew(newFleet);
-            var fleetId = _context.Fleets.First(f => f.Name == newFleet.Name).Id;
+            }
+        };
+        await _context.SaveChangesAsync();
 
-            // Act
-            var fleetToUpdate = await _service.Get(fleetId);
-            fleetToUpdate.ShortName = "Updated Fleet Name";
-            await _service.Update(fleetToUpdate);
+        // Act
+        var returnedValue = await _service.GetSeriesForFleet(fleet.Id) ;
 
-            // Assert
-            var updatedFleet = await _service.Get(fleetId);
-            Assert.Equal("updated-fleet-name", updatedFleet.ShortName);
-        }
+        // Assert
+        Assert.NotEmpty(returnedValue);
+    }
+
+    [Fact]
+    public async Task Update_WithSpacesInShortName_SanitizesForUrl()
+    {
+        // Arrange
+        var newFleet = new Fleet
+        {
+            Name = "Original Fleet",
+            ShortName = "originalfleet",
+            NickName = "Original",
+            ClubId = _clubId
+        };
+
+        await _service.SaveNew(newFleet);
+        var fleetId = _context.Fleets.First(f => f.Name == newFleet.Name).Id;
+
+        // Act
+        var fleetToUpdate = await _service.Get(fleetId);
+        fleetToUpdate.ShortName = "Updated Fleet Name";
+        await _service.Update(fleetToUpdate);
+
+        // Assert
+        var updatedFleet = await _service.Get(fleetId);
+        Assert.Equal("updated-fleet-name", updatedFleet.ShortName);
+    }
+
+    [Fact]
+    public async Task GetDeletableInfo_FleetUsedInRace_ReturnsNotDeletable()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.FirstAsync();
+        var race = await _context.Races.FirstAsync();
+        race.Fleet = fleet;
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = (await _service.GetDeletableInfo(_clubId)).ToList();
+        var fleetInfo = result.First(f => f.Id == fleet.Id);
+
+        // Assert
+        Assert.False(fleetInfo.IsDeletable);
+        Assert.Contains("races assigned", fleetInfo.Reason);
+    }
+
+    [Fact]
+    public async Task GetDeletableInfo_FleetUsedInSeries_ReturnsNotDeletable()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.FirstAsync();
+        var series = await _context.Series.FirstAsync();
+        series.FleetId = fleet.Id;
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = (await _service.GetDeletableInfo(_clubId)).ToList();
+        var fleetInfo = result.First(f => f.Id == fleet.Id);
+
+        // Assert
+        Assert.False(fleetInfo.IsDeletable);
+        Assert.Contains("filter", fleetInfo.Reason);
+    }
+
+    [Fact]
+    public async Task GetDeletableInfo_FleetUsedInBothRaceAndSeries_ReturnsNotDeletableWithBothReasons()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.FirstAsync();
+        var race = await _context.Races.FirstAsync();
+        var series = await _context.Series.FirstAsync();
+        race.Fleet = fleet;
+        series.FleetId = fleet.Id;
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = (await _service.GetDeletableInfo(_clubId)).ToList();
+        var fleetInfo = result.First(f => f.Id == fleet.Id);
+
+        // Assert
+        Assert.False(fleetInfo.IsDeletable);
+        Assert.Contains("races assigned", fleetInfo.Reason);
+        Assert.Contains("filter", fleetInfo.Reason);
+    }
+
+    [Fact]
+    public async Task GetDeletableInfo_FleetNotUsed_ReturnsDeletable()
+    {
+        // Arrange
+        var newFleet = new Fleet
+        {
+            Name = "Unused Fleet",
+            ShortName = "unused",
+            NickName = "Unused",
+            ClubId = _clubId
+        };
+        await _service.SaveNew(newFleet);
+        var fleetId = _context.Fleets.First(f => f.Name == newFleet.Name).Id;
+
+        // Act
+        var result = (await _service.GetDeletableInfo(_clubId)).ToList();
+        var fleetInfo = result.First(f => f.Id == fleetId);
+
+        // Assert
+        Assert.True(fleetInfo.IsDeletable);
+        Assert.Equal(string.Empty, fleetInfo.Reason);
     }
 }

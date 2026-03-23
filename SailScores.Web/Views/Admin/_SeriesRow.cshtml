@@ -1,0 +1,65 @@
+@model SailScores.Core.Model.Series
+
+@{
+    // Use Series StartDate/EndDate if available, otherwise calculate from Races
+    // but races will probably be null here: they aren't loaded by default for club admin.
+    DateTime? startDate = Model.StartDate.HasValue 
+        ? Model.StartDate.Value.ToDateTime(TimeOnly.MinValue) 
+        : Model.Races?.Where(r => r != null && r.Date.HasValue).Min(r => r.Date);
+    DateTime? endDate = Model.EndDate.HasValue 
+        ? Model.EndDate.Value.ToDateTime(TimeOnly.MinValue) 
+        : Model.Races?.Where(r => r != null && r.Date.HasValue).Max(r => r.Date);
+}
+
+<div class="row border-bottom mt-1 mb-1 pt-1 pb-1 ms-md-2 admin-series-row"
+     data-name="@Model.Name"
+     data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")"
+     data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
+    <div class="col-2 col-md-auto pe-1">
+        <a class="btn btn-sm btn-outline-danger me-2 mb-2"
+            asp-action="Delete"
+            asp-controller="Series"
+            asp-route-id="@Model.Id"
+            title="Delete">
+            <span class="fas fa-trash"></span>
+        </a>
+        <span class="d-none d-sm-inline"> </span><a class="btn btn-sm btn-outline-primary mb-2"
+            asp-action="Edit"
+            asp-controller="Series"
+            asp-route-id="@Model.Id"
+            title="Edit">
+            <span class="fas fa-pen"></span>
+        </a>
+    </div>
+    <div class="col-10 col-md">
+        <div class="row">
+          <div class="col-sm-9 col-md-7">
+              @Html.DisplayFor(modelItem => Model.Name)
+              @if (!string.IsNullOrEmpty(Model.Description))
+              {
+                  <div class="d-none d-md-block"><em>@Html.DisplayFor(modelItem => Model.Description)</em></div>
+              }
+          </div>
+          <div class="d-none d-sm-inline col-sm-3 col-md-2 text-sm-end text-md-start">
+              @if(Model.Type == SailScores.Core.Model.SeriesType.Summary)
+              {
+                  @:<span class="small muted">Summary</span>
+              } else
+              {
+                  @Html.DisplayFor(modelItem => Model.Races.Count)
+                  @:Races
+              }
+          </div>
+          <div class="d-none d-md-inline col-md-3">
+              @if(Model.StartDate.HasValue && Model.EndDate.HasValue &&
+              Model.StartDate != Model.EndDate) {
+                  @:(@Model.StartDate - @Model.EndDate)
+              } else if (Model.StartDate.HasValue && Model.EndDate.HasValue &&
+                  Model.StartDate == Model.EndDate
+              ){
+                  @:(@Model.StartDate)
+              }
+          </div>
+        </div>
+    </div>
+</div>

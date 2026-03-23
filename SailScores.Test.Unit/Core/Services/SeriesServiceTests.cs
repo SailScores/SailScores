@@ -279,4 +279,6 @@ public class SeriesServiceTests
         Assert.Contains(dbSummary.ChildLinks, l => l.ChildSeriesId == child1.Id);
         Assert.Contains(dbSummary.ChildLinks, l => l.ChildSeriesId == child2.Id);
     }
+
+
 }

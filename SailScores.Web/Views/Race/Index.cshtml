@@ -41,7 +41,7 @@
     @Model.ClubInitials @localizer["Races"]
 </h1>
 
-<div class="container">
+<div class="container-lg">
     @if (Model.CanEdit)
     {
 
@@ -88,28 +88,29 @@
                     </a>&nbsp;
                 </div>
             }
-            <div class="@(Model.CanEdit? "col-9" : "col-12") col-md-10">
+            <div class="@(Model.CanEdit? "col-10" : "col-12") col-md-10 col-xl-11">
                 <div class="row mb-1 pb-1">
-                    <div class="col-6 col-md-3">
-                        <span class="d-md-none">
+                    <div class="col-5 col-md-4">
+                        <span class="d-lg-none">
                             <a id="smallracelink_@race.Id"
                             asp-action="Details"
                             asp-controller="Race"
                             asp-route-id=@race.Id>
                                 @race.FleetName:
-                                R@(race.Order) @race.Date.ToShortString()
+                                @race.SuperShortName
                             </a>
                         </span>
-                        <span class="d-none d-md-inline">
+                        <span class="d-none d-lg-inline">
                             <a id="racelink_@race.Id"
                             asp-action="Details"
                             asp-controller="Race"
                             asp-route-id=@race.Id>
-                                @race.CalculatedName
+                                @race.FleetName:
+                                @race.CalculatedMediumName
                             </a>
                         </span>
                     </div>
-                    <div class="col-3 small">
+                    <div class="col-5 col-md-4 small">
                         @{ var lastSeries = race.SeriesUrlAndNames.LastOrDefault(); }
                         @foreach (var seriesUrlAndName in race.SeriesUrlAndNames)
                         {
@@ -121,7 +122,8 @@
                         @Html.DisplayFor(modelItem => race.CompetitorCount)
                         @localizer["boats"]
                     </div>
-                    <div class="col-1 d-none d-md-inline">
+                    <div class="col-2 d-none d-md-inline">
+                      <small>
                         @if (race.ExcludeFromCompStats)
                         {
                             @race.State@:&nbsp;<span class="text-warning">*</span>
@@ -130,6 +132,7 @@
                         {
                             @race.State
                         }
+                        </small>
                     </div>
                     <div class="col-12 col-md-10 d-none d-md-inline">
                         @Html.DisplayFor(modelItem => race.Name)

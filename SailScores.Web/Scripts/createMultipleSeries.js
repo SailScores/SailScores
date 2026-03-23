@@ -13,13 +13,29 @@ function addNewRow() {
     newRow.id = '';
     newRow.classList.add('series-row');
 
-    const inputs = newRow.querySelectorAll('input');
+    const inputs = newRow.querySelectorAll('input, select');
     inputs.forEach(function (input) {
         const name = input.getAttribute('name');
         if (!name) return;
         input.setAttribute('name', name.replace('template.', 'series[' + newIndex + '].'));
-        input.value = '';
+        if (input.tagName === 'INPUT') {
+            input.value = '';
+        } else if (input.tagName === 'SELECT') {
+            input.selectedIndex = 0;
+        }
         input.dataset.row = String(newIndex);
+    });
+
+    // Copy summary column visibility from existing rows (use Bootstrap d-none class)
+    const summaryColumns = newRow.querySelectorAll('.summary-column');
+    const summaryHeader = document.querySelector('.summary-column-header');
+    const isHidden = summaryHeader ? summaryHeader.classList.contains('d-none') : true;
+    summaryColumns.forEach(col => {
+        if (isHidden) {
+            col.classList.add('d-none');
+        } else {
+            col.classList.remove('d-none');
+        }
     });
 
     allSeries.appendChild(newRow);
@@ -41,7 +57,7 @@ function reindexRows() {
 
     const rows = allSeries.getElementsByClassName('series-row');
     for (let i = 0; i < rows.length; i++) {
-        const inputs = rows[i].querySelectorAll('input');
+        const inputs = rows[i].querySelectorAll('input, select');
         inputs.forEach(function (input) {
             const name = input.getAttribute('name');
             if (name) {
@@ -425,4 +441,28 @@ function setSeriesInRow(row, series) {
         if (col === '1') input.value = series.startDate;
         if (col === '2') input.value = series.endDate;
     });
+}
+
+function toggleSummaryColumn() {
+    const summaryColumns = document.querySelectorAll('.summary-column');
+    const summaryHeaders = document.querySelectorAll('.summary-column-header');
+    const toggleBtn = document.getElementById('toggleSummaryColumnBtn');
+
+    // Use Bootstrap's d-none utility instead of inline styles
+    const isHidden = summaryHeaders.length > 0 && summaryHeaders[0].classList.contains('d-none');
+
+    summaryColumns.forEach(col => col.classList.toggle('d-none', !isHidden ? true : false));
+    summaryHeaders.forEach(col => col.classList.toggle('d-none', !isHidden ? true : false));
+
+    if (toggleBtn) {
+        if (isHidden) {
+            toggleBtn.innerHTML = '<span class="fas fa-minus"></span> Hide Summary Series Column';
+            toggleBtn.classList.remove('btn-outline-secondary');
+            toggleBtn.classList.add('btn-secondary');
+        } else {
+            toggleBtn.innerHTML = '<span class="fas fa-plus"></span> Show Summary Series Column';
+            toggleBtn.classList.remove('btn-secondary');
+            toggleBtn.classList.add('btn-outline-secondary');
+        }
+    }
 }

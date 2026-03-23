@@ -36,6 +36,12 @@ namespace SailScores.Core.Scoring
 
         protected IComparer<SeriesCompetitorResults> CompetitorComparer { get; set; }
 
+        // When true, GetBasicScore implementations should use the score's original Place value
+        // as the base rather than computing a rank from allScores.  This is set for:
+        //   - series with no fleet filter (standard scoring, place = score)
+        //   - series with UseFullRaceScores = true (preserve full-race positions)
+        protected bool _useOriginalPlace;
+
         protected BaseScoringCalculator(ScoringSystem scoringSystem)
         {
             ScoringSystem = scoringSystem;
@@ -182,16 +188,16 @@ namespace SailScores.Core.Scoring
             return seriesResults.Competitors.Count;
         }
 
-        protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode)
+        protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
         {
-            var dnfScore = GetDnfScore(race) ?? 1;
+            var dnfScore = GetDnfScore(race, seriesResults) ?? 1;
             var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
             var percent = Math.Round(dnfScore * percentAdjustment / 100m, 1, MidpointRounding.AwayFromZero);
 
             return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
         }
 
-        protected decimal? GetDnfScore(Race race)
+        protected decimal? GetDnfScore(Race race, SeriesResults seriesResults = null)
         {
             var dnfCode = GetScoreCode(DNF_SCORENAME);
             if (IsTrivialCalculation(dnfCode))
@@ -206,12 +212,14 @@ namespace SailScores.Core.Scoring
                 return CalculateRaceBasedValue(new CalculatedScore
                 {
                     RawScore = new Score { Code = dnfCode.Name }
-                }, race);
+                }, race, seriesResults);
             }
 
-            return race.Scores
-                       .Count(s => CountsAsStarted(s)) +
-                        dnfCode.FormulaValue;
+            var relevantScores = (_useOriginalPlace || seriesResults == null)
+                ? race.Scores
+                : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
+
+            return relevantScores.Count(s => CountsAsStarted(s)) + dnfCode.FormulaValue;
         }
 
         protected virtual decimal? GetDefaultScore(Race race, SeriesResults resultsWorkInProgress)
@@ -229,7 +237,7 @@ namespace SailScores.Core.Scoring
                 return CalculateRaceBasedValue(new CalculatedScore
                 {
                     RawScore = new Score { Code = defaultCode.Name }
-                }, race);
+                }, race, resultsWorkInProgress);
             }
             if (IsSeriesBasedScore(defaultCode))
             {
@@ -237,8 +245,12 @@ namespace SailScores.Core.Scoring
                 // the competitors average, but that would create all sort of problems, I think.
                 return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0);
             }
-            return race.Scores.Count(s => CountsAsStarted(s)) +
-                        defaultCode.FormulaValue;
+
+            var relevantScores = (_useOriginalPlace || resultsWorkInProgress == null)
+                ? race.Scores
+                : race.Scores.Where(s => resultsWorkInProgress.Competitors.Any(c => c.Id == s.CompetitorId));
+
+            return relevantScores.Count(s => CountsAsStarted(s)) + defaultCode.FormulaValue;
         }
 
         protected bool IsAverage(string code)
@@ -385,16 +397,32 @@ namespace SailScores.Core.Scoring
         }
 
         // Ensure consistency of submitted results for calculations.
+        // Only scores belonging to series competitors are validated; non-fleet reference
+        // scores (included when UseFullRaceScores=true for correct position counting) are
+        // intentionally skipped.
         protected void ValidateSeries(SeriesResults results, IEnumerable<Score> scores)
         {
-            bool allRacesFound = scores.All(s => results.Races.Any(
-                r => r.Id == s.RaceId
-                    || r == s.Race));
-            bool allCompetitorsFound = scores.All(s => results.Competitors.Any(
-                c => c.Id == s.CompetitorId
-                    || c == s.Competitor));
+            // now that series might filter by fleet, null competitors are possible, so filter them out before validation.
+            var seriesCompetitorIds = results.Competitors.Select(c => c.Id).ToHashSet();
+            var seriesCompetitorRefs = new HashSet<Competitor>(results.Competitors);
 
-            //Used to check and make sure all score codes were found. but no more.
+            // Filter to only the scores that belong to series competitors.
+            var seriesScores = scores
+                .Where(s => seriesCompetitorIds.Contains(s.CompetitorId)
+                    || seriesCompetitorRefs.Contains(s.Competitor))
+                .ToList();
+
+            var raceIds = results.Races.Select(r => r.Id).ToHashSet();
+            var raceRefs = new HashSet<Race>(results.Races, ReferenceEqualityComparer.Instance);
+
+            bool allRacesFound = seriesScores.All(s =>
+                raceIds.Contains(s.RaceId)
+                || raceRefs.Contains(s.Race)
+                || (s.Race != null && raceIds.Contains(s.Race.Id)));
+
+            bool allCompetitorsFound = seriesScores.All(s =>
+                seriesCompetitorIds.Contains(s.CompetitorId)
+                || seriesCompetitorRefs.Contains(s.Competitor));
 
             if (!allRacesFound)
             {
@@ -459,7 +487,13 @@ namespace SailScores.Core.Scoring
 
             if (returnScoreCode == null)
             {
-                returnScoreCode = GetScoreCode(DEFAULT_CODE);
+                // Only fall back to DEFAULT_CODE if we are not already looking it up,
+                // to prevent infinite recursion when DEFAULT_CODE itself is missing.
+                if (!scoreCodeName.Equals(DEFAULT_CODE, CASE_INSENSITIVE))
+                {
+                    returnScoreCode = GetScoreCode(DEFAULT_CODE);
+                }
+
                 if (returnScoreCode == null)
                 {
                     returnScoreCode = new ScoreCode
@@ -578,16 +612,32 @@ namespace SailScores.Core.Scoring
 
         private SeriesResults GetResults(Series series)
         {
+            // Use original race place values when there is no fleet filter (standard scoring)
+            // or when the series is configured to preserve full-race positions.
+            _useOriginalPlace = series.FleetId == null || series.UseFullRaceScores == true;
+
             SeriesResults returnResults = GatherInitialResults(series);
 
-            SetScores(returnResults,
-                series
-                .Races
-                .SelectMany(
-                    r => r
-                        .Scores));
+            SetScores(returnResults, GetScoresForCalculation(series));
 
             return returnResults;
+        }
+
+        // Returns all race scores for non-fleet-filtered series; when a fleet is selected, returns only
+        // the scores belonging to fleet competitors.  The distinction between UseFullRaceScores
+        // true/false is handled inside GetBasicScore via the _useOriginalPlace flag:
+        //   - UseFullRaceScores = false  → GetBasicScore counts fleet competitors ahead → fleet rank
+        //   - UseFullRaceScores = true   → GetBasicScore uses score.Place directly → original position
+        // Race scores in the database are never modified.
+        private IEnumerable<Score> GetScoresForCalculation(Series series)
+        {
+            var allScores = series.Races.SelectMany(r => r.Scores);
+
+            if (series.FleetId == null)
+                return allScores;
+
+            var fleetCompetitorIds = series.Competitors.Select(c => c.Id).ToHashSet();
+            return allScores.Where(s => fleetCompetitorIds.Contains(s.CompetitorId));
         }
 
         private void AddTrend(SeriesResults results, Series series)
@@ -659,28 +709,43 @@ namespace SailScores.Core.Scoring
             {
                 return new List<Race>();
             }
-            var lastRaceId = races
+            var lastRace = races
                 .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                     || r.State == RaceState.Preliminary)
-                .OrderBy(r => r.Date).ThenBy(r => r.Order).Last().Id;
-            return races.Where(r => r.Id != lastRaceId).ToList();
+                .OrderBy(r => r.Date).ThenBy(r => r.Order).LastOrDefault();
+            Guid? lastRaceId;
+            if(lastRace == default)
+            {
+                lastRace = races
+                    .Where(r => r.State == RaceState.Abandoned)
+                    .OrderBy(r => r.Date).ThenBy(r => r.Order).LastOrDefault();
+            }
+            if(lastRace == default)
+            {
+                return new List<Race>();
+            }
+
+            return races.Where(r => r.Id != lastRace.Id).ToList();
         }
 
         private SeriesResults GatherInitialResults(Series series)
         {
+            // When PopulateCompetitorsAsync has already built the competitor list (e.g. with
+            // fleet filtering), use it directly. Otherwise derive from race scores as before.
+            var competitors = series.Competitors?.Any() == true
+                ? series.Competitors.ToList()
+                : series.Races
+                    .SelectMany(r => r.Scores.Select(s => s.Competitor))
+                    .Where(c => c != null && c.Id != default)
+                    .Distinct()
+                    .ToList();
+
             var returnResults = new SeriesResults
             {
                 Races = series.Races
                     .OrderBy(r => r.Date)
                     .ThenBy(r => r.Order).ToList(),
-                Competitors = series
-                    .Races
-                    .SelectMany(
-                        r => r
-                            .Scores
-                            .Select(s => s.Competitor))
-                    .Distinct()
-                    .ToList(),
+                Competitors = competitors,
                 Results = new Dictionary<Competitor, SeriesCompetitorResults>()
             };
 
@@ -728,7 +793,7 @@ namespace SailScores.Core.Scoring
                     }
                     else if (IsRaceBasedValue(scoreCode))
                     {
-                        score.ScoreValue = CalculateRaceBasedValue(score, race);
+                        score.ScoreValue = CalculateRaceBasedValue(score, race, resultsWorkInProgress);
                     }
                 }
             }
@@ -830,19 +895,26 @@ namespace SailScores.Core.Scoring
                 || scoreCode.Formula.Equals(CAMETOSTARTPLUS_FORMULANAME, CASE_INSENSITIVE);
         }
 
-        private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race)
+        private decimal? CalculateRaceBasedValue(CalculatedScore score, Race race, SeriesResults seriesResults = null)
         {
             var scoreCode = GetScoreCode(score.RawScore);
+
+            // When _useOriginalPlace is true (UseFullRaceScores=true or no fleet), use all race scores.
+            // When _useOriginalPlace is false (fleet filtering with recalculation), filter to fleet competitors.
+            var relevantScores = (_useOriginalPlace || seriesResults == null)
+                ? race.Scores
+                : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
+
             return (scoreCode.Formula.ToUpperInvariant()) switch
             {
                 FINISHERSPLUS_FORMULANAME =>
-                    race.Scores.Count(s => CountsAsFinished(s)) +
+                    relevantScores.Count(s => CountsAsFinished(s)) +
                         scoreCode.FormulaValue,
                 CAMETOSTARTPLUS_FORMULANAME =>
-                    race.Scores.Count(s => CameToStart(s)) +
+                    relevantScores.Count(s => CameToStart(s)) +
                         scoreCode.FormulaValue,
                 PLACEPLUSPERCENT_FORMULANAME =>
-                    GetPenaltyScore(score, race, scoreCode),
+                    GetPenaltyScore(score, race, scoreCode, seriesResults),
                 _ =>
                     throw new InvalidOperationException(
                         "Score code definition issue with race based score code."),
@@ -924,5 +996,4 @@ namespace SailScores.Core.Scoring
 
         }
     }
-
 }

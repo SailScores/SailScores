@@ -136,7 +136,7 @@ namespace SailScores.Core.Services
                 .Include(f => f.CompetitorFleets)
                 .ThenInclude(fcf => fcf.Competitor)
                 .AsSplitQuery()
-                .SingleAsync(c => c.Id == fleetId)
+                .FirstOrDefaultAsync(c => c.Id == fleetId)
                 .ConfigureAwait(false);
 
             return _mapper.Map<Fleet>(dbFleet);
@@ -225,13 +225,47 @@ namespace SailScores.Core.Services
 
         public async Task<IEnumerable<DeletableInfo>> GetDeletableInfo(Guid clubId)
         {
-            var usedFleets = _dbContext.Races.Select(r => r.Fleet.Id).Distinct();
-            return _dbContext.Fleets.Where(f => f.ClubId == clubId)
-                .Select(f => new DeletableInfo
+            var usedInRaces = await _dbContext.Races
+                .Where(r => r.Fleet.ClubId == clubId)
+                .Select(r => r.Fleet.Id)
+                .Distinct()
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var usedInSeries = await _dbContext.Series
+                .Where(s => s.ClubId == clubId && s.FleetId != null)
+                .Select(s => s.FleetId.Value)
+                .Distinct()
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var fleets = await _dbContext.Fleets
+                .Where(f => f.ClubId == clubId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return fleets.Select(f =>
+            {
+                var hasRaces = usedInRaces.Contains(f.Id);
+                var hasSeries = usedInSeries.Contains(f.Id);
+                var reasons = new List<string>();
+
+                if (hasRaces)
+                {
+                    reasons.Add("Fleet has races assigned");
+                }
+                if (hasSeries)
+                {
+                    reasons.Add("Fleet is used as a filter in one or more series");
+                }
+
+                return new DeletableInfo
                 {
                     Id = f.Id,
-                    IsDeletable = !usedFleets.Contains(f.Id)   
-                });
+                    IsDeletable = !hasRaces && !hasSeries,
+                    Reason = reasons.Count > 0 ? string.Join("; ", reasons) : string.Empty
+                };
+            });
         }
 
         public async Task<IDictionary<Guid, IEnumerable<Guid>>> GetClubRegattaFleets(Guid clubId)

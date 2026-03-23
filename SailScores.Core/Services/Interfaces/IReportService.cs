@@ -23,6 +23,11 @@ public interface IReportService
         DateTime? startDate = null,
         DateTime? endDate = null);
     Task<CompHistogram> GetAllCompHistogramStats(Guid clubId, DateTime? startDate = null, DateTime? endDate = null);
+
+    Task<IList<SeriesParticipationStats>> GetSeriesParticipationStats(
+        string clubInitials,
+        DateTime? startDate = null,
+        DateTime? endDate = null);
 }
 
 public class WindDataPoint

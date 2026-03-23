@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Identity.Entities;
+using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
@@ -14,15 +15,18 @@ public class SiteAdminController : Controller
     private readonly IWebSiteAdminService _siteAdminService;
     private readonly IAuthorizationService _authService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IStripeService _stripeService;
 
     public SiteAdminController(
         IWebSiteAdminService siteAdminService,
         IAuthorizationService authService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IStripeService stripeService)
     {
         _siteAdminService = siteAdminService;
         _authService = authService;
         _userManager = userManager;
+        _stripeService = stripeService;
     }
 
     // GET: SiteAdmin
@@ -140,6 +144,18 @@ public class SiteAdminController : Controller
         await _siteAdminService.RecalculateSeriesAsync(seriesId, userName);
         TempData["Message"] = "Series has been recalculated successfully.";
         return RedirectToAction(nameof(Details), new { clubInitials });
+    }
+
+    // GET: SiteAdmin/StripeConfiguration
+    public async Task<ActionResult> StripeConfiguration()
+    {
+        if (!await _authService.IsUserFullAdmin(User))
+        {
+            return Unauthorized();
+        }
+
+        var vm = await _stripeService.ValidateConfigurationAsync();
+        return View(vm);
     }
 
     private async Task<string> GetUserStringAsync()
