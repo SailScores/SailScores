@@ -40,7 +40,7 @@
                 <tr>
                     <th>
                         <a asp-action="Index" asp-route-sortOrder="@Model.NameSortParm" class="text-decoration-none">
-                            Club Name @(Model.CurrentSort == null || Model.CurrentSort == "" ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.NameDesc ? "↓" : ""))
+                            Club Name @(Model.CurrentSort == SiteAdminSortOrders.NameAsc ? "↑" : (Model.CurrentSort == SiteAdminSortOrders.NameDesc ? "↓" : ""))
                         </a>
                     </th>
                     <th>Initials</th>
