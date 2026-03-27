@@ -42,23 +42,28 @@ public class WebSiteAdminService : IWebSiteAdminService
             LatestRaceDate = c.latestRaceDate
         }).ToList();
 
+        var currentSort = string.IsNullOrWhiteSpace(sortOrder)
+            ? SiteAdminSortOrders.UpdateDesc
+            : sortOrder;
+
         var viewModel = new SiteAdminIndexViewModel
         {
-            CurrentSort = sortOrder,
-            NameSortParm = string.IsNullOrEmpty(sortOrder) ? SiteAdminSortOrders.NameDesc : "",
-            UpdateSortParm = sortOrder == SiteAdminSortOrders.UpdateAsc ? SiteAdminSortOrders.UpdateDesc : SiteAdminSortOrders.UpdateAsc,
-            RaceSortParm = sortOrder == SiteAdminSortOrders.RaceAsc ? SiteAdminSortOrders.RaceDesc : SiteAdminSortOrders.RaceAsc,
+            CurrentSort = currentSort,
+            NameSortParm = currentSort == SiteAdminSortOrders.NameAsc ? SiteAdminSortOrders.NameDesc : SiteAdminSortOrders.NameAsc,
+            UpdateSortParm = currentSort == SiteAdminSortOrders.UpdateAsc ? SiteAdminSortOrders.UpdateDesc : SiteAdminSortOrders.UpdateAsc,
+            RaceSortParm = currentSort == SiteAdminSortOrders.RaceAsc ? SiteAdminSortOrders.RaceDesc : SiteAdminSortOrders.RaceAsc,
             Clubs = clubSummaries
         };
 
-        viewModel.Clubs = sortOrder switch
+        viewModel.Clubs = currentSort switch
         {
+            SiteAdminSortOrders.NameAsc => viewModel.Clubs.OrderBy(c => c.Name).ToList(),
             SiteAdminSortOrders.NameDesc => viewModel.Clubs.OrderByDescending(c => c.Name).ToList(),
             SiteAdminSortOrders.UpdateAsc => viewModel.Clubs.OrderBy(c => c.LatestSeriesUpdate).ToList(),
             SiteAdminSortOrders.UpdateDesc => viewModel.Clubs.OrderByDescending(c => c.LatestSeriesUpdate).ToList(),
             SiteAdminSortOrders.RaceAsc => viewModel.Clubs.OrderBy(c => c.LatestRaceDate).ToList(),
             SiteAdminSortOrders.RaceDesc => viewModel.Clubs.OrderByDescending(c => c.LatestRaceDate).ToList(),
-            _ => viewModel.Clubs.OrderBy(c => c.Name).ToList(),
+            _ => viewModel.Clubs.OrderByDescending(c => c.LatestSeriesUpdate).ToList(),
         };
 
         return viewModel;

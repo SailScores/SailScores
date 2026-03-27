@@ -44,7 +44,12 @@ public class SailScoresTelemetryInitializer : ITelemetryInitializer
             // Add user context if authenticated
             if (context.User?.Identity?.IsAuthenticated == true)
             {
-                telemetry.Context.User.AuthenticatedUserId = context.User.Identity.Name;
+                var userId = context.User.FindFirst("sub")?.Value
+                    ?? context.User.Identity?.Name;
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    telemetry.Context.User.AuthenticatedUserId = userId;
+                }
             }
         }
 

@@ -17,8 +17,11 @@
 
     function drawChart(elementId, competitorId, seasonName ) {
         var chartElementId = elementId;
-        var dataPath = "/competitor/chart?competitorId=" + competitorId +
-            "&seasonName=" + seasonName;
+        var params = new URLSearchParams({
+            competitorId: competitorId,
+            seasonName: seasonName
+        });
+        var dataPath = "/competitor/chart?" + params.toString();
         if (typeof(d3) != "undefined" && d3 != null) {
             d3.json(dataPath).then(processChartData);
         }

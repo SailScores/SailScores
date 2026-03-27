@@ -106,9 +106,13 @@
         <link rel="stylesheet" type="text/css" href="~/css/weather-icons.min.css" />
         <link rel="stylesheet" type="text/css" href="~/css/weather-icons-wind.min.css" />
     </noscript>
-    @if ((bool?)ViewData["EnableAppInsights"] ?? false)
+    @if (SignInManager.IsSignedIn(User))
     {
-        @Html.Raw(JavaScriptSnippet.FullScript)
+        var aiUser = await UserManager.GetUserAsync(User);
+        @if (aiUser?.EnableAppInsights ?? false)
+        {
+            @Html.Raw(JavaScriptSnippet.FullScript)
+        }
     }
 
     <environment include="Development">
