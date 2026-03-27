@@ -5,6 +5,7 @@
 
 @{
     ViewData["Title"] = "Log in";
+    var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 }
 
 @section AdditionalMeta
@@ -51,37 +52,68 @@
             </form>
         </section>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        @*<section>
-                <h4>Use another service to log in.</h4>
+    @if (loginProviders.Count > 0)
+    {
+        <div class="col-md-5 col-md-offset-1">
+            <section>
+                <h4>Or sign in with</h4>
                 <hr />
-                @{
-                    var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    if (loginProviders.Count == 0)
-                    {
-                        <div>
-                            <p>
-                                There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
-                                for details on setting up this ASP.NET application to support logging in via external services.
-                            </p>
-                        </div>
-                    }
-                    else
-                    {
-                        <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
-                            <div>
-                                <p>
-                                    @foreach (var provider in loginProviders)
-                                    {
-                                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.Name</button>
-                                    }
-                                </p>
-                            </div>
-                        </form>
-                    }
-                }
-            </section>*@
-    </div>
+                <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                    <div class="d-flex flex-column gap-2" style="max-width:280px;">
+                        @foreach (var provider in loginProviders)
+                        {
+                            @switch (provider.Name)
+                            {
+                                case "Google":
+                                    <button type="submit" name="provider" value="Google"
+                                            class="btn w-100 fw-semibold"
+                                            style="background-color:#4285F4;color:#fff;border-color:#4285F4;"
+                                            title="Sign in with your Google account">
+                                        <i class="fab fa-google me-2"></i>Sign in with Google
+                                    </button>
+                                    break;
+
+                                case "Microsoft":
+                                case "MicrosoftAccount":
+                                    <button type="submit" name="provider" value="@provider.Name"
+                                            class="btn w-100 fw-semibold"
+                                            style="background-color:#2F2F2F;color:#fff;border-color:#2F2F2F;"
+                                            title="Sign in with your Microsoft account">
+                                        <i class="fab fa-microsoft me-2"></i>Sign in with Microsoft
+                                    </button>
+                                    break;
+
+                                case "Apple":
+                                    <button type="submit" name="provider" value="Apple"
+                                            class="btn btn-dark w-100 fw-semibold"
+                                            title="Sign in with your Apple ID">
+                                        <i class="fab fa-apple me-2"></i>Sign in with Apple
+                                    </button>
+                                    break;
+
+                                case "Facebook":
+                                    <button type="submit" name="provider" value="Facebook"
+                                            class="btn w-100 fw-semibold"
+                                            style="background-color:#1877F2;color:#fff;border-color:#1877F2;"
+                                            title="Sign in with your Facebook account">
+                                        <i class="fab fa-facebook me-2"></i>Sign in with Facebook
+                                    </button>
+                                    break;
+
+                                default:
+                                    <button type="submit" name="provider" value="@provider.Name"
+                                            class="btn btn-secondary w-100"
+                                            title="Sign in using your @provider.DisplayName account">
+                                        @provider.DisplayName
+                                    </button>
+                                    break;
+                            }
+                        }
+                    </div>
+                </form>
+            </section>
+        </div>
+    }
 </div>
 
 @section Scripts {

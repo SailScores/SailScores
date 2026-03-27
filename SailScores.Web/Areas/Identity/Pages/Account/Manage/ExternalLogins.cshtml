@@ -1,0 +1,122 @@
+@page
+@model ExternalLoginsModel
+@{
+    ViewData["Title"] = "External logins";
+    ViewData["ActivePage"] = ManageNavPages.ExternalLogins;
+}
+
+<h4>@ViewData["Title"]</h4>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    var isError = Model.StatusMessage.StartsWith("Error", StringComparison.OrdinalIgnoreCase);
+    <div class="alert @(isError ? "alert-danger" : "alert-success") alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @Model.StatusMessage
+    </div>
+}
+
+@if (Model.CurrentLogins?.Count > 0)
+{
+    <h5>Linked accounts</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Provider</th>
+                <th>Display name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var login in Model.CurrentLogins)
+            {
+                <tr>
+                    <td>@login.LoginProvider</td>
+                    <td>@login.ProviderDisplayName</td>
+                    <td>
+                        @if (Model.ShowRemoveButton)
+                        {
+                            <form asp-page-handler="RemoveLogin" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="loginProvider" value="@login.LoginProvider" />
+                                <input type="hidden" name="providerKey" value="@login.ProviderKey" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        title="Remove @login.ProviderDisplayName login">
+                                    Remove
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">
+                                Set a password before removing this login.
+                            </span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.OtherLogins?.Count > 0)
+{
+    <h5 class="mt-4">Add another account</h5>
+    <p class="text-muted">
+        Link an additional sign-in provider to your account.
+        You can then use it to sign in even if you forget your password.
+    </p>
+    <form asp-page-handler="LinkLogin" method="post">
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var provider in Model.OtherLogins)
+            {
+                @switch (provider.Name)
+                {
+                    case "Google":
+                        <button type="submit" name="provider" value="Google"
+                                class="btn fw-semibold"
+                                style="background-color:#4285F4;color:#fff;border-color:#4285F4;">
+                            <i class="fab fa-google me-1"></i>Add Google
+                        </button>
+                        break;
+
+                    case "Microsoft":
+                    case "MicrosoftAccount":
+                        <button type="submit" name="provider" value="@provider.Name"
+                                class="btn fw-semibold"
+                                style="background-color:#2F2F2F;color:#fff;border-color:#2F2F2F;">
+                            <i class="fab fa-microsoft me-1"></i>Add Microsoft
+                        </button>
+                        break;
+
+                    case "Apple":
+                        <button type="submit" name="provider" value="Apple"
+                                class="btn btn-dark fw-semibold">
+                            <i class="fab fa-apple me-1"></i>Add Apple
+                        </button>
+                        break;
+
+                    case "Facebook":
+                        <button type="submit" name="provider" value="Facebook"
+                                class="btn fw-semibold"
+                                style="background-color:#1877F2;color:#fff;border-color:#1877F2;">
+                            <i class="fab fa-facebook me-1"></i>Add Facebook
+                        </button>
+                        break;
+
+                    default:
+                        <button type="submit" name="provider" value="@provider.Name"
+                                class="btn btn-secondary">
+                            Add @provider.DisplayName
+                        </button>
+                        break;
+                }
+            }
+        </div>
+    </form>
+}
+
+@if (Model.CurrentLogins?.Count == 0 && Model.OtherLogins?.Count == 0)
+{
+    <p class="text-muted">No external login providers are configured.</p>
+}
