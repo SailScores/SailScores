@@ -127,7 +127,7 @@ public class CompetitorController : Controller
     }
 
     [AllowAnonymous]
-    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "competitorId", "seasonName" })]
     public async Task<JsonResult> Chart(
         Guid competitorId,
         string seasonName)
