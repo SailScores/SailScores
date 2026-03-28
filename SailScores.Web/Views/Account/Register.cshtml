@@ -17,28 +17,28 @@
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="FirstName"></label>
-                <input asp-for="FirstName" class="form-control" />
+                <input asp-for="FirstName" class="form-control" autocomplete="given-name" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="LastName"></label>
-                <input asp-for="LastName" class="form-control" />
+                <input asp-for="LastName" class="form-control" autocomplete="family-name" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" class="form-control" autocomplete="email" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control" autocomplete="new-password" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="ConfirmPassword"></label>
-                <input asp-for="ConfirmPassword" class="form-control" />
+                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
 
@@ -46,13 +46,16 @@
                 <input asp-for="EnableAppInsights" class="form-check-input" />
                 <label asp-for="EnableAppInsights" class="form-check-label"></label>
                 <span asp-validation-for="EnableAppInsights" class="text-danger"></span>
-                <div class="alert alert-primary" role="alert">
-                    If checked, SailScores will record information about the page speed and errors you encounter.
-                    This will greatly assist in improving the service. No data is shared with any other organization. See our
-                    <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a> for details.
+                <div class="border rounded p-3 mb-3 bg-body-tertiary text-body">
+                    <div class="small text-body-secondary">
+                        If checked, SailScores will record information about the page speed and errors you encounter.
+                        This will greatly assist in improving the service. No data is shared with any other organization. See our
+                        <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a> for details.
+                    </div>
                 </div>
             </div>
-@*             <div class="mb-3 form-check">
+            @await Html.PartialAsync("_TurnstileWidget")
+            @*             <div class="mb-3 form-check">
                 <input asp-for="NewsletterSubscribe" class="form-check-input" />
                 <label asp-for="NewsletterSubscribe" class="form-check-label"></label>
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>

@@ -33,6 +33,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ITemplateHelper, TemplateHelper>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ISpeechService, SpeechService>();
+        services.AddScoped<ITurnstileService, TurnstileService>();
         services.AddScoped<ISystemAlertService, SystemAlertService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<ISupporterService, SupporterService>();

@@ -42,6 +42,8 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 - **Views** should focus on data presentation, not business logic
 - Users with `UserClubPermission.CanEditAllClubs` are treated as super-admins (full admin) who bypass normal club-specific permission checks.
 - **Administrative features** must always use restrictive authorization policies (e.g., `[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]`).
+- **UI Changes**: Support dark mode; avoid forcing light-only styling and prefer theme-aware options like auto/adaptive themes.
+- **Line Length**: Keep line length at 120 characters or less in all files and honor all .editorconfig settings.
 
 ## Development Setup
 

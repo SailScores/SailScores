@@ -43,14 +43,14 @@
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label asp-for="ContactFirstName"></label>
-                        <input asp-for="ContactFirstName" class="form-control" />
+                        <input asp-for="ContactFirstName" class="form-control" autocomplete="given-name" />
                         <span asp-validation-for="ContactFirstName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label asp-for="ContactLastName"></label>
-                        <input asp-for="ContactLastName" class="form-control" />
+                        <input asp-for="ContactLastName" class="form-control" autocomplete="family-name" />
                         <span asp-validation-for="ContactLastName" class="text-danger"></span>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label asp-for="ContactEmail" class="control-label"></label>
-                        <input asp-for="ContactEmail" class="form-control" />
+                        <input asp-for="ContactEmail" class="form-control" autocomplete="email" />
                         <span asp-validation-for="ContactEmail" class="text-danger"></span>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label asp-for="Password"></label>
-                        <input asp-for="Password" class="form-control" />
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" />
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label asp-for="ConfirmPassword"></label>
-                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                 </div>
@@ -143,6 +143,13 @@
                         <label asp-for="Comments" class="control-label"></label>
                         <textarea asp-for="Comments" class="form-control" cols="60" rows="6"></textarea>
                         <span asp-validation-for="Comments" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="mb-3">
+                        @await Html.PartialAsync("_TurnstileWidget")
                     </div>
                 </div>
             </div>
