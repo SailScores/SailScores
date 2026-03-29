@@ -83,6 +83,8 @@ public class AccountController : Controller
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                await UpdateLastSuccessfulLoginAsync(user);
                 string homeClub = await _authService.GetHomeClub(model.Email);
 
                 //if they have a home club and return url isn't in it
@@ -163,6 +165,7 @@ public class AccountController : Controller
         if (result.Succeeded)
         {
             _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+            await UpdateLastSuccessfulLoginAsync(user);
             return RedirectToLocal(returnUrl);
         }
         else if (result.IsLockedOut)
@@ -219,6 +222,7 @@ public class AccountController : Controller
         if (result.Succeeded)
         {
             _logger.LogInformation("User with ID {UserId} logged in with a recovery code.", user.Id);
+            await UpdateLastSuccessfulLoginAsync(user);
             return RedirectToLocal(returnUrl);
         }
         if (result.IsLockedOut)
@@ -284,6 +288,7 @@ public class AccountController : Controller
             await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
             await _signInManager.SignInAsync(user, isPersistent: false);
+            await UpdateLastSuccessfulLoginAsync(user);
             _logger.LogInformation("User created a new account with password.");
 
             return RedirectToLocal(returnUrl);
@@ -348,6 +353,7 @@ public class AccountController : Controller
             if (existingUser != null)
             {
                 await RefreshUserProfileFromExternalLoginAsync(existingUser, info);
+                await UpdateLastSuccessfulLoginAsync(existingUser);
             }
             _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
             return RedirectToLocal(returnUrl);
@@ -371,6 +377,7 @@ public class AccountController : Controller
                 {
                     await RefreshUserProfileFromExternalLoginAsync(localUser, info);
                     await _signInManager.SignInAsync(localUser, isPersistent: false);
+                    await UpdateLastSuccessfulLoginAsync(localUser);
                     _logger.LogInformation(
                         "Linked {Provider} external login to existing account for {Email}.",
                         info.LoginProvider, email);
@@ -435,6 +442,7 @@ public class AccountController : Controller
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                    await UpdateLastSuccessfulLoginAsync(user);
                     _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
                     // Redirect to profile update when placeholder names were used.
@@ -569,6 +577,7 @@ public class AccountController : Controller
         if (result.Succeeded)
         {
             var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
+            await UpdateLastSuccessfulLoginAsync(appUser);
             return await GenerateJwtToken(model.Email, appUser);
         }
 
@@ -576,6 +585,17 @@ public class AccountController : Controller
     }
 
     #region Helpers
+
+    private async Task UpdateLastSuccessfulLoginAsync(ApplicationUser user)
+    {
+        if (user == null)
+        {
+            return;
+        }
+
+        user.LastSuccessfulLoginUtc = DateTimeOffset.UtcNow;
+        await _userManager.UpdateAsync(user);
+    }
 
     private void AddErrors(IdentityResult result)
     {
