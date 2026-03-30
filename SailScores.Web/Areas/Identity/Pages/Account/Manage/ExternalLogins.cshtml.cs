@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SailScores.Identity.Entities;
+using SailScores.Web.Services;
 
 namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -15,15 +16,18 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserStore<ApplicationUser> _userStore;
+        private readonly AppSettingsService _appSettingsService;
 
         public ExternalLoginsModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IUserStore<ApplicationUser> userStore)
+            IUserStore<ApplicationUser> userStore,
+            AppSettingsService appSettingsService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _userStore = userStore;
+            _appSettingsService = appSettingsService;
         }
 
         /// <summary>External login providers currently linked to this account.</summary>
@@ -52,9 +56,11 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
 
             CurrentLogins = await _userManager.GetLoginsAsync(user);
 
-            OtherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
-                .Where(scheme => CurrentLogins.All(ul => ul.LoginProvider != scheme.Name))
-                .ToList();
+            OtherLogins = _appSettingsService.IsExternalAuthenticationEnabled()
+                ? (await _signInManager.GetExternalAuthenticationSchemesAsync())
+                    .Where(scheme => CurrentLogins.All(ul => ul.LoginProvider != scheme.Name))
+                    .ToList()
+                : new List<AuthenticationScheme>();
 
             // The user can only remove a login if another sign-in method exists.
             string passwordHash = null;
@@ -93,6 +99,12 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
         /// </summary>
         public async Task<IActionResult> OnPostLinkLoginAsync(string provider)
         {
+            if (!_appSettingsService.IsExternalAuthenticationEnabled())
+            {
+                StatusMessage = "Error: External login providers are currently unavailable.";
+                return RedirectToPage();
+            }
+
             // Clear any leftover external cookie before starting a new challenge.
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
@@ -108,6 +120,12 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
         /// </summary>
         public async Task<IActionResult> OnGetLinkLoginCallbackAsync()
         {
+            if (!_appSettingsService.IsExternalAuthenticationEnabled())
+            {
+                StatusMessage = "Error: External login providers are currently unavailable.";
+                return RedirectToPage();
+            }
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

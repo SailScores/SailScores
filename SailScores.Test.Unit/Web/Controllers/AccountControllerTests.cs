@@ -15,6 +15,7 @@ using Moq;
 using SailScores.Identity.Entities;
 using SailScores.Web.Controllers;
 using SailScores.Web.Models.AccountViewModels;
+using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using Xunit;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -38,14 +39,15 @@ public class AccountControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
+        var configuration = new ConfigurationBuilder().Build();
         var controller = new AccountController(
             userManagerMock.Object,
             signInManagerMock.Object,
             emailSenderMock.Object,
             authServiceMock.Object,
             Mock.Of<ILogger<AccountController>>(),
-            new ConfigurationBuilder().Build(),
-            turnstileServiceMock.Object);
+            turnstileServiceMock.Object,
+            new AppSettingsService(configuration));
 
         SetHttpContext(controller, "bad-token");
 
@@ -95,14 +97,15 @@ public class AccountControllerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
+        var configuration = new ConfigurationBuilder().Build();
         var controller = new AccountController(
             userManagerMock.Object,
             signInManagerMock.Object,
             new Mock<IEmailSender>().Object,
             new Mock<IAuthorizationService>().Object,
             Mock.Of<ILogger<AccountController>>(),
-            new ConfigurationBuilder().Build(),
-            turnstileServiceMock.Object);
+            turnstileServiceMock.Object,
+            new AppSettingsService(configuration));
 
         SetHttpContext(controller, "good-token");
 

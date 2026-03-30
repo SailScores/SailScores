@@ -1,11 +1,16 @@
+@using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using SailScores.Identity.Entities
+@using SailScores.Web.Services
 @model SailScores.Web.Models.AccountViewModels.LoginViewModel
 @inject SignInManager<ApplicationUser> SignInManager
+@inject AppSettingsService AppSettingsService
 
 @{
     ViewData["Title"] = "Log in";
-    var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+    var loginProviders = AppSettingsService.IsExternalAuthenticationEnabled()
+        ? (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+        : new List<AuthenticationScheme>();
 }
 
 @section AdditionalMeta

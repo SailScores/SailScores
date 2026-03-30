@@ -10,7 +10,6 @@ using SailScores.Web.Services;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using SailScores.Identity.Entities;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -28,8 +27,8 @@ public class AccountController : Controller
     private readonly IEmailSender _emailSender;
     private readonly IAuthorizationService _authService;
     private readonly ILogger _logger;
-    private readonly IConfiguration _configuration;
     private readonly ITurnstileService _turnstileService;
+    private readonly AppSettingsService _appSettingsService;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
@@ -37,16 +36,16 @@ public class AccountController : Controller
         IEmailSender emailSender,
         IAuthorizationService authService,
         ILogger<AccountController> logger,
-        IConfiguration configuration,
-        ITurnstileService turnstileService)
+        ITurnstileService turnstileService,
+        AppSettingsService appSettingsService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _emailSender = emailSender;
         _authService = authService;
         _logger = logger;
-        _configuration = configuration;
         _turnstileService = turnstileService;
+        _appSettingsService = appSettingsService;
     }
 
     [TempData]
@@ -319,6 +318,11 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult ExternalLogin(string provider, string returnUrl = null)
     {
+        if (!_appSettingsService.IsExternalAuthenticationEnabled())
+        {
+            return NotFound();
+        }
+
         // Request a redirect to the external login provider.
         var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -331,6 +335,11 @@ public class AccountController : Controller
         string returnUrl = null,
         string remoteError = null)
     {
+        if (!_appSettingsService.IsExternalAuthenticationEnabled())
+        {
+            return NotFound();
+        }
+
         if (remoteError != null)
         {
             ErrorMessage = $"Error from external provider: {remoteError}";
@@ -408,6 +417,11 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginViewModel model, string returnUrl = null)
     {
+        if (!_appSettingsService.IsExternalAuthenticationEnabled())
+        {
+            return NotFound();
+        }
+
         if (ModelState.IsValid)
         {
             // Get the information about the user from the external login provider
@@ -627,13 +641,15 @@ public class AccountController : Controller
             new Claim(ClaimTypes.NameIdentifier, user.Id)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_appSettingsService.GetJwtKey()));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
+        var expires = DateTime.Now.AddDays(_appSettingsService.GetJwtExpireDays());
+        var issuer = _appSettingsService.GetJwtIssuer();
 
         var token = new JwtSecurityToken(
-            _configuration["JwtIssuer"],
-            _configuration["JwtIssuer"],
+            issuer,
+            issuer,
             claims,
             expires: expires,
             signingCredentials: creds

@@ -122,7 +122,6 @@ public class Startup
                     ValidIssuer = Configuration["JwtIssuer"],
                     ValidAudience = Configuration["JwtIssuer"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
-
                     ClockSkew = TimeSpan.Zero // remove delay of token when expire
                 };
             });
@@ -406,6 +405,11 @@ public class Startup
     // ─────────────────────────────────────────────────────────────────────────
     private void ConfigureExternalAuthentication(AuthenticationBuilder authBuilder)
     {
+        if (!Configuration.GetValue<bool>(AppSettingsService.ExternalIdentityProvidersEnabledKey))
+        {
+            return;
+        }
+
         // ── Google ────────────────────────────────────────────────────────────
         // Credentials: Google Cloud Console → APIs & Services → Credentials
         // Callback path (default): /signin-google
