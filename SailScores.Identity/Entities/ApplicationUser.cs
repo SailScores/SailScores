@@ -10,6 +10,7 @@ namespace SailScores.Identity.Entities
         public string LastName { get; set; }
         public bool? EnableAppInsights { get; set; }
         public DateTimeOffset? LastSuccessfulLoginUtc { get; set; }
+        public DateTimeOffset? CreatedUtc { get; set; }
 
         [StringLength(10)]
         public string SpeechRecognitionLanguage { get; set; }

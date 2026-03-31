@@ -93,7 +93,8 @@ public class ClubRequestController : Controller
             Email = request.ContactEmail,
             FirstName = request.ContactFirstName,
             LastName = request.ContactLastName,
-            EnableAppInsights = request.EnableAppInsights
+            EnableAppInsights = request.EnableAppInsights,
+            CreatedUtc = DateTimeOffset.UtcNow
         };
         var result = await _userManager.CreateAsync(user, request.Password);
         if(!result.Succeeded)

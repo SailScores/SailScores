@@ -275,7 +275,8 @@ public class AccountController : Controller
             Email = model.Email,
             FirstName = model.FirstName,
             LastName = model.LastName,
-            EnableAppInsights = model.EnableAppInsights
+            EnableAppInsights = model.EnableAppInsights,
+            CreatedUtc = DateTimeOffset.UtcNow
         };
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
