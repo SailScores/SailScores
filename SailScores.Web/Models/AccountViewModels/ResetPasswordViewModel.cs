@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.AccountViewModels
 {
@@ -6,6 +6,7 @@ namespace SailScores.Web.Models.AccountViewModels
     {
         [Required]
         [EmailAddress]
+        [Display(Name = "Username (usually your email address)")]
         public string Email { get; set; }
 
         [Required]

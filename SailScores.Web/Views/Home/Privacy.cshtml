@@ -54,11 +54,18 @@
     </p>
     <ul>
         <li>
-            <strong>Basic account information: </strong>We ask for basic information from you
-            in order to set up your account. For example, we require individuals who sign up for
-            a SailScores.com account to provide a name, email address, and password, — and that’s
-            it. A preferred language for speech recognition may be provided, but
+            <strong>Basic account information: </strong>When you create a SailScores account directly,
+            we ask for basic information such as your name, email address, and password. We may also
+            use a CAPTCHA or similar security check during account creation to help prevent automated
+            signups and abuse. A preferred language for speech recognition may be provided, but
             changing from the default is optional.
+        </li>
+        <li>
+            <strong>External sign-in information:</strong> If you choose to sign in or create an
+            account using an external identity provider, such as Microsoft, Google, or GitHub when
+            available, we receive the information that provider shares with us. This may include your
+            name, email address, a provider-specific account identifier, and profile image. We do not
+            receive your password from the external provider.
         </li>
         <li>
             <strong>Public profile information:</strong> If you have an account with us, we
@@ -143,12 +150,20 @@
             example, calculate how many people visit our Services from certain geographic regions.
         </li>
         <li>
+            <strong>Bot and abuse prevention information:</strong> When we protect account creation
+            or sign-in flows with Cloudflare Turnstile or similar services, those services may
+            receive technical and interaction data such as IP address, browser and device
+            characteristics, and security signals to help determine whether a request appears to be
+            from a human and to help prevent abuse.
+        </li>
+        <li>
             <strong>Information from cookies &amp; other technologies:</strong> A cookie is
             a string of information that a website stores on a visitor’s computer, and that the
             visitor’s browser provides to the website each time the visitor returns. SailScores
-            uses cookies to allow logged in users to stay logged in across sessions and to keep
-            track of a few user preferences, such as sort order. Users who do not log in will
-            not receive cookies from SailScores.
+            uses cookies and similar technologies to allow logged in users to stay logged in across
+            sessions, to keep track of user preferences such as sort order, and to support sign-in,
+            account creation, and security features. Some of these technologies may be used even
+            before you sign in, for example during an external sign-in flow or a security check.
         </li>
     </ul>
 </section>
@@ -162,7 +177,8 @@
         <li>
             <strong>To provide our Services.</strong> For example, to set up and maintain your
             account, host your club information, backup and restore your information, resolve
-            data problems, and verify user information.
+            data problems, authenticate you, and verify that account creation and sign-in requests
+            are legitimate.
         </li>
         <li>
             <strong>To ensure quality and improve our Services.</strong> For example,
@@ -173,9 +189,10 @@
         <li>
             <strong>To protect our Services, our users, and the public.</strong> For example, by
             detecting security incidents; detecting and protecting against malicious, deceptive,
-            fraudulent, or illegal activity; fighting spam; complying with our legal obligations;
-            and protecting the rights and property of SailScores and others, which may result in us,
-            for example, declining a request or terminating Services.
+            fraudulent, or illegal activity; fighting spam; preventing automated account creation;
+            complying with our legal obligations; and protecting the rights and property of
+            SailScores and others, which may result in us, for example, declining a request or
+            terminating Services.
         </li>
         <li>
             <strong>To fix problems with our Services.</strong> For example, by monitoring,
@@ -227,9 +244,9 @@
             to the functioning of the Services.
         </li>
         <li>
-            <strong>Third-party vendors:</strong> 
+            <strong>Third-party vendors:</strong>
             We may share information about you with third-party vendors who need the information
-            in order to provide their services to us. Currently, this includes two vendors:
+            in order to provide their services to us. Currently, this includes the following vendors:
             <ul>
                 <li>
                     Microsoft, to provide Speech and Image Recognition services. Their privacy
@@ -238,16 +255,28 @@
                         target="">Azure Cognitive Services</a>.
                 </li>
                 <li>
+                    Cloudflare, to provide Turnstile CAPTCHA and related abuse-prevention services.
+                    Cloudflare may process technical, network, and interaction information needed to
+                    help determine whether account creation or sign-in activity is legitimate. Their
+                    privacy policy is located at
+                    <a href="https://www.cloudflare.com/privacypolicy/">https://www.cloudflare.com/privacypolicy/</a>.
+                </li>
+                <li>
                   Stripe, to process payments. We send the club initials if you are
                   a scorekeeper to Stripe, so that we can associate a payment with a particular club. Stripe's
                   Privacy policy is located at <a href="https://stripe.com/privacy">https://stripe.com/privacy</a>.
                 </li>
             </ul>
             In the future we may use other vendors to help us provide our Services to
-            you, such as postal
+            you, such as identity providers, postal
             and email delivery services that help us stay in touch with you. We require vendors
             commit to customer privacy, including obligations that disallow the resale of our users'
-            data. 
+            data.
+        </li>
+        <li>
+            <strong>External identity providers:</strong> If you choose to sign in using an external
+            identity provider, we share the information needed to complete that sign-in and receive
+            the information the provider returns to us so we can authenticate your account.
         </li>
         <li>
             <strong>Legal and regulatory requirements:</strong> We may disclose information about
@@ -314,7 +343,7 @@
         For example, we keep web server logs that record information about a visitor to SailScore’s
         websites, like the visitor’s IP address, browser type, and operating system, for
         approximately 30 days. We retain the logs for this period of time in order to, among other things,
-        analyze traffic to SailScores’s Services and investigate issues if something goes wrong on 
+        analyze traffic to SailScores’s Services and investigate issues if something goes wrong on
         our websites.
     </p>
 </section>
@@ -334,6 +363,11 @@
             <strong>Limit the information that you provide:</strong> If you have an account with us,
             you can choose not to provide the optional club and score information. Use of speech
             recognition is optional.
+        </li>
+        <li>
+            <strong>Choose how you sign in:</strong> we offer both direct account creation and
+            external identity providers, you can choose which option to use. If you prefer not to use
+            an external identity provider, you can create and use a direct SailScores account.
         </li>
         <li>
             <strong>Limit access to information on your computing device:</strong> Your device
@@ -497,6 +531,8 @@
 <section id="change-log">
     <h3>Change log</h3>
     <ul>
+        <li><em>April 4, 2026:</em> Added Cloudflare Turnstile account protection details and
+            external identity provider support details.</li>
         <li><em>December 1, 2025:</em> Added details for upcoming features: Azure ComputerVision and
             Stripe payment processing.</li>
         <li><em>December 29, 2024:</em> Added preference storage to cookie description. We have added

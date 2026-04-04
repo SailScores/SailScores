@@ -6,6 +6,7 @@ namespace SailScores.Web.Models.AccountViewModels
     {
         [Required]
         [EmailAddress]
+        [Display(Name = "Username (usually your email address)")]
         public string Email { get; set; }
 
         [Display(Name = "First Name")]
