@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Api.Dtos.Public
@@ -10,6 +9,7 @@ namespace SailScores.Api.Dtos.Public
         public string Version { get; set; }
 
         [Required]
-        public IList<PublicLinkDto> Links { get; set; } = new List<PublicLinkDto>();
+        [StringLength(500)]
+        public string ClubsIndexUrl { get; set; }
     }
 }

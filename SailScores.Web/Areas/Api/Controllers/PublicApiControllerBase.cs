@@ -6,6 +6,11 @@ namespace SailScores.Web.Areas.Api.Controllers
     [ApiController]
     public abstract class PublicApiControllerBase : ControllerBase
     {
+        protected void SetPublicCacheHeaders(int maxAgeSeconds)
+        {
+            Response.Headers["Cache-Control"] = $"public,max-age={maxAgeSeconds}";
+        }
+
         protected ActionResult BadRequestProblem(string detail, string errorCode)
         {
             return ProblemResponse(

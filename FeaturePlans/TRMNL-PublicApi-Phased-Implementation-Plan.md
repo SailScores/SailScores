@@ -12,11 +12,13 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
 - Canonical JSON endpoints live under `/api/public/v1/...`.
 - Route tokens are case-insensitive.
 - Path and query values use standard URL encoding.
+- Route token names use explicit URL-name terms: `{seasonUrlName}` and `{seriesUrlName}`.
+- For public routes, a GUID `Id` is always a valid replacement for a URL-name token.
 - Optional friendly `.json` aliases may be added later for key human-facing pages.
 - Public read endpoints are anonymous; write/admin endpoints remain JWT/policy protected.
 - Controllers remain thin; business logic stays in services.
 - Series detail returns competitors in ranked order, with standing fields embedded in each competitor item.
-- Pre-ship contract evolution can prioritize simplicity; backward compatibility is required post-launch.
+- Pre-ship contract evolution can prioritize simplicity; strict backward compatibility is required at launch.
 
 ---
 
@@ -32,8 +34,8 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
   - `GET /api/public/v1/clubs`
   - `GET /api/public/v1/clubs/{clubInitials}/seasons`
   - `GET /api/public/v1/clubs/{clubInitials}/series`
-  - `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonName}/series`
-  - `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonName}/series/{seriesName}`
+  - `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonUrlName}/series`
+  - `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonUrlName}/series/{seriesUrlName}`
 - Response contract docs (fields + examples).
 - Date/time contract:
   - Use UTC only.
@@ -67,8 +69,7 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
   - Series identity (`id`, `name`, `urlName`)
   - Club + season identifiers
   - Last updated metadata
-  - Ranked competitors list where each competitor includes standing fields (for example, `position`, `totalPoints`)
-  - Hypermedia links for future expansion (`races`, `self`)
+  - Ranked competitors list where each competitor includes standing fields (for example, `rank`, `totalPoints`)
 - Add cache-control headers appropriate for public read endpoints.
 
 ### Implementation Tasks

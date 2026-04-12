@@ -6,6 +6,8 @@ This document defines response and error contracts for `/api/public/v1` endpoint
 
 - Routes are case-insensitive.
 - Standard URL encoding applies to path and query values.
+- URL-name route tokens use explicit names such as `seasonUrlName` and `seriesUrlName`.
+- A GUID `Id` is always a valid replacement for a URL-name token in public routes.
 - Date/time values are UTC and serialized as ISO 8601 round-trip (for example, `2026-01-15T18:42:13.511Z`).
 - Known fields with no value return `null`.
 - Optional include-only sections are omitted when not requested.
@@ -20,10 +22,7 @@ Response contract: `PublicApiRootResponseDto`
 ```json
 {
   "version": "v1",
-  "links": [
-    { "rel": "clubs", "href": "/api/public/v1/clubs" },
-    { "rel": "self", "href": "/api/public/v1" }
-  ]
+  "clubsIndexUrl": "/api/public/v1/clubs"
 }
 ```
 
@@ -51,7 +50,7 @@ All list endpoints use `PublicListResponseDto<TItem>`.
 
 ## Series Detail
 
-`GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonName}/series/{seriesName}`
+`GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonUrlName}/series/{seriesUrlName}`
 
 Response contract: `PublicSeriesDetailResponseDto`
 
@@ -59,8 +58,7 @@ Response contract: `PublicSeriesDetailResponseDto`
 
 - identity: `id`, `name`, `urlName`
 - route identity: `clubInitials`, `seasonName`
-- `competitors` (ranked order; each competitor includes standing data such as `position` and `totalPoints`)
-- `links` (`self`, and future links such as `races`, `competitors`)
+- `competitors` (ranked order; each competitor includes standing data such as `rank` and `totalPoints`)
 
 ### Optional include sections
 

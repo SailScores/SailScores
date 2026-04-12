@@ -207,6 +207,7 @@ The project uses libman for client-side libraries (Bootstrap, jQuery). Build err
 - Include cache-control headers and API root early.
 - For public race DTOs, include an integer `Order`/`RaceOrder` field because race display order is important for clients.
 - **Public series detail** should return competitors in ranked order with standings embedded in each competitor item, so clients do not need to join standings by name.
+- For public API routes, the club path parameter must accept either club initials or a club Guid.
 
 ## Testing Strategy
 

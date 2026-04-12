@@ -36,9 +36,6 @@ namespace SailScores.Api.Dtos.Public
         public DateTimeOffset? UpdatedUtc { get; set; }
 
         [Required]
-        public IList<PublicLinkDto> Links { get; set; } = new List<PublicLinkDto>();
-
-        [Required]
         public IList<PublicSeriesCompetitorDto> Competitors { get; set; } = new List<PublicSeriesCompetitorDto>();
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
