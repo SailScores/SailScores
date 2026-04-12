@@ -210,6 +210,34 @@ public class PublicApiServiceTests
         Assert.Equal(new DateTimeOffset(new DateTime(2026, 3, 12, 0, 0, 0, DateTimeKind.Utc)), result.UpdatedUtc);
     }
 
+    [Fact]
+    public async Task GetSeriesAsync_WithPaging_ReturnsPagedItemsAndPaginationMetadata()
+    {
+        var clubId = Guid.NewGuid();
+        _coreClubServiceMock.Setup(s => s.GetClubId("MYC")).ReturnsAsync(clubId);
+        _coreClubServiceMock.Setup(s => s.GetMinimalClub(clubId)).ReturnsAsync(new Club
+        {
+            Id = clubId,
+            Initials = "MYC"
+        });
+
+        _coreSeriesServiceMock.Setup(s => s.GetAllSeriesAsync(clubId, null, false, true)).ReturnsAsync(
+        [
+            BuildSeries(clubId, Guid.NewGuid(), Guid.NewGuid(), "2024", "s1"),
+            BuildSeries(clubId, Guid.NewGuid(), Guid.NewGuid(), "2024", "s2"),
+            BuildSeries(clubId, Guid.NewGuid(), Guid.NewGuid(), "2024", "s3")
+        ]);
+
+        var result = await _service.GetSeriesAsync("MYC", null, page: 2, pageSize: 1);
+
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.NotNull(result.Pagination);
+        Assert.Equal(2, result.Pagination.Page);
+        Assert.Equal(1, result.Pagination.PageSize);
+        Assert.Equal(3, result.Pagination.TotalCount);
+    }
+
     private static Series BuildSeries(Guid clubId, Guid seriesId, Guid seasonId, string seasonUrlName, string seriesUrlName)
     {
         var competitorId = Guid.NewGuid();

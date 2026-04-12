@@ -28,10 +28,19 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicClubListItemDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PublicListResponseDto<PublicClubListItemDto>>> GetClubs()
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<PublicListResponseDto<PublicClubListItemDto>>> GetClubs(
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
+            var pagingValidation = ValidatePaging(page, pageSize);
+            if (pagingValidation != null)
+            {
+                return pagingValidation;
+            }
+
             SetPublicCacheHeaders(300);
-            return Ok(await _publicApiService.GetClubsAsync());
+            return Ok(await _publicApiService.GetClubsAsync(page, pageSize));
         }
 
         [HttpGet("clubs/{clubToken}")]
@@ -52,10 +61,19 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("clubs/{clubToken}/seasons")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeasonListItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<PublicListResponseDto<PublicSeasonListItemDto>>> GetSeasons(
-            [FromRoute] string clubToken)
+            [FromRoute] string clubToken,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var response = await _publicApiService.GetSeasonsAsync(clubToken);
+            var pagingValidation = ValidatePaging(page, pageSize);
+            if (pagingValidation != null)
+            {
+                return pagingValidation;
+            }
+
+            var response = await _publicApiService.GetSeasonsAsync(clubToken, page, pageSize);
             if (response == null)
             {
                 return NotFoundProblem("Club was not found for the provided route.", "club_not_found");
@@ -68,10 +86,19 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("clubs/{clubToken}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<PublicListResponseDto<PublicSeriesListItemDto>>> GetSeriesByClub(
-            [FromRoute] string clubToken)
+            [FromRoute] string clubToken,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var response = await _publicApiService.GetSeriesAsync(clubToken);
+            var pagingValidation = ValidatePaging(page, pageSize);
+            if (pagingValidation != null)
+            {
+                return pagingValidation;
+            }
+
+            var response = await _publicApiService.GetSeriesAsync(clubToken, null, page, pageSize);
             if (response == null)
             {
                 return NotFoundProblem("Club was not found for the provided route.", "club_not_found");
@@ -84,11 +111,20 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("clubs/{clubToken}/seasons/{seasonUrlName}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<PublicListResponseDto<PublicSeriesListItemDto>>> GetSeriesBySeason(
             [FromRoute] string clubToken,
-            [FromRoute] string seasonUrlName)
+            [FromRoute] string seasonUrlName,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var response = await _publicApiService.GetSeriesAsync(clubToken, seasonUrlName);
+            var pagingValidation = ValidatePaging(page, pageSize);
+            if (pagingValidation != null)
+            {
+                return pagingValidation;
+            }
+
+            var response = await _publicApiService.GetSeriesAsync(clubToken, seasonUrlName, page, pageSize);
             if (response == null)
             {
                 return NotFoundProblem("Club was not found for the provided route.", "club_not_found");
@@ -96,6 +132,26 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             SetPublicCacheHeaders(300);
             return Ok(response);
+        }
+
+        private ActionResult ValidatePaging(int? page, int? pageSize)
+        {
+            if (!page.HasValue && !pageSize.HasValue)
+            {
+                return null;
+            }
+
+            if (!page.HasValue || !pageSize.HasValue)
+            {
+                return BadRequestProblem("Both page and pageSize are required when paging.", "invalid_paging");
+            }
+
+            if (page.Value <= 0 || pageSize.Value <= 0)
+            {
+                return BadRequestProblem("page and pageSize must be greater than zero.", "invalid_paging");
+            }
+
+            return null;
         }
     }
 }

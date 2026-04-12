@@ -50,11 +50,32 @@ Response contract: `PublicClubDetailResponseDto`
 
 All list endpoints use `PublicListResponseDto<TItem>`.
 
+### Paging
+
+- Paging is optional.
+- Query parameters:
+  - `page` (1-based)
+  - `pageSize`
+- To enable paging, provide both `page` and `pageSize`.
+- If paging parameters are omitted, endpoints return full lists.
+
 ### Fields
 
 - `items` (array, required)
 - `pagination` (object, optional)
-  - omitted when pagination parameters are not provided
+  - included only when paging parameters are provided
+  - fields: `page`, `pageSize`, `totalCount`
+  - For example, with `page=2` and `pageSize=100`:  
+```json
+{
+  "items": [...],
+  "pagination": {
+    "page": 2,
+    "pageSize": 100,
+    "totalCount": 257
+  }
+}
+```
 
 ### Sorting Defaults
 

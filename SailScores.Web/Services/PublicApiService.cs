@@ -50,7 +50,9 @@ public class PublicApiService : IPublicApiService
         };
     }
 
-    public async Task<PublicListResponseDto<PublicClubListItemDto>> GetClubsAsync()
+    public async Task<PublicListResponseDto<PublicClubListItemDto>> GetClubsAsync(
+        int? page = null,
+        int? pageSize = null)
     {
         var clubs = await _coreClubService.GetClubs(includeHidden: false);
 
@@ -70,10 +72,7 @@ public class PublicApiService : IPublicApiService
             });
         }
 
-        return new PublicListResponseDto<PublicClubListItemDto>
-        {
-            Items = items
-        };
+        return CreatePagedResponse(items, page, pageSize);
     }
 
     public async Task<PublicClubDetailResponseDto> GetClubAsync(string clubToken)
@@ -96,7 +95,10 @@ public class PublicApiService : IPublicApiService
         };
     }
 
-    public async Task<PublicListResponseDto<PublicSeasonListItemDto>> GetSeasonsAsync(string clubToken)
+    public async Task<PublicListResponseDto<PublicSeasonListItemDto>> GetSeasonsAsync(
+        string clubToken,
+        int? page = null,
+        int? pageSize = null)
     {
         var club = await ResolveClubContextAsync(clubToken);
         if (club == null)
@@ -123,15 +125,14 @@ public class PublicApiService : IPublicApiService
             })
             .ToList();
 
-        return new PublicListResponseDto<PublicSeasonListItemDto>
-        {
-            Items = items
-        };
+        return CreatePagedResponse(items, page, pageSize);
     }
 
     public async Task<PublicListResponseDto<PublicSeriesListItemDto>> GetSeriesAsync(
         string clubToken,
-        string seasonUrlName = null)
+        string seasonUrlName = null,
+        int? page = null,
+        int? pageSize = null)
     {
         var club = await ResolveClubContextAsync(clubToken);
         if (club == null)
@@ -139,7 +140,10 @@ public class PublicApiService : IPublicApiService
             return null;
         }
 
-        var allSeries = await _coreSeriesService.GetAllSeriesAsync(club.ClubId, null, includeRegatta: false,
+        var allSeries = await _coreSeriesService.GetAllSeriesAsync(
+            club.ClubId,
+            null,
+            includeRegatta: false,
             includeSummary: true);
 
         var filteredSeries = allSeries
@@ -169,10 +173,7 @@ public class PublicApiService : IPublicApiService
             })
             .ToList();
 
-        return new PublicListResponseDto<PublicSeriesListItemDto>
-        {
-            Items = items
-        };
+        return CreatePagedResponse(items, page, pageSize);
     }
 
     public async Task<PublicSeriesDetailResponseDto> GetSeriesDetailAsync(
@@ -408,5 +409,39 @@ public class PublicApiService : IPublicApiService
     private static string Escape(string value)
     {
         return Uri.EscapeDataString(value ?? string.Empty);
+    }
+
+    private static PublicListResponseDto<T> CreatePagedResponse<T>(IList<T> items, int? page, int? pageSize)
+    {
+        if (!page.HasValue || !pageSize.HasValue)
+        {
+            return new PublicListResponseDto<T>
+            {
+                Items = items
+            };
+        }
+
+        var totalCount = items.Count;
+        var skip = (page.Value - 1) * pageSize.Value;
+        if (skip < 0)
+        {
+            skip = 0;
+        }
+
+        var pagedItems = items
+            .Skip(skip)
+            .Take(pageSize.Value)
+            .ToList();
+
+        return new PublicListResponseDto<T>
+        {
+            Items = pagedItems,
+            Pagination = new PublicPaginationDto
+            {
+                Page = page.Value,
+                PageSize = pageSize.Value,
+                TotalCount = totalCount
+            }
+        };
     }
 }
