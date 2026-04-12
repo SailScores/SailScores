@@ -26,6 +26,26 @@ Response contract: `PublicApiRootResponseDto`
 }
 ```
 
+## Club Detail
+
+`GET /api/public/v1/clubs/{clubToken}`
+
+`clubToken` can be either `clubInitials` or a club `Guid`.
+
+Response contract: `PublicClubDetailResponseDto`
+
+```json
+{
+  "id": "8f7f9f76-7ee7-4eb0-bc88-2f7057b1d37a",
+  "clubInitials": "MYC",
+  "name": "My Club",
+  "description": "Club Description",
+  "url": "/api/public/v1/clubs/MYC",
+  "htmlUrl": "/MYC",
+  "updatedUtc": null
+}
+```
+
 ## List Responses
 
 All list endpoints use `PublicListResponseDto<TItem>`.

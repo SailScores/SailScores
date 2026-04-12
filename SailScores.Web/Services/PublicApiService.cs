@@ -1,17 +1,21 @@
+using System.Globalization;
 using SailScores.Api.Dtos.Public;
 using SailScores.Core.FlatModel;
 using SailScores.Web.Services.Interfaces;
 using CoreClubService = SailScores.Core.Services.IClubService;
+using CoreSeasonService = SailScores.Core.Services.ISeasonService;
 using CoreSeriesService = SailScores.Core.Services.ISeriesService;
 
 namespace SailScores.Web.Services;
 
 public class PublicApiService : IPublicApiService
 {
+    private const string ApiBasePath = "/api/public/v1";
     private const string ClubsIndexPath = "/api/public/v1/clubs";
 
     private readonly CoreSeriesService _coreSeriesService;
     private readonly CoreClubService _coreClubService;
+    private readonly CoreSeasonService _coreSeasonService;
 
     private sealed class ResolvedSeriesContext
     {
@@ -23,14 +27,18 @@ public class PublicApiService : IPublicApiService
     {
         public Guid ClubId { get; init; }
         public string ClubInitials { get; init; }
+        public string Name { get; init; }
+        public string Description { get; init; }
     }
 
     public PublicApiService(
         CoreSeriesService coreSeriesService,
-        CoreClubService coreClubService)
+        CoreClubService coreClubService,
+        CoreSeasonService coreSeasonService)
     {
         _coreSeriesService = coreSeriesService;
         _coreClubService = coreClubService;
+        _coreSeasonService = coreSeasonService;
     }
 
     public PublicApiRootResponseDto GetRootResponse()
@@ -39,6 +47,131 @@ public class PublicApiService : IPublicApiService
         {
             Version = "v1",
             ClubsIndexUrl = ClubsIndexPath
+        };
+    }
+
+    public async Task<PublicListResponseDto<PublicClubListItemDto>> GetClubsAsync()
+    {
+        var clubs = await _coreClubService.GetClubs(includeHidden: false);
+
+        var items = new List<PublicClubListItemDto>();
+        foreach (var club in clubs
+                     .Where(c => !string.IsNullOrWhiteSpace(c.Initials))
+                     .OrderBy(c => c.Initials))
+        {
+            items.Add(new PublicClubListItemDto
+            {
+                Id = club.Id,
+                ClubInitials = club.Initials,
+                Name = club.Name,
+                Url = BuildClubApiUrl(club.Initials),
+                HtmlUrl = BuildClubHtmlUrl(club.Initials),
+                UpdatedUtc = await GetMostRecentSeriesUpdateAsync(club.Id)
+            });
+        }
+
+        return new PublicListResponseDto<PublicClubListItemDto>
+        {
+            Items = items
+        };
+    }
+
+    public async Task<PublicClubDetailResponseDto> GetClubAsync(string clubToken)
+    {
+        var club = await ResolveClubContextAsync(clubToken);
+        if (club == null)
+        {
+            return null;
+        }
+
+        return new PublicClubDetailResponseDto
+        {
+            Id = club.ClubId,
+            ClubInitials = club.ClubInitials,
+            Name = club.Name,
+            Description = club.Description?.Trim(),
+            Url = BuildClubApiUrl(club.ClubInitials),
+            HtmlUrl = BuildClubHtmlUrl(club.ClubInitials),
+            UpdatedUtc = await GetMostRecentSeriesUpdateAsync(club.ClubId)
+        };
+    }
+
+    public async Task<PublicListResponseDto<PublicSeasonListItemDto>> GetSeasonsAsync(string clubToken)
+    {
+        var club = await ResolveClubContextAsync(clubToken);
+        if (club == null)
+        {
+            return null;
+        }
+
+        var seasons = await _coreSeasonService.GetSeasons(club.ClubId);
+
+        var items = seasons
+            .OrderByDescending(s => s.Start)
+            .Select(s =>
+            {
+                var seasonToken = GetRouteToken(s.UrlName, s.Id);
+                return new PublicSeasonListItemDto
+                {
+                    Id = s.Id,
+                    ClubInitials = club.ClubInitials,
+                    SeasonName = s.Name,
+                    SeasonUrlName = seasonToken,
+                    Url = BuildSeasonSeriesApiUrl(club.ClubInitials, seasonToken),
+                    UpdatedUtc = null
+                };
+            })
+            .ToList();
+
+        return new PublicListResponseDto<PublicSeasonListItemDto>
+        {
+            Items = items
+        };
+    }
+
+    public async Task<PublicListResponseDto<PublicSeriesListItemDto>> GetSeriesAsync(
+        string clubToken,
+        string seasonUrlName = null)
+    {
+        var club = await ResolveClubContextAsync(clubToken);
+        if (club == null)
+        {
+            return null;
+        }
+
+        var allSeries = await _coreSeriesService.GetAllSeriesAsync(club.ClubId, null, includeRegatta: false,
+            includeSummary: true);
+
+        var filteredSeries = allSeries
+            .Where(s => s.Season != null)
+            .Where(s => string.IsNullOrWhiteSpace(seasonUrlName)
+                || MatchesIdOrUrlName(s.Season.Id, s.Season.UrlName, seasonUrlName));
+
+        var items = filteredSeries
+            .OrderByDescending(s => s.UpdatedDate)
+            .ThenByDescending(s => s.Season.Start)
+            .ThenBy(s => s.Name)
+            .Select(s =>
+            {
+                var seasonToken = GetRouteToken(s.Season.UrlName, s.Season.Id);
+                var seriesToken = GetRouteToken(s.UrlName, s.Id);
+                return new PublicSeriesListItemDto
+                {
+                    Id = s.Id,
+                    ClubInitials = club.ClubInitials,
+                    SeasonName = s.Season.Name,
+                    SeasonUrlName = seasonToken,
+                    SeriesName = s.Name,
+                    Url = BuildSeriesApiUrl(club.ClubInitials, seasonToken, seriesToken),
+                    HtmlUrl = BuildSeriesHtmlUrl(club.ClubInitials, seasonToken, seriesToken),
+                    UpdatedUtc = GetUtcOffset(s.UpdatedDate)
+                };
+            })
+            .ToList();
+
+        return new PublicListResponseDto<PublicSeriesListItemDto>
+        {
+            Items = items
         };
     }
 
@@ -149,8 +282,22 @@ public class PublicApiService : IPublicApiService
         return new ResolvedClubContext
         {
             ClubId = club.Id,
-            ClubInitials = club.Initials
+            ClubInitials = club.Initials,
+            Name = club.Name,
+            Description = club.Description
         };
+    }
+
+    private async Task<DateTimeOffset?> GetMostRecentSeriesUpdateAsync(Guid clubId)
+    {
+        var allSeries = await _coreSeriesService.GetAllSeriesAsync(clubId, null, includeRegatta: true, includeSummary: true)
+            ?? [];
+        var latest = allSeries
+            .Where(s => s.UpdatedDate.HasValue)
+            .Select(s => s.UpdatedDate)
+            .Max();
+
+        return GetUtcOffset(latest);
     }
 
     private static bool TryParseGuid(string token, out Guid parsedGuid)
@@ -220,6 +367,32 @@ public class PublicApiService : IPublicApiService
             : value.Value.ToUniversalTime();
 
         return new DateTimeOffset(utcDate);
+    }
+
+    private static string BuildClubApiUrl(string clubInitials)
+    {
+        return $"{ApiBasePath}/clubs/{Escape(clubInitials)}";
+    }
+
+    private static string BuildClubSeasonsApiUrl(string clubInitials)
+    {
+        return $"{ApiBasePath}/clubs/{Escape(clubInitials)}/seasons";
+    }
+
+    private static string BuildSeasonSeriesApiUrl(string clubInitials, string seasonUrlName)
+    {
+        return $"{ApiBasePath}/clubs/{Escape(clubInitials)}/seasons/{Escape(seasonUrlName)}/series";
+    }
+
+    private static string BuildSeriesApiUrl(string clubInitials, string seasonUrlName, string seriesUrlName)
+    {
+        return $"{ApiBasePath}/clubs/{Escape(clubInitials)}/seasons/{Escape(seasonUrlName)}/series/"
+            + $"{Escape(seriesUrlName)}";
+    }
+
+    private static string BuildClubHtmlUrl(string clubInitials)
+    {
+        return $"/{Escape(clubInitials)}";
     }
 
     private static string BuildSeriesHtmlUrl(string clubInitials, string seasonUrlName, string seriesUrlName)
