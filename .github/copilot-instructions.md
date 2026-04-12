@@ -198,6 +198,16 @@ The project uses libman for client-side libraries (Bootstrap, jQuery). Build err
 - Supports Appendix A and High Point Percentage systems
 - Race results include proper rounding and tie-breaking
 
+## API Development Guidelines
+
+- When planning new JSON/TRMNL endpoints, place them under dedicated public API controllers/routes.
+- Routes are case-insensitive with standard URL encoding.
+- List endpoints hide hidden clubs but direct routes remain accessible.
+- Default list responses are unpaginated with sorting by recent first, except clubs which are sorted alphabetically.
+- Include cache-control headers and API root early.
+- For public race DTOs, include an integer `Order`/`RaceOrder` field because race display order is important for clients.
+- **Public series detail** should return competitors in ranked order with standings embedded in each competitor item, so clients do not need to join standings by name.
+
 ## Testing Strategy
 
 - Unit tests should mock database context and services
