@@ -60,7 +60,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs/{clubToken}/seasons")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeasonListItemDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IEnumerable<PublicKeyValueOptionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetSeasons(
@@ -85,11 +85,8 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             if (IsOptionsFormat(format))
             {
-                return Ok(response.Items.Select(i => new PublicKeyValueOptionDto
-                {
-                    Key = i.SeasonName,
-                    Value = i.SeasonUrlName
-                }));
+                var optionText = BuildRubyishOptions(response.Items.Select(i => (i.SeasonName, i.SeasonUrlName)));
+                return Content(optionText, "text/plain");
             }
 
             return Ok(response);
@@ -97,7 +94,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs/{clubToken}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IEnumerable<PublicKeyValueOptionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetSeriesByClub(
@@ -122,11 +119,8 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             if (IsOptionsFormat(format))
             {
-                return Ok(response.Items.Select(i => new PublicKeyValueOptionDto
-                {
-                    Key = i.SeriesName,
-                    Value = i.SeriesUrlName
-                }));
+                var optionText = BuildRubyishOptions(response.Items.Select(i => (i.SeriesName, i.SeriesUrlName)));
+                return Content(optionText, "text/plain");
             }
 
             return Ok(response);
@@ -134,7 +128,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs/{clubToken}/seasons/{seasonUrlName}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IEnumerable<PublicKeyValueOptionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetSeriesBySeason(
@@ -160,11 +154,8 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             if (IsOptionsFormat(format))
             {
-                return Ok(response.Items.Select(i => new PublicKeyValueOptionDto
-                {
-                    Key = i.SeriesName,
-                    Value = i.SeriesUrlName
-                }));
+                var optionText = BuildRubyishOptions(response.Items.Select(i => (i.SeriesName, i.SeriesUrlName)));
+                return Content(optionText, "text/plain");
             }
 
             return Ok(response);
@@ -173,6 +164,17 @@ namespace SailScores.Web.Areas.Api.Controllers
         private static bool IsOptionsFormat(string format)
         {
             return string.Equals(format, "options", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string BuildRubyishOptions(IEnumerable<(string Key, string Value)> options)
+        {
+            var items = options.Select(o => $"{{ '{EscapeRubyish(o.Key)}' => '{EscapeRubyish(o.Value)}' }}");
+            return $"[{string.Join(", ", items)}]";
+        }
+
+        private static string EscapeRubyish(string value)
+        {
+            return (value ?? string.Empty).Replace("\\", "\\\\").Replace("'", "\\'");
         }
 
         private ActionResult ValidatePaging(int? page, int? pageSize)
