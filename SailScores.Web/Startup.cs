@@ -59,6 +59,17 @@ public class Startup
 
         services.AddLocalization();
 
+        services.AddCors(options =>
+        {
+            options.AddPolicy("PublicApiCors", policyBuilder =>
+            {
+                policyBuilder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .WithMethods("GET", "OPTIONS");
+            });
+        });
+
 
         services.AddOptions<RequestLocalizationOptions>()
             .Configure<IWebHostEnvironment>((options, env) =>
@@ -288,9 +299,6 @@ public class Startup
 
         app.UseHttpsRedirection();
 
-        // Add response caching middleware (must be before UseStaticFiles)
-        app.UseResponseCaching();
-
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = ctx =>
@@ -318,6 +326,17 @@ public class Startup
     private static void AddRoutes(IApplicationBuilder app)
     {
         app.UseRouting();
+
+        app.UseWhen(
+            context => context.Request.Path.StartsWithSegments("/api/public/v1", StringComparison.OrdinalIgnoreCase),
+            branch =>
+            {
+                branch.UseCors("PublicApiCors");
+            });
+
+        // Response caching should run after CORS so cached responses include CORS headers.
+        app.UseResponseCaching();
+
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -373,11 +392,11 @@ public class Startup
                 defaults: new { controller = "Race", action = "Index" },
                 constraints: new { clubInitials = clubRouteConstraint });
             endpoints.MapControllerRoute(
-                    name: "WhatIf",
-                    pattern: "{clubInitials}/Series/WhatIf/{action}/",
-                    defaults: new { controller = "WhatIf" },
-                    constraints: new { clubInitials = clubRouteConstraint });
-                endpoints.MapControllerRoute(
+                name: "WhatIf",
+                pattern: "{clubInitials}/Series/WhatIf/{action}/",
+                defaults: new { controller = "WhatIf" },
+                constraints: new { clubInitials = clubRouteConstraint });
+            endpoints.MapControllerRoute(
                 name: "Series",
                 pattern: "{clubInitials}/{season}/{seriesName}",
                 defaults: new { controller = "Series", action = "Details" },
@@ -394,7 +413,8 @@ public class Startup
                 defaults: new { controller = "Error", action = "Error", code = 500 });
 
             endpoints.MapControllerRoute(
-                "default", "{controller=Home}/{action=Index}/{id?}");
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
         });
     }
 

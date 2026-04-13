@@ -28,10 +28,13 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicClubListItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<PublicListResponseDto<PublicClubListItemDto>>> GetClubs(
+        public async Task<ActionResult> GetClubs(
             [FromQuery] int? page,
-            [FromQuery] int? pageSize)
+            [FromQuery] int? pageSize,
+            [FromQuery] string format)
         {
             var pagingValidation = ValidatePaging(page, pageSize);
             if (pagingValidation != null)
@@ -39,8 +42,25 @@ namespace SailScores.Web.Areas.Api.Controllers
                 return pagingValidation;
             }
 
+            var response = await _publicApiService.GetClubsAsync(page, pageSize);
             SetPublicCacheHeaders(300);
-            return Ok(await _publicApiService.GetClubsAsync(page, pageSize));
+
+            var options = response.Items
+                .Select(i => (Key: i.Name, Value: i.ClubInitials))
+                .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (IsOptionsTextFormat(format))
+            {
+                return Content(BuildRubyishOptions(options), "text/plain");
+            }
+
+            if (IsOptionsFormat(format))
+            {
+                return Ok(BuildJsonOptions(options));
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("clubs/{clubToken}")]
@@ -60,6 +80,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs/{clubToken}/seasons")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeasonListItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -83,10 +104,19 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             SetPublicCacheHeaders(300);
 
+            var options = response.Items
+                .Select(i => (Key: i.SeasonName, Value: i.SeasonUrlName))
+                .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (IsOptionsTextFormat(format))
+            {
+                return Content(BuildRubyishOptions(options), "text/plain");
+            }
+
             if (IsOptionsFormat(format))
             {
-                var optionText = BuildRubyishOptions(response.Items.Select(i => (i.SeasonName, i.SeasonUrlName)));
-                return Content(optionText, "text/plain");
+                return Ok(BuildJsonOptions(options));
             }
 
             return Ok(response);
@@ -94,6 +124,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs/{clubToken}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -117,10 +148,19 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             SetPublicCacheHeaders(300);
 
+            var options = response.Items
+                .Select(i => (Key: i.SeriesName, Value: i.SeriesUrlName))
+                .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (IsOptionsTextFormat(format))
+            {
+                return Content(BuildRubyishOptions(options), "text/plain");
+            }
+
             if (IsOptionsFormat(format))
             {
-                var optionText = BuildRubyishOptions(response.Items.Select(i => (i.SeriesName, i.SeriesUrlName)));
-                return Content(optionText, "text/plain");
+                return Ok(BuildJsonOptions(options));
             }
 
             return Ok(response);
@@ -128,6 +168,7 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs/{clubToken}/seasons/{seasonUrlName}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -152,18 +193,42 @@ namespace SailScores.Web.Areas.Api.Controllers
 
             SetPublicCacheHeaders(300);
 
+            var options = response.Items
+                .Select(i => (Key: i.SeriesName, Value: i.SeriesUrlName))
+                .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (IsOptionsTextFormat(format))
+            {
+                return Content(BuildRubyishOptions(options), "text/plain");
+            }
+
             if (IsOptionsFormat(format))
             {
-                var optionText = BuildRubyishOptions(response.Items.Select(i => (i.SeriesName, i.SeriesUrlName)));
-                return Content(optionText, "text/plain");
+                return Ok(BuildJsonOptions(options));
             }
 
             return Ok(response);
         }
 
+        private static IEnumerable<Dictionary<string, string>> BuildJsonOptions(
+            IEnumerable<(string Key, string Value)> options)
+        {
+            return options.Select(o => new Dictionary<string, string>
+            {
+                [o.Key ?? string.Empty] = o.Value ?? string.Empty
+            });
+        }
+
         private static bool IsOptionsFormat(string format)
         {
             return string.Equals(format, "options", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsOptionsTextFormat(string format)
+        {
+            return string.Equals(format, "optionsText", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(format, "options-text", StringComparison.OrdinalIgnoreCase);
         }
 
         private static string BuildRubyishOptions(IEnumerable<(string Key, string Value)> options)
