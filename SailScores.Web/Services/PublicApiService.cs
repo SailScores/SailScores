@@ -166,6 +166,7 @@ public class PublicApiService : IPublicApiService
                     SeasonName = s.Season.Name,
                     SeasonUrlName = seasonToken,
                     SeriesName = s.Name,
+                    SeriesUrlName = seriesToken,
                     Url = BuildSeriesApiUrl(club.ClubInitials, seasonToken, seriesToken),
                     HtmlUrl = BuildSeriesHtmlUrl(club.ClubInitials, seasonToken, seriesToken),
                     UpdatedUtc = GetUtcOffset(s.UpdatedDate)

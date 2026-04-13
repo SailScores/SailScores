@@ -60,12 +60,14 @@ namespace SailScores.Web.Areas.Api.Controllers
 
         [HttpGet("clubs/{clubToken}/seasons")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeasonListItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PublicKeyValueOptionDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<PublicListResponseDto<PublicSeasonListItemDto>>> GetSeasons(
+        public async Task<ActionResult> GetSeasons(
             [FromRoute] string clubToken,
             [FromQuery] int? page,
-            [FromQuery] int? pageSize)
+            [FromQuery] int? pageSize,
+            [FromQuery] string format)
         {
             var pagingValidation = ValidatePaging(page, pageSize);
             if (pagingValidation != null)
@@ -80,17 +82,29 @@ namespace SailScores.Web.Areas.Api.Controllers
             }
 
             SetPublicCacheHeaders(300);
+
+            if (IsOptionsFormat(format))
+            {
+                return Ok(response.Items.Select(i => new PublicKeyValueOptionDto
+                {
+                    Key = i.SeasonName,
+                    Value = i.SeasonUrlName
+                }));
+            }
+
             return Ok(response);
         }
 
         [HttpGet("clubs/{clubToken}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PublicKeyValueOptionDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<PublicListResponseDto<PublicSeriesListItemDto>>> GetSeriesByClub(
+        public async Task<ActionResult> GetSeriesByClub(
             [FromRoute] string clubToken,
             [FromQuery] int? page,
-            [FromQuery] int? pageSize)
+            [FromQuery] int? pageSize,
+            [FromQuery] string format)
         {
             var pagingValidation = ValidatePaging(page, pageSize);
             if (pagingValidation != null)
@@ -105,18 +119,30 @@ namespace SailScores.Web.Areas.Api.Controllers
             }
 
             SetPublicCacheHeaders(300);
+
+            if (IsOptionsFormat(format))
+            {
+                return Ok(response.Items.Select(i => new PublicKeyValueOptionDto
+                {
+                    Key = i.SeriesName,
+                    Value = i.SeriesUrlName
+                }));
+            }
+
             return Ok(response);
         }
 
         [HttpGet("clubs/{clubToken}/seasons/{seasonUrlName}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PublicKeyValueOptionDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<PublicListResponseDto<PublicSeriesListItemDto>>> GetSeriesBySeason(
+        public async Task<ActionResult> GetSeriesBySeason(
             [FromRoute] string clubToken,
             [FromRoute] string seasonUrlName,
             [FromQuery] int? page,
-            [FromQuery] int? pageSize)
+            [FromQuery] int? pageSize,
+            [FromQuery] string format)
         {
             var pagingValidation = ValidatePaging(page, pageSize);
             if (pagingValidation != null)
@@ -131,7 +157,22 @@ namespace SailScores.Web.Areas.Api.Controllers
             }
 
             SetPublicCacheHeaders(300);
+
+            if (IsOptionsFormat(format))
+            {
+                return Ok(response.Items.Select(i => new PublicKeyValueOptionDto
+                {
+                    Key = i.SeriesName,
+                    Value = i.SeriesUrlName
+                }));
+            }
+
             return Ok(response);
+        }
+
+        private static bool IsOptionsFormat(string format)
+        {
+            return string.Equals(format, "options", StringComparison.OrdinalIgnoreCase);
         }
 
         private ActionResult ValidatePaging(int? page, int? pageSize)

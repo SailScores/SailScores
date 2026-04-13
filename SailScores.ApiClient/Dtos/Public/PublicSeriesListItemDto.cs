@@ -25,6 +25,10 @@ namespace SailScores.Api.Dtos.Public
         public string SeriesName { get; set; }
 
         [Required]
+        [StringLength(200)]
+        public string SeriesUrlName { get; set; }
+
+        [Required]
         [StringLength(500)]
         public string Url { get; set; }
 
