@@ -49,7 +49,7 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 
 ### Prerequisites
 
-- .NET 8 SDK
+- .NET 10 SDK
 - Docker (for SQL Server database)
 - Visual Studio or VS Code (optional but recommended)
 
@@ -262,6 +262,7 @@ Pipelines automatically:
 ## Additional Resources
 
 - Full development guide: `docs/Development.md`
+- Sailing domain glossary: `docs/SailingGlossary.md`
 - API documentation: REST endpoints support public API access
 - Sample database: `Sql Utility Scripts/starter.bak`
 
