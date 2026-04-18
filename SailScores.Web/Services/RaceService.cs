@@ -172,7 +172,8 @@ public class RaceService : IRaceService
             WeatherIconOptions = GetWeatherIconOptions(),
             ClubHasCompetitors = await _coreClubService.DoesClubHaveCompetitors(club.Id),
             NeedsLocalDate = true,
-            UseAdvancedFeatures = club.UseAdvancedFeatures ?? false
+            UseAdvancedFeatures = club.UseAdvancedFeatures ?? false,
+            EnableHandicapScoring = club.EnableHandicapScoring
         };
 
         switch (club.DefaultRaceDateOffset)
@@ -660,6 +661,7 @@ public class RaceService : IRaceService
         race.SeriesOptions = blankRace.SeriesOptions;
         race.WeatherIconOptions = blankRace.WeatherIconOptions;
         race.UseAdvancedFeatures = blankRace.UseAdvancedFeatures;
+        race.EnableHandicapScoring = blankRace.EnableHandicapScoring;
         foreach (var score in race?.Scores ?? new List<ScoreViewModel>())
         {
             score.Competitor = race.CompetitorOptions.First(c => c.Id == score.CompetitorId);

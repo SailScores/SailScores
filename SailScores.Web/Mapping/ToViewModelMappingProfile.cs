@@ -45,6 +45,7 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.HasRaces, o => o.Ignore())
                 .ForMember(d => d.HasCompetitors, o => o.Ignore())
                 .ForMember(d => d.Users, o => o.Ignore())
+                .ForMember(d => d.HandicapSystems, o => o.Ignore())
                 .ReverseMap()
                 .ForMember(d => d.DefaultScoringSystem, o => o.Ignore());
 

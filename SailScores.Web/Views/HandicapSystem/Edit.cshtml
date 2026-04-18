@@ -1,0 +1,43 @@
+@model SailScores.Web.Models.SailScores.HandicapSystemViewModel
+
+@{
+    ViewData["Title"] = "Edit Handicap System";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h4>Edit Handicap System</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ClubId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="SystemType" class="form-label"></label>
+                <select asp-for="SystemType" class="form-select"
+                        asp-items="@Html.GetEnumSelectList<SailScores.Core.Model.HandicapSystemType>()"></select>
+                <span asp-validation-for="SystemType" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-controller="Admin" asp-action="Index" asp-fragment="handicapsystems"
+                   class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

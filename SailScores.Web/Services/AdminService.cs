@@ -20,6 +20,7 @@ public class AdminService : IAdminService
     private readonly CoreServices.IFleetService _coreFleetService;
     private readonly CoreServices.ISeasonService _coreSeasonService;
     private readonly CoreServices.ISeriesService _coreSeriesService;
+    private readonly CoreServices.IHandicapService _coreHandicapService;
     private readonly IWeatherService _weatherService;
     private readonly IPermissionService _permissionService;
     private readonly ILocalizerService _localizerService;
@@ -35,6 +36,7 @@ public class AdminService : IAdminService
         CoreServices.IFleetService fleetService,
         CoreServices.ISeasonService seasonService,
         CoreServices.ISeriesService seriesService,
+        CoreServices.IHandicapService handicapService,
         IWeatherService weatherService,
         IPermissionService permissionService,
         ILocalizerService localizerService,
@@ -49,6 +51,7 @@ public class AdminService : IAdminService
         _coreFleetService = fleetService;
         _coreSeasonService = seasonService;
         _coreSeriesService = seriesService;
+        _coreHandicapService = handicapService;
         _weatherService = weatherService;
         _permissionService = permissionService;
         _localizerService = localizerService;
@@ -129,6 +132,23 @@ public class AdminService : IAdminService
         vm.HasRaces = vm.BoatClasses.Count != 0 &&
                       (await _coreRaceService.HasRacesAsync(club.Id));
         vm.Users = await _permissionService.GetUsersAsync(club.Id);
+
+        if (club.EnableHandicapScoring)
+        {
+            var handicapSystems = await _coreHandicapService.GetHandicapSystemsAsync(club.Id);
+            vm.HandicapSystems = handicapSystems
+                .Select(hs => new HandicapSystemDeleteViewModel
+                {
+                    Id = hs.Id,
+                    ClubId = hs.ClubId,
+                    Name = hs.Name,
+                    SystemType = hs.SystemType,
+                    Description = hs.Description,
+                    IsDeletable = hs.ClubId == club.Id,
+                    PreventDeleteReason = hs.ClubId != club.Id ? "Site-wide system cannot be deleted." : null
+                })
+                .ToList();
+        }
 
         return vm;
     }

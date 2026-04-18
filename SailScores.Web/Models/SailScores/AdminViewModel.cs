@@ -40,6 +40,8 @@ public class AdminViewModel
 
     public IList<ScoringSystem> ScoringSystemOptions { get; set; }
 
+    public IList<HandicapSystemDeleteViewModel> HandicapSystems { get; set; }
+
     public IList<AdminToDoViewModel> Tips { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }

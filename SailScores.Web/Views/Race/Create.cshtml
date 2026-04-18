@@ -275,6 +275,21 @@
                                 </div>
                             </div>
                         </div>
+                        @if (Model.EnableHandicapScoring)
+                        {
+                        <div class="row">
+                            <div class="mb-3 col-12 col-md-6 px-1">
+                                <div class="row">
+                                    <label asp-for="CourseDistance" class="control-label col-4 col-form-label pe-0 text-end">Course Distance</label>
+                                    <div class="col-5">
+                                        <input asp-for="CourseDistance" class="form-control text-center px-1" type="number" step="0.01" min="0" />
+                                        <span asp-validation-for="CourseDistance" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-3 col-form-label ps-1">nm</div>
+                                </div>
+                            </div>
+                        </div>
+                        }
                     </div>
                 </div>
             </div>
