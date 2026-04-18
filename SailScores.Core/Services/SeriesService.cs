@@ -21,6 +21,7 @@ namespace SailScores.Core.Services
     {
         private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
         private readonly IScoringService _scoringService;
+        private readonly IHandicapService _handicapService;
         private readonly IConversionService _converter;
         private readonly IForwarderService _forwarderService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
@@ -32,6 +33,7 @@ namespace SailScores.Core.Services
         public SeriesService(
             IScoringCalculatorFactory scoringCalculatorFactory,
             IScoringService scoringService,
+            IHandicapService handicapService,
             IForwarderService forwarderService,
             IConversionService converter,
             IDbObjectBuilder dbObjBuilder,
@@ -42,6 +44,7 @@ namespace SailScores.Core.Services
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
             _scoringService = scoringService;
+            _handicapService = handicapService;
             _forwarderService = forwarderService;
             _converter = converter;
             _dbObjectBuilder = dbObjBuilder;
@@ -368,9 +371,28 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
-            var calculator = await _scoringCalculatorFactory
-                .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
+
+            var handicapSystem = await _handicapService
+                .GetEffectiveHandicapSystemAsync(fullSeries)
                 .ConfigureAwait(false);
+
+            IScoringCalculator calculator;
+            if (handicapSystem != null)
+            {
+                fullSeries.HandicapSystem = handicapSystem;
+                var handicapLookup = await _handicapService
+                    .BuildHandicapLookupAsync(fullSeries, handicapSystem.Id)
+                    .ConfigureAwait(false);
+                calculator = await _scoringCalculatorFactory
+                    .CreateScoringCalculatorAsync(fullSeries.ScoringSystem, handicapSystem, handicapLookup)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                calculator = await _scoringCalculatorFactory
+                    .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
+                    .ConfigureAwait(false);
+            }
 
             if (initial)
             {
@@ -1086,6 +1108,7 @@ namespace SailScores.Core.Services
             existingSeries.EnforcedEndDate = model.EnforcedEndDate;
             existingSeries.FleetId = model.FleetId;
             existingSeries.UseFullRaceScores = model.UseFullRaceScores;
+            existingSeries.HandicapSystemId = model.HandicapSystemId;
         }
 
         private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)

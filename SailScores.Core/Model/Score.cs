@@ -16,5 +16,10 @@ namespace SailScores.Core.Model
         // New fields for timing
         public DateTime? FinishTime { get; set; }
         public TimeSpan? ElapsedTime { get; set; }
+
+        // Handicap fields — populated during series calculation when a handicap system is in use
+        public TimeSpan? CorrectedTime { get; set; }
+        // Snapshot of the handicap rating applied; may be manually set to override the lookup
+        public decimal? HandicapValue { get; set; }
     }
 }

@@ -206,6 +206,9 @@ namespace SailScores.Database.Migrations
                     b.Property<DateTime?>("AdvancedFeaturesEnabledDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("DefaultHandicapSystemId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int?>("DefaultRaceDateOffset")
                         .HasColumnType("int");
 
@@ -221,6 +224,9 @@ namespace SailScores.Database.Migrations
                     b.Property<string>("Initials")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<bool>("EnableHandicapScoring")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsHidden")
                         .HasColumnType("bit");
@@ -264,6 +270,8 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DefaultHandicapSystemId");
 
                     b.HasIndex("DefaultScoringSystemId");
 
@@ -565,6 +573,43 @@ namespace SailScores.Database.Migrations
                     b.ToTable("CompetitorForwarders");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.CompetitorHandicap", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CompetitorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EffectiveFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("HandicapSystemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HandicapSystemId");
+
+                    b.HasIndex("CompetitorId", "HandicapSystemId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CompetitorHandicap_NullEnd")
+                        .HasFilter("[EffectiveTo] IS NULL");
+
+                    b.ToTable("CompetitorHandicaps");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.CompetitorRankStats", b =>
                 {
                     b.Property<string>("Code")
@@ -706,6 +751,9 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid>("ClubId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("DefaultHandicapSystemId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
@@ -735,6 +783,8 @@ namespace SailScores.Database.Migrations
 
                     b.HasIndex("ClubId");
 
+                    b.HasIndex("DefaultHandicapSystemId");
+
                     b.ToTable("Fleets");
                 });
 
@@ -751,6 +801,55 @@ namespace SailScores.Database.Migrations
                     b.HasIndex("BoatClassId");
 
                     b.ToTable("FleetBoatClass", (string)null);
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.HandicapSystem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ClubId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SystemType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HandicapSystems");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a1b2c3d4-0001-0000-0000-000000000001"),
+                            Description = "corrected = elapsed_sec - (rating × distance_nm). Rating is seconds-per-mile; scratch boat rating is 0.",
+                            Name = "PHRF Time-on-Distance",
+                            SystemType = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("a1b2c3d4-0001-0000-0000-000000000002"),
+                            Description = "corrected = elapsed_sec × 600 / (600 + rating). Uses the same PHRF rating as ToD but requires no course distance.",
+                            Name = "PHRF Time-on-Time",
+                            SystemType = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("a1b2c3d4-0001-0000-0000-000000000003"),
+                            Description = "corrected = elapsed_sec / PY × 1000. Ratings published by RYA; baseline is 1000.",
+                            Name = "Portsmouth Yardstick",
+                            SystemType = 3
+                        });
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.HistoricalResults", b =>
@@ -788,6 +887,9 @@ namespace SailScores.Database.Migrations
 
                     b.Property<Guid>("ClubId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("CourseDistance")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
@@ -1155,6 +1257,9 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid?>("FleetId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("HandicapSystemId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool?>("HideDncDiscards")
                         .HasColumnType("bit");
 
@@ -1208,6 +1313,10 @@ namespace SailScores.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClubId");
+
+                    b.HasIndex("FleetId");
+
+                    b.HasIndex("HandicapSystemId");
 
                     b.HasIndex("ScoringSystemId");
 
@@ -1271,6 +1380,50 @@ namespace SailScores.Database.Migrations
                     b.HasIndex("NewSeriesId");
 
                     b.ToTable("SeriesForwarders");
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.SeriesParticipationStats", b =>
+                {
+                    b.Property<decimal?>("AverageCompetitorsPerRace")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int?>("ClassCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ClassName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CompetitorsStarted")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DistinctCompetitorsStarted")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DistinctDaysRaced")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FirstRace")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastRace")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RaceCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeasonName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SeasonStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SeriesName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SeriesType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable((string)null);
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.SeriesRace", b =>
@@ -1544,6 +1697,11 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.Club", b =>
                 {
+                    b.HasOne("SailScores.Database.Entities.HandicapSystem", "DefaultHandicapSystem")
+                        .WithMany("DefaultForClubs")
+                        .HasForeignKey("DefaultHandicapSystemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SailScores.Database.Entities.ScoringSystem", "DefaultScoringSystem")
                         .WithMany("DefaultForClubs")
                         .HasForeignKey("DefaultScoringSystemId");
@@ -1551,6 +1709,8 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.WeatherSettings", "WeatherSettings")
                         .WithMany()
                         .HasForeignKey("WeatherSettingsId");
+
+                    b.Navigation("DefaultHandicapSystem");
 
                     b.Navigation("DefaultScoringSystem");
 
@@ -1632,6 +1792,25 @@ namespace SailScores.Database.Migrations
                     b.Navigation("NewCompetitor");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.CompetitorHandicap", b =>
+                {
+                    b.HasOne("SailScores.Database.Entities.Competitor", "Competitor")
+                        .WithMany("Handicaps")
+                        .HasForeignKey("CompetitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SailScores.Database.Entities.HandicapSystem", "HandicapSystem")
+                        .WithMany("CompetitorHandicaps")
+                        .HasForeignKey("HandicapSystemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Competitor");
+
+                    b.Navigation("HandicapSystem");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.Fleet", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Club", null)
@@ -1639,6 +1818,13 @@ namespace SailScores.Database.Migrations
                         .HasForeignKey("ClubId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SailScores.Database.Entities.HandicapSystem", "DefaultHandicapSystem")
+                        .WithMany("DefaultForFleets")
+                        .HasForeignKey("DefaultHandicapSystemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("DefaultHandicapSystem");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.FleetBoatClass", b =>
@@ -1828,6 +2014,15 @@ namespace SailScores.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SailScores.Database.Entities.Fleet", "Fleet")
+                        .WithMany()
+                        .HasForeignKey("FleetId");
+
+                    b.HasOne("SailScores.Database.Entities.HandicapSystem", "HandicapSystem")
+                        .WithMany("DefaultForSeries")
+                        .HasForeignKey("HandicapSystemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SailScores.Database.Entities.ScoringSystem", "ScoringSystem")
                         .WithMany()
                         .HasForeignKey("ScoringSystemId");
@@ -1837,6 +2032,10 @@ namespace SailScores.Database.Migrations
                         .HasForeignKey("SeasonId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Fleet");
+
+                    b.Navigation("HandicapSystem");
 
                     b.Navigation("ScoringSystem");
 
@@ -1930,6 +2129,8 @@ namespace SailScores.Database.Migrations
 
                     b.Navigation("CompetitorFleets");
 
+                    b.Navigation("Handicaps");
+
                     b.Navigation("Scores");
                 });
 
@@ -1938,6 +2139,17 @@ namespace SailScores.Database.Migrations
                     b.Navigation("CompetitorFleets");
 
                     b.Navigation("FleetBoatClasses");
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.HandicapSystem", b =>
+                {
+                    b.Navigation("CompetitorHandicaps");
+
+                    b.Navigation("DefaultForClubs");
+
+                    b.Navigation("DefaultForFleets");
+
+                    b.Navigation("DefaultForSeries");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Race", b =>

@@ -13,4 +13,6 @@ public class CompetitorWithOptionsViewModel : Core.Model.Competitor
     public IList<HistoricalNote> CombinedHistory { get; set; }
 
     public string NewNote { get; set; }
+
+    public IList<Core.Model.CompetitorHandicap> HandicapRatings { get; set; }
 }

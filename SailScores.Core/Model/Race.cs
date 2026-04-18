@@ -45,6 +45,9 @@ namespace SailScores.Core.Model
         public DateTime? StartTime { get; set; }
         public bool TrackTimes { get; set; } = false;
 
+        // Course length in nautical miles; required for PHRF Time-on-Distance scoring
+        public decimal? CourseDistance { get; set; }
+
         public bool Equals(Race other)
         {
             return this.Id == other.Id

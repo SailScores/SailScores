@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,15 @@ namespace SailScores.Core.Scoring
             {
                 return new AppendixACalculator(scoringSystem);
             }
+        }
+
+        public async Task<IScoringCalculator> CreateScoringCalculatorAsync(
+            Model.ScoringSystem scoringSystem,
+            Model.HandicapSystem handicapSystem,
+            IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal> handicapLookup)
+        {
+            var innerCalculator = await CreateScoringCalculatorAsync(scoringSystem).ConfigureAwait(false);
+            return new HandicapScoringCalculator(innerCalculator, handicapSystem, handicapLookup);
         }
 
         private async Task<string> GetBaseScoringSystemNameAsync(ScoringSystem scoringSystem)

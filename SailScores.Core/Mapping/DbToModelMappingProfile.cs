@@ -54,7 +54,10 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.SeriesRaces, o => o.Ignore());
             CreateMap<Db.Score, Model.Score>()
                 .ForMember(d => d.Competitor, o => o.Ignore())
-                .ReverseMap();
+                .ReverseMap()
+                // CorrectedTime and HandicapValue are computed at scoring time; not persisted.
+                .ForSourceMember(s => s.CorrectedTime, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.HandicapValue, opt => opt.DoNotValidate());
 
             CreateMap<Db.Regatta, Model.Regatta>()
                 .ForMember(d => d.Series, o => o.MapFrom(s => s.RegattaSeries.Select(rs => rs.Series).ToList()))
@@ -81,6 +84,12 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.ScoreCode, Model.ScoreCode>()
                 .ForMember(d => d.ClubId, o => o.Ignore())
                 .ReverseMap();
+            CreateMap<Db.HandicapSystem, Model.HandicapSystem>()
+                .ReverseMap();
+            CreateMap<Db.CompetitorHandicap, Model.CompetitorHandicap>()
+                .ForMember(d => d.Competitor, o => o.Ignore())
+                .ReverseMap();
+
             CreateMap<Db.ClubRequest, Model.ClubRequest>()
                 .ReverseMap();
             CreateMap<Db.Weather, Model.Weather>()

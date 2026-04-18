@@ -15,6 +15,8 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
 
     public IList<Fleet> FleetOptions { get; set; }
 
+    public IList<Core.Model.HandicapSystem> HandicapSystemOptions { get; set; }
+
     private Guid _seasonId;
 
     [Required]

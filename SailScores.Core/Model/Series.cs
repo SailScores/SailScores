@@ -58,6 +58,9 @@ public class Series
     public Guid? ScoringSystemId { get; set; }
     public ScoringSystem ScoringSystem { get; set; }
 
+    public Guid? HandicapSystemId { get; set; }
+    public HandicapSystem HandicapSystem { get; set; }
+
     public TrendOption? TrendOption { get; set; }
 
     public Guid? FleetId { get; set; }

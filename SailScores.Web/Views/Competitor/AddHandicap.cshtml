@@ -1,0 +1,64 @@
+@model SailScores.Web.Models.SailScores.CompetitorHandicapViewModel
+
+@{
+    ViewData["Title"] = "Add Handicap Rating";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h4>Add Handicap Rating — @Model.CompetitorName</h4>
+<hr />
+<div class="row">
+    <div class="col-12 col-md-6">
+        <form asp-action="AddHandicap">
+            <input type="hidden" asp-for="CompetitorId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="HandicapSystemId" class="control-label"></label>
+                <select asp-for="HandicapSystemId" class="form-select">
+                    <option value="">-- Select a system --</option>
+                    @foreach (var hs in Model.HandicapSystemOptions ?? Enumerable.Empty<SailScores.Core.Model.HandicapSystem>())
+                    {
+                        <option value="@hs.Id">@hs.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="HandicapSystemId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Value" class="control-label"></label>
+                <input asp-for="Value" class="form-control" type="number" step="any" />
+                <span asp-validation-for="Value" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EffectiveFrom" class="control-label"></label>
+                <input asp-for="EffectiveFrom" class="form-control" type="date" />
+                <span asp-validation-for="EffectiveFrom" class="text-danger"></span>
+                <small class="form-text text-muted">Leave blank to apply from the beginning of time.</small>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EffectiveTo" class="control-label"></label>
+                <input asp-for="EffectiveTo" class="form-control" type="date" />
+                <span asp-validation-for="EffectiveTo" class="text-danger"></span>
+                <small class="form-text text-muted">Leave blank to apply indefinitely.</small>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Edit" asp-route-id="@Model.CompetitorId" class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -37,6 +37,7 @@ namespace SailScores.Core.Extensions
             services.AddScoped<IBackupService, BackupService>();
             services.AddScoped<ISiteAdminService, SiteAdminService>();
             services.AddScoped<IIndexNowService, IndexNowService>();
+            services.AddScoped<IHandicapService, HandicapService>();
 
         }
     }

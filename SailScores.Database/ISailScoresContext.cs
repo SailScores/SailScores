@@ -55,6 +55,9 @@ namespace SailScores.Database
         DbSet<ChangeType> ChangeTypes { get; set; }
         DbSet<CompetitorChange> CompetitorChanges { get; set; }
 
+        DbSet<HandicapSystem> HandicapSystems { get; set; }
+        DbSet<CompetitorHandicap> CompetitorHandicaps { get; set; }
+
         // Junction tables for backup/restore operations
         DbSet<SeriesRace> SeriesRaces { get; set; }
         DbSet<CompetitorFleet> CompetitorFleets { get; set; }

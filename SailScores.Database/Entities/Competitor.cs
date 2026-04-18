@@ -26,6 +26,7 @@ public class Competitor
     public BoatClass BoatClass { get; set; }
     public IList<CompetitorFleet> CompetitorFleets { get; set; }
     public IList<Score> Scores { get; set; }
+    public IList<CompetitorHandicap> Handicaps { get; set; }
 
     public IList<CompetitorChange> ChangeHistory { get; set; }
 

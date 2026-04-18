@@ -144,6 +144,12 @@
                     <h6 class="mb-0">Scoring & Localization</h6>
                 </div>
                 <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input asp-for="EnableHandicapScoring" class="form-check-input" id="EnableHandicapScoring" />
+                        <label class="form-check-label" for="EnableHandicapScoring">Enable Handicap Scoring</label>
+                        <div class="small text-muted">Enables corrected-time handicap scoring. Adds handicap fields to series and competitor pages.</div>
+                    </div>
+
                     <div class="mb-3">
                         <label asp-for="DefaultScoringSystemId" class="form-label">Default Scoring System</label>
                         <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-select">

@@ -22,6 +22,7 @@ public class AdminViewModel
     public bool IsHidden { get; set; }
     public bool ShowClubInResults { get; set; }
     public bool ShowCalendarInNav { get; set; }
+    public bool EnableHandicapScoring { get; set; }
 
     public String Url { get; set; }
 

@@ -18,6 +18,7 @@ public class SeriesService : ISeriesService
     private readonly IScoringService _coreScoringService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly Core.Services.IFleetService _coreFleetService;
+    private readonly Core.Services.IHandicapService _coreHandicapService;
     private readonly IMapper _mapper;
 
     // Validation error messages for date restrictions
@@ -32,6 +33,7 @@ public class SeriesService : ISeriesService
         Core.Services.IScoringService scoringService,
         Core.Services.ISeasonService seasonService,
         Core.Services.IFleetService fleetService,
+        Core.Services.IHandicapService handicapService,
         IMapper mapper)
     {
         _coreClubService = clubService;
@@ -39,6 +41,7 @@ public class SeriesService : ISeriesService
         _coreScoringService = scoringService;
         _coreSeasonService = seasonService;
         _coreFleetService = fleetService;
+        _coreHandicapService = handicapService;
         _mapper = mapper;
     }
 
@@ -124,6 +127,19 @@ public class SeriesService : ISeriesService
         // Get fleet options - include active fleets and any currently selected fleet
         var allFleets = await _coreFleetService.GetAllFleetsForClub(clubId);
         vm.FleetOptions = allFleets.Where(f => f.IsActive || f.Id == vm.FleetId).OrderBy(f => f.Name).ToList();
+
+        // Only populate handicap options when the club has opted in to handicap scoring.
+        var club = await _coreClubService.GetMinimalClub(clubId);
+        if (club.EnableHandicapScoring)
+        {
+            var handicapSystems = await _coreHandicapService.GetHandicapSystemsAsync(clubId);
+            var handicapOptions = new List<Core.Model.HandicapSystem>
+            {
+                new() { Id = Guid.Empty, Name = "<None — One-Design>" }
+            };
+            handicapOptions.AddRange(handicapSystems.OrderBy(h => h.Name));
+            vm.HandicapSystemOptions = handicapOptions;
+        }
 
         return vm;
 
@@ -326,6 +342,10 @@ public class SeriesService : ISeriesService
         {
             model.ScoringSystemId = null;
         }
+        if (model.HandicapSystemId == Guid.Empty)
+        {
+            model.HandicapSystemId = null;
+        }
 
         // Handle date restriction logic
         if (model.DateRestricted == true)
@@ -348,6 +368,10 @@ public class SeriesService : ISeriesService
         if (model.ScoringSystemId == Guid.Empty)
         {
             model.ScoringSystemId = null;
+        }
+        if (model.HandicapSystemId == Guid.Empty)
+        {
+            model.HandicapSystemId = null;
         }
 
         // Handle date restriction logic

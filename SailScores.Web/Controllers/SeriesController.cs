@@ -202,6 +202,7 @@ public class SeriesController : Controller
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
                 model.FleetOptions = blankVm.FleetOptions;
+                model.HandicapSystemOptions = blankVm.HandicapSystemOptions;
 
                 // Log model state errors for debugging
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
@@ -298,6 +299,7 @@ public class SeriesController : Controller
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
         seriesWithOptions.SummarySeriesOptions = blankVm.SummarySeriesOptions;
         seriesWithOptions.FleetOptions = blankVm.FleetOptions;
+        seriesWithOptions.HandicapSystemOptions = blankVm.HandicapSystemOptions;
         if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
         {
             seriesWithOptions.SeriesOptions =
@@ -330,6 +332,7 @@ public class SeriesController : Controller
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
                 model.FleetOptions = blankVm.FleetOptions;
+                model.HandicapSystemOptions = blankVm.HandicapSystemOptions;
 
                 // Log model state errors for debugging (visible in browser dev tools if using this pattern)
                 var errors = ModelState.Values.SelectMany(v => v.Errors);

@@ -62,6 +62,7 @@ public class SeriesFleetOptionTests
         _seriesService = new SeriesService(
             _mockScoringCalculatorFactory.Object,
             new Mock<IScoringService>().Object,
+            new Mock<IHandicapService>().Object,
             new Mock<IForwarderService>().Object,
             new Mock<IConversionService>().Object,
             _dbObjectBuilder,

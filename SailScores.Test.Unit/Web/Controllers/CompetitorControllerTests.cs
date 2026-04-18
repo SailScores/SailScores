@@ -58,6 +58,7 @@ namespace SailScores.Test.Unit.Web.Controllers
                 _clubServiceMock.Object,
                 _competitorServiceMock.Object,
                 _forwarderServiceMock.Object,
+                new Mock<IHandicapService>().Object,
                 _authServiceMock.Object,
                 _csvServiceMock.Object,
                 _adminTipServiceMock.Object,

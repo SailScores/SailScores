@@ -44,6 +44,11 @@ public class Club
     public int? DefaultRaceDateOffset { get; set; }
     public IList<ScoringSystem> ScoringSystems { get; set; }
 
+    public HandicapSystem DefaultHandicapSystem { get; set; }
+    public Guid? DefaultHandicapSystemId { get; set; }
+
+    public bool EnableHandicapScoring { get; set; }
+
     public IList<ClubSequence> ClubSequences { get; set; }
 
 }

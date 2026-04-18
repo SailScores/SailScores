@@ -30,6 +30,7 @@ public class SeriesServiceTests
     private readonly Mock<IForwarderService> _mockForwarderService;
     private readonly Mock<IConversionService> _mockConversionService;
     private readonly Mock<IIndexNowService> _mockIndexNowService;
+    private readonly Mock<IHandicapService> _mockHandicapService;
     private readonly IMemoryCache _realCache;
 
     public SeriesServiceTests()
@@ -46,6 +47,7 @@ public class SeriesServiceTests
         _mockForwarderService = new Mock<IForwarderService>();
         _mockConversionService = new Mock<IConversionService>();
         _mockIndexNowService = new Mock<IIndexNowService>();
+        _mockHandicapService = new Mock<IHandicapService>();
         _realCache = new MemoryCache(new MemoryCacheOptions());
 
         _context = Utilities.InMemoryContextBuilder.GetContext();
@@ -73,6 +75,7 @@ public class SeriesServiceTests
         _service = new SailScores.Core.Services.SeriesService(
             _mockScoringCalculatorFactory.Object,
             _mockScoringService.Object,
+            _mockHandicapService.Object,
             _mockForwarderService.Object,
             _mockConversionService.Object,
             _dbObjectBuilder,
