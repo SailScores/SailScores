@@ -512,6 +512,7 @@ namespace SailScores.Core.Services
             dbClub.LogoFileId = club.LogoFileId;
             dbClub.HomePageDescription = club.HomePageDescription;
             dbClub.ShowCalendarInNav = club.ShowCalendarInNav;
+            dbClub.EnableHandicapScoring = club.EnableHandicapScoring;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings?.Latitude;
