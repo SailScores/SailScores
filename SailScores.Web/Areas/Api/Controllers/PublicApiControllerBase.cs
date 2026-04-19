@@ -1,14 +1,24 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCaching;
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
     [ApiController]
     public abstract class PublicApiControllerBase : ControllerBase
     {
-        protected void SetPublicCacheHeaders(int maxAgeSeconds)
+        protected void SetPublicCacheHeaders(int maxAgeSeconds, params string[] varyByQueryKeys)
         {
             Response.Headers["Cache-Control"] = $"public,max-age={maxAgeSeconds}";
+
+            if (varyByQueryKeys != null && varyByQueryKeys.Length > 0)
+            {
+                var responseCachingFeature = HttpContext?.Features?.Get<IResponseCachingFeature>();
+                if (responseCachingFeature != null)
+                {
+                    responseCachingFeature.VaryByQueryKeys = varyByQueryKeys;
+                }
+            }
         }
 
         protected ActionResult BadRequestProblem(string detail, string errorCode)

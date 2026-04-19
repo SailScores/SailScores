@@ -5,6 +5,7 @@ using SailScores.Web.Services.Interfaces;
 using CoreClubService = SailScores.Core.Services.IClubService;
 using CoreSeasonService = SailScores.Core.Services.ISeasonService;
 using CoreSeriesService = SailScores.Core.Services.ISeriesService;
+using CoreRaceService = SailScores.Core.Services.IRaceService;
 
 namespace SailScores.Web.Services;
 
@@ -16,6 +17,7 @@ public class PublicApiService : IPublicApiService
     private readonly CoreSeriesService _coreSeriesService;
     private readonly CoreClubService _coreClubService;
     private readonly CoreSeasonService _coreSeasonService;
+    private readonly CoreRaceService _coreRaceService;
 
     private sealed class ResolvedSeriesContext
     {
@@ -34,11 +36,13 @@ public class PublicApiService : IPublicApiService
     public PublicApiService(
         CoreSeriesService coreSeriesService,
         CoreClubService coreClubService,
-        CoreSeasonService coreSeasonService)
+        CoreSeasonService coreSeasonService,
+        CoreRaceService coreRaceService)
     {
         _coreSeriesService = coreSeriesService;
         _coreClubService = coreClubService;
         _coreSeasonService = coreSeasonService;
+        _coreRaceService = coreRaceService;
     }
 
     public PublicApiRootResponseDto GetRootResponse()
@@ -177,10 +181,65 @@ public class PublicApiService : IPublicApiService
         return CreatePagedResponse(items, page, pageSize);
     }
 
+    public async Task<PublicRaceDetailResponseDto> GetRaceDetailAsync(
+        string clubInitials,
+        Guid raceId)
+    {
+        if (string.IsNullOrWhiteSpace(clubInitials))
+        {
+            return null;
+        }
+
+        var club = await ResolveClubContextAsync(clubInitials);
+        if (club == null)
+        {
+            return null;
+        }
+
+        var race = await _coreRaceService.GetRaceAsync(raceId);
+        if (race == null || race.ClubId != club.ClubId)
+        {
+            return null;
+        }
+
+        return new PublicRaceDetailResponseDto
+        {
+            Id = race.Id,
+            ClubInitials = club.ClubInitials,
+            Name = race.Name ?? string.Empty,
+            DateUtc = GetUtcOffset(race.Date),
+            Order = race.Order,
+            State = race.State,
+            Description = race.Description,
+            HtmlUrl = BuildRaceHtmlUrl(club.ClubInitials, race.Id),
+            WindSpeed = race.Weather?.WindSpeedString,
+            WindSpeedUnits = race.Weather?.WindSpeedString == null ? null : string.Empty,
+            WindDirectionDegrees = race.Weather?.WindDirectionDegrees,
+            WeatherIcon = race.Weather?.Icon,
+            UpdatedUtc = GetUtcOffset(race.UpdatedDate),
+            UpdatedBy = race.UpdatedBy,
+            CompetitorResults = (race.Scores ?? [])
+                .OrderBy(s => s.Place ?? int.MaxValue)
+                .Select(s => new PublicRaceCompetitorResultDto
+                {
+                    CompetitorId = s.CompetitorId,
+                    CompetitorName = s.Competitor?.Name,
+                    Place = s.Place,
+                    Code = s.Code,
+                    CodePoints = s.CodePoints,
+                    FinishTimeUtc = GetUtcOffset(s.FinishTime),
+                    ElapsedTime = s.ElapsedTime
+                })
+                .ToList()
+        };
+    }
+
     public async Task<PublicSeriesDetailResponseDto> GetSeriesDetailAsync(
         string clubInitials,
         string seasonUrlName,
-        string seriesUrlName)
+        string seriesUrlName,
+        bool includeCompetitors = false,
+        bool includeRaces = false)
     {
         var resolved = await ResolveSeriesAsync(clubInitials, seasonUrlName, seriesUrlName);
         if (resolved == null)
@@ -195,21 +254,63 @@ public class PublicApiService : IPublicApiService
         var seriesToken = GetRouteToken(series.UrlName, series.Id);
 
         var htmlSeriesUrl = BuildSeriesHtmlUrl(resolvedClubInitials, seasonToken, seriesToken);
+        var competitorRouteTokens = (series.Competitors ?? [])
+            .GroupBy(c => c.Id)
+            .ToDictionary(
+                g => g.Key,
+                g => GetCompetitorRouteToken(g.First().UrlName, g.First().UrlId));
 
         return new PublicSeriesDetailResponseDto
         {
             Id = series.Id,
             Name = series.Name,
             UrlName = series.UrlName,
+            Description = series.Description,
+            SeriesType = series.Type == Core.Model.SeriesType.Unknown
+                ? Core.Model.SeriesType.Standard.ToString()
+                : series.Type.ToString(),
+            FleetName = series.Fleet == null
+                ? string.Empty
+                : series.GetEffectiveFleetName(),
+            TrendOption = series.TrendOption?.ToString(),
+            PreferAlternativeSailNumbers = series.PreferAlternativeSailNumbers ?? false,
+            HideDncDiscards = series.HideDncDiscards,
+            IsPreliminary = series.FlatResults?.IsPreliminary,
+            NumberOfSailedRaces = series.FlatResults?.NumberOfSailedRaces ?? 0,
+            NumberOfDiscards = series.FlatResults?.NumberOfDiscards ?? 0,
+            CompetitorCount = series.FlatResults?.Competitors?.Count() ?? 0,
+            ScoringSystemName = series.FlatResults?.ScoringSystemName,
+            PercentRequired = series.FlatResults?.IsPercentSystem == true
+                ? series.FlatResults.PercentRequired
+                : null,
+            UpdatedBy = series.UpdatedBy,
             HtmlUrl = htmlSeriesUrl,
             ClubInitials = resolvedClubInitials,
             SeasonName = series.Season?.Name ?? seasonUrlName,
             SeasonUrlName = seasonToken,
             UpdatedUtc = GetUtcOffset(series.UpdatedDate),
-            Competitors = MapCompetitors(
-                series.FlatResults?.Competitors,
-                series.FlatResults?.CalculatedScores,
-                resolvedClubInitials)
+            Competitors = includeCompetitors
+                ? MapCompetitors(
+                    series.FlatResults?.Competitors,
+                    series.FlatResults?.CalculatedScores,
+                    competitorRouteTokens,
+                    resolvedClubInitials,
+                    (series.ShowCompetitorClub ?? false)
+                        || (series.FlatResults?.Competitors?.Any(c => !string.IsNullOrWhiteSpace(c.HomeClubName))
+                            ?? false),
+                    series.PreferAlternativeSailNumbers ?? false,
+                    includeRaces)
+                : null,
+            Races = includeRaces
+                ? MapRaces(
+                    series.FlatResults?.Races,
+                    series.FlatResults?.CalculatedScores,
+                    resolvedClubInitials,
+                    includeCompetitors)
+                : null,
+            ScoreCodesUsed = includeRaces
+                ? MapScoreCodes(series.FlatResults?.ScoreCodesUsed)
+                : null
         };
     }
 
@@ -330,7 +431,11 @@ public class PublicApiService : IPublicApiService
     private static List<PublicSeriesCompetitorDto> MapCompetitors(
         IEnumerable<FlatCompetitor> competitors,
         IEnumerable<FlatSeriesScore> scores,
-        string clubInitials)
+        IDictionary<Guid, string> competitorRouteTokens,
+        string clubInitials,
+        bool showCompetitorClub,
+        bool preferAlternativeSailNumbers,
+        bool includeRaceResults)
     {
         var flatCompetitors = competitors?.ToList() ?? [];
         var scoreByCompetitorId = (scores ?? [])
@@ -346,14 +451,111 @@ public class PublicApiService : IPublicApiService
                 {
                     Id = competitor.Id,
                     Rank = score?.Rank ?? index + 1,
+                    Trend = score?.Trend,
                     CompetitorName = competitor.Name,
                     BoatName = competitor.BoatName ?? string.Empty,
                     SailNumber = competitor.SailNumber,
+                    AlternativeSailNumber = preferAlternativeSailNumbers
+                        ? competitor.AlternativeSailNumber
+                        : null,
+                    HomeClubName = showCompetitorClub
+                        ? competitor.HomeClubName
+                        : null,
                     TotalPoints = score?.TotalScore?.ToString("0.##", CultureInfo.InvariantCulture),
-                    Url = BuildCompetitorHtmlUrl(clubInitials, competitor.UrlName)
+                    Url = BuildCompetitorHtmlUrl(
+                        clubInitials,
+                        competitorRouteTokens.TryGetValue(competitor.Id, out var competitorRouteToken)
+                            ? competitorRouteToken
+                            : null),
+                    RaceResults = includeRaceResults
+                        ? MapCompetitorRaceResults(score?.Scores)
+                        : null
                 };
             })
             .OrderBy(c => c.Rank ?? int.MaxValue)
+            .ToList();
+    }
+
+    private static List<PublicSeriesCompetitorRaceResultDto> MapCompetitorRaceResults(
+        IEnumerable<FlatCalculatedScore> scores)
+    {
+        return (scores ?? [])
+            .OrderBy(s => s.RaceId)
+            .Select(s => new PublicSeriesCompetitorRaceResultDto
+            {
+                RaceId = s.RaceId,
+                Place = s.Place,
+                Code = s.Code,
+                ScoreValue = s.ScoreValue,
+                PerfectScoreValue = s.PerfectScoreValue,
+                Discard = s.Discard,
+                ElapsedTime = s.ElapsedTime
+            })
+            .ToList();
+    }
+
+    private static List<PublicSeriesRaceItemDto> MapRaces(
+        IEnumerable<FlatRace> races,
+        IEnumerable<FlatSeriesScore> scores,
+        string clubInitials,
+        bool includeCompetitorResults)
+    {
+        var scoresByRaceId = (scores ?? [])
+            .SelectMany(s => (s.Scores ?? [])
+                .Select(r => new { s.CompetitorId, Result = r }))
+            .GroupBy(x => x.Result.RaceId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.OrderBy(x => x.Result.Place ?? int.MaxValue)
+                    .Select(x => new PublicSeriesRaceCompetitorResultDto
+                    {
+                        CompetitorId = x.CompetitorId,
+                        Place = x.Result.Place,
+                        Code = x.Result.Code,
+                        ScoreValue = x.Result.ScoreValue,
+                        PerfectScoreValue = x.Result.PerfectScoreValue,
+                        Discard = x.Result.Discard,
+                        ElapsedTime = x.Result.ElapsedTime,
+                        FinishTimeUtc = null
+                    })
+                    .ToList());
+
+        return (races ?? [])
+            .OrderBy(r => r.Date)
+            .ThenBy(r => r.Order)
+            .Select(r => new PublicSeriesRaceItemDto
+            {
+                Id = r.Id,
+                DateUtc = GetUtcOffset(r.Date),
+                Order = r.Order,
+                State = r.State,
+                WindSpeed = r.WindSpeed,
+                WindSpeedUnits = r.WindSpeedUnits,
+                WindDirectionDegrees = r.WindDirectionDegrees,
+                WeatherIcon = r.WeatherIcon,
+                Name = r.Name ?? string.Empty,
+                Url = BuildRaceApiUrl(clubInitials, r.Id),
+                HtmlUrl = BuildRaceHtmlUrl(clubInitials, r.Id),
+                CompetitorResults = includeCompetitorResults
+                    ? (scoresByRaceId.TryGetValue(r.Id, out var raceResults)
+                        ? raceResults
+                        : [])
+                    : null
+            })
+            .ToList();
+    }
+
+    private static List<PublicSeriesScoreCodeDto> MapScoreCodes(
+        IDictionary<string, Core.Scoring.ScoreCodeSummary> scoreCodes)
+    {
+        return (scoreCodes ?? new Dictionary<string, Core.Scoring.ScoreCodeSummary>())
+            .OrderBy(c => c.Key)
+            .Select(c => new PublicSeriesScoreCodeDto
+            {
+                Code = c.Key,
+                Description = c.Value?.Description,
+                Formula = c.Value?.Formula
+            })
             .ToList();
     }
 
@@ -392,6 +594,11 @@ public class PublicApiService : IPublicApiService
             + $"{Escape(seriesUrlName)}";
     }
 
+    private static string BuildRaceApiUrl(string clubInitials, Guid raceId)
+    {
+        return $"{ApiBasePath}/clubs/{Escape(clubInitials)}/races/{raceId}";
+    }
+
     private static string BuildClubHtmlUrl(string clubInitials)
     {
         return $"/{Escape(clubInitials)}";
@@ -402,9 +609,21 @@ public class PublicApiService : IPublicApiService
         return $"/{Escape(clubInitials)}/{Escape(seasonUrlName)}/{Escape(seriesUrlName)}";
     }
 
-    private static string BuildCompetitorHtmlUrl(string clubInitials, string competitorUrlName)
+    private static string BuildRaceHtmlUrl(string clubInitials, Guid raceId)
     {
-        return $"/{Escape(clubInitials)}/Competitor/{Escape(competitorUrlName)}";
+        return $"/{Escape(clubInitials)}/Race/Details/{raceId}";
+    }
+
+    private static string GetCompetitorRouteToken(string competitorUrlName, string competitorUrlId)
+    {
+        return !string.IsNullOrWhiteSpace(competitorUrlName)
+            ? competitorUrlName
+            : competitorUrlId;
+    }
+
+    private static string BuildCompetitorHtmlUrl(string clubInitials, string competitorRouteToken)
+    {
+        return $"/{Escape(clubInitials)}/Competitor/{Escape(competitorRouteToken)}";
     }
 
     private static string Escape(string value)

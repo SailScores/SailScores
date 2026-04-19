@@ -206,7 +206,8 @@ The project uses libman for client-side libraries (Bootstrap, jQuery). Build err
 - Default list responses are unpaginated with sorting by recent first, except clubs which are sorted alphabetically.
 - Include cache-control headers and API root early.
 - For public race DTOs, include an integer `Order`/`RaceOrder` field because race display order is important for clients.
-- **Public series detail** should return competitors in ranked order with standings embedded in each competitor item, so clients do not need to join standings by name.
+- Public series detail should return competitors in ranked order with standings embedded in each competitor item, so clients do not need to join standings by name.
+- Compute competitor URLs for public series responses at response time from current competitor data; do not preserve or serialize `UrlName` in flattened or embedded results because `UrlName` can change after flattening.
 - For TRMNL xhrSelect-compatible API option responses, return key/value items where key is the user-facing label and value is the DB-stored token (typically UrlName).
 - For public API routes, the club path parameter must accept either club initials or a club Guid.
 

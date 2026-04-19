@@ -17,7 +17,9 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
 - Optional friendly `.json` aliases may be added later for key human-facing pages.
 - Public read endpoints are anonymous; write/admin endpoints remain JWT/policy protected.
 - Controllers remain thin; business logic stays in services.
-- Series detail returns competitors in ranked order, with standing fields embedded in each competitor item.
+- Series detail can include competitors and/or races via `?include=competitors`,
+  `?include=races`, or `?include=competitors,races`.
+- Competitors are returned in ranked order, with standing fields embedded in each competitor item.
 - Pre-ship contract evolution can prioritize simplicity; strict backward compatibility is required at launch.
 
 ---
@@ -42,7 +44,7 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
   - Serialize using ISO 8601 round-trip format (for example, `2026-01-15T18:42:13.511Z`).
 - Nullability contract:
   - Use `null` for known fields with no value.
-  - Omit sections that are only present via optional includes (`races`) when not requested.
+  - Omit sections that are only present via optional includes (`competitors`, `races`) when not requested.
 - Error contract (`404`, `400`, `429`, `500`) using RFC 7807 `ProblemDetails` with:
   - `type`, `title`, `status`, `detail`, `instance`
   - extension fields: `traceId`, `errorCode` (stable machine-readable code)
@@ -57,19 +59,26 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
 ## Phase 1 - Series Results Detail (Test of concept)
 
 ### Objectives
-- Develop one reliable public endpoint for full series results and allow testing of model
+- Develop one reliable public endpoint for full series results and allow testing of model.
 
 ### Endpoints
 - `GET /api/public/v1`
-- `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonName}/series/{seriesName}`
+- `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonUrlName}/series/{seriesUrlName}`
+- `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonUrlName}/series/{seriesUrlName}?include=competitors`
 
 ### Behavior
 - `[AllowAnonymous]`
-- Return:
+- Default response (without `include`, or without `competitors` in `include`):
   - Series identity (`id`, `name`, `urlName`)
   - Club + season identifiers
   - Last updated metadata
-  - Ranked competitors list where each competitor includes standing fields (for example, `rank`, `totalPoints`)
+  - Summary standings count (for example, total number of competitors ranked)
+- With `include=competitors`:
+  - All default fields plus a ranked competitors list
+  - Each competitor includes standing fields and is sorted by rank (ascending)
+- With `include=races`:
+  - Include race metadata and score codes
+  - Omit race competitor results unless `competitors` is also included
 - Add cache-control headers appropriate for public read endpoints.
 
 ### Implementation Tasks
@@ -77,15 +86,25 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
 2. Add public API root endpoint listing available v1 resources.
 3. Add web service adapter for public result projection (if needed), backed by existing series services.
 4. Map domain model to a dedicated public response DTO (do not expose internal entities directly).
-5. Add shared helper methods for consistent `ProblemDetails` responses.
-6. Add unit tests for:
-   - valid series lookup
-   - competitor ranking order in response payload
+5. Implement `include` query parameter handling:
+   - When omitted: return lightweight series summary without competitor or race arrays
+   - When `include=competitors`: include full ranked competitors list with standings embedded in each competitor
+   - When `include=races`: include race details and score codes, but omit race competitor results
+   - When `include=competitors,races`: include both sections and include race results in both views
+6. Add shared helper methods for consistent `ProblemDetails` responses.
+7. Add unit tests for:
+   - valid series lookup with no include values
+   - valid series lookup with `include=competitors`
+   - valid series lookup with `include=races`
+   - valid series lookup with `include=competitors,races`
+   - competitor ranking order in response payload when included
    - not found behavior
    - hidden/non-public club handling (if applicable)
 
 ### Exit Criteria
 - Endpoint returns stable JSON for known public series and is test-covered.
+- Default response is lightweight and fast.
+- `include=competitors` returns ranked competitor standings.
 - API root can be used to discover primary resources.
 
 ---
@@ -99,7 +118,7 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
 - `GET /api/public/v1/clubs`
 - `GET /api/public/v1/clubs/{clubInitials}/seasons`
 - `GET /api/public/v1/clubs/{clubInitials}/series`
-- `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonName}/series`
+- `GET /api/public/v1/clubs/{clubInitials}/seasons/{seasonUrlName}/series`
 
 ### Behavior
 - Return lightweight lists with stable keys:
@@ -133,16 +152,25 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
 
 ### Approach
 - Keep base series response lean.
-- Add opt-in race expansion via query parameter:
+- Add opt-in expansions via a single `include` query parameter:
   - `?include=races`
+  - `?include=competitors`
+  - `?include=competitors,races`
 
 ### Implementation Tasks
 1. Add response DTO section for races.
-2. Keep default response unchanged once launch contract is frozen.
-3. Add tests for include behavior and payload size sanity.
+2. Add `include=races` handling.
+3. Ensure each optional include (`competitors`, `races`) can be toggled independently.
+4. Keep default response unchanged once launch contract is frozen.
+5. Add tests for:
+   - `include=races` only
+   - `include=competitors` only
+   - `include=competitors,races`
+   - payload size sanity for all combinations
 
 ### Exit Criteria
 - Consumers can request race details when needed, while default remains fast and small.
+- Multiple include values work independently and in combination.
 
 ---
 
@@ -209,7 +237,7 @@ This plan keeps API concerns out of `AuthController` and uses dedicated public A
 
 ## Milestone Summary
 
-- **M1:** API root + series detail endpoint live (Phase 1)
+- **M1:** API root + series detail endpoint live with `include=competitors` support (Phase 1)
 - **M2:** Clubs/seasons/series indexes live (Phase 2)
-- **M3:** `include=races` expansion live (Phase 3)
+- **M3:** `include=races` expansion live, with combined `include=competitors,races` support (Phase 3)
 - **M4:** discoverability aliases + hardening complete (Phases 4-5)
