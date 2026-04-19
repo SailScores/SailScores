@@ -29,7 +29,6 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("clubs")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicClubListItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetClubs(
             [FromQuery] int? page,
@@ -43,17 +42,12 @@ namespace SailScores.Web.Areas.Api.Controllers
             }
 
             var response = await _publicApiService.GetClubsAsync(page, pageSize);
-            SetPublicCacheHeaders(300);
+            SetPublicCacheHeaders(300, "page", "pageSize", "format");
 
             var options = response.Items
                 .Select(i => (Key: i.Name, Value: i.ClubInitials))
                 .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
                 .ToList();
-
-            if (IsOptionsTextFormat(format))
-            {
-                return Content(BuildRubyishOptions(options), "text/plain");
-            }
 
             if (IsOptionsFormat(format))
             {
@@ -81,7 +75,6 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("clubs/{clubToken}/seasons")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeasonListItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetSeasons(
@@ -102,17 +95,12 @@ namespace SailScores.Web.Areas.Api.Controllers
                 return NotFoundProblem("Club was not found for the provided route.", "club_not_found");
             }
 
-            SetPublicCacheHeaders(300);
+            SetPublicCacheHeaders(300, "page", "pageSize", "format");
 
             var options = response.Items
                 .Select(i => (Key: i.SeasonName, Value: i.SeasonUrlName))
                 .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
                 .ToList();
-
-            if (IsOptionsTextFormat(format))
-            {
-                return Content(BuildRubyishOptions(options), "text/plain");
-            }
 
             if (IsOptionsFormat(format))
             {
@@ -125,7 +113,6 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("clubs/{clubToken}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetSeriesByClub(
@@ -146,17 +133,12 @@ namespace SailScores.Web.Areas.Api.Controllers
                 return NotFoundProblem("Club was not found for the provided route.", "club_not_found");
             }
 
-            SetPublicCacheHeaders(300);
+            SetPublicCacheHeaders(300, "page", "pageSize", "format");
 
             var options = response.Items
                 .Select(i => (Key: i.SeriesName, Value: i.SeriesUrlName))
                 .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
                 .ToList();
-
-            if (IsOptionsTextFormat(format))
-            {
-                return Content(BuildRubyishOptions(options), "text/plain");
-            }
 
             if (IsOptionsFormat(format))
             {
@@ -169,7 +151,6 @@ namespace SailScores.Web.Areas.Api.Controllers
         [HttpGet("clubs/{clubToken}/seasons/{seasonUrlName}/series")]
         [ProducesResponseType(typeof(PublicListResponseDto<PublicSeriesListItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(IEnumerable<Dictionary<string, string>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetSeriesBySeason(
@@ -191,17 +172,12 @@ namespace SailScores.Web.Areas.Api.Controllers
                 return NotFoundProblem("Club was not found for the provided route.", "club_not_found");
             }
 
-            SetPublicCacheHeaders(300);
+            SetPublicCacheHeaders(300, "page", "pageSize", "format");
 
             var options = response.Items
                 .Select(i => (Key: i.SeriesName, Value: i.SeriesUrlName))
                 .OrderBy(i => i.Key, StringComparer.OrdinalIgnoreCase)
                 .ToList();
-
-            if (IsOptionsTextFormat(format))
-            {
-                return Content(BuildRubyishOptions(options), "text/plain");
-            }
 
             if (IsOptionsFormat(format))
             {
@@ -223,23 +199,6 @@ namespace SailScores.Web.Areas.Api.Controllers
         private static bool IsOptionsFormat(string format)
         {
             return string.Equals(format, "options", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsOptionsTextFormat(string format)
-        {
-            return string.Equals(format, "optionsText", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(format, "options-text", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static string BuildRubyishOptions(IEnumerable<(string Key, string Value)> options)
-        {
-            var items = options.Select(o => $"{{ '{EscapeRubyish(o.Key)}' => '{EscapeRubyish(o.Value)}' }}");
-            return $"[{string.Join(", ", items)}]";
-        }
-
-        private static string EscapeRubyish(string value)
-        {
-            return (value ?? string.Empty).Replace("\\", "\\\\").Replace("'", "\\'");
         }
 
         private ActionResult ValidatePaging(int? page, int? pageSize)

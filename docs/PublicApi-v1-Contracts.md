@@ -1,4 +1,4 @@
-# Public API v1 Contracts (Phase 0)
+# Public API v1 Contracts
 
 This document defines response and error contracts for `/api/public/v1` endpoints.
 
@@ -95,15 +95,47 @@ All list endpoints use `PublicListResponseDto<TItem>`.
 
 Response contract: `PublicSeriesDetailResponseDto`
 
-### Required sections
+### Core fields
 
 - identity: `id`, `name`, `urlName`
-- route identity: `clubInitials`, `seasonName`
-- `competitors` (ranked order; each competitor includes standing data such as `rank` and `totalPoints`)
+- route identity: `clubInitials`, `seasonName`, `seasonUrlName`
+- links/meta: `htmlUrl`, `updatedUtc`, `updatedBy`
+- series metadata: `description`, `seriesType`, `fleetName`, `trendOption`
+- display/scoring flags: `preferAlternativeSailNumbers`, `hideDncDiscards`
+- summary metrics: `isPreliminary`, `numberOfSailedRaces`, `numberOfDiscards`, `competitorCount`, `scoringSystemName`
+- percent scoring detail: `percentRequired` (set when the series uses percent scoring)
+
+### Competitors
+
+`competitors` are returned in ranked order. Each item includes:
+
+- `id`, `rank`, `trend`
+- `competitorName`, `boatName`
+- `sailNumber`, `alternativeSailNumber`
+- `homeClubName` (returned when club data is available for display)
+- `totalPoints`
+- `url`
 
 ### Optional include sections
 
 - `races` appears only for `?include=races`
+  - each race includes: `id`, `dateUtc`, `order`, `state`, `name`, `url`, `htmlUrl`
+  - weather/header fields: `windSpeed`, `windSpeedUnits`, `windDirectionDegrees`, `weatherIcon`
+- `scoreCodesUsed` appears only for `?include=races`
+  - each score code item includes: `code`, `description`, `formula`
+
+## Race Detail
+
+`GET /api/public/v1/clubs/{clubInitials}/races/{raceId}`
+
+Response contract: `PublicRaceDetailResponseDto`
+
+Fields include:
+
+- identity: `id`, `clubInitials`, `name`
+- timing/state: `dateUtc`, `order`, `state`
+- text/meta: `description`, `htmlUrl`, `updatedUtc`, `updatedBy`
+- weather/header values: `windSpeed`, `windSpeedUnits`, `windDirectionDegrees`, `weatherIcon`
 
 ## Error Contract
 

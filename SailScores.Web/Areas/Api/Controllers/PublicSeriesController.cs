@@ -23,7 +23,8 @@ namespace SailScores.Web.Areas.Api.Controllers
         public async Task<ActionResult<PublicSeriesDetailResponseDto>> Get(
             [FromRoute] string clubInitials,
             [FromRoute] string seasonUrlName,
-            [FromRoute] string seriesUrlName)
+            [FromRoute] string seriesUrlName,
+            [FromQuery] string include)
         {
             if (string.IsNullOrWhiteSpace(clubInitials)
                 || string.IsNullOrWhiteSpace(seasonUrlName)
@@ -32,13 +33,22 @@ namespace SailScores.Web.Areas.Api.Controllers
                 return BadRequestProblem("Club, season, and series route values are required.", "invalid_route_values");
             }
 
-            var dto = await _publicApiService.GetSeriesDetailAsync(clubInitials, seasonUrlName, seriesUrlName);
+            var includeValues = (include ?? string.Empty)
+                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            var includeCompetitors = includeValues.Contains("competitors", StringComparer.OrdinalIgnoreCase);
+            var includeRaces = includeValues.Contains("races", StringComparer.OrdinalIgnoreCase);
+            var dto = await _publicApiService.GetSeriesDetailAsync(
+                clubInitials,
+                seasonUrlName,
+                seriesUrlName,
+                includeCompetitors,
+                includeRaces);
             if (dto == null)
             {
                 return NotFoundProblem("Series was not found for the provided route.", "series_not_found");
             }
 
-            SetPublicCacheHeaders(300);
+            SetPublicCacheHeaders(300, "include");
 
             return Ok(dto);
         }

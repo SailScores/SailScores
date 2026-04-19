@@ -26,5 +26,11 @@ public interface IPublicApiService
     Task<PublicSeriesDetailResponseDto> GetSeriesDetailAsync(
         string clubInitials,
         string seasonUrlName,
-        string seriesUrlName);
+        string seriesUrlName,
+        bool includeCompetitors = false,
+        bool includeRaces = false);
+
+    Task<PublicRaceDetailResponseDto> GetRaceDetailAsync(
+        string clubInitials,
+        Guid raceId);
 }
