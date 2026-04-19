@@ -67,47 +67,61 @@
         You can then use it to sign in even if you forget your password.
     </p>
     <form asp-page-handler="LinkLogin" method="post">
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 gap-md-3">
             @foreach (var provider in Model.OtherLogins)
             {
                 @switch (provider.Name)
                 {
                     case "Google":
                         <button type="submit" name="provider" value="Google"
-                                class="btn fw-semibold"
-                                style="background-color:#4285F4;color:#fff;border-color:#4285F4;">
-                            <i class="fab fa-google me-1"></i>Add Google
+                                class="btn external-auth-btn external-auth-btn--google"
+                                title="Link your Google account">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-google"></i></span>
+                            <span class="external-auth-btn__label">Link Google</span>
                         </button>
                         break;
 
                     case "Microsoft":
                     case "MicrosoftAccount":
                         <button type="submit" name="provider" value="@provider.Name"
-                                class="btn fw-semibold"
-                                style="background-color:#2F2F2F;color:#fff;border-color:#2F2F2F;">
-                            <i class="fab fa-microsoft me-1"></i>Add Microsoft
+                                class="btn external-auth-btn external-auth-btn--microsoft"
+                                title="Link your Microsoft account">
+                            <span class="external-auth-btn__icon external-auth-btn__icon--microsoft" aria-hidden="true">
+                                <span class="external-auth-btn__microsoft-mark">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </span>
+                            </span>
+                            <span class="external-auth-btn__label">Link Microsoft</span>
                         </button>
                         break;
 
                     case "Apple":
                         <button type="submit" name="provider" value="Apple"
-                                class="btn btn-dark fw-semibold">
-                            <i class="fab fa-apple me-1"></i>Add Apple
+                                class="btn external-auth-btn external-auth-btn--apple"
+                                title="Link your Apple ID">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-apple"></i></span>
+                            <span class="external-auth-btn__label">Link Apple</span>
                         </button>
                         break;
 
                     case "Facebook":
                         <button type="submit" name="provider" value="Facebook"
-                                class="btn fw-semibold"
-                                style="background-color:#1877F2;color:#fff;border-color:#1877F2;">
-                            <i class="fab fa-facebook me-1"></i>Add Facebook
+                                class="btn external-auth-btn external-auth-btn--facebook"
+                                title="Link your Facebook account">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-facebook-f"></i></span>
+                            <span class="external-auth-btn__label">Link Facebook</span>
                         </button>
                         break;
 
                     default:
                         <button type="submit" name="provider" value="@provider.Name"
-                                class="btn btn-secondary">
-                            Add @provider.DisplayName
+                                class="btn external-auth-btn external-auth-btn--generic"
+                                title="Link your @(provider.DisplayName ?? provider.Name) account">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fas fa-link"></i></span>
+                            <span class="external-auth-btn__label">Link @(provider.DisplayName ?? provider.Name)</span>
                         </button>
                         break;
                 }

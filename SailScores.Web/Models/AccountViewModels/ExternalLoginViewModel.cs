@@ -16,5 +16,8 @@ namespace SailScores.Web.Models.AccountViewModels
         [Display(Name = "Last Name")]
         [StringLength(100)]
         public string LastName { get; set; }
+
+        [Display(Name = "Enable Browser Analytics")]
+        public bool EnableAppInsights { get; set; }
     }
 }
