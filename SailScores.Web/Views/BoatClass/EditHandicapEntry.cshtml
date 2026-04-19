@@ -1,17 +1,17 @@
-@model SailScores.Web.Models.SailScores.CompetitorHandicapViewModel
+@model SailScores.Web.Models.SailScores.ClassHandicapViewModel
 
 @{
     ViewData["Title"] = "Edit Handicap Rating";
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
-<h4>Edit Handicap Rating — @Model.CompetitorName</h4>
+<h4>Edit Handicap Rating — @Model.ClassName</h4>
 <hr />
 <div class="row">
     <div class="col-12 col-md-6">
         <form asp-action="EditHandicapEntry">
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="CompetitorId" />
+            <input type="hidden" asp-for="BoatClassId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
@@ -47,7 +47,7 @@
 
             <div class="mb-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Edit" asp-route-id="@Model.CompetitorId" class="btn btn-outline-primary">Cancel</a>
+                <a asp-action="Edit" asp-route-id="@Model.BoatClassId" class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
     </div>

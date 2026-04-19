@@ -76,6 +76,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     public DbSet<HandicapSystem> HandicapSystems { get; set; }
     public DbSet<CompetitorHandicap> CompetitorHandicaps { get; set; }
+    public DbSet<ClassHandicap> ClassHandicaps { get; set; }
 
     public async Task<IList<AllCompHistogramFields>> GetAllCompHistogramFields(
         Guid clubId,
@@ -474,6 +475,32 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasFilter("[EffectiveTo] IS NULL")
             .IsUnique()
             .HasDatabaseName("IX_CompetitorHandicap_NullEnd");
+
+        modelBuilder.Entity<ClassHandicap>()
+            .HasOne(ch => ch.BoatClass)
+            .WithMany()
+            .HasForeignKey(ch => ch.BoatClassId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ClassHandicap>()
+            .HasOne(ch => ch.HandicapSystem)
+            .WithMany()
+            .HasForeignKey(ch => ch.HandicapSystemId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // At most one row per (BoatClassId, HandicapSystemId) may have EffectiveFrom IS NULL
+        modelBuilder.Entity<ClassHandicap>()
+            .HasIndex(ch => new { ch.BoatClassId, ch.HandicapSystemId })
+            .HasFilter("[EffectiveFrom] IS NULL")
+            .IsUnique()
+            .HasDatabaseName("IX_ClassHandicap_NullStart");
+
+        // At most one row per (BoatClassId, HandicapSystemId) may have EffectiveTo IS NULL
+        modelBuilder.Entity<ClassHandicap>()
+            .HasIndex(ch => new { ch.BoatClassId, ch.HandicapSystemId })
+            .HasFilter("[EffectiveTo] IS NULL")
+            .IsUnique()
+            .HasDatabaseName("IX_ClassHandicap_NullEnd");
 
         modelBuilder.Entity<HandicapSystem>().HasData(
             new HandicapSystem

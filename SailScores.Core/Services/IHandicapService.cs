@@ -26,6 +26,12 @@ namespace SailScores.Core.Services
 
         Task DeleteCompetitorHandicapAsync(Guid id);
 
+        Task<IList<ClassHandicap>> GetClassHandicapsAsync(Guid boatClassId);
+
+        Task<ClassHandicap> SaveClassHandicapAsync(ClassHandicap handicap);
+
+        Task DeleteClassHandicapAsync(Guid id);
+
         // Resolves the effective HandicapSystem for a series via the Series → Fleet → Club hierarchy.
         // Returns null if no handicap system is configured at any level.
         Task<HandicapSystem> GetEffectiveHandicapSystemAsync(Series series);

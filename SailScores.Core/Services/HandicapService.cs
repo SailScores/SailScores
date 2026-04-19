@@ -128,10 +128,12 @@ namespace SailScores.Core.Services
 
                 existing.Value = handicap.Value;
                 existing.EffectiveFrom = handicap.EffectiveFrom;
-                existing.EffectiveTo = handicap.EffectiveTo;
                 existing.Notes = handicap.Notes;
                 await _dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
+
+            await RebuildCompetitorHandicapChainAsync(handicap.CompetitorId, handicap.HandicapSystemId)
+                .ConfigureAwait(false);
 
             return handicap;
         }
@@ -142,8 +144,130 @@ namespace SailScores.Core.Services
                 .SingleAsync(ch => ch.Id == id)
                 .ConfigureAwait(false);
 
+            var competitorId = handicap.CompetitorId;
+            var systemId = handicap.HandicapSystemId;
+
             _dbContext.CompetitorHandicaps.Remove(handicap);
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await RebuildCompetitorHandicapChainAsync(competitorId, systemId).ConfigureAwait(false);
+        }
+
+        private async Task RebuildCompetitorHandicapChainAsync(Guid competitorId, Guid handicapSystemId)
+        {
+            var all = await _dbContext.CompetitorHandicaps
+                .Where(ch => ch.CompetitorId == competitorId && ch.HandicapSystemId == handicapSystemId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            RebuildChain(all.Select(r => new CompetitorHandicapEntry(r)).Cast<IHandicapEntry>().ToList());
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async Task<IList<ClassHandicap>> GetClassHandicapsAsync(Guid boatClassId)
+        {
+            var handicaps = await _dbContext.ClassHandicaps
+                .Include(ch => ch.HandicapSystem)
+                .Where(ch => ch.BoatClassId == boatClassId)
+                .OrderBy(ch => ch.HandicapSystem.Name)
+                .ThenBy(ch => ch.EffectiveFrom)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return _mapper.Map<IList<ClassHandicap>>(handicaps);
+        }
+
+        public async Task<ClassHandicap> SaveClassHandicapAsync(ClassHandicap handicap)
+        {
+            if (handicap.Id == Guid.Empty)
+            {
+                var dbHandicap = _mapper.Map<Db.ClassHandicap>(handicap);
+                dbHandicap.Id = Guid.NewGuid();
+                _dbContext.ClassHandicaps.Add(dbHandicap);
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+                handicap.Id = dbHandicap.Id;
+            }
+            else
+            {
+                var existing = await _dbContext.ClassHandicaps
+                    .SingleAsync(ch => ch.Id == handicap.Id)
+                    .ConfigureAwait(false);
+
+                existing.Value = handicap.Value;
+                existing.EffectiveFrom = handicap.EffectiveFrom;
+                existing.Notes = handicap.Notes;
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+
+            await RebuildClassHandicapChainAsync(handicap.BoatClassId, handicap.HandicapSystemId)
+                .ConfigureAwait(false);
+
+            return handicap;
+        }
+
+        public async Task DeleteClassHandicapAsync(Guid id)
+        {
+            var handicap = await _dbContext.ClassHandicaps
+                .SingleAsync(ch => ch.Id == id)
+                .ConfigureAwait(false);
+
+            var classId = handicap.BoatClassId;
+            var systemId = handicap.HandicapSystemId;
+
+            _dbContext.ClassHandicaps.Remove(handicap);
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await RebuildClassHandicapChainAsync(classId, systemId).ConfigureAwait(false);
+        }
+
+        private async Task RebuildClassHandicapChainAsync(Guid boatClassId, Guid handicapSystemId)
+        {
+            var all = await _dbContext.ClassHandicaps
+                .Where(ch => ch.BoatClassId == boatClassId && ch.HandicapSystemId == handicapSystemId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            RebuildChain(all.Select(r => new ClassHandicapEntry(r)).Cast<IHandicapEntry>().ToList());
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        private interface IHandicapEntry
+        {
+            DateTime? EffectiveFrom { get; }
+            DateTime? EffectiveTo { get; set; }
+        }
+
+        private sealed class CompetitorHandicapEntry : IHandicapEntry
+        {
+            private readonly Db.CompetitorHandicap _row;
+            public CompetitorHandicapEntry(Db.CompetitorHandicap row) => _row = row;
+            public DateTime? EffectiveFrom => _row.EffectiveFrom;
+            public DateTime? EffectiveTo { get => _row.EffectiveTo; set => _row.EffectiveTo = value; }
+        }
+
+        private sealed class ClassHandicapEntry : IHandicapEntry
+        {
+            private readonly Db.ClassHandicap _row;
+            public ClassHandicapEntry(Db.ClassHandicap row) => _row = row;
+            public DateTime? EffectiveFrom => _row.EffectiveFrom;
+            public DateTime? EffectiveTo { get => _row.EffectiveTo; set => _row.EffectiveTo = value; }
+        }
+
+        private static void RebuildChain(IList<IHandicapEntry> entries)
+        {
+            // Sort: null EffectiveFrom (oldest) first, then ascending by date
+            var sorted = entries
+                .OrderBy(e => e.EffectiveFrom.HasValue ? 1 : 0)
+                .ThenBy(e => e.EffectiveFrom)
+                .ToList();
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                if (i < sorted.Count - 1)
+                    sorted[i].EffectiveTo = sorted[i + 1].EffectiveFrom!.Value.AddDays(-1);
+                else
+                    sorted[i].EffectiveTo = null;
+            }
         }
 
         public async Task<HandicapSystem> GetEffectiveHandicapSystemAsync(Series series)
@@ -176,7 +300,6 @@ namespace SailScores.Core.Services
             Series series,
             Guid handicapSystemId)
         {
-            // Collect all competitor IDs that appear in the series
             var competitorIds = series.Races?
                 .Where(r => r.Scores != null)
                 .SelectMany(r => r.Scores)
@@ -184,7 +307,6 @@ namespace SailScores.Core.Services
                 .Distinct()
                 .ToList() ?? new List<Guid>();
 
-            // Collect all distinct race dates
             var raceDates = series.Races?
                 .Where(r => r.Date.HasValue)
                 .Select(r => r.Date!.Value.Date)
@@ -194,31 +316,62 @@ namespace SailScores.Core.Services
             if (!competitorIds.Any() || !raceDates.Any())
                 return new Dictionary<(Guid, DateTime), decimal>();
 
-            // Batch-load all relevant handicap rows
-            var rows = await _dbContext.CompetitorHandicaps
+            var competitorRows = await _dbContext.CompetitorHandicaps
                 .Where(ch => ch.HandicapSystemId == handicapSystemId
                           && competitorIds.Contains(ch.CompetitorId))
                 .ToListAsync()
                 .ConfigureAwait(false);
 
+            // Load each competitor's BoatClassId for class-level fallback
+            var classIdByCompetitor = await _dbContext.Competitors
+                .Where(c => competitorIds.Contains(c.Id))
+                .Select(c => new { c.Id, c.BoatClassId })
+                .ToDictionaryAsync(c => c.Id, c => c.BoatClassId)
+                .ConfigureAwait(false);
+
+            var classIds = classIdByCompetitor.Values.Distinct().ToList();
+
+            var classRows = classIds.Any()
+                ? await _dbContext.ClassHandicaps
+                    .Where(ch => ch.HandicapSystemId == handicapSystemId
+                              && classIds.Contains(ch.BoatClassId))
+                    .ToListAsync()
+                    .ConfigureAwait(false)
+                : new List<Db.ClassHandicap>();
+
             var lookup = new Dictionary<(Guid competitorId, DateTime raceDate), decimal>();
 
             foreach (var competitorId in competitorIds)
             {
-                var competitorRows = rows
-                    .Where(r => r.CompetitorId == competitorId)
-                    .ToList();
+                var compRows = competitorRows.Where(r => r.CompetitorId == competitorId).ToList();
+                var boatClassId = classIdByCompetitor.TryGetValue(competitorId, out var cid) ? cid : (Guid?)null;
+                var clsRows = boatClassId.HasValue
+                    ? classRows.Where(r => r.BoatClassId == boatClassId.Value).ToList()
+                    : new List<Db.ClassHandicap>();
 
                 foreach (var raceDate in raceDates)
                 {
-                    var effective = competitorRows
+                    var effective = compRows
                         .Where(r => (r.EffectiveFrom == null || r.EffectiveFrom.Value.Date <= raceDate)
                                  && (r.EffectiveTo == null || r.EffectiveTo.Value.Date >= raceDate))
                         .OrderByDescending(r => r.EffectiveFrom)
                         .FirstOrDefault();
 
                     if (effective != null)
+                    {
                         lookup[(competitorId, raceDate)] = effective.Value;
+                        continue;
+                    }
+
+                    // Fall back to class-level rating
+                    var classEffective = clsRows
+                        .Where(r => (r.EffectiveFrom == null || r.EffectiveFrom.Value.Date <= raceDate)
+                                 && (r.EffectiveTo == null || r.EffectiveTo.Value.Date >= raceDate))
+                        .OrderByDescending(r => r.EffectiveFrom)
+                        .FirstOrDefault();
+
+                    if (classEffective != null)
+                        lookup[(competitorId, raceDate)] = classEffective.Value;
                 }
             }
 

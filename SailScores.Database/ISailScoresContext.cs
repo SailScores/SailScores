@@ -57,6 +57,7 @@ namespace SailScores.Database
 
         DbSet<HandicapSystem> HandicapSystems { get; set; }
         DbSet<CompetitorHandicap> CompetitorHandicaps { get; set; }
+        DbSet<ClassHandicap> ClassHandicaps { get; set; }
 
         // Junction tables for backup/restore operations
         DbSet<SeriesRace> SeriesRaces { get; set; }

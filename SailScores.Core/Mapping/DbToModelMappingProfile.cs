@@ -89,6 +89,9 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.CompetitorHandicap, Model.CompetitorHandicap>()
                 .ForMember(d => d.Competitor, o => o.Ignore())
                 .ReverseMap();
+            CreateMap<Db.ClassHandicap, Model.ClassHandicap>()
+                .ForMember(d => d.BoatClass, o => o.Ignore())
+                .ReverseMap();
 
             CreateMap<Db.ClubRequest, Model.ClubRequest>()
                 .ReverseMap();
