@@ -104,6 +104,21 @@
         background: #424242 !important;
     }
 
+    .external-auth-btn__icon--microsoft {
+        background-color: #1f1f1f;
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .external-auth-help {
+        background-color: rgba(13, 202, 240, 0.12);
+        border-color: rgba(13, 202, 240, 0.3);
+        color: #dee2e6;
+
+        a {
+            color: #7bdff6;
+        }
+    }
+
     /* Form elements */
     .form-control {
         background-color: $bg-darker !important;

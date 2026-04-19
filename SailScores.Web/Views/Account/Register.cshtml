@@ -1,12 +1,21 @@
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using SailScores.Identity.Entities
+@using SailScores.Web.Services
 @model SailScores.Web.Models.AccountViewModels.RegisterViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+@inject AppSettingsService AppSettingsService
 @{
     ViewData["Title"] = "Register";
+    var loginProviders = AppSettingsService.IsExternalAuthenticationEnabled()
+        ? (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+        : new List<AuthenticationScheme>();
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<div class="row">
-    <p class="col-md-8 col-xl-4">
+<div class="row g-4">
+    <div class="col-md-8 col-xl-4">
         <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
             <h4>Create a new account:</h4>
             <p class="lead">
@@ -68,6 +77,87 @@
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
     </div>
+
+    @if (loginProviders.Count > 0)
+    {
+        <div class="col-md-5 col-xl-4">
+            <section>
+                <h4>Or register with</h4>
+                <p class="text-muted mb-3">
+                    Create your SailScores account using one of these providers.
+                </p>
+                <hr />
+                <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                    <div class="external-auth-group" style="max-width:320px;">
+                        @foreach (var provider in loginProviders)
+                        {
+                            @switch (provider.Name)
+                            {
+                                case "Google":
+                                    <button type="submit" name="provider" value="Google"
+                                            class="btn external-auth-btn external-auth-btn--google w-100"
+                                            title="Register with your Google account">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-google"></i></span>
+                                        <span class="external-auth-btn__label">Continue with Google</span>
+                                    </button>
+                                    break;
+
+                                case "Microsoft":
+                                case "MicrosoftAccount":
+                                    <button type="submit" name="provider" value="@provider.Name"
+                                            class="btn external-auth-btn external-auth-btn--microsoft w-100"
+                                            title="Register with your Microsoft account">
+                                        <span class="external-auth-btn__icon external-auth-btn__icon--microsoft" aria-hidden="true">
+                                            <span class="external-auth-btn__microsoft-mark">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </span>
+                                        </span>
+                                        <span class="external-auth-btn__label">Continue with Microsoft</span>
+                                    </button>
+                                    break;
+
+                                case "Apple":
+                                    <button type="submit" name="provider" value="Apple"
+                                            class="btn external-auth-btn external-auth-btn--apple w-100"
+                                            title="Register with your Apple ID">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-apple"></i></span>
+                                        <span class="external-auth-btn__label">Continue with Apple</span>
+                                    </button>
+                                    break;
+
+                                case "Facebook":
+                                    <button type="submit" name="provider" value="Facebook"
+                                            class="btn external-auth-btn external-auth-btn--facebook w-100"
+                                            title="Register with your Facebook account">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-facebook-f"></i></span>
+                                        <span class="external-auth-btn__label">Continue with Facebook</span>
+                                    </button>
+                                    break;
+
+                                default:
+                                    <button type="submit" name="provider" value="@provider.Name"
+                                            class="btn external-auth-btn external-auth-btn--generic w-100"
+                                            title="Register using your @(provider.DisplayName ?? provider.Name) account">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fas fa-user-plus"></i></span>
+                                        <span class="external-auth-btn__label">Continue with @(provider.DisplayName ?? provider.Name)</span>
+                                    </button>
+                                    break;
+                            }
+                        }
+                    </div>
+                </form>
+                <div class="external-auth-help alert alert-info mt-3 mb-0" role="note">
+                    <h5 class="h6 mb-2">Already have a SailScores account?</h5>
+                    <p class="mb-0">
+                        Use the <a asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]">Log in</a> page instead, then link external providers from My Account &gt; External logins.
+                    </p>
+                </div>
+            </section>
+        </div>
+    }
 </div>
 
 @section Scripts {
