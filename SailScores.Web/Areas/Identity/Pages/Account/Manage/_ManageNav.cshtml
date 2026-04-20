@@ -1,7 +1,10 @@
 @using SailScores.Identity.Entities
+@using SailScores.Web.Services
 @inject SignInManager<ApplicationUser> SignInManager
+@inject AppSettingsService AppSettingsService
 @{
-    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+    var hasExternalLogins = AppSettingsService.IsExternalAuthenticationEnabled()
+        && (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
 <ul class="nav nav-pills flex-column">
     <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" asp-page="./Index">Profile</a></li>
