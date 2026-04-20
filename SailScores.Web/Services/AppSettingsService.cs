@@ -18,7 +18,7 @@ public class AppSettingsService
 
     public bool IsExternalAuthenticationEnabled()
     {
-        return _config.GetValue<bool>(ExternalIdentityProvidersEnabledKey);
+        return _config.GetValue<bool?>(ExternalIdentityProvidersEnabledKey) == true;
     }
 
     public string GetJwtKey()
