@@ -59,6 +59,7 @@
     </div>
     @if (loginProviders.Count > 0)
     {
+        var providerListText = string.Join(", ", loginProviders.Select(provider => provider.DisplayName ?? provider.Name));
         <div class="col-md-5 col-md-offset-1">
             <section>
                 <h4>Or</h4>
@@ -126,17 +127,14 @@
                     </div>
                 </form>
                 <div class="external-auth-help alert alert-info mt-3 mb-0" role="note">
-                    <h5 class="h6 mb-2">Already have a SailScores account?</h5>
+                    <h5 class="h6 mb-2">Sign in faster with @providerListText</h5>
                     <p class="mb-2">
-                        To avoid creating a second account, first sign in with your SailScores email and password.
+                        If you already have a SailScores account, first sign in once with your SailScores email and
+                        password, then link your external provider in
+                        <span class="link-primary">My Account &gt; External logins.</span>
                     </p>
-                    <ol class="mb-2 ps-3">
-                        <li>Sign in with your existing SailScores account.</li>
-                        <li>Open <span class="link-primary">My Account &gt; External logins.</span></li>
-                        <li>Link the external login there.</li>
-                    </ol>
                     <p class="mb-0">
-                        After linking, you can use either sign-in method for the same account.
+                        After linking, you can use either method to sign in.
                     </p>
                 </div>
             </section>
