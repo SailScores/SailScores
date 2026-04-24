@@ -40,7 +40,5 @@ namespace SailScores.Api.Dtos.Public
         [StringLength(500)]
         public string Url { get; set; }
 
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public IList<PublicSeriesCompetitorRaceResultDto> RaceResults { get; set; }
     }
 }
