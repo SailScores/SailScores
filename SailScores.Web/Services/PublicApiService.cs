@@ -298,8 +298,7 @@ public class PublicApiService : IPublicApiService
                     (series.ShowCompetitorClub ?? false)
                         || (series.FlatResults?.Competitors?.Any(c => !string.IsNullOrWhiteSpace(c.HomeClubName))
                             ?? false),
-                    series.PreferAlternativeSailNumbers ?? false,
-                    includeRaces)
+                    series.PreferAlternativeSailNumbers ?? false)
                 : null,
             Races = includeRaces
                 ? MapRaces(
@@ -467,9 +466,6 @@ public class PublicApiService : IPublicApiService
                         competitorRouteTokens.TryGetValue(competitor.Id, out var competitorRouteToken)
                             ? competitorRouteToken
                             : null),
-                    RaceResults = includeRaceResults
-                        ? MapCompetitorRaceResults(score?.Scores)
-                        : null
                 };
             })
             .OrderBy(c => c.Rank ?? int.MaxValue)
