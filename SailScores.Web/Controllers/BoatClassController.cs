@@ -140,15 +140,25 @@ public class BoatClassController : Controller
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
             return View(model);
         }
-        await _handicapService.SaveClassHandicapAsync(new ClassHandicap
+        try
         {
-            Id = Guid.Empty,
-            BoatClassId = model.BoatClassId,
-            HandicapSystemId = model.HandicapSystemId,
-            Value = model.Value,
-            EffectiveFrom = model.EffectiveFrom,
-            Notes = model.Notes
-        });
+            await _handicapService.SaveClassHandicapAsync(new ClassHandicap
+            {
+                Id = Guid.Empty,
+                BoatClassId = model.BoatClassId,
+                HandicapSystemId = model.HandicapSystemId,
+                Value = model.Value,
+                EffectiveFrom = model.EffectiveFrom,
+                Notes = model.Notes
+            });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            var clubId = await _clubService.GetClubId(clubInitials);
+            model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            return View(model);
+        }
         return RedirectToAction("Edit", new { clubInitials, id = model.BoatClassId });
     }
 
@@ -185,15 +195,25 @@ public class BoatClassController : Controller
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
             return View(model);
         }
-        await _handicapService.SaveClassHandicapAsync(new ClassHandicap
+        try
         {
-            Id = model.Id,
-            BoatClassId = model.BoatClassId,
-            HandicapSystemId = model.HandicapSystemId,
-            Value = model.Value,
-            EffectiveFrom = model.EffectiveFrom,
-            Notes = model.Notes
-        });
+            await _handicapService.SaveClassHandicapAsync(new ClassHandicap
+            {
+                Id = model.Id,
+                BoatClassId = model.BoatClassId,
+                HandicapSystemId = model.HandicapSystemId,
+                Value = model.Value,
+                EffectiveFrom = model.EffectiveFrom,
+                Notes = model.Notes
+            });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            var clubId = await _clubService.GetClubId(clubInitials);
+            model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            return View(model);
+        }
         return RedirectToAction("Edit", new { clubInitials, id = model.BoatClassId });
     }
 
