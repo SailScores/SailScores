@@ -35,7 +35,7 @@
                 <label asp-for="EffectiveFrom" class="control-label"></label>
                 <input asp-for="EffectiveFrom" class="form-control" type="date" />
                 <span asp-validation-for="EffectiveFrom" class="text-danger"></span>
-                <small class="form-text text-muted">Leave blank to apply from the beginning. The previous rating's end date will be set automatically.</small>
+                <small class="form-text text-muted">Leave blank if this is the first rating for the selected system. A start date is required when other ratings already exist for that system. End dates are set automatically.</small>
             </div>
 
             <div class="mb-3">

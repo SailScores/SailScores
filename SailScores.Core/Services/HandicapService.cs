@@ -114,6 +114,18 @@ namespace SailScores.Core.Services
         {
             if (handicap.Id == Guid.Empty)
             {
+                if (handicap.EffectiveFrom == null)
+                {
+                    var nullStartExists = await _dbContext.CompetitorHandicaps
+                        .AnyAsync(ch => ch.CompetitorId == handicap.CompetitorId
+                                     && ch.HandicapSystemId == handicap.HandicapSystemId
+                                     && ch.EffectiveFrom == null)
+                        .ConfigureAwait(false);
+                    if (nullStartExists)
+                        throw new InvalidOperationException(
+                            "A rating with no start date already exists for this system. Please enter a start date for the new rating.");
+                }
+
                 var dbHandicap = _mapper.Map<Db.CompetitorHandicap>(handicap);
                 dbHandicap.Id = Guid.NewGuid();
                 _dbContext.CompetitorHandicaps.Add(dbHandicap);
@@ -125,6 +137,19 @@ namespace SailScores.Core.Services
                 var existing = await _dbContext.CompetitorHandicaps
                     .SingleAsync(ch => ch.Id == handicap.Id)
                     .ConfigureAwait(false);
+
+                if (handicap.EffectiveFrom == null)
+                {
+                    var nullStartExists = await _dbContext.CompetitorHandicaps
+                        .AnyAsync(ch => ch.CompetitorId == handicap.CompetitorId
+                                     && ch.HandicapSystemId == handicap.HandicapSystemId
+                                     && ch.EffectiveFrom == null
+                                     && ch.Id != handicap.Id)
+                        .ConfigureAwait(false);
+                    if (nullStartExists)
+                        throw new InvalidOperationException(
+                            "Another rating with no start date already exists for this system. Please enter a start date.");
+                }
 
                 existing.Value = handicap.Value;
                 existing.EffectiveFrom = handicap.EffectiveFrom;
@@ -181,6 +206,18 @@ namespace SailScores.Core.Services
         {
             if (handicap.Id == Guid.Empty)
             {
+                if (handicap.EffectiveFrom == null)
+                {
+                    var nullStartExists = await _dbContext.ClassHandicaps
+                        .AnyAsync(ch => ch.BoatClassId == handicap.BoatClassId
+                                     && ch.HandicapSystemId == handicap.HandicapSystemId
+                                     && ch.EffectiveFrom == null)
+                        .ConfigureAwait(false);
+                    if (nullStartExists)
+                        throw new InvalidOperationException(
+                            "A rating with no start date already exists for this system. Please enter a start date for the new rating.");
+                }
+
                 var dbHandicap = _mapper.Map<Db.ClassHandicap>(handicap);
                 dbHandicap.Id = Guid.NewGuid();
                 _dbContext.ClassHandicaps.Add(dbHandicap);
@@ -192,6 +229,19 @@ namespace SailScores.Core.Services
                 var existing = await _dbContext.ClassHandicaps
                     .SingleAsync(ch => ch.Id == handicap.Id)
                     .ConfigureAwait(false);
+
+                if (handicap.EffectiveFrom == null)
+                {
+                    var nullStartExists = await _dbContext.ClassHandicaps
+                        .AnyAsync(ch => ch.BoatClassId == handicap.BoatClassId
+                                     && ch.HandicapSystemId == handicap.HandicapSystemId
+                                     && ch.EffectiveFrom == null
+                                     && ch.Id != handicap.Id)
+                        .ConfigureAwait(false);
+                    if (nullStartExists)
+                        throw new InvalidOperationException(
+                            "Another rating with no start date already exists for this system. Please enter a start date.");
+                }
 
                 existing.Value = handicap.Value;
                 existing.EffectiveFrom = handicap.EffectiveFrom;
