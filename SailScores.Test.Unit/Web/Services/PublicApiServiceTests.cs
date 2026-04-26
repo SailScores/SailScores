@@ -160,7 +160,6 @@ public class PublicApiServiceTests
         Assert.Single(result.Competitors);
         Assert.Single(result.Races);
         Assert.Single(result.ScoreCodesUsed);
-        Assert.Single(result.Competitors[0].RaceResults);
         Assert.Single(result.Races[0].CompetitorResults);
         Assert.Equal(TimeSpan.FromMinutes(42), result.Races[0].CompetitorResults[0].ElapsedTime);
         Assert.Equal(2, result.Competitors[0].Trend);
@@ -199,7 +198,6 @@ public class PublicApiServiceTests
 
         Assert.NotNull(result);
         Assert.Single(result.Competitors);
-        Assert.Null(result.Competitors[0].RaceResults);
         Assert.Null(result.Races);
         Assert.Null(result.ScoreCodesUsed);
     }

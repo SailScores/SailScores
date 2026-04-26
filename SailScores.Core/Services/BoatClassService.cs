@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Database;
 using System;
@@ -34,7 +34,72 @@ namespace SailScores.Core.Services
                         fbc.BoatClassId == dbClass.Id))
                 .ToListAsync().ConfigureAwait(false);
 
-            _dbContext.Fleets.RemoveRange(fleets);
+            // if fleet has other classes, just remove this one.
+            // otherwise delete the fleet as well.
+
+            var fleetIds = fleets.Select(f => f.Id).ToList();
+
+            var fleetBoatClasses = await _dbContext.FleetBoatClasses
+                .Where(fbc => fleetIds.Contains(fbc.FleetId))
+                .ToListAsync().ConfigureAwait(false);
+
+            var fleetClassCounts = fleetBoatClasses
+                .GroupBy(fbc => fbc.FleetId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var fleetsToDelete = fleets
+                .Where(f => fleetClassCounts.TryGetValue(f.Id, out var classCount) && classCount == 1)
+                .ToList();
+
+            var fleetsToKeep = fleets
+                .Where(f => fleetClassCounts.TryGetValue(f.Id, out var classCount) && classCount > 1)
+                .ToList();
+
+            var fleetsToDeleteIds = fleetsToDelete.Select(f => f.Id).ToList();
+            var fleetsToKeepIds = fleetsToKeep.Select(f => f.Id).ToList();
+
+            var fleetBoatClassesToRemove = fleetBoatClasses
+                .Where(fbc =>
+                    fleetsToDeleteIds.Contains(fbc.FleetId)
+                    || (fleetsToKeepIds.Contains(fbc.FleetId) && fbc.BoatClassId == dbClass.Id))
+                .ToList();
+
+            if (fleetsToDeleteIds.Any())
+            {
+                var allBoatsFleet = await _dbContext.Fleets
+                    .Where(f =>
+                        f.ClubId == dbClass.ClubId
+                        && f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub)
+                    .SingleOrDefaultAsync().ConfigureAwait(false);
+
+                var races = await _dbContext.Races
+                    .Where(r => fleetsToDeleteIds.Contains(r.Fleet.Id))
+                    .ToListAsync().ConfigureAwait(false);
+
+                if (races.Any())
+                {
+                    if (allBoatsFleet == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Cannot delete boat class '{dbClass.Name}' because races are using a fleet " +
+                            $"associated with this class, and no 'All Boats in Club' fleet exists to reassign them to.");
+                    }
+
+                    foreach (var race in races)
+                    {
+                        race.Fleet = allBoatsFleet;
+                    }
+                }
+
+                var competitorFleets = await _dbContext.CompetitorFleets
+                    .Where(cf => fleetsToDeleteIds.Contains(cf.FleetId))
+                    .ToListAsync().ConfigureAwait(false);
+
+                _dbContext.CompetitorFleets.RemoveRange(competitorFleets);
+                _dbContext.Fleets.RemoveRange(fleetsToDelete);
+            }
+
+            _dbContext.FleetBoatClasses.RemoveRange(fleetBoatClassesToRemove);
             _dbContext.BoatClasses.Remove(dbClass);
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
