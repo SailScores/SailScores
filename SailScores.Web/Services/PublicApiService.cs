@@ -433,8 +433,7 @@ public class PublicApiService : IPublicApiService
         IDictionary<Guid, string> competitorRouteTokens,
         string clubInitials,
         bool showCompetitorClub,
-        bool preferAlternativeSailNumbers,
-        bool includeRaceResults)
+        bool preferAlternativeSailNumbers)
     {
         var flatCompetitors = competitors?.ToList() ?? [];
         var scoreByCompetitorId = (scores ?? [])
