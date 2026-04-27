@@ -344,7 +344,6 @@ public class SeriesService : ISeriesService
 
     public async Task Update(SeriesWithOptionsViewModel model)
     {
-        // no longer allowing update of season.
         if (model.ScoringSystemId == Guid.Empty)
         {
             model.ScoringSystemId = null;
@@ -826,7 +825,7 @@ public class SeriesService : ISeriesService
             Season = summarySeries.Season,
             Description = summarySeries.Description,
             Type = SeriesType.Summary,
-            ScoringSystemId = summarySeries.ScoringSystem?.Id,
+            ScoringSystemId = summarySeries.ScoringSystemId,
             TrendOption = summarySeries.TrendOption,
             HideDncDiscards = summarySeries.HideDncDiscards,
             ExcludeFromCompetitorStats = summarySeries.ExcludeFromCompetitorStats,
