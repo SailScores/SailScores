@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SailScores.Identity.Entities;
@@ -15,19 +15,22 @@ public class ClubRequestController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ILogger<AccountController> _logger;
+    private readonly ITurnstileService _turnstileService;
 
     public ClubRequestController(
         IClubRequestService clubRequestService,
         IAuthorizationService authService,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        ILogger<AccountController> logger)
+        ILogger<AccountController> logger,
+        ITurnstileService turnstileService)
     {
         _clubRequestService = clubRequestService;
         _authService = authService;
         _userManager = userManager;
         _signInManager = signInManager;
         _logger = logger;
+        _turnstileService = turnstileService;
 
     }
 
@@ -72,6 +75,12 @@ public class ClubRequestController : Controller
             return View(request);
         }
 
+        if (!await IsTurnstileValidAsync())
+        {
+            ModelState.AddModelError(string.Empty, "Please complete the captcha challenge.");
+            return View(request);
+        }
+
         if (!(await _clubRequestService.AreInitialsAllowed(request.ClubInitials)))
         {
             ModelState.AddModelError("ClubInitials", "Initials are not valid.");
@@ -84,7 +93,8 @@ public class ClubRequestController : Controller
             Email = request.ContactEmail,
             FirstName = request.ContactFirstName,
             LastName = request.ContactLastName,
-            EnableAppInsights = request.EnableAppInsights
+            EnableAppInsights = request.EnableAppInsights,
+            CreatedUtc = DateTimeOffset.UtcNow
         };
         var result = await _userManager.CreateAsync(user, request.Password);
         if(!result.Succeeded)
@@ -119,6 +129,12 @@ public class ClubRequestController : Controller
         await _clubRequestService.SubmitRequest(request);
 
         return View("RequestSubmitted", request);
+    }
+
+    private async Task<bool> IsTurnstileValidAsync()
+    {
+        var token = Request.Form["cf-turnstile-response"].ToString();
+        return await _turnstileService.VerifyAsync(token, HttpContext.Connection.RemoteIpAddress, HttpContext.RequestAborted);
     }
 
 

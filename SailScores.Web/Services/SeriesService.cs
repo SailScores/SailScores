@@ -344,7 +344,6 @@ public class SeriesService : ISeriesService
 
     public async Task Update(SeriesWithOptionsViewModel model)
     {
-        // no longer allowing update of season.
         if (model.ScoringSystemId == Guid.Empty)
         {
             model.ScoringSystemId = null;
@@ -483,21 +482,132 @@ public class SeriesService : ISeriesService
 
     private static List<Occurrence> GetSortedOccurrences(Ical.Net.Calendar calendar, Season season)
     {
+        var defaultTzId = calendar.Properties
+            .FirstOrDefault(p => p.Name == "X-WR-TIMEZONE")
+            ?.Value
+            ?.ToString();
+        var defaultTimeZone = ResolveTimeZone(defaultTzId);
+
         var start = new CalDateTime(season.Start);
         var end = new CalDateTime(season.End);
-        
+
         var occurrences = new List<Occurrence>();
         foreach (var evt in calendar.Events)
         {
             var eventOccurrences = evt.GetOccurrences(start)
-                .TakeWhile(o => o.Period.StartTime.Value <= end.Value);
-                
+                .TakeWhile(o => o.Period.StartTime.Value <= end.Value)
+                .ToList();
+
+            foreach (var occurrence in eventOccurrences)
+            {
+                ApplyDefaultTimeZone(occurrence, defaultTzId, defaultTimeZone);
+            }
+
             occurrences.AddRange(eventOccurrences);
         }
-        
+
         return occurrences
             .OrderBy(o => o.Period.StartTime.Value)
             .ToList();
+    }
+
+    private static void ApplyDefaultTimeZone(
+        Occurrence occurrence,
+        string? defaultTzId,
+        TimeZoneInfo? defaultTimeZone)
+    {
+        if (string.IsNullOrWhiteSpace(defaultTzId) || defaultTimeZone == null)
+        {
+            return;
+        }
+
+        var start = ConvertDateTimeWithDefaultZone(occurrence.Period?.StartTime, defaultTzId, defaultTimeZone);
+        var endSource = occurrence.Period?.EndTime ?? occurrence.Period?.EffectiveEndTime;
+        var end = ConvertDateTimeWithDefaultZone(endSource, defaultTzId, defaultTimeZone);
+
+        if (start == null)
+        {
+            return;
+        }
+
+        if (end == null)
+        {
+            end = start;
+        }
+
+        occurrence.Period = new Period(start, end);
+    }
+
+    private static CalDateTime? ConvertDateTimeWithDefaultZone(
+        CalDateTime? value,
+        string defaultTzId,
+        TimeZoneInfo defaultTimeZone)
+    {
+        if (value == null || !value.HasTime)
+        {
+            return value;
+        }
+
+        if (string.IsNullOrWhiteSpace(value.TzId) && !value.IsUtc)
+        {
+            return new CalDateTime(value.Value, defaultTzId, value.HasTime);
+        }
+
+        if (value.IsUtc)
+        {
+            var utcValue = DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+            var converted = TimeZoneInfo.ConvertTimeFromUtc(utcValue, defaultTimeZone);
+            var localUnspecified = DateTime.SpecifyKind(converted, DateTimeKind.Unspecified);
+            return new CalDateTime(localUnspecified, defaultTzId, value.HasTime);
+        }
+
+        return value;
+    }
+
+    private static TimeZoneInfo? ResolveTimeZone(string? timeZoneId)
+    {
+        if (string.IsNullOrWhiteSpace(timeZoneId))
+        {
+            return null;
+        }
+
+        if (TryFindTimeZone(timeZoneId, out var zone))
+        {
+            return zone;
+        }
+
+        if (TimeZoneInfo.TryConvertIanaIdToWindowsId(timeZoneId, out var windowsId)
+            && TryFindTimeZone(windowsId, out zone))
+        {
+            return zone;
+        }
+
+        if (TimeZoneInfo.TryConvertWindowsIdToIanaId(timeZoneId, out var ianaId)
+            && TryFindTimeZone(ianaId, out zone))
+        {
+            return zone;
+        }
+
+        return null;
+    }
+
+    private static bool TryFindTimeZone(string timeZoneId, out TimeZoneInfo? timeZone)
+    {
+        try
+        {
+            timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            return true;
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            timeZone = null;
+            return false;
+        }
+        catch (InvalidTimeZoneException)
+        {
+            timeZone = null;
+            return false;
+        }
     }
 
     private async Task<(List<ImportedSeries> Series, bool OutOfRange)> ProcessOccurrencesAsync(
@@ -715,7 +825,7 @@ public class SeriesService : ISeriesService
             Season = summarySeries.Season,
             Description = summarySeries.Description,
             Type = SeriesType.Summary,
-            ScoringSystemId = summarySeries.ScoringSystem?.Id,
+            ScoringSystemId = summarySeries.ScoringSystemId,
             TrendOption = summarySeries.TrendOption,
             HideDncDiscards = summarySeries.HideDncDiscards,
             ExcludeFromCompetitorStats = summarySeries.ExcludeFromCompetitorStats,

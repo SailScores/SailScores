@@ -1,0 +1,17 @@
+@inject SailScores.Web.Services.Interfaces.ITurnstileService TurnstileService
+
+@if (TurnstileService.IsEnabled)
+{
+    <div class="mt-3 mb-2">
+        <div class="small text-muted mb-2">
+            <strong>Security check.</strong>
+            This helps prevent automated signups and protects club accounts from spam.
+        </div>
+        <div class="cf-turnstile"
+             data-sitekey="@TurnstileService.SiteKey"
+             data-theme="auto"
+             data-size="flexible">
+        </div>
+    </div>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+}

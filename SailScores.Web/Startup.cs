@@ -1,4 +1,11 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
+using AspNet.Security.OAuth.Apple;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
@@ -52,6 +58,17 @@ public class Startup
         ConfigureAppInsightsTelemetry(services);
 
         services.AddLocalization();
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy("PublicApiCors", policyBuilder =>
+            {
+                policyBuilder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .WithMethods("GET", "OPTIONS");
+            });
+        });
 
 
         services.AddOptions<RequestLocalizationOptions>()
@@ -101,11 +118,11 @@ public class Startup
             .AddDefaultTokenProviders();
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-        services
+        var authBuilder = services
             .AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ExternalScheme;
             })
             .AddJwtBearer(cfg =>
             {
@@ -116,10 +133,11 @@ public class Startup
                     ValidIssuer = Configuration["JwtIssuer"],
                     ValidAudience = Configuration["JwtIssuer"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
-
                     ClockSkew = TimeSpan.Zero // remove delay of token when expire
                 };
             });
+
+        ConfigureExternalAuthentication(authBuilder);
 
         // Register authorization handler and policies for club permissions
         services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, SailScores.Web.Authorization.ClubPermissionHandler>();
@@ -281,9 +299,6 @@ public class Startup
 
         app.UseHttpsRedirection();
 
-        // Add response caching middleware (must be before UseStaticFiles)
-        app.UseResponseCaching();
-
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = ctx =>
@@ -311,6 +326,17 @@ public class Startup
     private static void AddRoutes(IApplicationBuilder app)
     {
         app.UseRouting();
+
+        app.UseWhen(
+            context => context.Request.Path.StartsWithSegments("/api/public/v1", StringComparison.OrdinalIgnoreCase),
+            branch =>
+            {
+                branch.UseCors("PublicApiCors");
+            });
+
+        // Response caching should run after CORS so cached responses include CORS headers.
+        app.UseResponseCaching();
+
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -366,11 +392,11 @@ public class Startup
                 defaults: new { controller = "Race", action = "Index" },
                 constraints: new { clubInitials = clubRouteConstraint });
             endpoints.MapControllerRoute(
-                    name: "WhatIf",
-                    pattern: "{clubInitials}/Series/WhatIf/{action}/",
-                    defaults: new { controller = "WhatIf" },
-                    constraints: new { clubInitials = clubRouteConstraint });
-                endpoints.MapControllerRoute(
+                name: "WhatIf",
+                pattern: "{clubInitials}/Series/WhatIf/{action}/",
+                defaults: new { controller = "WhatIf" },
+                constraints: new { clubInitials = clubRouteConstraint });
+            endpoints.MapControllerRoute(
                 name: "Series",
                 pattern: "{clubInitials}/{season}/{seriesName}",
                 defaults: new { controller = "Series", action = "Details" },
@@ -387,7 +413,127 @@ public class Startup
                 defaults: new { controller = "Error", action = "Error", code = 500 });
 
             endpoints.MapControllerRoute(
-                "default", "{controller=Home}/{action=Index}/{id?}");
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
         });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // External OAuth / OIDC providers
+    // Each provider is registered only when its ClientId / AppId is non-empty,
+    // so leaving config values blank disables the button on the login page.
+    // ─────────────────────────────────────────────────────────────────────────
+    private void ConfigureExternalAuthentication(AuthenticationBuilder authBuilder)
+    {
+        if (!Configuration.GetValue<bool>(AppSettingsService.ExternalIdentityProvidersEnabledKey))
+        {
+            return;
+        }
+
+        // ── Google ────────────────────────────────────────────────────────────
+        // Credentials: Google Cloud Console → APIs & Services → Credentials
+        // Callback path (default): /signin-google
+        var googleClientId = Configuration["Authentication:Google:ClientId"];
+        if (!string.IsNullOrEmpty(googleClientId))
+        {
+            authBuilder.AddGoogle(options =>
+            {
+                options.ClientId = googleClientId;
+                options.ClientSecret = Configuration["Authentication:Google:ClientSecret"]!;
+                // Request profile scope so given_name / family_name claims arrive
+                options.Scope.Add("profile");
+                options.Scope.Add("email");
+                // Map Google OIDC claims → standard ClaimTypes
+                options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
+                options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
+            });
+        }
+
+        // ── Microsoft Account (personal + work/school via common endpoint) ────
+        // Credentials: Azure Portal → App registrations
+        // Callback path (default): /signin-microsoft
+        var msClientId = Configuration["Authentication:Microsoft:ClientId"];
+        if (!string.IsNullOrEmpty(msClientId))
+        {
+            authBuilder.AddMicrosoftAccount(options =>
+            {
+                options.ClientId = msClientId;
+                options.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"]!;
+                // Map profile claims to standard ClaimTypes
+                options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
+                options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
+            });
+        }
+
+        // ── Apple (Sign in with Apple) ────────────────────────────────────────
+        // Credentials: Apple Developer → Certificates, IDs & Profiles → Keys
+        // Callback path (default): /signin-apple
+        // IMPORTANT: Apple only sends the user's name on the VERY FIRST sign-in.
+        //            The app captures it at that moment and stores it locally.
+        // IMPORTANT: Apple requires HTTPS. Use ngrok or a staging URL for local dev.
+        var appleClientId = Configuration["Authentication:Apple:ClientId"];
+        if (!string.IsNullOrEmpty(appleClientId))
+        {
+            authBuilder.AddApple(options =>
+            {
+                options.ClientId = appleClientId;
+                options.KeyId  = Configuration["Authentication:Apple:KeyId"]!;
+                options.TeamId = Configuration["Authentication:Apple:TeamId"]!;
+                // The private key is the full PEM content of the .p8 file.
+                // Store it in User Secrets or an Azure App Setting (Authentication__Apple__PrivateKey).
+                options.UsePrivateKey(_ =>
+                {
+                    var pem = Configuration["Authentication:Apple:PrivateKey"]
+                        ?? throw new InvalidOperationException(
+                            "Authentication:Apple:PrivateKey is required when Apple Sign In is enabled.");
+                    return new InMemoryFileInfo("apple-private-key.p8", pem);
+                });
+                options.Scope.Add("name");
+                options.Scope.Add("email");
+            });
+        }
+
+        // ── Facebook ──────────────────────────────────────────────────────────
+        // Credentials: Facebook Developers → Your App → Settings → Basic
+        // Callback path (default): /signin-facebook
+        var fbAppId = Configuration["Authentication:Facebook:AppId"];
+        if (!string.IsNullOrEmpty(fbAppId))
+        {
+            authBuilder.AddFacebook(options =>
+            {
+                options.AppId     = fbAppId;
+                options.AppSecret = Configuration["Authentication:Facebook:AppSecret"]!;
+                // Request first_name and last_name fields from the Graph API
+                options.Fields.Add("first_name");
+                options.Fields.Add("last_name");
+                options.Fields.Add("email");
+                // Map Graph API JSON fields → standard ClaimTypes
+                options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "first_name");
+                options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "last_name");
+            });
+        }
+    }
+
+    /// <summary>
+    /// Wraps an in-memory string as an <see cref="IFileInfo"/> so the Apple
+    /// authentication handler can read the private-key PEM from configuration.
+    /// </summary>
+    private sealed class InMemoryFileInfo : IFileInfo
+    {
+        private readonly byte[] _content;
+
+        public InMemoryFileInfo(string name, string pemContent)
+        {
+            Name = name;
+            _content = Encoding.UTF8.GetBytes(pemContent);
+        }
+
+        public bool Exists => true;
+        public bool IsDirectory => false;
+        public DateTimeOffset LastModified => DateTimeOffset.UtcNow;
+        public long Length => _content.Length;
+        public string Name { get; }
+        public string PhysicalPath => null;
+        public Stream CreateReadStream() => new MemoryStream(_content, writable: false);
     }
 }

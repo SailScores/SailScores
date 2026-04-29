@@ -1,10 +1,16 @@
+@using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using SailScores.Identity.Entities
+@using SailScores.Web.Services
 @model SailScores.Web.Models.AccountViewModels.LoginViewModel
 @inject SignInManager<ApplicationUser> SignInManager
+@inject AppSettingsService AppSettingsService
 
 @{
     ViewData["Title"] = "Log in";
+    var loginProviders = AppSettingsService.IsExternalAuthenticationEnabled()
+        ? (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+        : new List<AuthenticationScheme>();
 }
 
 @section AdditionalMeta
@@ -51,37 +57,89 @@
             </form>
         </section>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        @*<section>
-                <h4>Use another service to log in.</h4>
+    @if (loginProviders.Count > 0)
+    {
+        var providerListText = string.Join(", ", loginProviders.Select(provider => provider.DisplayName ?? provider.Name));
+        <div class="col-md-5 col-md-offset-1">
+            <section>
+                <h4>Or</h4>
                 <hr />
-                @{
-                    var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    if (loginProviders.Count == 0)
-                    {
-                        <div>
-                            <p>
-                                There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
-                                for details on setting up this ASP.NET application to support logging in via external services.
-                            </p>
-                        </div>
-                    }
-                    else
-                    {
-                        <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
-                            <div>
-                                <p>
-                                    @foreach (var provider in loginProviders)
-                                    {
-                                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.Name</button>
-                                    }
-                                </p>
-                            </div>
-                        </form>
-                    }
-                }
-            </section>*@
-    </div>
+                <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                    <div class="external-auth-group" style="max-width:320px;">
+                        @foreach (var provider in loginProviders)
+                        {
+                            @switch (provider.Name)
+                            {
+                                case "Google":
+                                    <button type="submit" name="provider" value="Google"
+                                            class="btn external-auth-btn external-auth-btn--google w-100"
+                                            title="Sign in with your Google account">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-google"></i></span>
+                                        <span class="external-auth-btn__label">Sign in with Google</span>
+                                    </button>
+                                    break;
+
+                                case "Microsoft":
+                                case "MicrosoftAccount":
+                                    <button type="submit" name="provider" value="@provider.Name"
+                                            class="btn external-auth-btn external-auth-btn--microsoft w-100"
+                                            title="Sign in with your Microsoft account">
+                                        <span class="external-auth-btn__icon external-auth-btn__icon--microsoft" aria-hidden="true">
+                                            <span class="external-auth-btn__microsoft-mark">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </span>
+                                        </span>
+                                        <span class="external-auth-btn__label">Sign in with Microsoft</span>
+                                    </button>
+                                    break;
+
+                                case "Apple":
+                                    <button type="submit" name="provider" value="Apple"
+                                            class="btn external-auth-btn external-auth-btn--apple w-100"
+                                            title="Sign in with your Apple ID">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-apple"></i></span>
+                                        <span class="external-auth-btn__label">Sign in with Apple</span>
+                                    </button>
+                                    break;
+
+                                case "Facebook":
+                                    <button type="submit" name="provider" value="Facebook"
+                                            class="btn external-auth-btn external-auth-btn--facebook w-100"
+                                            title="Sign in with your Facebook account">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-facebook-f"></i></span>
+                                        <span class="external-auth-btn__label">Continue with Facebook</span>
+                                    </button>
+                                    break;
+
+                                default:
+                                    <button type="submit" name="provider" value="@provider.Name"
+                                            class="btn external-auth-btn external-auth-btn--generic w-100"
+                                            title="Sign in using your @(provider.DisplayName ?? provider.Name) account">
+                                        <span class="external-auth-btn__icon" aria-hidden="true"><i class="fas fa-sign-in-alt"></i></span>
+                                        <span class="external-auth-btn__label">Sign in with @(provider.DisplayName ?? provider.Name)</span>
+                                    </button>
+                                    break;
+                            }
+                        }
+                    </div>
+                </form>
+                <div class="external-auth-help alert alert-info mt-3 mb-0" role="note">
+                    <h5 class="h6 mb-2">Sign in faster with @providerListText</h5>
+                    <p class="mb-2">
+                        If you already have a SailScores account, first sign in once with your SailScores email and
+                        password, then link your external provider in
+                        <span class="link-primary">My Account &gt; External logins.</span>
+                    </p>
+                    <p class="mb-0">
+                        After linking, you can use either method to sign in.
+                    </p>
+                </div>
+            </section>
+        </div>
+    }
 </div>
 
 @section Scripts {

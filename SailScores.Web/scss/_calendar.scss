@@ -87,6 +87,23 @@
     height: 100%;
 }
 
+.week-row .day-cell.today-cell {
+    background-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.08);
+}
+
+.week-row .day-number {
+    display: inline-block;
+    min-width: 1.75rem;
+    text-align: center;
+}
+
+.week-row .day-number.today-number {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+    border-radius: 999px;
+    font-weight: 700;
+}
+
 /* First column needs left border too */
 .week-row .day-cell:first-child {
     border-left: 1px solid var(--bs-border-color);

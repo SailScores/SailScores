@@ -101,12 +101,160 @@ nav.bg-dark {
     margin-top: -.24rem;
 }
 
-.faded-logo {
+ .faded-logo {
     opacity: .5;
 
     &:hover {
         opacity: .8;
     }
+}
+
+/* External authentication buttons */
+.external-auth-group {
+    display: grid;
+    gap: .75rem;
+}
+
+.external-auth-btn {
+    --external-auth-bg: #ffffff;
+    --external-auth-border: #d0d7de;
+    --external-auth-color: #1f2328;
+    --external-auth-hover-bg: #f8fafc;
+    --external-auth-hover-border: #b8c2cc;
+    --external-auth-focus-ring: rgba(15, 23, 42, 0.16);
+    --external-auth-icon-color: currentColor;
+    align-items: center;
+    background-color: var(--external-auth-bg) !important;
+    border: 1px solid var(--external-auth-border) !important;
+    border-radius: .75rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    color: var(--external-auth-color) !important;
+    display: flex;
+    font-weight: 600;
+    gap: .75rem;
+    justify-content: flex-start;
+    min-height: 2.75rem;
+    padding: .625rem .875rem;
+    text-align: left;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+
+    &:hover {
+        background-color: var(--external-auth-hover-bg) !important;
+        border-color: var(--external-auth-hover-border) !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+        color: var(--external-auth-color) !important;
+        transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 .2rem var(--external-auth-focus-ring), 0 4px 12px rgba(15, 23, 42, 0.12);
+        outline: 0;
+    }
+}
+
+ .external-auth-btn__icon {
+    align-items: center;
+    color: var(--external-auth-icon-color);
+    display: inline-flex;
+    flex: 0 0 1.5rem;
+    font-size: 1rem;
+    justify-content: center;
+    min-width: 1.5rem;
+}
+
+.external-auth-btn__label {
+    flex: 1 1 auto;
+    line-height: 1.2;
+}
+
+.external-auth-btn__icon--microsoft {
+    background-color: #f3f3f3;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: .25rem;
+    flex: 0 0 1.5rem;
+    min-height: 1.5rem;
+    min-width: 1.5rem;
+    padding: .125rem;
+}
+
+.external-auth-btn__microsoft-mark {
+    display: grid;
+    gap: .1rem;
+    grid-template-columns: repeat(2, .5rem);
+}
+
+.external-auth-btn__microsoft-mark span {
+    display: block;
+    height: .5rem;
+    width: .5rem;
+
+    &:nth-child(1) {
+        background-color: #f25022;
+    }
+
+    &:nth-child(2) {
+        background-color: #7fba00;
+    }
+
+    &:nth-child(3) {
+        background-color: #00a4ef;
+    }
+
+    &:nth-child(4) {
+        background-color: #ffb900;
+    }
+}
+
+.external-auth-help {
+    border-radius: .75rem;
+    max-width: 320px;
+
+    ol {
+        margin-bottom: 0;
+    }
+}
+
+.external-auth-btn--google {
+    --external-auth-border: #dadce0;
+    --external-auth-color: #1f1f1f;
+    --external-auth-hover-bg: #f8faff;
+    --external-auth-hover-border: #c7d2fe;
+    --external-auth-focus-ring: rgba(66, 133, 244, 0.24);
+    --external-auth-icon-color: #4285f4;
+}
+
+.external-auth-btn--microsoft {
+    --external-auth-border: #d1d5db;
+    --external-auth-color: #1f1f1f;
+    --external-auth-hover-bg: #f8fafc;
+    --external-auth-hover-border: #94a3b8;
+    --external-auth-focus-ring: rgba(0, 120, 212, 0.22);
+}
+
+.external-auth-btn--apple {
+    --external-auth-bg: #000000;
+    --external-auth-border: #000000;
+    --external-auth-color: #ffffff;
+    --external-auth-hover-bg: #1f1f1f;
+    --external-auth-hover-border: #1f1f1f;
+    --external-auth-focus-ring: rgba(0, 0, 0, 0.22);
+}
+
+.external-auth-btn--facebook {
+    --external-auth-bg: #1877f2;
+    --external-auth-border: #1877f2;
+    --external-auth-color: #ffffff;
+    --external-auth-hover-bg: #166fe5;
+    --external-auth-hover-border: #166fe5;
+    --external-auth-focus-ring: rgba(24, 119, 242, 0.24);
+}
+
+.external-auth-btn--generic {
+    --external-auth-border: #ced4da;
+    --external-auth-color: #212529;
+    --external-auth-hover-bg: #f8f9fa;
+    --external-auth-hover-border: #adb5bd;
+    --external-auth-focus-ring: rgba(108, 117, 125, 0.2);
 }
 
 /* Finish place colors (light mode) */

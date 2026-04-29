@@ -10,7 +10,6 @@ using SailScores.Web.Services;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using SailScores.Identity.Entities;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -28,7 +27,8 @@ public class AccountController : Controller
     private readonly IEmailSender _emailSender;
     private readonly IAuthorizationService _authService;
     private readonly ILogger _logger;
-    private readonly IConfiguration _configuration;
+    private readonly ITurnstileService _turnstileService;
+    private readonly AppSettingsService _appSettingsService;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
@@ -36,14 +36,16 @@ public class AccountController : Controller
         IEmailSender emailSender,
         IAuthorizationService authService,
         ILogger<AccountController> logger,
-        IConfiguration configuration)
+        ITurnstileService turnstileService,
+        AppSettingsService appSettingsService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _emailSender = emailSender;
         _authService = authService;
         _logger = logger;
-        _configuration = configuration;
+        _turnstileService = turnstileService;
+        _appSettingsService = appSettingsService;
     }
 
     [TempData]
@@ -80,6 +82,8 @@ public class AccountController : Controller
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                await UpdateLastSuccessfulLoginAsync(user);
                 string homeClub = await _authService.GetHomeClub(model.Email);
 
                 //if they have a home club and return url isn't in it
@@ -160,6 +164,7 @@ public class AccountController : Controller
         if (result.Succeeded)
         {
             _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+            await UpdateLastSuccessfulLoginAsync(user);
             return RedirectToLocal(returnUrl);
         }
         else if (result.IsLockedOut)
@@ -216,6 +221,7 @@ public class AccountController : Controller
         if (result.Succeeded)
         {
             _logger.LogInformation("User with ID {UserId} logged in with a recovery code.", user.Id);
+            await UpdateLastSuccessfulLoginAsync(user);
             return RedirectToLocal(returnUrl);
         }
         if (result.IsLockedOut)
@@ -252,35 +258,51 @@ public class AccountController : Controller
     public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var user = new ApplicationUser
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                EnableAppInsights = model.EnableAppInsights
-            };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User created a new account with password.");
-
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
-
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                _logger.LogInformation("User created a new account with password.");
-
-                return RedirectToLocal(returnUrl);
-            }
-            AddErrors(result);
+            return View(model);
         }
+
+        if (!await IsTurnstileValidAsync())
+        {
+            ModelState.AddModelError(string.Empty, "Please complete the captcha challenge.");
+            return View(model);
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            EnableAppInsights = model.EnableAppInsights,
+            CreatedUtc = DateTimeOffset.UtcNow
+        };
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("User created a new account with password.");
+
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+            await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            await UpdateLastSuccessfulLoginAsync(user);
+            _logger.LogInformation("User created a new account with password.");
+
+            return RedirectToLocal(returnUrl);
+        }
+        AddErrors(result);
 
         // If we got this far, something failed, redisplay form
         return View(model);
+    }
+
+    private async Task<bool> IsTurnstileValidAsync()
+    {
+        var token = Request.Form["cf-turnstile-response"].ToString();
+        return await _turnstileService.VerifyAsync(token, HttpContext.Connection.RemoteIpAddress, HttpContext.RequestAborted);
     }
 
     [HttpPost]
@@ -297,6 +319,11 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult ExternalLogin(string provider, string returnUrl = null)
     {
+        if (!_appSettingsService.IsExternalAuthenticationEnabled())
+        {
+            return NotFound();
+        }
+
         // Request a redirect to the external login provider.
         var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -309,6 +336,11 @@ public class AccountController : Controller
         string returnUrl = null,
         string remoteError = null)
     {
+        if (!_appSettingsService.IsExternalAuthenticationEnabled())
+        {
+            return NotFound();
+        }
+
         if (remoteError != null)
         {
             ErrorMessage = $"Error from external provider: {remoteError}";
@@ -321,9 +353,18 @@ public class AccountController : Controller
         }
 
         // Sign in the user with this external login provider if the user already has a login.
-        var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+        var result = await _signInManager.ExternalLoginSignInAsync(
+            info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
         if (result.Succeeded)
         {
+            // Refresh locally stored profile fields with any fresher data from the provider.
+            var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            if (existingUser != null)
+            {
+                await RefreshUserProfileFromExternalLoginAsync(existingUser, info);
+                await UpdateLastSuccessfulLoginAsync(existingUser);
+            }
             _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
             return RedirectToLocal(returnUrl);
         }
@@ -331,14 +372,45 @@ public class AccountController : Controller
         {
             return RedirectToAction(nameof(Lockout));
         }
-        else
+
+        // The user has no external-login record yet.
+        // Auto-link to an existing local account if the email matches.
+        var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+        if (!string.IsNullOrEmpty(email))
         {
-            // If the user does not have an account, then ask the user to create an account.
-            ViewData["ReturnUrl"] = returnUrl;
-            ViewData["LoginProvider"] = info.LoginProvider;
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            return View("ExternalLogin", new ExternalLoginViewModel { Email = email });
+            var localUser = await _userManager.FindByEmailAsync(email);
+            if (localUser != null)
+            {
+                // Link the external provider to the existing account and sign in.
+                var addResult = await _userManager.AddLoginAsync(localUser, info);
+                if (addResult.Succeeded)
+                {
+                    await RefreshUserProfileFromExternalLoginAsync(localUser, info);
+                    await _signInManager.SignInAsync(localUser, isPersistent: false);
+                    await UpdateLastSuccessfulLoginAsync(localUser);
+                    _logger.LogInformation(
+                        "Linked {Provider} external login to existing account for {Email}.",
+                        info.LoginProvider, email);
+                    return RedirectToLocal(returnUrl);
+                }
+                // AddLoginAsync can fail if the login is already linked to a different account.
+                foreach (var error in addResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
         }
+
+        // No existing account — ask the user to confirm / complete their profile.
+        ViewData["ReturnUrl"] = returnUrl;
+        ViewData["LoginProvider"] = info.LoginProvider;
+        var (firstName, lastName) = GetNamesFromExternalClaims(info.Principal);
+        return View("ExternalLogin", new ExternalLoginViewModel
+        {
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName
+        });
     }
 
     [HttpPost]
@@ -346,6 +418,11 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginViewModel model, string returnUrl = null)
     {
+        if (!_appSettingsService.IsExternalAuthenticationEnabled())
+        {
+            return NotFound();
+        }
+
         if (ModelState.IsValid)
         {
             // Get the information about the user from the external login provider
@@ -356,9 +433,23 @@ public class AccountController : Controller
                 ErrorMessage = "Error loading external login information. Please try again.";
                 return RedirectToAction(nameof(Login));
             }
+
+            // Use placeholder names if the provider did not supply them;
+            // the user will be prompted to complete their profile after sign-in.
+            var firstName = string.IsNullOrWhiteSpace(model.FirstName) ? "User" : model.FirstName;
+            var lastName  = string.IsNullOrWhiteSpace(model.LastName)
+                ? (model.Email?.Split('@')[0] ?? "Unknown")
+                : model.LastName;
+            var needsProfileUpdate = string.IsNullOrWhiteSpace(model.FirstName)
+                                  || string.IsNullOrWhiteSpace(model.LastName);
+
             var user = new ApplicationUser
             {
-                UserName = model.Email, Email = model.Email
+                UserName = model.Email,
+                Email = model.Email,
+                FirstName = firstName,
+                LastName = lastName,
+                EnableAppInsights = model.EnableAppInsights
             };
             var result = await _userManager.CreateAsync(user);
             if (result.Succeeded)
@@ -367,7 +458,15 @@ public class AccountController : Controller
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                    await UpdateLastSuccessfulLoginAsync(user);
                     _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+
+                    // Redirect to profile update when placeholder names were used.
+                    if (needsProfileUpdate)
+                    {
+                        return RedirectToPage("/Account/Manage/UpdateProfile", new { area = "Identity",
+                            StatusMessage = "Please complete your name to finish setting up your account." });
+                    }
                     return RedirectToLocal(returnUrl);
                 }
             }
@@ -389,8 +488,6 @@ public class AccountController : Controller
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            // Don't throw exception - handle gracefully
-            // Could be invalid ID, expired link, or malicious request
             _logger.LogWarning("Email confirmation attempted with invalid user ID: '{UserId}'", userId);
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
@@ -419,8 +516,6 @@ public class AccountController : Controller
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 
-            // For more information on how to enable account confirmation and password reset please
-            // visit https://go.microsoft.com/fwlink/?LinkID=532713
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
             var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
             await _emailSender.SendEmailAsync(model.Email, "Reset SailScores Password",
@@ -428,7 +523,6 @@ public class AccountController : Controller
             return RedirectToAction(nameof(ForgotPasswordConfirmation));
         }
 
-        // If we got this far, something failed, redisplay form
         return View(model);
     }
 
@@ -483,7 +577,6 @@ public class AccountController : Controller
         return View();
     }
 
-
     [HttpGet]
     public IActionResult AccessDenied()
     {
@@ -500,6 +593,7 @@ public class AccountController : Controller
         if (result.Succeeded)
         {
             var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
+            await UpdateLastSuccessfulLoginAsync(appUser);
             return await GenerateJwtToken(model.Email, appUser);
         }
 
@@ -507,6 +601,17 @@ public class AccountController : Controller
     }
 
     #region Helpers
+
+    private async Task UpdateLastSuccessfulLoginAsync(ApplicationUser user)
+    {
+        if (user == null)
+        {
+            return;
+        }
+
+        user.LastSuccessfulLoginUtc = DateTimeOffset.UtcNow;
+        await _userManager.UpdateAsync(user);
+    }
 
     private void AddErrors(IdentityResult result)
     {
@@ -538,13 +643,15 @@ public class AccountController : Controller
             new Claim(ClaimTypes.NameIdentifier, user.Id)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_appSettingsService.GetJwtKey()));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
+        var expires = DateTime.Now.AddDays(_appSettingsService.GetJwtExpireDays());
+        var issuer = _appSettingsService.GetJwtIssuer();
 
         var token = new JwtSecurityToken(
-            _configuration["JwtIssuer"],
-            _configuration["JwtIssuer"],
+            issuer,
+            issuer,
             claims,
             expires: expires,
             signingCredentials: creds
@@ -554,4 +661,60 @@ public class AccountController : Controller
     }
 
     #endregion
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // External login helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Updates FirstName / LastName on the local user record when the external
+    /// provider supplies fresher values.  No-ops when claims are absent.
+    /// </summary>
+    private async Task RefreshUserProfileFromExternalLoginAsync(
+        ApplicationUser user, ExternalLoginInfo info)
+    {
+        var (firstName, lastName) = GetNamesFromExternalClaims(info.Principal);
+        var changed = false;
+
+        if (!string.IsNullOrWhiteSpace(firstName) && user.FirstName != firstName)
+        {
+            user.FirstName = firstName;
+            changed = true;
+        }
+        if (!string.IsNullOrWhiteSpace(lastName) && user.LastName != lastName)
+        {
+            user.LastName = lastName;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            await _userManager.UpdateAsync(user);
+        }
+    }
+
+    /// <summary>
+    /// Extracts given name and surname from external-provider claims.
+    /// Falls back to splitting ClaimTypes.Name when dedicated claims are absent
+    /// (e.g. Apple on second and subsequent sign-ins).
+    /// </summary>
+    private static (string firstName, string lastName) GetNamesFromExternalClaims(
+        ClaimsPrincipal principal)
+    {
+        var firstName = principal.FindFirstValue(ClaimTypes.GivenName);
+        var lastName  = principal.FindFirstValue(ClaimTypes.Surname);
+
+        if (string.IsNullOrWhiteSpace(firstName) && string.IsNullOrWhiteSpace(lastName))
+        {
+            var fullName = principal.FindFirstValue(ClaimTypes.Name);
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                var parts = fullName.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+                firstName = parts[0];
+                lastName  = parts.Length > 1 ? parts[1] : string.Empty;
+            }
+        }
+
+        return (firstName ?? string.Empty, lastName ?? string.Empty);
+    }
 }

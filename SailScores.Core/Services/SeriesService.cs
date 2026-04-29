@@ -124,12 +124,14 @@ namespace SailScores.Core.Services
             var fullSeries = _mapper.Map<Series>(seriesDb);
             if (fullSeries != null)
             {
-                // populate parentSeriesIds
-                fullSeries.ParentSeriesIds = await _dbContext.Series
+                // populate parentSeriesIds and ParentSeries
+                var parentSeriesDb = await _dbContext.Series
+                    .Include(s => s.Season)
                     .Where(s => s.ChildLinks.Any(l => l.ChildSeriesId == seriesDb.Id))
-                    .Select(s => s.Id)
                     .ToListAsync()
                     .ConfigureAwait(false);
+                fullSeries.ParentSeriesIds = parentSeriesDb.Select(s => s.Id).ToList();
+                fullSeries.ParentSeries = _mapper.Map<List<Series>>(parentSeriesDb);
 
                 var flatResults = await GetHistoricalResults(fullSeries)
                     .ConfigureAwait(false);

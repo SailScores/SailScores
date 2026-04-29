@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
@@ -15,6 +15,8 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
 
         public static string ExternalLogins => "ExternalLogins";
 
+        public static string UpdateProfile => "UpdateProfile";
+
         public static string PersonalData => "PersonalData";
 
         public static string TwoFactorAuthentication => "TwoFactorAuthentication";
@@ -28,6 +30,8 @@ namespace SailScores.Web.Areas.Identity.Pages.Account.Manage
         public static string DeletePersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeletePersonalData);
 
         public static string ExternalLoginsNavClass(ViewContext viewContext) => PageNavClass(viewContext, ExternalLogins);
+
+        public static string UpdateProfileNavClass(ViewContext viewContext) => PageNavClass(viewContext, UpdateProfile);
 
         public static string PersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, PersonalData);
 

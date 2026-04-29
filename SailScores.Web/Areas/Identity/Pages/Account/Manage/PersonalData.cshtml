@@ -1,0 +1,25 @@
+@page
+@model PersonalDataModel
+@{
+    ViewData["Title"] = "Personal data";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<h4>@ViewData["Title"]</h4>
+<p>
+    SailScores stores a small amount of personal data for your account. This typically
+    includes your name, email address,
+    and identifiers related to linked external login services.
+</p>
+<p>
+    You can download a copy of this data using the button below.
+</p>
+<p>
+    If you would like this personal data removed, please contact
+    <a href="mailto:info@sailscores.com">info@sailscores.com</a>.
+    After we validate your identity, your personal data will be deleted within 14 days.
+</p>
+
+<form id="download-data" method="post" asp-page-handler="Download">
+    <button class="btn btn-outline-primary" type="submit">Download personal data</button>
+</form>

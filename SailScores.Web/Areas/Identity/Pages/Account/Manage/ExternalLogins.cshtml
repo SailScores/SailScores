@@ -1,0 +1,136 @@
+@page
+@model ExternalLoginsModel
+@{
+    ViewData["Title"] = "External logins";
+    ViewData["ActivePage"] = ManageNavPages.ExternalLogins;
+}
+
+<h4>@ViewData["Title"]</h4>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    var isError = Model.StatusMessage.StartsWith("Error", StringComparison.OrdinalIgnoreCase);
+    <div class="alert @(isError ? "alert-danger" : "alert-success") alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @Model.StatusMessage
+    </div>
+}
+
+@if (Model.CurrentLogins?.Count > 0)
+{
+    <h5>Linked accounts</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Provider</th>
+                <th>Display name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var login in Model.CurrentLogins)
+            {
+                <tr>
+                    <td>@login.LoginProvider</td>
+                    <td>@login.ProviderDisplayName</td>
+                    <td>
+                        @if (Model.ShowRemoveButton)
+                        {
+                            <form asp-page-handler="RemoveLogin" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="loginProvider" value="@login.LoginProvider" />
+                                <input type="hidden" name="providerKey" value="@login.ProviderKey" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        title="Remove @login.ProviderDisplayName login">
+                                    Remove
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">
+                                Set a password before removing this login.
+                            </span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.OtherLogins?.Count > 0)
+{
+    <h5 class="mt-4">Add another account</h5>
+    <p class="text-muted">
+        Link an additional sign-in provider to your account.
+        You can then use it to sign in even if you forget your password.
+    </p>
+    <form asp-page-handler="LinkLogin" method="post">
+        <div class="d-flex flex-wrap gap-2 gap-md-3">
+            @foreach (var provider in Model.OtherLogins)
+            {
+                @switch (provider.Name)
+                {
+                    case "Google":
+                        <button type="submit" name="provider" value="Google"
+                                class="btn external-auth-btn external-auth-btn--google"
+                                title="Link your Google account">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-google"></i></span>
+                            <span class="external-auth-btn__label">Link Google</span>
+                        </button>
+                        break;
+
+                    case "Microsoft":
+                    case "MicrosoftAccount":
+                        <button type="submit" name="provider" value="@provider.Name"
+                                class="btn external-auth-btn external-auth-btn--microsoft"
+                                title="Link your Microsoft account">
+                            <span class="external-auth-btn__icon external-auth-btn__icon--microsoft" aria-hidden="true">
+                                <span class="external-auth-btn__microsoft-mark">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </span>
+                            </span>
+                            <span class="external-auth-btn__label">Link Microsoft</span>
+                        </button>
+                        break;
+
+                    case "Apple":
+                        <button type="submit" name="provider" value="Apple"
+                                class="btn external-auth-btn external-auth-btn--apple"
+                                title="Link your Apple ID">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-apple"></i></span>
+                            <span class="external-auth-btn__label">Link Apple</span>
+                        </button>
+                        break;
+
+                    case "Facebook":
+                        <button type="submit" name="provider" value="Facebook"
+                                class="btn external-auth-btn external-auth-btn--facebook"
+                                title="Link your Facebook account">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fab fa-facebook-f"></i></span>
+                            <span class="external-auth-btn__label">Link Facebook</span>
+                        </button>
+                        break;
+
+                    default:
+                        <button type="submit" name="provider" value="@provider.Name"
+                                class="btn external-auth-btn external-auth-btn--generic"
+                                title="Link your @(provider.DisplayName ?? provider.Name) account">
+                            <span class="external-auth-btn__icon" aria-hidden="true"><i class="fas fa-link"></i></span>
+                            <span class="external-auth-btn__label">Link @(provider.DisplayName ?? provider.Name)</span>
+                        </button>
+                        break;
+                }
+            }
+        </div>
+    </form>
+}
+
+@if (Model.CurrentLogins?.Count == 0 && Model.OtherLogins?.Count == 0)
+{
+    <p class="text-muted">No external login providers are configured.</p>
+}

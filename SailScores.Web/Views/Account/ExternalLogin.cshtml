@@ -1,7 +1,7 @@
 @using SailScores.Web.Models.AccountViewModels
 @model ExternalLoginViewModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Complete Registration";
 }
 @section AdditionalMeta
 {
@@ -13,18 +13,39 @@
 
 <p class="text-info">
     You've successfully authenticated with <strong>@ViewData["LoginProvider"]</strong>.
-    Please enter an email address for this site below and click the Register button to finish
-    logging in.
+    Please confirm or fill in the details below to finish creating your SailScores account.
 </p>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <form asp-action="ExternalLoginConfirmation" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Email"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" class="form-control" placeholder="Required for SailScores permissions" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" class="form-control" placeholder="Required for SailScores permissions" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="mb-3 form-check">
+                <input asp-for="EnableAppInsights" class="form-check-input" />
+                <label asp-for="EnableAppInsights" class="form-check-label"></label>
+                <span asp-validation-for="EnableAppInsights" class="text-danger"></span>
+                <div class="border rounded p-3 mb-3 bg-body-tertiary text-body">
+                    <div class="small text-body-secondary">
+                        If checked, SailScores will record information about the page speed and errors you encounter.
+                        This will greatly assist in improving the service. No data is shared with any other organization. See our
+                        <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a> for details.
+                    </div>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Register</button>
         </form>

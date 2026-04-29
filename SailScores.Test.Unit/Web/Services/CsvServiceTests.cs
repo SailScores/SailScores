@@ -193,7 +193,9 @@ namespace SailScores.Test.Unit.Web.Services
             Assert.NotEmpty(lines);
             var headerLine = lines[0];
             Assert.Contains("Race 1 - Elapsed", headerLine);
+            Assert.Contains("Race 1 - Elapsed Seconds", headerLine);
             Assert.Contains("Race 2 - Elapsed", headerLine);
+            Assert.Contains("Race 2 - Elapsed Seconds", headerLine);
         }
 
         [Fact]
@@ -216,8 +218,11 @@ namespace SailScores.Test.Unit.Web.Services
             // Assert
             var headerLine = lines[0];
             Assert.Contains("Race 1 - Elapsed", headerLine);
+            Assert.Contains("Race 1 - Elapsed Seconds", headerLine);
             Assert.DoesNotContain("Race 2 - Elapsed", headerLine);
+            Assert.DoesNotContain("Race 2 - Elapsed Seconds", headerLine);
             Assert.Contains("Race 3 - Elapsed", headerLine);
+            Assert.Contains("Race 3 - Elapsed Seconds", headerLine);
         }
 
         [Fact]
@@ -237,8 +242,9 @@ namespace SailScores.Test.Unit.Web.Services
             Assert.True(lines.Count >= 3, "CSV should have header + at least 2 data rows");
             var dataRow = lines[1];
 
-            // The data row should contain formatted elapsed times
+            // The data row should contain formatted elapsed times and elapsed seconds
             Assert.Contains(":", dataRow); // Should contain time format HH:MM:SS
+            Assert.Contains(",4530,", dataRow); // 01:15:30 => 4530 seconds
         }
 
         [Fact]
@@ -317,9 +323,9 @@ namespace SailScores.Test.Unit.Web.Services
             Assert.NotEmpty(lines);
             var dataRow = lines[1];
 
-            // The elapsed time column should be empty (between two commas)
-            // Pattern: "...FIN 1,," indicates empty elapsed time column
-            Assert.Contains(",,", dataRow);
+            // The elapsed time and elapsed seconds columns should be empty
+            // Pattern: "...FIN 1,,," indicates both elapsed columns are empty
+            Assert.Contains(",,,", dataRow);
         }
 
         [Fact]

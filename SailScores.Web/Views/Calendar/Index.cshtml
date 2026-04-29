@@ -104,8 +104,10 @@ else
                 {
                     var current = weekStart.AddDays(i);
                     var col = i + 1;
-                    <div class="day-cell p-2" style="grid-column: @col; grid-row: 1;"> 
-                        <div class="fw-bold text-end">@current.Day</div>
+                    <div class="day-cell p-2" data-calendar-date="@current.ToString("yyyy-MM-dd")" style="grid-column: @col; grid-row: 1;"> 
+                        <div class="fw-bold text-end">
+                            <span class="day-number">@current.Day</span>
+                        </div>
                     </div>
                 }
 
@@ -198,4 +200,26 @@ else
             </div>
         }
     </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const today = new Date();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayLocal = `${today.getFullYear()}-${month}-${day}`;
+
+            const todayCell = document.querySelector(`.day-cell[data-calendar-date="${todayLocal}"]`);
+            if (!todayCell) {
+                return;
+            }
+
+            todayCell.classList.add('today-cell');
+            const dayNumber = todayCell.querySelector('.day-number');
+            if (dayNumber) {
+                dayNumber.classList.add('today-number');
+            }
+        })();
+    </script>
 }

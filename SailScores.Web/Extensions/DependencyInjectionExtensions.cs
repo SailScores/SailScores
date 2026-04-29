@@ -33,10 +33,12 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ITemplateHelper, TemplateHelper>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ISpeechService, SpeechService>();
+        services.AddScoped<ITurnstileService, TurnstileService>();
         services.AddScoped<ISystemAlertService, SystemAlertService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<ISupporterService, SupporterService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IPublicApiService, PublicApiService>();
         services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
         services.AddScoped<ILocalizerService, LocalizerService>();
         services.AddTransient<IStripeService, StripeService>();

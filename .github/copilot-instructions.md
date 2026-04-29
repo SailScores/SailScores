@@ -42,6 +42,8 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 - **Views** should focus on data presentation, not business logic
 - Users with `UserClubPermission.CanEditAllClubs` are treated as super-admins (full admin) who bypass normal club-specific permission checks.
 - **Administrative features** must always use restrictive authorization policies (e.g., `[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]`).
+- **UI Changes**: Support dark mode; avoid forcing light-only styling and prefer theme-aware options like auto/adaptive themes.
+- **Line Length**: Keep line length at 120 characters or less in all files and honor all .editorconfig settings.
 
 ## Development Setup
 
@@ -195,6 +197,19 @@ The project uses libman for client-side libraries (Bootstrap, jQuery). Build err
 - Scoring calculations are in `SailScores.Core/Scoring/`
 - Supports Appendix A and High Point Percentage systems
 - Race results include proper rounding and tie-breaking
+
+## API Development Guidelines
+
+- When planning new JSON/TRMNL endpoints, place them under dedicated public API controllers/routes.
+- Routes are case-insensitive with standard URL encoding.
+- List endpoints hide hidden clubs but direct routes remain accessible.
+- Default list responses are unpaginated with sorting by recent first, except clubs which are sorted alphabetically.
+- Include cache-control headers and API root early.
+- For public race DTOs, include an integer `Order`/`RaceOrder` field because race display order is important for clients.
+- Public series detail should return competitors in ranked order with standings embedded in each competitor item, so clients do not need to join standings by name.
+- Compute competitor URLs for public series responses at response time from current competitor data; do not preserve or serialize `UrlName` in flattened or embedded results because `UrlName` can change after flattening.
+- For TRMNL xhrSelect-compatible API option responses, return key/value items where key is the user-facing label and value is the DB-stored token (typically UrlName).
+- For public API routes, the club path parameter must accept either club initials or a club Guid.
 
 ## Testing Strategy
 
