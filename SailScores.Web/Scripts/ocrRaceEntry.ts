@@ -83,7 +83,7 @@ export class OcrRaceEntry {
         // Store lines globally for selection/adding
         (window as any).ocrLineResults = ocrResult.lines || [];
 
-        ocrResult.lines.forEach((line, lineIndex) => {
+        ocrResult.lines.forEach((line: OcrMatchResult['lines'][number], lineIndex: number) => {
             this.renderResultRow(line, lineIndex, tbody);
         });
 
@@ -514,7 +514,7 @@ export class OcrRaceEntry {
         // Get current lines including manually inserted ones
         const lines = (window as any).ocrLineResults as any[] || ocrResult.lines;
         
-        lines.forEach((line, idx) => {
+        lines.forEach((line: any, idx: number) => {
             // Skip manual entries (they don't have bounding boxes)
             if (line.isManual || !line.boundingBox) return;
             
@@ -796,7 +796,7 @@ export class OcrRaceEntry {
         $(`#ocrStep${step.charAt(0).toUpperCase() + step.slice(1)}`).removeClass('d-none');
 
         // Update progress bar
-        const progress = {
+        const progress: Record<OcrStep, number> = {
             upload: 25,
             crop: 50,
             processing: 75,

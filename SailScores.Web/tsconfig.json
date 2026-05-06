@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "rootDir": "./Scripts",
     "outDir": "./wwwroot/js/",
     "esModuleInterop": true,
     "noImplicitAny": true,
@@ -8,9 +9,13 @@
     "removeComments": false,
     "sourceMap": true,
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "target": "es2020",
-    "baseUrl": "./Scripts",
+    "paths": {
+      "*": [
+        "./Scripts/*"
+      ]
+    },
     "lib": [
       "ES2020",
       "es5",
