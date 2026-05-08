@@ -19,6 +19,7 @@ public class SeriesBackup
     public DateTime? UpdatedDate { get; set; }
     public string UpdatedBy { get; set; }
     public Guid? ScoringSystemId { get; set; }
+    public Guid? HandicapSystemId { get; set; }
     public TrendOption? TrendOption { get; set; }
     public Guid? FleetId { get; set; }
     public bool? UseFullRaceScores { get; set; }

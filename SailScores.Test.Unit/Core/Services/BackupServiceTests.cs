@@ -67,6 +67,8 @@ public class BackupServiceTests
         Assert.NotNull(backup.Fleets);
         Assert.NotNull(backup.Competitors);
         Assert.NotNull(backup.ScoringSystems);
+        Assert.NotNull(backup.HandicapSystems);
+        Assert.NotNull(backup.CompetitorHandicaps);
         Assert.NotNull(backup.Series);
         Assert.NotNull(backup.Races);
         Assert.NotNull(backup.Regattas);
@@ -109,6 +111,41 @@ public class BackupServiceTests
         var backedUpChild = backup.ScoringSystems.FirstOrDefault(s => s.Name == "Child System");
         Assert.NotNull(backedUpChild);
         Assert.Equal(parentSystem.Id, backedUpChild.ParentSystemId);
+    }
+
+    [Fact]
+    public async Task CreateBackupAsync_IncludesHandicapSystemsAndCompetitorHandicaps()
+    {
+        // Arrange
+        var clubSystem = new Db.HandicapSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "Club Handicap",
+            SystemType = Db.HandicapSystemType.PhrfToT,
+            Description = "Club handicap system"
+        };
+        _context.HandicapSystems.Add(clubSystem);
+
+        var competitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId);
+        _context.CompetitorHandicaps.Add(new Db.CompetitorHandicap
+        {
+            Id = Guid.NewGuid(),
+            CompetitorId = competitor.Id,
+            HandicapSystemId = clubSystem.Id,
+            Value = 105.5m,
+            EffectiveFrom = DateTime.UtcNow.Date,
+            Notes = "Test handicap"
+        });
+
+        await _context.SaveChangesAsync();
+
+        // Act
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+
+        // Assert
+        Assert.Contains(backup.HandicapSystems, hs => hs.Name == "Club Handicap");
+        Assert.Contains(backup.CompetitorHandicaps, ch => ch.Value == 105.5m);
     }
 
     #endregion
@@ -422,6 +459,123 @@ public class BackupServiceTests
     }
 
     [Fact]
+    public async Task RestoreBackupAsync_RestoresHandicapSystemsAndReferences()
+    {
+        // Arrange
+        var sourceClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId);
+        sourceClub.EnableHandicapScoring = true;
+
+        var siteWideParent = await _context.HandicapSystems
+            .FirstOrDefaultAsync(h => h.ClubId == null && h.SystemType == Db.HandicapSystemType.PhrfToT);
+
+        if (siteWideParent == null)
+        {
+            siteWideParent = new Db.HandicapSystem
+            {
+                Id = Guid.NewGuid(),
+                ClubId = null,
+                Name = "Site PHRF ToT",
+                SystemType = Db.HandicapSystemType.PhrfToT,
+                Description = "Site-wide fallback"
+            };
+            _context.HandicapSystems.Add(siteWideParent);
+        }
+
+        var clubHandicapParent = new Db.HandicapSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "Club Parent",
+            SystemType = Db.HandicapSystemType.PhrfToT,
+            ParentSystemId = siteWideParent.Id
+        };
+        _context.HandicapSystems.Add(clubHandicapParent);
+
+        var clubHandicapChild = new Db.HandicapSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "Club Child",
+            SystemType = Db.HandicapSystemType.PhrfToT,
+            ParentSystemId = clubHandicapParent.Id
+        };
+        _context.HandicapSystems.Add(clubHandicapChild);
+
+        sourceClub.DefaultHandicapSystemId = clubHandicapChild.Id;
+
+        var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId);
+        fleet.DefaultHandicapSystemId = clubHandicapChild.Id;
+
+        var series = await _context.Series.FirstAsync(s => s.ClubId == _clubId);
+        series.HandicapSystemId = clubHandicapChild.Id;
+
+        var competitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId);
+        _context.CompetitorHandicaps.Add(new Db.CompetitorHandicap
+        {
+            Id = Guid.NewGuid(),
+            CompetitorId = competitor.Id,
+            HandicapSystemId = clubHandicapChild.Id,
+            Value = 123.45m,
+            Notes = "Round-trip"
+        });
+
+        await _context.SaveChangesAsync();
+
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+
+        // Force fallback path for child's parent resolution by removing restored parent from payload.
+        backup.HandicapSystems = backup.HandicapSystems
+            .Where(h => h.Name != "Club Parent")
+            .ToList();
+
+        // Act
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+
+        // Assert
+        var restoredClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId);
+        Assert.True(restoredClub.EnableHandicapScoring);
+        Assert.True(restoredClub.DefaultHandicapSystemId.HasValue);
+
+        var restoredChild = await _context.HandicapSystems
+            .FirstAsync(h => h.ClubId == _clubId && h.Name == "Club Child");
+        Assert.True(restoredChild.ParentSystemId.HasValue);
+
+        var restoredParent = await _context.HandicapSystems
+            .FirstOrDefaultAsync(h => h.Id == restoredChild.ParentSystemId.Value);
+        Assert.NotNull(restoredParent);
+        Assert.Equal(Db.HandicapSystemType.PhrfToT, restoredParent.SystemType);
+
+        var restoredFleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId);
+        Assert.Equal(restoredChild.Id, restoredFleet.DefaultHandicapSystemId);
+
+        var restoredSeries = await _context.Series.FirstAsync(s => s.ClubId == _clubId);
+        Assert.Equal(restoredChild.Id, restoredSeries.HandicapSystemId);
+
+        var restoredCompetitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId);
+        var restoredCompetitorHandicap = await _context.CompetitorHandicaps
+            .FirstOrDefaultAsync(ch => ch.CompetitorId == restoredCompetitor.Id);
+        Assert.NotNull(restoredCompetitorHandicap);
+        Assert.Equal(restoredChild.Id, restoredCompetitorHandicap.HandicapSystemId);
+        Assert.Equal(123.45m, restoredCompetitorHandicap.Value);
+    }
+
+    [Fact]
+    public async Task RestoreBackupAsync_OlderBackupWithoutHandicapData_DoesNotThrow()
+    {
+        // Arrange
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        backup.HandicapSystems = null;
+        backup.CompetitorHandicaps = null;
+        backup.DefaultHandicapSystemName = null;
+
+        // Act
+        var result = await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
     public async Task BackupAndRestore_WithFleetBoatClassRelationships_PreservesAssociations()
     {
         // Arrange
@@ -457,6 +611,8 @@ public class BackupServiceTests
     [InlineData(typeof(Db.BoatClass), typeof(BoatClassBackup))]
     [InlineData(typeof(Db.Season), typeof(SeasonBackup))]
     [InlineData(typeof(Db.ScoringSystem), typeof(ScoringSystemBackup))]
+    [InlineData(typeof(Db.HandicapSystem), typeof(HandicapSystemBackup))]
+    [InlineData(typeof(Db.CompetitorHandicap), typeof(CompetitorHandicapBackup))]
     [InlineData(typeof(Db.ScoreCode), typeof(ScoreCodeBackup))]
     [InlineData(typeof(Db.Series), typeof(SeriesBackup))]
     [InlineData(typeof(Db.Race), typeof(RaceBackup))]
@@ -498,6 +654,8 @@ public class BackupServiceTests
             (typeof(Db.BoatClass), typeof(BoatClassBackup), new[] { "ClubId" }),
             (typeof(Db.Season), typeof(SeasonBackup), new[] { "ClubId" }),
             (typeof(Db.ScoringSystem), typeof(ScoringSystemBackup), new[] { "ClubId" }),
+            (typeof(Db.HandicapSystem), typeof(HandicapSystemBackup), new[] { "ClubId", "ParentSystem" }),
+            (typeof(Db.CompetitorHandicap), typeof(CompetitorHandicapBackup), new[] { "Competitor", "HandicapSystem" }),
             (typeof(Db.ScoreCode), typeof(ScoreCodeBackup), new[] { "ScoringSystemId" }),
             (typeof(Db.Series), typeof(SeriesBackup), new[] { "ClubId", "RaceSeries", "ChildLinks", "ParentLinks", "Season", "ScoringSystem" }),
             (typeof(Db.Race), typeof(RaceBackup), new[] { "ClubId", "Fleet", "Scores", "SeriesRaces", "Weather" }),
@@ -550,6 +708,7 @@ public class BackupServiceTests
         { 
             "ClubId",           // Added during restore
             "ScoringSystemId",  // For ScoreCode - it's a foreign key
+            "HandicapSystemId", // For competitor handicaps - it's a foreign key
         };
 
         // Navigation properties
@@ -557,7 +716,8 @@ public class BackupServiceTests
         {
             "Club", "BoatClass", "Fleet", "Season", "ScoringSystem", "Competitor", "Race", "Series", "Regatta",
             "FleetBoatClasses", "CompetitorFleets", "Scores", "RaceSeries", "SeriesRaces", "ChildLinks", "ParentLinks",
-            "RegattaSeries", "RegattaFleet", "Weather", "NewCompetitor", "NewRegatta", "NewSeries", "ChangeHistory"
+            "RegattaSeries", "RegattaFleet", "Weather", "NewCompetitor", "NewRegatta", "NewSeries", "ChangeHistory",
+            "ParentSystem", "DefaultForClubs", "DefaultForFleets", "DefaultForSeries", "CompetitorHandicaps"
         };
 
         // Backup-specific exclusions
@@ -567,7 +727,9 @@ public class BackupServiceTests
             "IsDeleted",        // Announcement: filtered during backup
             "PreviousVersion",  // Announcement/Document: version chains not preserved
             "NewRegattaId",     // RegattaForwarder: uses RegattaId in backup
-            "NewSeriesId"       // SeriesForwarder: uses SeriesId in backup
+            "NewSeriesId",      // SeriesForwarder: uses SeriesId in backup
+            "DefaultHandicapSystemId", // Fleet/Club: restored via name-based backup references
+            "CourseDistance"    // Race: not currently included in backup payload
         };
 
         return commonExclusions.Contains(propertyName) 

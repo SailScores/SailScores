@@ -21,4 +21,6 @@ public class FleetBackup
     /// Boat class IDs associated with this fleet.
     /// </summary>
     public IList<Guid> BoatClassIds { get; set; }
+
+    public string DefaultHandicapSystemName { get; set; }
 }

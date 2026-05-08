@@ -135,7 +135,8 @@ public class BackupService : IBackupService
             Locale = club.Locale,
             DefaultRaceDateOffset = club.DefaultRaceDateOffset,
             StatisticsDescription = club.StatisticsDescription,
-            LogoFileId = club.LogoFileId
+            LogoFileId = club.LogoFileId,
+            EnableHandicapScoring = club.EnableHandicapScoring
         };
 
         // Weather settings
@@ -222,11 +223,55 @@ public class BackupService : IBackupService
             backup.DefaultScoringSystemName = defaultSystem?.Name;
         }
 
+        // Get default handicap system name for reference
+        if (club.DefaultHandicapSystemId.HasValue)
+        {
+            var defaultSystem = await _dbContext.HandicapSystems
+                .Where(hs => hs.Id == club.DefaultHandicapSystemId.Value)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+            backup.DefaultHandicapSystemName = defaultSystem?.Name;
+        }
+
+        // Handicap Systems (only those owned by this club)
+        var handicapSystems = await _dbContext.HandicapSystems
+            .Where(hs => hs.ClubId == clubId)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        backup.HandicapSystems = handicapSystems.Select(hs => new HandicapSystemBackup
+        {
+            Id = hs.Id,
+            Name = hs.Name,
+            SystemType = hs.SystemType,
+            Description = hs.Description,
+            ParentSystemId = hs.ParentSystemId
+        }).ToList();
+
+        // Competitor handicaps for this club's competitors
+        var competitorHandicaps = await _dbContext.CompetitorHandicaps
+            .Where(ch => _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).Contains(ch.CompetitorId))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        backup.CompetitorHandicaps = competitorHandicaps.Select(ch => new CompetitorHandicapBackup
+        {
+            Id = ch.Id,
+            CompetitorId = ch.CompetitorId,
+            HandicapSystemId = ch.HandicapSystemId,
+            Value = ch.Value,
+            EffectiveFrom = ch.EffectiveFrom,
+            EffectiveTo = ch.EffectiveTo,
+            Notes = ch.Notes
+        }).ToList();
+
         // Fleets with boat class and competitor associations
         var fleets = await _dbContext.Fleets
             .Where(f => f.ClubId == clubId)
             .Include(f => f.FleetBoatClasses)
             .Include(f => f.CompetitorFleets)
+            .Include(f => f.DefaultHandicapSystem)
             .AsNoTracking()
             .AsSplitQuery()
             .ToListAsync(cancellationToken)
@@ -240,7 +285,8 @@ public class BackupService : IBackupService
             Description = f.Description,
             IsActive = f.IsActive,
             FleetType = f.FleetType,
-            BoatClassIds = f.FleetBoatClasses?.Select(fbc => fbc.BoatClassId).ToList() ?? new List<Guid>()
+            BoatClassIds = f.FleetBoatClasses?.Select(fbc => fbc.BoatClassId).ToList() ?? new List<Guid>(),
+            DefaultHandicapSystemName = f.DefaultHandicapSystem?.Name
         }).ToList();
 
         // Competitors with fleet associations
@@ -290,6 +336,7 @@ public class BackupService : IBackupService
             UpdatedDate = s.UpdatedDate,
             UpdatedBy = s.UpdatedBy,
             ScoringSystemId = s.ScoringSystemId,
+            HandicapSystemId = s.HandicapSystemId,
             TrendOption = s.TrendOption,
             FleetId = s.FleetId,
             PreferAlternativeSailNumbers = s.PreferAlternativeSailNumbers,
@@ -901,16 +948,25 @@ public class BackupService : IBackupService
             RestoreBoatClasses(backup, targetClubId);
             RestoreSeasons(backup, targetClubId);
             var defaultScoringSystemId = RestoreScoringSystems(backup, targetClubId);
+            var defaultHandicapSystemId = RestoreHandicapSystems(backup, targetClubId);
             RestoreFleets(backup, targetClubId);
             RestoreCompetitors(backup, targetClubId);
+            RestoreCompetitorHandicaps(backup);
 
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             await UpdateScoringSystemParentReferencesAsync(backup, cancellationToken).ConfigureAwait(false);
+            await UpdateHandicapSystemParentReferencesAsync(backup, cancellationToken).ConfigureAwait(false);
+            await UpdateHandicapDefaultReferencesAsync(club, backup, cancellationToken).ConfigureAwait(false);
 
             if (defaultScoringSystemId.HasValue)
             {
                 club.DefaultScoringSystemId = defaultScoringSystemId;
+            }
+
+            if (defaultHandicapSystemId.HasValue)
+            {
+                club.DefaultHandicapSystemId = defaultHandicapSystemId;
             }
 
             await RestoreSeriesAsync(backup, targetClubId, cancellationToken).ConfigureAwait(false);
@@ -984,6 +1040,7 @@ public class BackupService : IBackupService
         club.Locale = backup.Locale;
         club.DefaultRaceDateOffset = backup.DefaultRaceDateOffset;
         club.StatisticsDescription = backup.StatisticsDescription;
+        club.EnableHandicapScoring = backup.EnableHandicapScoring;
 
         // Note: club.Initials are NOT updated (always preserved from target club)
 
@@ -1055,6 +1112,32 @@ public class BackupService : IBackupService
         }
 
         return defaultScoringSystemId;
+    }
+
+    private Guid? RestoreHandicapSystems(ClubBackupData backup, Guid targetClubId)
+    {
+        Guid? defaultHandicapSystemId = null;
+
+        foreach (var hs in backup.HandicapSystems ?? Enumerable.Empty<HandicapSystemBackup>())
+        {
+            var dbHs = new Db.HandicapSystem
+            {
+                Id = GetNewGuid(hs.Id),
+                ClubId = targetClubId,
+                Name = hs.Name,
+                SystemType = hs.SystemType,
+                Description = hs.Description
+            };
+
+            if (hs.Name == backup.DefaultHandicapSystemName)
+            {
+                defaultHandicapSystemId = dbHs.Id;
+            }
+
+            _dbContext.HandicapSystems.Add(dbHs);
+        }
+
+        return defaultHandicapSystemId;
     }
 
     private void RestoreScoreCodes(ScoringSystemBackup ss, Guid scoringSystemId)
@@ -1166,6 +1249,33 @@ public class BackupService : IBackupService
         }
     }
 
+    private void RestoreCompetitorHandicaps(ClubBackupData backup)
+    {
+        foreach (var handicap in backup.CompetitorHandicaps ?? Enumerable.Empty<CompetitorHandicapBackup>())
+        {
+            var newCompetitorId = GetNewGuidIfExists(handicap.CompetitorId);
+            var mappedHandicapSystemId = GetNewOrOldGuid(handicap.HandicapSystemId);
+
+            if (!newCompetitorId.HasValue || !mappedHandicapSystemId.HasValue)
+            {
+                continue;
+            }
+
+            var dbCompetitorHandicap = new Db.CompetitorHandicap
+            {
+                Id = GetNewGuid(handicap.Id),
+                CompetitorId = newCompetitorId.Value,
+                HandicapSystemId = mappedHandicapSystemId.Value,
+                Value = handicap.Value,
+                EffectiveFrom = handicap.EffectiveFrom,
+                EffectiveTo = handicap.EffectiveTo,
+                Notes = handicap.Notes
+            };
+
+            _dbContext.CompetitorHandicaps.Add(dbCompetitorHandicap);
+        }
+    }
+
     private void RestoreCompetitorFleets(CompetitorBackup comp, Guid competitorId)
     {
         foreach (var fleetId in comp.FleetIds ?? Enumerable.Empty<Guid>())
@@ -1189,6 +1299,7 @@ public class BackupService : IBackupService
         {
             var newSeasonId = series.SeasonId.HasValue ? GetNewGuidIfExists(series.SeasonId.Value) : null;
             var newScoringId = series.ScoringSystemId.HasValue ? GetNewGuidIfExists(series.ScoringSystemId.Value) : null;
+            var newHandicapId = series.HandicapSystemId.HasValue ? GetNewOrOldGuid(series.HandicapSystemId.Value) : null;
 
             var dbSeries = new Db.Series
             {
@@ -1203,6 +1314,7 @@ public class BackupService : IBackupService
                 UpdatedDate = series.UpdatedDate,
                 UpdatedBy = series.UpdatedBy,
                 ScoringSystemId = newScoringId,
+                HandicapSystemId = newHandicapId,
                 TrendOption = series.TrendOption,
                 FleetId = series.FleetId.HasValue ? GetNewGuidIfExists(series.FleetId.Value) : null,
                 PreferAlternativeSailNumbers = series.PreferAlternativeSailNumbers,
@@ -1635,6 +1747,119 @@ public class BackupService : IBackupService
          }
      }
 
+    private async Task UpdateHandicapSystemParentReferencesAsync(ClubBackupData backup, CancellationToken cancellationToken = default)
+    {
+        foreach (var hs in backup.HandicapSystems ?? Enumerable.Empty<HandicapSystemBackup>())
+        {
+            if (!hs.ParentSystemId.HasValue) continue;
+
+            var newId = GetNewGuidIfExists(hs.Id);
+            if (!newId.HasValue) continue;
+
+            var dbHs = await _dbContext.HandicapSystems.FindAsync([newId.Value], cancellationToken).ConfigureAwait(false);
+            if (dbHs == null) continue;
+
+            // First priority: remap to a restored handicap system if present.
+            var mappedParentId = GetNewGuidIfExists(hs.ParentSystemId.Value);
+            if (mappedParentId.HasValue)
+            {
+                dbHs.ParentSystemId = mappedParentId.Value;
+                continue;
+            }
+
+            // Fallback: map to site-wide base system by system type, then optional name tie-breaker.
+            var parentName = backup.HandicapSystems?
+                .FirstOrDefault(x => x.Id == hs.ParentSystemId.Value)?.Name;
+
+            var siteWideCandidates = await _dbContext.HandicapSystems
+                .Where(x => x.ClubId == null && x.SystemType == hs.SystemType)
+                .OrderBy(x => x.Name)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            var siteWideParent = !string.IsNullOrWhiteSpace(parentName)
+                ? siteWideCandidates.FirstOrDefault(x => x.Name == parentName) ?? siteWideCandidates.FirstOrDefault()
+                : siteWideCandidates.FirstOrDefault();
+
+            if (siteWideParent != null)
+            {
+                dbHs.ParentSystemId = siteWideParent.Id;
+                continue;
+            }
+
+            _logger.LogWarning(
+                "Could not resolve handicap parent for restored handicap system {HandicapSystemId} ({HandicapSystemName}). Parent source id {ParentSourceId}.",
+                dbHs.Id,
+                dbHs.Name,
+                hs.ParentSystemId.Value);
+        }
+    }
+
+    private async Task UpdateHandicapDefaultReferencesAsync(Db.Club club, ClubBackupData backup, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(backup.DefaultHandicapSystemName))
+        {
+            return;
+        }
+
+        if (!club.DefaultHandicapSystemId.HasValue)
+        {
+            club.DefaultHandicapSystemId = await ResolveHandicapSystemIdByNameAsync(backup.DefaultHandicapSystemName, backup, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        foreach (var fleet in backup.Fleets ?? Enumerable.Empty<FleetBackup>())
+        {
+            if (string.IsNullOrWhiteSpace(fleet.DefaultHandicapSystemName))
+            {
+                continue;
+            }
+
+            var newFleetId = GetNewGuidIfExists(fleet.Id);
+            if (!newFleetId.HasValue)
+            {
+                continue;
+            }
+
+            var dbFleet = await _dbContext.Fleets.FindAsync([newFleetId.Value], cancellationToken).ConfigureAwait(false);
+            if (dbFleet == null)
+            {
+                continue;
+            }
+
+            dbFleet.DefaultHandicapSystemId = await ResolveHandicapSystemIdByNameAsync(
+                    fleet.DefaultHandicapSystemName,
+                    backup,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+    }
+
+    private async Task<Guid?> ResolveHandicapSystemIdByNameAsync(
+        string systemName,
+        ClubBackupData backup,
+        CancellationToken cancellationToken = default)
+    {
+        var restoredSystem = (backup.HandicapSystems ?? Enumerable.Empty<HandicapSystemBackup>())
+            .FirstOrDefault(h => h.Name == systemName);
+
+        if (restoredSystem != null)
+        {
+            var mappedId = GetNewGuidIfExists(restoredSystem.Id);
+            if (mappedId.HasValue)
+            {
+                return mappedId.Value;
+            }
+        }
+
+        return await _dbContext.HandicapSystems
+            .Where(h => h.ClubId == null && h.Name == systemName)
+            .OrderBy(h => h.SystemType)
+            .Select(h => (Guid?)h.Id)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     // Replace GUID strings in JSON payload with their remapped GUIDs from _guidMap (creating mappings when necessary).
     private string ReplaceGuidsInJson(string json)
     {
@@ -1862,9 +2087,21 @@ public class BackupService : IBackupService
             .ExecuteDeleteAsync(cancellationToken)
             .ConfigureAwait(false);
 
+        // Competitor handicaps (safety cleanup in case provider does not cascade)
+        await _dbContext.CompetitorHandicaps
+            .Where(ch => _dbContext.Competitors.Where(c => c.ClubId == clubId).Select(c => c.Id).Contains(ch.CompetitorId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         // Competitors
         await _dbContext.Competitors
             .Where(c => c.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Class handicaps (depends on boat classes)
+        await _dbContext.ClassHandicaps
+            .Where(ch => _dbContext.BoatClasses.Where(bc => bc.ClubId == clubId).Select(bc => bc.Id).Contains(ch.BoatClassId))
             .ExecuteDeleteAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -1890,12 +2127,22 @@ public class BackupService : IBackupService
         // This prevents FK constraint violation: FK_Clubs_ScoringSystems_DefaultScoringSystemId
         await _dbContext.Clubs
             .Where(c => c.Id == clubId)
-            .ExecuteUpdateAsync(u => u.SetProperty(c => c.DefaultScoringSystemId, (Guid?)null), cancellationToken)
+            .ExecuteUpdateAsync(
+                u => u
+                    .SetProperty(c => c.DefaultScoringSystemId, (Guid?)null)
+                    .SetProperty(c => c.DefaultHandicapSystemId, (Guid?)null),
+                cancellationToken)
             .ConfigureAwait(false);
 
         // ScoringSystems
         await _dbContext.ScoringSystems
             .Where(ss => ss.ClubId == clubId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // HandicapSystems (club-owned only)
+        await _dbContext.HandicapSystems
+            .Where(hs => hs.ClubId == clubId)
             .ExecuteDeleteAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -2053,6 +2300,13 @@ public class BackupService : IBackupService
         var competitorFleets = await _dbContext.CompetitorFleets.Where(cf => competitorIds2.Contains(cf.CompetitorId)).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.CompetitorFleets.RemoveRange(competitorFleets);
 
+        // Competitor handicaps (safety cleanup in case provider does not cascade)
+        var competitorHandicaps = await _dbContext.CompetitorHandicaps
+            .Where(ch => competitorIds2.Contains(ch.CompetitorId))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        _dbContext.CompetitorHandicaps.RemoveRange(competitorHandicaps);
+
         // Competitors
         var competitors = await _dbContext.Competitors.Where(c => c.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.Competitors.RemoveRange(competitors);
@@ -2066,6 +2320,13 @@ public class BackupService : IBackupService
         var fleets = await _dbContext.Fleets.Where(f => f.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.Fleets.RemoveRange(fleets);
 
+        // Class handicaps (depends on boat classes)
+        var classHandicaps = await _dbContext.ClassHandicaps
+            .Where(ch => _dbContext.BoatClasses.Where(bc => bc.ClubId == clubId).Select(bc => bc.Id).Contains(ch.BoatClassId))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        _dbContext.ClassHandicaps.RemoveRange(classHandicaps);
+
         // ScoreCodes (via scoring systems)
         var scoringSystemIds = await _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).Select(ss => ss.Id).ToListAsync(cancellationToken).ConfigureAwait(false);
         var scoreCodes = await _dbContext.ScoreCodes.Where(sc => scoringSystemIds.Contains(sc.ScoringSystemId)).ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -2074,10 +2335,15 @@ public class BackupService : IBackupService
         // Clear DefaultScoringSystemId on the club before deleting ScoringSystems
         var club = await _dbContext.Clubs.Where(c => c.Id == clubId).FirstAsync(cancellationToken).ConfigureAwait(false);
         club.DefaultScoringSystemId = null;
+        club.DefaultHandicapSystemId = null;
 
         // ScoringSystems
         var scoringSystems = await _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.ScoringSystems.RemoveRange(scoringSystems);
+
+        // HandicapSystems (club-owned only)
+        var handicapSystems = await _dbContext.HandicapSystems.Where(hs => hs.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
+        _dbContext.HandicapSystems.RemoveRange(handicapSystems);
 
         // Seasons
         var seasons = await _dbContext.Seasons.Where(s => s.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
