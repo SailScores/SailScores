@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using SailScores.Api.Enumerations;
 
 namespace SailScores.Api.Dtos.Public
 {
@@ -15,7 +14,8 @@ namespace SailScores.Api.Dtos.Public
 
         public int Order { get; set; }
 
-        public RaceState? State { get; set; }
+        [StringLength(50)]
+        public string State { get; set; }
 
         [StringLength(30)]
         public string WindSpeed { get; set; }
@@ -31,6 +31,10 @@ namespace SailScores.Api.Dtos.Public
         [Required]
         [StringLength(200)]
         public string Name { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string ShortName { get; set; }
 
         [Required]
         [StringLength(500)]

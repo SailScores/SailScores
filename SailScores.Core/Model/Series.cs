@@ -34,6 +34,8 @@ public class Series
 
     public IList<Guid> ParentSeriesIds { get; set; } = new List<Guid>();
 
+    public IList<Series> ParentSeries { get; set; } = new List<Series>();
+
     public IList<Race> Races { get; set; }
 
     public int? RaceCount { get; set; }

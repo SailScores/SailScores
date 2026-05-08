@@ -13,6 +13,14 @@ const noCodeString = "No Code";
 
 // OCR module instance
 let ocrModule: OcrRaceEntry | null = null;
+let previousDateValue = "";
+let suppressSeriesRemovalConfirmation = false;
+
+interface seriesListResult {
+    series: seriesDto[];
+    noSeasonForDate: boolean;
+    noSeriesForDate: boolean;
+}
 
 function checkEnter(e: KeyboardEvent) {
     let txtArea = /textarea/i.test((e.target as HTMLElement).tagName);
@@ -151,6 +159,14 @@ export function loadFleet() {
 }
 
 export function dateChanged() {
+    const currentDateValue = $("#date").val() as string;
+    if (!suppressSeriesRemovalConfirmation) {
+        const dateInput = document.getElementById('date') as HTMLInputElement | null;
+        previousDateValue = dateInput?.defaultValue ?? "";
+        if (currentDateValue && dateInput) {
+            dateInput.defaultValue = currentDateValue;
+        }
+    }
     loadSeriesOptions();
     if ($("#defaultWeather").val() === "true") {
         console.log("defaultWeather was true");
@@ -695,36 +711,65 @@ function displayRaceNumber() {
 }
 
 
-let seriesOptions: seriesDto[];
+let seriesOptions: seriesDto[] = [];
 function getSeries(clubId: string, date: string) {
+    const seriesSelect = $('#SeriesIds, #seriesIds') as JQuery;
+    const selectedSeriesValues = seriesSelect.val() as string[] || [];
+    const seriesDateError = $('#seriesDateError');
+
+    seriesDateError.text('');
+
     if (clubId && date) {
-        $.getJSON("/api/Series",
-            {
+        $.ajax({
+            url: "/api/Series",
+            data: {
                 clubId: clubId,
                 date: date,
                 includeSummary: false
             },
-            function (data: seriesDto[]) {
-                seriesOptions = data;
-                setSeries();
-            });
+            dataType: "json",
+            success: function (data: seriesListResult) {
+                seriesOptions = data.series || [];
+
+                if (data.noSeasonForDate) {
+                    seriesDateError.append($("<div></div>")
+                        .text("No season exists covering the selected date. Series cannot be added to this race."));
+                }
+                if (data.noSeriesForDate) {
+                    seriesDateError.append($("<div></div>")
+                        .text("No series cover the selected date."));
+                }
+
+                const availableSeriesIds = new Set(seriesOptions.map(s => s.id.toString()));
+                const removedSeriesIds = selectedSeriesValues.filter(id => !availableSeriesIds.has(id));
+
+                if (removedSeriesIds.length > 0 && !suppressSeriesRemovalConfirmation) {
+                    const confirmed = window.confirm("This date isn't allowed for the currently selected series. This will remove the series from this race. Are you sure?");
+                    if (!confirmed) {
+                        suppressSeriesRemovalConfirmation = true;
+                        const dateInput = document.getElementById('date') as HTMLInputElement | null;
+                        $("#date").val(previousDateValue);
+                        if (dateInput) {
+                            dateInput.defaultValue = previousDateValue;
+                        }
+                        getSeries(clubId, previousDateValue);
+                        return;
+                    }
+                }
+
+                suppressSeriesRemovalConfirmation = false;
+
+                setSeries(selectedSeriesValues);
+            },
+            error: function () {
+                seriesDateError.text("Unable to load series for the selected date.");
+            }
+        });
     }
 }
 
-function setSeries() {
-    let seriesSelect = $('#SeriesIds') as JQuery;
-    // Save current selections as an array of strings
-    let selectedSeriesValues = seriesSelect.val() as string[] || [];
-
-    // Capture existing option texts so we can restore selected ones that may not be in the new list
-    const existingOptionTextMap: Record<string, string> = {};
-    seriesSelect.find('option').each(function () {
-        const $opt = $(this);
-        const val = $opt.val() as string;
-        if (val) {
-            existingOptionTextMap[val] = $opt.text();
-        }
-    });
+function setSeries(selectedSeriesValues: string[] = []) {
+    let seriesSelect = $('#SeriesIds, #seriesIds') as JQuery;
 
     // Destroy existing Select2 instance to avoid duplicates
     if (seriesSelect.hasClass("select2-hidden-accessible")) {

@@ -74,6 +74,8 @@ public class CsvService : ICsvService, IDisposable
             {
                 sb.Append(GetEscapedValue(_sailscoresLocalizer.GetShortName(race) + " - " + GetEscapedLocalizedValue("Elapsed")));
                 sb.Append(_separator);
+                sb.Append(GetEscapedValue(_sailscoresLocalizer.GetShortName(race) + " - " + GetEscapedLocalizedValue("Elapsed Seconds")));
+                sb.Append(_separator);
             }
         }
 
@@ -142,6 +144,9 @@ public class CsvService : ICsvService, IDisposable
                 var raceScore = series.FlatResults.GetScore(comp, race);
                 var elapsedTimeString = FormatElapsedTime(raceScore?.ElapsedTime);
                 sb.Append(GetEscapedValue(elapsedTimeString));
+                sb.Append(_separator);
+                var elapsedTimeSecondsString = FormatElapsedTimeSeconds(raceScore?.ElapsedTime);
+                sb.Append(GetEscapedValue(elapsedTimeSecondsString));
                 sb.Append(_separator);
             }
         }
@@ -244,6 +249,16 @@ public class CsvService : ICsvService, IDisposable
         {
             return $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
         }
+    }
+
+    private static string FormatElapsedTimeSeconds(TimeSpan? elapsedTime)
+    {
+        if (!elapsedTime.HasValue)
+        {
+            return string.Empty;
+        }
+
+        return ((int)elapsedTime.Value.TotalSeconds).ToString();
     }
 
     private static string GetEscapedValue(string s)
