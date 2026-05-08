@@ -13,15 +13,18 @@ public class HandicapSystemController : Controller
 {
     private readonly IClubService _clubService;
     private readonly IHandicapService _handicapService;
+    private readonly Services.Interfaces.IHandicapSystemService _webHandicapSystemService;
     private readonly IAuthorizationService _authService;
 
     public HandicapSystemController(
         IClubService clubService,
         IHandicapService handicapService,
+        Services.Interfaces.IHandicapSystemService webHandicapSystemService,
         IAuthorizationService authService)
     {
         _clubService = clubService;
         _handicapService = handicapService;
+        _webHandicapSystemService = webHandicapSystemService;
         _authService = authService;
     }
 
@@ -29,35 +32,35 @@ public class HandicapSystemController : Controller
     public async Task<ActionResult> Create(string clubInitials)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
-        var vm = new HandicapSystemViewModel
+        var vm = new CreateHandicapSystemViewModel
         {
             ClubId = clubId,
-            SystemType = HandicapSystemType.PhrfToD
+            BaseSystemOptions = await _webHandicapSystemService.GetBaseSystemsAsync()
         };
+
+        if (vm.BaseSystemOptions.Any())
+        {
+            vm.ParentSystemId = vm.BaseSystemOptions.First().Id;
+        }
+
         return View(vm);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
-    public async Task<ActionResult> Create(string clubInitials, HandicapSystemViewModel model)
+    public async Task<ActionResult> Create(string clubInitials, CreateHandicapSystemViewModel model)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         model.ClubId = clubId;
 
         if (!ModelState.IsValid)
         {
+            model.BaseSystemOptions = await _webHandicapSystemService.GetBaseSystemsAsync();
             return View(model);
         }
 
-        await _handicapService.SaveHandicapSystemAsync(new HandicapSystem
-        {
-            Id = Guid.NewGuid(),
-            ClubId = clubId,
-            Name = model.Name,
-            SystemType = model.SystemType,
-            Description = model.Description
-        });
+        await _webHandicapSystemService.CreateClubSystemAsync(model);
 
         return RedirectToAction("Index", "Admin");
     }

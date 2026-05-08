@@ -1,4 +1,4 @@
-@model SailScores.Web.Models.SailScores.HandicapSystemViewModel
+@model SailScores.Web.Models.SailScores.CreateHandicapSystemViewModel
 
 @{
     ViewData["Title"] = "Create Handicap System";
@@ -10,6 +10,7 @@
 <div class="row">
     <div class="col-md-8 col-lg-6">
         <form asp-action="Create">
+            <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Name" class="form-label"></label>
@@ -17,15 +18,16 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="SystemType" class="form-label"></label>
-                <select asp-for="SystemType" class="form-select"
-                        asp-items="@Html.GetEnumSelectList<SailScores.Core.Model.HandicapSystemType>()"></select>
-                <span asp-validation-for="SystemType" class="text-danger"></span>
+                <label asp-for="ParentSystemId" class="form-label"></label>
+                <select asp-for="ParentSystemId" class="form-select">
+                    @foreach (var option in Model.BaseSystemOptions ?? Enumerable.Empty<SailScores.Web.Models.SailScores.HandicapSystemSummary>())
+                    {
+                        <option value="@option.Id">@option.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="ParentSystemId" class="text-danger"></span>
                 <div class="small text-muted mt-1">
-                    <strong>PHRF ToD</strong>: corrected = elapsed &minus; (rating &times; distance)<br />
-                    <strong>PHRF ToT</strong>: corrected = elapsed &times; 600 / (600 + rating)<br />
-                    <strong>Portsmouth</strong>: corrected = elapsed / PY &times; 1000<br />
-                    <strong>Time-on-Time</strong>: corrected = elapsed &times; TCC (for IRC/ORC)
+                    Select the base formula to inherit. This club system will appear in series handicap selections.
                 </div>
             </div>
             <div class="mb-3">

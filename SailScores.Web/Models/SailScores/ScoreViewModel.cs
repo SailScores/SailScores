@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
@@ -28,4 +28,6 @@ public class ScoreViewModel
 
     public DateTime? FinishTime { get; set; }
     public TimeSpan? ElapsedTime { get; set; }
+    public TimeSpan? CorrectedTime { get; set; }
+    public decimal? HandicapValue { get; set; }
 }

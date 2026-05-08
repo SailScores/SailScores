@@ -227,17 +227,17 @@
             </div>
         </div>
 
-        @if (Model.EnableHandicapScoring && Model.HandicapSystems != null)
+        @if (Model.EnableHandicapScoring)
         {
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHandicap" aria-expanded="false" aria-controls="collapseHandicap">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHandicapSystems" aria-expanded="false" aria-controls="collapseHandicapSystems">
                     <h4 class="mb-0"><span class="accordion-title">Handicap Systems</span></h4>
                 </button>
             </h2>
-            <div id="collapseHandicap" class="accordion-collapse collapse">
+            <div id="collapseHandicapSystems" class="accordion-collapse collapse">
                 <div class="accordion-body">
-                    @await Html.PartialAsync("_HandicapSystems", Model.HandicapSystems)
+                    @await Html.PartialAsync("_HandicapSystemList", Model.HandicapSystems)
                 </div>
             </div>
         </div>

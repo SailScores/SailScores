@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Test.Unit.Utilities;
@@ -12,6 +12,7 @@ using SailScores.Core.JobQueue;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Api.Dtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace SailScores.Test.Unit.Core.Services
 {
@@ -131,6 +132,126 @@ namespace SailScores.Test.Unit.Core.Services
             );
             Assert.Equal(racesBefore.Count() + 1, racesAfter.Count());
 
+        }
+
+        [Fact]
+        public async Task GetRaceHandicapSystemsAsync_WithSingleEffectiveSystem_ReturnsOne()
+        {
+            var club = await _context.Clubs.FirstAsync();
+            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == club.Id);
+            var season = await _context.Seasons.FirstAsync(s => s.ClubId == club.Id);
+
+            var baseSystem = new SailScores.Database.Entities.HandicapSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Base Portsmouth",
+                ClubId = null,
+                SystemType = SailScores.Database.Entities.HandicapSystemType.Portsmouth
+            };
+            _context.HandicapSystems.Add(baseSystem);
+            club.DefaultHandicapSystemId = baseSystem.Id;
+
+            var race = new SailScores.Database.Entities.Race
+            {
+                Id = Guid.NewGuid(),
+                ClubId = club.Id,
+                Date = DateTime.Today,
+                Fleet = fleet
+            };
+
+            var series = new SailScores.Database.Entities.Series
+            {
+                Id = Guid.NewGuid(),
+                ClubId = club.Id,
+                Name = "Series A",
+                Season = season
+            };
+
+            _context.Races.Add(race);
+            _context.Series.Add(series);
+            _context.SeriesRaces.Add(new SailScores.Database.Entities.SeriesRace
+            {
+                RaceId = race.Id,
+                SeriesId = series.Id
+            });
+            await _context.SaveChangesAsync();
+
+            var result = await _service.GetRaceHandicapSystemsAsync(race.Id);
+
+            Assert.Single(result);
+            Assert.Equal(baseSystem.Id, result[0].Id);
+        }
+
+        [Fact]
+        public async Task GetRaceHandicapSystemsAsync_WithMultipleDistinctSystems_ReturnsDistinctSet()
+        {
+            var club = await _context.Clubs.FirstAsync();
+            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == club.Id);
+            var season = await _context.Seasons.FirstAsync(s => s.ClubId == club.Id);
+
+            var systemA = new SailScores.Database.Entities.HandicapSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Base ToD",
+                ClubId = null,
+                SystemType = SailScores.Database.Entities.HandicapSystemType.PhrfToD
+            };
+            var systemB = new SailScores.Database.Entities.HandicapSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Base ToT",
+                ClubId = null,
+                SystemType = SailScores.Database.Entities.HandicapSystemType.PhrfToT
+            };
+
+            _context.HandicapSystems.Add(systemA);
+            _context.HandicapSystems.Add(systemB);
+
+            var race = new SailScores.Database.Entities.Race
+            {
+                Id = Guid.NewGuid(),
+                ClubId = club.Id,
+                Date = DateTime.Today,
+                Fleet = fleet
+            };
+
+            var seriesA = new SailScores.Database.Entities.Series
+            {
+                Id = Guid.NewGuid(),
+                ClubId = club.Id,
+                Name = "Series A",
+                Season = season,
+                HandicapSystemId = systemA.Id
+            };
+            var seriesB = new SailScores.Database.Entities.Series
+            {
+                Id = Guid.NewGuid(),
+                ClubId = club.Id,
+                Name = "Series B",
+                Season = season,
+                HandicapSystemId = systemB.Id
+            };
+
+            _context.Races.Add(race);
+            _context.Series.Add(seriesA);
+            _context.Series.Add(seriesB);
+            _context.SeriesRaces.Add(new SailScores.Database.Entities.SeriesRace
+            {
+                RaceId = race.Id,
+                SeriesId = seriesA.Id
+            });
+            _context.SeriesRaces.Add(new SailScores.Database.Entities.SeriesRace
+            {
+                RaceId = race.Id,
+                SeriesId = seriesB.Id
+            });
+            await _context.SaveChangesAsync();
+
+            var result = await _service.GetRaceHandicapSystemsAsync(race.Id);
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, h => h.Id == systemA.Id);
+            Assert.Contains(result, h => h.Id == systemB.Id);
         }
 
     }

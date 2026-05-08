@@ -136,16 +136,20 @@ public class AdminService : IAdminService
         if (club.EnableHandicapScoring)
         {
             var handicapSystems = await _coreHandicapService.GetHandicapSystemsAsync(club.Id);
+            var baseSystems = await _coreHandicapService.GetBaseHandicapSystemsAsync();
+            var baseById = baseSystems.ToDictionary(s => s.Id, s => s.Name);
             vm.HandicapSystems = handicapSystems
-                .Select(hs => new HandicapSystemDeleteViewModel
+                .Select(hs => new HandicapSystemSummary
                 {
                     Id = hs.Id,
-                    ClubId = hs.ClubId,
                     Name = hs.Name,
                     SystemType = hs.SystemType,
                     Description = hs.Description,
-                    IsDeletable = hs.ClubId == club.Id,
-                    PreventDeleteReason = hs.ClubId != club.Id ? "Site-wide system cannot be deleted." : null
+                    ParentSystemId = hs.ParentSystemId,
+                    ParentSystemName = hs.ParentSystemId.HasValue
+                        && baseById.TryGetValue(hs.ParentSystemId.Value, out var parentName)
+                        ? parentName
+                        : null
                 })
                 .ToList();
         }

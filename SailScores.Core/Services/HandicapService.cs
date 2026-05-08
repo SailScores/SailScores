@@ -24,13 +24,55 @@ namespace SailScores.Core.Services
         public async Task<IList<HandicapSystem>> GetHandicapSystemsAsync(Guid clubId)
         {
             var systems = await _dbContext.HandicapSystems
-                .Where(h => h.ClubId == null || h.ClubId == clubId)
-                .OrderBy(h => h.ClubId == null ? 0 : 1)
-                .ThenBy(h => h.Name)
+                .Where(h => h.ClubId == clubId)
+                .OrderBy(h => h.Name)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
             return _mapper.Map<IList<HandicapSystem>>(systems);
+        }
+
+        public async Task<IList<HandicapSystem>> GetBaseHandicapSystemsAsync()
+        {
+            var systems = await _dbContext.HandicapSystems
+                .Where(h => h.ClubId == null)
+                .OrderBy(h => h.Name)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return _mapper.Map<IList<HandicapSystem>>(systems);
+        }
+
+        public async Task<HandicapSystem> CreateClubHandicapSystemAsync(
+            Guid clubId,
+            Guid baseSystemId,
+            string name,
+            string description)
+        {
+            var baseSystem = await _dbContext.HandicapSystems
+                .SingleOrDefaultAsync(h => h.Id == baseSystemId)
+                .ConfigureAwait(false);
+
+            if (baseSystem == null)
+                throw new InvalidOperationException("Base handicap system was not found.");
+
+            if (baseSystem.ClubId.HasValue)
+                throw new InvalidOperationException("Only site-wide base handicap systems can be used as a parent.");
+
+            var dbSystem = new Db.HandicapSystem
+            {
+                Id = Guid.NewGuid(),
+                ClubId = clubId,
+                ParentSystemId = baseSystem.Id,
+                Name = name,
+                Description = description,
+                SystemType = baseSystem.SystemType
+            };
+
+            _dbContext.HandicapSystems.Add(dbSystem);
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            return _mapper.Map<HandicapSystem>(dbSystem);
         }
 
         public async Task<HandicapSystem> GetHandicapSystemAsync(Guid id)

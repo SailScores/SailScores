@@ -98,6 +98,11 @@
             </div>
         }
 
+        @if (!string.IsNullOrWhiteSpace(Model.Item.CorrectedTimeNote))
+        {
+            <div class="alert alert-info" role="alert">@Model.Item.CorrectedTimeNote</div>
+        }
+
         <table class="table table-borderless" aria-describedby="racetitle">
             <thead>
             <tr>
@@ -109,6 +114,10 @@
                 {
                     <th scope="col" class="d-none d-sm-table-cell">Finish Time</th>
                     <th scope="col" class="d-none d-sm-table-cell">Elapsed</th>
+                    @if (Model.Item.ShowCorrectedTime)
+                    {
+                        <th scope="col" class="d-none d-sm-table-cell">Corrected</th>
+                    }
                 }
             </tr>
             </thead>
@@ -129,14 +138,23 @@
                     {
                         <td class="d-none d-sm-table-cell">@(score.FinishTime.HasValue? score.FinishTime.Value.ToString("HH:mm:ss") : "")</td>
                         <td class="d-none d-sm-table-cell">@(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString() : "")</td>
+                        @if (Model.Item.ShowCorrectedTime)
+                        {
+                            <td class="d-none d-sm-table-cell">@(score.CorrectedTime.HasValue ? score.CorrectedTime.Value.ToString() : "")</td>
+                        }
                     }
                 </tr>
                 @if (Model.Item.TrackTimes)
                 {
                     <tr class="score-row-secondary d-table-row d-sm-none">
-                        <td colspan="2"></td>
+                        <td></td>
+                        <td></td>
                         <td>@(score.FinishTime.HasValue? score.FinishTime.Value.ToString("HH:mm:ss") : "")</td>
                         <td>@(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString() : "")</td>
+                        @if (Model.Item.ShowCorrectedTime)
+                        {
+                            <td>@(score.CorrectedTime.HasValue ? score.CorrectedTime.Value.ToString() : "")</td>
+                        }
                     </tr>
                 }
             }

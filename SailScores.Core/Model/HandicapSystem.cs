@@ -11,6 +11,8 @@ public class HandicapSystem
     // null = site-wide standard; never modified by clubs
     public Guid? ClubId { get; set; }
 
+    public Guid? ParentSystemId { get; set; }
+
     [Required]
     [StringLength(100)]
     public string Name { get; set; }

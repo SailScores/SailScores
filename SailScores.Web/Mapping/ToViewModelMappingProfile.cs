@@ -80,6 +80,7 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Fleet, FleetDeleteViewModel>()
                 .ForMember(d => d.IsDeletable, o => o.Ignore())
                 .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
+            CreateMap<Model.HandicapSystem, HandicapSystemSummary>();
 
 
             CreateMap<Model.Series, SeriesSummary>()

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SailScores.Api.Dtos;
 using SailScores.Core.Model;
+using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
@@ -19,6 +20,7 @@ public class RaceService : IRaceService
     private readonly Core.Services.IRegattaService _coreRegattaService;
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly CoreServices.ICompetitorService _coreCompetitorService;
+    private readonly Core.Services.IHandicapService _coreHandicapService;
     private readonly IWeatherService _weatherService;
     private readonly ISpeechService _speechService;
     private readonly IMapper _mapper;
@@ -32,6 +34,7 @@ public class RaceService : IRaceService
         Core.Services.IRegattaService coreRegattaService,
         Core.Services.ISeasonService coreSeasonService,
         Core.Services.ICompetitorService coreCompetitorService,
+        Core.Services.IHandicapService coreHandicapService,
 
         IWeatherService weatherService,
         ISpeechService speechService,
@@ -45,6 +48,7 @@ public class RaceService : IRaceService
         _coreRegattaService = coreRegattaService;
         _coreSeasonService = coreSeasonService;
         _coreCompetitorService = coreCompetitorService;
+        _coreHandicapService = coreHandicapService;
 
         _weatherService = weatherService;
         _speechService = speechService;
@@ -404,6 +408,73 @@ public class RaceService : IRaceService
         {
             score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
         }
+
+        if (retRace.TrackTimes)
+        {
+            var handicapSystems = await _coreRaceService.GetRaceHandicapSystemsAsync(retRace.Id);
+            if (handicapSystems.Count == 1)
+            {
+                retRace.ShowCorrectedTime = true;
+                var handicapSystem = handicapSystems.Single();
+                var seriesForLookup = coreRace.Series?
+                    .FirstOrDefault(s =>
+                        (s.HandicapSystemId ?? s.Fleet?.DefaultHandicapSystemId) == handicapSystem.Id)
+                    ?? coreRace.Series?.FirstOrDefault();
+
+                IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal> lookup =
+                    new Dictionary<(Guid competitorId, DateTime raceDate), decimal>();
+
+                if (seriesForLookup != null)
+                {
+                    lookup = await _coreHandicapService.BuildHandicapLookupAsync(seriesForLookup, handicapSystem.Id);
+                }
+
+                var raceDate = retRace.Date?.Date;
+                foreach (var score in retRace.Scores)
+                {
+                    if (!score.ElapsedTime.HasValue || !string.IsNullOrWhiteSpace(score.Code) || !raceDate.HasValue)
+                    {
+                        continue;
+                    }
+
+                    decimal? handicap = score.HandicapValue;
+                    if (!handicap.HasValue
+                        && lookup.TryGetValue((score.CompetitorId, raceDate.Value), out var lookedUpValue))
+                    {
+                        handicap = lookedUpValue;
+                    }
+
+                    if (!handicap.HasValue)
+                    {
+                        continue;
+                    }
+
+                    score.HandicapValue = handicap;
+                    try
+                    {
+                        score.CorrectedTime = HandicapScoringCalculator.ComputeCorrectedTime(
+                            score.ElapsedTime.Value,
+                            handicap.Value,
+                            handicapSystem.SystemType,
+                            retRace.CourseDistance);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        _logger.LogInformation(ex,
+                            "Skipping corrected time for race {RaceId}, competitor {CompetitorId}: {Message}",
+                            retRace.Id,
+                            score.CompetitorId,
+                            ex.Message);
+                    }
+                }
+            }
+            else if (handicapSystems.Count > 1)
+            {
+                retRace.CorrectedTimeNote =
+                    "Corrected times are not shown because this race is used by multiple handicap systems.";
+            }
+        }
+
         retRace.Weather = await _weatherService.ConvertToLocalizedWeather(coreRace.Weather, coreRace.ClubId);
         retRace.Regatta = await GetRegatta(retRace);
 

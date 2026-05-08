@@ -7,8 +7,18 @@ namespace SailScores.Core.Services
 {
     public interface IHandicapService
     {
-        // Returns site-wide systems plus any club-specific systems for the given club
+        // Returns club-specific systems for the given club.
         Task<IList<HandicapSystem>> GetHandicapSystemsAsync(Guid clubId);
+
+        // Returns site-wide base systems (ClubId == null).
+        Task<IList<HandicapSystem>> GetBaseHandicapSystemsAsync();
+
+        // Creates a club-specific system inheriting behavior from a base system.
+        Task<HandicapSystem> CreateClubHandicapSystemAsync(
+            Guid clubId,
+            Guid baseSystemId,
+            string name,
+            string description);
 
         Task<HandicapSystem> GetHandicapSystemAsync(Guid id);
 

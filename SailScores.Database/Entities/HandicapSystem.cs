@@ -11,6 +11,11 @@ public class HandicapSystem
     [StringLength(100)]
     public string Name { get; set; }
 
+    public Guid? ParentSystemId { get; set; }
+
+    [ForeignKey("ParentSystemId")]
+    public HandicapSystem ParentSystem { get; set; }
+
     public HandicapSystemType SystemType { get; set; }
 
     [StringLength(2000)]

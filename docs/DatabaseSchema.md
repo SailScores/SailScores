@@ -206,6 +206,65 @@ Defines how races are scored.
 
 ---
 
+### HandicapSystem
+Defines handicap formulas used for corrected-time calculations.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-----------|-------|
+| Id | GUID | PK | Primary key |
+| ClubId | GUID | Nullable, FK (Clubs) | Null for site-wide base systems; set for club-owned systems |
+| ParentSystemId | GUID | Nullable, FK (HandicapSystem) | Links club system to its base system |
+| Name | VARCHAR(100) | NOT NULL | Display name |
+| SystemType | INT | NOT NULL | PhrfToD, PhrfToT, Portsmouth, TimeOnTime, Custom |
+| Description | VARCHAR(2000) | Nullable | Optional notes/instructions |
+
+**Relationships:**
+- Referenced by `Series.HandicapSystemId` (series-level override)
+- Referenced by `Fleet.DefaultHandicapSystemId` (fleet-level default)
+- Referenced by `Club.DefaultHandicapSystemId` (club-level default)
+- Referenced by competitor/class handicap rows for rating lookups
+
+**Key Notes:**
+- Site-wide base systems are immutable club-facing templates.
+- Club systems inherit from base systems via `ParentSystemId`.
+- Effective system resolution for scoring follows Series → Fleet → Club.
+
+---
+
+### CompetitorHandicap
+Stores handicap rating values by competitor and handicap system with effective dates.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-----------|-------|
+| Id | GUID | PK | Primary key |
+| CompetitorId | GUID | FK (Competitors) | Competitor |
+| HandicapSystemId | GUID | FK (HandicapSystems) | Handicap system the value applies to |
+| Value | DECIMAL | NOT NULL | Rating value (meaning depends on system type) |
+| EffectiveFrom | DATETIME | Nullable | Start date for the rating |
+| EffectiveTo | DATETIME | Nullable | End date for the rating |
+| Notes | VARCHAR(2000) | Nullable | Optional admin notes |
+
+**Key Notes:**
+- Supports changing ratings over time.
+- Lookup uses race date against effective range.
+
+---
+
+### ClassHandicap
+Stores class-level fallback handicap values by system and effective dates.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-----------|-------|
+| Id | GUID | PK | Primary key |
+| BoatClassId | GUID | FK (BoatClasses) | Boat class |
+| HandicapSystemId | GUID | FK (HandicapSystems) | Handicap system |
+| Value | DECIMAL | NOT NULL | Fallback rating value |
+| EffectiveFrom | DATETIME | Nullable | Start date |
+| EffectiveTo | DATETIME | Nullable | End date |
+| Notes | VARCHAR(2000) | Nullable | Optional notes |
+
+---
+
 ### Score
 Individual competitor scores in a race.
 

@@ -47,6 +47,9 @@ public class RaceViewModel
     public DateTime? StartTime { get; set; }
     public bool TrackTimes { get; set; }
 
+    public bool ShowCorrectedTime { get; set; }
+    public string CorrectedTimeNote { get; set; }
+
     public string DisplayName
     {
         get

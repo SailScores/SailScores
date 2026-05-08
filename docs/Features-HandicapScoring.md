@@ -1,4 +1,47 @@
-# Handicap Race Scoring — Feature Plan
+# Handicap Race Scoring
+
+## Current Implementation Notes (Important)
+
+- `Score.CorrectedTime` is **ephemeral** and is **not persisted to the database**.
+  It is calculated in memory during scoring/race-detail workflows.
+- This non-persisted behavior is intentional so one race can belong to multiple
+  series that may use different handicap systems.
+- Clubs can enable handicap scoring, then create **club handicap systems** from
+  site-wide base systems (inheritance model).
+- Series handicap selection should use club systems; base systems are intended
+  for admin setup/discovery.
+
+## Race Details Corrected-Time Display Rules
+
+Corrected-time columns are shown on race details only when all conditions are true:
+
+1. `Race.TrackTimes` is enabled.
+2. The race resolves to exactly **one** effective handicap system across all
+   series that include that race (with inheritance considered).
+
+Behavior by effective system count:
+
+- **0 systems**: No corrected-time column.
+- **1 system**: Corrected-time values are calculated and displayed.
+- **>1 systems**: No corrected-time column; show an informational note that
+  multiple handicap systems are in use.
+
+## Handicap Resolution Chain
+
+For each series, effective handicap resolution is:
+
+1. `Series.HandicapSystemId`
+2. `Series.Fleet.DefaultHandicapSystemId`
+3. `Club.DefaultHandicapSystemId`
+
+## Club/Base Handicap System Model
+
+- **Base systems**: site-wide (`ClubId = null`), not directly edited by clubs.
+- **Club systems**: club-owned (`ClubId = club.Id`) and linked to a base system
+  by `ParentSystemId`.
+
+This mirrors scoring-system inheritance and supports feature discovery by making
+available options explicit in club admin.
 
 ## Executive Summary
 

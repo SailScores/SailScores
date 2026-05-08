@@ -98,17 +98,26 @@ namespace SailScores.Core.Scoring
             }
         }
 
-        private TimeSpan ComputeCorrectedTime(TimeSpan elapsed, decimal handicapValue, decimal? courseDistance)
+        public static TimeSpan ComputeCorrectedTime(
+            TimeSpan elapsed,
+            decimal handicapValue,
+            HandicapSystemType systemType,
+            decimal? courseDistance)
         {
-            return _handicapSystem.SystemType switch
+            return systemType switch
             {
                 HandicapSystemType.PhrfToD => PhrfToD(elapsed, handicapValue, courseDistance),
                 HandicapSystemType.PhrfToT => PhrfToT(elapsed, handicapValue),
                 HandicapSystemType.Portsmouth => Portsmouth(elapsed, handicapValue),
                 HandicapSystemType.TimeOnTime => TimeOnTime(elapsed, handicapValue),
                 _ => throw new InvalidOperationException(
-                    $"Unsupported handicap system type: {_handicapSystem.SystemType}")
+                    $"Unsupported handicap system type: {systemType}")
             };
+        }
+
+        private TimeSpan ComputeCorrectedTime(TimeSpan elapsed, decimal handicapValue, decimal? courseDistance)
+        {
+            return ComputeCorrectedTime(elapsed, handicapValue, _handicapSystem.SystemType, courseDistance);
         }
 
         // corrected = elapsed_sec - (rating × distance_nm)

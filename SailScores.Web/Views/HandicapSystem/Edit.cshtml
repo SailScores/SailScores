@@ -20,9 +20,9 @@
             </div>
             <div class="mb-3">
                 <label asp-for="SystemType" class="form-label"></label>
-                <select asp-for="SystemType" class="form-select"
-                        asp-items="@Html.GetEnumSelectList<SailScores.Core.Model.HandicapSystemType>()"></select>
-                <span asp-validation-for="SystemType" class="text-danger"></span>
+                <input asp-for="SystemType" class="form-control" readonly />
+                <input type="hidden" asp-for="SystemType" />
+                <div class="small text-muted mt-1">System type is inherited from the selected base handicap system.</div>
             </div>
             <div class="mb-3">
                 <label asp-for="Description" class="form-label"></label>

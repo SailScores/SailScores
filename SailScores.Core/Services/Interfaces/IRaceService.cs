@@ -28,5 +28,9 @@ namespace SailScores.Core.Services
         Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId);
         Task<bool> HasRacesAsync(Guid clubId);
         Task<IList<Guid>> GetStatsExcludedRaces(Guid clubId, Guid seasonId);
+
+        // Resolves all distinct effective handicap systems used by this race across
+        // its assigned series (Series -> Fleet -> Club fallback chain per series).
+        Task<IList<HandicapSystem>> GetRaceHandicapSystemsAsync(Guid raceId);
     }
 }
