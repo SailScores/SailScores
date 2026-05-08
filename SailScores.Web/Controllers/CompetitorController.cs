@@ -731,12 +731,15 @@ public class CompetitorController : Controller
         if (competitor == null || competitor.ClubId != clubId)
             return NotFound();
 
+        var handicapSystems = await _handicapService.GetHandicapSystemsAsync(clubId);
+
         var vm = new CompetitorHandicapViewModel
         {
             CompetitorId = competitorId,
             CompetitorName = competitor.Name,
             ClubInitials = clubInitials,
-            HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId)
+            HandicapSystemOptions = handicapSystems,
+            HandicapSystemId = handicapSystems.Count == 1 ? handicapSystems[0].Id : Guid.Empty
         };
         return View(vm);
     }
@@ -751,6 +754,10 @@ public class CompetitorController : Controller
         {
             model.ClubInitials = clubInitials;
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
             var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
             model.CompetitorName = competitor?.Name;
             return View(model);
@@ -811,6 +818,12 @@ public class CompetitorController : Controller
             ClubInitials = clubInitials,
             HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId)
         };
+
+        if (vm.HandicapSystemId == Guid.Empty && vm.HandicapSystemOptions.Count == 1)
+        {
+            vm.HandicapSystemId = vm.HandicapSystemOptions[0].Id;
+        }
+
         return View(vm);
     }
 
@@ -824,6 +837,10 @@ public class CompetitorController : Controller
         {
             model.ClubInitials = clubInitials;
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
             var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
             model.CompetitorName = competitor?.Name;
             return View(model);
@@ -849,6 +866,10 @@ public class CompetitorController : Controller
             ModelState.AddModelError(string.Empty, ex.Message);
             model.ClubInitials = clubInitials;
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
             var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
             model.CompetitorName = competitor?.Name;
             return View(model);

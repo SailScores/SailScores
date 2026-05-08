@@ -405,18 +405,35 @@ namespace SailScores.Core.Services
                 .Distinct()
                 .ToList() ?? new List<DateTime>();
 
-            if (!competitorIds.Any() || !raceDates.Any())
+            return await BuildHandicapLookupAsync(
+                    handicapSystemId,
+                    competitorIds,
+                    raceDates)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal>> BuildHandicapLookupAsync(
+            Guid handicapSystemId,
+            IReadOnlyCollection<Guid> competitorIds,
+            IReadOnlyCollection<DateTime> raceDates)
+        {
+            if (competitorIds == null || competitorIds.Count == 0 || raceDates == null || raceDates.Count == 0)
                 return new Dictionary<(Guid, DateTime), decimal>();
 
+            var distinctCompetitorIds = competitorIds.Distinct().ToList();
+            var distinctRaceDates = raceDates.Select(d => d.Date).Distinct().ToList();
+
             var competitorRows = await _dbContext.CompetitorHandicaps
+                .AsNoTracking()
                 .Where(ch => ch.HandicapSystemId == handicapSystemId
-                          && competitorIds.Contains(ch.CompetitorId))
+                          && distinctCompetitorIds.Contains(ch.CompetitorId))
                 .ToListAsync()
                 .ConfigureAwait(false);
 
             // Load each competitor's BoatClassId for class-level fallback
             var classIdByCompetitor = await _dbContext.Competitors
-                .Where(c => competitorIds.Contains(c.Id))
+                .AsNoTracking()
+                .Where(c => distinctCompetitorIds.Contains(c.Id))
                 .Select(c => new { c.Id, c.BoatClassId })
                 .ToDictionaryAsync(c => c.Id, c => c.BoatClassId)
                 .ConfigureAwait(false);
@@ -425,28 +442,39 @@ namespace SailScores.Core.Services
 
             var classRows = classIds.Any()
                 ? await _dbContext.ClassHandicaps
+                    .AsNoTracking()
                     .Where(ch => ch.HandicapSystemId == handicapSystemId
                               && classIds.Contains(ch.BoatClassId))
                     .ToListAsync()
                     .ConfigureAwait(false)
                 : new List<Db.ClassHandicap>();
 
+            var competitorRowsByCompetitor = competitorRows
+                .GroupBy(r => r.CompetitorId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(r => r.EffectiveFrom).ToList());
+
+            var classRowsByClass = classRows
+                .GroupBy(r => r.BoatClassId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(r => r.EffectiveFrom).ToList());
+
             var lookup = new Dictionary<(Guid competitorId, DateTime raceDate), decimal>();
 
-            foreach (var competitorId in competitorIds)
+            foreach (var competitorId in distinctCompetitorIds)
             {
-                var compRows = competitorRows.Where(r => r.CompetitorId == competitorId).ToList();
+                competitorRowsByCompetitor.TryGetValue(competitorId, out var compRows);
                 var boatClassId = classIdByCompetitor.TryGetValue(competitorId, out var cid) ? cid : (Guid?)null;
-                var clsRows = boatClassId.HasValue
-                    ? classRows.Where(r => r.BoatClassId == boatClassId.Value).ToList()
-                    : new List<Db.ClassHandicap>();
+                List<Db.ClassHandicap> clsRows = null;
 
-                foreach (var raceDate in raceDates)
+                if (boatClassId.HasValue)
+                {
+                    classRowsByClass.TryGetValue(boatClassId.Value, out clsRows);
+                }
+
+                foreach (var raceDate in distinctRaceDates)
                 {
                     var effective = compRows
-                        .Where(r => (r.EffectiveFrom == null || r.EffectiveFrom.Value.Date <= raceDate)
-                                 && (r.EffectiveTo == null || r.EffectiveTo.Value.Date >= raceDate))
-                        .OrderByDescending(r => r.EffectiveFrom)
+                        ?.Where(r => (r.EffectiveFrom == null || r.EffectiveFrom.Value.Date <= raceDate)
+                                  && (r.EffectiveTo == null || r.EffectiveTo.Value.Date >= raceDate))
                         .FirstOrDefault();
 
                     if (effective != null)
@@ -457,9 +485,8 @@ namespace SailScores.Core.Services
 
                     // Fall back to class-level rating
                     var classEffective = clsRows
-                        .Where(r => (r.EffectiveFrom == null || r.EffectiveFrom.Value.Date <= raceDate)
-                                 && (r.EffectiveTo == null || r.EffectiveTo.Value.Date >= raceDate))
-                        .OrderByDescending(r => r.EffectiveFrom)
+                        ?.Where(r => (r.EffectiveFrom == null || r.EffectiveFrom.Value.Date <= raceDate)
+                                  && (r.EffectiveTo == null || r.EffectiveTo.Value.Date >= raceDate))
                         .FirstOrDefault();
 
                     if (classEffective != null)

@@ -99,7 +99,10 @@ public class RaceServiceTests
         });
         _coreScoringServiceMock.Setup(s => s.GetScoreCodesAsync(clubId)).ReturnsAsync(new List<ScoreCode>());
         _coreHandicapServiceMock
-            .Setup(s => s.BuildHandicapLookupAsync(It.IsAny<Series>(), handicapSystemId))
+            .Setup(s => s.BuildHandicapLookupAsync(
+                handicapSystemId,
+                It.IsAny<IReadOnlyCollection<Guid>>(),
+                It.IsAny<IReadOnlyCollection<DateTime>>()))
             .ReturnsAsync(new Dictionary<(Guid competitorId, DateTime raceDate), decimal>
             {
                 [(competitorId, race.Date.Value.Date)] = 1000m

@@ -125,7 +125,8 @@ public class BoatClassController : Controller
             BoatClassId = boatClassId,
             ClassName = boatClass.Name,
             ClubInitials = clubInitials,
-            HandicapSystemOptions = systems
+            HandicapSystemOptions = systems,
+            HandicapSystemId = systems.Count == 1 ? systems[0].Id : Guid.Empty
         });
     }
 
@@ -138,6 +139,10 @@ public class BoatClassController : Controller
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
             return View(model);
         }
         try
@@ -157,6 +162,10 @@ public class BoatClassController : Controller
             ModelState.AddModelError(string.Empty, ex.Message);
             var clubId = await _clubService.GetClubId(clubInitials);
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
             return View(model);
         }
         return RedirectToAction("Edit", new { clubInitials, id = model.BoatClassId });
@@ -193,6 +202,10 @@ public class BoatClassController : Controller
         {
             var clubId = await _clubService.GetClubId(clubInitials);
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
             return View(model);
         }
         try
@@ -212,6 +225,10 @@ public class BoatClassController : Controller
             ModelState.AddModelError(string.Empty, ex.Message);
             var clubId = await _clubService.GetClubId(clubInitials);
             model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
             return View(model);
         }
         return RedirectToAction("Edit", new { clubInitials, id = model.BoatClassId });

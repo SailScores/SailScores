@@ -17,7 +17,10 @@
             <div class="mb-3">
                 <label asp-for="HandicapSystemId" class="control-label"></label>
                 <select asp-for="HandicapSystemId" class="form-select">
-                    <option value="">-- Select a system --</option>
+                    @if ((Model.HandicapSystemOptions?.Count ?? 0) != 1)
+                    {
+                        <option value="">-- Select a system --</option>
+                    }
                     @foreach (var hs in Model.HandicapSystemOptions ?? Enumerable.Empty<SailScores.Core.Model.HandicapSystem>())
                     {
                         <option value="@hs.Id">@hs.Name</option>

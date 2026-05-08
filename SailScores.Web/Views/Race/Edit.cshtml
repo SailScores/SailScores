@@ -205,7 +205,7 @@
                                     <label asp-for="StartTime" class="control-label col-3 col-md-4 col-form-label text-end">Start Time</label>
                                     <div class="col-9 col-md-8">
                                         <div class="input-group">
-                                            <input asp-for="StartTime" class="form-control time-picker" type="text" placeholder="hh:mm:ss AM/PM" />
+                                            <input asp-for="StartTime" asp-format="{0:h:mm:ss tt}" class="form-control time-picker" type="text" placeholder="hh:mm:ss AM/PM" />
                                             <button type="button" class="btn btn-outline-secondary" id="startNowButton" style="display:none;">Start Now</button>
                                         </div>
                                         <span asp-validation-for="StartTime" class="text-danger"></span>

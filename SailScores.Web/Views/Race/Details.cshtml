@@ -140,7 +140,8 @@
                         <td class="d-none d-sm-table-cell">@(score.ElapsedTime.HasValue ? score.ElapsedTime.Value.ToString() : "")</td>
                         @if (Model.Item.ShowCorrectedTime)
                         {
-                            <td class="d-none d-sm-table-cell">@(score.CorrectedTime.HasValue ? score.CorrectedTime.Value.ToString() : "")</td>
+                          //need to display only to hundredths of a second:
+                            <td class="d-none d-sm-table-cell">@(score.CorrectedTime.HasValue ? score.CorrectedTime.Value.ToString("hh\\:mm\\:ss\\.ff") : "")</td>
                         }
                     }
                 </tr>

@@ -22,6 +22,73 @@ interface seriesListResult {
     noSeriesForDate: boolean;
 }
 
+function logStartTimeState(context: string, startTimeInput?: HTMLInputElement | null) {
+    const input = startTimeInput ?? document.getElementById("StartTime") as HTMLInputElement | null;
+    if (!input) {
+        console.log(`[StartTime][${context}] input not found`);
+        return;
+    }
+
+    const flatpickrInstance = (input as any)._flatpickr;
+    const selectedDate = flatpickrInstance?.selectedDates?.[0] as Date | undefined;
+    const selectedDateText = selectedDate ? selectedDate.toString() : "<none>";
+    console.log(
+        `[StartTime][${context}] value='${input.value}', default='${input.defaultValue}', ` +
+        `trackTimes='${(document.getElementById("trackTimesCheckbox") as HTMLInputElement | null)?.checked ?? "n/a"}', ` +
+        `flatpickr='${selectedDateText}'`
+    );
+}
+
+function attachStartTimeDiagnostics(startTimeInput: HTMLInputElement) {
+    const state = { lastValue: startTimeInput.value };
+
+    startTimeInput.addEventListener("input", function () {
+        console.log(`[StartTime][input] '${state.lastValue}' -> '${startTimeInput.value}'`);
+        state.lastValue = startTimeInput.value;
+    });
+
+    startTimeInput.addEventListener("change", function () {
+        console.log(`[StartTime][change] '${state.lastValue}' -> '${startTimeInput.value}'`);
+        logStartTimeState("change", startTimeInput);
+        console.log("[StartTime][change] stack", new Error().stack);
+        state.lastValue = startTimeInput.value;
+    });
+
+    const tryHookFlatpickrSetDate = () => {
+        const flatpickrInstance = (startTimeInput as any)._flatpickr;
+        if (!flatpickrInstance || typeof flatpickrInstance.setDate !== "function") {
+            return false;
+        }
+
+        if ((flatpickrInstance as any).__startTimeSetDateHooked) {
+            return true;
+        }
+
+        const originalSetDate = flatpickrInstance.setDate.bind(flatpickrInstance);
+        flatpickrInstance.setDate = (date: any, triggerChange?: boolean, format?: string) => {
+            console.log(
+                `[StartTime][flatpickr.setDate] date=`,
+                date,
+                `triggerChange=${triggerChange ?? "<undefined>"}`,
+                `format=${format ?? "<undefined>"}`
+            );
+            console.log("[StartTime][flatpickr.setDate] stack", new Error().stack);
+            return originalSetDate(date, triggerChange, format);
+        };
+
+        (flatpickrInstance as any).__startTimeSetDateHooked = true;
+        return true;
+    };
+
+    if (!tryHookFlatpickrSetDate()) {
+        window.setTimeout(() => {
+            if (tryHookFlatpickrSetDate()) {
+                logStartTimeState("flatpickr hook attached (delayed)", startTimeInput);
+            }
+        }, 0);
+    }
+}
+
 function checkEnter(e: KeyboardEvent) {
     let txtArea = /textarea/i.test((e.target as HTMLElement).tagName);
     return txtArea || e.key !== 'Enter';
@@ -117,6 +184,13 @@ export function initialize() {
     // Update all score times if race start time changes and TrackTimes is enabled
     const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
     if (startTimeInput) {
+        logStartTimeState("initialize", startTimeInput);
+        attachStartTimeDiagnostics(startTimeInput);
+
+        window.addEventListener("load", function () {
+            logStartTimeState("window.load", startTimeInput);
+        });
+
         startTimeInput.addEventListener('change', function () {
             updateAllScoreTimesForStartTimeChange();
         });
@@ -973,7 +1047,10 @@ function startNow() {
     const timeString = formatTimeForInput(now);
     const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
     if (startTimeInput) {
+        console.log(`[StartTime][startNow] setting value to '${timeString}'`);
+        logStartTimeState("startNow.before", startTimeInput);
         updateTimeInput(startTimeInput, timeString);
+        logStartTimeState("startNow.afterUpdateTimeInput", startTimeInput);
         $(startTimeInput).trigger('change');
     }
 }
@@ -1182,10 +1259,19 @@ function initTimePickers(container: HTMLElement) {
 }
 
 function updateTimeInput(input: HTMLInputElement, value: string) {
+    if (input.id === "StartTime") {
+        console.log(`[StartTime][updateTimeInput] '${input.value}' -> '${value}'`);
+        console.log("[StartTime][updateTimeInput] stack", new Error().stack);
+    }
+
     input.value = value;
     const fp = (input as any)._flatpickr;
     if (fp) {
         fp.setDate(value);
+    }
+
+    if (input.id === "StartTime") {
+        logStartTimeState("updateTimeInput.after", input);
     }
 }
 

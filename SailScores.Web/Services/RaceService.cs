@@ -416,20 +416,24 @@ public class RaceService : IRaceService
             {
                 retRace.ShowCorrectedTime = true;
                 var handicapSystem = handicapSystems.Single();
-                var seriesForLookup = coreRace.Series?
-                    .FirstOrDefault(s =>
-                        (s.HandicapSystemId ?? s.Fleet?.DefaultHandicapSystemId) == handicapSystem.Id)
-                    ?? coreRace.Series?.FirstOrDefault();
-
                 IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal> lookup =
                     new Dictionary<(Guid competitorId, DateTime raceDate), decimal>();
 
-                if (seriesForLookup != null)
+                var raceDate = retRace.Date?.Date;
+                var competitorIdsForLookup = retRace.Scores
+                    .Select(s => s.CompetitorId)
+                    .Where(id => id != Guid.Empty)
+                    .Distinct()
+                    .ToArray();
+
+                if (raceDate.HasValue && competitorIdsForLookup.Length > 0)
                 {
-                    lookup = await _coreHandicapService.BuildHandicapLookupAsync(seriesForLookup, handicapSystem.Id);
+                    lookup = await _coreHandicapService.BuildHandicapLookupAsync(
+                        handicapSystem.Id,
+                        competitorIdsForLookup,
+                        new[] { raceDate.Value });
                 }
 
-                var raceDate = retRace.Date?.Date;
                 foreach (var score in retRace.Scores)
                 {
                     if (!score.ElapsedTime.HasValue || !string.IsNullOrWhiteSpace(score.Code) || !raceDate.HasValue)

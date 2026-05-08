@@ -52,5 +52,12 @@ namespace SailScores.Core.Services
         Task<IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal>> BuildHandicapLookupAsync(
             Series series,
             Guid handicapSystemId);
+
+        // Builds the lookup dictionary used by HandicapScoringCalculator from explicit inputs.
+        // Key: (competitorId, raceDate.Date). Value: the effective rating on that date.
+        Task<IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal>> BuildHandicapLookupAsync(
+            Guid handicapSystemId,
+            IReadOnlyCollection<Guid> competitorIds,
+            IReadOnlyCollection<DateTime> raceDates);
     }
 }

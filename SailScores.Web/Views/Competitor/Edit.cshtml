@@ -103,6 +103,10 @@
 </div>
 @if (Model.HandicapRatings != null)
 {
+    var showEffectiveDates = !(Model.HandicapRatings.Count == 1
+        && !Model.HandicapRatings[0].EffectiveFrom.HasValue
+        && !Model.HandicapRatings[0].EffectiveTo.HasValue);
+
     <hr />
     <div class="row">
         <div class="col-12 col-xl-8">
@@ -114,8 +118,11 @@
                         <tr>
                             <th>System</th>
                             <th>Rating</th>
-                            <th>From</th>
-                            <th>To</th>
+                            @if (showEffectiveDates)
+                            {
+                                <th>From</th>
+                                <th>To</th>
+                            }
                             <th>Notes</th>
                             <th></th>
                         </tr>
@@ -126,8 +133,11 @@
                             <tr>
                                 <td>@(h.HandicapSystem?.Name ?? h.HandicapSystemId.ToString("D").Substring(0, 8))</td>
                                 <td>@h.Value</td>
-                                <td>@(h.EffectiveFrom?.ToString("d") ?? "—")</td>
-                                <td>@(h.EffectiveTo?.ToString("d") ?? "—")</td>
+                                @if (showEffectiveDates)
+                                {
+                                    <td>@(h.EffectiveFrom?.ToString("d") ?? "—")</td>
+                                    <td>@(h.EffectiveTo?.ToString("d") ?? "—")</td>
+                                }
                                 <td>@h.Notes</td>
                                 <td>
                                     <a asp-action="EditHandicapEntry"
