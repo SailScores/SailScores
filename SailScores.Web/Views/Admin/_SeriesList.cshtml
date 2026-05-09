@@ -1,4 +1,10 @@
 @model IEnumerable<SailScores.Core.Model.Series>
+@{
+    // Converts a fleet group key into a safe HTML id segment by replacing
+    // any character that is not alphanumeric or a hyphen with a hyphen.
+    Func<string, string> safeId = key =>
+        System.Text.RegularExpressions.Regex.Replace(key ?? "", @"[^a-zA-Z0-9\-]", "-");
+}
 <div id="seriesdiv">
     <div class="row">
         <div class="col-12 col-sm-6 col-md-4">
@@ -98,16 +104,16 @@
                 {
                     <div class="row ms-2">
                         <div class="col-12">
-                            <a class="fleet-group-header" data-bs-toggle="collapse" href="#fleet-@(fleetGroup.Key.Replace(" ", "-"))-@season?.UrlName" role="button"
+                            <a class="fleet-group-header" data-bs-toggle="collapse" href="#fleet-@(safeId(fleetGroup.Key))-@season?.UrlName" role="button"
                                 aria-expanded="false"
-                                aria-controls="fleet-@(fleetGroup.Key.Replace(" ", "-"))-@season?.UrlName"
+                                aria-controls="fleet-@(safeId(fleetGroup.Key))-@season?.UrlName"
                                 style="display: flex; align-items: center; text-decoration: none;">
                                 <span class="fa fa-chevron-right me-2" style="display: inline-block; transition: transform 0.2s ease; flex-shrink: 0;"></span>
                                 <h5 class="mb-0">@fleetGroup.Key</h5>
                             </a>
                         </div>
                     </div>
-                    <div class="collapse" id="fleet-@(fleetGroup.Key.Replace(" ", "-"))-@season?.UrlName">
+                    <div class="collapse" id="fleet-@(safeId(fleetGroup.Key))-@season?.UrlName">
                         <div class="admin-series-list-fleet">
                         @foreach (var item in fleetGroup)
                         {
