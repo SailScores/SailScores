@@ -207,6 +207,83 @@ namespace SailScores.Test.Unit.Core.Scoring
             Assert.Equal(expected, score.CorrectedTime!.Value.TotalSeconds, precision: 1);
         }
 
+        [Fact]
+        public void CalculateResults_PortsmouthDpy_IsOneTenthOfPortsmouth()
+        {
+            var raceDate = new DateTime(2025, 6, 1);
+            var comp = MakeCompetitor();
+            var race = MakeRace(raceDate);
+            var score = MakeTimedScore(comp, race, TimeSpan.FromSeconds(3600));
+            race.Scores = new List<Score> { score };
+
+            var lookup = new Dictionary<(Guid, DateTime), decimal>
+            {
+                { (comp.Id, raceDate.Date), 1050m }
+            };
+
+            var seriesPortsmouth = new Series { Races = new List<Race> { race }, ScoringSystem = MakeScoringSystem() };
+            score.Competitor = comp;
+
+            var portsmouthCalculator = MakeCalculator(HandicapSystemType.Portsmouth, lookup);
+            portsmouthCalculator.CalculateResults(seriesPortsmouth);
+            var pyCorrected = score.CorrectedTime;
+
+            var raceDpy = MakeRace(raceDate);
+            var scoreDpy = MakeTimedScore(comp, raceDpy, TimeSpan.FromSeconds(3600));
+            raceDpy.Scores = new List<Score> { scoreDpy };
+            var seriesDpy = new Series { Races = new List<Race> { raceDpy }, ScoringSystem = MakeScoringSystem() };
+            scoreDpy.Competitor = comp;
+
+            var dpyCalculator = MakeCalculator(HandicapSystemType.PortsmouthDpy, lookup);
+            dpyCalculator.CalculateResults(seriesDpy);
+
+            Assert.NotNull(pyCorrected);
+            Assert.NotNull(scoreDpy.CorrectedTime);
+            Assert.Equal(pyCorrected!.Value.TotalSeconds / 10.0, scoreDpy.CorrectedTime!.Value.TotalSeconds, precision: 1);
+        }
+
+        [Fact]
+        public void CalculateResults_PortsmouthDpy_PreservesRankingFromPortsmouth()
+        {
+            var raceDate = new DateTime(2025, 6, 1);
+            var compA = MakeCompetitor();
+            var compB = MakeCompetitor();
+
+            var lookup = new Dictionary<(Guid, DateTime), decimal>
+            {
+                { (compA.Id, raceDate.Date), 1000m },
+                { (compB.Id, raceDate.Date), 1000m }
+            };
+
+            var racePortsmouth = MakeRace(raceDate);
+            var scorePortsmouthA = MakeTimedScore(compA, racePortsmouth, TimeSpan.FromSeconds(3500));
+            var scorePortsmouthB = MakeTimedScore(compB, racePortsmouth, TimeSpan.FromSeconds(3600));
+            racePortsmouth.Scores = new List<Score> { scorePortsmouthA, scorePortsmouthB };
+
+            var seriesPortsmouth = new Series { Races = new List<Race> { racePortsmouth }, ScoringSystem = MakeScoringSystem() };
+            scorePortsmouthA.Competitor = compA;
+            scorePortsmouthB.Competitor = compB;
+
+            var portsmouthCalculator = MakeCalculator(HandicapSystemType.Portsmouth, lookup);
+            portsmouthCalculator.CalculateResults(seriesPortsmouth);
+
+            var raceDpy = MakeRace(raceDate);
+            var scoreDpyA = MakeTimedScore(compA, raceDpy, TimeSpan.FromSeconds(3500));
+            var scoreDpyB = MakeTimedScore(compB, raceDpy, TimeSpan.FromSeconds(3600));
+            raceDpy.Scores = new List<Score> { scoreDpyA, scoreDpyB };
+
+            var seriesDpy = new Series { Races = new List<Race> { raceDpy }, ScoringSystem = MakeScoringSystem() };
+            scoreDpyA.Competitor = compA;
+            scoreDpyB.Competitor = compB;
+
+            var dpyCalculator = MakeCalculator(HandicapSystemType.PortsmouthDpy, lookup);
+            dpyCalculator.CalculateResults(seriesDpy);
+
+            Assert.Equal(scorePortsmouthA.Place, scoreDpyA.Place);
+            Assert.Equal(scorePortsmouthB.Place, scoreDpyB.Place);
+            Assert.True(scoreDpyA.Place < scoreDpyB.Place);
+        }
+
         // --- NHC code assignment ---
 
         [Fact]

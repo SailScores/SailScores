@@ -33,5 +33,7 @@ public enum HandicapSystemType
     Portsmouth = 3,
     // Generic Time-on-Time with multiplier (covers IRC/ORC when TCC is stored as Value)
     TimeOnTime = 4,
+    // D-PY North American Portsmouth Yardstick: corrected = elapsed_sec / PY × 100
+    PortsmouthDpy = 5,
     Custom = 99,
 }

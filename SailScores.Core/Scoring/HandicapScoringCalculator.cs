@@ -110,6 +110,7 @@ namespace SailScores.Core.Scoring
                 HandicapSystemType.PhrfToT => PhrfToT(elapsed, handicapValue),
                 HandicapSystemType.Portsmouth => Portsmouth(elapsed, handicapValue),
                 HandicapSystemType.TimeOnTime => TimeOnTime(elapsed, handicapValue),
+                HandicapSystemType.PortsmouthDpy => PortsmouthDpy(elapsed, handicapValue),
                 _ => throw new InvalidOperationException(
                     $"Unsupported handicap system type: {systemType}")
             };
@@ -145,6 +146,16 @@ namespace SailScores.Core.Scoring
                 throw new InvalidOperationException("Portsmouth Yardstick rating must not be zero.");
 
             var correctedSeconds = elapsed.TotalSeconds / (double)py * 1000.0;
+            return TimeSpan.FromSeconds(correctedSeconds);
+        }
+
+        // corrected = elapsed_sec / PY × 100
+        private static TimeSpan PortsmouthDpy(TimeSpan elapsed, decimal py)
+        {
+            if (py == 0m)
+                throw new InvalidOperationException("Portsmouth Yardstick rating must not be zero.");
+
+            var correctedSeconds = elapsed.TotalSeconds / (double)py * 100.0;
             return TimeSpan.FromSeconds(correctedSeconds);
         }
 
