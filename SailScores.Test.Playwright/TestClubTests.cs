@@ -51,16 +51,14 @@ public class TestClubTests
         var page = await browser.NewPageAsync();
         await LoginAndGoToHiddenTestClubAsync(page);
 
-        var sectionId = "classes";
         await page.Locator("a:has-text('Admin page')").ClickAsync();
-        await page.Locator($"#{sectionId}").ClickAsync();
+        await ExpandSectionAsync(page, "classes");
         var createLink = page.Locator("a:has-text('New Class')");
         await createLink.ClickAsync();
         var className = $"AutoTest Class {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
         await page.Locator("#Name").FillAsync(className);
         await page.Locator("input[value='Create']").ClickAsync();
-        await page.Locator("#classes").ClickAsync();
-        var deleteButton = await GetDeleteButtonForRowAsync(page, sectionId, className);
+        var deleteButton = await GetAdminSectionDeleteLinkAsync(page, "classes", className);
         await deleteButton.ClickAsync();
         await page.Locator("input[value='Delete']").ClickAsync();
         Assert.Contains("/TEST/Admin", page.Url);
@@ -74,6 +72,7 @@ public class TestClubTests
         await LoginAndGoToHiddenTestClubAsync(page);
 
         await page.Locator("a:has-text('Admin page')").ClickAsync();
+        await ExpandSectionAsync(page, "competitors");
         await page.Locator("a:has-text('Competitor page')").ClickAsync();
         var createLink = page.Locator("a:has-text('Create')");
         await createLink.ClickAsync();
@@ -101,9 +100,8 @@ public class TestClubTests
         var page = await browser.NewPageAsync();
         await LoginAndGoToHiddenTestClubAsync(page);
 
-        var sectionName = "fleets";
         await page.Locator("a:has-text('Admin page')").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
+        await ExpandSectionAsync(page, "fleets");
         var createLink = page.Locator("a:has-text('New Fleet')");
         await createLink.ClickAsync();
         var fleetName = $"AutoTest Fleet {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
@@ -116,12 +114,10 @@ public class TestClubTests
         var submitButton = page.Locator("input[value='Create']");
         await submitButton.ScrollIntoViewIfNeededAsync();
         await submitButton.ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
-        var editButton = await GetEditButtonForRowAsync(page, sectionName, fleetName);
+        var editButton = await GetAdminSectionEditLinkAsync(page, "fleets", fleetName);
         await editButton.ClickAsync();
         await page.Locator("input[value='Save']").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
-        var deleteButton = await GetDeleteButtonForRowAsync(page, sectionName, fleetName);
+        var deleteButton = await GetAdminSectionDeleteLinkAsync(page, "fleets", fleetName);
         await deleteButton.ClickAsync();
         await page.Locator("input[value='Delete']").ClickAsync();
         Assert.Contains("/TEST/Admin", page.Url);
@@ -135,8 +131,7 @@ public class TestClubTests
         await LoginAndGoToHiddenTestClubAsync(page);
 
         await page.Locator("a:has-text('Admin page')").ClickAsync();
-        var sectionName = "seasons";
-        await page.Locator($"#{sectionName}").ClickAsync();
+        await ExpandSectionAsync(page, "seasons");
         var createLink = page.Locator("a:has-text('New Season')");
         await createLink.ClickAsync();
         var startDate = DateTime.Today.AddYears(1);
@@ -146,13 +141,10 @@ public class TestClubTests
         await page.Locator("#Start").FillAsync(startDate.ToString("yyyy-MM-dd"));
         await page.Locator("#End").FillAsync(finishDate.ToString("yyyy-MM-dd"));
         await page.Locator("input[value='Create']").ClickAsync();
-        // Redirects to Admin Index
-        await page.Locator($"#{sectionName}").ClickAsync();
-        var editButton = await GetEditButtonForRowAsync(page, sectionName, seasonName);
+        var editButton = await GetAdminSectionEditLinkAsync(page, "seasons", seasonName);
         await editButton.ClickAsync();
         await page.Locator("input[value='Save']").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
-        var deleteButton = await GetDeleteButtonForRowAsync(page, sectionName, seasonName);
+        var deleteButton = await GetAdminSectionDeleteLinkAsync(page, "seasons", seasonName);
         await deleteButton.ClickAsync();
         await page.Locator("input[value='Delete']").ClickAsync();
         Assert.Contains("/TEST/Admin", page.Url);
@@ -165,22 +157,19 @@ public class TestClubTests
         var page = await browser.NewPageAsync();
         await LoginAndGoToHiddenTestClubAsync(page);
 
-        var sectionName = "series";
         var seriesName = $"Test Series {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
 
         await page.Locator("a:has-text('Admin page')").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
+        await ExpandSectionAsync(page, "series");
         var createLink = page.Locator("a:has-text('New Series')");
         await createLink.ClickAsync();
         await page.Locator("#Name").FillAsync(seriesName);
         await page.Locator("#SeasonId").SelectOptionAsync(new SelectOptionValue { Label = DateTime.Today.Year.ToString() });
         await page.Locator("input[value='Create']").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
-        var editButton = await GetEditButtonForRowAsync(page, sectionName, seriesName);
+        var editButton = await GetAdminSectionEditLinkAsync(page, "series", seriesName);
         await editButton.ClickAsync();
         await page.Locator("input[value='Save']").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
-        var deleteButton = await GetDeleteButtonForRowAsync(page, sectionName, seriesName);
+        var deleteButton = await GetAdminSectionDeleteLinkAsync(page, "series", seriesName);
         await deleteButton.ClickAsync();
         await page.Locator("input[value='Delete']").ClickAsync();
         Assert.Contains("/TEST/Admin", page.Url);
@@ -193,10 +182,9 @@ public class TestClubTests
         var page = await browser.NewPageAsync();
         await LoginAndGoToHiddenTestClubAsync(page);
 
-        var sectionName = "regattas";
         var regattaName = $"Test Regatta {DateTime.Now.ToString("yyyyMMdd Hmmss")}";
         await page.Locator("a:has-text('Admin page')").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
+        await ExpandSectionAsync(page, "regattas");
         var createLink = page.Locator("a:has-text('New Regatta')");
         await createLink.ClickAsync();
         await page.Locator("#Name").FillAsync(regattaName);
@@ -206,8 +194,7 @@ public class TestClubTests
         await page.Locator("a:has-text('Edit Regatta')").ClickAsync();
         await page.Locator("input[value='Save']").ClickAsync();
         await page.Locator("a:has-text('Club Admin')").ClickAsync();
-        await page.Locator($"#{sectionName}").ClickAsync();
-        var deleteButton = await GetDeleteButtonForRowAsync(page, sectionName, regattaName);
+        var deleteButton = await GetAdminSectionDeleteLinkAsync(page, "regattas", regattaName);
         await deleteButton.ClickAsync();
         await page.Locator("input[value='Delete']").ClickAsync();
         Assert.Contains("/TEST/Admin", page.Url);
@@ -246,28 +233,55 @@ public class TestClubTests
         await addCompElement.FillAsync("222");
         await addCompElement.PressAsync("Enter");
         await page.Locator("input[value='Create']").ClickAsync();
-        await page.Locator(".navbar-brand:has-text('TEST')").ClickAsync();
-        await Task.Delay(1000);
-        await page.Locator($"a:has-text('{year} Test Series')").ClickAsync();
-        var linkText = $"{DateTime.Today.ToString("M/d")} R{order}";
-        var raceLink = page.Locator($"a:has-text('{linkText}')");
-        Assert.True(await raceLink.CountAsync() > 0);
+
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        Assert.DoesNotContain("/Race/Create", page.Url);
+        var createdRacePath = new Uri(page.Url).AbsolutePath;
+
+        var selectedSeriesUrl = UrlCombine(configuration.BaseUrl, selectedSeriesHref!);
+        await page.GotoAsync(selectedSeriesUrl);
+        await Assertions.Expect(page.Locator($"a[href='{createdRacePath}']")).ToHaveCountAsync(1);
         await page.CloseAsync();
     }
 
-    private async Task<ILocator> GetDeleteButtonForRowAsync(
-        IPage page,
-        string sectionId,
-        string itemName)
+    private async Task ExpandSectionAsync(IPage page, string sectionName)
     {
-        return page.Locator($"#{sectionId}div .row").Filter(new() { HasText = itemName }).First.Locator("a[title='Delete']");
+        await GetAdminSectionToggleAsync(page, sectionName).ClickAsync();
+        await page.WaitForTimeoutAsync(300);
     }
 
-    private async Task<ILocator> GetEditButtonForRowAsync(
+    private ILocator GetAdminSectionToggleAsync(IPage page, string sectionName)
+    {
+        var buttonText = char.ToUpper(sectionName[0]) + sectionName.Substring(1);
+        return page.Locator($"button:has-text('{buttonText}')");
+    }
+
+    private async Task<ILocator> GetAdminSectionItemContainerAsync(
         IPage page,
-        string sectionId,
         string itemName)
     {
-        return page.Locator($"#{sectionId}div .row").Filter(new() { HasText = itemName }).First.Locator("a[title='Edit']");
+        return page.GetByText(itemName, new() { Exact = false })
+            .Locator("xpath=ancestor::div[.//a[starts-with(@href, '/TEST/')]][1]")
+            .First;
+    }
+
+    private async Task<ILocator> GetAdminSectionEditLinkAsync(
+        IPage page,
+        string sectionName,
+        string itemName)
+    {
+        await ExpandSectionAsync(page, sectionName);
+        var row = await GetAdminSectionItemContainerAsync(page, itemName);
+        return row.Locator("a[title='Edit'], a[href*='/Edit/']").First;
+    }
+
+    private async Task<ILocator> GetAdminSectionDeleteLinkAsync(
+        IPage page,
+        string sectionName,
+        string itemName)
+    {
+        await ExpandSectionAsync(page, sectionName);
+        var row = await GetAdminSectionItemContainerAsync(page, itemName);
+        return row.Locator("a[title='Delete'], a[href*='/Delete/']").First;
     }
 }
