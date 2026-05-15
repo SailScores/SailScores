@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using System;
 using System.Threading.Tasks;
 
 namespace SailScores.Test.Playwright.Utilities;
@@ -24,7 +25,57 @@ public static class PageExtensions
         
         await page.Locator("#Email").FillAsync(email);
         await page.Locator("#Password").FillAsync(password);
-        await page.Locator("form input[type='submit'], form button[type='submit']").ClickAsync();
+        // Target the primary form's submit button specifically. The login page has two separate forms:
+        // 1. Primary form (form[action*="/Account/Login"]) - email/password with this button
+        // 2. External auth form (form[action*="/Account/ExternalLogin"]) - Google/Microsoft/Facebook buttons
+        // Using the specific selector prevents clicking the wrong button on pages with multiple submit buttons.
+        await page.Locator("form[action*=\"/Account/Login\"] button[type=submit]").ClickAsync();
+    }
+
+    /// <summary>
+    /// Captures a screenshot with timestamp. Ensures screenshot directory exists.
+    /// </summary>
+    public static async Task CaptureScreenshotAsync(this IPage page, string screenshotPath, string testName)
+    {
+        if (string.IsNullOrWhiteSpace(screenshotPath))
+            return;
+
+        var dir = System.IO.Path.GetDirectoryName(screenshotPath);
+        if (!System.IO.Directory.Exists(dir))
+            System.IO.Directory.CreateDirectory(dir);
+
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-fff");
+        var filename = $"{timestamp}_{testName}.png";
+        var fullPath = System.IO.Path.Combine(screenshotPath, filename);
+
+        await page.ScreenshotAsync(new PageScreenshotOptions { Path = fullPath });
+    }
+
+    /// <summary>
+    /// Captures a screenshot on test failure for troubleshooting.
+    /// </summary>
+    public static async Task CaptureScreenshotOnFailureAsync(this IPage page, string screenshotPath, string testName, Exception exception)
+    {
+        if (string.IsNullOrWhiteSpace(screenshotPath))
+            return;
+
+        try
+        {
+            var dir = System.IO.Path.GetDirectoryName(screenshotPath);
+            if (!System.IO.Directory.Exists(dir))
+                System.IO.Directory.CreateDirectory(dir);
+
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-fff");
+            var filename = $"FAILURE_{timestamp}_{testName}.png";
+            var fullPath = System.IO.Path.Combine(screenshotPath, filename);
+
+            await page.ScreenshotAsync(new PageScreenshotOptions { Path = fullPath });
+            System.Console.WriteLine($"Screenshot captured: {fullPath}");
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"Failed to capture screenshot: {ex.Message}");
+        }
     }
 
     public static async Task SelectOptionByLabelAsync(this IPage page, string selector, string label)

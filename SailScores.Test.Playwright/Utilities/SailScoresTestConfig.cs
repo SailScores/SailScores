@@ -12,4 +12,6 @@ public class SailScoresTestConfig
     public string SeriesScorekeeperEmail { get; set; }
     public string PermissionTestPassword { get; set; }
     public bool Headless { get; set; } = true;
+    public bool CaptureScreenshots { get; set; } = true;
+    public string ScreenshotPath { get; set; } = "bin/Debug/net10.0/screenshots";
 }
