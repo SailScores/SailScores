@@ -208,21 +208,32 @@ public class TestClubTests
         await LoginAndGoToHiddenTestClubAsync(page);
 
         var year = DateTime.Today.Year;
-        var serieslink = await page.Locator("a:has-text('Series')").AllAsync();
-        if (serieslink.Count == 0)
-        {
-            await page.Locator("button").First.ClickAsync();
-            serieslink = await page.Locator("a:has-text('Series')").AllAsync();
-        }
-        await serieslink[0].ClickAsync();
-        var testSeriesLink = page.Locator($"a:has-text('{year} Test Series')").First;
-        await testSeriesLink.ClickAsync();
-        var headerlinks = await page.Locator("th a").AllAsync();
-        int raceCount = headerlinks.Count;
+        await page.GotoAsync(UrlCombine(configuration.BaseUrl, configuration.TestClubInitials + "/Series"));
+
+        var currentYearSeriesLinks = page.Locator($"a[href^='/{configuration.TestClubInitials}/{year}/']");
+        var preferredSeriesLink = page.Locator($"a[href='/{configuration.TestClubInitials}/{year}/series-1']");
+        var selectedSeriesLink = await preferredSeriesLink.CountAsync() > 0
+            ? preferredSeriesLink.First
+            : currentYearSeriesLinks.First;
+
+        var selectedSeriesName = (await selectedSeriesLink.InnerTextAsync()).Trim();
+        var selectedSeriesHref = await selectedSeriesLink.GetAttributeAsync("href");
+        Assert.False(string.IsNullOrWhiteSpace(selectedSeriesHref));
+        await selectedSeriesLink.ClickAsync();
+        var raceCount = await page.Locator("a[href*='/Race/Details/']").CountAsync();
+
         await page.Locator(".navbar-brand:has-text('TEST')").ClickAsync();
         await page.Locator("a:has-text('New Race')").ClickAsync();
         await page.Locator("#fleetId").SelectOptionAsync(new SelectOptionValue { Label = "Test Boat Class Fleet" });
-        await page.SelectOptionsByLabelHiddenAsync("#SeriesIds", $"{year} Test Series");
+        await page.EvalOnSelectorAsync("#SeriesIds", @"(el, seriesName) => {
+            const target = (seriesName || '').trim().toLowerCase();
+            for (let i = 0; i < el.options.length; i++) {
+                const opt = el.options[i];
+                const optText = (opt.text || opt.label || '').trim().toLowerCase();
+                opt.selected = optText === target || optText.endsWith(` ${target}`) || optText.endsWith(`- ${target}`);
+            }
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        }", selectedSeriesName);
         await page.Locator("a:has-text('Optional Fields')").ClickAsync();
         int order = ++raceCount;
         var orderField = page.Locator("#InitialOrder");
