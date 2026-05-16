@@ -488,6 +488,14 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasForeignKey(ch => ch.HandicapSystemId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<CompetitorHandicap>()
+            .Property(ch => ch.Value)
+            .HasColumnType("decimal(18, 6)");
+
+        modelBuilder.Entity<ClassHandicap>()
+            .Property(ch => ch.Value)
+            .HasColumnType("decimal(18, 6)");
+
         // At most one row per (BoatClassId, HandicapSystemId) may have EffectiveFrom IS NULL
         modelBuilder.Entity<ClassHandicap>()
             .HasIndex(ch => new { ch.BoatClassId, ch.HandicapSystemId })
