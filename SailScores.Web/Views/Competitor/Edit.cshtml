@@ -164,6 +164,47 @@
             <a asp-action="AddHandicap"
                asp-route-competitorId="@Model.Id"
                class="btn btn-sm btn-outline-primary mb-3">Add Handicap Rating</a>
+            @if (Model.ClassHandicapRatings != null && Model.ClassHandicapRatings.Any())
+            {
+                var showClassEffectiveDates = !(Model.ClassHandicapRatings.Count == 1
+                    && !Model.ClassHandicapRatings[0].EffectiveFrom.HasValue
+                    && !Model.ClassHandicapRatings[0].EffectiveTo.HasValue);
+
+                <div class="alert alert-info mt-3" role="alert">
+                    <strong>Class-level handicap ratings</strong> are defined for this competitor's boat class.
+                    Adding a competitor-level rating above will override the class-level ratings.
+                  <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>System</th>
+                            <th>Rating</th>
+                            @if (showClassEffectiveDates)
+                            {
+                                <th>From</th>
+                                <th>To</th>
+                            }
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ch in Model.ClassHandicapRatings)
+                        {
+                            <tr>
+                                <td>@ch.HandicapSystem?.Name</td>
+                                <td>@ch.Value.ToString("0.######")</td>
+                                @if (showClassEffectiveDates)
+                                {
+                                    <td>@(ch.EffectiveFrom?.ToString("d") ?? "—")</td>
+                                    <td>@(ch.EffectiveTo?.ToString("d") ?? "—")</td>
+                                }
+                                <td>@ch.Notes</td>
+                            </tr>
+                        }
+                    </tbody>
+                  </table>
+                </div>
+            }
+
         </div>
     </div>
 }

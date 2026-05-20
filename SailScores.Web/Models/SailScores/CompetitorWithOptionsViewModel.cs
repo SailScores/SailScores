@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -15,4 +15,6 @@ public class CompetitorWithOptionsViewModel : Core.Model.Competitor
     public string NewNote { get; set; }
 
     public IList<Core.Model.CompetitorHandicap> HandicapRatings { get; set; }
+
+    public IList<Core.Model.ClassHandicap> ClassHandicapRatings { get; set; }
 }

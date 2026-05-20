@@ -65,8 +65,8 @@
                         @foreach (var h in Model.HandicapRatings)
                         {
                             <tr>
-                                <td>@(h.HandicapSystem?.Name ?? h.HandicapSystemId.ToString("D").Substring(0, 8))</td>
-                                <td>@h.Value</td>
+                                <td>@h.HandicapSystem?.Name</td>
+                                <td>@h.Value.ToString("0.######")</td>
                                 @if (showEffectiveDates)
                                 {
                                     <td>@(h.EffectiveFrom?.ToString("d") ?? "—")</td>

@@ -382,6 +382,11 @@ public class CompetitorController : Controller
         if (club.EnableHandicapScoring)
         {
             compWithOptions.HandicapRatings = await _handicapService.GetCompetitorHandicapsAsync(id);
+            if (compWithOptions.BoatClassId != Guid.Empty)
+            {
+                compWithOptions.ClassHandicapRatings =
+                    await _handicapService.GetClassHandicapsAsync(compWithOptions.BoatClassId);
+            }
         }
 
         return View(compWithOptions);
