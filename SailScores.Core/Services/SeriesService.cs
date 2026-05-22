@@ -374,6 +374,12 @@ namespace SailScores.Core.Services
 
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
 
+            // For import-mode summary series, populate races BEFORE building handicap lookup
+            if (initial && fullSeries.Type == SeriesType.Summary && !fullSeries.ChildrenSeriesAsSingleRace)
+            {
+                await AddChildSeriesAsSeries(fullSeries).ConfigureAwait(false);
+            }
+
             var handicapSystem = await _handicapService
                 .GetEffectiveHandicapSystemAsync(fullSeries)
                 .ConfigureAwait(false);
@@ -405,10 +411,7 @@ namespace SailScores.Core.Services
                     {
                         await AddChildSeriesAsRaces(fullSeries).ConfigureAwait(false);
                     }
-                    else
-                    {
-                        await AddChildSeriesAsSeries(fullSeries).ConfigureAwait(false);
-                    }
+                    // else: AddChildSeriesAsSeries already called above before handicap lookup
                 }
                 else  // non-summary series.
                 {

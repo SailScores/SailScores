@@ -123,6 +123,24 @@
                                 </select>
                                 <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
                             </div>
+                            @if (Model.HandicapSystemOptions != null && Model.HandicapSystemOptions.Any())
+                            {
+                                <div class="mb-3">
+                                    <label asp-for="HandicapSystemId">Handicap System</label>
+                                    <select asp-for="HandicapSystemId" class="form-select">
+                                        <option value="">@("<default>")</option>
+                                        @foreach (var hs in Model.HandicapSystemOptions.Where(h => h.Id != Guid.Empty))
+                                        {
+                                            <option value="@hs.Id">@hs.Name</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="HandicapSystemId" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        This setting only applies when children series are imported as individual races.
+                                        When "Children series each count as a single race" is checked above, each child series' own handicap system is used instead.
+                                    </small>
+                                </div>
+                            }
                             <div class="mb-3">
                                 <label for="whatifanchor">Scoring "What If"</label>
                                 <a class="form-control btn btn-secondary"
