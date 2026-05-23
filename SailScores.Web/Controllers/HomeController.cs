@@ -10,19 +10,16 @@ public class HomeController : Controller
 {
 
     private readonly CoreServices.IClubService _clubservice;
-    private readonly IClubService _webClubService;
     private readonly IRegattaService _regattaService;
     private readonly AppVersionInfo _versionService;
 
     public HomeController(
         CoreServices.IClubService clubService,
-        IClubService webClubService,
         IRegattaService regattaService,
         AppVersionInfo versionService)
 
     {
         _clubservice = clubService;
-        _webClubService = webClubService;
         _regattaService = regattaService;
         _versionService = versionService;
     }
@@ -73,13 +70,6 @@ public class HomeController : Controller
 #if DEBUG
         vm.Version = _versionService.InformationalVersion;
 #endif
-        return View(vm);
-    }
-
-    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
-    public async Task<IActionResult> Stats()
-    {
-        var vm = await _webClubService.GetAllClubStats();
         return View(vm);
     }
 

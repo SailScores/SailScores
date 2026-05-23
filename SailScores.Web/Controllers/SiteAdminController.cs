@@ -16,17 +16,20 @@ public class SiteAdminController : Controller
     private readonly IAuthorizationService _authService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStripeService _stripeService;
+    private readonly IClubService _webClubService;
 
     public SiteAdminController(
         IWebSiteAdminService siteAdminService,
         IAuthorizationService authService,
         UserManager<ApplicationUser> userManager,
-        IStripeService stripeService)
+        IStripeService stripeService,
+        IClubService webClubService)
     {
         _siteAdminService = siteAdminService;
         _authService = authService;
         _userManager = userManager;
         _stripeService = stripeService;
+        _webClubService = webClubService;
     }
 
     // GET: SiteAdmin
@@ -38,6 +41,18 @@ public class SiteAdminController : Controller
         }
 
         var vm = await _siteAdminService.GetAllClubsAsync(sortOrder);
+        return View(vm);
+    }
+
+    // GET: SiteAdmin/Stats
+    public async Task<ActionResult> Stats()
+    {
+        if (!await _authService.IsUserFullAdmin(User))
+        {
+            return Unauthorized();
+        }
+
+        var vm = await _webClubService.GetAllClubStats();
         return View(vm);
     }
 
