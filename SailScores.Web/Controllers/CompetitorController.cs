@@ -125,7 +125,8 @@ public class CompetitorController : Controller
         {
             ClubInitials = clubInitials.ToUpperInvariant(),
             Item = competitorStats,
-            WindSpeedUnits = windSpeedUnits
+            WindSpeedUnits = windSpeedUnits,
+            CanEdit = await _authService.CanUserEditRaces(User, clubInitials)
         };
         return View(vm);
     }
@@ -140,6 +141,22 @@ public class CompetitorController : Controller
             competitorId,
             seasonName);
         if (ranks == null)
+        {
+            return Json(String.Empty);
+        }
+        return Json(ranks);
+    }
+
+    [AllowAnonymous]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "competitorId", "seasonName" })]
+    public async Task<JsonResult> HandicapChart(
+        Guid competitorId,
+        string seasonName)
+    {
+        var ranks = await _competitorService.GetCompetitorHandicapSeasonRanksAsync(
+            competitorId,
+            seasonName);
+        if (ranks == null || !ranks.Any())
         {
             return Json(String.Empty);
         }

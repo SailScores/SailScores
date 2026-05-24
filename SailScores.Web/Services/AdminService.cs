@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -70,6 +70,7 @@ public class AdminService : IAdminService
         vm.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
         vm.LocaleOptions = GetLocaleLongNames();
         vm.Locale = _localizerService.GetLocaleLongName(club.Locale);
+        vm.HandicapSystemOptions = await _coreHandicapService.GetHandicapSystemsAsync(club.Id);
         return vm;
     }
 

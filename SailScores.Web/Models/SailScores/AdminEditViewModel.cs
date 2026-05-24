@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
@@ -37,6 +37,11 @@ public class AdminEditViewModel
 
     [Display(Name = "Enable Handicap Scoring")]
     public bool EnableHandicapScoring { get; set; }
+
+    [Display(Name = "Default Handicap System")]
+    public Guid? DefaultHandicapSystemId { get; set; }
+
+    public IList<HandicapSystem> HandicapSystemOptions { get; set; }
 
     public String Url { get; set; }
 

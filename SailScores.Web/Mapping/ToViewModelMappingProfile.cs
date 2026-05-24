@@ -46,13 +46,16 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.HasCompetitors, o => o.Ignore())
                 .ForMember(d => d.Users, o => o.Ignore())
                 .ForMember(d => d.HandicapSystems, o => o.Ignore())
+                .ForMember(d => d.HandicapSystemOptions, o => o.Ignore())
                 .ReverseMap()
-                .ForMember(d => d.DefaultScoringSystem, o => o.Ignore());
+                .ForMember(d => d.DefaultScoringSystem, o => o.Ignore())
+                .ForMember(d => d.DefaultHandicapSystem, o => o.Ignore());
 
             CreateMap<AdminViewModel, AdminEditViewModel>();
-            
+
             CreateMap<AdminEditViewModel, Model.Club>()
                 .ForMember(d => d.DefaultScoringSystem, o => o.Ignore())
+                .ForMember(d => d.DefaultHandicapSystem, o => o.Ignore())
                 .ForMember(d => d.WeatherSettings, o => o.Ignore())
                 .ForMember(d => d.Fleets, o => o.Ignore())
                 .ForMember(d => d.Competitors, o => o.Ignore())

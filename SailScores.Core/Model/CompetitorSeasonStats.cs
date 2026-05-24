@@ -29,5 +29,17 @@ namespace SailScores.Core.Model
         [Display(Name = "Latest Date Raced")]
         [DataType(DataType.Date)]
         public DateTime? LastRacedDate { get; internal set; }
+
+        [Display(Name = "Corrected Race Count")]
+        public int? CorrectedRaceCount { get; internal set; }
+
+        [Display(Name = "Average Corrected Place")]
+        public double? AverageCorrectedRank { get; internal set; }
+
+        [Display(Name = "Corrected Boats Raced Against")]
+        public int? CorrectedBoatsRacedAgainst { get; internal set; }
+
+        [Display(Name = "Corrected Boats Beat")]
+        public int? CorrectedBoatsBeat { get; internal set; }
     }
 }

@@ -24,7 +24,9 @@ public class AdminViewModel
     public bool ShowCalendarInNav { get; set; }
     public bool EnableHandicapScoring { get; set; }
 
-    public String Url { get; set; }
+    public Guid? DefaultHandicapSystemId { get; set; }
+
+    public IList<HandicapSystem> HandicapSystemOptions { get; set; }
 
     public IList<FleetDeleteViewModel> Fleets { get; set; }
     public IList<BoatClassDeleteViewModel> BoatClasses { get; set; }

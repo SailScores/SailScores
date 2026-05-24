@@ -26,6 +26,7 @@
     <None Remove="Sql\DeletableCompetitors.sql" />
     <None Remove="Sql\RankCounts.sql" />
     <None Remove="Sql\RankCountsById.sql" />
+    <None Remove="Sql\RankCountsByIdHandicap.sql" />
     <None Remove="Sql\SiteStats.sql" />
   </ItemGroup>
 
@@ -42,6 +43,7 @@
     <EmbeddedResource Include="Sql\ClubStats.sql" />
     <EmbeddedResource Include="Sql\RankCountsById.sql" />
     <EmbeddedResource Include="Sql\RankCounts.sql" />
+    <EmbeddedResource Include="Sql\RankCountsByIdHandicap.sql" />
     <EmbeddedResource Include="Sql\SeriesParticipationStats.sql" />
   </ItemGroup>
 

@@ -356,6 +356,7 @@ namespace SailScores.Core.Services
                 .Include(c => c.Regattas)
                 .ThenInclude(r => r.RegattaFleet)
                 .Include(c => c.WeatherSettings)
+                .Include(c => c.DefaultHandicapSystem)
                 .AsSplitQuery()
                 .LoadAsync().ConfigureAwait(false);
 
@@ -513,6 +514,7 @@ namespace SailScores.Core.Services
             dbClub.HomePageDescription = club.HomePageDescription;
             dbClub.ShowCalendarInNav = club.ShowCalendarInNav;
             dbClub.EnableHandicapScoring = club.EnableHandicapScoring;
+            dbClub.DefaultHandicapSystemId = club.DefaultHandicapSystemId;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings?.Latitude;

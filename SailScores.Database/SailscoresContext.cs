@@ -61,6 +61,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     // these sets below are not tables in the database 
     private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
+    private DbSet<CompetitorHandicapStatsSummary> CompetitorHandicapStatsSummary { get; set; }
     private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
     private DbSet<ClubSeasonStats> ClubSeasonStats { get; set; }
     private DbSet<SeriesParticipationStats> SeriesParticipationStats { get; set; }
@@ -120,6 +121,26 @@ public class SailScoresContext : DbContext, ISailScoresContext
         return result;
     }
 
+    public async Task<IList<CompetitorHandicapStatsSummary>> GetCompetitorHandicapStatsSummaryAsync(
+        Guid clubId,
+        Guid competitorId,
+        Guid handicapSystemId,
+        int systemType)
+    {
+        var query = "EXECUTE dbo.SS_SP_GetSeasonSummaryHandicap" +
+            " @CompetitorId = @competitorId, @ClubId = @clubId," +
+            " @HandicapSystemId = @handicapSystemId, @SystemType = @systemType";
+
+        var clubParam = new SqlParameter("clubId", clubId);
+        var competitorParam = new SqlParameter("competitorId", competitorId);
+        var systemParam = new SqlParameter("handicapSystemId", handicapSystemId);
+        var typeParam = new SqlParameter("systemType", systemType);
+        var result = await this.CompetitorHandicapStatsSummary
+            .FromSqlRaw(query, competitorParam, clubParam, systemParam, typeParam)
+            .ToListAsync();
+        return result;
+    }
+
     public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber)
     {
         var query = await GetSqlQuery("RankCounts");
@@ -136,6 +157,19 @@ public class SailScoresContext : DbContext, ISailScoresContext
         string seasonUrlName)
     {
         var query = await GetSqlQuery("RankCountsById");
+        var competitorParam = new SqlParameter("CompetitorId", competitorId);
+        var seasonParam = new SqlParameter("SeasonUrlName", seasonUrlName);
+        var result = await this.CompetitorRankStats
+            .FromSqlRaw(query, competitorParam, seasonParam)
+            .ToListAsync();
+        return result;
+    }
+
+    public async Task<IList<CompetitorRankStats>> GetCompetitorHandicapRankCountsAsync(
+        Guid competitorId,
+        string seasonUrlName)
+    {
+        var query = await GetSqlQuery("RankCountsByIdHandicap");
         var competitorParam = new SqlParameter("CompetitorId", competitorId);
         var seasonParam = new SqlParameter("SeasonUrlName", seasonUrlName);
         var result = await this.CompetitorRankStats
@@ -371,6 +405,12 @@ public class SailScoresContext : DbContext, ISailScoresContext
         modelBuilder.Entity<Announcement>().HasQueryFilter(p => !p.IsDeleted);
 
         modelBuilder.Entity<CompetitorStatsSummary>(
+            cs =>
+            {
+                cs.HasNoKey();
+                cs.ToTable((string)null);
+            });
+        modelBuilder.Entity<CompetitorHandicapStatsSummary>(
             cs =>
             {
                 cs.HasNoKey();

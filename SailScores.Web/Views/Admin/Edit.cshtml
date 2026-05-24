@@ -150,6 +150,30 @@
                         <div class="small text-muted">Enables corrected-time handicap scoring. Adds handicap fields to series and competitor pages.</div>
                     </div>
 
+                    <div class="mb-3" id="defaultHandicapSystemRow">
+                        <label asp-for="DefaultHandicapSystemId" class="form-label">Default Handicap System</label>
+                        @if (Model.HandicapSystemOptions == null || !Model.HandicapSystemOptions.Any())
+                        {
+                            <div class="small text-muted fst-italic">
+                                No handicap systems have been set up yet.
+                                <a asp-controller="HandicapSystem" asp-action="Create" asp-route-clubInitials="@Model.Initials">Add a handicap system</a>,
+                                then return here to set the default.
+                            </div>
+                        }
+                        else
+                        {
+                            <select asp-for="DefaultHandicapSystemId" class="form-select">
+                                <option value="">(none)</option>
+                                @foreach (var hs in Model.HandicapSystemOptions)
+                                {
+                                    <option value="@hs.Id">@hs.Name</option>
+                                }
+                            </select>
+                        }
+                        <div class="small text-muted">Used for corrected-time stats on competitor pages.</div>
+                        <span asp-validation-for="DefaultHandicapSystemId" class="text-danger"></span>
+                    </div>
+
                     <div class="mb-3">
                         <label asp-for="DefaultScoringSystemId" class="form-label">Default Scoring System</label>
                         <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-select">
@@ -255,8 +279,16 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
+
     <script>
+        (function () {
+            var cb = document.getElementById('EnableHandicapScoring');
+            var row = document.getElementById('defaultHandicapSystemRow');
+            function toggle() { row.style.display = cb.checked ? '' : 'none'; }
+            toggle();
+            cb.addEventListener('change', toggle);
+        })();
+
         document.getElementById('logoFileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const preview = document.getElementById('newLogoPreview');

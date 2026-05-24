@@ -318,6 +318,7 @@ namespace SailScores.Core.Services
             dbRace.UpdatedBy = race.UpdatedBy;
             dbRace.StartTime = race.StartTime;
             dbRace.TrackTimes = race.TrackTimes;
+            dbRace.CourseDistance = race.CourseDistance;
 
             PopulateWeather(race, dbRace);
 

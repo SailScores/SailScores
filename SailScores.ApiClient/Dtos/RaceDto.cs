@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -42,6 +42,9 @@ namespace SailScores.Api.Dtos
         // New fields
         public DateTime? StartTime { get; set; }
         public bool TrackTimes { get; set; }
+
+        // Course length in nautical miles; required for PHRF Time-on-Distance scoring
+        public decimal? CourseDistance { get; set; }
 
         public bool Equals(RaceDto other)
         {

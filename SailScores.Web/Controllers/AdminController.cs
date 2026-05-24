@@ -79,6 +79,7 @@ public class AdminController : Controller
                 clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
                 clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
                 clubAdmin.LocaleOptions = club.LocaleOptions;
+                clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
                 clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
                 return View(clubAdmin);
             }
@@ -97,6 +98,7 @@ public class AdminController : Controller
                 clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
                 clubAdmin.LocaleOptions = club.LocaleOptions;
                 clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
+                clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
                 clubAdmin.LogoFile = null; // Clear the file input
                 return View(clubAdmin);
             }
@@ -104,6 +106,7 @@ public class AdminController : Controller
             var clubObject = _mapper.Map<Club>(clubAdmin);
             clubObject.DefaultScoringSystemId =
                 clubAdmin.DefaultScoringSystemId;
+            clubObject.DefaultHandicapSystemId = clubAdmin.DefaultHandicapSystemId;
             clubObject.WeatherSettings = new WeatherSettings
             {
                 Latitude = clubAdmin.Latitude,
@@ -124,6 +127,7 @@ public class AdminController : Controller
             clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
             clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
             clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
+            clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
             return View(clubAdmin);
         }
     }

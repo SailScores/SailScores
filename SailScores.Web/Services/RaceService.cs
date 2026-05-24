@@ -364,6 +364,9 @@ public class RaceService : IRaceService
 
     public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions)
     {
+        var club = await _coreClubService.GetMinimalClub(raceWithOptions.ClubId);
+        raceWithOptions.EnableHandicapScoring = club.EnableHandicapScoring;
+
         if (raceWithOptions.RegattaId.HasValue)
         {
             raceWithOptions.FleetOptions = await _coreClubService.GetAllFleets(raceWithOptions.ClubId);

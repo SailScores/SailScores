@@ -22,6 +22,7 @@ public interface ICompetitorService
         string clubInitials,
         string sailor);
     Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonUrlName);
+    Task<IList<PlaceCount>> GetCompetitorHandicapSeasonRanksAsync(Guid competitorId, string seasonUrlName);
     Task<Guid?> GetCompetitorIdForSailnumberAsync(
         Guid clubId,
         string sailNumber);
