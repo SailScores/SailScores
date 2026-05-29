@@ -313,3 +313,5 @@ SailScores.Web/appsettings.Development.json
 
 # SQL Server backup files (production data)
 *.bacpac
+
+*.lscache

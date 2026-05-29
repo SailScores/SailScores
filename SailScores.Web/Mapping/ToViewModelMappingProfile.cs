@@ -246,7 +246,8 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Regatta, RegattaViewModel>();
             CreateMap<Model.Regatta, RegattaSummaryViewModel>()
                 .ForMember(d => d.ClubInitials, o => o.Ignore())
-                .ForMember(d => d.ClubName, o => o.Ignore());
+                .ForMember(d => d.ClubName, o => o.Ignore())
+                .ForMember(d => d.Series, o => o.MapFrom(s => s.Series));
             CreateMap<RegattaViewModel, RegattaSummaryViewModel>()
                 .ForMember(d => d.ClubInitials, o => o.Ignore())
                 .ForMember(d => d.ClubName, o => o.Ignore())

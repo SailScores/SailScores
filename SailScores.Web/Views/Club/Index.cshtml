@@ -99,6 +99,13 @@
                     <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.UrlName/@regatta.UrlName" style="text-wrap: pretty;">
                         @(regatta.Name.Contains(regatta.Season.Name, StringComparison.OrdinalIgnoreCase) ? regatta.Name : $"{regatta.Season.Name} {regatta.Name}")
                     </a>
+                    @{
+                        var mostRecentUpdate = regatta.GetMostRecentSeriesUpdatedDate();
+                        if (mostRecentUpdate.HasValue && mostRecentUpdate > DateTime.Now.AddDays(-15))
+                        {
+                            <span class="fst-italic small">@localizer["Updated"] @mostRecentUpdate.ToApproxTimeAgoString()</span>
+                        }
+                    }
                 </h3>
                 <br />
             }

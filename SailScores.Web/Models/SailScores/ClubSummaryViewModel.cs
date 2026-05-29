@@ -37,10 +37,28 @@ public class ClubSummaryViewModel
 
     private DateTime recentCutoff = DateTime.Now.AddDays(-9);
     public IEnumerable<RaceSummaryViewModel> RecentRaces => Races?.Where(r => r.Date > recentCutoff
-                                                                              && ((r.State ?? RaceState.Raced) == RaceState.Raced
-                                                                                  || r.State == RaceState.Preliminary))
+                                                                               && ((r.State ?? RaceState.Raced) == RaceState.Raced
+                                                                                   || r.State == RaceState.Preliminary)
+                                                                               && !IsRaceFromRegatta(r))
         .OrderByDescending(r => r.Date)
         .ThenBy(r => r.Order);
+
+    private bool IsRaceFromRegatta(RaceSummaryViewModel race)
+    {
+        // Check if this race belongs to any series that is part of a regatta.
+        if (Series == null || race.SeriesUrlAndNames == null)
+            return false;
+
+        var raceSeriesUrlNames = race.SeriesUrlAndNames.Select(s => s.Key).ToList();
+        var regattaSeriesUrlNames = Series
+            .Where(s => s.Type == SeriesType.Regatta)
+            .Select(s => s.UrlName)
+            .ToList();
+
+        // If the race belongs to any regatta series, return true
+        return raceSeriesUrlNames.Any(urlName =>
+            regattaSeriesUrlNames.Contains(urlName));
+    }
 
     public IEnumerable<SeriesSummary> RecentSeries => Series
         ?.Where(s =>

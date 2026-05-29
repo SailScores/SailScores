@@ -47,6 +47,8 @@ namespace SailScores.Core.Services
                 .SelectMany(c => c.Regattas)
                 .Include(c => c.Season)
                 .Include(c => c.RegattaFleet)
+                .Include(c => c.RegattaSeries)
+                .ThenInclude(rs => rs.Series)
                 .OrderBy(r => r.StartDate)
                 .AsSplitQuery()
                 .ToListAsync()
