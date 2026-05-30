@@ -246,6 +246,7 @@ namespace SailScores.Core.Services
             existingRegatta.ScoringSystemId = model.ScoringSystemId;
             existingRegatta.PreferAlternateSailNumbers = model.PreferAlternateSailNumbers;
             existingRegatta.HideFromFrontPage = model.HideFromFrontPage;
+            existingRegatta.HideFromClubHomePage = model.HideFromClubHomePage;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty

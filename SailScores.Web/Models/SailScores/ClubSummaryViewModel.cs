@@ -62,16 +62,18 @@ public class ClubSummaryViewModel
 
     public IEnumerable<SeriesSummary> RecentSeries => Series
         ?.Where(s =>
-            (
-                s.Type == SeriesType.Summary
-                && (s.EndDate??DateOnly.MinValue) > DateOnly.FromDateTime(recentCutoff)
-                && (s.UpdatedDate??DateTime.MinValue) > recentCutoff
-                && (s.StartDate ?? DateOnly.MinValue) < DateOnly.FromDateTime(DateTime.Now)
-            )
-            || (s.Races
-                ?.Any(r => r.Date > recentCutoff
-                           && ((r.State ?? RaceState.Raced) == RaceState.Raced
-                               || r.State == RaceState.Preliminary )) ?? false))
+            s.Type != SeriesType.Regatta
+            && (
+                (
+                    s.Type == SeriesType.Summary
+                    && (s.EndDate??DateOnly.MinValue) > DateOnly.FromDateTime(recentCutoff)
+                    && (s.UpdatedDate??DateTime.MinValue) > recentCutoff
+                    && (s.StartDate ?? DateOnly.MinValue) < DateOnly.FromDateTime(DateTime.Now)
+                )
+                || (s.Races
+                    ?.Any(r => r.Date > recentCutoff
+                               && ((r.State ?? RaceState.Raced) == RaceState.Raced
+                                   || r.State == RaceState.Preliminary )) ?? false)))
         .OrderByDescending(s => s.Races
             .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                         || r.State == RaceState.Preliminary).Max(r => r.Date))

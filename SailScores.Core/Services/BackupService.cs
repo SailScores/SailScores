@@ -456,6 +456,7 @@ public class BackupService : IBackupService
             ScoringSystemId = r.ScoringSystemId,
             PreferAlternateSailNumbers = r.PreferAlternateSailNumbers,
             HideFromFrontPage = r.HideFromFrontPage,
+            HideFromClubHomePage = r.HideFromClubHomePage,
             SeasonId = r.Season?.Id,
             SeriesIds = r.RegattaSeries?.Select(rs => rs.SeriesId).ToList() ?? new List<Guid>(),
             FleetIds = r.RegattaFleet?.Select(rf => rf.FleetId).ToList() ?? new List<Guid>()
@@ -1496,7 +1497,8 @@ public class BackupService : IBackupService
             UpdatedDate = regatta.UpdatedDate,
             ScoringSystemId = newScoringId,
             PreferAlternateSailNumbers = regatta.PreferAlternateSailNumbers,
-            HideFromFrontPage = regatta.HideFromFrontPage
+            HideFromFrontPage = regatta.HideFromFrontPage,
+            HideFromClubHomePage = regatta.HideFromClubHomePage
         };
 
         if (newSeasonId.HasValue)

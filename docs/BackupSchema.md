@@ -283,6 +283,7 @@ Club-level weather configuration.
 | `scoringSystemId` | guid? | Reference to a scoring system. |
 | `preferAlternateSailNumbers` | bool? | Use alternative sail numbers. |
 | `hideFromFrontPage` | bool? | Keep off the public front page. |
+| `hideFromClubHomePage` | bool? | Keep off the club home page. |
 | `seasonId` | guid? | Reference to a season. |
 | `seriesIds` | guid[] | Series belonging to this regatta. |
 | `fleetIds` | guid[] | Fleets participating in this regatta. |

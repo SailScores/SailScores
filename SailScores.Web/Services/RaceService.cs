@@ -163,11 +163,19 @@ public class RaceService : IRaceService
     {
 
         var club = await _coreClubService.GetMinimalClub(clubInitials);
+        var allSeries = await _coreSeriesService.GetAllSeriesAsync(club.Id, DateTime.Today, false, false);
+
+        // When creating a race without regatta context, exclude regatta series
+        // This should be redundant with GetAllSeries(...,..., false,...)
+        var filteredSeries = allSeries
+            .Where(s => s.Type != SeriesType.Regatta)
+            .ToList();
+
         var model = new RaceWithOptionsViewModel
         {
             ClubId = club.Id,
             FleetOptions = await _coreClubService.GetActiveFleets(club.Id),
-            SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(club.Id, DateTime.Today, false, false),
+            SeriesOptions = filteredSeries,
             ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
                 .OrderBy(s => s.Name).ToList(),
             CompetitorOptions = new List<Competitor>(),
@@ -363,34 +371,59 @@ public class RaceService : IRaceService
     }
 
     public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions)
-    {
-        var club = await _coreClubService.GetMinimalClub(raceWithOptions.ClubId);
-        raceWithOptions.EnableHandicapScoring = club.EnableHandicapScoring;
+       {
+           var club = await _coreClubService.GetMinimalClub(raceWithOptions.ClubId);
+           raceWithOptions.EnableHandicapScoring = club.EnableHandicapScoring;
 
-        if (raceWithOptions.RegattaId.HasValue)
-        {
-            raceWithOptions.FleetOptions = await _coreClubService.GetAllFleets(raceWithOptions.ClubId);
-        }
-        else
-        {
-            raceWithOptions.FleetOptions = await _coreClubService.GetActiveFleets(raceWithOptions.ClubId);
-        }
-        raceWithOptions.FleetOptions = raceWithOptions.FleetOptions.OrderBy(f => f.ShortName).ToList();
+           if (raceWithOptions.RegattaId.HasValue)
+           {
+               raceWithOptions.FleetOptions = await _coreClubService.GetAllFleets(raceWithOptions.ClubId);
+           }
+           else
+           {
+               raceWithOptions.FleetOptions = await _coreClubService.GetActiveFleets(raceWithOptions.ClubId);
+           }
+           raceWithOptions.FleetOptions = raceWithOptions.FleetOptions.OrderBy(f => f.ShortName).ToList();
 
-        raceWithOptions.SeriesOptions = await _coreSeriesService.GetAllSeriesAsync(
-            raceWithOptions.ClubId,
-            raceWithOptions.Date ?? DateTime.Today,
-            true,
-            false);
+           var allSeries = await _coreSeriesService.GetAllSeriesAsync(
+               raceWithOptions.ClubId,
+               raceWithOptions.Date ?? DateTime.Today,
+               true,
+               false);
 
-        raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(raceWithOptions.ClubId))
-            .OrderBy(s => s.Name).ToList();
-        // CompetitorOptions should be set by the JS on the page at edit time.
-        raceWithOptions.CompetitorBoatClassOptions =
-            (await _coreClubService.GetAllBoatClasses(raceWithOptions.ClubId)).OrderBy(c => c.Name);
-        raceWithOptions.WeatherIconOptions = _weatherService.GetWeatherIconOptions();
+           // Filter series based on regatta context
+           if (raceWithOptions.RegattaId.HasValue)
+           {
+               // Show only series that belong to this regatta
+               var regatta = await _coreRegattaService.GetRegattaAsync(raceWithOptions.RegattaId.Value);
+               if (regatta?.Series != null)
+               {
+                   var regattaSeriesIds = regatta.Series.Select(s => s.Id).ToHashSet();
+                   raceWithOptions.SeriesOptions = allSeries
+                       .Where(s => regattaSeriesIds.Contains(s.Id))
+                       .ToList();
+               }
+               else
+               {
+                   raceWithOptions.SeriesOptions = new List<Series>();
+               }
+           }
+           else
+           {
+               // Hide any series that belong to regattas (Type == Regatta)
+               raceWithOptions.SeriesOptions = allSeries
+                   .Where(s => s.Type != SeriesType.Regatta)
+                   .ToList();
+           }
 
-    }
+           raceWithOptions.ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(raceWithOptions.ClubId))
+               .OrderBy(s => s.Name).ToList();
+           // CompetitorOptions should be set by the JS on the page at edit time.
+           raceWithOptions.CompetitorBoatClassOptions =
+               (await _coreClubService.GetAllBoatClasses(raceWithOptions.ClubId)).OrderBy(c => c.Name);
+           raceWithOptions.WeatherIconOptions = _weatherService.GetWeatherIconOptions();
+
+       }
 
     public async Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id)
     {
