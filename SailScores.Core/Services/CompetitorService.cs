@@ -793,6 +793,106 @@ public class CompetitorService : ICompetitorService
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
+    public async Task SetAlternativeSailNumber(
+        Guid competitorId,
+        string alternativeSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "")
+    {
+        var competitor = await _dbContext.Competitors
+            .Include(c => c.BoatClass)
+            .FirstOrDefaultAsync(c => c.Id == competitorId)
+            .ConfigureAwait(false);
+
+        if (competitor == null)
+        {
+            return;
+        }
+
+        var normalizedAltNumber = string.IsNullOrWhiteSpace(alternativeSailNumber)
+            ? null
+            : alternativeSailNumber.Trim();
+
+        // Handle conflict resolution if setting a non-null value
+        if (!string.IsNullOrWhiteSpace(normalizedAltNumber))
+        {
+            IQueryable<Db.Competitor> conflictQuery = _dbContext.Competitors
+                .Where(c => c.ClubId == competitor.ClubId
+                    && c.Id != competitorId
+                    && c.AlternativeSailNumber == normalizedAltNumber);
+
+            if (conflictResolution == AltSailNumberConflictResolution.ClearFromOthersInSameClass)
+            {
+                // Only clear from competitors in the same boat class
+                conflictQuery = conflictQuery.Where(c => c.BoatClassId == competitor.BoatClassId);
+            }
+            else if (conflictResolution == AltSailNumberConflictResolution.AllowDuplicates)
+            {
+                // Don't clear from anyone
+                conflictQuery = conflictQuery.Where(c => false);
+            }
+            // ClearFromOthersInClub uses the base query (all club competitors)
+
+            var conflictingCompetitors = await conflictQuery.ToListAsync().ConfigureAwait(false);
+
+            foreach (var conflictingComp in conflictingCompetitors)
+            {
+                conflictingComp.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                    ChangedBy = userName,
+                    NewValue = null,
+                    Summary = $"Alternative Sail Number cleared (reassigned to {competitor.Name})"
+                });
+                conflictingComp.AlternativeSailNumber = null;
+            }
+        }
+
+        // Update the target competitor
+        if (competitor.AlternativeSailNumber != normalizedAltNumber)
+        {
+            competitor.ChangeHistory.Add(new Db.CompetitorChange
+            {
+                ChangeTimeStamp = DateTime.UtcNow,
+                ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                ChangedBy = userName,
+                NewValue = normalizedAltNumber,
+                Summary = "Alternative Sail Number Changed"
+            });
+            competitor.AlternativeSailNumber = normalizedAltNumber;
+        }
+
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public async Task ApplyRotationAsync(
+        Guid clubId,
+        Guid competitorId,
+        string boatSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "")
+    {
+        // Set the alternative sail number (with conflict resolution)
+        await SetAlternativeSailNumber(competitorId, boatSailNumber, conflictResolution, userName).ConfigureAwait(false);
+
+        // Record the boat rotation
+        var rotation = new Db.BoatRotation
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            CompetitorId = competitorId,
+            BoatSailNumber = boatSailNumber?.Trim(),
+            RotationDate = DateTime.UtcNow.Date,
+            IsActive = true,
+            CreatedUtc = DateTime.UtcNow,
+            CreatedBy = userName
+        };
+
+        await _dbContext.BoatRotations.AddAsync(rotation).ConfigureAwait(false);
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
     public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
         Guid competitorId,
         string seasonUrlName = null,

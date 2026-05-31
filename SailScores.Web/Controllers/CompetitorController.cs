@@ -85,14 +85,17 @@ public class CompetitorController : Controller
                      || f.FleetType == Api.Enumerations.FleetType.SelectedClasses)
             .OrderBy(f => f.Name)
             .ToList();
-        
+
+        var club = await _clubService.GetMinimalClub(clubInitials);
+
         var vm = new ClubCollectionViewModel<CompetitorIndexViewModel>
         {
             ClubInitials = clubInitials,
             List = competitors,
             CanEdit = await _authService.CanUserEditRaces(User, clubInitials),
             FleetOptions = _mapper.Map<List<FleetSummary>>(fleets),
-            SelectedFleetId = fleetId
+            SelectedFleetId = fleetId,
+            UseAlternativeSailNumbers = club?.EnableAlternativeSailNumbers ?? false,
         };
         return View(vm);
     }
@@ -607,6 +610,7 @@ public class CompetitorController : Controller
         await _competitorService.SetAlternativeSailNumber(
             model.CompetitorId,
             model.AlternativeSailNumber,
+            model.ConflictResolution,
             await GetUserStringAsync());
 
         var normalizedAlt = string.IsNullOrWhiteSpace(model.AlternativeSailNumber)

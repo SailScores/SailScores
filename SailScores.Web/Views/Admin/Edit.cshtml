@@ -150,6 +150,12 @@
                         <div class="small text-muted">Enables corrected-time handicap scoring. Adds handicap fields to series and competitor pages.</div>
                     </div>
 
+                    <div class="form-check mb-3">
+                        <input asp-for="EnableAlternativeSailNumbers" class="form-check-input" id="EnableAlternativeSailNumbers" />
+                        <label class="form-check-label" for="EnableAlternativeSailNumbers">Enable Fast Alternative Sail Number Changes</label>
+                        <div class="small text-muted">Adds buttons in the UI to allow faster changes to Alternative Sail Numbers for clubs with frequently changing boats. Alternative Sail Number editing is always available, even when this setting is off.</div>
+                    </div>
+
                     <div class="mb-3" id="defaultHandicapSystemRow">
                         <label asp-for="DefaultHandicapSystemId" class="form-label">Default Handicap System</label>
                         @if (Model.HandicapSystemOptions == null || !Model.HandicapSystemOptions.Any())

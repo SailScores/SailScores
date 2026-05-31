@@ -23,6 +23,7 @@ public class AdminViewModel
     public bool ShowClubInResults { get; set; }
     public bool ShowCalendarInNav { get; set; }
     public bool EnableHandicapScoring { get; set; }
+    public bool EnableAlternativeSailNumbers { get; set; }
 
     public Guid? DefaultHandicapSystemId { get; set; }
 

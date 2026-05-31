@@ -38,6 +38,17 @@ namespace SailScores.Core.Services
             string userName = "");
         Task<List<HistoricalNote>> GetCompetitorParticipationAsync(Guid competitorId);
         Task AddHistoryElement(Guid competitorId, string note, string userName);
+        Task SetAlternativeSailNumber(
+            Guid competitorId,
+            string alternativeSailNumber,
+            AltSailNumberConflictResolution conflictResolution,
+            string userName = "");
+        Task ApplyRotationAsync(
+            Guid clubId,
+            Guid competitorId,
+            string boatSailNumber,
+            AltSailNumberConflictResolution conflictResolution,
+            string userName = "");
 #pragma warning disable CA1054 // Uri parameters should not be strings
         Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
             Guid competitorId,

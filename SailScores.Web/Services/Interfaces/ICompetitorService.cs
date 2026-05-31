@@ -48,7 +48,17 @@ public interface ICompetitorService
         bool active,
         string userName = "");
     Task AddCompetitorNote(Guid id, string newNote, string v);
-    Task SetAlternativeSailNumber(Guid competitorId, string alternativeSailNumber, string userName = "");
+    Task SetAlternativeSailNumber(
+        Guid competitorId,
+        string alternativeSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "");
+    Task ApplyRotationAsync(
+        Guid clubId,
+        Guid competitorId,
+        string boatSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "");
 #pragma warning disable CA1054 // Uri parameters should not be strings
     Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
         Guid competitorId,

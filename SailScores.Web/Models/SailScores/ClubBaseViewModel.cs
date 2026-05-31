@@ -11,4 +11,6 @@ public abstract class ClubBaseViewModel
     public bool CanEditSeries { get; set; }
 
     public string WindSpeedUnits { get; set; }
+
+    public bool UseAlternativeSailNumbers { get; set; }
 }

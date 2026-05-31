@@ -49,6 +49,8 @@ public class Club
 
     public bool EnableHandicapScoring { get; set; }
 
+    public bool? EnableAlternativeSailNumbers { get; set; }
+
     public IList<ClubSequence> ClubSequences { get; set; }
 
 }

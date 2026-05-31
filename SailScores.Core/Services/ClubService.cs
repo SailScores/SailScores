@@ -514,6 +514,7 @@ namespace SailScores.Core.Services
             dbClub.HomePageDescription = club.HomePageDescription;
             dbClub.ShowCalendarInNav = club.ShowCalendarInNav;
             dbClub.EnableHandicapScoring = club.EnableHandicapScoring;
+            dbClub.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers;
             dbClub.DefaultHandicapSystemId = club.DefaultHandicapSystemId;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();

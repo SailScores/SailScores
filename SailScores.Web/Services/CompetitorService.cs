@@ -338,19 +338,32 @@ public class CompetitorService : ICompetitorService
         await _coreCompetitorService.AddHistoryElement(competitorId, newNote, userName);
     }
 
-    public async Task SetAlternativeSailNumber(Guid competitorId, string alternativeSailNumber, string userName = "")
+    public async Task SetAlternativeSailNumber(
+        Guid competitorId,
+        string alternativeSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "")
     {
-        var competitor = await _coreCompetitorService.GetCompetitorAsync(competitorId);
-        if (competitor == null)
-        {
-            return;
-        }
+        await _coreCompetitorService.SetAlternativeSailNumber(
+            competitorId,
+            alternativeSailNumber,
+            conflictResolution,
+            userName);
+    }
 
-        competitor.AlternativeSailNumber = string.IsNullOrWhiteSpace(alternativeSailNumber)
-            ? null
-            : alternativeSailNumber.Trim();
-
-        await _coreCompetitorService.SaveAsync(competitor, userName);
+    public async Task ApplyRotationAsync(
+        Guid clubId,
+        Guid competitorId,
+        string boatSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "")
+    {
+        await _coreCompetitorService.ApplyRotationAsync(
+            clubId,
+            competitorId,
+            boatSailNumber,
+            conflictResolution,
+            userName);
     }
 
     public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(

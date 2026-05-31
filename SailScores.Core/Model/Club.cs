@@ -52,6 +52,8 @@ namespace SailScores.Core.Model
 
         public bool EnableHandicapScoring { get; set; }
 
+        public bool? EnableAlternativeSailNumbers { get; set; }
+
         public String StatisticsDescription { get; set; }
 
     }

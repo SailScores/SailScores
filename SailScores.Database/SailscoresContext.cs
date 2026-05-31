@@ -79,6 +79,8 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<CompetitorHandicap> CompetitorHandicaps { get; set; }
     public DbSet<ClassHandicap> ClassHandicaps { get; set; }
 
+    public DbSet<BoatRotation> BoatRotations { get; set; }
+
     public async Task<IList<AllCompHistogramFields>> GetAllCompHistogramFields(
         Guid clubId,
         DateTime? startDate,
@@ -549,6 +551,27 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasFilter("[EffectiveTo] IS NULL")
             .IsUnique()
             .HasDatabaseName("IX_ClassHandicap_NullEnd");
+
+        modelBuilder.Entity<BoatRotation>()
+            .HasOne(br => br.Club)
+            .WithMany()
+            .HasForeignKey(br => br.ClubId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<BoatRotation>()
+            .HasOne(br => br.Competitor)
+            .WithMany()
+            .HasForeignKey(br => br.CompetitorId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BoatRotation>()
+            .HasOne(br => br.BoatClass)
+            .WithMany()
+            .HasForeignKey(br => br.BoatClassId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<BoatRotation>()
+            .HasIndex(br => new { br.ClubId, br.RotationDate });
 
         modelBuilder.Entity<HandicapSystem>().HasData(
             new HandicapSystem
