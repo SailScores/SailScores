@@ -351,21 +351,6 @@ public class CompetitorService : ICompetitorService
             userName);
     }
 
-    public async Task ApplyRotationAsync(
-        Guid clubId,
-        Guid competitorId,
-        string boatSailNumber,
-        AltSailNumberConflictResolution conflictResolution,
-        string userName = "")
-    {
-        await _coreCompetitorService.ApplyRotationAsync(
-            clubId,
-            competitorId,
-            boatSailNumber,
-            conflictResolution,
-            userName);
-    }
-
     public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
         Guid competitorId,
         string seasonUrlName = null,

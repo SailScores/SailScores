@@ -801,6 +801,7 @@ public class CompetitorService : ICompetitorService
     {
         var competitor = await _dbContext.Competitors
             .Include(c => c.BoatClass)
+            .Include(c => c.ChangeHistory)
             .FirstOrDefaultAsync(c => c.Id == competitorId)
             .ConfigureAwait(false);
 
@@ -817,6 +818,7 @@ public class CompetitorService : ICompetitorService
         if (!string.IsNullOrWhiteSpace(normalizedAltNumber))
         {
             IQueryable<Db.Competitor> conflictQuery = _dbContext.Competitors
+                .Include(c => c.ChangeHistory)
                 .Where(c => c.ClubId == competitor.ClubId
                     && c.Id != competitorId
                     && c.AlternativeSailNumber == normalizedAltNumber);
@@ -863,33 +865,6 @@ public class CompetitorService : ICompetitorService
             competitor.AlternativeSailNumber = normalizedAltNumber;
         }
 
-        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-    }
-
-    public async Task ApplyRotationAsync(
-        Guid clubId,
-        Guid competitorId,
-        string boatSailNumber,
-        AltSailNumberConflictResolution conflictResolution,
-        string userName = "")
-    {
-        // Set the alternative sail number (with conflict resolution)
-        await SetAlternativeSailNumber(competitorId, boatSailNumber, conflictResolution, userName).ConfigureAwait(false);
-
-        // Record the boat rotation
-        var rotation = new Db.BoatRotation
-        {
-            Id = Guid.NewGuid(),
-            ClubId = clubId,
-            CompetitorId = competitorId,
-            BoatSailNumber = boatSailNumber?.Trim(),
-            RotationDate = DateTime.UtcNow.Date,
-            IsActive = true,
-            CreatedUtc = DateTime.UtcNow,
-            CreatedBy = userName
-        };
-
-        await _dbContext.BoatRotations.AddAsync(rotation).ConfigureAwait(false);
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
