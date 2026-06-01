@@ -55,6 +55,9 @@ public class Series
 
     public bool? PreferAlternativeSailNumbers { get; set; }
 
+    public Guid? SeriesResultsTemplateId { get; set; }
+    public SeriesResultsTemplate SeriesResultsTemplate { get; set; }
+
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }
 

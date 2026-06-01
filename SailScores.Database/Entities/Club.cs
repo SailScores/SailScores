@@ -51,6 +51,11 @@ public class Club
 
     public bool? EnableAlternativeSailNumbers { get; set; }
 
+    public Guid? DefaultSeriesResultsTemplateId { get; set; }
+    public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+
     public IList<ClubSequence> ClubSequences { get; set; }
+
+    public IList<SeriesResultsTemplate> SeriesResultsTemplates { get; set; }
 
 }

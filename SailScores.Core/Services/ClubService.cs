@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using SailScores.Core.Model;
 using SailScores.Core.Model.Summary;
+using SailScores.Core.Services.Interfaces;
 using SailScores.Core.Utility;
 using SailScores.Database;
 using System;
@@ -19,6 +20,7 @@ namespace SailScores.Core.Services
         private readonly IMemoryCache _cache;
         private readonly IScoringService _scoringService;
         private readonly IMapper _mapper;
+        private readonly ISeriesResultsTemplateService _templateService;
 
         //used for copying club
         private Dictionary<Guid, Guid> guidMapper;
@@ -27,12 +29,14 @@ namespace SailScores.Core.Services
             ISailScoresContext dbContext,
             IMemoryCache cache,
             IScoringService scoringService,
-            IMapper mapper)
+            IMapper mapper,
+            ISeriesResultsTemplateService templateService)
         {
             _dbContext = dbContext;
             _cache = cache;
             _scoringService = scoringService;
             _mapper = mapper;
+            _templateService = templateService;
         }
 
         public async Task<IList<Fleet>> GetAllFleets(Guid clubId)
@@ -466,6 +470,11 @@ namespace SailScores.Core.Services
                 await _dbContext.SaveChangesAsync()
                     .ConfigureAwait(false);
             }
+
+            // Seed default series results templates
+            await _templateService.SeedDefaultTemplatesAsync(club.Id)
+                .ConfigureAwait(false);
+
             return club.Id;
         }
 

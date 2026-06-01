@@ -298,7 +298,7 @@ public class PublicApiService : IPublicApiService
                     series.FlatResults?.CalculatedScores,
                     competitorRouteTokens,
                     resolvedClubInitials,
-                    (series.ShowCompetitorClub ?? false)
+                    (series.SeriesResultsTemplate?.CompetitorClubVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                         || (series.FlatResults?.Competitors?.Any(c => !string.IsNullOrWhiteSpace(c.HomeClubName))
                             ?? false),
                     series.PreferAlternativeSailNumbers ?? false)

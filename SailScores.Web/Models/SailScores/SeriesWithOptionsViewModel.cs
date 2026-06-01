@@ -17,6 +17,8 @@ public class SeriesWithOptionsViewModel : Core.Model.Series
 
     public IList<Core.Model.HandicapSystem> HandicapSystemOptions { get; set; }
 
+    public IList<SeriesResultsTemplate> TemplateOptions { get; set; }
+
     private Guid _seasonId;
 
     [Required]

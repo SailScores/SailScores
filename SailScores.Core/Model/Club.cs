@@ -54,6 +54,9 @@ namespace SailScores.Core.Model
 
         public bool? EnableAlternativeSailNumbers { get; set; }
 
+        public Guid? DefaultSeriesResultsTemplateId { get; set; }
+        public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+
         public String StatisticsDescription { get; set; }
 
     }

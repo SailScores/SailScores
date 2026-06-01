@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using SailScores.Core.Services.Interfaces;
 using SailScores.Database;
 using SailScores.Test.Unit.Utilities;
 using System;
@@ -39,11 +40,14 @@ namespace SailScores.Test.Unit.Core.Services
                     new ScoringSystem { Id = Guid.NewGuid(), ClubId = clubId, Name = $"{initials} scoring based on App. A Rule 5.3" }
                 });
 
+            var mockTemplateService = new Mock<ISeriesResultsTemplateService>();
+
             _service = new SailScores.Core.Services.ClubService(
                 _context,
                 _realCache,
                 _mockScoringService.Object,
-                _mapper
+                _mapper,
+                mockTemplateService.Object
                 );
         }
 

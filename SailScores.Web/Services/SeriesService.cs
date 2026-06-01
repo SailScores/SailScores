@@ -19,6 +19,7 @@ public class SeriesService : ISeriesService
     private readonly Core.Services.ISeasonService _coreSeasonService;
     private readonly Core.Services.IFleetService _coreFleetService;
     private readonly Core.Services.IHandicapService _coreHandicapService;
+    private readonly Core.Services.Interfaces.ISeriesResultsTemplateService _templateService;
     private readonly IMapper _mapper;
 
     // Validation error messages for date restrictions
@@ -34,6 +35,7 @@ public class SeriesService : ISeriesService
         Core.Services.ISeasonService seasonService,
         Core.Services.IFleetService fleetService,
         Core.Services.IHandicapService handicapService,
+        Core.Services.Interfaces.ISeriesResultsTemplateService templateService,
         IMapper mapper)
     {
         _coreClubService = clubService;
@@ -42,6 +44,7 @@ public class SeriesService : ISeriesService
         _coreSeasonService = seasonService;
         _coreFleetService = fleetService;
         _coreHandicapService = handicapService;
+        _templateService = templateService;
         _mapper = mapper;
     }
 
@@ -140,6 +143,9 @@ public class SeriesService : ISeriesService
             handicapOptions.AddRange(handicapSystems.OrderBy(h => h.Name));
             vm.HandicapSystemOptions = handicapOptions;
         }
+
+        // Load available templates for series results display
+        vm.TemplateOptions = (await _templateService.GetTemplatesForClubAsync(clubId)).ToList();
 
         return vm;
 

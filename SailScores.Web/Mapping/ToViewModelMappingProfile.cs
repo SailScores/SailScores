@@ -48,6 +48,7 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.Users, o => o.Ignore())
                 .ForMember(d => d.HandicapSystems, o => o.Ignore())
                 .ForMember(d => d.HandicapSystemOptions, o => o.Ignore())
+                .ForMember(d => d.TemplateOptions, o => o.Ignore())
                 .ReverseMap()
                 .ForMember(d => d.DefaultScoringSystem, o => o.Ignore())
                 .ForMember(d => d.DefaultHandicapSystem, o => o.Ignore());
@@ -173,6 +174,11 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Document, DocumentWithOptions>()
                 .ForMember( d => d.TimeOffset, o => o.Ignore())
                 .ForMember( d => d.File, o => o.Ignore());
+
+            CreateMap<Core.Model.SeriesResultsTemplate, SeriesResultsTemplateViewModel>()
+                .ForMember(d => d.ClubInitials, o => o.Ignore())
+                .ForMember(d => d.IsClubDefault, o => o.Ignore())
+                .ReverseMap();
 
             MapRegattaObjects();
         }

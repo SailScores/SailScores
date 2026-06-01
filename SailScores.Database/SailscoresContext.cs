@@ -47,6 +47,8 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
     public DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
 
+    public DbSet<SeriesResultsTemplate> SeriesResultsTemplates { get; set; }
+
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
     public DbSet<SystemAlert> SystemAlerts { get; set; }
@@ -331,6 +333,31 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasOne(sl => sl.ChildSeries)
             .WithMany(s => s.ParentLinks)
             .HasForeignKey(sl => sl.ChildSeriesId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // SeriesResultsTemplate relationships
+        modelBuilder.Entity<SeriesResultsTemplate>()
+            .HasOne(t => t.Club)
+            .WithMany(c => c.SeriesResultsTemplates)
+            .HasForeignKey(t => t.ClubId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Series>()
+            .HasOne(s => s.SeriesResultsTemplate)
+            .WithMany()
+            .HasForeignKey(s => s.SeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Club>()
+            .HasOne<SeriesResultsTemplate>()
+            .WithMany()
+            .HasForeignKey(c => c.DefaultSeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Club>()
+            .HasOne<SeriesResultsTemplate>()
+            .WithMany()
+            .HasForeignKey(c => c.DefaultRegattaSeriesResultsTemplateId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Regatta>()

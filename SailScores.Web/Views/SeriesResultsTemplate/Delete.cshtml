@@ -1,0 +1,126 @@
+@model SailScores.Web.Models.SailScores.SeriesResultsTemplateViewModel
+@{
+    ViewData["Title"] = "Delete Results Display Template";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (Model.IsClubDefault)
+{
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Warning:</strong> This template is currently set as a club default. 
+        You must change the club default settings before deleting this template.
+        <a asp-controller="Admin" asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" class="alert-link">
+            Go to Club Settings
+        </a>
+    </div>
+}
+
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Confirm Deletion</h5>
+    </div>
+    <div class="card-body">
+        <p class="lead">Are you sure you want to delete this template?</p>
+
+        <dl class="row">
+            <dt class="col-sm-3">Template Name</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Sail Number</dt>
+            <dd class="col-sm-9">
+                @switch (Model.SailNumberVisibility)
+                {
+                    case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                        <span class="badge bg-success">Always</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                        <span class="badge bg-info">On Larger Screens</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                        <span class="badge bg-secondary">Hidden</span>
+                        break;
+                }
+            </dd>
+
+            <dt class="col-sm-3">@Model.CompetitorNameHeader</dt>
+            <dd class="col-sm-9">
+                @switch (Model.CompetitorNameVisibility)
+                {
+                    case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                        <span class="badge bg-success">Always</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                        <span class="badge bg-info">On Larger Screens</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                        <span class="badge bg-secondary">Hidden</span>
+                        break;
+                }
+            </dd>
+
+            <dt class="col-sm-3">@Model.BoatNameHeader</dt>
+            <dd class="col-sm-9">
+                @switch (Model.BoatNameVisibility)
+                {
+                    case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                        <span class="badge bg-success">Always</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                        <span class="badge bg-info">On Larger Screens</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                        <span class="badge bg-secondary">Hidden</span>
+                        break;
+                }
+            </dd>
+
+            <dt class="col-sm-3">Competitor Club</dt>
+            <dd class="col-sm-9">
+                @switch (Model.CompetitorClubVisibility)
+                {
+                    case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                        <span class="badge bg-success">Always</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                        <span class="badge bg-info">On Larger Screens</span>
+                        break;
+                    case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                        <span class="badge bg-secondary">Hidden</span>
+                        break;
+                }
+            </dd>
+        </dl>
+
+        @if (!Model.IsClubDefault)
+        {
+            <div class="alert alert-warning">
+                <i class="fas fa-info-circle"></i>
+                <strong>Note:</strong> Any series currently using this template will revert to the club default template after deletion.
+            </div>
+        }
+    </div>
+    <div class="card-footer">
+        @if (!Model.IsClubDefault)
+        {
+            <form asp-action="Delete" method="post" class="d-inline">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirm Delete
+                </button>
+            </form>
+        }
+        <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Templates
+        </a>
+    </div>
+</div>
+

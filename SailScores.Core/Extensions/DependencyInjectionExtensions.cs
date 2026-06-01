@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Core.Scoring;
 using SailScores.Core.Services;
+using SailScores.Core.Services.Interfaces;
 
 namespace SailScores.Core.Extensions
 {
@@ -38,6 +39,7 @@ namespace SailScores.Core.Extensions
             services.AddScoped<ISiteAdminService, SiteAdminService>();
             services.AddScoped<IIndexNowService, IndexNowService>();
             services.AddScoped<IHandicapService, HandicapService>();
+            services.AddScoped<ISeriesResultsTemplateService, SeriesResultsTemplateService>();
 
         }
     }

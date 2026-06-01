@@ -58,6 +58,11 @@ public class AdminViewModel
     public string Locale { get; set; }
     public IList<string> LocaleOptions { get; set; }
 
+    public Guid? DefaultSeriesResultsTemplateId { get; set; }
+    public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+
+    public IList<SeriesResultsTemplate> TemplateOptions { get; set; }
+
     public bool HasRaces { get; set; }
     public bool HasCompetitors { get; internal set; }
 

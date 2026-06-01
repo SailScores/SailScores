@@ -1,3 +1,4 @@
+@using SailScores.Core.Services
 @model SailScores.Web.Models.SailScores.WhatIfResultsViewModel
 @inject IStringLocalizer<SharedResource> localizer
 @inject AppSettingsService settingsService
@@ -34,13 +35,22 @@
 </p>
 
 @{
+    // Resolve template settings
+    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(Model.Series.SeriesResultsTemplate)
+        ?? SeriesResultsTemplateHelper.GetDefaultTemplate(false);
+
     var previewModel = new ResultsTableViewModel
         {
             SeriesId = Model.Series.Id,
             Results = alternateResults,
             ShowTrend = true,
             ShowTrendOnAllDevices = true,
-            ShowCompetitorClub = false,
+            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
+            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
+            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
+            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
+            BoatNameHeader = resolvedTemplate.BoatNameHeader,
+            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
             IsExport = false,
             ShowExportButtons = false,
             ExcludeCompetitorLinks = true,
@@ -75,7 +85,12 @@
             SeriesId = Model.Series.Id,
             Results = Model.Series.FlatResults,
             ShowTrend = false,
-            ShowCompetitorClub = false,
+            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
+            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
+            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
+            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
+            BoatNameHeader = resolvedTemplate.BoatNameHeader,
+            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
             IsExport = false,
             ShowExportButtons = false,
             ExcludeCompetitorLinks = true,

@@ -120,6 +120,7 @@ namespace SailScores.Core.Services
                 .Series
                 .Include(s => s.Season)
                 .Include(s => s.ChildLinks)
+                .Include(s => s.SeriesResultsTemplate)
                 .AsSingleQuery()
                 .FirstOrDefaultAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
@@ -127,6 +128,26 @@ namespace SailScores.Core.Services
             var fullSeries = _mapper.Map<Series>(seriesDb);
             if (fullSeries != null)
             {
+                // If series doesn't have a template, load the club's default template
+                if (fullSeries.SeriesResultsTemplateId == null)
+                {
+                    var club = await _dbContext.Clubs
+                        .FirstOrDefaultAsync(c => c.Id == seriesDb.ClubId)
+                        .ConfigureAwait(false);
+
+                    Guid? defaultTemplateId = seriesDb.Type.HasValue && seriesDb.Type.Value == dbObj.SeriesType.Regatta
+                        ? club?.DefaultRegattaSeriesResultsTemplateId
+                        : club?.DefaultSeriesResultsTemplateId;
+
+                    if (defaultTemplateId.HasValue)
+                    {
+                        var defaultTemplate = await _dbContext.SeriesResultsTemplates
+                            .FirstOrDefaultAsync(t => t.Id == defaultTemplateId.Value)
+                            .ConfigureAwait(false);
+                        fullSeries.SeriesResultsTemplate = _mapper.Map<SeriesResultsTemplate>(defaultTemplate);
+                    }
+                }
+
                 // populate parentSeriesIds and ParentSeries
                 var parentSeriesDb = await _dbContext.Series
                     .Include(s => s.Season)
@@ -157,7 +178,6 @@ namespace SailScores.Core.Services
                 if (await IsPartOfRegatta(seriesDb.Id))
                 {
                     fullSeries.PreferAlternativeSailNumbers = await DoesRegattaPrefersAltSailNumbers(seriesDb.Id);
-                    fullSeries.ShowCompetitorClub = true;
                 }
             }
             return fullSeries;
@@ -566,8 +586,6 @@ namespace SailScores.Core.Services
 
             var fullSeries = await GetOneSeriesAsync(seriesId)
                 .ConfigureAwait(false);
-
-            fullSeries.ShowCompetitorClub = club.ShowClubInResults;
 
             // get the current version of the competitors, so we can get current sail number.
             var competitorUrlNamesById = await _dbContext.Competitors

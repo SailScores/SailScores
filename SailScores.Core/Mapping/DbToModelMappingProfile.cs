@@ -35,7 +35,6 @@ namespace SailScores.Core.Mapping
                 .ForMember(d => d.Results, o => o.Ignore())
                 .ForMember(d => d.FlatResults, o => o.Ignore())
                 .ForMember(d => d.Competitors, o => o.Ignore())
-                .ForMember(d => d.ShowCompetitorClub, o => o.Ignore())
                 .ForMember(d => d.ExcludeFromCompetitorStats, o => o.MapFrom(s => (s.ExcludeFromCompetitorStats ?? false)))
                 .ForMember(d => d.HideDncDiscards, o => o.MapFrom(s => (s.HideDncDiscards ?? false)))
                 .ForMember(d => d.ChildrenSeriesIds, o => o.MapFrom(s => s.ChildLinks.Select(cs => cs.ChildSeriesId).ToList()))
@@ -101,6 +100,9 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.CompetitorRankStats, Model.PlaceCount>();
 
             CreateMap<Db.CompetitorStatsSummary, Model.CompetitorSeasonStats>();
+
+            CreateMap<Db.SeriesResultsTemplate, Model.SeriesResultsTemplate>()
+                .ReverseMap();
         }
     }
 }

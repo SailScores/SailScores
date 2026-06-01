@@ -192,6 +192,63 @@
                     </div>
 
                     <div class="mb-3">
+                        <a asp-controller="SeriesResultsTemplate"
+                           asp-action="Index"
+                           class="small text-decoration-none">
+                            <span class="fas fa-sliders-h me-1" aria-hidden="true"></span>
+                            Manage results templates
+                        </a>
+                    </div>
+
+                    @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
+                    {
+                        <div class="mb-3">
+                            <label asp-for="DefaultSeriesResultsTemplateId" class="form-label">
+                                Default Results Template (Standard Series)
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Choose the default template for displaying results in standard series. Series can override this individually.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
+                            <select asp-for="DefaultSeriesResultsTemplateId" class="form-select">
+                                <option value="">(none)</option>
+                                @foreach (var template in Model.TemplateOptions)
+                                {
+                                    <option value="@template.Id">@template.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DefaultSeriesResultsTemplateId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-label">
+                                Default Results Template (Regattas)
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Choose the default template for displaying results in regattas. Series marked as regatta type can override this individually.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
+                            <select asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-select">
+                                <option value="">(none)</option>
+                                @foreach (var template in Model.TemplateOptions)
+                                {
+                                    <option value="@template.Id">@template.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DefaultRegattaSeriesResultsTemplateId" class="text-danger"></span>
+                        </div>
+                    }
+
+
+                    <div class="mb-3">
                         <label asp-for="DefaultRaceDateOffset" class="form-label">Default Race Date</label>
                         <select asp-for="DefaultRaceDateOffset" class="form-select">
                             <option value="">Empty</option>

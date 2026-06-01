@@ -126,7 +126,6 @@ namespace SailScores.Core.Services
                 series.FlatResults = await _seriesService.GetHistoricalResults(series)
                     .ConfigureAwait(false);
                 series.PreferAlternativeSailNumbers = fullRegatta.PreferAlternateSailNumbers;
-                series.ShowCompetitorClub = true;
             }
             return fullRegatta;
         }

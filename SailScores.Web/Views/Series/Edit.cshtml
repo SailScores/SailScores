@@ -158,6 +158,31 @@
                                     <small class="form-text text-muted">Select a handicap system to enable corrected-time scoring for this series.</small>
                                 </div>
                             }
+                            @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
+                            {
+                                <div class="mb-3">
+                                    <label asp-for="SeriesResultsTemplateId" class="control-label">
+                                        Results Display Template
+                                        <a class="text-primary"
+                                           data-bs-container="body"
+                                           data-bs-toggle="popover"
+                                           data-bs-placement="top"
+                                           data-bs-trigger="focus hover"
+                                           data-bs-content="Choose a template that controls which columns appear in the series results table and their visibility on different screen sizes.">
+                                            <span class="far fa-question-circle"></span>
+                                        </a>
+                                    </label>
+                                    <select asp-for="SeriesResultsTemplateId" class="form-select">
+                                        <option value="">-Use club default-</option>
+                                        @foreach (var template in Model.TemplateOptions)
+                                        {
+                                            <option value="@template.Id">@template.Name</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="SeriesResultsTemplateId" class="text-danger"></span>
+                                    <small class="form-text text-muted">Leave blank to use the club's default template for this series type.</small>
+                                </div>
+                            }
                             <div class="mb-3">
                                 <label asp-for="FleetId" class="control-label">
                                     Fleet 

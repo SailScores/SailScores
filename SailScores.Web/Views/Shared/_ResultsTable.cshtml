@@ -5,6 +5,7 @@
 @using SailScores.Web.Resources
 @using SailScores.Web.Services
 @using SailScores.Web.Services.Interfaces
+@using SailScores.Web.Extensions
 @using System.Text
 
 @inject ILocalizerService localizer
@@ -34,12 +35,21 @@
                     {
                         <th scope="col" class="d-table-cell">@localizer["Change"]*</th>
                     }
-                    <th scope="col">@localizer["Sail"]</th>
-                    <th scope="col">@localizer["Helm"]</th>
-                    <th scope="col" class="d-none d-sm-table-cell">@localizer["Boat"]</th>
-                    @if (Model.ShowCompetitorClub)
+                    @if (Model.SailNumberVisibility != ColumnVisibility.Hidden)
                     {
-                        <th scope="col" class="d-none d-sm-table-cell">@localizer["Club"]</th>
+                        <th scope="col" class="@Model.SailNumberVisibility.ToCssClass()">@localizer["Sail"]</th>
+                    }
+                    @if (Model.CompetitorNameVisibility != ColumnVisibility.Hidden)
+                    {
+                        <th scope="col" class="@Model.CompetitorNameVisibility.ToCssClass()">@Model.CompetitorNameHeader</th>
+                    }
+                    @if (Model.BoatNameVisibility != ColumnVisibility.Hidden)
+                    {
+                        <th scope="col" class="@Model.BoatNameVisibility.ToCssClass()">@Model.BoatNameHeader</th>
+                    }
+                    @if (Model.CompetitorClubVisibility != ColumnVisibility.Hidden)
+                    {
+                        <th scope="col" class="@Model.CompetitorClubVisibility.ToCssClass()">@localizer["Club"]</th>
                     }
                     <th scope="col" class="text-center">@localizer["Total"]</th>
                     @{
@@ -57,7 +67,7 @@
                         if (needCompNameColumn && (race.Date != prevRaceDate || colCount % 23 == 4 ))
                         {
                             needCompNameColumn = false;
-                            <th scope="col">@localizer["Helm"]</th>
+                            <th scope="col">@Model.CompetitorNameHeader</th>
                         }
                         if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                         {
@@ -137,7 +147,7 @@
                     @if ((Model.Results.NumberOfSailedRaces) > 4)
                     {
                         <th scope="col" class="d-table-cell @((Model.Results.NumberOfSailedRaces < 25)?"d-md-none":"")">
-                            @localizer["Helm"]
+                            @Model.CompetitorNameHeader
                         </th>
                     }
                 </tr>
@@ -199,33 +209,42 @@
                             }
                         </th>   
                     }
-                    <th scope="row">
-                        @if ((Model.PreferAlternativeSailNumbers)
-                     && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber))
-                        {
-                            @comp.AlternativeSailNumber
-                        }
-                        else
-                        {
-                            @comp.SailNumber
-                        }
-                    </th>
-                    <th scope="row">
-                        @if (Model.IsExport || Model.ExcludeCompetitorLinks || NoCompetitors)
-                        {
-                            @comp.Name
-                        }
-                        else
-                        {
-                            <a asp-route="Competitor"
-                               asp-route-urlName="@(comp.UrlName)"
-                               asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]">@comp.Name</a>
-                        }
-                    </th>
-                    <td class="d-none d-sm-table-cell">@comp.BoatName</td>
-                    @if (Model.ShowCompetitorClub)
+                    @if (Model.SailNumberVisibility != ColumnVisibility.Hidden)
                     {
-                        <td class="d-none d-sm-table-cell">@comp.HomeClubName</td>
+                        <th scope="row" class="@Model.SailNumberVisibility.ToCssClass()">
+                            @if ((Model.PreferAlternativeSailNumbers)
+                         && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber))
+                            {
+                                @comp.AlternativeSailNumber
+                            }
+                            else
+                            {
+                                @comp.SailNumber
+                            }
+                        </th>
+                    }
+                    @if (Model.CompetitorNameVisibility != ColumnVisibility.Hidden)
+                    {
+                        <th scope="row" class="@Model.CompetitorNameVisibility.ToCssClass()">
+                            @if (Model.IsExport || Model.ExcludeCompetitorLinks || NoCompetitors)
+                            {
+                                @comp.Name
+                            }
+                            else
+                            {
+                                <a asp-route="Competitor"
+                                   asp-route-urlName="@(comp.UrlName)"
+                                   asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]">@comp.Name</a>
+                            }
+                        </th>
+                    }
+                    @if (Model.BoatNameVisibility != ColumnVisibility.Hidden)
+                    {
+                        <td class="@Model.BoatNameVisibility.ToCssClass()">@comp.BoatName</td>
+                    }
+                    @if (Model.CompetitorClubVisibility != ColumnVisibility.Hidden)
+                    {
+                        <td class="@Model.CompetitorClubVisibility.ToCssClass()">@comp.HomeClubName</td>
                     }
                     <td scope="row" class="text-center">
                         <strong>
