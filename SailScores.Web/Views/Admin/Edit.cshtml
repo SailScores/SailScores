@@ -43,7 +43,7 @@
                         </a>
                         <textarea asp-for="Description" class="form-control" cols="60" rows="4"></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
-                        <small class="form-text text-muted">Public description for both the SailScores index and the club page</small>
+                        <small class="form-text text-muted">Public description for both the SailScores front page and the club page</small>
                     </div>
 
                     <div class="mb-3">
@@ -117,21 +117,96 @@
                 <div class="card-body">
                     <div class="form-check mb-3">
                         <input asp-for="IsHidden" class="form-check-input" id="IsHidden" />
-                        <label class="form-check-label" for="IsHidden">Hidden</label>
-                        <div class="small text-muted">Hide this club on the front page list?</div>
+                        <label class="form-check-label" for="IsHidden">
+                            Hidden
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Keeps your club out of the SailScores front‑page list, but also makes it harder for search engines to find it.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
                     </div>
+
 
                     <div class="form-check mb-3">
                         <input asp-for="ShowCalendarInNav" class="form-check-input" id="ShowCalendarInNav" />
-                        <label class="form-check-label" for="ShowCalendarInNav">Show Calendar in Navigation</label>
-                        <div class="small text-muted">Add Calendar link to the top navigation bar. <strong>Caution:</strong> If you maintain your official race calendar elsewhere, enabling this may cause confusion. The calendar is always accessible at <a href="/@Model.Initials/Calendar" target="_blank">/@Model.Initials/Calendar</a> regardless of this setting.</div>
+                        <label class="form-check-label" for="ShowCalendarInNav">
+                            Show Calendar in Navigation
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Adds a Calendar link to the top navigation. ">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
+                        <small class="form-text text-muted d-block">
+                            If you maintain a separate official calendar, enabling this may confuse members. Regardless of this setting,
+                            a calendar is always accessible at <a href="/@Model.Initials/Calendar"
+                            target="_blank">/@Model.Initials/Calendar</a> regardless of this setting.</small>
                     </div>
 
-                    <div class="form-check mb-3">
-                        <input asp-for="ShowClubInResults" class="form-check-input" id="ShowClubInResults" />
-                        <label class="form-check-label" for="ShowClubInResults">Show Clubs in Results</label>
-                        <div class="small text-muted">List clubs in series results?</div>
+                    <div class="small fw-semibold text-body-secondary mb-2">Result views</div>
+
+                    <div class="mb-3">
+                        <a asp-controller="SeriesResultsTemplate"
+                           asp-action="Index"
+                           class="btn btn-outline-primary">
+                            Edit result view templates
+                        </a>
                     </div>
+
+                    @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
+                    {
+                        <div class="mb-3">
+                            <label asp-for="DefaultSeriesResultsTemplateId" class="form-label">
+                                Default View for Non-Regatta Series
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Choose the default template for displaying results in standard series. Series can override this individually.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
+                            <select asp-for="DefaultSeriesResultsTemplateId" class="form-select">
+                                <option value="">(none)</option>
+                                @foreach (var template in Model.TemplateOptions)
+                                {
+                                    <option value="@template.Id">@template.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DefaultSeriesResultsTemplateId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-label">
+                                Default View for Regattas
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Choose the default template for displaying results in regattas. Series marked as regatta type can override this individually.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
+                            <select asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-select">
+                                <option value="">(none)</option>
+                                @foreach (var template in Model.TemplateOptions)
+                                {
+                                    <option value="@template.Id">@template.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DefaultRegattaSeriesResultsTemplateId" class="text-danger"></span>
+                        </div>
+                    }
+
 
                 </div>
             </div>
@@ -146,14 +221,32 @@
                 <div class="card-body">
                     <div class="form-check mb-3">
                         <input asp-for="EnableHandicapScoring" class="form-check-input" id="EnableHandicapScoring" />
-                        <label class="form-check-label" for="EnableHandicapScoring">Enable Handicap Scoring</label>
-                        <div class="small text-muted">Enables corrected-time handicap scoring. Adds handicap fields to series and competitor pages.</div>
+                        <label class="form-check-label" for="EnableHandicapScoring">
+                            Enable Handicap Scoring
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Enables corrected‑time scoring. Adds handicap fields to series and competitor pages.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
                     </div>
 
                     <div class="form-check mb-3">
                         <input asp-for="EnableAlternativeSailNumbers" class="form-check-input" id="EnableAlternativeSailNumbers" />
-                        <label class="form-check-label" for="EnableAlternativeSailNumbers">Enable Fast Alternative Sail Number Changes</label>
-                        <div class="small text-muted">Adds buttons in the UI to allow faster changes to Alternative Sail Numbers for clubs with frequently changing boats. Alternative Sail Number editing is always available, even when this setting is off.</div>
+                        <label class="form-check-label" for="EnableAlternativeSailNumbers">
+                            Enable Fast Alternative Sail Number Changes
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Adds quick‑change buttons for clubs with boats that frequently swap sail numbers.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
                     </div>
 
                     <div class="mb-3" id="defaultHandicapSystemRow">
@@ -181,7 +274,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="DefaultScoringSystemId" class="form-label">Default Scoring System</label>
+                        <label asp-for="DefaultScoringSystemId" class="form-label">
+                            Default Scoring System
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="The scoring method automatically applied when creating a new series or regatta.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
                         <select id="defaultScoringSystemId" asp-for="DefaultScoringSystemId" class="form-select">
                             @foreach (var scoringSystem in Model.ScoringSystemOptions)
                             {
@@ -192,64 +295,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <a asp-controller="SeriesResultsTemplate"
-                           asp-action="Index"
-                           class="small text-decoration-none">
-                            <span class="fas fa-sliders-h me-1" aria-hidden="true"></span>
-                            Manage results templates
-                        </a>
-                    </div>
-
-                    @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
-                    {
-                        <div class="mb-3">
-                            <label asp-for="DefaultSeriesResultsTemplateId" class="form-label">
-                                Default Results Template (Standard Series)
-                                <a class="text-primary"
-                                   data-bs-container="body"
-                                   data-bs-toggle="popover"
-                                   data-bs-placement="top"
-                                   data-bs-trigger="focus hover"
-                                   data-bs-content="Choose the default template for displaying results in standard series. Series can override this individually.">
-                                    <span class="far fa-question-circle"></span>
-                                </a>
-                            </label>
-                            <select asp-for="DefaultSeriesResultsTemplateId" class="form-select">
-                                <option value="">(none)</option>
-                                @foreach (var template in Model.TemplateOptions)
-                                {
-                                    <option value="@template.Id">@template.Name</option>
-                                }
-                            </select>
-                            <span asp-validation-for="DefaultSeriesResultsTemplateId" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-label">
-                                Default Results Template (Regattas)
-                                <a class="text-primary"
-                                   data-bs-container="body"
-                                   data-bs-toggle="popover"
-                                   data-bs-placement="top"
-                                   data-bs-trigger="focus hover"
-                                   data-bs-content="Choose the default template for displaying results in regattas. Series marked as regatta type can override this individually.">
-                                    <span class="far fa-question-circle"></span>
-                                </a>
-                            </label>
-                            <select asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-select">
-                                <option value="">(none)</option>
-                                @foreach (var template in Model.TemplateOptions)
-                                {
-                                    <option value="@template.Id">@template.Name</option>
-                                }
-                            </select>
-                            <span asp-validation-for="DefaultRegattaSeriesResultsTemplateId" class="text-danger"></span>
-                        </div>
-                    }
-
-
-                    <div class="mb-3">
-                        <label asp-for="DefaultRaceDateOffset" class="form-label">Default Race Date</label>
+                        <label asp-for="DefaultRaceDateOffset" class="form-label">
+                            Default Race Date
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Used as the pre‑filled date when entering new races. Helpful if results aren't usually entered the same day a racing.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
                         <select asp-for="DefaultRaceDateOffset" class="form-select">
                             <option value="">Empty</option>
                             <option value="0">Current date</option>
@@ -259,7 +315,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Locale" class="form-label">Localization</label>
+                        <label asp-for="Locale" class="form-label">
+                            Localization
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Controls language and formatting for dates, numbers, and text across your club pages.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
                         <select id="locale" asp-for="Locale" class="form-select" asp-items="new SelectList(Model.LocaleOptions)"></select>
                         <span asp-validation-for="Locale" class="text-danger"></span>
                     </div>
@@ -276,29 +342,67 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="mb-3 col-sm-6">
-                            <label asp-for="Latitude" class="form-label"></label>
+                            <label asp-for="Latitude" class="form-label">
+                                Latitude
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Used for weather data and map features. Positive = North, negative = South.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
                             <input asp-for="Latitude" class="form-control" type="text" pattern="[0-9]+([\.,][0-9]+)?" />
                             <span asp-validation-for="Latitude" class="text-danger"></span>
-                            <small class="form-text text-muted">Positive numbers are Northern Hemisphere.</small>
                         </div>
 
                         <div class="mb-3 col-sm-6">
-                            <label asp-for="Longitude" class="form-label"></label>
+                            <label asp-for="Longitude" class="form-label">
+                                Longitude
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Used for weather data and map features. Positive = East, negative = West.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
                             <input asp-for="Longitude" class="form-control" type="text" pattern="[0-9]+([\.,][0-9]+)?" />
                             <span asp-validation-for="Longitude" class="text-danger"></span>
-                            <small class="form-text text-muted">Negative for Western Hemisphere (including U.S.)</small>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="mb-3 col-sm-6">
-                            <label asp-for="SpeedUnits" class="form-label">Wind Speed Units</label>
+                            <label asp-for="SpeedUnits" class="form-label">
+                                Wind Speed Units
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Choose the unit used when displaying wind speeds on race pages.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
                             <select id="speedUnits" asp-for="SpeedUnits" class="form-select" asp-items="new SelectList(Model.SpeedUnitOptions)"></select>
                             <span asp-validation-for="SpeedUnits" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3 col-sm-6">
-                            <label asp-for="TemperatureUnits" class="form-label">Temp Units</label>
+                            <label asp-for="TemperatureUnits" class="form-label">
+                                Temperature Units
+                                <a class="text-primary"
+                                   data-bs-container="body"
+                                   data-bs-toggle="popover"
+                                   data-bs-placement="top"
+                                   data-bs-trigger="focus hover"
+                                   data-bs-content="Choose the unit used when displaying temperature on race pages.">
+                                    <span class="far fa-question-circle"></span>
+                                </a>
+                            </label>
                             <select id="temperatureUnits" asp-for="TemperatureUnits" class="form-select" asp-items="new SelectList(Model.TemperatureUnitOptions)"></select>
                             <span asp-validation-for="TemperatureUnits" class="text-danger"></span>
                         </div>
@@ -344,6 +448,11 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
+        // help popovers (to be touch screen friendly.)
+        $(function () {
+            $('[data-bs-toggle="popover"]').popover();
+        });
+
         (function () {
             var cb = document.getElementById('EnableHandicapScoring');
             var row = document.getElementById('defaultHandicapSystemRow');
