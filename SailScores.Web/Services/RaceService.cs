@@ -133,7 +133,7 @@ public class RaceService : IRaceService
         }
         else if (fleetId.HasValue)
         {
-            returnRace = await CreateClubRaceAsync(clubInitials);
+            returnRace = await CreateClubRaceAsync(clubInitials, false);
             if (returnRace.FleetOptions.Any(f => f.Id == fleetId.Value))
             {
                 returnRace.FleetId = fleetId.Value;
@@ -143,7 +143,7 @@ public class RaceService : IRaceService
         }
         else
         {
-            returnRace = await CreateClubRaceAsync(clubInitials);
+            returnRace = await CreateClubRaceAsync(clubInitials, false);
         }
         if ((returnRace.FleetOptions?.Count ?? 0) == 1)
         {
@@ -159,7 +159,9 @@ public class RaceService : IRaceService
         return _weatherService.GetWeatherIconOptions();
     }
 
-    private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(string clubInitials)
+    private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(
+        string clubInitials,
+        bool isRegatta)
     {
 
         var club = await _coreClubService.GetMinimalClub(clubInitials);
@@ -174,7 +176,7 @@ public class RaceService : IRaceService
         var model = new RaceWithOptionsViewModel
         {
             ClubId = club.Id,
-            FleetOptions = await _coreClubService.GetActiveFleets(club.Id),
+            FleetOptions = await _coreClubService.GetActiveFleets(club.Id, isRegatta),
             SeriesOptions = filteredSeries,
             ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
                 .OrderBy(s => s.Name).ToList(),
@@ -215,7 +217,7 @@ public class RaceService : IRaceService
         string clubInitials,
         Guid? regattaId)
     {
-        var model = await CreateClubRaceAsync(clubInitials);
+        var model = await CreateClubRaceAsync(clubInitials, true);
         if (!regattaId.HasValue)
         {
             return model;
@@ -263,7 +265,7 @@ public class RaceService : IRaceService
         string clubInitials,
         Guid seriesId)
     {
-        var model = await CreateClubRaceAsync(clubInitials);
+        var model = await CreateClubRaceAsync(clubInitials, false);
         var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
         // Season doesn't include now. so use last race date or season start.
         if(series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)

@@ -65,8 +65,10 @@ namespace SailScores.Core.Services
             
             if (!includeRegatta)
             {
-                regattaSeriesIds = _dbContext.Regattas.SelectMany(r =>
-                    r.RegattaSeries).Select(rs => rs.SeriesId);
+                regattaSeriesIds = _dbContext.Regattas
+                    .Where(r => r.ClubId == clubId)
+                    .SelectMany(r => r.RegattaSeries)
+                    .Select(rs => rs.SeriesId);
             }
 
             IQueryable<dbObj.Series> seriesQuery =  _dbContext

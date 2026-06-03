@@ -101,6 +101,47 @@ namespace SailScores.Core.Services
             return bizObj;
         }
 
+        public async Task<IList<Fleet>> GetActiveFleets(Guid clubId, bool includeRegattaFleets)
+        {
+            var regattaFleetIds = new List<Guid>();
+            if (!includeRegattaFleets)
+            {
+                var regattaIds = await _dbContext.Regattas
+                    .Where(r => r.ClubId == clubId)
+                    .Select(r => r.Id)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                regattaFleetIds = await _dbContext.RegattaFleets
+                    .Where(rf => regattaIds.Contains(rf.RegattaId))
+                    .Select(rf => rf.FleetId)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+            }
+
+            var dbFleets = await _dbContext
+                .Fleets
+                .Include(f => f.FleetBoatClasses)
+                    .ThenInclude(fbc => fbc.BoatClass)
+                .Include(f => f.CompetitorFleets)
+                    .ThenInclude(cf => cf.Competitor)
+                .Where(f => f.ClubId == clubId && (f.IsActive ?? true) && (includeRegattaFleets || !regattaFleetIds.Contains(f.Id)))
+                .AsSplitQuery()
+                .ToListAsync()
+                .ConfigureAwait(false);
+            var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
+            // ignored in mapper to avoid loops.
+            foreach (var fleet in dbFleets)
+            {
+                var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
+                bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
+                    = _mapper.Map<IList<BoatClass>>(boatClasses);
+                var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
+                bizObj.First(bo => bo.Id == fleet.Id).Competitors
+                    = _mapper.Map<IList<Competitor>>(competitors);
+            }
+            return bizObj;
+        }
+
 
         public async Task<IList<Fleet>> GetMinimalForSelectedBoatsFleets(Guid clubId)
         {
