@@ -29,6 +29,7 @@ public class AccountController : Controller
     private readonly ILogger _logger;
     private readonly ITurnstileService _turnstileService;
     private readonly AppSettingsService _appSettingsService;
+    private readonly IRedirectHelper _redirectHelper;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
@@ -37,7 +38,8 @@ public class AccountController : Controller
         IAuthorizationService authService,
         ILogger<AccountController> logger,
         ITurnstileService turnstileService,
-        AppSettingsService appSettingsService)
+        AppSettingsService appSettingsService,
+        IRedirectHelper redirectHelper)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -46,6 +48,7 @@ public class AccountController : Controller
         _logger = logger;
         _turnstileService = turnstileService;
         _appSettingsService = appSettingsService;
+        _redirectHelper = redirectHelper;
     }
 
     [TempData]
@@ -99,7 +102,7 @@ public class AccountController : Controller
                         actionName: "Index",
                         routeValues: new {ClubInitials = homeClub});
                 }
-                return Redirect(returnUrl);
+                return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Home");
             }
             if (result.RequiresTwoFactor)
             {

@@ -45,6 +45,7 @@ public static class DependencyInjectionExtensions
         services.AddTransient<IStripeService, StripeService>();
         services.AddScoped<ICalendarService, CalendarService>();
         services.AddScoped<IBackupService, BackupService>();
+        services.AddScoped<IRedirectHelper, RedirectHelper>();
 
 
         services.AddSingleton<AppVersionInfo>();

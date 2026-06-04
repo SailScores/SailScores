@@ -24,6 +24,7 @@ public class SeriesBackup
     public Guid? FleetId { get; set; }
     public bool? UseFullRaceScores { get; set; }
     public bool? PreferAlternativeSailNumbers { get; set; }
+    public Guid? SeriesResultsTemplateId { get; set; }
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }
     public bool? ChildrenSeriesAsSingleRace { get; set; }

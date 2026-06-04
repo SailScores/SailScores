@@ -2,8 +2,11 @@
 @{
     // Converts a fleet group key into a safe HTML id segment by replacing
     // any character that is not alphanumeric or a hyphen with a hyphen.
+
+    // need to add a timeout for safety:
     Func<string, string> safeId = key =>
-        System.Text.RegularExpressions.Regex.Replace(key ?? "", @"[^a-zA-Z0-9\-]", "-");
+        System.Text.RegularExpressions.Regex.Replace(key ?? "", @"[^a-zA-Z0-9\-]", "-", System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(1));
+
 }
 <div id="seriesdiv">
     <div class="row">

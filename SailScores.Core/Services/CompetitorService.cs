@@ -540,9 +540,13 @@ public class CompetitorService : ICompetitorService
         var result = new CompetitorStatsResult { SeasonStats = stats };
 
         var club = await _clubService.GetFullClubExceptScores(clubId).ConfigureAwait(false);
-        result.ClubHasHandicapScoring = club?.EnableHandicapScoring ?? false;
-        result.ClubHasDefaultHandicapSystem = club?.DefaultHandicapSystemId.HasValue ?? false;
-        result.HandicapSystemName = club?.DefaultHandicapSystem?.Name;
+        if(club == null)
+        {
+            throw new InvalidOperationException("Club not found.");
+        }
+        result.ClubHasHandicapScoring = club.EnableHandicapScoring;
+        result.ClubHasDefaultHandicapSystem = club.DefaultHandicapSystemId.HasValue;
+        result.HandicapSystemName = club.DefaultHandicapSystem?.Name;
 
         if (!result.ClubHasHandicapScoring || !result.ClubHasDefaultHandicapSystem)
         {

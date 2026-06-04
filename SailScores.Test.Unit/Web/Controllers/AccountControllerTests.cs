@@ -40,6 +40,7 @@ public class AccountControllerTests
             .ReturnsAsync(false);
 
         var configuration = new ConfigurationBuilder().Build();
+        var redirectHelperMock = new Mock<IRedirectHelper>();
         var controller = new AccountController(
             userManagerMock.Object,
             signInManagerMock.Object,
@@ -47,7 +48,8 @@ public class AccountControllerTests
             authServiceMock.Object,
             Mock.Of<ILogger<AccountController>>(),
             turnstileServiceMock.Object,
-            new AppSettingsService(configuration));
+            new AppSettingsService(configuration),
+            redirectHelperMock.Object);
 
         SetHttpContext(controller, "bad-token");
 
@@ -98,6 +100,7 @@ public class AccountControllerTests
             .ReturnsAsync(true);
 
         var configuration = new ConfigurationBuilder().Build();
+        var redirectHelperMock = new Mock<IRedirectHelper>();
         var controller = new AccountController(
             userManagerMock.Object,
             signInManagerMock.Object,
@@ -105,7 +108,8 @@ public class AccountControllerTests
             new Mock<IAuthorizationService>().Object,
             Mock.Of<ILogger<AccountController>>(),
             turnstileServiceMock.Object,
-            new AppSettingsService(configuration));
+            new AppSettingsService(configuration),
+            redirectHelperMock.Object);
 
         SetHttpContext(controller, "good-token");
 

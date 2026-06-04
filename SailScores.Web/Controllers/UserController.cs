@@ -18,19 +18,22 @@ public class UserController : Controller
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IRedirectHelper _redirectHelper;
 
     public UserController(
         IClubService clubService,
         IPermissionService permissionService,
         IAuthorizationService authService,
         UserManager<ApplicationUser> userManager,
-        IMapper mapper)
+        IMapper mapper,
+        IRedirectHelper redirectHelper)
     {
         _clubService = clubService;
         _permissionService = permissionService;
         _authService = authService;
         _userManager = userManager;
         _mapper = mapper;
+        _redirectHelper = redirectHelper;
     }
 
     public async Task<ActionResult> Add(
@@ -69,13 +72,7 @@ public class UserController : Controller
             model.Created = DateTime.UtcNow;
             await _permissionService.UpdatePermission(clubId, model);
 
-            if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return Redirect(Url.RouteUrl(new {
-                controller = "Admin",
-                action = "Index"}) + "#scorekeepers");
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Admin");
 
         }
         catch
@@ -108,15 +105,7 @@ public class UserController : Controller
         {
             await _permissionService.Delete(id);
 
-            if (!String.IsNullOrWhiteSpace(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return Redirect(Url.RouteUrl(new
-            {
-                controller = "Admin",
-                action = "Index"
-            }) + "#scorekeepers");
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Admin");
         }
         catch
         {
@@ -171,15 +160,7 @@ public class UserController : Controller
             var clubId = await _clubService.GetClubId(clubInitials);
             await _permissionService.UpdatePermission(clubId, model);
 
-            if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return Redirect(Url.RouteUrl(new
-            {
-                controller = "Admin",
-                action = "Index"
-            }) + "#scorekeepers");
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Admin");
         }
         catch
         {
