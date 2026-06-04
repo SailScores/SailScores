@@ -280,6 +280,8 @@ SailScores.Web/wwwroot/js/raceEditor.min.js.LICENSE.txt
 
 SailScores.Web/appsettings.Development.json
 SailScores.Web/appsettings.ApplicationInsights.json
+SailScores.Database/appsettings.Development.json
+SailScores.Database/appsettings.*.json
 
 # TypeScript compiled output
 SailScores.Web/wwwroot/js/**/*.js

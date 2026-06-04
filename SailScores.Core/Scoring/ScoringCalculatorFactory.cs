@@ -60,7 +60,7 @@ namespace SailScores.Core.Scoring
             {
                 return new TopXHighPointCalculator(scoringSystem);
             }
-            else if (baseSystemName.Contains("Appendix A") & baseSystemName.Contains("pre-2025"))
+            else if (baseSystemName.Contains("Appendix A") && baseSystemName.Contains("pre-2025"))
             {
                 return new AppendixAPre2025Calculator(scoringSystem);
             } else if (baseSystemName.StartsWith("PWA Standard"))

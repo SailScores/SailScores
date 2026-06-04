@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -69,7 +69,7 @@ namespace SailScores.Api.Services
                     if (retryCount < 2)
                     {
                         await AuthenticateAsync();
-                        return await PostAsync<T>(urlExtension, item, ++retryCount);
+                        return await PostAsync<T>(urlExtension, item, retryCount+1);
                     }
                     else
                     {
