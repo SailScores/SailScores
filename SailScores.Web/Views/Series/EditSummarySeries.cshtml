@@ -97,6 +97,13 @@
                                         </select>
                                         <span asp-validation-for="TrendOption" class="text-danger"></span>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Scoring -->
+                            <div class="settings-section mb-4">
+                                <h4 class="mb-3">Scoring</h4>
+                                <div class="row g-3">
                                     @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
                                     {
                                         <div class="col-12 col-md-6 settings-group">
@@ -122,13 +129,6 @@
                                             <small class="form-text text-muted">Leave blank to use the club's default template for this series type.</small>
                                         </div>
                                     }
-                                </div>
-                            </div>
-
-                            <!-- Scoring Behavior -->
-                            <div class="settings-section mb-4">
-                                <h4 class="mb-3">Scoring Behavior</h4>
-                                <div class="row g-3">
                                     <div class="col-12 col-md-6 settings-group">
                                         <label asp-for="ScoringSystemId">Scoring System</label>
                                         <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">

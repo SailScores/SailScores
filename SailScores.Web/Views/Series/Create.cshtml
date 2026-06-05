@@ -80,22 +80,6 @@
                                             <label class="form-check-label">List as Top Series</label>
                                         </div>
                                     </div>
-                                    @if (Model.SummarySeriesOptions != null && Model.SummarySeriesOptions.Any())
-                                    {
-                                        <div class="col-12 settings-group" id="parentSeriesSelection" style="display: @(Model.Type == SailScores.Core.Model.SeriesType.Standard ? "block" : "none");">
-                                            <label asp-for="ParentSeriesIds" class="control-label">Include in Summary Series</label>
-                                            <select id="ParentSeriesIds" asp-for="ParentSeriesIds" class="form-select" multiple>
-                                                @foreach (var series in Model.SummarySeriesOptions)
-                                                {
-                                                    <option value="@series.Id">
-                                                        @series.Name (@series.Season.Name)
-                                                    </option>
-                                                }
-                                            </select>
-                                            <span asp-validation-for="ParentSeriesIds" class="text-danger"></span>
-                                            <span class="small">Select one or more summary series that this series should be included in.</span>
-                                        </div>
-                                    }
                                     <div class="col-12 col-md-6 settings-group">
                                         <label asp-for="TrendOption">Show Rank Trend</label>
                                         <select id="ScoringSystemId" asp-for="TrendOption" class="form-select">
@@ -136,9 +120,9 @@
                                 </div>
                             </div>
 
-                            <!-- Active Date Restrictions -->
+                            <!-- Date Restrictions -->
                             <div class="settings-section mb-4" id="standardRegattaOnly" style="display: @(Model.Type == SailScores.Core.Model.SeriesType.Standard || Model.Type == SailScores.Core.Model.SeriesType.Regatta ? "block" : "none");">
-                                <h4 class="mb-3">Active Date Restrictions</h4>
+                                <h4 class="mb-3">Date Restrictions</h4>
                                 <div class="row g-3">
                                     <div class="col-12 settings-group">
                                         <div class="form-check">
@@ -164,10 +148,26 @@
                                 </div>
                             </div>
 
-                            <!-- Scoring Behavior -->
+                            <!-- Scoring -->
                             <div class="settings-section mb-4">
-                                <h4 class="mb-3">Scoring Behavior</h4>
+                                <h4 class="mb-3">Scoring</h4>
                                 <div class="row g-3">
+                                    @if (Model.SummarySeriesOptions != null && Model.SummarySeriesOptions.Any())
+                                    {
+                                        <div class="col-12 settings-group" id="parentSeriesSelection" style="display: @(Model.Type == SailScores.Core.Model.SeriesType.Standard ? "block" : "none");">
+                                            <label asp-for="ParentSeriesIds" class="control-label">Include in Summary Series</label>
+                                            <select id="ParentSeriesIds" asp-for="ParentSeriesIds" class="form-select" multiple>
+                                                @foreach (var series in Model.SummarySeriesOptions)
+                                                {
+                                                    <option value="@series.Id">
+                                                        @series.Name (@series.Season.Name)
+                                                    </option>
+                                                }
+                                            </select>
+                                            <span asp-validation-for="ParentSeriesIds" class="text-danger"></span>
+                                            <span class="small">Select one or more summary series that this series should be included in.</span>
+                                        </div>
+                                    }
                                     <div class="col-12 col-md-6 settings-group">
                                         <label asp-for="ScoringSystemId">Scoring System</label>
                                         <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
@@ -210,9 +210,9 @@
                                 </div>
                             </div>
 
-                            <!-- Competitor Filtering -->
+                            <!-- Fleet -->
                             <div class="settings-section mb-4">
-                                <h4 class="mb-3">Competitor Filtering</h4>
+                                <h4 class="mb-3">Fleet</h4>
                                 <div class="row g-3">
                                     <div class="col-12 settings-group">
                                         <label asp-for="FleetId" class="control-label">
