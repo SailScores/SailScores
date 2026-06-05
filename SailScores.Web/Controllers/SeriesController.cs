@@ -354,6 +354,15 @@ public class SeriesController : Controller
                     System.Diagnostics.Debug.WriteLine($"ModelState Error: {error.ErrorMessage}");
                 }
 
+                if (model.Type == Core.Model.SeriesType.Summary)
+                {
+                    model.SeriesOptions =
+                        (await _seriesService.GetChildSeriesSummariesAsync(
+                            clubId,
+                            model.SeasonId)).ToList();
+                    return View("EditSummarySeries", model);
+                }
+
                 return View(model);
             }
 
