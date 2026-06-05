@@ -185,6 +185,7 @@ public class Startup
             .AddMvc(option =>
             {
                 option.Filters.Add(new ResponseCacheAttribute() { NoStore = true, Location = ResponseCacheLocation.None });
+                option.Filters.Add<SailScores.Web.Filters.ReturnUrlViewDataFilter>();
             });
 
         var mailchimpManager = new MailChimpManager(Configuration["MailchimpApiKey"]);

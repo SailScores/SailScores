@@ -13,7 +13,8 @@
 <hr />
 <div class="row">
     <div class="col-lg-6 col-md-8">
-        <form asp-action="Create">
+        <form asp-action="Create"
+              asp-route-returnurl="@ViewData["ReturnUrl"]">
             <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
@@ -268,11 +269,19 @@
             </div>
 
             <br/>
+            @{
+                var cancelUrl = ViewData["ReturnUrl"]?.ToString();
+                if (string.IsNullOrWhiteSpace(cancelUrl))
+                {
+                    var clubInitials = ViewContext.RouteData.Values["clubInitials"]?.ToString()
+                        ?? ViewContext.RouteData.Values["ClubInitials"]?.ToString();
+                    var adminIndexUrl = Url.Action("Index", "Admin", new { clubInitials }) ?? "/";
+                    cancelUrl = $"{adminIndexUrl}#series";
+                }
+            }
             <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
-                <a asp-controller="Admin"
-                   asp-action="Index"
-                   asp-fragment="series"
+                <a href="@cancelUrl"
                    class="btn btn-outline-primary">Cancel</a>
             </div>
         </form>
