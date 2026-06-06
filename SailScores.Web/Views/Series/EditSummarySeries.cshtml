@@ -75,9 +75,9 @@
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
 
-                            <!-- Appearance & Presentation -->
+                            <!-- Appearance -->
                             <div class="settings-section mb-4">
-                                <h4 class="mb-3">Appearance &amp; Presentation</h4>
+                                <h4 class="mb-3">Appearance</h4>
                                 <div class="row g-3">
                                     <div class="col-12 col-md-6 settings-group">
                                         <div class="form-check">
@@ -98,37 +98,37 @@
                                         <span asp-validation-for="TrendOption" class="text-danger"></span>
                                     </div>
                                 </div>
+                                @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
+                                {
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <label asp-for="SeriesResultsTemplateId" class="control-label">
+                                            View Template
+                                            <a class="text-primary"
+                                               data-bs-container="body"
+                                               data-bs-toggle="popover"
+                                               data-bs-placement="top"
+                                               data-bs-trigger="focus hover"
+                                               data-bs-content="Choose a template that controls which columns appear in the series results table and their visibility on different screen sizes.">
+                                                <span class="far fa-question-circle"></span>
+                                            </a>
+                                        </label>
+                                        <select asp-for="SeriesResultsTemplateId" class="form-select">
+                                            <option value="">-Use club default-</option>
+                                            @foreach (var template in Model.TemplateOptions)
+                                            {
+                                                <option value="@template.Id">@template.Name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="SeriesResultsTemplateId" class="text-danger"></span>
+                                        <small class="form-text text-muted">Create templates in the Club Info page.</small>
+                                    </div>
+                                }
                             </div>
 
                             <!-- Scoring -->
                             <div class="settings-section mb-4">
                                 <h4 class="mb-3">Scoring</h4>
                                 <div class="row g-3">
-                                    @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
-                                    {
-                                        <div class="col-12 col-md-6 settings-group">
-                                            <label asp-for="SeriesResultsTemplateId" class="control-label">
-                                                View Template
-                                                <a class="text-primary"
-                                                   data-bs-container="body"
-                                                   data-bs-toggle="popover"
-                                                   data-bs-placement="top"
-                                                   data-bs-trigger="focus hover"
-                                                   data-bs-content="Choose a template that controls which columns appear in the series results table and their visibility on different screen sizes.">
-                                                    <span class="far fa-question-circle"></span>
-                                                </a>
-                                            </label>
-                                            <select asp-for="SeriesResultsTemplateId" class="form-select">
-                                                <option value="">-Use club default-</option>
-                                                @foreach (var template in Model.TemplateOptions)
-                                                {
-                                                    <option value="@template.Id">@template.Name</option>
-                                                }
-                                            </select>
-                                            <span asp-validation-for="SeriesResultsTemplateId" class="text-danger"></span>
-                                            <small class="form-text text-muted">Create templates in the Club Info page.</small>
-                                        </div>
-                                    }
                                     <div class="col-12 col-md-6 settings-group">
                                         <label asp-for="ScoringSystemId">Scoring System</label>
                                         <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
@@ -217,4 +217,12 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+      // help popovers (to be touch screen friendly.)
+      $(function () {
+          $('[data-bs-toggle="popover"]').popover();
+      })
+    </script>
+
 }
