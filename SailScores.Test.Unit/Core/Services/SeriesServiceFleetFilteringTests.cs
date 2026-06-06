@@ -55,6 +55,7 @@ public class SeriesServiceFleetFilteringTests
         _service = new SeriesService(
             _scoringCalculatorFactory,
             scoringService,
+            new Moq.Mock<IHandicapService>().Object,
             mockForwarderService.Object,
             mockConversionService.Object,
             dbObjectBuilder,

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using SailScores.Core.Model;
 using SailScores.Core.Model.Summary;
+using SailScores.Core.Services.Interfaces;
 using SailScores.Core.Utility;
 using SailScores.Database;
 using System;
@@ -19,6 +20,7 @@ namespace SailScores.Core.Services
         private readonly IMemoryCache _cache;
         private readonly IScoringService _scoringService;
         private readonly IMapper _mapper;
+        private readonly ISeriesResultsTemplateService _templateService;
 
         //used for copying club
         private Dictionary<Guid, Guid> guidMapper;
@@ -27,12 +29,14 @@ namespace SailScores.Core.Services
             ISailScoresContext dbContext,
             IMemoryCache cache,
             IScoringService scoringService,
-            IMapper mapper)
+            IMapper mapper,
+            ISeriesResultsTemplateService templateService)
         {
             _dbContext = dbContext;
             _cache = cache;
             _scoringService = scoringService;
             _mapper = mapper;
+            _templateService = templateService;
         }
 
         public async Task<IList<Fleet>> GetAllFleets(Guid clubId)
@@ -90,6 +94,47 @@ namespace SailScores.Core.Services
                 bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
                     = _mapper.Map<IList<BoatClass>>(boatClasses);
 
+                var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
+                bizObj.First(bo => bo.Id == fleet.Id).Competitors
+                    = _mapper.Map<IList<Competitor>>(competitors);
+            }
+            return bizObj;
+        }
+
+        public async Task<IList<Fleet>> GetActiveFleets(Guid clubId, bool includeRegattaFleets)
+        {
+            var regattaFleetIds = new List<Guid>();
+            if (!includeRegattaFleets)
+            {
+                var regattaIds = await _dbContext.Regattas
+                    .Where(r => r.ClubId == clubId)
+                    .Select(r => r.Id)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+                regattaFleetIds = await _dbContext.RegattaFleets
+                    .Where(rf => regattaIds.Contains(rf.RegattaId))
+                    .Select(rf => rf.FleetId)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+            }
+
+            var dbFleets = await _dbContext
+                .Fleets
+                .Include(f => f.FleetBoatClasses)
+                    .ThenInclude(fbc => fbc.BoatClass)
+                .Include(f => f.CompetitorFleets)
+                    .ThenInclude(cf => cf.Competitor)
+                .Where(f => f.ClubId == clubId && (f.IsActive ?? true) && (includeRegattaFleets || !regattaFleetIds.Contains(f.Id)))
+                .AsSplitQuery()
+                .ToListAsync()
+                .ConfigureAwait(false);
+            var bizObj = _mapper.Map<IList<Fleet>>(dbFleets);
+            // ignored in mapper to avoid loops.
+            foreach (var fleet in dbFleets)
+            {
+                var boatClasses = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClass);
+                bizObj.First(bo => bo.Id == fleet.Id).BoatClasses
+                    = _mapper.Map<IList<BoatClass>>(boatClasses);
                 var competitors = fleet.CompetitorFleets.Select(cf => cf.Competitor);
                 bizObj.First(bo => bo.Id == fleet.Id).Competitors
                     = _mapper.Map<IList<Competitor>>(competitors);
@@ -356,6 +401,7 @@ namespace SailScores.Core.Services
                 .Include(c => c.Regattas)
                 .ThenInclude(r => r.RegattaFleet)
                 .Include(c => c.WeatherSettings)
+                .Include(c => c.DefaultHandicapSystem)
                 .AsSplitQuery()
                 .LoadAsync().ConfigureAwait(false);
 
@@ -465,6 +511,11 @@ namespace SailScores.Core.Services
                 await _dbContext.SaveChangesAsync()
                     .ConfigureAwait(false);
             }
+
+            // Seed default series results templates
+            await _templateService.SeedDefaultTemplatesAsync(club.Id)
+                .ConfigureAwait(false);
+
             return club.Id;
         }
 
@@ -512,6 +563,9 @@ namespace SailScores.Core.Services
             dbClub.LogoFileId = club.LogoFileId;
             dbClub.HomePageDescription = club.HomePageDescription;
             dbClub.ShowCalendarInNav = club.ShowCalendarInNav;
+            dbClub.EnableHandicapScoring = club.EnableHandicapScoring;
+            dbClub.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers;
+            dbClub.DefaultHandicapSystemId = club.DefaultHandicapSystemId;
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings?.Latitude;

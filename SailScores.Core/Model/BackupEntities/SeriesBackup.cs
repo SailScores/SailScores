@@ -19,10 +19,12 @@ public class SeriesBackup
     public DateTime? UpdatedDate { get; set; }
     public string UpdatedBy { get; set; }
     public Guid? ScoringSystemId { get; set; }
+    public Guid? HandicapSystemId { get; set; }
     public TrendOption? TrendOption { get; set; }
     public Guid? FleetId { get; set; }
     public bool? UseFullRaceScores { get; set; }
     public bool? PreferAlternativeSailNumbers { get; set; }
+    public Guid? SeriesResultsTemplateId { get; set; }
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }
     public bool? ChildrenSeriesAsSingleRace { get; set; }

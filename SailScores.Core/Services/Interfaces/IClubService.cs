@@ -22,7 +22,7 @@ public interface IClubService
     Task SaveNewSeason(Season season);
     Task<IList<Fleet>> GetAllFleets(Guid clubId);
     Task<IList<Fleet>> GetActiveFleets(Guid clubId);
-
+    Task<IList<Fleet>> GetActiveFleets(Guid clubId, bool includeRegattaFleets);
     Task UpdateClub(Club club);
     Task<Guid> GetClubId(string initials);
     Task<Guid> CopyClubAsync(Guid copyFromClubId, Club targetClub);

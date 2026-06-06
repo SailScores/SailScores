@@ -1,0 +1,120 @@
+@model SailScores.Web.Models.SailScores.SeriesResultsTemplateListViewModel
+@{
+    ViewData["Title"] = "Results Display Templates";
+    Layout = "_ClubLayout";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p class="lead">
+    Manage how series results are displayed. Templates control which columns appear and their visibility on different screen sizes.
+</p>
+
+<div class="mb-3">
+    <a asp-action="Create" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create New Template
+    </a>
+    <a asp-controller="Admin" asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-secondary">
+        <i class="fas fa-cog"></i> Club Settings
+    </a>
+</div>
+
+@if (!Model.Templates.Any())
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        No templates have been created yet. Click "Create New Template" to add your first results display template.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Template Name</th>
+                    <th>Sail Number</th>
+                    <th>@(Model.Templates.FirstOrDefault()?.CompetitorNameHeader ?? "Helm")</th>
+                    <th>@(Model.Templates.FirstOrDefault()?.BoatNameHeader ?? "Boat")</th>
+                    <th>Competitor Club</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var template in Model.Templates)
+                {
+                    <tr>
+                        <td><strong>@template.Name</strong></td>
+                        <td>
+                            @switch (template.SailNumberVisibility)
+                            {
+                                case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                                    <span class="badge bg-success">Always</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                                    <span class="badge bg-info">On Larger Screens</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                                    <span class="badge bg-secondary">Hidden</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            @switch (template.CompetitorNameVisibility)
+                            {
+                                case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                                    <span class="badge bg-success">Always</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                                    <span class="badge bg-info">On Larger Screens</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                                    <span class="badge bg-secondary">Hidden</span>
+                                    break;
+                            }
+                            <small class="text-muted">(@template.CompetitorNameHeader)</small>
+                        </td>
+                        <td>
+                            @switch (template.BoatNameVisibility)
+                            {
+                                case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                                    <span class="badge bg-success">Always</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                                    <span class="badge bg-info">On Larger Screens</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                                    <span class="badge bg-secondary">Hidden</span>
+                                    break;
+                            }
+                            <small class="text-muted">(@template.BoatNameHeader)</small>
+                        </td>
+                        <td>
+                            @switch (template.CompetitorClubVisibility)
+                            {
+                                case SailScores.Api.Enumerations.ColumnVisibility.Always:
+                                    <span class="badge bg-success">Always</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
+                                    <span class="badge bg-info">On Larger Screens</span>
+                                    break;
+                                case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
+                                    <span class="badge bg-secondary">Hidden</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" asp-route-id="@template.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-clubInitials="@Model.ClubInitials" asp-route-id="@template.Id" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+

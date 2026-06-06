@@ -53,13 +53,30 @@ public class PermissionLevelsTests
 
         // ACT & ASSERT - Check Series on Admin page
         await page.GotoAsync(UrlCombine(configuration.BaseUrl, configuration.TestClubInitials + "/Admin"));
-        // Race Scorekeeper should NOT see 'New Series' button
-        var newSeriesButton = page.Locator("a:has-text('New Series')");
-        await Assertions.Expect(newSeriesButton).Not.ToBeVisibleAsync();
+        
+        // Check if Series section exists at all
+        var seriesSectionButton = page.Locator("button:has-text('Series')");
+        var seriesSectionExists = await seriesSectionButton.CountAsync() > 0;
+        
+        if (seriesSectionExists)
+        {
+            // Expand the Series section
+            await seriesSectionButton.ClickAsync();
+            
+            // Race Scorekeeper should NOT see 'New Series' button
+            var newSeriesButton = page.Locator("a:has-text('New Series')");
+            await Assertions.Expect(newSeriesButton).ToHaveCountAsync(0);
 
-        // Race Scorekeeper should NOT see Series 'Edit' pencil buttons
-        var editSeriesLink = page.Locator(".admin-series-row .fa-pen");
-        await Assertions.Expect(editSeriesLink).Not.ToBeVisibleAsync();
+            // Race Scorekeeper should NOT see Series 'Edit' links (which link to /Series/Edit/{id})
+            var editSeriesLink = page.Locator("a[href*='/Series/Edit/']");
+            await Assertions.Expect(editSeriesLink).ToHaveCountAsync(0);
+        }
+        else
+        {
+            // If Series section doesn't exist at all for race scorekeepers, that's also acceptable
+            // It means they have no access to series management at all
+            await Assertions.Expect(seriesSectionButton).ToHaveCountAsync(0);
+        }
 
         await page.CloseAsync();
     }
@@ -82,10 +99,14 @@ public class PermissionLevelsTests
 
         // ACT & ASSERT - Check Series on Admin page
         await page.GotoAsync(UrlCombine(configuration.BaseUrl, configuration.TestClubInitials + "/Admin"));
+        
+        // Expand the Series section
+        await page.Locator("button:has-text('Series')").ClickAsync();
+        
         // Series Scorekeeper SHOULD see 'New Series' button
         await Assertions.Expect(page.Locator("a:has-text('New Series')")).ToBeVisibleAsync();
-        // Series Scorekeeper SHOULD see Series 'Edit' pencil buttons
-        await Assertions.Expect(page.Locator(".admin-series-row .fa-pen").First).ToBeVisibleAsync();
+        // Series Scorekeeper SHOULD see Series 'Edit' links (which link to /Series/Edit/{id})
+        await Assertions.Expect(page.Locator("a[href*='/Series/Edit/']").First).ToBeVisibleAsync();
 
         await page.CloseAsync();
     }

@@ -22,8 +22,12 @@ public class AdminViewModel
     public bool IsHidden { get; set; }
     public bool ShowClubInResults { get; set; }
     public bool ShowCalendarInNav { get; set; }
+    public bool EnableHandicapScoring { get; set; }
+    public bool EnableAlternativeSailNumbers { get; set; }
 
-    public String Url { get; set; }
+    public Guid? DefaultHandicapSystemId { get; set; }
+
+    public IList<HandicapSystem> HandicapSystemOptions { get; set; }
 
     public IList<FleetDeleteViewModel> Fleets { get; set; }
     public IList<BoatClassDeleteViewModel> BoatClasses { get; set; }
@@ -39,6 +43,8 @@ public class AdminViewModel
 
     public IList<ScoringSystem> ScoringSystemOptions { get; set; }
 
+    public IList<HandicapSystemSummary> HandicapSystems { get; set; }
+
     public IList<AdminToDoViewModel> Tips { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
@@ -51,6 +57,11 @@ public class AdminViewModel
 
     public string Locale { get; set; }
     public IList<string> LocaleOptions { get; set; }
+
+    public Guid? DefaultSeriesResultsTemplateId { get; set; }
+    public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+
+    public IList<SeriesResultsTemplate> TemplateOptions { get; set; }
 
     public bool HasRaces { get; set; }
     public bool HasCompetitors { get; internal set; }

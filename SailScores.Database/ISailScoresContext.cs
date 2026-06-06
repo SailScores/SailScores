@@ -45,6 +45,8 @@ namespace SailScores.Database
         DbSet<RegattaForwarder> RegattaForwarders { get; set; }
         DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
 
+        DbSet<SeriesResultsTemplate> SeriesResultsTemplates { get; set; }
+
         DbSet<ClubRequest> ClubRequests { get; set; }
         DbSet<ClubSequence> ClubSequences { get; set; }
 
@@ -55,6 +57,10 @@ namespace SailScores.Database
         DbSet<ChangeType> ChangeTypes { get; set; }
         DbSet<CompetitorChange> CompetitorChanges { get; set; }
 
+        DbSet<HandicapSystem> HandicapSystems { get; set; }
+        DbSet<CompetitorHandicap> CompetitorHandicaps { get; set; }
+        DbSet<ClassHandicap> ClassHandicaps { get; set; }
+
         // Junction tables for backup/restore operations
         DbSet<SeriesRace> SeriesRaces { get; set; }
         DbSet<CompetitorFleet> CompetitorFleets { get; set; }
@@ -64,9 +70,17 @@ namespace SailScores.Database
         DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
 
         Task<IList<CompetitorStatsSummary>> GetCompetitorStatsSummaryAsync(Guid clubId, Guid competitorId);
+        Task<IList<CompetitorHandicapStatsSummary>> GetCompetitorHandicapStatsSummaryAsync(
+            Guid clubId,
+            Guid competitorId,
+            Guid handicapSystemId,
+            int systemType);
 
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber);
         Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(
+            Guid competitorId,
+            string seasonUrlName);
+        Task<IList<CompetitorRankStats>> GetCompetitorHandicapRankCountsAsync(
             Guid competitorId,
             string seasonUrlName);
 

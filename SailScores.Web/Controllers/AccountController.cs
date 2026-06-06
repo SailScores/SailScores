@@ -22,6 +22,7 @@ namespace SailScores.Web.Controllers;
 [Route("[controller]/[action]")]
 public class AccountController : Controller
 {
+    private const string RETURN_URL_NAME = "ReturnUrl";
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IEmailSender _emailSender;
@@ -29,6 +30,7 @@ public class AccountController : Controller
     private readonly ILogger _logger;
     private readonly ITurnstileService _turnstileService;
     private readonly AppSettingsService _appSettingsService;
+    private readonly IRedirectHelper _redirectHelper;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
@@ -37,7 +39,8 @@ public class AccountController : Controller
         IAuthorizationService authService,
         ILogger<AccountController> logger,
         ITurnstileService turnstileService,
-        AppSettingsService appSettingsService)
+        AppSettingsService appSettingsService,
+        IRedirectHelper redirectHelper)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -46,6 +49,7 @@ public class AccountController : Controller
         _logger = logger;
         _turnstileService = turnstileService;
         _appSettingsService = appSettingsService;
+        _redirectHelper = redirectHelper;
     }
 
     [TempData]
@@ -58,7 +62,7 @@ public class AccountController : Controller
         // Clear the existing external cookie to ensure a clean login process
         await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
         return View();
     }
 
@@ -69,7 +73,7 @@ public class AccountController : Controller
         LoginViewModel model,
         string returnUrl = null)
     {
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
         if (ModelState.IsValid)
         {
             // This doesn't count login failures towards account lockout
@@ -99,7 +103,7 @@ public class AccountController : Controller
                         actionName: "Index",
                         routeValues: new {ClubInitials = homeClub});
                 }
-                return Redirect(returnUrl);
+                return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Home");
             }
             if (result.RequiresTwoFactor)
             {
@@ -125,6 +129,12 @@ public class AccountController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
     {
+        var model = new LoginWith2faViewModel { RememberMe = rememberMe };
+        if (!ModelState.IsValid)
+        {
+            return View();
+        }
+
         // Ensure the user has gone through the username & password screen first
         var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
@@ -134,8 +144,7 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
-        var model = new LoginWith2faViewModel { RememberMe = rememberMe };
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
 
         return View(model);
     }
@@ -192,7 +201,7 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
 
         return View();
     }
@@ -248,7 +257,7 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult Register(string returnUrl = null)
     {
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
         return View();
     }
 
@@ -257,7 +266,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
     {
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
         if (!ModelState.IsValid)
         {
             return View(model);
@@ -341,7 +350,7 @@ public class AccountController : Controller
             return NotFound();
         }
 
-        if (remoteError != null)
+       if (remoteError != null)
         {
             ErrorMessage = $"Error from external provider: {remoteError}";
             return RedirectToAction(nameof(Login));
@@ -402,7 +411,7 @@ public class AccountController : Controller
         }
 
         // No existing account — ask the user to confirm / complete their profile.
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
         ViewData["LoginProvider"] = info.LoginProvider;
         var (firstName, lastName) = GetNamesFromExternalClaims(info.Principal);
         return View("ExternalLogin", new ExternalLoginViewModel
@@ -473,7 +482,7 @@ public class AccountController : Controller
             AddErrors(result);
         }
 
-        ViewData["ReturnUrl"] = returnUrl;
+        ViewData[RETURN_URL_NAME] = returnUrl;
         return View(nameof(ExternalLogin), model);
     }
 
@@ -588,6 +597,11 @@ public class AccountController : Controller
     [AllowAnonymous]
     public async Task<object> JwtToken([FromBody] LoginViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
 
         if (result.Succeeded)

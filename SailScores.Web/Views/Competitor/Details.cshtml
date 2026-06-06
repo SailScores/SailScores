@@ -12,6 +12,11 @@
     ViewData["MetaDescription"] = $"Competitor Statistics for {Model.Item.SailNumber} : {Model.Item.Name} with {Model.ClubName}";
     ViewData["ogTitle"] = ViewBag.Title;
     ViewData["ogDescription"] = ViewData["MetaDescription"];
+
+    bool _missingSystem = Model.Item.ClubHasHandicapScoring && !Model.Item.ClubHasDefaultHandicapSystem;
+    bool _missingRating = Model.Item.ClubHasHandicapScoring
+        && Model.Item.ClubHasDefaultHandicapSystem
+        && !Model.Item.CompetitorHasRatingForDefaultSystem;
 }
 
 
@@ -28,6 +33,26 @@
         }
     </div>
 </div>
+
+@if (Model.CanEdit && (_missingSystem || _missingRating))
+{
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="alert alert-warning py-2 small fst-italic mb-0" role="note">
+                <b>Scorekeeper:</b> To show corrected-time stats:
+                @if (_missingSystem)
+                {
+                    <span>set a default handicap system in Club Settings,</span>
+                }
+                @if (_missingRating)
+                {
+                    <span>add a rating for this competitor in the <em>@Model.Item.HandicapSystemName</em> handicap system,</span>
+                }
+                and ensure elapsed times are recorded on race results.
+            </div>
+        </div>
+    </div>
+}
 
 @if (Model.Item.SeasonStats != null && Model.Item.SeasonStats.Any())
 {
@@ -63,13 +88,29 @@
                 }
             }
         }
+        @if (SeasonStats.CorrectedRaceCount > 0)
+        {
+            <br />
+            <span class="text-muted small">
+                Corrected: <strong>@SeasonStats.CorrectedRaceCount</strong> races scored&emsp;
+                @if (SeasonStats.AverageCorrectedRank.HasValue)
+                {
+                    @:Avg corrected place: @SeasonStats.AverageCorrectedRank.Value.ToString("0.0")&emsp;
+                }
+                @if (SeasonStats.CorrectedBoatsRacedAgainst.HasValue)
+                {
+                    @:vs @SeasonStats.CorrectedBoatsRacedAgainst others
+                }
+            </span>
+        }
         <br />
     </div>
     <div class="row">
         <div class="col-12">
             <svg id="chart-@(SeasonStats.SeasonUrlName)" class="season-chart"
                     data-competitor-id="@Model.Item.Id"
-                    data-season-name="@SeasonStats.SeasonUrlName"></svg>
+                    data-season-name="@SeasonStats.SeasonUrlName"
+                    data-has-handicap="@(SeasonStats.CorrectedRaceCount > 0 ? "true" : "false")"></svg>
         </div>
     </div>
     }
@@ -115,9 +156,28 @@
     </div>
 }
 
-<div class="row">
-    <div class="col-12">
+<div class="row mt-2">
+    <div class="col-12 text-muted small">
         Statistics may not include all series.
+        @if (Model.Item.ClubHasHandicapScoring)
+        {
+            if (Model.Item.ClubHasDefaultHandicapSystem && Model.Item.CompetitorHasRatingForDefaultSystem)
+            {
+                <span>Corrected-time results use the <em>@Model.Item.HandicapSystemName</em> handicap system.</span>
+            }
+            else
+            {
+                <span>Charts show raw finish position</span>
+                if (!Model.Item.ClubHasDefaultHandicapSystem)
+                {
+                    <span> — no default handicap system is set for this club.</span>
+                }
+                else if (!Model.Item.CompetitorHasRatingForDefaultSystem)
+                {
+                    <span> — this competitor has no rating in the <em>@Model.Item.HandicapSystemName</em> system.</span>
+                }
+            }
+        }
     </div>
 </div>
 

@@ -47,6 +47,16 @@ namespace SailScores.Core.Model
 
         public IList<ScoringSystem> ScoringSystems { get; set; }
 
+        public HandicapSystem DefaultHandicapSystem { get; set; }
+        public Guid? DefaultHandicapSystemId { get; set; }
+
+        public bool EnableHandicapScoring { get; set; }
+
+        public bool? EnableAlternativeSailNumbers { get; set; }
+
+        public Guid? DefaultSeriesResultsTemplateId { get; set; }
+        public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+
         public String StatisticsDescription { get; set; }
 
     }

@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
@@ -23,6 +23,11 @@ public class CompetitorStatsViewModel
     public String HomeClubName { get; set; }
 
     public IList<CompetitorSeasonStats> SeasonStats { get; internal set; }
+
+    public bool ClubHasHandicapScoring { get; set; }
+    public bool ClubHasDefaultHandicapSystem { get; set; }
+    public bool CompetitorHasRatingForDefaultSystem { get; set; }
+    public string HandicapSystemName { get; set; }
 
     public override string ToString()
     {

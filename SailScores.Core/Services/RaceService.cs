@@ -79,6 +79,8 @@ namespace SailScores.Core.Services
                 .OrderByDescending(r => r.Date)
                 .ThenBy(r => r.Order)
                 .Include(r => r.Fleet)
+                .Include(r => r.SeriesRaces)
+                .ThenInclude(sr => sr.Series)
                 .ToListAsync()
                 .ConfigureAwait(false);
             return _mapper.Map<List<Model.Race>>(dbObjects);
@@ -217,6 +219,45 @@ namespace SailScores.Core.Services
 
         }
 
+        public async Task<IList<HandicapSystem>> GetRaceHandicapSystemsAsync(Guid raceId)
+        {
+            var seriesRows = await _dbContext.SeriesRaces
+                .Where(sr => sr.RaceId == raceId)
+                .Join(
+                    _dbContext.Clubs,
+                    sr => sr.Series.ClubId,
+                    c => c.Id,
+                    (sr, club) => new
+                    {
+                        sr.Series.HandicapSystemId,
+                        FleetDefaultHandicapSystemId = sr.Series.Fleet.DefaultHandicapSystemId,
+                        ClubDefaultHandicapSystemId = club.DefaultHandicapSystemId
+                    })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var handicapIds = seriesRows
+                .Select(row => row.HandicapSystemId
+                    ?? row.FleetDefaultHandicapSystemId
+                    ?? row.ClubDefaultHandicapSystemId)
+                .Where(id => id.HasValue)
+                .Select(id => id.Value)
+                .Distinct()
+                .ToList();
+
+            if (!handicapIds.Any())
+            {
+                return new List<HandicapSystem>();
+            }
+
+            var handicapSystems = await _dbContext.HandicapSystems
+                .Where(h => handicapIds.Contains(h.Id))
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return _mapper.Map<IList<HandicapSystem>>(handicapSystems);
+        }
+
         private async Task PopulateCompetitors(Race race)
         {
             if (race?.Scores == null || !race.Scores.Any())
@@ -279,6 +320,7 @@ namespace SailScores.Core.Services
             dbRace.UpdatedBy = race.UpdatedBy;
             dbRace.StartTime = race.StartTime;
             dbRace.TrackTimes = race.TrackTimes;
+            dbRace.CourseDistance = race.CourseDistance;
 
             PopulateWeather(race, dbRace);
 

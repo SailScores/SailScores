@@ -86,7 +86,7 @@
 }
 @if (Model.CurrentRegattas.Any())
 {
-    <div class="row">
+    <div class="row pb-3">
         <div class="col-md-12">
             <h2>Regatta!</h2>
             @foreach (var regatta in Model.CurrentRegattas)
@@ -95,12 +95,19 @@
                 {
                     @regatta.StartDate?.ToString("D") @:- @regatta.EndDate?.ToString("D")
                 }
-                <h3>
+                <h3 class="pb-0 mb-0">
                     <a href="~/@ViewData["ClubInitials"]/Regatta/@regatta.Season.UrlName/@regatta.UrlName" style="text-wrap: pretty;">
                         @(regatta.Name.Contains(regatta.Season.Name, StringComparison.OrdinalIgnoreCase) ? regatta.Name : $"{regatta.Season.Name} {regatta.Name}")
                     </a>
+
                 </h3>
-                <br />
+                var mostRecentUpdate = regatta.GetMostRecentSeriesUpdatedDate();
+                if (mostRecentUpdate.HasValue && mostRecentUpdate > DateTime.Now.AddDays(-15))
+                {
+                    <span class="fst-italic small text-body-secondary mt-0 pt-0">@localizer["Updated"] @mostRecentUpdate.ToApproxTimeAgoString()</span>
+                }
+                    
+                <br class="pt-3 mt-3">
             }
         </div>
     </div>

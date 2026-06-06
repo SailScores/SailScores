@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
@@ -13,6 +13,10 @@ public class CompetitorIndexViewModel
     [Display(Name = "Sail Number")]
     [StringLength(20)]
     public String SailNumber { get; set; }
+
+    [Display(Name = "Alt Sail #")]
+    [StringLength(20)]
+    public String AlternativeSailNumber { get; set; }
 
     [Display(Name = "Boat Name")]
     [StringLength(200)]

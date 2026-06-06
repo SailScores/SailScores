@@ -10,6 +10,8 @@ public class RaceWithOptionsViewModel : RaceViewModel
 
     public string ClubInitials { get; set; }
     public bool UseAdvancedFeatures { get; set; }
+    public bool EnableHandicapScoring { get; set; }
+    public bool EnableAlternativeSailNumbers { get; set; }
     public IList<Fleet> FleetOptions { get; set; }
     public IList<Series> SeriesOptions { get; set; }
     public IList<ScoreCode> ScoreCodeOptions { get; set; }

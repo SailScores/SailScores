@@ -40,6 +40,9 @@ public class Series
     public Guid? ScoringSystemId { get; set; }
     public ScoringSystem ScoringSystem { get; set; }
 
+    public Guid? HandicapSystemId { get; set; }
+    public HandicapSystem HandicapSystem { get; set; }
+
     public TrendOption? TrendOption { get; set; }
 
     // used for connecting series to correct fleet. Particularly for Regatta use.
@@ -51,6 +54,9 @@ public class Series
     public bool? UseFullRaceScores { get; set; }
 
     public bool? PreferAlternativeSailNumbers { get; set; }
+
+    public Guid? SeriesResultsTemplateId { get; set; }
+    public SeriesResultsTemplate SeriesResultsTemplate { get; set; }
 
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }

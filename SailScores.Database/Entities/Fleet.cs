@@ -27,4 +27,7 @@ public class Fleet
     public IList<FleetBoatClass> FleetBoatClasses { get; set; }
     public IList<CompetitorFleet> CompetitorFleets { get; set; }
 
+    public HandicapSystem DefaultHandicapSystem { get; set; }
+    public Guid? DefaultHandicapSystemId { get; set; }
+
 }

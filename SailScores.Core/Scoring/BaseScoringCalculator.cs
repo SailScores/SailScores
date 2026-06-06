@@ -713,7 +713,6 @@ namespace SailScores.Core.Scoring
                 .Where(r => (r.State ?? RaceState.Raced) == RaceState.Raced
                     || r.State == RaceState.Preliminary)
                 .OrderBy(r => r.Date).ThenBy(r => r.Order).LastOrDefault();
-            Guid? lastRaceId;
             if(lastRace == default)
             {
                 lastRace = races

@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -17,6 +17,8 @@ public class RegattaSummaryViewModel
     public DateTime? EndDate { get; set; }
 
     public DateTime? UpdatedDate { get; set; }
+
+    public IList<SeriesSummary> Series { get; set; }
 
     public String ClubInitials { get; set; }
     public String ClubName { get; set; }
@@ -37,5 +39,16 @@ public class RegattaSummaryViewModel
                     return $"{count} fleets";
             }
         }
+    }
+
+    /// <summary>
+    /// Gets the most recent UpdatedDate from the series in this regatta.
+    /// </summary>
+    public DateTime? GetMostRecentSeriesUpdatedDate()
+    {
+        if (Series == null || !Series.Any())
+            return null;
+
+        return Series.Max(s => s.UpdatedDate);
     }
 }

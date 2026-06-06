@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -30,6 +30,8 @@ namespace SailScores.Core.Model
         public DateTime? UpdatedDate { get; set; }
 
         public bool HideFromFrontPage { get; set; }
+
+        public bool HideFromClubHomePage { get; set; }
 
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]

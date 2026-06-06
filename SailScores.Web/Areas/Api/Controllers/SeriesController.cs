@@ -7,35 +7,60 @@ using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationS
 
 namespace SailScores.Web.Areas.Api.Controllers
 {
+    public class SeriesListResult
+    {
+        public required IEnumerable<SeriesDto> Series { get; set; }
+        public bool NoSeasonForDate { get; set; }
+        public bool NoSeriesForDate { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SeriesController : ControllerBase
     {
         private readonly Core.Services.ISeriesService _service;
+        private readonly Core.Services.ISeasonService _seasonService;
         private readonly IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public SeriesController(
             Core.Services.ISeriesService service,
+            Core.Services.ISeasonService seasonService,
             IAuthorizationService authService,
             IMapper mapper)
         {
             _service = service;
+            _seasonService = seasonService;
             _authService = authService;
             _mapper = mapper;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IEnumerable<SeriesDto>> Get(
+        public async Task<ActionResult<SeriesListResult>> Get(
             Guid clubId,
             DateTime? date,
             bool? includeSummary = true
             )
         {
             var series = await _service.GetAllSeriesAsync(clubId, date, true, includeSummary ?? true);
-            return _mapper.Map<List<SeriesDto>>(series);
+            var noSeasonForDate = false;
+            var noSeriesForDate = false;
+
+            if (date.HasValue)
+            {
+                var seasons = await _seasonService.GetSeasons(clubId);
+                noSeasonForDate = !seasons.Any(s => s.Start <= date.Value && s.End >= date.Value);
+                noSeriesForDate = !series.Any();
+            }
+
+            return Ok(new SeriesListResult
+            {
+                Series = _mapper.Map<List<SeriesDto>>(series),
+                NoSeasonForDate = noSeasonForDate,
+                NoSeriesForDate = noSeriesForDate
+            });
         }
 
         [HttpGet("{identifier}")]

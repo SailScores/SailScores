@@ -13,6 +13,81 @@ const noCodeString = "No Code";
 
 // OCR module instance
 let ocrModule: OcrRaceEntry | null = null;
+let previousDateValue = "";
+let suppressSeriesRemovalConfirmation = false;
+
+interface seriesListResult {
+    series: seriesDto[];
+    noSeasonForDate: boolean;
+    noSeriesForDate: boolean;
+}
+
+function logStartTimeState(context: string, startTimeInput?: HTMLInputElement | null) {
+    const input = startTimeInput ?? document.getElementById("StartTime") as HTMLInputElement | null;
+    if (!input) {
+        console.log(`[StartTime][${context}] input not found`);
+        return;
+    }
+
+    const flatpickrInstance = (input as any)._flatpickr;
+    const selectedDate = flatpickrInstance?.selectedDates?.[0] as Date | undefined;
+    const selectedDateText = selectedDate ? selectedDate.toString() : "<none>";
+    console.log(
+        `[StartTime][${context}] value='${input.value}', default='${input.defaultValue}', ` +
+        `trackTimes='${(document.getElementById("trackTimesCheckbox") as HTMLInputElement | null)?.checked ?? "n/a"}', ` +
+        `flatpickr='${selectedDateText}'`
+    );
+}
+
+function attachStartTimeDiagnostics(startTimeInput: HTMLInputElement) {
+    const state = { lastValue: startTimeInput.value };
+
+    startTimeInput.addEventListener("input", function () {
+        console.log(`[StartTime][input] '${state.lastValue}' -> '${startTimeInput.value}'`);
+        state.lastValue = startTimeInput.value;
+    });
+
+    startTimeInput.addEventListener("change", function () {
+        console.log(`[StartTime][change] '${state.lastValue}' -> '${startTimeInput.value}'`);
+        logStartTimeState("change", startTimeInput);
+        console.log("[StartTime][change] stack", new Error().stack);
+        state.lastValue = startTimeInput.value;
+    });
+
+    const tryHookFlatpickrSetDate = () => {
+        const flatpickrInstance = (startTimeInput as any)._flatpickr;
+        if (!flatpickrInstance || typeof flatpickrInstance.setDate !== "function") {
+            return false;
+        }
+
+        if ((flatpickrInstance as any).__startTimeSetDateHooked) {
+            return true;
+        }
+
+        const originalSetDate = flatpickrInstance.setDate.bind(flatpickrInstance);
+        flatpickrInstance.setDate = (date: any, triggerChange?: boolean, format?: string) => {
+            console.log(
+                `[StartTime][flatpickr.setDate] date=`,
+                date,
+                `triggerChange=${triggerChange ?? "<undefined>"}`,
+                `format=${format ?? "<undefined>"}`
+            );
+            console.log("[StartTime][flatpickr.setDate] stack", new Error().stack);
+            return originalSetDate(date, triggerChange, format);
+        };
+
+        (flatpickrInstance as any).__startTimeSetDateHooked = true;
+        return true;
+    };
+
+    if (!tryHookFlatpickrSetDate()) {
+        window.setTimeout(() => {
+            if (tryHookFlatpickrSetDate()) {
+                logStartTimeState("flatpickr hook attached (delayed)", startTimeInput);
+            }
+        }, 0);
+    }
+}
 
 function checkEnter(e: KeyboardEvent) {
     let txtArea = /textarea/i.test((e.target as HTMLElement).tagName);
@@ -109,6 +184,13 @@ export function initialize() {
     // Update all score times if race start time changes and TrackTimes is enabled
     const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
     if (startTimeInput) {
+        logStartTimeState("initialize", startTimeInput);
+        attachStartTimeDiagnostics(startTimeInput);
+
+        window.addEventListener("load", function () {
+            logStartTimeState("window.load", startTimeInput);
+        });
+
         startTimeInput.addEventListener('change', function () {
             updateAllScoreTimesForStartTimeChange();
         });
@@ -151,6 +233,14 @@ export function loadFleet() {
 }
 
 export function dateChanged() {
+    const currentDateValue = $("#date").val() as string;
+    if (!suppressSeriesRemovalConfirmation) {
+        const dateInput = document.getElementById('date') as HTMLInputElement | null;
+        previousDateValue = dateInput?.defaultValue ?? "";
+        if (currentDateValue && dateInput) {
+            dateInput.defaultValue = currentDateValue;
+        }
+    }
     loadSeriesOptions();
     if ($("#defaultWeather").val() === "true") {
         console.log("defaultWeather was true");
@@ -695,36 +785,65 @@ function displayRaceNumber() {
 }
 
 
-let seriesOptions: seriesDto[];
+let seriesOptions: seriesDto[] = [];
 function getSeries(clubId: string, date: string) {
+    const seriesSelect = $('#SeriesIds, #seriesIds') as JQuery;
+    const selectedSeriesValues = seriesSelect.val() as string[] || [];
+    const seriesDateError = $('#seriesDateError');
+
+    seriesDateError.text('');
+
     if (clubId && date) {
-        $.getJSON("/api/Series",
-            {
+        $.ajax({
+            url: "/api/Series",
+            data: {
                 clubId: clubId,
                 date: date,
                 includeSummary: false
             },
-            function (data: seriesDto[]) {
-                seriesOptions = data;
-                setSeries();
-            });
+            dataType: "json",
+            success: function (data: seriesListResult) {
+                seriesOptions = data.series || [];
+
+                if (data.noSeasonForDate) {
+                    seriesDateError.append($("<div></div>")
+                        .text("No season exists covering the selected date. Series cannot be added to this race."));
+                }
+                if (data.noSeriesForDate) {
+                    seriesDateError.append($("<div></div>")
+                        .text("No series cover the selected date."));
+                }
+
+                const availableSeriesIds = new Set(seriesOptions.map(s => s.id.toString()));
+                const removedSeriesIds = selectedSeriesValues.filter(id => !availableSeriesIds.has(id));
+
+                if (removedSeriesIds.length > 0 && !suppressSeriesRemovalConfirmation) {
+                    const confirmed = window.confirm("This date isn't allowed for the currently selected series. This will remove the series from this race. Are you sure?");
+                    if (!confirmed) {
+                        suppressSeriesRemovalConfirmation = true;
+                        const dateInput = document.getElementById('date') as HTMLInputElement | null;
+                        $("#date").val(previousDateValue);
+                        if (dateInput) {
+                            dateInput.defaultValue = previousDateValue;
+                        }
+                        getSeries(clubId, previousDateValue);
+                        return;
+                    }
+                }
+
+                suppressSeriesRemovalConfirmation = false;
+
+                setSeries(selectedSeriesValues);
+            },
+            error: function () {
+                seriesDateError.text("Unable to load series for the selected date.");
+            }
+        });
     }
 }
 
-function setSeries() {
-    let seriesSelect = $('#SeriesIds') as JQuery;
-    // Save current selections as an array of strings
-    let selectedSeriesValues = seriesSelect.val() as string[] || [];
-
-    // Capture existing option texts so we can restore selected ones that may not be in the new list
-    const existingOptionTextMap: Record<string, string> = {};
-    seriesSelect.find('option').each(function () {
-        const $opt = $(this);
-        const val = $opt.val() as string;
-        if (val) {
-            existingOptionTextMap[val] = $opt.text();
-        }
-    });
+function setSeries(selectedSeriesValues: string[] = []) {
+    let seriesSelect = $('#SeriesIds, #seriesIds') as JQuery;
 
     // Destroy existing Select2 instance to avoid duplicates
     if (seriesSelect.hasClass("select2-hidden-accessible")) {
@@ -928,7 +1047,10 @@ function startNow() {
     const timeString = formatTimeForInput(now);
     const startTimeInput = document.getElementById('StartTime') as HTMLInputElement;
     if (startTimeInput) {
+        console.log(`[StartTime][startNow] setting value to '${timeString}'`);
+        logStartTimeState("startNow.before", startTimeInput);
         updateTimeInput(startTimeInput, timeString);
+        logStartTimeState("startNow.afterUpdateTimeInput", startTimeInput);
         $(startTimeInput).trigger('change');
     }
 }
@@ -1137,10 +1259,19 @@ function initTimePickers(container: HTMLElement) {
 }
 
 function updateTimeInput(input: HTMLInputElement, value: string) {
+    if (input.id === "StartTime") {
+        console.log(`[StartTime][updateTimeInput] '${input.value}' -> '${value}'`);
+        console.log("[StartTime][updateTimeInput] stack", new Error().stack);
+    }
+
     input.value = value;
     const fp = (input as any)._flatpickr;
     if (fp) {
         fp.setDate(value);
+    }
+
+    if (input.id === "StartTime") {
+        logStartTimeState("updateTimeInput.after", input);
     }
 }
 

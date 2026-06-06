@@ -1,0 +1,111 @@
+@model SailScores.Web.Models.SailScores.SeriesResultsTemplateViewModel
+@{
+    ViewData["Title"] = "Edit Results Display Template";
+    Layout = "_ClubLayout";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p class="lead">
+    Modify this template's column visibility and header settings.
+</p>
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Template Settings</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="e.g., Standard, Mobile-Friendly, Regatta Full" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+                <small class="form-text text-muted">Give this template a descriptive name to help identify its purpose.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Column Visibility</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">
+                Choose when each column should be displayed:
+                <strong>Always</strong> = visible on all devices,
+                <strong>On Larger Screens</strong> = hidden on phones but visible on tablets/desktops,
+                <strong>Hidden</strong> = never shown.
+            </p>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="SailNumberVisibility" class="form-label"></label>
+                    <select asp-for="SailNumberVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
+                    <span asp-validation-for="SailNumberVisibility" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="CompetitorNameVisibility" class="form-label"></label>
+                    <select asp-for="CompetitorNameVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
+                    <span asp-validation-for="CompetitorNameVisibility" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="BoatNameVisibility" class="form-label"></label>
+                    <select asp-for="BoatNameVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
+                    <span asp-validation-for="BoatNameVisibility" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="CompetitorClubVisibility" class="form-label"></label>
+                    <select asp-for="CompetitorClubVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
+                    <span asp-validation-for="CompetitorClubVisibility" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Column Headers</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">
+                Customize the text shown in column headers. Common examples: "Helm", "Skipper", "Crew", "Name" for competitors;
+                "Boat", "Yacht", "Dinghy" for boat names.
+            </p>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="CompetitorNameHeader" class="form-label"></label>
+                    <input asp-for="CompetitorNameHeader" class="form-control" placeholder="Helm" />
+                    <span asp-validation-for="CompetitorNameHeader" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="BoatNameHeader" class="form-label"></label>
+                    <input asp-for="BoatNameHeader" class="form-control" placeholder="Boat" />
+                    <span asp-validation-for="BoatNameHeader" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+        </button>
+        <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Cancel
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

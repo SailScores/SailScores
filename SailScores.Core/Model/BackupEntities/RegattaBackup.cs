@@ -19,7 +19,8 @@ public class RegattaBackup
     public Guid? ScoringSystemId { get; set; }
     public bool? PreferAlternateSailNumbers { get; set; }
     public bool? HideFromFrontPage { get; set; }
-    
+    public bool? HideFromClubHomePage { get; set; }
+
     /// <summary>
     /// Season ID reference.
     /// </summary>

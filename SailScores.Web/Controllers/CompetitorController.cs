@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
+using SailScores.Core.Services;
 using SailScores.Identity.Entities;
 using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
@@ -19,6 +20,7 @@ public class CompetitorController : Controller
 {
     private readonly IClubService _clubService;
     private readonly ICompetitorService _competitorService;
+    private readonly IHandicapService _handicapService;
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authService;
     private readonly ICsvService _csvService;
@@ -30,6 +32,7 @@ public class CompetitorController : Controller
         IClubService clubService,
         ICompetitorService competitorService,
         IForwarderService forwarderService,
+        IHandicapService handicapService,
         IAuthorizationService authService,
         ICsvService csvService,
         IAdminTipService adminTipService,
@@ -39,6 +42,7 @@ public class CompetitorController : Controller
         _clubService = clubService;
         _competitorService = competitorService;
         _forwarderService = forwarderService;
+        _handicapService = handicapService;
         _authService = authService;
         _csvService = csvService;
         _adminTipService = adminTipService;
@@ -81,14 +85,17 @@ public class CompetitorController : Controller
                      || f.FleetType == Api.Enumerations.FleetType.SelectedClasses)
             .OrderBy(f => f.Name)
             .ToList();
-        
+
+        var club = await _clubService.GetMinimalClub(clubInitials);
+
         var vm = new ClubCollectionViewModel<CompetitorIndexViewModel>
         {
             ClubInitials = clubInitials,
             List = competitors,
             CanEdit = await _authService.CanUserEditRaces(User, clubInitials),
             FleetOptions = _mapper.Map<List<FleetSummary>>(fleets),
-            SelectedFleetId = fleetId
+            SelectedFleetId = fleetId,
+            UseAlternativeSailNumbers = club?.EnableAlternativeSailNumbers ?? false,
         };
         return View(vm);
     }
@@ -121,7 +128,8 @@ public class CompetitorController : Controller
         {
             ClubInitials = clubInitials.ToUpperInvariant(),
             Item = competitorStats,
-            WindSpeedUnits = windSpeedUnits
+            WindSpeedUnits = windSpeedUnits,
+            CanEdit = await _authService.CanUserEditRaces(User, clubInitials)
         };
         return View(vm);
     }
@@ -136,6 +144,22 @@ public class CompetitorController : Controller
             competitorId,
             seasonName);
         if (ranks == null)
+        {
+            return Json(String.Empty);
+        }
+        return Json(ranks);
+    }
+
+    [AllowAnonymous]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "competitorId", "seasonName" })]
+    public async Task<JsonResult> HandicapChart(
+        Guid competitorId,
+        string seasonName)
+    {
+        var ranks = await _competitorService.GetCompetitorHandicapSeasonRanksAsync(
+            competitorId,
+            seasonName);
+        if (ranks == null || !ranks.Any())
         {
             return Json(String.Empty);
         }
@@ -374,6 +398,17 @@ public class CompetitorController : Controller
             .OrderBy(f => f.Name);
         compWithOptions.FleetOptions = _mapper.Map<IList<FleetSummary>>(fleets);
 
+        var club = await _clubService.GetMinimalClub(clubId);
+        if (club.EnableHandicapScoring)
+        {
+            compWithOptions.HandicapRatings = await _handicapService.GetCompetitorHandicapsAsync(id);
+            if (compWithOptions.BoatClassId != Guid.Empty)
+            {
+                compWithOptions.ClassHandicapRatings =
+                    await _handicapService.GetClassHandicapsAsync(compWithOptions.BoatClassId);
+            }
+        }
+
         return View(compWithOptions);
     }
 
@@ -575,6 +610,7 @@ public class CompetitorController : Controller
         await _competitorService.SetAlternativeSailNumber(
             model.CompetitorId,
             model.AlternativeSailNumber,
+            model.ConflictResolution,
             await GetUserStringAsync());
 
         var normalizedAlt = string.IsNullOrWhiteSpace(model.AlternativeSailNumber)
@@ -710,6 +746,178 @@ public class CompetitorController : Controller
         Response.Headers.Append("content-disposition", disposition);
 
         return View(competitors);
+    }
+
+    [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
+    public async Task<ActionResult> AddHandicap(string clubInitials, Guid competitorId)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var competitor = await _competitorService.GetCompetitorAsync(competitorId);
+        if (competitor == null || competitor.ClubId != clubId)
+            return NotFound();
+
+        var handicapSystems = await _handicapService.GetHandicapSystemsAsync(clubId);
+
+        var vm = new CompetitorHandicapViewModel
+        {
+            CompetitorId = competitorId,
+            CompetitorName = competitor.Name,
+            ClubInitials = clubInitials,
+            HandicapSystemOptions = handicapSystems,
+            HandicapSystemId = handicapSystems.Count == 1 ? handicapSystems[0].Id : Guid.Empty
+        };
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
+    public async Task<ActionResult> AddHandicap(string clubInitials, CompetitorHandicapViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!ModelState.IsValid)
+        {
+            model.ClubInitials = clubInitials;
+            model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
+            var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
+            model.CompetitorName = competitor?.Name;
+            return View(model);
+        }
+
+        var handicap = new CompetitorHandicap
+        {
+            Id = Guid.Empty,
+            CompetitorId = model.CompetitorId,
+            HandicapSystemId = model.HandicapSystemId,
+            Value = model.Value,
+            EffectiveFrom = model.EffectiveFrom,
+            EffectiveTo = model.EffectiveTo,
+            Notes = model.Notes
+        };
+
+        try
+        {
+            await _handicapService.SaveCompetitorHandicapAsync(handicap);
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            model.ClubInitials = clubInitials;
+            model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
+            model.CompetitorName = competitor?.Name;
+            return View(model);
+        }
+
+        return RedirectToAction("Edit", new { clubInitials, id = model.CompetitorId });
+    }
+
+    [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
+    public async Task<ActionResult> EditHandicapEntry(string clubInitials, Guid competitorId, Guid handicapId)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var competitor = await _competitorService.GetCompetitorAsync(competitorId);
+        if (competitor == null || competitor.ClubId != clubId)
+            return NotFound();
+
+        var handicaps = await _handicapService.GetCompetitorHandicapsAsync(competitorId);
+        var handicap = handicaps.FirstOrDefault(h => h.Id == handicapId);
+        if (handicap == null)
+            return NotFound();
+
+        var vm = new CompetitorHandicapViewModel
+        {
+            Id = handicap.Id,
+            CompetitorId = competitorId,
+            HandicapSystemId = handicap.HandicapSystemId,
+            Value = handicap.Value,
+            EffectiveFrom = handicap.EffectiveFrom,
+            EffectiveTo = handicap.EffectiveTo,
+            Notes = handicap.Notes,
+            CompetitorName = competitor.Name,
+            ClubInitials = clubInitials,
+            HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId)
+        };
+
+        if (vm.HandicapSystemId == Guid.Empty && vm.HandicapSystemOptions.Count == 1)
+        {
+            vm.HandicapSystemId = vm.HandicapSystemOptions[0].Id;
+        }
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
+    public async Task<ActionResult> EditHandicapEntry(string clubInitials, CompetitorHandicapViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        if (!ModelState.IsValid)
+        {
+            model.ClubInitials = clubInitials;
+            model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
+            var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
+            model.CompetitorName = competitor?.Name;
+            return View(model);
+        }
+
+        var handicap = new CompetitorHandicap
+        {
+            Id = model.Id,
+            CompetitorId = model.CompetitorId,
+            HandicapSystemId = model.HandicapSystemId,
+            Value = model.Value,
+            EffectiveFrom = model.EffectiveFrom,
+            EffectiveTo = model.EffectiveTo,
+            Notes = model.Notes
+        };
+
+        try
+        {
+            await _handicapService.SaveCompetitorHandicapAsync(handicap);
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            model.ClubInitials = clubInitials;
+            model.HandicapSystemOptions = await _handicapService.GetHandicapSystemsAsync(clubId);
+            if (model.HandicapSystemId == Guid.Empty && model.HandicapSystemOptions.Count == 1)
+            {
+                model.HandicapSystemId = model.HandicapSystemOptions[0].Id;
+            }
+            var competitor = await _competitorService.GetCompetitorAsync(model.CompetitorId);
+            model.CompetitorName = competitor?.Name;
+            return View(model);
+        }
+
+        return RedirectToAction("Edit", new { clubInitials, id = model.CompetitorId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
+    public async Task<ActionResult> DeleteHandicap(string clubInitials, Guid handicapId, Guid competitorId)
+    {
+        try
+        {
+            await _handicapService.DeleteCompetitorHandicapAsync(handicapId);
+        }
+        catch
+        {
+            // non-critical: redirect regardless
+        }
+        return RedirectToAction("Edit", new { clubInitials, id = competitorId });
     }
 
     private async Task<string> GetUserStringAsync()

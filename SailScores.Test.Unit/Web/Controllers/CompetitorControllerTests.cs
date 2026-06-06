@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using SailScores.Core.Model;
 using SailScores.Web.Controllers;
 using System;
 using System.Security.Claims;
@@ -58,6 +59,7 @@ namespace SailScores.Test.Unit.Web.Controllers
                 _clubServiceMock.Object,
                 _competitorServiceMock.Object,
                 _forwarderServiceMock.Object,
+                new Mock<IHandicapService>().Object,
                 _authServiceMock.Object,
                 _csvServiceMock.Object,
                 _adminTipServiceMock.Object,
@@ -150,7 +152,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             var result = await _controller.PostSetAlternativeSailNumber(_clubInitials, model);
 
             Assert.IsType<BadRequestObjectResult>(result);
-            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<AltSailNumberConflictResolution>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -169,7 +171,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             var result = await _controller.PostSetAlternativeSailNumber(_clubInitials, model);
 
             Assert.IsType<NotFoundResult>(result);
-            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<AltSailNumberConflictResolution>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -192,7 +194,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             var result = await _controller.PostSetAlternativeSailNumber(_clubInitials, model);
 
             Assert.IsType<UnauthorizedResult>(result);
-            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<AltSailNumberConflictResolution>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -224,7 +226,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             Assert.Equal(competitorId, responseCompetitorId);
             Assert.Equal("ALT-77", responseAltSailNumber);
 
-            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(competitorId, " ALT-77 ", "Test User"), Times.Once);
+            _competitorServiceMock.Verify(s => s.SetAlternativeSailNumber(competitorId, " ALT-77 ", AltSailNumberConflictResolution.AllowDuplicates, "Test User"), Times.Once);
         }
 
         private void SetupAltSailPermissions(Guid clubId, bool canEdit)

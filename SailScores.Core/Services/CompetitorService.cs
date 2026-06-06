@@ -527,6 +527,80 @@ public class CompetitorService : ICompetitorService
         return returnList;
     }
 
+    public async Task<CompetitorStatsResult> GetCompetitorStatsWithHandicapAsync(Guid clubId, Guid competitorId)
+    {
+        var rawSummaries = await _dbContext.GetCompetitorStatsSummaryAsync(clubId, competitorId)
+            .ConfigureAwait(false);
+
+        var stats = rawSummaries
+            .OrderByDescending(s => s.SeasonStart)
+            .Select(s => _mapper.Map<CompetitorSeasonStats>(s))
+            .ToList();
+
+        var result = new CompetitorStatsResult { SeasonStats = stats };
+
+        var club = await _clubService.GetFullClubExceptScores(clubId).ConfigureAwait(false);
+        if(club == null)
+        {
+            throw new InvalidOperationException("Club not found.");
+        }
+        result.ClubHasHandicapScoring = club.EnableHandicapScoring;
+        result.ClubHasDefaultHandicapSystem = club.DefaultHandicapSystemId.HasValue;
+        result.HandicapSystemName = club.DefaultHandicapSystem?.Name;
+
+        if (!result.ClubHasHandicapScoring || !result.ClubHasDefaultHandicapSystem)
+        {
+            return result;
+        }
+
+        var systemId = club.DefaultHandicapSystemId!.Value;
+        var systemType = (int)club.DefaultHandicapSystem.SystemType;
+
+        // Determine if the competitor (or their class) has a rating for the default system.
+        var competitor = await _dbContext.Competitors
+            .Include(c => c.Handicaps)
+            .Include(c => c.BoatClass)
+            .FirstOrDefaultAsync(c => c.Id == competitorId)
+            .ConfigureAwait(false);
+
+        bool competitorHasRating = competitor?.Handicaps?.Any(h => h.HandicapSystemId == systemId) ?? false;
+
+        bool classHasRating = false;
+        if (!competitorHasRating && competitor?.BoatClassId != null)
+        {
+            classHasRating = await _dbContext.ClassHandicaps
+                .AnyAsync(ch => ch.BoatClassId == competitor.BoatClassId
+                             && ch.HandicapSystemId == systemId)
+                .ConfigureAwait(false);
+        }
+
+        result.CompetitorHasRatingForDefaultSystem = competitorHasRating || classHasRating;
+
+        if (!result.CompetitorHasRatingForDefaultSystem)
+        {
+            return result;
+        }
+
+        var handicapSummaries = await _dbContext.GetCompetitorHandicapStatsSummaryAsync(
+            clubId, competitorId, systemId, systemType)
+            .ConfigureAwait(false);
+
+        // Merge corrected-rank fields into the existing season stats by UrlName.
+        var handicapLookup = handicapSummaries.ToDictionary(h => h.SeasonUrlName);
+        foreach (var season in result.SeasonStats)
+        {
+            if (handicapLookup.TryGetValue(season.SeasonUrlName, out var h))
+            {
+                season.CorrectedRaceCount = h.CorrectedRaceCount;
+                season.AverageCorrectedRank = h.AverageCorrectedRank;
+                season.CorrectedBoatsRacedAgainst = h.CorrectedBoatsRacedAgainst;
+                season.CorrectedBoatsBeat = h.CorrectedBoatsBeat;
+            }
+        }
+
+        return result;
+    }
+
 #pragma warning disable CA1054 // Uri parameters should not be strings
     public async Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(
         Guid competitorId,
@@ -534,6 +608,20 @@ public class CompetitorService : ICompetitorService
 #pragma warning restore CA1054 // Uri parameters should not be strings
     {
         var ranks = await _dbContext.GetCompetitorRankCountsAsync(
+            competitorId,
+            seasonUrlName)
+            .ConfigureAwait(false);
+        return _mapper.Map<IList<PlaceCount>>(ranks
+            .OrderBy(r => r.Place ?? 100).ThenBy(r => r.Code));
+    }
+
+#pragma warning disable CA1054 // Uri parameters should not be strings
+    public async Task<IList<PlaceCount>> GetCompetitorHandicapSeasonRanksAsync(
+        Guid competitorId,
+        string seasonUrlName)
+#pragma warning restore CA1054 // Uri parameters should not be strings
+    {
+        var ranks = await _dbContext.GetCompetitorHandicapRankCountsAsync(
             competitorId,
             seasonUrlName)
             .ConfigureAwait(false);
@@ -705,6 +793,81 @@ public class CompetitorService : ICompetitorService
             NewValue = String.Empty,
             Summary = note
         }).ConfigureAwait(false);
+
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public async Task SetAlternativeSailNumber(
+        Guid competitorId,
+        string alternativeSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "")
+    {
+        var competitor = await _dbContext.Competitors
+            .Include(c => c.BoatClass)
+            .Include(c => c.ChangeHistory)
+            .FirstOrDefaultAsync(c => c.Id == competitorId)
+            .ConfigureAwait(false);
+
+        if (competitor == null)
+        {
+            return;
+        }
+
+        var normalizedAltNumber = string.IsNullOrWhiteSpace(alternativeSailNumber)
+            ? null
+            : alternativeSailNumber.Trim();
+
+        // Handle conflict resolution if setting a non-null value
+        if (!string.IsNullOrWhiteSpace(normalizedAltNumber))
+        {
+            IQueryable<Db.Competitor> conflictQuery = _dbContext.Competitors
+                .Include(c => c.ChangeHistory)
+                .Where(c => c.ClubId == competitor.ClubId
+                    && c.Id != competitorId
+                    && c.AlternativeSailNumber == normalizedAltNumber);
+
+            if (conflictResolution == AltSailNumberConflictResolution.ClearFromOthersInSameClass)
+            {
+                // Only clear from competitors in the same boat class
+                conflictQuery = conflictQuery.Where(c => c.BoatClassId == competitor.BoatClassId);
+            }
+            else if (conflictResolution == AltSailNumberConflictResolution.AllowDuplicates)
+            {
+                // Don't clear from anyone
+                conflictQuery = conflictQuery.Where(c => false);
+            }
+            // ClearFromOthersInClub uses the base query (all club competitors)
+
+            var conflictingCompetitors = await conflictQuery.ToListAsync().ConfigureAwait(false);
+
+            foreach (var conflictingComp in conflictingCompetitors)
+            {
+                conflictingComp.ChangeHistory.Add(new Db.CompetitorChange
+                {
+                    ChangeTimeStamp = DateTime.UtcNow,
+                    ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                    ChangedBy = userName,
+                    NewValue = null,
+                    Summary = $"Alternative Sail Number cleared (reassigned to {competitor.Name})"
+                });
+                conflictingComp.AlternativeSailNumber = null;
+            }
+        }
+
+        // Update the target competitor
+        if (competitor.AlternativeSailNumber != normalizedAltNumber)
+        {
+            competitor.ChangeHistory.Add(new Db.CompetitorChange
+            {
+                ChangeTimeStamp = DateTime.UtcNow,
+                ChangeTypeId = Db.ChangeType.PropertyChangedId,
+                ChangedBy = userName,
+                NewValue = normalizedAltNumber,
+                Summary = "Alternative Sail Number Changed"
+            });
+            competitor.AlternativeSailNumber = normalizedAltNumber;
+        }
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }

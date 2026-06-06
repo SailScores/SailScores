@@ -26,6 +26,7 @@ public class ClubBackupData
     public string StatisticsDescription { get; set; }
     public WeatherSettingsBackup WeatherSettings { get; set; }
     public Guid? LogoFileId { get; set; }
+    public bool EnableHandicapScoring { get; set; }
 
     // Referenced data
     public IList<BoatClassBackup> BoatClasses { get; set; }
@@ -33,6 +34,8 @@ public class ClubBackupData
     public IList<FleetBackup> Fleets { get; set; }
     public IList<CompetitorBackup> Competitors { get; set; }
     public IList<ScoringSystemBackup> ScoringSystems { get; set; }
+    public IList<HandicapSystemBackup> HandicapSystems { get; set; }
+    public IList<CompetitorHandicapBackup> CompetitorHandicaps { get; set; }
     public IList<SeriesBackup> Series { get; set; }
     public IList<RaceBackup> Races { get; set; }
     public IList<RegattaBackup> Regattas { get; set; }
@@ -50,4 +53,7 @@ public class ClubBackupData
 
     // Default scoring system name for reference
     public string DefaultScoringSystemName { get; set; }
+
+    // Default handicap system name for reference
+    public string DefaultHandicapSystemName { get; set; }
 }

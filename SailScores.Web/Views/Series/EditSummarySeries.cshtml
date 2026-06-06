@@ -74,66 +74,132 @@
 
                     <div id="collapseAdvanced" class="collapse" role="tabpanel" aria-labelledby="advancedHeading" data-parent="#advancedFields">
                         <div class="card-body">
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="IsImportantSeries" />
-                                    <label class="form-check-label" asp-for="IsImportantSeries"> List as Top Series</label>
+
+                            <!-- Appearance -->
+                            <div class="settings-section mb-4">
+                                <h4 class="mb-3">Appearance</h4>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" asp-for="IsImportantSeries" />
+                                            <label class="form-check-label" asp-for="IsImportantSeries">List as Top Series</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <label asp-for="TrendOption">Show Rank Trend</label>
+                                        <select id="ScoringSystemId" asp-for="TrendOption" class="form-select">
+                                            @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+                                            {
+                                                <option value="@trendOption">
+                                                    @(EnumHelper<TrendOption>.GetDisplayValue(trendOption))
+                                                </option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="TrendOption" class="text-danger"></span>
+                                    </div>
                                 </div>
+                                @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
+                                {
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <label asp-for="SeriesResultsTemplateId" class="control-label">
+                                            View Template
+                                            <a class="text-primary"
+                                               data-bs-container="body"
+                                               data-bs-toggle="popover"
+                                               data-bs-placement="top"
+                                               data-bs-trigger="focus hover"
+                                               data-bs-content="Choose a template that controls which columns appear in the series results table and their visibility on different screen sizes.">
+                                                <span class="far fa-question-circle"></span>
+                                            </a>
+                                        </label>
+                                        <select asp-for="SeriesResultsTemplateId" class="form-select">
+                                            <option value="">-Use club default-</option>
+                                            @foreach (var template in Model.TemplateOptions)
+                                            {
+                                                <option value="@template.Id">@template.Name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="SeriesResultsTemplateId" class="text-danger"></span>
+                                        <small class="form-text text-muted">Create templates in the Club Info page.</small>
+                                    </div>
+                                }
                             </div>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="ResultsLocked" />
-                                    <label asp-for="ResultsLocked"> Lock Results</label>
-                                    <span class="small">Prevents scores from recalculating for this series</span>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label asp-for="TrendOption">Calculate Rank Trend</label>
-                                <select id="ScoringSystemId" asp-for="TrendOption" class="form-select">
-                                    @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
+
+                            <!-- Scoring -->
+                            <div class="settings-section mb-4">
+                                <h4 class="mb-3">Scoring</h4>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <label asp-for="ScoringSystemId">Scoring System</label>
+                                        <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
+                                            @foreach (var scoringSystem in Model.ScoringSystemOptions)
+                                            {
+                                                <option value="@scoringSystem.Id">
+                                                    @scoringSystem.Name
+                                                </option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
+                                    </div>
+                                    @if (Model.HandicapSystemOptions != null && Model.HandicapSystemOptions.Any())
                                     {
-                                        <option value="@trendOption">
-                                            @(EnumHelper<TrendOption>.GetDisplayValue(trendOption))
-                                        </option>
+                                        <div class="col-12 col-md-6 settings-group">
+                                            <label asp-for="HandicapSystemId">Handicap System</label>
+                                            <select asp-for="HandicapSystemId" class="form-select">
+                                                <option value="">@("<default>")</option>
+                                                @foreach (var hs in Model.HandicapSystemOptions.Where(h => h.Id != Guid.Empty))
+                                                {
+                                                    <option value="@hs.Id">@hs.Name</option>
+                                                }
+                                            </select>
+                                            <span asp-validation-for="HandicapSystemId" class="text-danger"></span>
+                                            <small class="form-text text-muted">
+                                                This setting only applies when children series are imported as individual races.
+                                                When "Children series each count as a single race" is checked above, each child series' own handicap system is used instead.
+                                            </small>
+                                        </div>
                                     }
-                                </select>
-                                <span asp-validation-for="TrendOption" class="text-danger"></span>
-                            </div>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="ExcludeFromCompetitorStats" />
-                                    <label class="form-check-label" asp-for="ExcludeFromCompetitorStats"> Exclude from competitor summary statistics</label>
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" asp-for="ResultsLocked" />
+                                            <label asp-for="ResultsLocked">Lock Results</label>
+                                            <small class="form-text text-muted d-block">Prevents scores from recalculating for this series</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" asp-for="HideDncDiscards" />
+                                            <label class="form-check-label" asp-for="HideDncDiscards">Hide Discarded DNC Scores</label>
+                                            <small class="form-text text-muted d-block">Show as blanks</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" asp-for="ExcludeFromCompetitorStats" />
+                                            <label class="form-check-label" asp-for="ExcludeFromCompetitorStats">Exclude from Competitor Statistics</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="HideDncDiscards" />
-                                    <label class="form-check-label" asp-for="HideDncDiscards"> Hide discarded DNC scores (Show as blanks)</label>
+
+                            <!-- Advanced Tools -->
+                            <div class="settings-section mb-4">
+                                <h4 class="mb-3">Advanced Tools</h4>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6 settings-group">
+                                        <label for="whatifanchor">Scoring "What‑If"</label>
+                                        <a class="form-control btn btn-secondary"
+                                           id="whatifanchor"
+                                           asp-route="WhatIf"
+                                           asp-route-action="options"
+                                           asp-route-seriesId="@Model.Id"
+                                           asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]"
+                                           asp-route-returnUrl="@ViewData["ReturnUrl"]"
+                                           title="Test scoring changes">Try Different Scoring</a>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label asp-for="ScoringSystemId">Scoring System</label>
-                                <select id="ScoringSystemId" asp-for="ScoringSystemId" class="form-select">
-                                    @foreach (var scoringSystem in Model.ScoringSystemOptions)
-                                    {
-                                        <option value="@scoringSystem.Id">
-                                            @scoringSystem.Name
-                                        </option>
-                                    }
-                                </select>
-                                <span asp-validation-for="ScoringSystemId" class="text-danger"></span>
-                            </div>
-                            <div class="mb-3">
-                                <label for="whatifanchor">Scoring "What If"</label>
-                                <a class="form-control btn btn-secondary"
-                                   id="whatifanchor"
-                                   asp-route="WhatIf"
-                                   asp-route-action="options"
-                                   asp-route-seriesId="@Model.Id"
-                                   asp-route-clubInitials="@ViewContext.RouteData.Values["ClubInitials"]"
-                                   asp-route-returnUrl="@ViewData["ReturnUrl"]"
-                                   title="Test scoring changes">Try Different Scoring</a>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -151,4 +217,12 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+      // help popovers (to be touch screen friendly.)
+      $(function () {
+          $('[data-bs-toggle="popover"]').popover();
+      })
+    </script>
+
 }

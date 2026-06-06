@@ -41,9 +41,14 @@ public class RaceViewModel
     public DateTime? UpdatedDate { get; set; }
     public String UpdatedBy { get; set; }
 
+    public decimal? CourseDistance { get; set; }
+
     // New timing fields
     public DateTime? StartTime { get; set; }
     public bool TrackTimes { get; set; }
+
+    public bool ShowCorrectedTime { get; set; }
+    public string CorrectedTimeNote { get; set; }
 
     public string DisplayName
     {

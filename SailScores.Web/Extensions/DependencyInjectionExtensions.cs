@@ -39,11 +39,13 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ISupporterService, SupporterService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IPublicApiService, PublicApiService>();
+        services.AddScoped<IHandicapSystemService, HandicapSystemService>();
         services.AddSingleton<IHtmlSanitizer>(new HtmlSanitizer());
         services.AddScoped<ILocalizerService, LocalizerService>();
         services.AddTransient<IStripeService, StripeService>();
         services.AddScoped<ICalendarService, CalendarService>();
         services.AddScoped<IBackupService, BackupService>();
+        services.AddScoped<IRedirectHelper, RedirectHelper>();
 
 
         services.AddSingleton<AppVersionInfo>();

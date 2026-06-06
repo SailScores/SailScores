@@ -31,5 +31,5 @@
 else
 {
     <a class="float-end" asp-area="" asp-controller="Account" asp-action="Login"
-       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">@localizer["Log in"]</a>
+       asp-route-returnUrl="@settingsService.GetRelativeUri(Context.Request)">@localizer["Log in"]</a>
 }

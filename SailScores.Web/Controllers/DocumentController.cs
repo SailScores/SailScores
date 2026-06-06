@@ -24,6 +24,7 @@ public class DocumentController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
     private readonly IHtmlSanitizer _sanitizer;
+    private readonly IRedirectHelper _redirectHelper;
 
     public DocumentController(
         CoreServices.IClubService clubService,
@@ -31,7 +32,8 @@ public class DocumentController : Controller
         IAuthorizationService authService,
         UserManager<ApplicationUser> userManager,
         IHtmlSanitizer sanitizer,
-        IMapper mapper)
+        IMapper mapper,
+        IRedirectHelper redirectHelper)
     {
         _clubService = clubService;
         _documentService = regattaDocumentService;
@@ -39,6 +41,7 @@ public class DocumentController : Controller
         _userManager = userManager;
         _sanitizer = sanitizer;
         _mapper = mapper;
+        _redirectHelper = redirectHelper;
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -206,11 +209,7 @@ public class DocumentController : Controller
             model.CreatedLocalDate = DateTime.UtcNow.AddMinutes(0 - model.TimeOffset);
             await _documentService.UpdateDocument(model);
 
-            if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return RedirectToAction("Index", "Admin");
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Admin");
         }
         catch (Exception)
         {
@@ -244,11 +243,7 @@ public class DocumentController : Controller
         {
             await _documentService.Delete(id);
 
-            if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return RedirectToAction("Index", "Admin");
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Admin");
         }
         catch
         {

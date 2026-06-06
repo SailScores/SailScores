@@ -47,6 +47,8 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
     public DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
 
+    public DbSet<SeriesResultsTemplate> SeriesResultsTemplates { get; set; }
+
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
     public DbSet<SystemAlert> SystemAlerts { get; set; }
@@ -61,6 +63,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     // these sets below are not tables in the database 
     private DbSet<CompetitorStatsSummary> CompetitorStatsSummary { get; set; }
+    private DbSet<CompetitorHandicapStatsSummary> CompetitorHandicapStatsSummary { get; set; }
     private DbSet<CompetitorRankStats> CompetitorRankStats { get; set; }
     private DbSet<ClubSeasonStats> ClubSeasonStats { get; set; }
     private DbSet<SeriesParticipationStats> SeriesParticipationStats { get; set; }
@@ -73,6 +76,10 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     public DbSet<ChangeType> ChangeTypes { get; set; }
     public DbSet<CompetitorChange> CompetitorChanges { get; set; }
+
+    public DbSet<HandicapSystem> HandicapSystems { get; set; }
+    public DbSet<CompetitorHandicap> CompetitorHandicaps { get; set; }
+    public DbSet<ClassHandicap> ClassHandicaps { get; set; }
 
     public async Task<IList<AllCompHistogramFields>> GetAllCompHistogramFields(
         Guid clubId,
@@ -116,6 +123,26 @@ public class SailScoresContext : DbContext, ISailScoresContext
         return result;
     }
 
+    public async Task<IList<CompetitorHandicapStatsSummary>> GetCompetitorHandicapStatsSummaryAsync(
+        Guid clubId,
+        Guid competitorId,
+        Guid handicapSystemId,
+        int systemType)
+    {
+        var query = "EXECUTE dbo.SS_SP_GetSeasonSummaryHandicap" +
+            " @CompetitorId = @competitorId, @ClubId = @clubId," +
+            " @HandicapSystemId = @handicapSystemId, @SystemType = @systemType";
+
+        var clubParam = new SqlParameter("clubId", clubId);
+        var competitorParam = new SqlParameter("competitorId", competitorId);
+        var systemParam = new SqlParameter("handicapSystemId", handicapSystemId);
+        var typeParam = new SqlParameter("systemType", systemType);
+        var result = await this.CompetitorHandicapStatsSummary
+            .FromSqlRaw(query, competitorParam, clubParam, systemParam, typeParam)
+            .ToListAsync();
+        return result;
+    }
+
     public async Task<IList<CompetitorRankStats>> GetCompetitorRankCountsAsync(string clubInitials, string sailNumber)
     {
         var query = await GetSqlQuery("RankCounts");
@@ -132,6 +159,19 @@ public class SailScoresContext : DbContext, ISailScoresContext
         string seasonUrlName)
     {
         var query = await GetSqlQuery("RankCountsById");
+        var competitorParam = new SqlParameter("CompetitorId", competitorId);
+        var seasonParam = new SqlParameter("SeasonUrlName", seasonUrlName);
+        var result = await this.CompetitorRankStats
+            .FromSqlRaw(query, competitorParam, seasonParam)
+            .ToListAsync();
+        return result;
+    }
+
+    public async Task<IList<CompetitorRankStats>> GetCompetitorHandicapRankCountsAsync(
+        Guid competitorId,
+        string seasonUrlName)
+    {
+        var query = await GetSqlQuery("RankCountsByIdHandicap");
         var competitorParam = new SqlParameter("CompetitorId", competitorId);
         var seasonParam = new SqlParameter("SeasonUrlName", seasonUrlName);
         var result = await this.CompetitorRankStats
@@ -295,6 +335,31 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasForeignKey(sl => sl.ChildSeriesId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // SeriesResultsTemplate relationships
+        modelBuilder.Entity<SeriesResultsTemplate>()
+            .HasOne(t => t.Club)
+            .WithMany(c => c.SeriesResultsTemplates)
+            .HasForeignKey(t => t.ClubId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Series>()
+            .HasOne(s => s.SeriesResultsTemplate)
+            .WithMany()
+            .HasForeignKey(s => s.SeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Club>()
+            .HasOne<SeriesResultsTemplate>()
+            .WithMany()
+            .HasForeignKey(c => c.DefaultSeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Club>()
+            .HasOne<SeriesResultsTemplate>()
+            .WithMany()
+            .HasForeignKey(c => c.DefaultRegattaSeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Regatta>()
             .Property(e => e.UpdatedDate)
             .HasConversion(v => v, v =>
@@ -372,6 +437,12 @@ public class SailScoresContext : DbContext, ISailScoresContext
                 cs.HasNoKey();
                 cs.ToTable((string)null);
             });
+        modelBuilder.Entity<CompetitorHandicapStatsSummary>(
+            cs =>
+            {
+                cs.HasNoKey();
+                cs.ToTable((string)null);
+            });
         modelBuilder.Entity<CompetitorRankStats>(
             cs =>
             {
@@ -427,6 +498,114 @@ public class SailScoresContext : DbContext, ISailScoresContext
                 cs.HasNoKey();
                 cs.ToTable((string)null);
             });
+
+        modelBuilder.Entity<Club>()
+            .HasOne(c => c.DefaultHandicapSystem)
+            .WithMany(h => h.DefaultForClubs)
+            .HasForeignKey(c => c.DefaultHandicapSystemId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Fleet>()
+            .HasOne(f => f.DefaultHandicapSystem)
+            .WithMany(h => h.DefaultForFleets)
+            .HasForeignKey(f => f.DefaultHandicapSystemId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Series>()
+            .HasOne(s => s.HandicapSystem)
+            .WithMany(h => h.DefaultForSeries)
+            .HasForeignKey(s => s.HandicapSystemId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<CompetitorHandicap>()
+            .HasOne(ch => ch.Competitor)
+            .WithMany(c => c.Handicaps)
+            .HasForeignKey(ch => ch.CompetitorId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CompetitorHandicap>()
+            .HasOne(ch => ch.HandicapSystem)
+            .WithMany(h => h.CompetitorHandicaps)
+            .HasForeignKey(ch => ch.HandicapSystemId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // At most one row per (CompetitorId, HandicapSystemId) may have EffectiveFrom IS NULL
+        modelBuilder.Entity<CompetitorHandicap>()
+            .HasIndex(ch => new { ch.CompetitorId, ch.HandicapSystemId })
+            .HasFilter("[EffectiveFrom] IS NULL")
+            .IsUnique()
+            .HasDatabaseName("IX_CompetitorHandicap_NullStart");
+
+        // At most one row per (CompetitorId, HandicapSystemId) may have EffectiveTo IS NULL
+        modelBuilder.Entity<CompetitorHandicap>()
+            .HasIndex(ch => new { ch.CompetitorId, ch.HandicapSystemId })
+            .HasFilter("[EffectiveTo] IS NULL")
+            .IsUnique()
+            .HasDatabaseName("IX_CompetitorHandicap_NullEnd");
+
+        modelBuilder.Entity<ClassHandicap>()
+            .HasOne(ch => ch.BoatClass)
+            .WithMany()
+            .HasForeignKey(ch => ch.BoatClassId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ClassHandicap>()
+            .HasOne(ch => ch.HandicapSystem)
+            .WithMany()
+            .HasForeignKey(ch => ch.HandicapSystemId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<CompetitorHandicap>()
+            .Property(ch => ch.Value)
+            .HasColumnType("decimal(18, 6)");
+
+        modelBuilder.Entity<ClassHandicap>()
+            .Property(ch => ch.Value)
+            .HasColumnType("decimal(18, 6)");
+
+        // At most one row per (BoatClassId, HandicapSystemId) may have EffectiveFrom IS NULL
+        modelBuilder.Entity<ClassHandicap>()
+            .HasIndex(ch => new { ch.BoatClassId, ch.HandicapSystemId })
+            .HasFilter("[EffectiveFrom] IS NULL")
+            .IsUnique()
+            .HasDatabaseName("IX_ClassHandicap_NullStart");
+
+        // At most one row per (BoatClassId, HandicapSystemId) may have EffectiveTo IS NULL
+        modelBuilder.Entity<ClassHandicap>()
+            .HasIndex(ch => new { ch.BoatClassId, ch.HandicapSystemId })
+            .HasFilter("[EffectiveTo] IS NULL")
+            .IsUnique()
+            .HasDatabaseName("IX_ClassHandicap_NullEnd");
+
+        modelBuilder.Entity<HandicapSystem>().HasData(
+            new HandicapSystem
+            {
+                Id = new Guid("a1b2c3d4-0001-0000-0000-000000000001"),
+                ClubId = null,
+                Name = "PHRF Time-on-Distance",
+                SystemType = HandicapSystemType.PhrfToD,
+                Description = "corrected = elapsed_sec - (rating × distance_nm). " +
+                    "Rating is seconds-per-mile; scratch boat rating is 0."
+            },
+            new HandicapSystem
+            {
+                Id = new Guid("a1b2c3d4-0001-0000-0000-000000000002"),
+                ClubId = null,
+                Name = "PHRF Time-on-Time",
+                SystemType = HandicapSystemType.PhrfToT,
+                Description = "corrected = elapsed_sec × 600 / (600 + rating). " +
+                    "Uses the same PHRF rating as ToD but requires no course distance."
+            },
+            new HandicapSystem
+            {
+                Id = new Guid("a1b2c3d4-0001-0000-0000-000000000003"),
+                ClubId = null,
+                Name = "Portsmouth Yardstick",
+                SystemType = HandicapSystemType.Portsmouth,
+                Description = "corrected = elapsed_sec / PY × 1000. " +
+                    "Ratings published by RYA; baseline is 1000."
+            }
+        );
 
         modelBuilder.Entity<ChangeType>().HasData(
             new ChangeType { Id = ChangeType.CreatedId, Name = "Created" },

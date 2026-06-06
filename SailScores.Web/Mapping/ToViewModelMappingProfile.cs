@@ -42,16 +42,22 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.DefaultScoringSystemName, o => o.MapFrom(s => s.DefaultScoringSystem.Name))
                 .ForMember(d => d.ShowClubInResults, o => o.MapFrom(s => s.ShowClubInResults ?? false))
                 .ForMember(d => d.ShowCalendarInNav, o => o.MapFrom(s => s.ShowCalendarInNav ?? false))
+                .ForMember(d => d.EnableAlternativeSailNumbers, o => o.MapFrom(s => s.EnableAlternativeSailNumbers ?? false))
                 .ForMember(d => d.HasRaces, o => o.Ignore())
                 .ForMember(d => d.HasCompetitors, o => o.Ignore())
                 .ForMember(d => d.Users, o => o.Ignore())
+                .ForMember(d => d.HandicapSystems, o => o.Ignore())
+                .ForMember(d => d.HandicapSystemOptions, o => o.Ignore())
+                .ForMember(d => d.TemplateOptions, o => o.Ignore())
                 .ReverseMap()
-                .ForMember(d => d.DefaultScoringSystem, o => o.Ignore());
+                .ForMember(d => d.DefaultScoringSystem, o => o.Ignore())
+                .ForMember(d => d.DefaultHandicapSystem, o => o.Ignore());
 
             CreateMap<AdminViewModel, AdminEditViewModel>();
-            
+
             CreateMap<AdminEditViewModel, Model.Club>()
                 .ForMember(d => d.DefaultScoringSystem, o => o.Ignore())
+                .ForMember(d => d.DefaultHandicapSystem, o => o.Ignore())
                 .ForMember(d => d.WeatherSettings, o => o.Ignore())
                 .ForMember(d => d.Fleets, o => o.Ignore())
                 .ForMember(d => d.Competitors, o => o.Ignore())
@@ -79,6 +85,7 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Fleet, FleetDeleteViewModel>()
                 .ForMember(d => d.IsDeletable, o => o.Ignore())
                 .ForMember(d => d.PreventDeleteReason, o => o.Ignore());
+            CreateMap<Model.HandicapSystem, HandicapSystemSummary>();
 
 
             CreateMap<Model.Series, SeriesSummary>()
@@ -168,6 +175,11 @@ namespace SailScores.Web.Mapping
                 .ForMember( d => d.TimeOffset, o => o.Ignore())
                 .ForMember( d => d.File, o => o.Ignore());
 
+            CreateMap<Core.Model.SeriesResultsTemplate, SeriesResultsTemplateViewModel>()
+                .ForMember(d => d.ClubInitials, o => o.Ignore())
+                .ForMember(d => d.IsClubDefault, o => o.Ignore())
+                .ReverseMap();
+
             MapRegattaObjects();
         }
 
@@ -241,7 +253,8 @@ namespace SailScores.Web.Mapping
             CreateMap<Model.Regatta, RegattaViewModel>();
             CreateMap<Model.Regatta, RegattaSummaryViewModel>()
                 .ForMember(d => d.ClubInitials, o => o.Ignore())
-                .ForMember(d => d.ClubName, o => o.Ignore());
+                .ForMember(d => d.ClubName, o => o.Ignore())
+                .ForMember(d => d.Series, o => o.MapFrom(s => s.Series));
             CreateMap<RegattaViewModel, RegattaSummaryViewModel>()
                 .ForMember(d => d.ClubInitials, o => o.Ignore())
                 .ForMember(d => d.ClubName, o => o.Ignore())

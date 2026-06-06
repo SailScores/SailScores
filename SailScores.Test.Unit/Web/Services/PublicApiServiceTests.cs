@@ -166,7 +166,8 @@ public class PublicApiServiceTests
         Assert.Equal("ALT-101", result.Competitors[0].AlternativeSailNumber);
         Assert.Equal("Home YC", result.Competitors[0].HomeClubName);
         Assert.Equal("/LHYC/Competitor/skipper-one", result.Competitors[0].Url);
-        Assert.Equal(SailScores.Api.Enumerations.RaceState.Raced, result.Races[0].State);
+        Assert.Equal("Raced", result.Races[0].State);
+        Assert.Equal("Race 1 (1/5)", result.Races[0].ShortName);
         Assert.Equal(180m, result.Races[0].WindDirectionDegrees);
         Assert.Equal("day-sunny", result.Races[0].WeatherIcon);
         Assert.Equal("DNC", result.ScoreCodesUsed[0].Code);
@@ -250,6 +251,56 @@ public class PublicApiServiceTests
         Assert.NotNull(result);
         Assert.Single(result.Competitors);
         Assert.Equal("/MYC/Competitor/comp-42", result.Competitors[0].Url);
+    }
+
+    [Fact]
+    public async Task GetSeriesDetailAsync_WithRaceCount_ReturnsMostRecentRacesOnly()
+    {
+        var clubId = Guid.NewGuid();
+        var seasonId = Guid.NewGuid();
+        var club = new Club { Id = clubId, Initials = "MYC" };
+        var series = BuildSeries(clubId, Guid.NewGuid(), seasonId, "2025", "fall");
+        var secondRaceId = Guid.NewGuid();
+        var thirdRaceId = Guid.NewGuid();
+
+        var races = series.FlatResults.Races.ToList();
+        races.Add(new FlatRace
+        {
+            Id = secondRaceId,
+            Name = "Race 2",
+            Date = new DateTime(2026, 1, 6, 0, 0, 0, DateTimeKind.Utc),
+            Order = 2,
+            State = SailScores.Api.Enumerations.RaceState.Scheduled
+        });
+        races.Add(new FlatRace
+        {
+            Id = thirdRaceId,
+            Name = "Race 3",
+            Date = new DateTime(2026, 1, 7, 0, 0, 0, DateTimeKind.Utc),
+            Order = 3,
+            State = SailScores.Api.Enumerations.RaceState.Abandoned
+        });
+        series.FlatResults.Races = races;
+
+        _coreClubServiceMock.Setup(s => s.GetClubId("MYC")).ReturnsAsync(clubId);
+        _coreClubServiceMock.Setup(s => s.GetMinimalClub(clubId)).ReturnsAsync(club);
+        _coreSeriesServiceMock.Setup(s => s.GetSeriesDetailsAsync("MYC", "2025", "fall")).ReturnsAsync(series);
+
+        var result = await _service.GetSeriesDetailAsync(
+            "MYC",
+            "2025",
+            "fall",
+            includeRaces: true,
+            raceCount: 2);
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Races.Count);
+        Assert.Equal("Race 2", result.Races[0].Name);
+        Assert.Equal("Race 3", result.Races[1].Name);
+        Assert.Equal("Scheduled", result.Races[0].State);
+        Assert.Equal("Abandoned", result.Races[1].State);
+        Assert.Equal("Race 2 (1/6)", result.Races[0].ShortName);
+        Assert.Equal("Race 3 (1/7)", result.Races[1].ShortName);
     }
 
     [Fact]

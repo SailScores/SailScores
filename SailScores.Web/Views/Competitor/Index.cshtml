@@ -147,7 +147,7 @@
             <div class="row border-bottom mb-1 pb-1 comp-row @(item.IsActive ? "" : "comp-inactive") " data-name="@item.Name" data-sail="@item.SailNumber">
                 @if (Model.CanEdit)
                 {
-                    <div class="col-auto pe-1">
+                    <div class="col-12 col-md-4 col-lg-3 pe-1">
                         @if (!item.IsDeletable)
                         {
                             <span data-bs-toggle="tooltip" title="Cannot be deleted: @item.PreventDeleteReason">
@@ -168,16 +168,36 @@
                                 <span class="fas fa-trash"></span>
                             </a>
                         }
-                        <span class="d-none d-sm-inline"> </span><a class="btn btn-sm btn-outline-primary mb-2"
-                                                                    asp-action="Edit"
-                                                                    asp-controller="Competitor"
-                                                                    asp-route-id="@item.Id"
-                                                                    title="Edit">
+                        <a class="btn btn-sm btn-outline-primary me-2 mb-2"
+                           asp-action="Edit"
+                           asp-controller="Competitor"
+                           asp-route-id="@item.Id"
+                           title="Edit">
                             <span class="fas fa-pen"></span>
                         </a>
+                        @if (Model.UseAlternativeSailNumbers)
+                        {
+                            <button type="button"
+                                    class="btn btn-sm mb-2 @(string.IsNullOrWhiteSpace(item.AlternativeSailNumber) ? "btn-outline-secondary" : "btn-outline-dark") comp-alt-sail-btn"
+                                    title="@(string.IsNullOrWhiteSpace(item.AlternativeSailNumber) ? "Set Alternative Sail Number" : "Change Alternative Sail Number")"
+                                    data-competitor-id="@item.Id"
+                                    data-competitor-name="@item.Name"
+                                    data-sail-number="@item.SailNumber"
+                                    data-alt-sail-number="@item.AlternativeSailNumber">
+                                @if (string.IsNullOrWhiteSpace(item.AlternativeSailNumber))
+                                {
+                                    <span class="fas fa-hashtag"></span>
+                                }
+                                else
+                                {
+                                    <span class="fas fa-hashtag"></span>
+                                    <span class="small ms-1">@item.AlternativeSailNumber</span>
+                                }
+                            </button>
+                        }
                     </div>
                 }
-                <div class="col">
+                <div class="col-12 col-md-8 col-lg-9">
                     <div class="row">
                         <div class="col-3">
                             <a asp-route="Competitor"
@@ -226,6 +246,11 @@
         }
     </div>
 </div>
+
+@if (Model.CanEdit && Model.UseAlternativeSailNumbers)
+{
+    @await Html.PartialAsync("_editAltSailNumberModal")
+}
 
 @section Scripts {
     <script>
@@ -413,6 +438,93 @@
             sortCompetitors();
             changeVisibility(0);
             initializeToggles();
+            initializeAltSailButtons();
         });
+
+        function initializeAltSailButtons() {
+            const setAlternativeSailNumberUrl = '@Url.Action("SetAlternativeSailNumber", "Competitor", new { clubInitials = Model.ClubInitials })';
+            const conflictResolutionStorageKey = 'altSailConflictResolution';
+
+            document.querySelectorAll('.comp-alt-sail-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const competitorId = this.dataset.competitorId;
+                    const competitorName = this.dataset.competitorName;
+                    const sailNumber = this.dataset.sailNumber;
+                    const altSailNumber = this.dataset.altSailNumber || '';
+
+                    document.getElementById('altSailNumberCompetitorId').value = competitorId;
+                    document.getElementById('altSailNumberCompetitorName').textContent = competitorName;
+                    document.getElementById('altSailNumberSailNumber').textContent = sailNumber;
+                    document.getElementById('altSailNumberInput').value = altSailNumber;
+
+                    const savedConflictResolution = localStorage.getItem(conflictResolutionStorageKey);
+                    const conflictRadioToSelect = document.querySelector(
+                        'input[name="altSailNumberConflictResolution"][value="' + savedConflictResolution + '"]');
+                    if (conflictRadioToSelect) {
+                        conflictRadioToSelect.checked = true;
+                    } else {
+                        document.getElementById('conflictAllowDuplicates').checked = true;
+                    }
+
+                    const modal = new bootstrap.Modal(document.getElementById('editAltSailNumberModal'));
+                    modal.show();
+                });
+            });
+
+            const saveBtn = document.getElementById('altSailNumberSaveButton');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function () {
+                    const competitorId = document.getElementById('altSailNumberCompetitorId').value;
+                    const altSailNumber = document.getElementById('altSailNumberInput').value;
+                    const conflictResolution = document.querySelector('input[name="altSailNumberConflictResolution"]:checked').value;
+                    localStorage.setItem(conflictResolutionStorageKey, conflictResolution);
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                    fetch(setAlternativeSailNumberUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': token
+                        },
+                        body: new URLSearchParams({
+                            CompetitorId: competitorId,
+                            AlternativeSailNumber: altSailNumber,
+                            ConflictResolution: conflictResolution
+                        })
+                    })
+                    .then(function (response) {
+                        if (!response.ok) throw new Error('Save failed');
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        // Update the button's stored data and appearance
+                        const btn = document.querySelector('.comp-alt-sail-btn[data-competitor-id="' + data.competitorId + '"]');
+                        if (btn) {
+                            btn.dataset.altSailNumber = data.alternativeSailNumber || '';
+                            if (data.alternativeSailNumber) {
+                                btn.classList.remove('btn-outline-secondary');
+                                btn.classList.add('btn-outline-dark');
+                                btn.innerHTML = '<span class="fas fa-hashtag"></span><span class="small ms-1">' + data.alternativeSailNumber + '</span>';
+                                btn.title = 'Change Alternative Sail Number';
+                            } else {
+                                btn.classList.remove('btn-outline-dark');
+                                btn.classList.add('btn-outline-secondary');
+                                btn.innerHTML = '<span class="fas fa-hashtag"></span>';
+                                btn.title = 'Set Alternative Sail Number';
+                            }
+                        }
+                        // If conflict resolution cleared others, refresh the page to reflect changes
+                        if (parseInt(conflictResolution) > 0) {
+                            window.location.reload();
+                        } else {
+                            bootstrap.Modal.getInstance(document.getElementById('editAltSailNumberModal')).hide();
+                        }
+                    })
+                    .catch(function () {
+                        alert('Failed to save alternative sail number. Please try again.');
+                    });
+                });
+            }
+        }
     </script>
 }

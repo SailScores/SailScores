@@ -101,6 +101,113 @@
         </form>
     </div>
 </div>
+@if (Model.HandicapRatings != null)
+{
+    var showEffectiveDates = !(Model.HandicapRatings.Count == 1
+        && !Model.HandicapRatings[0].EffectiveFrom.HasValue
+        && !Model.HandicapRatings[0].EffectiveTo.HasValue);
+
+    <hr />
+    <div class="row">
+        <div class="col-12 col-xl-8">
+            <h4>Handicap Ratings</h4>
+            @if (Model.HandicapRatings.Any())
+            {
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>System</th>
+                            <th>Rating</th>
+                            @if (showEffectiveDates)
+                            {
+                                <th>From</th>
+                                <th>To</th>
+                            }
+                            <th>Notes</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var h in Model.HandicapRatings)
+                        {
+                            <tr>
+                                <td>@(h.HandicapSystem?.Name ?? h.HandicapSystemId.ToString("D").Substring(0, 8))</td>
+                                <td>@h.Value</td>
+                                @if (showEffectiveDates)
+                                {
+                                    <td>@(h.EffectiveFrom?.ToString("d") ?? "—")</td>
+                                    <td>@(h.EffectiveTo?.ToString("d") ?? "—")</td>
+                                }
+                                <td>@h.Notes</td>
+                                <td>
+                                    <a asp-action="EditHandicapEntry"
+                                       asp-route-competitorId="@Model.Id"
+                                       asp-route-handicapId="@h.Id"
+                                       class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <form asp-action="DeleteHandicap" method="post" style="display:inline;"
+                                          onsubmit="return confirm('Delete this handicap rating?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="handicapId" value="@h.Id" />
+                                        <input type="hidden" name="competitorId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">No handicap ratings on file.</p>
+            }
+            <a asp-action="AddHandicap"
+               asp-route-competitorId="@Model.Id"
+               class="btn btn-sm btn-outline-primary mb-3">Add Handicap Rating</a>
+            @if (Model.ClassHandicapRatings != null && Model.ClassHandicapRatings.Any())
+            {
+                var showClassEffectiveDates = !(Model.ClassHandicapRatings.Count == 1
+                    && !Model.ClassHandicapRatings[0].EffectiveFrom.HasValue
+                    && !Model.ClassHandicapRatings[0].EffectiveTo.HasValue);
+
+                <div class="alert alert-info mt-3" role="alert">
+                    <strong>Class-level handicap ratings</strong> are defined for this competitor's boat class.
+                    Adding a competitor-level rating above will override the class-level ratings.
+                  <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>System</th>
+                            <th>Rating</th>
+                            @if (showClassEffectiveDates)
+                            {
+                                <th>From</th>
+                                <th>To</th>
+                            }
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ch in Model.ClassHandicapRatings)
+                        {
+                            <tr>
+                                <td>@ch.HandicapSystem?.Name</td>
+                                <td>@ch.Value.ToString("0.######")</td>
+                                @if (showClassEffectiveDates)
+                                {
+                                    <td>@(ch.EffectiveFrom?.ToString("d") ?? "—")</td>
+                                    <td>@(ch.EffectiveTo?.ToString("d") ?? "—")</td>
+                                }
+                                <td>@ch.Notes</td>
+                            </tr>
+                        }
+                    </tbody>
+                  </table>
+                </div>
+            }
+
+        </div>
+    </div>
+}
 <hr />
 <div class="row">
     <div class="col-12 col-xl-8">

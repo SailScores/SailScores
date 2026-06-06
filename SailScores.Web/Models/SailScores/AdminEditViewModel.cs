@@ -31,9 +31,20 @@ public class AdminEditViewModel
     
     public bool IsHidden { get; set; }
     public bool ShowClubInResults { get; set; }
-    
+
     [Display(Name = "Show Calendar in Navigation")]
     public bool ShowCalendarInNav { get; set; }
+
+    [Display(Name = "Enable Handicap Scoring")]
+    public bool EnableHandicapScoring { get; set; }
+
+    [Display(Name = "Enable Alternative Sail Numbers")]
+    public bool EnableAlternativeSailNumbers { get; set; }
+
+    [Display(Name = "Default Handicap System")]
+    public Guid? DefaultHandicapSystemId { get; set; }
+
+    public IList<HandicapSystem> HandicapSystemOptions { get; set; }
 
     public String Url { get; set; }
 
@@ -57,8 +68,16 @@ public class AdminEditViewModel
     public IList<string> LocaleOptions { get; set; }
 
     public int RaceCount { get; set; }
-    
+
     public bool CanSelfReset => RaceCount <= ResetClubViewModel.MaxSelfServiceRaceCount;
+
+    [Display(Name = "Default Template for Standard Series")]
+    public Guid? DefaultSeriesResultsTemplateId { get; set; }
+
+    [Display(Name = "Default Template for Regattas")]
+    public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+
+    public IList<SeriesResultsTemplate> TemplateOptions { get; set; }
 
 #pragma warning restore CA2227 // Collection properties should be read only
 }

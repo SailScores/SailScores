@@ -348,6 +348,21 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
 
             _context = new SailScoresContext(options);
 
+            // Apply any pending migrations to the restored database
+            try
+            {
+                Log("Applying pending migrations to restored database...");
+                await _context.Database.MigrateAsync();
+                Log("✓ Migrations applied successfully");
+            }
+            catch (Exception migEx)
+            {
+                Log($"WARNING: Migration failed: {migEx.Message}");
+                Log($"Migration exception type: {migEx.GetType().Name}");
+                Log($"Migration stack trace: {migEx.StackTrace}");
+                Log("Continuing with restored database (may have missing columns)");
+            }
+
             // Verify connection and get club count
             Log("Verifying database connection...");
             var clubCount = await _context.Clubs.CountAsync();

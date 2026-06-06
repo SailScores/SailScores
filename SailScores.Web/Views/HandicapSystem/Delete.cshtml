@@ -1,0 +1,45 @@
+@model SailScores.Web.Models.SailScores.HandicapSystemDeleteViewModel
+
+@{
+    ViewData["Title"] = "Delete Handicap System";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h4>Delete Handicap System</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Name</dt>
+            <dd class="col-sm-8">@Model.Name</dd>
+            <dt class="col-sm-4">System Type</dt>
+            <dd class="col-sm-8">@Model.SystemType</dd>
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <dt class="col-sm-4">Description</dt>
+                <dd class="col-sm-8">@Model.Description</dd>
+            }
+        </dl>
+
+        @if (Model.IsDeletable)
+        {
+            <div class="alert alert-warning">
+                <strong>Warning:</strong> Deleting this handicap system will remove it from any series that use it.
+                Competitor ratings for this system will also be removed.
+            </div>
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="submit" value="Delete" class="btn btn-danger" />
+                <a asp-controller="Admin" asp-action="Index" asp-fragment="handicapsystems"
+                   class="btn btn-outline-primary">Cancel</a>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-danger">@Model.PreventDeleteReason</div>
+            <a asp-controller="Admin" asp-action="Index" asp-fragment="handicapsystems"
+               class="btn btn-outline-primary">Back</a>
+        }
+    </div>
+</div>

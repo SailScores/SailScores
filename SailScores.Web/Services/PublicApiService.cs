@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Threading;
 using SailScores.Api.Dtos.Public;
+using SailScores.Core.Extensions;
 using SailScores.Core.FlatModel;
 using SailScores.Web.Services.Interfaces;
 using CoreClubService = SailScores.Core.Services.IClubService;
@@ -239,7 +241,8 @@ public class PublicApiService : IPublicApiService
         string seasonUrlName,
         string seriesUrlName,
         bool includeCompetitors = false,
-        bool includeRaces = false)
+        bool includeRaces = false,
+        int? raceCount = null)
     {
         var resolved = await ResolveSeriesAsync(clubInitials, seasonUrlName, seriesUrlName);
         if (resolved == null)
@@ -295,7 +298,7 @@ public class PublicApiService : IPublicApiService
                     series.FlatResults?.CalculatedScores,
                     competitorRouteTokens,
                     resolvedClubInitials,
-                    (series.ShowCompetitorClub ?? false)
+                    (series.SeriesResultsTemplate?.CompetitorClubVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                         || (series.FlatResults?.Competitors?.Any(c => !string.IsNullOrWhiteSpace(c.HomeClubName))
                             ?? false),
                     series.PreferAlternativeSailNumbers ?? false)
@@ -305,7 +308,8 @@ public class PublicApiService : IPublicApiService
                     series.FlatResults?.Races,
                     series.FlatResults?.CalculatedScores,
                     resolvedClubInitials,
-                    includeCompetitors)
+                    includeCompetitors,
+                    raceCount)
                 : null,
             ScoreCodesUsed = includeRaces
                 ? MapScoreCodes(series.FlatResults?.ScoreCodesUsed)
@@ -493,10 +497,24 @@ public class PublicApiService : IPublicApiService
         IEnumerable<FlatRace> races,
         IEnumerable<FlatSeriesScore> scores,
         string clubInitials,
-        bool includeCompetitorResults)
+        bool includeCompetitorResults,
+        int? raceCount)
     {
+        var selectedRaces = (races ?? [])
+            .OrderByDescending(r => r.Date ?? DateTime.MinValue)
+            .ThenByDescending(r => r.Order)
+            .Take(raceCount ?? int.MaxValue)
+            .OrderBy(r => r.Date)
+            .ThenBy(r => r.Order)
+            .ToList();
+
+        var raceIds = selectedRaces
+            .Select(r => r.Id)
+            .ToHashSet();
+
         var scoresByRaceId = (scores ?? [])
             .SelectMany(s => (s.Scores ?? [])
+                .Where(r => raceIds.Contains(r.RaceId))
                 .Select(r => new { s.CompetitorId, Result = r }))
             .GroupBy(x => x.Result.RaceId)
             .ToDictionary(
@@ -515,20 +533,19 @@ public class PublicApiService : IPublicApiService
                     })
                     .ToList());
 
-        return (races ?? [])
-            .OrderBy(r => r.Date)
-            .ThenBy(r => r.Order)
+        return selectedRaces
             .Select(r => new PublicSeriesRaceItemDto
             {
                 Id = r.Id,
                 DateUtc = GetUtcOffset(r.Date),
                 Order = r.Order,
-                State = r.State,
+                State = r.State?.ToString(),
                 WindSpeed = r.WindSpeed,
                 WindSpeedUnits = r.WindSpeedUnits,
                 WindDirectionDegrees = r.WindDirectionDegrees,
                 WeatherIcon = r.WeatherIcon,
                 Name = r.Name ?? string.Empty,
+                ShortName = GetRaceShortName(r),
                 Url = BuildRaceApiUrl(clubInitials, r.Id),
                 HtmlUrl = BuildRaceHtmlUrl(clubInitials, r.Id),
                 CompetitorResults = includeCompetitorResults
@@ -538,6 +555,42 @@ public class PublicApiService : IPublicApiService
                     : null
             })
             .ToList();
+    }
+
+    private static string GetRaceShortName(FlatRace race)
+    {
+        if (string.IsNullOrEmpty(race.Name))
+        {
+            return $"{race.Date.ToSuperShortString()} {GetRaceLetter()}{race.Order}";
+        }
+
+        if ((race.IsSeries ?? false) && race.StartDate != null && race.EndDate != null)
+        {
+            if (race.StartDate == race.EndDate)
+            {
+                return $"{race.Name} ({race.StartDate.ToSuperShortString()})";
+            }
+
+            return $"{race.Name} ({race.StartDate.ToSuperShortString()} - {race.EndDate.ToSuperShortString()})";
+        }
+
+        return $"{race.Name} ({race.Date.ToSuperShortString()})";
+    }
+
+    private static string GetRaceLetter()
+    {
+        var raceWord = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName switch
+        {
+            "fi" => "Purjehdukset",
+            "sv" => "Seglingar",
+            _ => "Race"
+        };
+
+        var first = string.IsNullOrEmpty(raceWord)
+            ? "R"
+            : raceWord.Substring(0, 1);
+
+        return CultureInfo.CurrentCulture.TextInfo.ToUpper(first);
     }
 
     private static List<PublicSeriesScoreCodeDto> MapScoreCodes(

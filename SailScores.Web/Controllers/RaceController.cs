@@ -182,6 +182,7 @@ public class RaceController : Controller
 
         await _raceService.AddOptionsToRace(raceWithOptions);
         raceWithOptions.UseAdvancedFeatures = club.UseAdvancedFeatures ?? false;
+        raceWithOptions.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers ?? false;
 
         return View(raceWithOptions);
     }

@@ -20,6 +20,8 @@ public class AdminService : IAdminService
     private readonly CoreServices.IFleetService _coreFleetService;
     private readonly CoreServices.ISeasonService _coreSeasonService;
     private readonly CoreServices.ISeriesService _coreSeriesService;
+    private readonly CoreServices.IHandicapService _coreHandicapService;
+    private readonly CoreServices.Interfaces.ISeriesResultsTemplateService _coreTemplateService;
     private readonly IWeatherService _weatherService;
     private readonly IPermissionService _permissionService;
     private readonly ILocalizerService _localizerService;
@@ -35,6 +37,8 @@ public class AdminService : IAdminService
         CoreServices.IFleetService fleetService,
         CoreServices.ISeasonService seasonService,
         CoreServices.ISeriesService seriesService,
+        CoreServices.IHandicapService handicapService,
+        CoreServices.Interfaces.ISeriesResultsTemplateService templateService,
         IWeatherService weatherService,
         IPermissionService permissionService,
         ILocalizerService localizerService,
@@ -49,6 +53,8 @@ public class AdminService : IAdminService
         _coreFleetService = fleetService;
         _coreSeasonService = seasonService;
         _coreSeriesService = seriesService;
+        _coreHandicapService = handicapService;
+        _coreTemplateService = templateService;
         _weatherService = weatherService;
         _permissionService = permissionService;
         _localizerService = localizerService;
@@ -61,12 +67,22 @@ public class AdminService : IAdminService
     {
         var club = await _coreClubService.GetClubForAdmin(clubInitials);
 
+        // Ensure default templates exist for this club (one-time seed)
+        if (club.DefaultSeriesResultsTemplateId == null || club.DefaultRegattaSeriesResultsTemplateId == null)
+        {
+            await _coreTemplateService.SeedDefaultTemplatesAsync(club.Id);
+            // Reload club to get the updated default template IDs
+            club = await _coreClubService.GetClubForAdmin(clubInitials);
+        }
+
         var vm = _mapper.Map<AdminViewModel>(club);
         vm.ScoringSystemOptions = await _coreScoringService.GetScoringSystemsAsync(club.Id, false);
         vm.SpeedUnitOptions = _weatherService.GetSpeedUnitOptions();
         vm.TemperatureUnitOptions = _weatherService.GetTemperatureUnitOptions();
         vm.LocaleOptions = GetLocaleLongNames();
         vm.Locale = _localizerService.GetLocaleLongName(club.Locale);
+        vm.HandicapSystemOptions = await _coreHandicapService.GetHandicapSystemsAsync(club.Id);
+        vm.TemplateOptions = (await _coreTemplateService.GetTemplatesForClubAsync(club.Id)).ToList();
         return vm;
     }
 
@@ -129,6 +145,27 @@ public class AdminService : IAdminService
         vm.HasRaces = vm.BoatClasses.Count != 0 &&
                       (await _coreRaceService.HasRacesAsync(club.Id));
         vm.Users = await _permissionService.GetUsersAsync(club.Id);
+
+        if (club.EnableHandicapScoring)
+        {
+            var handicapSystems = await _coreHandicapService.GetHandicapSystemsAsync(club.Id);
+            var baseSystems = await _coreHandicapService.GetBaseHandicapSystemsAsync();
+            var baseById = baseSystems.ToDictionary(s => s.Id, s => s.Name);
+            vm.HandicapSystems = handicapSystems
+                .Select(hs => new HandicapSystemSummary
+                {
+                    Id = hs.Id,
+                    Name = hs.Name,
+                    SystemType = hs.SystemType,
+                    Description = hs.Description,
+                    ParentSystemId = hs.ParentSystemId,
+                    ParentSystemName = hs.ParentSystemId.HasValue
+                        && baseById.TryGetValue(hs.ParentSystemId.Value, out var parentName)
+                        ? parentName
+                        : null
+                })
+                .ToList();
+        }
 
         return vm;
     }

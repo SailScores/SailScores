@@ -45,7 +45,6 @@ public class CompetitorService : ICompetitorService
         string clubInitials,
         string urlName)
     {
-
         var clubId = await _coreClubService.GetClubId(clubInitials);
         // sailor will usually be sailNumber but falls back to name if no number.
         var comp = await _coreCompetitorService.GetCompetitorByUrlNameAsync(clubId, urlName);
@@ -57,7 +56,12 @@ public class CompetitorService : ICompetitorService
 
         var vm = _mapper.Map<CompetitorStatsViewModel>(comp);
 
-        vm.SeasonStats = await _coreCompetitorService.GetCompetitorStatsAsync(clubId, comp.Id);
+        var statsResult = await _coreCompetitorService.GetCompetitorStatsWithHandicapAsync(clubId, comp.Id);
+        vm.SeasonStats = statsResult.SeasonStats;
+        vm.ClubHasHandicapScoring = statsResult.ClubHasHandicapScoring;
+        vm.ClubHasDefaultHandicapSystem = statsResult.ClubHasDefaultHandicapSystem;
+        vm.CompetitorHasRatingForDefaultSystem = statsResult.CompetitorHasRatingForDefaultSystem;
+        vm.HandicapSystemName = statsResult.HandicapSystemName;
 
         return vm;
     }
@@ -66,14 +70,20 @@ public class CompetitorService : ICompetitorService
         Guid competitorId,
         string seasonUrlName)
     {
-
         var seasonStats = await _coreCompetitorService.GetCompetitorSeasonRanksAsync(
             competitorId,
             seasonUrlName);
+        return seasonStats;
+    }
 
-        var vm = seasonStats;
-
-        return vm;
+    public async Task<IList<PlaceCount>> GetCompetitorHandicapSeasonRanksAsync(
+        Guid competitorId,
+        string seasonUrlName)
+    {
+        var seasonStats = await _coreCompetitorService.GetCompetitorHandicapSeasonRanksAsync(
+            competitorId,
+            seasonUrlName);
+        return seasonStats;
     }
 
     public async Task SaveAsync(
@@ -328,19 +338,17 @@ public class CompetitorService : ICompetitorService
         await _coreCompetitorService.AddHistoryElement(competitorId, newNote, userName);
     }
 
-    public async Task SetAlternativeSailNumber(Guid competitorId, string alternativeSailNumber, string userName = "")
+    public async Task SetAlternativeSailNumber(
+        Guid competitorId,
+        string alternativeSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "")
     {
-        var competitor = await _coreCompetitorService.GetCompetitorAsync(competitorId);
-        if (competitor == null)
-        {
-            return;
-        }
-
-        competitor.AlternativeSailNumber = string.IsNullOrWhiteSpace(alternativeSailNumber)
-            ? null
-            : alternativeSailNumber.Trim();
-
-        await _coreCompetitorService.SaveAsync(competitor, userName);
+        await _coreCompetitorService.SetAlternativeSailNumber(
+            competitorId,
+            alternativeSailNumber,
+            conflictResolution,
+            userName);
     }
 
     public async Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(

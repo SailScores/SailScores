@@ -47,6 +47,8 @@ namespace SailScores.Core.Services
                 .SelectMany(c => c.Regattas)
                 .Include(c => c.Season)
                 .Include(c => c.RegattaFleet)
+                .Include(c => c.RegattaSeries)
+                .ThenInclude(rs => rs.Series)
                 .OrderBy(r => r.StartDate)
                 .AsSplitQuery()
                 .ToListAsync()
@@ -124,7 +126,6 @@ namespace SailScores.Core.Services
                 series.FlatResults = await _seriesService.GetHistoricalResults(series)
                     .ConfigureAwait(false);
                 series.PreferAlternativeSailNumbers = fullRegatta.PreferAlternateSailNumbers;
-                series.ShowCompetitorClub = true;
             }
             return fullRegatta;
         }
@@ -244,6 +245,7 @@ namespace SailScores.Core.Services
             existingRegatta.ScoringSystemId = model.ScoringSystemId;
             existingRegatta.PreferAlternateSailNumbers = model.PreferAlternateSailNumbers;
             existingRegatta.HideFromFrontPage = model.HideFromFrontPage;
+            existingRegatta.HideFromClubHomePage = model.HideFromClubHomePage;
 
             if (model.Season != null
                 && model.Season.Id != Guid.Empty

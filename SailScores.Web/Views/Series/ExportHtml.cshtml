@@ -73,7 +73,16 @@
                     SeriesId = Model.Id,
                     Results = Model.FlatResults,
                     ShowTrend = false,
-                    ShowCompetitorClub = Model.ShowCompetitorClub ?? false,
+                    SailNumberVisibility = Model.SeriesResultsTemplate?.SailNumberVisibility
+                        ?? SailScores.Api.Enumerations.ColumnVisibility.Always,
+                    CompetitorNameVisibility = Model.SeriesResultsTemplate?.CompetitorNameVisibility
+                        ?? SailScores.Api.Enumerations.ColumnVisibility.Always,
+                    CompetitorNameHeader = Model.SeriesResultsTemplate?.CompetitorNameHeader ?? "Helm",
+                    BoatNameVisibility = Model.SeriesResultsTemplate?.BoatNameVisibility
+                        ?? SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens,
+                    BoatNameHeader = Model.SeriesResultsTemplate?.BoatNameHeader ?? "Boat",
+                    CompetitorClubVisibility = Model.SeriesResultsTemplate?.CompetitorClubVisibility
+                        ?? SailScores.Api.Enumerations.ColumnVisibility.Hidden,
                     IsExport = true,
                     ShowExportButtons = false,
                     ExcludeCompetitorLinks = true,

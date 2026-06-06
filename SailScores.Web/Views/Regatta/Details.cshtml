@@ -4,6 +4,7 @@
 @using SailScores.Core.Utility
 @using SailScores.Web.Resources;
 @using SailScores.Web.Services;
+@using SailScores.Core.Services
 
 @using SailScores.Web.Models.SailScores
 
@@ -298,12 +299,22 @@
                         && !((bool?)ViewData["IsExport"] ?? false);
                     string trendLegend = localizer["Rank change from"] + " " +
                         localizer[EnumHelper<TrendOption>.GetDisplayValue(currentSeries.TrendOption.Value)];
+
+                    // Resolve template settings
+                    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(currentSeries.SeriesResultsTemplate)
+                        ?? SeriesResultsTemplateHelper.GetDefaultTemplate(true); // Regatta default
+
                     var tableModel = new ResultsTableViewModel
                         {
                             SeriesId = currentSeries.Id,
                             Results = currentSeries.FlatResults,
                             ShowTrend = showTrend,
-                            ShowCompetitorClub = currentSeries.ShowCompetitorClub ?? false,
+                            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
+                            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
+                            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
+                            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
+                            BoatNameHeader = resolvedTemplate.BoatNameHeader,
+                            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
                             IsExport = false,
                             ShowExportButtons = true,
                             ExcludeCompetitorLinks = true,

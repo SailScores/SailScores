@@ -15,9 +15,33 @@
                     <label class="form-label mb-0">Sail Number</label>
                     <div id="altSailNumberSailNumber" class="form-control-plaintext"></div>
                 </div>
-                <div class="mb-2">
+                <div class="mb-3">
                     <label class="form-label" for="altSailNumberInput">Alternative Sail Number</label>
                     <input id="altSailNumberInput" type="text" class="form-control" maxlength="20" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">If this number is already assigned to another competitor:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="altSailNumberConflictResolution" 
+                               id="conflictAllowDuplicates" value="0" checked>
+                        <label class="form-check-label" for="conflictAllowDuplicates">
+                            Allow the same number on multiple competitors
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="altSailNumberConflictResolution" 
+                               id="conflictClearSameClass" value="1">
+                        <label class="form-check-label" for="conflictClearSameClass">
+                            Remove from other competitors in the same class
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="altSailNumberConflictResolution" 
+                               id="conflictClearAllClub" value="2">
+                        <label class="form-check-label" for="conflictClearAllClub">
+                            Remove from all other competitors in this club
+                        </label>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

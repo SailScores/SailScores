@@ -49,7 +49,7 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 
 ### Prerequisites
 
-- .NET 8 SDK
+- .NET 10 SDK
 - Docker (for SQL Server database)
 - Visual Studio or VS Code (optional but recommended)
 
@@ -259,10 +259,14 @@ Pipelines automatically:
 ## Active Features in Development
 
 - **Series Fleet Options** ([Issue #150](https://github.com/SailScores/SailScores/issues/150)): Adds optional fleet association to series with fleet-based competitor filtering and race score recalculation. See `docs/Features-SeriesFleetOption.md` for details.
+- **Handicap System Inheritance**: Clubs should create club-owned handicap systems from site-wide base systems (`ParentSystemId`), similar to scoring system inheritance. Prefer club-owned systems in UI selection lists and expose base systems in admin setup/discovery flows.
+- **CorrectedTime Lifecycle**: `Score.CorrectedTime` is computed during scoring/race-detail workflows and is not persisted. This allows the same race to participate in multiple series with different handicap systems.
+- **Effective Handicap Resolution**: Resolve handicap systems by Series → Fleet → Club defaults. For race-detail corrected-time display, show corrected times only when exactly one effective handicap system applies across the race's assigned series.
 
 ## Additional Resources
 
 - Full development guide: `docs/Development.md`
+- Sailing domain glossary: `docs/SailingGlossary.md`
 - API documentation: REST endpoints support public API access
 - Sample database: `Sql Utility Scripts/starter.bak`
 

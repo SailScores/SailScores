@@ -30,6 +30,7 @@ public class SeriesController : Controller
     private readonly IMapper _mapper;
     private readonly IForwarderService _forwarderService;
     private readonly Core.Services.IFleetService _fleetService;
+    private readonly Core.Services.Interfaces.ISeriesResultsTemplateService _templateService;
 
     public SeriesController(
         ISeriesService seriesService,
@@ -39,6 +40,7 @@ public class SeriesController : Controller
         ICsvService csvService,
         IForwarderService forwarderService,
         Core.Services.IFleetService fleetService,
+        Core.Services.Interfaces.ISeriesResultsTemplateService templateService,
         UserManager<ApplicationUser> userManager,
         IMapper mapper)
     {
@@ -49,6 +51,7 @@ public class SeriesController : Controller
         _csvService = csvService;
         _forwarderService = forwarderService;
         _fleetService = fleetService;
+        _templateService = templateService;
         _userManager = userManager;
         _mapper = mapper;
     }
@@ -202,6 +205,7 @@ public class SeriesController : Controller
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
                 model.FleetOptions = blankVm.FleetOptions;
+                model.HandicapSystemOptions = blankVm.HandicapSystemOptions;
 
                 // Log model state errors for debugging
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
@@ -236,6 +240,8 @@ public class SeriesController : Controller
             model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
             model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
             model.FleetOptions = blankVm.FleetOptions;
+            model.HandicapSystemOptions = blankVm.HandicapSystemOptions;
+            model.TemplateOptions = blankVm.TemplateOptions;
 
             // Clear parent series IDs for Summary Series since they can't have parents
             // probably redundant with above, but doesn't hurt.
@@ -298,6 +304,8 @@ public class SeriesController : Controller
         seriesWithOptions.ScoringSystemOptions = blankVm.ScoringSystemOptions;
         seriesWithOptions.SummarySeriesOptions = blankVm.SummarySeriesOptions;
         seriesWithOptions.FleetOptions = blankVm.FleetOptions;
+        seriesWithOptions.HandicapSystemOptions = blankVm.HandicapSystemOptions;
+        seriesWithOptions.TemplateOptions = (await _templateService.GetTemplatesForClubAsync(clubId)).ToList();
         if(seriesWithOptions.Type == Core.Model.SeriesType.Summary)
         {
             seriesWithOptions.SeriesOptions =
@@ -330,6 +338,8 @@ public class SeriesController : Controller
                 model.ScoringSystemOptions = blankVm.ScoringSystemOptions;
                 model.SummarySeriesOptions = blankVm.SummarySeriesOptions;
                 model.FleetOptions = blankVm.FleetOptions;
+                model.HandicapSystemOptions = blankVm.HandicapSystemOptions;
+                model.TemplateOptions = (await _templateService.GetTemplatesForClubAsync(clubId)).ToList();
 
                 // Log model state errors for debugging (visible in browser dev tools if using this pattern)
                 var errors = ModelState.Values.SelectMany(v => v.Errors);

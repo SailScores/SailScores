@@ -1,4 +1,4 @@
-﻿namespace SailScores.Database.Entities;
+namespace SailScores.Database.Entities;
 
 public class Regatta
 {
@@ -36,4 +36,5 @@ public class Regatta
 
     public IList<Announcement> Announcements { get; set; }
     public bool? HideFromFrontPage { get; set; }
+    public bool? HideFromClubHomePage { get; set; }
 }

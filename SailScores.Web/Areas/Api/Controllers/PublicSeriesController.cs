@@ -24,13 +24,19 @@ namespace SailScores.Web.Areas.Api.Controllers
             [FromRoute] string clubInitials,
             [FromRoute] string seasonUrlName,
             [FromRoute] string seriesUrlName,
-            [FromQuery] string include)
+            [FromQuery] string include,
+            [FromQuery] int? raceCount)
         {
             if (string.IsNullOrWhiteSpace(clubInitials)
                 || string.IsNullOrWhiteSpace(seasonUrlName)
                 || string.IsNullOrWhiteSpace(seriesUrlName))
             {
                 return BadRequestProblem("Club, season, and series route values are required.", "invalid_route_values");
+            }
+
+            if (raceCount.HasValue && raceCount.Value < 1)
+            {
+                return BadRequestProblem("raceCount must be greater than zero.", "invalid_race_count");
             }
 
             var includeValues = (include ?? string.Empty)
@@ -42,13 +48,14 @@ namespace SailScores.Web.Areas.Api.Controllers
                 seasonUrlName,
                 seriesUrlName,
                 includeCompetitors,
-                includeRaces);
+                includeRaces,
+                raceCount);
             if (dto == null)
             {
                 return NotFoundProblem("Series was not found for the provided route.", "series_not_found");
             }
 
-            SetPublicCacheHeaders(300, "include");
+            SetPublicCacheHeaders(300, "include", "raceCount");
 
             return Ok(dto);
         }

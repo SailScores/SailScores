@@ -41,4 +41,7 @@ public class Race
     // New fields for timing
     public DateTime? StartTime { get; set; }
     public bool TrackTimes { get; set; } = false;
+
+    // Course length in nautical miles; required for PHRF Time-on-Distance scoring
+    public decimal? CourseDistance { get; set; }
 }

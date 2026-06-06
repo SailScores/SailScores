@@ -31,6 +31,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             _controller = new BoatClassController(
                 _clubServiceMock.Object,
                 _classServiceMock.Object,
+                new Moq.Mock<SailScores.Core.Services.IHandicapService>().Object,
                 _authServiceMock.Object);
         }
 

@@ -4,6 +4,7 @@
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Resources
 @using SailScores.Web.Services
+@using SailScores.Core.Services
 
 @inject IStringLocalizer<SharedResource> localizer
 @inject AppSettingsService settingsService
@@ -49,10 +50,7 @@
                     @for (int i = 0; i < Model.Item.ParentSeries.Count; i++)
                     {
                         var parent = Model.Item.ParentSeries[i];
-                        <a href="~/@Model.ClubInitials/@parent.Season.UrlName/@parent.UrlName">@parent.Name</a>
-                        @if (i < Model.Item.ParentSeries.Count - 1)
-                        {
-                          @:,&nbsp;
+                        <a href="~/@Model.ClubInitials/@parent.Season.UrlName/@parent.UrlName">@parent.Name</a>@if (i < Model.Item.ParentSeries.Count - 1){@:,&nbsp;
                         }
                     }
                 </small>
@@ -122,12 +120,22 @@
         localizer[EnumHelper<TrendOption>
         .GetDisplayValue(Model.Item.TrendOption.Value)];
     }
+
+    // Resolve template settings
+    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(Model.Item.SeriesResultsTemplate)
+        ?? SeriesResultsTemplateHelper.GetDefaultTemplate(Model.Item.Type == SeriesType.Regatta);
+
     var tableModel = new ResultsTableViewModel
     {
         SeriesId = Model.Item.Id,
         Results = Model.Item.FlatResults,
         ShowTrend = showTrend,
-        ShowCompetitorClub = Model.Item.ShowCompetitorClub ?? false,
+        SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
+        CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
+        CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
+        BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
+        BoatNameHeader = resolvedTemplate.BoatNameHeader,
+        CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
         IsExport = false,
         ShowExportButtons = true,
         ExcludeCompetitorLinks = false,

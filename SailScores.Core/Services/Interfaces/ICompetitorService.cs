@@ -16,8 +16,10 @@ namespace SailScores.Core.Services
         Task SaveAsync(CompetitorDto comp, string username = "");
         Task DeleteCompetitorAsync(Guid competitorId);
         Task<IList<CompetitorSeasonStats>> GetCompetitorStatsAsync(Guid clubId, Guid competitorId);
+        Task<CompetitorStatsResult> GetCompetitorStatsWithHandicapAsync(Guid clubId, Guid competitorId);
 #pragma warning disable CA1054 // Uri parameters should not be strings
         Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonUrlName);
+        Task<IList<PlaceCount>> GetCompetitorHandicapSeasonRanksAsync(Guid competitorId, string seasonUrlName);
 #pragma warning restore CA1054 // Uri parameters should not be strings
         Task<Dictionary<Guid, DateTime?>> GetLastActiveDates(Guid clubId);
         Task<Dictionary<String, IEnumerable<Competitor>>> GetCompetitorsForFleetAsync(
@@ -36,6 +38,11 @@ namespace SailScores.Core.Services
             string userName = "");
         Task<List<HistoricalNote>> GetCompetitorParticipationAsync(Guid competitorId);
         Task AddHistoryElement(Guid competitorId, string note, string userName);
+        Task SetAlternativeSailNumber(
+            Guid competitorId,
+            string alternativeSailNumber,
+            AltSailNumberConflictResolution conflictResolution,
+            string userName = "");
 #pragma warning disable CA1054 // Uri parameters should not be strings
         Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
             Guid competitorId,

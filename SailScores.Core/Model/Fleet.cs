@@ -48,5 +48,8 @@ namespace SailScores.Core.Model
 
         public Regatta Regatta { get; set; }
         public Guid? RegattaId { get; set; }
+
+        public HandicapSystem DefaultHandicapSystem { get; set; }
+        public Guid? DefaultHandicapSystemId { get; set; }
     }
 }

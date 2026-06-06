@@ -22,6 +22,7 @@ public interface ICompetitorService
         string clubInitials,
         string sailor);
     Task<IList<PlaceCount>> GetCompetitorSeasonRanksAsync(Guid competitorId, string seasonUrlName);
+    Task<IList<PlaceCount>> GetCompetitorHandicapSeasonRanksAsync(Guid competitorId, string seasonUrlName);
     Task<Guid?> GetCompetitorIdForSailnumberAsync(
         Guid clubId,
         string sailNumber);
@@ -47,7 +48,11 @@ public interface ICompetitorService
         bool active,
         string userName = "");
     Task AddCompetitorNote(Guid id, string newNote, string v);
-    Task SetAlternativeSailNumber(Guid competitorId, string alternativeSailNumber, string userName = "");
+    Task SetAlternativeSailNumber(
+        Guid competitorId,
+        string alternativeSailNumber,
+        AltSailNumberConflictResolution conflictResolution,
+        string userName = "");
 #pragma warning disable CA1054 // Uri parameters should not be strings
     Task<IList<CompetitorWindStats>> GetCompetitorWindStatsAsync(
         Guid competitorId,

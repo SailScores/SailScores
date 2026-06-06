@@ -1,0 +1,51 @@
+@model IList<SailScores.Web.Models.SailScores.HandicapSystemSummary>
+
+<p>
+    <a asp-controller="HandicapSystem"
+       asp-action="Create"
+       asp-route-clubInitials="@ViewContext.RouteData.Values["clubInitials"]"
+       class="btn btn-outline-primary btn-sm">Create Handicap System</a>
+</p>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Base System</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var system in Model)
+            {
+                <tr>
+                    <td>@system.Name</td>
+                    <td>@(string.IsNullOrWhiteSpace(system.ParentSystemName) ? "-" : system.ParentSystemName)</td>
+                    <td>@system.SystemType</td>
+                    <td>@system.Description</td>
+                    <td class="text-nowrap">
+                        <a asp-controller="HandicapSystem"
+                           asp-action="Edit"
+                           asp-route-id="@system.Id"
+                           asp-route-clubInitials="@ViewContext.RouteData.Values["clubInitials"]">Edit</a>
+                        |
+                        <a asp-controller="HandicapSystem"
+                           asp-action="Delete"
+                           asp-route-id="@system.Id"
+                           asp-route-clubInitials="@ViewContext.RouteData.Values["clubInitials"]">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="small text-muted">
+        No club handicap systems configured yet. Create one from a base system to enable handicap selection in series.
+    </div>
+}

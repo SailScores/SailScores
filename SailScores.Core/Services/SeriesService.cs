@@ -21,6 +21,7 @@ namespace SailScores.Core.Services
     {
         private readonly IScoringCalculatorFactory _scoringCalculatorFactory;
         private readonly IScoringService _scoringService;
+        private readonly IHandicapService _handicapService;
         private readonly IConversionService _converter;
         private readonly IForwarderService _forwarderService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
@@ -32,6 +33,7 @@ namespace SailScores.Core.Services
         public SeriesService(
             IScoringCalculatorFactory scoringCalculatorFactory,
             IScoringService scoringService,
+            IHandicapService handicapService,
             IForwarderService forwarderService,
             IConversionService converter,
             IDbObjectBuilder dbObjBuilder,
@@ -42,6 +44,7 @@ namespace SailScores.Core.Services
         {
             _scoringCalculatorFactory = scoringCalculatorFactory;
             _scoringService = scoringService;
+            _handicapService = handicapService;
             _forwarderService = forwarderService;
             _converter = converter;
             _dbObjectBuilder = dbObjBuilder;
@@ -62,8 +65,10 @@ namespace SailScores.Core.Services
             
             if (!includeRegatta)
             {
-                regattaSeriesIds = _dbContext.Regattas.SelectMany(r =>
-                    r.RegattaSeries).Select(rs => rs.SeriesId);
+                regattaSeriesIds = _dbContext.Regattas
+                    .Where(r => r.ClubId == clubId)
+                    .SelectMany(r => r.RegattaSeries)
+                    .Select(rs => rs.SeriesId);
             }
 
             IQueryable<dbObj.Series> seriesQuery =  _dbContext
@@ -117,6 +122,7 @@ namespace SailScores.Core.Services
                 .Series
                 .Include(s => s.Season)
                 .Include(s => s.ChildLinks)
+                .Include(s => s.SeriesResultsTemplate)
                 .AsSingleQuery()
                 .FirstOrDefaultAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
@@ -124,6 +130,26 @@ namespace SailScores.Core.Services
             var fullSeries = _mapper.Map<Series>(seriesDb);
             if (fullSeries != null)
             {
+                // If series doesn't have a template, load the club's default template
+                if (fullSeries.SeriesResultsTemplateId == null)
+                {
+                    var club = await _dbContext.Clubs
+                        .FirstOrDefaultAsync(c => c.Id == seriesDb.ClubId)
+                        .ConfigureAwait(false);
+
+                    Guid? defaultTemplateId = seriesDb.Type.HasValue && seriesDb.Type.Value == dbObj.SeriesType.Regatta
+                        ? club?.DefaultRegattaSeriesResultsTemplateId
+                        : club?.DefaultSeriesResultsTemplateId;
+
+                    if (defaultTemplateId.HasValue)
+                    {
+                        var defaultTemplate = await _dbContext.SeriesResultsTemplates
+                            .FirstOrDefaultAsync(t => t.Id == defaultTemplateId.Value)
+                            .ConfigureAwait(false);
+                        fullSeries.SeriesResultsTemplate = _mapper.Map<SeriesResultsTemplate>(defaultTemplate);
+                    }
+                }
+
                 // populate parentSeriesIds and ParentSeries
                 var parentSeriesDb = await _dbContext.Series
                     .Include(s => s.Season)
@@ -154,7 +180,6 @@ namespace SailScores.Core.Services
                 if (await IsPartOfRegatta(seriesDb.Id))
                 {
                     fullSeries.PreferAlternativeSailNumbers = await DoesRegattaPrefersAltSailNumbers(seriesDb.Id);
-                    fullSeries.ShowCompetitorClub = true;
                 }
             }
             return fullSeries;
@@ -370,9 +395,34 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
-            var calculator = await _scoringCalculatorFactory
-                .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
+
+            // For import-mode summary series, populate races BEFORE building handicap lookup
+            if (initial && fullSeries.Type == SeriesType.Summary && !fullSeries.ChildrenSeriesAsSingleRace)
+            {
+                await AddChildSeriesAsSeries(fullSeries).ConfigureAwait(false);
+            }
+
+            var handicapSystem = await _handicapService
+                .GetEffectiveHandicapSystemAsync(fullSeries)
                 .ConfigureAwait(false);
+
+            IScoringCalculator calculator;
+            if (handicapSystem != null)
+            {
+                fullSeries.HandicapSystem = handicapSystem;
+                var handicapLookup = await _handicapService
+                    .BuildHandicapLookupAsync(fullSeries, handicapSystem.Id)
+                    .ConfigureAwait(false);
+                calculator = await _scoringCalculatorFactory
+                    .CreateScoringCalculatorAsync(fullSeries.ScoringSystem, handicapSystem, handicapLookup)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                calculator = await _scoringCalculatorFactory
+                    .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
+                    .ConfigureAwait(false);
+            }
 
             if (initial)
             {
@@ -383,10 +433,7 @@ namespace SailScores.Core.Services
                     {
                         await AddChildSeriesAsRaces(fullSeries).ConfigureAwait(false);
                     }
-                    else
-                    {
-                        await AddChildSeriesAsSeries(fullSeries).ConfigureAwait(false);
-                    }
+                    // else: AddChildSeriesAsSeries already called above before handicap lookup
                 }
                 else  // non-summary series.
                 {
@@ -541,8 +588,6 @@ namespace SailScores.Core.Services
 
             var fullSeries = await GetOneSeriesAsync(seriesId)
                 .ConfigureAwait(false);
-
-            fullSeries.ShowCompetitorClub = club.ShowClubInResults;
 
             // get the current version of the competitors, so we can get current sail number.
             var competitorUrlNamesById = await _dbContext.Competitors
@@ -1088,6 +1133,7 @@ namespace SailScores.Core.Services
             existingSeries.EnforcedEndDate = model.EnforcedEndDate;
             existingSeries.FleetId = model.FleetId;
             existingSeries.UseFullRaceScores = model.UseFullRaceScores;
+            existingSeries.HandicapSystemId = model.HandicapSystemId;
         }
 
         private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)
