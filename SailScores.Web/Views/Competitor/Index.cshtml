@@ -178,7 +178,7 @@
                         @if (Model.UseAlternativeSailNumbers)
                         {
                             <button type="button"
-                                    class="btn btn-sm mb-2 @(string.IsNullOrWhiteSpace(item.AlternativeSailNumber) ? "btn-outline-secondary" : "btn-outline-dark") comp-alt-sail-btn"
+                                    class="btn btn-sm mb-2 btn-outline-secondary comp-alt-sail-btn"
                                     title="@(string.IsNullOrWhiteSpace(item.AlternativeSailNumber) ? "Set Alternative Sail Number" : "Change Alternative Sail Number")"
                                     data-competitor-id="@item.Id"
                                     data-competitor-name="@item.Name"
@@ -191,7 +191,7 @@
                                 else
                                 {
                                     <span class="fas fa-hashtag"></span>
-                                    <span class="small ms-1">@item.AlternativeSailNumber</span>
+                                    <span class="ms-1"><strong>@item.AlternativeSailNumber</strong></span>
                                 }
                             </button>
                         }
