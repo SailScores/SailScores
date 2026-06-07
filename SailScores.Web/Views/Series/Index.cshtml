@@ -36,10 +36,28 @@
     {
         <div class="row bg-almost">
             <div class="col-sm-3 my-2">
-                <a asp-controller="Series"
-                   asp-action="Create"
-                   asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                   class="btn btn-outline-primary">@localizer["New Series"]</a>
+                <div class="btn-group">
+                    <a asp-controller="Series"
+                       asp-action="Create"
+                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                       class="btn btn-outline-primary">
+                        <span class="fas fa-plus"></span>
+                        <span>@localizer["New Series"]</span>
+                    </a>
+                    <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item"
+                               asp-action="CreateMultiple"
+                               asp-controller="Series"
+                               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">
+                                Create Multiple...
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <br />

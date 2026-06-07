@@ -336,19 +336,90 @@
             });
         });
 
-        // Handle hash navigation (e.g., page loaded with #collapseSeries)
+        // Handle hash navigation (e.g., page loaded with #series or #collapseSeries)
         window.addEventListener('hashchange', expandSectionFromHash);
         document.addEventListener('DOMContentLoaded', expandSectionFromHash);
 
+        function resolveAccordionCollapseFromHash(hash) {
+            if (!hash) {
+                return null;
+            }
+
+            const normalized = hash.toLowerCase();
+            const fragmentMap = {
+                collapseclasses: 'collapseClasses',
+                classes: 'collapseClasses',
+                collapsefleets: 'collapseFleets',
+                fleets: 'collapseFleets',
+                collapseseasons: 'collapseSeasons',
+                seasons: 'collapseSeasons',
+                collapseseries: 'collapseSeries',
+                series: 'collapseSeries',
+                collapsecompetitors: 'collapseCompetitors',
+                competitors: 'collapseCompetitors',
+                collapseraces: 'collapseRaces',
+                races: 'collapseRaces',
+                collapsescoring: 'collapseScoring',
+                scoring: 'collapseScoring',
+                scoringsystems: 'collapseScoring',
+                collapseregattas: 'collapseRegattas',
+                regattas: 'collapseRegattas',
+                regatta: 'collapseRegattas',
+                collapsescorekeepers: 'collapseScorekeepers',
+                scorekeepers: 'collapseScorekeepers',
+                collapsehandicapsystems: 'collapseHandicapSystems',
+                handicapsystems: 'collapseHandicapSystems',
+                handicaps: 'collapseHandicapSystems',
+                handicap: 'collapseHandicapSystems'
+            };
+
+            const mappedId = fragmentMap[normalized] || hash;
+            const mappedElement = document.getElementById(mappedId);
+            if (mappedElement && mappedElement.classList.contains('accordion-collapse')) {
+                return mappedElement;
+            }
+
+            if (normalized.includes('series')) {
+                return document.getElementById('collapseSeries');
+            }
+
+            if (normalized.includes('regatta')) {
+                return document.getElementById('collapseRegattas');
+            }
+
+            if (normalized.includes('fleet')) {
+                return document.getElementById('collapseFleets');
+            }
+
+            if (normalized.includes('season')) {
+                return document.getElementById('collapseSeasons');
+            }
+
+            if (normalized.includes('class')) {
+                return document.getElementById('collapseClasses');
+            }
+
+            return null;
+        }
+
         function expandSectionFromHash() {
             const hash = window.location.hash.substring(1);
-            if (hash) {
-                const element = document.getElementById(hash);
-                if (element && element.classList.contains('accordion-collapse')) {
-                    const bsCollapse = new bootstrap.Collapse(element, { toggle: false });
-                    bsCollapse.show();
-                }
+            const targetCollapse = resolveAccordionCollapseFromHash(hash);
+            if (!targetCollapse) {
+                return;
             }
+
+            const bsCollapse = new bootstrap.Collapse(targetCollapse, { toggle: false });
+            bsCollapse.show();
+
+            setTimeout(() => {
+                const accordionHeader = targetCollapse.previousElementSibling;
+                if (accordionHeader && accordionHeader.classList.contains('accordion-header')) {
+                    accordionHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    targetCollapse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300);
         }
     </script>
 }

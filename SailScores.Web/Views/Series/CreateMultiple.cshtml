@@ -16,7 +16,8 @@
 
     <div id="seriesNameValidationErrors" class="alert alert-danger d-none mb-3"></div>
 
-    <form asp-action="CreateMultiple">
+    <form asp-action="CreateMultiple"
+          asp-route-returnurl="@ViewData["ReturnUrl"]">
         <input type="hidden" asp-for="ClubId" />
         <div class="row">
             <div class="col-md-10 col-lg-8">
@@ -387,13 +388,28 @@
                 </div>
             </div>
             <div class="col-md-3">
+                @{
+                    var cancelUrl = ViewData["ReturnUrl"]?.ToString();
+                    if (string.IsNullOrWhiteSpace(cancelUrl))
+                    {
+                        var clubInitials = ViewContext.RouteData.Values["clubInitials"]?.ToString()
+                            ?? ViewContext.RouteData.Values["ClubInitials"]?.ToString();
+                        var adminIndexUrl = Url.Action("Index", "Admin", new { clubInitials }) ?? "/";
+                        cancelUrl = $"{adminIndexUrl}#series";
+                    }
+                }
                 <div class="d-grid gap-2">
-                    <a asp-controller="Admin" asp-action="Index" asp-fragment="series"
+                    <a href="@cancelUrl"
                        class="btn btn-outline-primary btn-block my-2">Cancel</a>
                 </div>
             </div>
         </div>
     </form>
+
+    <div id="ssWaitingModal" class="waitingModal">
+        <span><div class="spinner-border" role="status"></div><br/>
+            <h3>Creating...</h3></span>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="importIcalModal" tabindex="-1" aria-labelledby="importIcalModalLabel" aria-hidden="true">

@@ -114,13 +114,21 @@
         });
     }
 
+    function showWaitingAndSubmit() {
+        const waiting = document.getElementById('ssWaitingModal');
+        if (waiting) {
+            waiting.style.display = 'block';
+        }
+        form.submit();
+    }
+
     function validateAndSubmit() {
         const seasonSelect = document.getElementById('SeasonId');
         const seasonId = seasonSelect ? seasonSelect.value : null;
 
         if (!seasonId || seasonId === 'Select a season...') {
             // Let standard form validation handle the season requirement
-            form.submit();
+            showWaitingAndSubmit();
             return;
         }
 
@@ -128,7 +136,7 @@
 
         if (names.length === 0) {
             // Let standard validation handle empty form
-            form.submit();
+            showWaitingAndSubmit();
             return;
         }
 
@@ -168,7 +176,7 @@
                     clearValidationErrors();
                     clearHighlights();
                     // All validations passed, submit the form
-                    form.submit();
+                    showWaitingAndSubmit();
                 }
             })
             .catch(function (error) {
@@ -181,7 +189,7 @@
                     // Allow submission if we can't reach the server for validation
                     clearValidationErrors();
                     clearHighlights();
-                    form.submit();
+                    showWaitingAndSubmit();
                 }
             });
     }

@@ -16,6 +16,7 @@
               asp-route-returnurl="@ViewData["ReturnUrl"]" >
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
+            <input type="hidden" asp-for="SeasonId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
@@ -87,7 +88,7 @@
                                     </div>
                                     <div class="col-12 col-md-6 settings-group">
                                         <label asp-for="TrendOption">Show Rank Trend</label>
-                                        <select id="ScoringSystemId" asp-for="TrendOption" class="form-select">
+                                        <select asp-for="TrendOption" class="form-select">
                                             @foreach (var trendOption in EnumHelper<TrendOption>.GetValues(TrendOption.None))
                                             {
                                                 <option value="@trendOption">
@@ -182,6 +183,59 @@
                                 </div>
                             </div>
 
+                            <!-- Fleet -->
+                            <div class="settings-section mb-4">
+                                <h4 class="mb-3">Fleet</h4>
+                                <div class="row g-3">
+                                    <div class="col-12 settings-group">
+                                        <label asp-for="FleetId" class="control-label">
+                                            Fleet Competitor Filter
+                                            <a class="text-primary"
+                                               data-bs-container="body"
+                                               data-bs-toggle="popover"
+                                               data-bs-placement="top"
+                                               data-bs-trigger="focus hover"
+                                               data-bs-content="Limit series results to include only competitors of a specific fleet. E.g., create a Women's Series from races that include all sailors.">
+                                                <span class="far fa-question-circle"></span>
+                                            </a>
+                                        </label>
+                                        <select id="FleetId" asp-for="FleetId" class="form-select">
+                                            <option value="">-Allow any competitors-</option>
+                                            @if (Model.FleetOptions != null)
+                                            {
+                                                @foreach (var fleet in Model.FleetOptions)
+                                                {
+                                                    <option value="@fleet.Id">
+                                                        @fleet.Name @(fleet.IsActive ? "" : " (Inactive)")
+                                                    </option>
+                                                }
+                                            }
+                                        </select>
+                                        <span asp-validation-for="FleetId" class="text-danger"></span>
+                                        <span class="small">Only competitors in this fleet will appear in series standings.</span>
+                                    </div>
+                                    <div id="useFullRaceScoresField" class="col-12 settings-group" style="display: none; margin-left: 2rem;">
+                                        <div class="form-check">
+                                            <input type="hidden" name="UseFullRaceScores" value="false" />
+                                            <input type="checkbox" class="form-check-input" id="UseFullRaceScores" name="UseFullRaceScores" value="true" @(Model.UseFullRaceScores == true ? "checked" : "") />
+                                            <input type="hidden" name="UseFullRaceScores" value="false" />
+                                            <label class="form-check-label" for="UseFullRaceScores">
+                                                Use Original Race Positions
+                                                <a class="text-primary"
+                                                   data-bs-container="body"
+                                                   data-bs-toggle="popover"
+                                                   data-bs-placement="top"
+                                                   data-bs-trigger="focus hover"
+                                                   data-bs-content="Unchecked (default): Rank competitors only against others in the fleet. Checked: Use original race ranking even if non-fleet competitors placed higher.">
+                                                    <span class="far fa-question-circle"></span>
+                                                </a>
+                                            </label>
+                                            <small class="form-text text-muted d-block">Finishing positions include all race competitors if selected.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Advanced Tools -->
                             <div class="settings-section mb-4">
                                 <h4 class="mb-3">Advanced Tools</h4>
@@ -217,12 +271,22 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
     <script>
-      // help popovers (to be touch screen friendly.)
-      $(function () {
-          $('[data-bs-toggle="popover"]').popover();
-      })
-    </script>
+        function toggleUseFullRaceScores() {
+            var fleetIdSelect = document.getElementById('FleetId');
+            var useFullRaceScoresField = document.getElementById('useFullRaceScoresField');
+            if (fleetIdSelect.value) {
+                useFullRaceScoresField.style.display = 'block';
+            } else {
+                useFullRaceScoresField.style.display = 'none';
+            }
+        }
 
+        document.getElementById('FleetId').addEventListener('change', toggleUseFullRaceScores);
+        toggleUseFullRaceScores();
+
+        $(function () {
+            $('[data-bs-toggle="popover"]').popover();
+        })
+    </script>
 }

@@ -31,6 +31,7 @@ public class SeriesController : Controller
     private readonly IForwarderService _forwarderService;
     private readonly Core.Services.IFleetService _fleetService;
     private readonly Core.Services.Interfaces.ISeriesResultsTemplateService _templateService;
+    private readonly IRedirectHelper _redirectHelper;
 
     public SeriesController(
         ISeriesService seriesService,
@@ -42,7 +43,8 @@ public class SeriesController : Controller
         Core.Services.IFleetService fleetService,
         Core.Services.Interfaces.ISeriesResultsTemplateService templateService,
         UserManager<ApplicationUser> userManager,
-        IMapper mapper)
+        IMapper mapper,
+        IRedirectHelper redirectHelper)
     {
         _seriesService = seriesService;
         _clubService = clubService;
@@ -54,6 +56,7 @@ public class SeriesController : Controller
         _templateService = templateService;
         _userManager = userManager;
         _mapper = mapper;
+        _redirectHelper = redirectHelper;
     }
 
     // GET: Series
@@ -176,7 +179,7 @@ public class SeriesController : Controller
 
 
     [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
-    public async Task<ActionResult> Create(string clubInitials)
+    public async Task<ActionResult> Create(string clubInitials, string returnUrl = null)
     {
         var vm = await _seriesService.GetBlankVmForCreate(clubInitials);
         var errors = _adminTipService.GetSeriesCreateErrors(vm);
@@ -191,7 +194,10 @@ public class SeriesController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
-    public async Task<ActionResult> Create(string clubInitials, SeriesWithOptionsViewModel model)
+    public async Task<ActionResult> Create(
+        string clubInitials,
+        SeriesWithOptionsViewModel model,
+        string returnUrl = null)
     {
         try
         {
@@ -228,10 +234,10 @@ public class SeriesController : Controller
 
             if (model.Type == Core.Model.SeriesType.Summary)
             {
-                return RedirectToAction("Edit", new { clubInitials, id = newSeriesId });
+                return RedirectToAction("Edit", new { clubInitials, id = newSeriesId, returnUrl });
             }
 
-            return RedirectToAction("Index", "Admin");
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Admin");
         }
         catch (InvalidOperationException ex)
         {
@@ -348,6 +354,15 @@ public class SeriesController : Controller
                     System.Diagnostics.Debug.WriteLine($"ModelState Error: {error.ErrorMessage}");
                 }
 
+                if (model.Type == Core.Model.SeriesType.Summary)
+                {
+                    model.SeriesOptions =
+                        (await _seriesService.GetChildSeriesSummariesAsync(
+                            clubId,
+                            model.SeasonId)).ToList();
+                    return View("EditSummarySeries", model);
+                }
+
                 return View(model);
             }
 
@@ -408,7 +423,7 @@ public class SeriesController : Controller
     }
 
     [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
-    public async Task<ActionResult> CreateMultiple(string clubInitials)
+    public async Task<ActionResult> CreateMultiple(string clubInitials, string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
 
@@ -422,7 +437,8 @@ public class SeriesController : Controller
     [Authorize(Policy = AuthorizationPolicies.SeriesScorekeeper)]
     public async Task<ActionResult> CreateMultiple(
         string clubInitials,
-        MultipleSeriesWithOptionsViewModel model)
+        MultipleSeriesWithOptionsViewModel model,
+        string returnUrl = null)
     {
         var clubId = await _clubService.GetClubId(clubInitials);
 
@@ -447,7 +463,7 @@ public class SeriesController : Controller
         try
         {
             await _seriesService.CreateMultipleAsync(clubInitials, clubId, model, await GetUserStringAsync());
-            return RedirectToAction("Index", "Admin", new { clubInitials });
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Admin");
         }
         catch (InvalidOperationException ex)
         {
