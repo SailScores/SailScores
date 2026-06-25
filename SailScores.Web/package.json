@@ -3,7 +3,7 @@
   "name": "asp.net",
   "private": true,
   "devDependencies": {
-    "@babel/core": "^7.9.0",
+    "@babel/core": "^7.29.6",
     "@babel/preset-env": "^7.9.5",
     "@types/d3": "^7.4.3",
     "@types/jquery": "^3.5.33",
@@ -33,7 +33,7 @@
     "build": "^0.1.4",
     "cropperjs": "^2.1.0",
     "d3": "7.6.1",
-    "devbridge-autocomplete": "^1.5.0",
+    "devbridge-autocomplete": "^2.0.1",
     "dragula": "3.7.2",
     "gulp-cli": "^3.0.0",
     "jquery": "^3.6.0",
