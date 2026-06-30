@@ -16,6 +16,7 @@ public class AdminViewModel
 
     [StringLength(10)]
     public String Initials { get; set; }
+    public String Url { get; set; }
     public String Description { get; set; }
     public String HomePageDescription { get; set; }
     public Guid? LogoFileId { get; set; }
