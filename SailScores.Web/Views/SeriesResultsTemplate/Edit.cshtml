@@ -96,6 +96,31 @@
         </div>
     </div>
 
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Score Display Options</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">
+                Configure additional scoring display options.
+            </p>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="ShowPreDiscardTotal" />
+                    <label class="form-check-label" asp-for="ShowPreDiscardTotal">
+                        Show Pre-Discard Total Column
+                    </label>
+                    <small class="d-block form-text text-muted mt-2">
+                        When enabled, displays a "Pre-Discard Total" column that shows each competitor's total score 
+                        including all races (before applying discards). This appears to the right of the standard Total column.
+                        This option is only displayed for low-point scoring systems, not for percentage-based systems.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="mb-3">
         <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> Save Changes

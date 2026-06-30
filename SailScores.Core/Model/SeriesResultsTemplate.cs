@@ -16,4 +16,5 @@ public class SeriesResultsTemplate
     public ColumnVisibility BoatNameVisibility { get; set; }
     public string BoatNameHeader { get; set; }
     public ColumnVisibility CompetitorClubVisibility { get; set; }
+    public bool ShowPreDiscardTotal { get; set; }
 }

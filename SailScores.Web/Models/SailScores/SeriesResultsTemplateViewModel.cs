@@ -35,6 +35,9 @@ public class SeriesResultsTemplateViewModel
     [Display(Name = "Competitor Club")]
     public ColumnVisibility CompetitorClubVisibility { get; set; } = ColumnVisibility.Hidden;
 
+    [Display(Name = "Show Pre-Discard Total")]
+    public bool ShowPreDiscardTotal { get; set; } = false;
+
     // Used in delete view to show warning
     public bool IsClubDefault { get; set; }
 }
