@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace SailScores.Database.Entities;
 
 public class Club
@@ -38,6 +41,7 @@ public class Club
     public IList<Series> Series { get; set; }
     public IList<Race> Races { get; set; }
     public IList<Regatta> Regattas { get; set; }
+    public IList<CompetitorFieldDefinition> CompetitorFieldDefinitions { get; set; }
 
     public ScoringSystem DefaultScoringSystem { get; set; }
     public Guid? DefaultScoringSystemId { get; set; }
@@ -50,6 +54,7 @@ public class Club
     public bool EnableHandicapScoring { get; set; }
 
     public bool? EnableAlternativeSailNumbers { get; set; }
+    public bool EnableCustomCompetitorFields { get; set; }
 
     public Guid? DefaultSeriesResultsTemplateId { get; set; }
     public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }

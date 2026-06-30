@@ -41,6 +41,9 @@ public class AdminEditViewModel
     [Display(Name = "Enable Alternative Sail Numbers")]
     public bool EnableAlternativeSailNumbers { get; set; }
 
+    [Display(Name = "Enable Custom Competitor Fields")]
+    public bool EnableCustomCompetitorFields { get; set; }
+
     [Display(Name = "Default Handicap System")]
     public Guid? DefaultHandicapSystemId { get; set; }
 

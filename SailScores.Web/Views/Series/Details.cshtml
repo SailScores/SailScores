@@ -5,9 +5,11 @@
 @using SailScores.Web.Resources
 @using SailScores.Web.Services
 @using SailScores.Core.Services
+@using SailScores.Core.Services.Interfaces
 
 @inject IStringLocalizer<SharedResource> localizer
 @inject AppSettingsService settingsService
+@inject ICompetitorFieldService competitorFieldService
 
 @model ClubItemViewModel<Series>
 
@@ -125,6 +127,19 @@
     var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(Model.Item.SeriesResultsTemplate)
         ?? SeriesResultsTemplateHelper.GetDefaultTemplate(Model.Item.Type == SeriesType.Regatta);
 
+    var customFieldDefinitions = new Dictionary<Guid, CompetitorFieldDefinition>();
+    var customFieldColumns = new List<SeriesResultsTemplateCustomField>();
+    if (Model.Item?.ClubId != Guid.Empty)
+    {
+        var definitions = await competitorFieldService.GetFieldDefinitionsAsync(Model.Item.ClubId);
+        customFieldDefinitions = definitions.ToDictionary(d => d.Id, d => d);
+        customFieldColumns = (Model.Item.SeriesResultsTemplate?.CustomFields ?? new List<SeriesResultsTemplateCustomField>())
+            .Where(c => c.Visibility != ColumnVisibility.Hidden)
+            .OrderBy(c => c.DisplayOrder)
+            .ThenBy(c => c.FieldDefinitionId)
+            .ToList();
+    }
+
     var tableModel = new ResultsTableViewModel
     {
         SeriesId = Model.Item.Id,
@@ -136,6 +151,8 @@
         BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
         BoatNameHeader = resolvedTemplate.BoatNameHeader,
         CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
+        CustomFieldColumns = customFieldColumns,
+        CustomFieldDefinitions = customFieldDefinitions,
         IsExport = false,
         ShowExportButtons = true,
         ExcludeCompetitorLinks = false,

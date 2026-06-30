@@ -82,6 +82,34 @@
                                 <label asp-for="IsActive" class="form-check-label"></label>
                                 <span asp-validation-for="IsActive" class="text-danger"></span>
                             </div>
+                            @if (Model.CustomFieldValues != null && Model.CustomFieldValues.Any())
+                            {
+                                <div class="mb-3">
+                                    <h5 class="h6">Custom Fields</h5>
+                                    @for (var index = 0; index < Model.CustomFieldValues.Count; index++)
+                                    {
+                                        var field = Model.CustomFieldValues[index];
+                                        <div class="border rounded p-3 mb-3">
+                                            <label asp-for="@Model.CustomFieldValues[index].Value" class="form-label">@field.DisplayHeader</label>
+                                            <input asp-for="@Model.CustomFieldValues[index].Value" class="form-control" type="@(field.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")" />
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[index].FieldDefinitionId" />
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[index].DisplayHeader" />
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[index].DataType" />
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[index].ShowDates" />
+                                            <div class="row mt-2">
+                                                <div class="col-md-6">
+                                                    <label asp-for="@Model.CustomFieldValues[index].EffectiveFrom" class="form-label">Effective From</label>
+                                                    <input asp-for="@Model.CustomFieldValues[index].EffectiveFrom" class="form-control" type="date" />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label asp-for="@Model.CustomFieldValues[index].EffectiveTo" class="form-label">Effective To</label>
+                                                    <input asp-for="@Model.CustomFieldValues[index].EffectiveTo" class="form-control" type="date" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
                             <div class="mb-3">
                                 <label asp-for="Notes" class="control-label"></label>
                                 <input asp-for="Notes" class="form-control" />

@@ -96,6 +96,57 @@
         </div>
     </div>
 
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Custom Competitor Fields</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">
+                Select which custom competitor fields should appear in this results view.
+            </p>
+            @if (Model.AvailableCustomFields != null && Model.AvailableCustomFields.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Include</th>
+                                <th scope="col">Field</th>
+                                <th scope="col">Visibility</th>
+                                <th scope="col">Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
+                            {
+                                var selection = Model.CustomFieldSelections[index];
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="form-check-input" asp-for="@Model.CustomFieldSelections[index].Selected" />
+                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
+                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
+                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
+                                    </td>
+                                    <td>@selection.DisplayHeader</td>
+                                    <td>
+                                        <select class="form-select form-select-sm" asp-for="@Model.CustomFieldSelections[index].Visibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()"></select>
+                                    </td>
+                                    <td>
+                                        <input class="form-control form-control-sm" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No custom competitor fields are available for this club yet.</p>
+            }
+        </div>
+    </div>
+
     <div class="mb-3">
         <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> Save Changes

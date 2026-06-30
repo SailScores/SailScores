@@ -46,6 +46,9 @@ namespace SailScores.Database
         DbSet<CompetitorForwarder> CompetitorForwarders { get; set; }
 
         DbSet<SeriesResultsTemplate> SeriesResultsTemplates { get; set; }
+        DbSet<CompetitorFieldDefinition> CompetitorFieldDefinitions { get; set; }
+        DbSet<CompetitorFieldValue> CompetitorFieldValues { get; set; }
+        DbSet<SeriesResultsTemplateCustomField> SeriesResultsTemplateCustomFields { get; set; }
 
         DbSet<ClubRequest> ClubRequests { get; set; }
         DbSet<ClubSequence> ClubSequences { get; set; }

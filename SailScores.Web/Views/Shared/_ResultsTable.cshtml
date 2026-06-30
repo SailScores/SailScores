@@ -14,7 +14,14 @@
 @model ResultsTableViewModel
 @{
     bool NoCompetitors = false;
+    var customFieldColumns = (Model?.CustomFieldColumns ?? new List<SeriesResultsTemplateCustomField>())
+        .Where(c => c.Visibility != ColumnVisibility.Hidden)
+        .OrderBy(c => c.DisplayOrder)
+        .ThenBy(c => c.FieldDefinitionId)
+        .ToList();
 }
+
+@using System.Collections.Generic
 
 @if (Model != null)
 {
@@ -50,6 +57,13 @@
                     @if (Model.CompetitorClubVisibility != ColumnVisibility.Hidden)
                     {
                         <th scope="col" class="@Model.CompetitorClubVisibility.ToCssClass()">@localizer["Club"]</th>
+                    }
+                    @foreach (var customField in customFieldColumns)
+                    {
+                        var headerText = Model.CustomFieldDefinitions.TryGetValue(customField.FieldDefinitionId, out var definition)
+                            ? definition.DisplayHeader
+                            : customField.FieldDefinitionId.ToString("D").Substring(0, 8);
+                        <th scope="col" class="@customField.Visibility.ToCssClass()">@headerText</th>
                     }
                     <th scope="col" class="text-center">@localizer["Total"]</th>
                     @{
@@ -245,6 +259,13 @@
                     @if (Model.CompetitorClubVisibility != ColumnVisibility.Hidden)
                     {
                         <td class="@Model.CompetitorClubVisibility.ToCssClass()">@comp.HomeClubName</td>
+                    }
+                    @foreach (var customField in customFieldColumns)
+                    {
+                        var value = comp.CustomFieldValues != null && comp.CustomFieldValues.TryGetValue(customField.FieldDefinitionId, out var fieldValue)
+                            ? fieldValue
+                            : null;
+                        <td class="@customField.Visibility.ToCssClass()">@value</td>
                     }
                     <td scope="row" class="text-center">
                         <strong>

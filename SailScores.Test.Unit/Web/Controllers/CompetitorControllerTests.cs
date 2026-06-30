@@ -58,6 +58,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             _controller = new CompetitorController(
                 _clubServiceMock.Object,
                 _competitorServiceMock.Object,
+                Mock.Of<SailScores.Core.Services.Interfaces.ICompetitorFieldService>(),
                 _forwarderServiceMock.Object,
                 new Mock<IHandicapService>().Object,
                 _authServiceMock.Object,

@@ -56,8 +56,11 @@ namespace SailScores.Core.Model
 
         public Guid? DefaultSeriesResultsTemplateId { get; set; }
         public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+        public bool EnableCustomCompetitorFields { get; set; }
 
         public String StatisticsDescription { get; set; }
+        public IList<CompetitorFieldDefinition> CompetitorFieldDefinitions { get; set; }
+
 
     }
 

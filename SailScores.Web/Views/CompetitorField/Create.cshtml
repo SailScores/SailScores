@@ -1,0 +1,42 @@
+@model SailScores.Core.Model.CompetitorFieldDefinition
+
+@{
+    ViewData["Title"] = "Create Custom Field";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Create Custom Field</h2>
+<hr />
+
+<form asp-action="Create" method="post">
+    <input type="hidden" name="clubInitials" value="@ViewData["ClubInitials"]" />
+    <input asp-for="ClubId" type="hidden" />
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DisplayHeader" class="form-label"></label>
+        <input asp-for="DisplayHeader" class="form-control" />
+        <span asp-validation-for="DisplayHeader" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DataType" class="form-label"></label>
+        <select asp-for="DataType" class="form-select">
+            <option value="0">Text</option>
+            <option value="1">Number</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DisplayOrder" class="form-label"></label>
+        <input asp-for="DisplayOrder" class="form-control" />
+        <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" asp-route-clubInitials="@ViewData["ClubInitials"]" class="btn btn-outline-secondary">Cancel</a>
+</form>

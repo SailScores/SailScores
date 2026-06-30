@@ -6,7 +6,6 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Identity.Client;
 using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
@@ -786,17 +785,92 @@ namespace SailScores.Core.Services
 
         private IEnumerable<FlatCompetitor> FlattenCompetitors(Series series)
         {
+            var raceDatesByCompetitor = series.Races
+                .Where(r => r != null)
+                .SelectMany(r => r.Scores ?? Enumerable.Empty<Score>(), (race, score) => new { race, score })
+                .GroupBy(x => x.score.CompetitorId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.race.Date?.Date).Where(d => d.HasValue).Select(d => d.Value).Distinct().ToList());
+
+            var fieldDefinitions = series.ClubId != Guid.Empty
+                ? _dbContext.CompetitorFieldDefinitions
+                    .Where(d => d.ClubId == series.ClubId && d.IsActive)
+                    .OrderBy(d => d.DisplayOrder)
+                    .ThenBy(d => d.Name)
+                    .ToList()
+                : new List<dbObj.CompetitorFieldDefinition>();
+
             return series.Competitors
                 .Select(c =>
-                    new FlatCompetitor
+                {
+                    var customFieldValues = new Dictionary<Guid, string>();
+                    var raceDates = raceDatesByCompetitor.TryGetValue(c.Id, out var dates) ? dates : new List<DateTime>();
+
+                    foreach (var definition in fieldDefinitions)
+                    {
+                        var availableValues = (c.CustomFieldValues ?? Enumerable.Empty<CompetitorFieldValue>())
+                            .Where(v => v.FieldDefinitionId == definition.Id)
+                            .ToList();
+
+                        if (availableValues.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        var matchedValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        foreach (var date in raceDates)
+                        {
+                            var activeValue = availableValues
+                                .Where(v => IsValueActiveOnDate(v, date))
+                                .Select(v => v.Value)
+                                .FirstOrDefault();
+
+                            if (!string.IsNullOrWhiteSpace(activeValue))
+                            {
+                                matchedValues.Add(activeValue);
+                            }
+                        }
+
+                        if (matchedValues.Count == 1)
+                        {
+                            customFieldValues[definition.Id] = matchedValues.Single();
+                        }
+                        else if (matchedValues.Count > 1)
+                        {
+                            customFieldValues[definition.Id] = "-multiple-";
+                        }
+                    }
+
+                    return new FlatCompetitor
                     {
                         Id = c.Id,
                         Name = c.Name,
                         SailNumber = c.SailNumber,
                         AlternativeSailNumber = c.AlternativeSailNumber,
                         BoatName = c.BoatName,
-                        HomeClubName = c.HomeClubName
-                    });
+                        HomeClubName = c.HomeClubName,
+                        CustomFieldValues = customFieldValues
+                    };
+                });
+        }
+
+        private static bool IsValueActiveOnDate(CompetitorFieldValue value, DateTime date)
+        {
+            if (value == null)
+            {
+                return false;
+            }
+
+            if (value.EffectiveFrom.HasValue && date < value.EffectiveFrom.Value.Date)
+            {
+                return false;
+            }
+
+            if (value.EffectiveTo.HasValue && date > value.EffectiveTo.Value.Date)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private async Task PopulateCompetitorsAsync(Series series)
@@ -812,6 +886,7 @@ namespace SailScores.Core.Services
                 var query = _dbContext.Competitors
                     .Include(c => c.CompetitorFleets)
                     .Include(c => c.BoatClass)
+                    .Include(c => c.CustomFieldValues)
                     .Where(c => compIds.Contains(c.Id));
 
                 // Filter by fleet if series has FleetId set
@@ -862,6 +937,15 @@ namespace SailScores.Core.Services
 
             series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
 
+            foreach (var competitor in series.Competitors)
+            {
+                var dbCompetitor = dbCompetitors.FirstOrDefault(c => c.Id == competitor.Id);
+                if (dbCompetitor?.CustomFieldValues != null)
+                {
+                    competitor.CustomFieldValues = _mapper.Map<IList<CompetitorFieldValue>>(dbCompetitor.CustomFieldValues);
+                }
+            }
+
             foreach (var score in series.Races
                 .Where(r => r != null).SelectMany(r => r.Scores))
             {
@@ -871,6 +955,7 @@ namespace SailScores.Core.Services
                     var query = _dbContext.Competitors
                         .Include(c => c.CompetitorFleets)
                         .Include(c => c.BoatClass)
+                        .Include(c => c.CustomFieldValues)
                         .Where(c => compIds.Contains(c.Id));
 
                     // Filter by fleet if series has FleetId set

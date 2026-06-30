@@ -17,4 +17,6 @@ public class CompetitorWithOptionsViewModel : Core.Model.Competitor
     public IList<Core.Model.CompetitorHandicap> HandicapRatings { get; set; }
 
     public IList<Core.Model.ClassHandicap> ClassHandicapRatings { get; set; }
+
+    public IList<CompetitorCustomFieldViewModel> CustomFieldValues { get; set; } = new List<CompetitorCustomFieldViewModel>();
 }

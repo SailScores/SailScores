@@ -1,0 +1,50 @@
+@model IList<SailScores.Core.Model.CompetitorFieldDefinition>
+
+@{
+    ViewData["Title"] = "Custom Fields";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h2>Custom Fields</h2>
+<p class="text-muted">Define the custom competitor fields available for your club.</p>
+
+<a asp-action="Create" asp-route-clubInitials="@ViewData["ClubInitials"]" class="btn btn-primary mb-3">Add Field</a>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Header</th>
+                <th>Type</th>
+                <th>Order</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var field in Model)
+            {
+                <tr>
+                    <td>@field.Name</td>
+                    <td>@field.DisplayHeader</td>
+                    <td>@field.DataType</td>
+                    <td>@field.DisplayOrder</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-clubInitials="@ViewData["ClubInitials"]" asp-route-id="@field.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Delete this field?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="clubInitials" value="@ViewData["ClubInitials"]" />
+                            <input type="hidden" name="id" value="@field.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">No custom fields are defined yet.</p>
+}

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using SailScores.Api.Enumerations;
 
 namespace SailScores.Database.Entities;
@@ -26,4 +29,6 @@ public class SeriesResultsTemplate
     public string BoatNameHeader { get; set; }
 
     public ColumnVisibility CompetitorClubVisibility { get; set; }
+
+    public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 }

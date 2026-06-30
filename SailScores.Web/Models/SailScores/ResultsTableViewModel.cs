@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
@@ -19,6 +21,8 @@ public class ResultsTableViewModel
     public ColumnVisibility BoatNameVisibility { get; set; } = ColumnVisibility.OnLargerScreens;
     public string BoatNameHeader { get; set; } = "Boat";
     public ColumnVisibility CompetitorClubVisibility { get; set; } = ColumnVisibility.Hidden;
+    public IList<SeriesResultsTemplateCustomField> CustomFieldColumns { get; set; } = new List<SeriesResultsTemplateCustomField>();
+    public IDictionary<Guid, CompetitorFieldDefinition> CustomFieldDefinitions { get; set; } = new Dictionary<Guid, CompetitorFieldDefinition>();
 
     // Backward compatibility - computed from CompetitorClubVisibility
     public bool ShowCompetitorClub => CompetitorClubVisibility != ColumnVisibility.Hidden;

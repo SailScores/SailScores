@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
+using SailScores.Core.FlatModel;
 using SailScores.Core.Mapping;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
@@ -10,6 +11,7 @@ using SailScores.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -222,6 +224,110 @@ public class SeriesServiceTests
 
         // Assert - restricted series should be included when date is null
         Assert.Contains(allSeries, s => s.Id == restrictedSeries.Id);
+    }
+
+    [Fact]
+    public async Task FlattenResults_WithDateRangedCustomFieldValues_ResolvesMultipleOrSingleValue()
+    {
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+        var competitor = new Competitor
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Comp With Dates",
+            BoatName = "Boat",
+            CustomFieldValues = new List<CompetitorFieldValue>()
+        };
+
+        var definition = new Database.Entities.CompetitorFieldDefinition
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Age",
+            DisplayHeader = "Age",
+            DataType = Database.Entities.CustomFieldDataType.Text,
+            DisplayOrder = 1,
+            IsActive = true
+        };
+
+        var firstValue = new CompetitorFieldValue
+        {
+            Id = Guid.NewGuid(),
+            CompetitorId = competitor.Id,
+            FieldDefinitionId = definition.Id,
+            Value = "Junior",
+            EffectiveFrom = new DateTime(2024, 1, 1),
+            EffectiveTo = new DateTime(2024, 1, 10)
+        };
+        var secondValue = new CompetitorFieldValue
+        {
+            Id = Guid.NewGuid(),
+            CompetitorId = competitor.Id,
+            FieldDefinitionId = definition.Id,
+            Value = "Senior",
+            EffectiveFrom = new DateTime(2024, 1, 11),
+            EffectiveTo = new DateTime(2024, 1, 20)
+        };
+
+        competitor.CustomFieldValues.Add(firstValue);
+        competitor.CustomFieldValues.Add(secondValue);
+
+        var raceOne = new Race
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Date = new DateTime(2024, 1, 5),
+            Name = "Race 1",
+            Scores = new List<Score>
+            {
+                new Score
+                {
+                    CompetitorId = competitor.Id,
+                    Place = 1
+                }
+            }
+        };
+        var raceTwo = new Race
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Date = new DateTime(2024, 1, 15),
+            Name = "Race 2",
+            Scores = new List<Score>
+            {
+                new Score
+                {
+                    CompetitorId = competitor.Id,
+                    Place = 2
+                }
+            }
+        };
+
+        _context.CompetitorFieldDefinitions.Add(definition);
+        await _context.SaveChangesAsync();
+
+        var mappedSeries = new SailScores.Core.Model.Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = clubId,
+            Name = "Custom Field Series",
+            UrlName = "custom-field-series",
+            Season = _mapper.Map<Season>(season),
+            Type = SailScores.Core.Model.SeriesType.Standard,
+            Competitors = new List<Competitor> { competitor },
+            Races = new List<Race> { raceOne, raceTwo },
+            Results = new SeriesResults
+            {
+                Results = new Dictionary<Competitor, SeriesCompetitorResults>()
+            }
+        };
+
+        var method = typeof(SeriesService).GetMethod("FlattenResults", BindingFlags.Instance | BindingFlags.NonPublic);
+        var flatResults = (FlatResults)method.Invoke(_service, new object[] { mappedSeries });
+
+        var flatCompetitor = Assert.Single(flatResults.Competitors);
+        Assert.Equal("-multiple-", flatCompetitor.CustomFieldValues[definition.Id]);
     }
 
     [Fact]

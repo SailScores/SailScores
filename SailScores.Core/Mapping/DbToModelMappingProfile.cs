@@ -103,6 +103,13 @@ namespace SailScores.Core.Mapping
 
             CreateMap<Db.SeriesResultsTemplate, Model.SeriesResultsTemplate>()
                 .ReverseMap();
+
+            CreateMap<Db.CompetitorFieldDefinition, Model.CompetitorFieldDefinition>()
+                .ReverseMap();
+            CreateMap<Db.CompetitorFieldValue, Model.CompetitorFieldValue>()
+                .ReverseMap();
+            CreateMap<Db.SeriesResultsTemplateCustomField, Model.SeriesResultsTemplateCustomField>()
+                .ReverseMap();
         }
     }
 }

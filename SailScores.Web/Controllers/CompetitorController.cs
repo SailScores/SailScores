@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +14,7 @@ using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 using IClubService = SailScores.Core.Services.IClubService;
+using ICompetitorFieldService = SailScores.Core.Services.Interfaces.ICompetitorFieldService;
 using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService;
 using IForwarderService = SailScores.Core.Services.IForwarderService;
 
@@ -20,6 +25,7 @@ public class CompetitorController : Controller
 {
     private readonly IClubService _clubService;
     private readonly ICompetitorService _competitorService;
+    private readonly ICompetitorFieldService _competitorFieldService;
     private readonly IHandicapService _handicapService;
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authService;
@@ -31,6 +37,7 @@ public class CompetitorController : Controller
     public CompetitorController(
         IClubService clubService,
         ICompetitorService competitorService,
+        ICompetitorFieldService competitorFieldService,
         IForwarderService forwarderService,
         IHandicapService handicapService,
         IAuthorizationService authService,
@@ -41,6 +48,7 @@ public class CompetitorController : Controller
     {
         _clubService = clubService;
         _competitorService = competitorService;
+        _competitorFieldService = competitorFieldService;
         _forwarderService = forwarderService;
         _handicapService = handicapService;
         _authService = authService;
@@ -409,6 +417,30 @@ public class CompetitorController : Controller
             }
         }
 
+        if (club.EnableCustomCompetitorFields)
+        {
+            var definitions = await _competitorFieldService.GetFieldDefinitionsAsync(clubId);
+            var values = await _competitorFieldService.GetValuesForCompetitorAsync(id);
+            var valueLookup = values.ToDictionary(v => v.FieldDefinitionId, v => v);
+
+            compWithOptions.CustomFieldValues = definitions
+                .Select(definition =>
+                {
+                    var value = valueLookup.GetValueOrDefault(definition.Id);
+                    return new CompetitorCustomFieldViewModel
+                    {
+                        FieldDefinitionId = definition.Id,
+                        DisplayHeader = definition.DisplayHeader,
+                        DataType = definition.DataType,
+                        Value = value?.Value,
+                        EffectiveFrom = value?.EffectiveFrom,
+                        EffectiveTo = value?.EffectiveTo,
+                        ShowDates = true
+                    };
+                })
+                .ToList();
+        }
+
         return View(compWithOptions);
     }
 
@@ -446,6 +478,44 @@ public class CompetitorController : Controller
                 return View(competitor);
             }
             await _competitorService.SaveAsync(competitor, await GetUserStringAsync());
+
+            var club = await _clubService.GetMinimalClub(competitor.ClubId);
+            if (club.EnableCustomCompetitorFields && competitor.CustomFieldValues != null)
+            {
+                var existingValues = await _competitorFieldService.GetValuesForCompetitorAsync(competitor.Id);
+                var existingLookup = existingValues.ToDictionary(v => v.FieldDefinitionId, v => v);
+
+                foreach (var entry in competitor.CustomFieldValues)
+                {
+                    if (entry == null)
+                    {
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(entry.Value)
+                        && !entry.EffectiveFrom.HasValue
+                        && !entry.EffectiveTo.HasValue)
+                    {
+                        if (existingLookup.TryGetValue(entry.FieldDefinitionId, out var existingValue))
+                        {
+                            await _competitorFieldService.DeleteValueAsync(existingValue.Id);
+                        }
+                        continue;
+                    }
+
+                    var modelValue = new Core.Model.CompetitorFieldValue
+                    {
+                        Id = existingLookup.TryGetValue(entry.FieldDefinitionId, out var currentValue) ? currentValue.Id : Guid.Empty,
+                        CompetitorId = competitor.Id,
+                        FieldDefinitionId = entry.FieldDefinitionId,
+                        Value = entry.Value,
+                        EffectiveFrom = entry.EffectiveFrom,
+                        EffectiveTo = entry.EffectiveTo
+                    };
+
+                    await _competitorFieldService.SaveValueAsync(modelValue);
+                }
+            }
 
             return RedirectToAction("Index", "Competitor");
         }
