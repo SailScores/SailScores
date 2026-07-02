@@ -127,7 +127,7 @@
                                         <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
                                         <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
                                     </td>
-                                    <td>@selection.DisplayHeader</td>
+                                    <td>@(string.IsNullOrWhiteSpace(selection.DisplayHeader) ? selection.Name : selection.DisplayHeader)</td>
                                     <td>
                                         <select class="form-select form-select-sm" asp-for="@Model.CustomFieldSelections[index].Visibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()"></select>
                                     </td>

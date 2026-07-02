@@ -355,7 +355,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasOne(v => v.Competitor)
             .WithMany(c => c.CustomFieldValues)
             .HasForeignKey(v => v.CompetitorId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<CompetitorFieldValue>()
             .HasOne(v => v.FieldDefinition)

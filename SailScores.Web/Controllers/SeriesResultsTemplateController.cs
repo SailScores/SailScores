@@ -123,6 +123,7 @@ public class SeriesResultsTemplateController : Controller
             .Select(field => new TemplateCustomFieldSelectionViewModel
             {
                 FieldDefinitionId = field.Id,
+                Name = field.Name,
                 DisplayHeader = field.DisplayHeader,
                 DataType = field.DataType,
                 Selected = selectionLookup.ContainsKey(field.Id),

@@ -61,7 +61,7 @@
                     @foreach (var customField in customFieldColumns)
                     {
                         var headerText = Model.CustomFieldDefinitions.TryGetValue(customField.FieldDefinitionId, out var definition)
-                            ? definition.DisplayHeader
+                            ? (string.IsNullOrWhiteSpace(definition.DisplayHeader) ? definition.Name : definition.DisplayHeader)
                             : customField.FieldDefinitionId.ToString("D").Substring(0, 8);
                         <th scope="col" class="@customField.Visibility.ToCssClass()">@headerText</th>
                     }

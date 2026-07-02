@@ -430,6 +430,7 @@ public class CompetitorController : Controller
                     return new CompetitorCustomFieldViewModel
                     {
                         FieldDefinitionId = definition.Id,
+                        Name = definition.Name,
                         DisplayHeader = definition.DisplayHeader,
                         DataType = definition.DataType,
                         Value = value?.Value,

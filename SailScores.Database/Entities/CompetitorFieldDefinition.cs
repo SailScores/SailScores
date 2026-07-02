@@ -15,9 +15,8 @@ public class CompetitorFieldDefinition
     [StringLength(200)]
     public string Name { get; set; }
 
-    [Required]
     [StringLength(100)]
-    public string DisplayHeader { get; set; }
+    public string? DisplayHeader { get; set; }
 
     public CustomFieldDataType DataType { get; set; }
 

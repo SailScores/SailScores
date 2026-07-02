@@ -122,6 +122,7 @@ namespace SailScores.Core.Services
                 .Include(s => s.Season)
                 .Include(s => s.ChildLinks)
                 .Include(s => s.SeriesResultsTemplate)
+                    .ThenInclude(t => t.CustomFields)
                 .AsSingleQuery()
                 .FirstOrDefaultAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
@@ -143,6 +144,7 @@ namespace SailScores.Core.Services
                     if (defaultTemplateId.HasValue)
                     {
                         var defaultTemplate = await _dbContext.SeriesResultsTemplates
+                            .Include(t => t.CustomFields)
                             .FirstOrDefaultAsync(t => t.Id == defaultTemplateId.Value)
                             .ConfigureAwait(false);
                         fullSeries.SeriesResultsTemplate = _mapper.Map<SeriesResultsTemplate>(defaultTemplate);
@@ -887,7 +889,8 @@ namespace SailScores.Core.Services
                     .Include(c => c.CompetitorFleets)
                     .Include(c => c.BoatClass)
                     .Include(c => c.CustomFieldValues)
-                    .Where(c => compIds.Contains(c.Id));
+                    .Where(c => compIds.Contains(c.Id))
+                    .AsSplitQuery();
 
                 // Filter by fleet if series has FleetId set
                 if (series.FleetId.HasValue)

@@ -90,7 +90,7 @@
                                     {
                                         var field = Model.CustomFieldValues[index];
                                         <div class="border rounded p-3 mb-3">
-                                            <label asp-for="@Model.CustomFieldValues[index].Value" class="form-label">@field.DisplayHeader</label>
+                                            <label asp-for="@Model.CustomFieldValues[index].Value" class="form-label">@(string.IsNullOrWhiteSpace(field.DisplayHeader) ? field.Name : field.DisplayHeader)</label>
                                             <input asp-for="@Model.CustomFieldValues[index].Value" class="form-control" type="@(field.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")" />
                                             <input type="hidden" asp-for="@Model.CustomFieldValues[index].FieldDefinitionId" />
                                             <input type="hidden" asp-for="@Model.CustomFieldValues[index].DisplayHeader" />

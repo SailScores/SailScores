@@ -8,7 +8,9 @@ public class CompetitorCustomFieldViewModel
 {
     public Guid FieldDefinitionId { get; set; }
 
-    public string DisplayHeader { get; set; }
+    public string Name { get; set; }
+
+    public string? DisplayHeader { get; set; }
 
     public CustomFieldDataType DataType { get; set; }
 
@@ -25,7 +27,9 @@ public class TemplateCustomFieldSelectionViewModel
 {
     public Guid FieldDefinitionId { get; set; }
 
-    public string DisplayHeader { get; set; }
+    public string Name { get; set; }
+
+    public string? DisplayHeader { get; set; }
 
     public CustomFieldDataType DataType { get; set; }
 
