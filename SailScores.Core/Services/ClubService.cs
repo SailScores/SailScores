@@ -566,6 +566,9 @@ namespace SailScores.Core.Services
             dbClub.EnableHandicapScoring = club.EnableHandicapScoring;
             dbClub.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers;
             dbClub.DefaultHandicapSystemId = club.DefaultHandicapSystemId;
+            dbClub.DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId;
+            dbClub.DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId;
+
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings?.Latitude;
