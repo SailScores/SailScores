@@ -6,6 +6,7 @@ using SailScores.Database;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
@@ -29,6 +30,29 @@ public class BackupService : IBackupService
 
     // Extended timeout for backup reads (5 minutes)
     private static readonly TimeSpan BackupCommandTimeout = TimeSpan.FromMinutes(5);
+
+    private sealed class ClubBackupSnapshot
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Initials { get; set; }
+        public string Description { get; set; }
+        public string HomePageDescription { get; set; }
+        public bool IsHidden { get; set; }
+        public bool? ShowClubInResults { get; set; }
+        public bool? ShowCalendarInNav { get; set; }
+        public string Url { get; set; }
+        public string Locale { get; set; }
+        public int? DefaultRaceDateOffset { get; set; }
+        public string StatisticsDescription { get; set; }
+        public Guid? LogoFileId { get; set; }
+        public bool EnableHandicapScoring { get; set; }
+        public Guid? DefaultScoringSystemId { get; set; }
+        public Guid? DefaultHandicapSystemId { get; set; }
+        public bool? EnableAlternativeSailNumbers { get; set; }
+        public Guid? DefaultSeriesResultsTemplateId { get; set; }
+        public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+    }
 
     public BackupService(ISailScoresContext dbContext, ILogger<BackupService> logger)
     {
@@ -102,11 +126,7 @@ public class BackupService : IBackupService
 
     private async Task<ClubBackupData> CreateBackupInternalAsync(Guid clubId, string createdBy, CancellationToken cancellationToken)
     {
-        var club = await _dbContext.Clubs
-            .Where(c => c.Id == clubId)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(cancellationToken)
-            .ConfigureAwait(false);
+        var club = await LoadClubBackupSnapshotAsync(clubId, cancellationToken).ConfigureAwait(false);
 
         if (club == null)
         {
@@ -136,20 +156,13 @@ public class BackupService : IBackupService
             DefaultRaceDateOffset = club.DefaultRaceDateOffset,
             StatisticsDescription = club.StatisticsDescription,
             LogoFileId = club.LogoFileId,
-            EnableHandicapScoring = club.EnableHandicapScoring
+            EnableHandicapScoring = club.EnableHandicapScoring,
+            DefaultScoringSystemId = club.DefaultScoringSystemId,
+            DefaultHandicapSystemId = club.DefaultHandicapSystemId,
+            EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers,
+            DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
+            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId
         };
-
-        // Weather settings
-        if (club.WeatherSettings != null)
-        {
-            backup.WeatherSettings = new WeatherSettingsBackup
-            {
-                Latitude = club.WeatherSettings.Latitude,
-                Longitude = club.WeatherSettings.Longitude,
-                TemperatureUnits = club.WeatherSettings.TemperatureUnits,
-                WindSpeedUnits = club.WeatherSettings.WindSpeedUnits
-            };
-        }
 
         // Boat Classes
         var boatClasses = await _dbContext.BoatClasses
@@ -764,12 +777,12 @@ public class BackupService : IBackupService
         result.Warnings.AddRange(quickValidation.Warnings);
 
         // Verify target club exists
-        var targetClub = await _dbContext.Clubs
+        var targetClubExists = await _dbContext.Clubs
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == targetClubId, cancellationToken)
+            .AnyAsync(c => c.Id == targetClubId, cancellationToken)
             .ConfigureAwait(false);
 
-        if (targetClub == null)
+        if (!targetClubExists)
         {
             result.IsValid = false;
             result.CanRestore = false;
@@ -935,16 +948,16 @@ public class BackupService : IBackupService
         {
             _guidMap = new Dictionary<Guid, Guid>();
 
-            var club = await _dbContext.Clubs
-                .Include(c => c.WeatherSettings)
-                .FirstOrDefaultAsync(c => c.Id == targetClubId, cancellationToken)
-                .ConfigureAwait(false)
-                ?? throw new InvalidOperationException($"Target club {targetClubId} not found.");
+            if (!await _dbContext.Clubs
+                .AsNoTracking()
+                .AnyAsync(c => c.Id == targetClubId, cancellationToken)
+                .ConfigureAwait(false))
+            {
+                throw new InvalidOperationException($"Target club {targetClubId} not found.");
+            }
 
             _logger.LogDebug("Deleting existing data for club {TargetClubId}", targetClubId);
             await DeleteExistingClubDataAsync(targetClubId, cancellationToken).ConfigureAwait(false);
-
-            UpdateClubSettings(club, backup, preserveClubName);
 
             RestoreBoatClasses(backup, targetClubId);
             RestoreSeasons(backup, targetClubId);
@@ -958,17 +971,15 @@ public class BackupService : IBackupService
 
             await UpdateScoringSystemParentReferencesAsync(backup, cancellationToken).ConfigureAwait(false);
             await UpdateHandicapSystemParentReferencesAsync(backup, cancellationToken).ConfigureAwait(false);
-            await UpdateHandicapDefaultReferencesAsync(club, backup, cancellationToken).ConfigureAwait(false);
+            await UpdateHandicapDefaultReferencesAsync(targetClubId, backup, cancellationToken).ConfigureAwait(false);
 
-            if (defaultScoringSystemId.HasValue)
-            {
-                club.DefaultScoringSystemId = defaultScoringSystemId;
-            }
-
-            if (defaultHandicapSystemId.HasValue)
-            {
-                club.DefaultHandicapSystemId = defaultHandicapSystemId;
-            }
+            await UpdateClubSettingsAsync(
+                targetClubId,
+                backup,
+                preserveClubName,
+                defaultScoringSystemId,
+                defaultHandicapSystemId,
+                cancellationToken).ConfigureAwait(false);
 
             await RestoreSeriesAsync(backup, targetClubId, cancellationToken).ConfigureAwait(false);
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -979,7 +990,7 @@ public class BackupService : IBackupService
 
             RestoreAnnouncements(backup, targetClubId);
             RestoreDocuments(backup, targetClubId);
-            RestoreFiles(backup, club);
+            RestoreFiles(backup, targetClubId, cancellationToken);
             RestoreClubSequences(backup, targetClubId);
             RestoreForwarders(backup);
             RestoreSeriesResults(backup);
@@ -1024,35 +1035,389 @@ public class BackupService : IBackupService
         }
     }
 
-    private void UpdateClubSettings(Db.Club club, ClubBackupData backup, bool preserveClubName)
+    private bool IsRelationalProvider => _dbContext.Database.ProviderName?.Contains("InMemory", StringComparison.OrdinalIgnoreCase) != true;
+
+    private async Task UpdateClubSettingsAsync(
+        Guid clubId,
+        ClubBackupData backup,
+        bool preserveClubName,
+        Guid? defaultScoringSystemId,
+        Guid? defaultHandicapSystemId,
+        CancellationToken cancellationToken = default)
     {
-        // Only optionally preserve club name; initials are always preserved, URL is always restored
+        if (!IsRelationalProvider)
+        {
+            var club = await _dbContext.Clubs.FirstOrDefaultAsync(c => c.Id == clubId, cancellationToken).ConfigureAwait(false);
+            if (club == null)
+            {
+                return;
+            }
+
+            if (!preserveClubName)
+            {
+                club.Name = backup.Name;
+            }
+
+            club.Url = backup.Url;
+            club.Description = backup.Description;
+            club.HomePageDescription = backup.HomePageDescription;
+            club.IsHidden = backup.IsHidden;
+            club.ShowClubInResults = backup.ShowClubInResults;
+            club.ShowCalendarInNav = backup.ShowCalendarInNav;
+            club.Locale = backup.Locale;
+            club.DefaultRaceDateOffset = backup.DefaultRaceDateOffset;
+            club.StatisticsDescription = backup.StatisticsDescription;
+            club.EnableHandicapScoring = backup.EnableHandicapScoring;
+            club.DefaultScoringSystemId = defaultScoringSystemId;
+            club.DefaultHandicapSystemId = defaultHandicapSystemId;
+            club.EnableAlternativeSailNumbers = backup.EnableAlternativeSailNumbers;
+            club.DefaultSeriesResultsTemplateId = backup.DefaultSeriesResultsTemplateId;
+            club.DefaultRegattaSeriesResultsTemplateId = backup.DefaultRegattaSeriesResultsTemplateId;
+            return;
+        }
+
+        var assignments = new List<string>();
+        var parameters = new List<(string Name, object Value)>();
+
         if (!preserveClubName)
         {
-            club.Name = backup.Name;
+            assignments.Add("Name = @name");
+            parameters.Add(("@name", backup.Name ?? string.Empty));
         }
 
-        // Always restore these settings
-        club.Url = backup.Url;
-        club.Description = backup.Description;
-        club.HomePageDescription = backup.HomePageDescription;
-        club.ShowClubInResults = backup.ShowClubInResults;
-        club.ShowCalendarInNav = backup.ShowCalendarInNav;
-        club.Locale = backup.Locale;
-        club.DefaultRaceDateOffset = backup.DefaultRaceDateOffset;
-        club.StatisticsDescription = backup.StatisticsDescription;
-        club.EnableHandicapScoring = backup.EnableHandicapScoring;
+        assignments.Add("Url = @url");
+        parameters.Add(("@url", backup.Url ?? (object)DBNull.Value));
 
-        // Note: club.Initials are NOT updated (always preserved from target club)
+        assignments.Add("Description = @description");
+        parameters.Add(("@description", backup.Description ?? (object)DBNull.Value));
 
-        if (backup.WeatherSettings != null)
+        assignments.Add("HomePageDescription = @homePageDescription");
+        parameters.Add(("@homePageDescription", backup.HomePageDescription ?? (object)DBNull.Value));
+
+        assignments.Add("IsHidden = @isHidden");
+        parameters.Add(("@isHidden", backup.IsHidden));
+
+        if (await ClubColumnExistsAsync("ShowClubInResults", cancellationToken).ConfigureAwait(false))
         {
-            club.WeatherSettings ??= new Db.WeatherSettings();
-            club.WeatherSettings.Latitude = backup.WeatherSettings.Latitude;
-            club.WeatherSettings.Longitude = backup.WeatherSettings.Longitude;
-            club.WeatherSettings.TemperatureUnits = backup.WeatherSettings.TemperatureUnits;
-            club.WeatherSettings.WindSpeedUnits = backup.WeatherSettings.WindSpeedUnits;
+            assignments.Add("ShowClubInResults = @showClubInResults");
+            parameters.Add(("@showClubInResults", backup.ShowClubInResults ?? (object)DBNull.Value));
         }
+
+        if (await ClubColumnExistsAsync("ShowCalendarInNav", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("ShowCalendarInNav = @showCalendarInNav");
+            parameters.Add(("@showCalendarInNav", backup.ShowCalendarInNav ?? (object)DBNull.Value));
+        }
+
+        assignments.Add("Locale = @locale");
+        parameters.Add(("@locale", backup.Locale ?? (object)DBNull.Value));
+
+        if (await ClubColumnExistsAsync("DefaultRaceDateOffset", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("DefaultRaceDateOffset = @defaultRaceDateOffset");
+            parameters.Add(("@defaultRaceDateOffset", backup.DefaultRaceDateOffset ?? (object)DBNull.Value));
+        }
+
+        assignments.Add("StatisticsDescription = @statisticsDescription");
+        parameters.Add(("@statisticsDescription", backup.StatisticsDescription ?? (object)DBNull.Value));
+
+        if (await ClubColumnExistsAsync("EnableHandicapScoring", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("EnableHandicapScoring = @enableHandicapScoring");
+            parameters.Add(("@enableHandicapScoring", backup.EnableHandicapScoring));
+        }
+
+        if (await ClubColumnExistsAsync("DefaultScoringSystemId", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("DefaultScoringSystemId = @defaultScoringSystemId");
+            parameters.Add(("@defaultScoringSystemId", defaultScoringSystemId ?? (object)DBNull.Value));
+        }
+
+        if (await ClubColumnExistsAsync("DefaultHandicapSystemId", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("DefaultHandicapSystemId = @defaultHandicapSystemId");
+            parameters.Add(("@defaultHandicapSystemId", defaultHandicapSystemId ?? (object)DBNull.Value));
+        }
+
+        if (await ClubColumnExistsAsync("EnableAlternativeSailNumbers", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("EnableAlternativeSailNumbers = @enableAlternativeSailNumbers");
+            parameters.Add(("@enableAlternativeSailNumbers", backup.EnableAlternativeSailNumbers ?? (object)DBNull.Value));
+        }
+
+        if (await ClubColumnExistsAsync("DefaultSeriesResultsTemplateId", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("DefaultSeriesResultsTemplateId = @defaultSeriesResultsTemplateId");
+            parameters.Add(("@defaultSeriesResultsTemplateId", backup.DefaultSeriesResultsTemplateId ?? (object)DBNull.Value));
+        }
+
+        if (await ClubColumnExistsAsync("DefaultRegattaSeriesResultsTemplateId", cancellationToken).ConfigureAwait(false))
+        {
+            assignments.Add("DefaultRegattaSeriesResultsTemplateId = @defaultRegattaSeriesResultsTemplateId");
+            parameters.Add(("@defaultRegattaSeriesResultsTemplateId", backup.DefaultRegattaSeriesResultsTemplateId ?? (object)DBNull.Value));
+        }
+
+        if (assignments.Count == 0)
+        {
+            return;
+        }
+
+        await EnsureDatabaseConnectionOpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var command = CreateDbCommand();
+        command.CommandText = $"UPDATE Clubs SET {string.Join(", ", assignments)} WHERE Id = @clubId";
+        command.Parameters.Add(CreateDbParameter(command, "@clubId", clubId));
+
+        foreach (var (name, value) in parameters)
+        {
+            command.Parameters.Add(CreateDbParameter(command, name, value));
+        }
+
+        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<bool> ClubColumnExistsAsync(string columnName, CancellationToken cancellationToken)
+    {
+        if (!IsRelationalProvider)
+        {
+            return true;
+        }
+
+        await EnsureDatabaseConnectionOpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var command = CreateDbCommand();
+        command.CommandText = "SELECT CASE WHEN EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Clubs' AND COLUMN_NAME = @columnName) THEN 1 ELSE 0 END";
+        command.Parameters.Add(CreateDbParameter(command, "@columnName", columnName));
+
+        var result = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        return Convert.ToInt32(result) == 1;
+    }
+
+    private async Task<ClubBackupSnapshot?> LoadClubBackupSnapshotAsync(Guid clubId, CancellationToken cancellationToken)
+    {
+        if (!IsRelationalProvider)
+        {
+            var club = await _dbContext.Clubs
+                .Where(c => c.Id == clubId)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            if (club == null)
+            {
+                return null;
+            }
+
+            return new ClubBackupSnapshot
+            {
+                Id = club.Id,
+                Name = club.Name,
+                Initials = club.Initials,
+                Description = club.Description,
+                HomePageDescription = club.HomePageDescription,
+                IsHidden = club.IsHidden,
+                ShowClubInResults = club.ShowClubInResults,
+                ShowCalendarInNav = club.ShowCalendarInNav,
+                Url = club.Url,
+                Locale = club.Locale,
+                DefaultRaceDateOffset = club.DefaultRaceDateOffset,
+                StatisticsDescription = club.StatisticsDescription,
+                LogoFileId = club.LogoFileId,
+                EnableHandicapScoring = club.EnableHandicapScoring,
+                DefaultScoringSystemId = club.DefaultScoringSystemId,
+                DefaultHandicapSystemId = club.DefaultHandicapSystemId,
+                EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers,
+                DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
+                DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId
+            };
+        }
+
+        var requestedColumns = new List<string>
+        {
+            "Id",
+            "Name",
+            "Initials",
+            "Description",
+            "HomePageDescription",
+            "IsHidden",
+            "Url",
+            "Locale",
+            "StatisticsDescription",
+            "LogoFileId"
+        };
+
+        if (await ClubColumnExistsAsync("ShowClubInResults", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("ShowClubInResults");
+        }
+
+        if (await ClubColumnExistsAsync("ShowCalendarInNav", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("ShowCalendarInNav");
+        }
+
+        if (await ClubColumnExistsAsync("DefaultRaceDateOffset", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("DefaultRaceDateOffset");
+        }
+
+        if (await ClubColumnExistsAsync("EnableHandicapScoring", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("EnableHandicapScoring");
+        }
+
+        if (await ClubColumnExistsAsync("DefaultScoringSystemId", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("DefaultScoringSystemId");
+        }
+
+        if (await ClubColumnExistsAsync("DefaultHandicapSystemId", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("DefaultHandicapSystemId");
+        }
+
+        if (await ClubColumnExistsAsync("EnableAlternativeSailNumbers", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("EnableAlternativeSailNumbers");
+        }
+
+        if (await ClubColumnExistsAsync("DefaultSeriesResultsTemplateId", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("DefaultSeriesResultsTemplateId");
+        }
+
+        if (await ClubColumnExistsAsync("DefaultRegattaSeriesResultsTemplateId", cancellationToken).ConfigureAwait(false))
+        {
+            requestedColumns.Add("DefaultRegattaSeriesResultsTemplateId");
+        }
+
+        await EnsureDatabaseConnectionOpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var command = CreateDbCommand();
+        command.CommandText = $"SELECT {string.Join(", ", requestedColumns)} FROM Clubs WHERE Id = @clubId";
+        command.Parameters.Add(CreateDbParameter(command, "@clubId", clubId));
+
+        using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            return null;
+        }
+
+        var snapshot = new ClubBackupSnapshot
+        {
+            Id = reader.GetGuid(reader.GetOrdinal("Id")),
+            Name = reader.IsDBNull(reader.GetOrdinal("Name")) ? null : reader.GetString(reader.GetOrdinal("Name")),
+            Initials = reader.IsDBNull(reader.GetOrdinal("Initials")) ? null : reader.GetString(reader.GetOrdinal("Initials")),
+            Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+            HomePageDescription = reader.IsDBNull(reader.GetOrdinal("HomePageDescription")) ? null : reader.GetString(reader.GetOrdinal("HomePageDescription")),
+            IsHidden = reader.GetBoolean(reader.GetOrdinal("IsHidden")),
+            Url = reader.IsDBNull(reader.GetOrdinal("Url")) ? null : reader.GetString(reader.GetOrdinal("Url")),
+            Locale = reader.IsDBNull(reader.GetOrdinal("Locale")) ? null : reader.GetString(reader.GetOrdinal("Locale")),
+            StatisticsDescription = reader.IsDBNull(reader.GetOrdinal("StatisticsDescription")) ? null : reader.GetString(reader.GetOrdinal("StatisticsDescription")),
+            LogoFileId = reader.IsDBNull(reader.GetOrdinal("LogoFileId")) ? null : reader.GetGuid(reader.GetOrdinal("LogoFileId"))
+        };
+
+        if (requestedColumns.Contains("ShowClubInResults", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.ShowClubInResults = reader.IsDBNull(reader.GetOrdinal("ShowClubInResults")) ? null : reader.GetBoolean(reader.GetOrdinal("ShowClubInResults"));
+        }
+
+        if (requestedColumns.Contains("ShowCalendarInNav", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.ShowCalendarInNav = reader.IsDBNull(reader.GetOrdinal("ShowCalendarInNav")) ? null : reader.GetBoolean(reader.GetOrdinal("ShowCalendarInNav"));
+        }
+
+        if (requestedColumns.Contains("DefaultRaceDateOffset", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.DefaultRaceDateOffset = reader.IsDBNull(reader.GetOrdinal("DefaultRaceDateOffset")) ? null : reader.GetInt32(reader.GetOrdinal("DefaultRaceDateOffset"));
+        }
+
+        if (requestedColumns.Contains("EnableHandicapScoring", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.EnableHandicapScoring = reader.GetBoolean(reader.GetOrdinal("EnableHandicapScoring"));
+        }
+
+        if (requestedColumns.Contains("DefaultScoringSystemId", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.DefaultScoringSystemId = reader.IsDBNull(reader.GetOrdinal("DefaultScoringSystemId")) ? null : reader.GetGuid(reader.GetOrdinal("DefaultScoringSystemId"));
+        }
+
+        if (requestedColumns.Contains("DefaultHandicapSystemId", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.DefaultHandicapSystemId = reader.IsDBNull(reader.GetOrdinal("DefaultHandicapSystemId")) ? null : reader.GetGuid(reader.GetOrdinal("DefaultHandicapSystemId"));
+        }
+
+        if (requestedColumns.Contains("EnableAlternativeSailNumbers", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.EnableAlternativeSailNumbers = reader.IsDBNull(reader.GetOrdinal("EnableAlternativeSailNumbers")) ? null : reader.GetBoolean(reader.GetOrdinal("EnableAlternativeSailNumbers"));
+        }
+
+        if (requestedColumns.Contains("DefaultSeriesResultsTemplateId", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.DefaultSeriesResultsTemplateId = reader.IsDBNull(reader.GetOrdinal("DefaultSeriesResultsTemplateId")) ? null : reader.GetGuid(reader.GetOrdinal("DefaultSeriesResultsTemplateId"));
+        }
+
+        if (requestedColumns.Contains("DefaultRegattaSeriesResultsTemplateId", StringComparer.OrdinalIgnoreCase))
+        {
+            snapshot.DefaultRegattaSeriesResultsTemplateId = reader.IsDBNull(reader.GetOrdinal("DefaultRegattaSeriesResultsTemplateId")) ? null : reader.GetGuid(reader.GetOrdinal("DefaultRegattaSeriesResultsTemplateId"));
+        }
+
+        return snapshot;
+    }
+
+    private async Task EnsureDatabaseConnectionOpenAsync(CancellationToken cancellationToken)
+    {
+        var connection = _dbContext.Database.GetDbConnection();
+        if (connection.State != ConnectionState.Open)
+        {
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private DbCommand CreateDbCommand()
+    {
+        var command = _dbContext.Database.GetDbConnection().CreateCommand();
+        var currentTransaction = _dbContext.Database.CurrentTransaction;
+        if (currentTransaction != null)
+        {
+            command.Transaction = currentTransaction.GetDbTransaction();
+        }
+
+        return command;
+    }
+
+    private DbParameter CreateDbParameter(DbCommand command, string name, object value)
+    {
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = name;
+        parameter.Value = value ?? DBNull.Value;
+        return parameter;
+    }
+
+    private async Task SetClubLogoFileIdAsync(Guid clubId, Guid logoFileId, CancellationToken cancellationToken)
+    {
+        if (!IsRelationalProvider)
+        {
+            var club = await _dbContext.Clubs.FirstOrDefaultAsync(c => c.Id == clubId, cancellationToken).ConfigureAwait(false);
+            if (club != null)
+            {
+                club.LogoFileId = logoFileId;
+            }
+
+            return;
+        }
+
+        if (!await ClubColumnExistsAsync("LogoFileId", cancellationToken).ConfigureAwait(false))
+        {
+            return;
+        }
+
+        await EnsureDatabaseConnectionOpenAsync(cancellationToken).ConfigureAwait(false);
+        var command = CreateDbCommand();
+        command.CommandText = "UPDATE Clubs SET LogoFileId = @logoFileId WHERE Id = @clubId";
+        command.Parameters.Add(CreateDbParameter(command, "@clubId", clubId));
+        command.Parameters.Add(CreateDbParameter(command, "@logoFileId", logoFileId));
+        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private void RestoreBoatClasses(ClubBackupData backup, Guid targetClubId)
@@ -1593,7 +1958,7 @@ public class BackupService : IBackupService
         }
     }
 
-    private void RestoreFiles(ClubBackupData backup, Db.Club club)
+    private async Task RestoreFiles(ClubBackupData backup, Guid targetClubId, CancellationToken cancellationToken = default)
     {
         foreach (var file in backup.Files ?? Enumerable.Empty<FileBackup>())
         {
@@ -1612,7 +1977,7 @@ public class BackupService : IBackupService
             var newLogoFileId = GetNewGuidIfExists(backup.LogoFileId.Value);
             if (newLogoFileId.HasValue)
             {
-                club.LogoFileId = newLogoFileId.Value;
+                await SetClubLogoFileIdAsync(targetClubId, newLogoFileId.Value, cancellationToken).ConfigureAwait(false);
             }
         }
     }
@@ -1797,17 +2162,11 @@ public class BackupService : IBackupService
         }
     }
 
-    private async Task UpdateHandicapDefaultReferencesAsync(Db.Club club, ClubBackupData backup, CancellationToken cancellationToken = default)
+    private async Task UpdateHandicapDefaultReferencesAsync(Guid clubId, ClubBackupData backup, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(backup.DefaultHandicapSystemName))
         {
             return;
-        }
-
-        if (!club.DefaultHandicapSystemId.HasValue)
-        {
-            club.DefaultHandicapSystemId = await ResolveHandicapSystemIdByNameAsync(backup.DefaultHandicapSystemName, backup, cancellationToken)
-                .ConfigureAwait(false);
         }
 
         foreach (var fleet in backup.Fleets ?? Enumerable.Empty<FleetBackup>())
@@ -2125,16 +2484,9 @@ public class BackupService : IBackupService
             .ExecuteDeleteAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        // Clear DefaultScoringSystemId on the club before deleting ScoringSystems
-        // This prevents FK constraint violation: FK_Clubs_ScoringSystems_DefaultScoringSystemId
-        await _dbContext.Clubs
-            .Where(c => c.Id == clubId)
-            .ExecuteUpdateAsync(
-                u => u
-                    .SetProperty(c => c.DefaultScoringSystemId, (Guid?)null)
-                    .SetProperty(c => c.DefaultHandicapSystemId, (Guid?)null),
-                cancellationToken)
-            .ConfigureAwait(false);
+        // Clear default system references on the club before deleting ScoringSystems.
+        // This prevents FK constraint violations when the club still references a scoring or handicap system.
+        await ClearClubDefaultSystemReferencesAsync(clubId, cancellationToken).ConfigureAwait(false);
 
         // ScoringSystems
         await _dbContext.ScoringSystems
@@ -2198,6 +2550,50 @@ public class BackupService : IBackupService
                     .ConfigureAwait(false);
             }
         }
+    }
+
+    private async Task ClearClubDefaultSystemReferencesAsync(Guid clubId, CancellationToken cancellationToken)
+    {
+        if (!IsRelationalProvider)
+        {
+            var club = await _dbContext.Clubs.FirstOrDefaultAsync(c => c.Id == clubId, cancellationToken).ConfigureAwait(false);
+            if (club != null)
+            {
+                club.DefaultScoringSystemId = null;
+                club.DefaultHandicapSystemId = null;
+            }
+
+            return;
+        }
+
+        var updates = new List<(string ColumnName, object Value)>();
+
+        if (await ClubColumnExistsAsync("DefaultScoringSystemId", cancellationToken).ConfigureAwait(false))
+        {
+            updates.Add(("DefaultScoringSystemId", (Guid?)null));
+        }
+
+        if (await ClubColumnExistsAsync("DefaultHandicapSystemId", cancellationToken).ConfigureAwait(false))
+        {
+            updates.Add(("DefaultHandicapSystemId", (Guid?)null));
+        }
+
+        if (updates.Count == 0)
+        {
+            return;
+        }
+
+        await EnsureDatabaseConnectionOpenAsync(cancellationToken).ConfigureAwait(false);
+        var command = CreateDbCommand();
+        command.CommandText = $"UPDATE Clubs SET {string.Join(", ", updates.Select(u => $"{u.ColumnName} = @{u.ColumnName}"))} WHERE Id = @clubId";
+        command.Parameters.Add(CreateDbParameter(command, "@clubId", clubId));
+
+        foreach (var (columnName, value) in updates)
+        {
+            command.Parameters.Add(CreateDbParameter(command, $"@{columnName}", value));
+        }
+
+        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task DeleteExistingClubDataUsingLoadAndRemove(Guid clubId, CancellationToken cancellationToken = default)
@@ -2334,10 +2730,8 @@ public class BackupService : IBackupService
         var scoreCodes = await _dbContext.ScoreCodes.Where(sc => scoringSystemIds.Contains(sc.ScoringSystemId)).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.ScoreCodes.RemoveRange(scoreCodes);
 
-        // Clear DefaultScoringSystemId on the club before deleting ScoringSystems
-        var club = await _dbContext.Clubs.Where(c => c.Id == clubId).FirstAsync(cancellationToken).ConfigureAwait(false);
-        club.DefaultScoringSystemId = null;
-        club.DefaultHandicapSystemId = null;
+        // Clear default system references on the club before deleting ScoringSystems
+        await ClearClubDefaultSystemReferencesAsync(clubId, cancellationToken).ConfigureAwait(false);
 
         // ScoringSystems
         var scoringSystems = await _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).ToListAsync(cancellationToken).ConfigureAwait(false);
