@@ -111,19 +111,21 @@ public class SeriesController : Controller
             }
         }
 
+        var club = await _clubService.GetMinimalClub(clubInitials);
+
         var canEdit = false;
         var canEditSeries = false;
         if (User != null && (User.Identity?.IsAuthenticated ?? false))
         {
-            var clubId = await _clubService.GetClubId(clubInitials);
-            canEdit = await _authService.CanUserEdit(User, clubId);
-            canEditSeries = await _authService.CanUserEditSeries(User, clubId);
+            canEdit = await _authService.CanUserEdit(User, club.Id);
+            canEditSeries = await _authService.CanUserEditSeries(User, club.Id);
         }
 
         return View(new ClubItemViewModel<Core.Model.Series>
         {
             Item = series,
             ClubInitials = clubInitials,
+            ClubLogoFileId = club.LogoFileId,
             CanEdit = canEdit,
             CanEditSeries = canEditSeries
         });

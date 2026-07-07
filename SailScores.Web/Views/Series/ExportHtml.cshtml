@@ -1,10 +1,12 @@
 @using SailScores.Api.Enumerations
 @using SailScores.Core.Model
+@using SailScores.Core.Services
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Extensions
 @using SailScores.Web.Resources
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject IClubService clubService
 
 @model Series
 
@@ -14,6 +16,18 @@
 }
 @{
     var results = Model.FlatResults;
+    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
+        Model.SeriesResultsTemplate, Model.Type == SeriesType.Regatta);
+
+    string logoDataUri = null;
+    if (resolvedTemplate.ShowClubLogo)
+    {
+        var club = await clubService.GetMinimalClub(Model.ClubId);
+        if (club?.LogoFileId != null)
+        {
+            logoDataUri = await clubService.GetLogoDataUriAsync(club.LogoFileId.Value);
+        }
+    }
 }
 
 <!DOCTYPE html>
@@ -37,7 +51,8 @@
 <body>
     <div class="body-content">
         <main class="col-12 col-lg-9 py-md-3 ps-md-5 bd-content" role="main">
-            <div class="row">
+            <div class="d-flex justify-content-between align-items-start">
+            <div class="row flex-grow-1">
                 <div class="col-12">
                     <h2>@Model.Name</h2>
                     @if (!String.IsNullOrWhiteSpace(Model.Description))
@@ -61,6 +76,11 @@
                     }
                 </div>
             </div>
+                @if (!String.IsNullOrEmpty(logoDataUri))
+                {
+                    <img src="@logoDataUri" class="series-club-logo ms-3" alt="Club logo" />
+                }
+            </div>
             @{
                 ViewData["IsExport"] = true;
                 string trendLegend = Model.TrendOption.HasValue ? 
@@ -73,16 +93,12 @@
                     SeriesId = Model.Id,
                     Results = Model.FlatResults,
                     ShowTrend = false,
-                    SailNumberVisibility = Model.SeriesResultsTemplate?.SailNumberVisibility
-                        ?? SailScores.Api.Enumerations.ColumnVisibility.Always,
-                    CompetitorNameVisibility = Model.SeriesResultsTemplate?.CompetitorNameVisibility
-                        ?? SailScores.Api.Enumerations.ColumnVisibility.Always,
-                    CompetitorNameHeader = Model.SeriesResultsTemplate?.CompetitorNameHeader ?? "Helm",
-                    BoatNameVisibility = Model.SeriesResultsTemplate?.BoatNameVisibility
-                        ?? SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens,
-                    BoatNameHeader = Model.SeriesResultsTemplate?.BoatNameHeader ?? "Boat",
-                    CompetitorClubVisibility = Model.SeriesResultsTemplate?.CompetitorClubVisibility
-                        ?? SailScores.Api.Enumerations.ColumnVisibility.Hidden,
+                    SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
+                    CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
+                    CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
+                    BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
+                    BoatNameHeader = resolvedTemplate.BoatNameHeader,
+                    CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
                     IsExport = true,
                     ShowExportButtons = false,
                     ExcludeCompetitorLinks = true,

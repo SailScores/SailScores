@@ -24,6 +24,12 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
                 <small class="form-text text-muted">Give this template a descriptive name to help identify its purpose.</small>
             </div>
+
+            <div class="form-check">
+                <input asp-for="ShowClubLogo" class="form-check-input" />
+                <label asp-for="ShowClubLogo" class="form-check-label"></label>
+                <small class="form-text text-muted d-block">Displays the club logo in the upper right of the results page, browser prints, and HTML exports.</small>
+            </div>
         </div>
     </div>
 

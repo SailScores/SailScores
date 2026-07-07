@@ -5,11 +5,11 @@ namespace SailScores.Core.Services;
 
 public static class SeriesResultsTemplateHelper
 {
-    public static ResolvedTemplate GetResolvedTemplate(SeriesResultsTemplate template)
+    public static ResolvedTemplate GetResolvedTemplate(SeriesResultsTemplate template, bool isRegatta = false)
     {
         if (template == null)
         {
-            return GetDefaultTemplate();
+            return GetDefaultTemplate(isRegatta);
         }
 
         return new ResolvedTemplate
@@ -19,7 +19,8 @@ public static class SeriesResultsTemplateHelper
             CompetitorNameHeader = template.CompetitorNameHeader ?? "Helm",
             BoatNameVisibility = template.BoatNameVisibility,
             BoatNameHeader = template.BoatNameHeader ?? "Boat",
-            CompetitorClubVisibility = template.CompetitorClubVisibility
+            CompetitorClubVisibility = template.CompetitorClubVisibility,
+            ShowClubLogo = template.ShowClubLogo
         };
     }
 
@@ -32,7 +33,8 @@ public static class SeriesResultsTemplateHelper
             CompetitorNameHeader = "Helm",
             BoatNameVisibility = ColumnVisibility.OnLargerScreens,
             BoatNameHeader = "Boat",
-            CompetitorClubVisibility = isRegatta ? ColumnVisibility.OnLargerScreens : ColumnVisibility.Hidden
+            CompetitorClubVisibility = isRegatta ? ColumnVisibility.OnLargerScreens : ColumnVisibility.Hidden,
+            ShowClubLogo = false
         };
     }
 }
@@ -45,4 +47,5 @@ public class ResolvedTemplate
     public ColumnVisibility BoatNameVisibility { get; set; }
     public string BoatNameHeader { get; set; }
     public ColumnVisibility CompetitorClubVisibility { get; set; }
+    public bool ShowClubLogo { get; set; }
 }

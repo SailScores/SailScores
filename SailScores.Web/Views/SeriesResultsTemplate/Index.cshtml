@@ -44,7 +44,13 @@ else
                 @foreach (var template in Model.Templates)
                 {
                     <tr>
-                        <td><strong>@template.Name</strong></td>
+                        <td>
+                            <strong>@template.Name</strong>
+                            @if (template.ShowClubLogo)
+                            {
+                                <span class="badge bg-info" title="Shows club logo"><i class="fas fa-image"></i> Logo</span>
+                            }
+                        </td>
                         <td>
                             @switch (template.SailNumberVisibility)
                             {

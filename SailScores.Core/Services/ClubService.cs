@@ -778,6 +778,18 @@ namespace SailScores.Core.Services
             return await _dbContext.Files.FirstOrDefaultAsync(f => f.Id == id);
         }
 
+        public async Task<string> GetLogoDataUriAsync(Guid fileId)
+        {
+            var file = await GetFileAsync(fileId);
+            if (file?.FileContents == null)
+            {
+                return null;
+            }
+
+            var contentType = ImageContentTypeDetector.Detect(file.FileContents);
+            return $"data:{contentType};base64,{Convert.ToBase64String(file.FileContents)}";
+        }
+
         public async Task ResetClubAsync(Guid clubId, Model.ResetLevel resetLevel)
         {
             // Verify club exists

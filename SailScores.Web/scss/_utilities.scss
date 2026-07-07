@@ -224,3 +224,16 @@ html {
 .faq-details > summary:hover {
     color: $primary;
 }
+
+/* Club logo shown on series results pages, prints, and HTML exports */
+.series-club-logo {
+    max-height: 80px;
+    max-width: 220px;
+    object-fit: contain;
+}
+
+@media print {
+    .series-club-logo {
+        max-height: 60px;
+    }
+}
