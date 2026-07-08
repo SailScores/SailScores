@@ -20,7 +20,8 @@ public static class SeriesResultsTemplateHelper
             BoatNameVisibility = template.BoatNameVisibility,
             BoatNameHeader = template.BoatNameHeader ?? "Boat",
             CompetitorClubVisibility = template.CompetitorClubVisibility,
-            ShowClubLogo = template.ShowClubLogo
+            ShowPreDiscardTotal = template.ShowPreDiscardTotal,
+            ShowClubLogo = template.ShowClubLogo,
         };
     }
 
@@ -34,7 +35,8 @@ public static class SeriesResultsTemplateHelper
             BoatNameVisibility = ColumnVisibility.OnLargerScreens,
             BoatNameHeader = "Boat",
             CompetitorClubVisibility = isRegatta ? ColumnVisibility.OnLargerScreens : ColumnVisibility.Hidden,
-            ShowClubLogo = false
+            ShowPreDiscardTotal = false,
+            ShowClubLogo = false,
         };
     }
 }
@@ -47,5 +49,6 @@ public class ResolvedTemplate
     public ColumnVisibility BoatNameVisibility { get; set; }
     public string BoatNameHeader { get; set; }
     public ColumnVisibility CompetitorClubVisibility { get; set; }
+    public bool ShowPreDiscardTotal { get; set; }
     public bool ShowClubLogo { get; set; }
 }

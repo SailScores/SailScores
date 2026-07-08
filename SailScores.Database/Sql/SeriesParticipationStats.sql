@@ -288,15 +288,9 @@ ORDER BY MIN(se.[Start]) DESC, MIN(rs.SeriesName), rs.BoatClassName;
 
 
 DROP TABLE #SeasonDistinctClassCounts;
-
 DROP TABLE #SeasonDistinctSeriesCounts;
-
 DROP TABLE #RaceCompetitors;
-
 DROP TABLE #RaceStats;
-
 DROP TABLE #ValidScoreCodes;
-
 DROP TABLE #RacesWithOwningSeries;
-
 DROP TABLE #SeriesLinks;

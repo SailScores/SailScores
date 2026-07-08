@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace SailScores.Core.FlatModel
@@ -9,6 +9,7 @@ namespace SailScores.Core.FlatModel
         public int? Rank { get; set; }
         public int? Trend { get; set; }
         public Decimal? TotalScore { get; set; }
+        public Decimal? TotalScoreIncludingDiscards { get; set; }
         public Decimal? Average { get; set; }
         public Decimal? PointsEarned { get; set; }
         public Decimal? PointsPossible { get; set; }

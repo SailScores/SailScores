@@ -154,6 +154,10 @@ namespace SailScores.Core.Scoring
                 compResults.TotalScore = compResults
                     .CalculatedScores.Values
                     .Sum(s => !s.Discard ? (s.ScoreValue ?? 0.0m) : 0.0m);
+
+                compResults.TotalScoreIncludingDiscards = compResults
+                    .CalculatedScores.Values
+                    .Sum(s => s.ScoreValue ?? 0.0m);
             }
         }
 
