@@ -100,16 +100,17 @@ DELETE
 FROM Series
 WHERE ClubId = @ClubId
 
+PRINT N'Deleting Regattas'
+DELETE
+FROM Regattas
+WHERE ClubId = @ClubId
 
 PRINT N'Deleting ScoringSystems'
 DELETE
 FROM ScoringSystems
 WHERE ClubId = @ClubId
 
-PRINT N'Deleting Regattas'
-DELETE
-FROM Regattas
-WHERE ClubId = @ClubId
+
 
 PRINT N'Deleting Seasons'
 DELETE
