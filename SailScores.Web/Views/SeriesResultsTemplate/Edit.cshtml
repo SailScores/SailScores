@@ -4,42 +4,37 @@
     Layout = "_ClubLayout";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container-lg p-0 p-md-2">
+    <div class="mb-3">
+        <h1 class="h2 mb-1">@ViewData["Title"]</h1>
+        <p class="text-body-secondary mb-0">
+            Modify this template's column visibility and header settings.
+        </p>
+    </div>
 
-<p class="lead">
-    Modify this template's column visibility and header settings.
-</p>
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="Id" />
 
-<form asp-action="Edit" method="post">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-    <input type="hidden" asp-for="Id" />
-
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Template Settings</h5>
-        </div>
-        <div class="card-body">
+        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+            <h2 class="h5 mb-3">Template settings</h2>
             <div class="mb-3">
                 <label asp-for="Name" class="form-label"></label>
                 <input asp-for="Name" class="form-control" placeholder="e.g., Standard, Mobile-Friendly, Regatta Full" />
                 <span asp-validation-for="Name" class="text-danger"></span>
-                <small class="form-text text-muted">Give this template a descriptive name to help identify its purpose.</small>
+                <small class="form-text text-body-secondary">Give this template a descriptive name to help identify its purpose.</small>
             </div>
 
             <div class="form-check">
                 <input asp-for="ShowClubLogo" class="form-check-input" />
                 <label asp-for="ShowClubLogo" class="form-check-label"></label>
-                <small class="form-text text-muted d-block">Displays the club logo in the upper right of the results page, browser prints, and HTML exports.</small>
+                <small class="form-text text-body-secondary d-block">Displays the club logo in the upper right of the results page, browser prints, and HTML exports.</small>
             </div>
         </div>
-    </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Column Visibility</h5>
-        </div>
-        <div class="card-body">
-            <p class="text-muted small">
+        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+            <h2 class="h5 mb-3">Column visibility</h2>
+            <p class="text-body-secondary small mb-3">
                 Choose when each column should be displayed:
                 <strong>Always</strong> = visible on all devices,
                 <strong>On Larger Screens</strong> = hidden on phones but visible on tablets/desktops,
@@ -74,14 +69,10 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Column Headers</h5>
-        </div>
-        <div class="card-body">
-            <p class="text-muted small">
+        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+            <h2 class="h5 mb-3">Column headers</h2>
+            <p class="text-body-secondary small mb-3">
                 Customize the text shown in column headers. Common examples: "Helm", "Skipper", "Crew", "Name" for competitors;
                 "Boat", "Yacht", "Dinghy" for boat names.
             </p>
@@ -100,14 +91,10 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Score Display Options</h5>
-        </div>
-        <div class="card-body">
-            <p class="text-muted small">
+        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+            <h2 class="h5 mb-3">Score display options</h2>
+            <p class="text-body-secondary small mb-3">
                 Configure additional scoring display options.
             </p>
 
@@ -117,26 +104,28 @@
                     <label class="form-check-label" asp-for="ShowPreDiscardTotal">
                         Show Pre-Discard Total Column
                     </label>
-                    <small class="d-block form-text text-muted mt-2">
-                        When enabled, displays a "Pre-Discard Total" column that shows each competitor's total score 
-                        including all races (before applying discards). This appears to the right of the standard Total column.
-                        This option is only displayed for low-point scoring systems, not for percentage-based systems.
+                    <small class="d-block form-text text-body-secondary mt-2">
+                        When enabled, results include the "Pre-Discard Total" showing each competitor's total score
+                        before applying discards. This option is only displayed for low-point scoring
+                        systems, not for percentage-based systems.
                     </small>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="mb-3">
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Save Changes
-        </button>
-        <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-secondary">
-            <i class="fas fa-times"></i> Cancel
-        </a>
-    </div>
-</form>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary">
+                Save
+            </button>
+            <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+},{

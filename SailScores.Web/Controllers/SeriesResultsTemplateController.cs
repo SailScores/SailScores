@@ -66,6 +66,7 @@ public class SeriesResultsTemplateController : Controller
         {
             if (!ModelState.IsValid)
             {
+                model.ClubInitials = clubInitials;
                 return View(model);
             }
 
@@ -80,6 +81,7 @@ public class SeriesResultsTemplateController : Controller
         }
         catch (Exception ex)
         {
+            model.ClubInitials = clubInitials;
             ModelState.AddModelError(string.Empty, $"Error creating template: {ex.Message}");
             return View(model);
         }
@@ -112,6 +114,7 @@ public class SeriesResultsTemplateController : Controller
         {
             if (!ModelState.IsValid)
             {
+                model.ClubInitials = clubInitials;
                 return View(model);
             }
 
@@ -127,6 +130,7 @@ public class SeriesResultsTemplateController : Controller
         }
         catch (Exception ex)
         {
+            model.ClubInitials = clubInitials;
             ModelState.AddModelError(string.Empty, $"Error updating template: {ex.Message}");
             return View(model);
         }

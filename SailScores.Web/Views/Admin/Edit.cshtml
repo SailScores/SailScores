@@ -67,39 +67,110 @@
                     <h6 class="mb-0">Club Logo</h6>
                 </div>
                 <div class="card-body">
+                    <style>
+                        .logo-preview-card {
+                            display: flex;
+                            flex-direction: column;
+                            gap: .35rem;
+                            min-width: 96px;
+                        }
+
+                        .logo-preview-surface {
+                            width: 96px;
+                            height: 96px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border: 1px solid var(--bs-border-color);
+                            border-radius: .5rem;
+                            padding: .5rem;
+                            overflow: hidden;
+                        }
+
+                        .logo-preview-surface-light {
+                            background-color: #f8f9fa;
+                            background-image:
+                                linear-gradient(45deg, rgba(0, 0, 0, 0.06) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.06) 75%, rgba(0, 0, 0, 0.06)),
+                                linear-gradient(45deg, rgba(0, 0, 0, 0.06) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.06) 75%, rgba(0, 0, 0, 0.06));
+                            background-size: 12px 12px;
+                            background-position: 0 0, 6px 6px;
+                        }
+
+                        .logo-preview-surface-dark {
+                            background-color: #1f2329;
+                            background-image:
+                                linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.08) 75%, rgba(255, 255, 255, 0.08)),
+                                linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.08) 75%, rgba(255, 255, 255, 0.08));
+                            background-size: 12px 12px;
+                            background-position: 0 0, 6px 6px;
+                        }
+
+                        .logo-preview-image {
+                            max-width: 100%;
+                            max-height: 100%;
+                            width: auto;
+                            height: auto;
+                            object-fit: contain;
+                        }
+
+                        .logo-preview-caption {
+                            font-size: .8rem;
+                            color: var(--bs-secondary-color);
+                            text-align: center;
+                        }
+                    </style>
+
                     @if (Model.LogoFileId.HasValue)
                     {
                         <div class="mb-3">
-                            <label class="form-label">Current Burgee/Logo</label>
-                            <div class="d-flex gap-3">
-                                <div class="p-2 bg-light" style="width:80px;">
-                                    <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on light background" class="img-fluid logo-preview" />
+                            <label class="form-label">Current burgee/logo</label>
+                            <p class="small text-body-secondary mb-2">
+                                These preview tiles show how the logo appears on light and dark surfaces. If a solid box or background appears in either preview, the image may not have a transparent background.
+                            </p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="logo-preview-card">
+                                    <div class="logo-preview-surface logo-preview-surface-light">
+                                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on light background" class="logo-preview-image" />
+                                    </div>
+                                    <div class="logo-preview-caption">Light mode</div>
                                 </div>
-                                <div class="p-2 bg-dark" style="width:80px;">
-                                    <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on dark background" class="img-fluid logo-preview" />
+                                <div class="logo-preview-card">
+                                    <div class="logo-preview-surface logo-preview-surface-dark">
+                                        <img src="@Url.Action("GetLogo", new { id = Model.LogoFileId })" alt="Current logo on dark background" class="logo-preview-image" />
+                                    </div>
+                                    <div class="logo-preview-caption">Dark mode</div>
                                 </div>
                             </div>
                         </div>
-                        <style>
-                            .logo-preview { width:64px; height:64px; object-fit:contain; }
-                        </style>
                     }
 
                     <div class="mb-3">
                         <label asp-for="LogoFile" class="form-label"></label>
                         <input asp-for="LogoFile" type="file" class="form-control" accept=".png,.jpg,.jpeg,.jpe,.jfif,.gif,.webp,image/png,image/jpeg,image/gif,image/webp" id="logoFileInput" />
                         <span asp-validation-for="LogoFile" class="text-danger"></span>
-                        <small class="form-text text-muted">Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). Supported formats: PNG, JPG, GIF, WebP. PNG or WebP with transparent background recommended for best results.</small>
+                        <small class="form-text text-body-secondary">
+                            Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). PNG or WebP with a transparent background is recommended.
+                            The preview tiles below show how it will look on light and dark surfaces.
+                        </small>
                     </div>
 
                     <div id="newLogoPreview" class="mb-3" style="display:none;">
-                        <label class="form-label">New Logo Preview</label>
-                        <div class="d-flex gap-3">
-                            <div class="p-2 bg-light" style="width:80px;">
-                                <img id="previewLight" alt="New logo on light background" class="img-fluid logo-preview" />
+                        <label class="form-label">New logo preview</label>
+                        <p class="small text-body-secondary mb-2">
+                            These preview tiles show how the new logo will appear on light and dark surfaces. If a solid box or background appears in either preview, the image may not have a transparent background.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="logo-preview-card">
+                                <div class="logo-preview-surface logo-preview-surface-light">
+                                    <img id="previewLight" alt="New logo on light background" class="logo-preview-image" />
+                                </div>
+                                <div class="logo-preview-caption">Light mode</div>
                             </div>
-                            <div class="p-2 bg-dark" style="width:80px;">
-                                <img id="previewDark" alt="New logo on dark background" class="img-fluid logo-preview" />
+                            <div class="logo-preview-card">
+                                <div class="logo-preview-surface logo-preview-surface-dark">
+                                    <img id="previewDark" alt="New logo on dark background" class="logo-preview-image" />
+                                </div>
+                                <div class="logo-preview-caption">Dark mode</div>
                             </div>
                         </div>
                     </div>

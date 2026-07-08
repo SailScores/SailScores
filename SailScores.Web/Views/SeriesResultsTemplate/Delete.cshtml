@@ -4,35 +4,50 @@
     Layout = "_ClubLayout";
 }
 
-<h2>@ViewData["Title"]</h2>
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+<div class="container-lg p-0 p-md-2">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2 mb-3">
+        <div>
+            <h1 class="h2 mb-1">@ViewData["Title"]</h1>
+            <p class="text-body-secondary mb-0">Delete this template and remove its configuration.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            @if (!Model.IsClubDefault)
+            {
+                <form asp-action="Delete" method="post" class="d-inline">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger">
+                        Delete
+                    </button>
+                </form>
+            }
+            <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
+                Back
+            </a>
+        </div>
     </div>
-}
 
-@if (Model.IsClubDefault)
-{
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation-triangle"></i>
-        <strong>Warning:</strong> This template is currently set as a club default. 
-        You must change the club default settings before deleting this template.
-        <a asp-controller="Admin" asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" class="alert-link">
-            Go to Club Settings
-        </a>
-    </div>
-}
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger mb-3">
+            <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
 
-<div class="card">
-    <div class="card-header bg-danger text-white">
-        <h5 class="mb-0">Confirm Deletion</h5>
-    </div>
-    <div class="card-body">
-        <p class="lead">Are you sure you want to delete this template?</p>
+    @if (Model.IsClubDefault)
+    {
+        <div class="alert alert-warning mb-3">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Warning:</strong> This template is currently set as a club default. You must change the club default settings before deleting this template.
+            <a asp-controller="Admin" asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" class="alert-link">
+                Go to Club Settings
+            </a>
+        </div>
+    }
 
-        <dl class="row">
+    <div class="border rounded p-3 p-md-4 bg-almost">
+        <p class="mb-3">Are you sure you want to delete this template?</p>
+
+        <dl class="row mb-0">
             <dt class="col-sm-3">Template Name</dt>
             <dd class="col-sm-9">@Model.Name</dd>
 
@@ -41,13 +56,13 @@
                 @switch (Model.SailNumberVisibility)
                 {
                     case SailScores.Api.Enumerations.ColumnVisibility.Always:
-                        <span class="badge bg-success">Always</span>
+                        <span class="badge text-bg-success">Always</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
-                        <span class="badge bg-info">On Larger Screens</span>
+                        <span class="badge text-bg-info">On Larger Screens</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
-                        <span class="badge bg-secondary">Hidden</span>
+                        <span class="badge text-bg-secondary">Hidden</span>
                         break;
                 }
             </dd>
@@ -57,13 +72,13 @@
                 @switch (Model.CompetitorNameVisibility)
                 {
                     case SailScores.Api.Enumerations.ColumnVisibility.Always:
-                        <span class="badge bg-success">Always</span>
+                        <span class="badge text-bg-success">Always</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
-                        <span class="badge bg-info">On Larger Screens</span>
+                        <span class="badge text-bg-info">On Larger Screens</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
-                        <span class="badge bg-secondary">Hidden</span>
+                        <span class="badge text-bg-secondary">Hidden</span>
                         break;
                 }
             </dd>
@@ -73,13 +88,13 @@
                 @switch (Model.BoatNameVisibility)
                 {
                     case SailScores.Api.Enumerations.ColumnVisibility.Always:
-                        <span class="badge bg-success">Always</span>
+                        <span class="badge text-bg-success">Always</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
-                        <span class="badge bg-info">On Larger Screens</span>
+                        <span class="badge text-bg-info">On Larger Screens</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
-                        <span class="badge bg-secondary">Hidden</span>
+                        <span class="badge text-bg-secondary">Hidden</span>
                         break;
                 }
             </dd>
@@ -89,13 +104,13 @@
                 @switch (Model.CompetitorClubVisibility)
                 {
                     case SailScores.Api.Enumerations.ColumnVisibility.Always:
-                        <span class="badge bg-success">Always</span>
+                        <span class="badge text-bg-success">Always</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens:
-                        <span class="badge bg-info">On Larger Screens</span>
+                        <span class="badge text-bg-info">On Larger Screens</span>
                         break;
                     case SailScores.Api.Enumerations.ColumnVisibility.Hidden:
-                        <span class="badge bg-secondary">Hidden</span>
+                        <span class="badge text-bg-secondary">Hidden</span>
                         break;
                 }
             </dd>
@@ -103,25 +118,12 @@
 
         @if (!Model.IsClubDefault)
         {
-            <div class="alert alert-warning">
+            <div class="alert alert-warning mt-3 mb-0">
                 <i class="fas fa-info-circle"></i>
                 <strong>Note:</strong> Any series currently using this template will revert to the club default template after deletion.
             </div>
         }
     </div>
-    <div class="card-footer">
-        @if (!Model.IsClubDefault)
-        {
-            <form asp-action="Delete" method="post" class="d-inline">
-                <input type="hidden" asp-for="Id" />
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Confirm Delete
-                </button>
-            </form>
-        }
-        <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Templates
-        </a>
-    </div>
 </div>
 
+}]}출장샵commentary to=functions.multi_replace_string_in_file  unlikely?  The tool call ended unexpectedly due to invalid JSON maybe because of odd inserted text. Need ensure correct JSON. The previous attempt likely malformed from the huge content. We need retry with properly formatted JSON. Could also use create_file? We need edit existing files. Use replace_string_in_file maybe for each file with full content. Since four files, maybe use multi_replace with four replacements and valid JSON. Need ensure no stray quotes or extra commas. The earlier string had some syntax issues because I inserted `},{
