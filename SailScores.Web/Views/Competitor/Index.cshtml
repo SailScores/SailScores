@@ -466,7 +466,18 @@
                         document.getElementById('conflictAllowDuplicates').checked = true;
                     }
 
-                    const modal = new bootstrap.Modal(document.getElementById('editAltSailNumberModal'));
+                    const modalElement = document.getElementById('editAltSailNumberModal');
+                    const modal = new bootstrap.Modal(modalElement);
+
+                    modalElement.addEventListener('shown.bs.modal', function onModalShown() {
+                        const altInput = document.getElementById('altSailNumberInput');
+                        if (altInput) {
+                            altInput.focus();
+                            altInput.select();
+                        }
+                        modalElement.removeEventListener('shown.bs.modal', onModalShown);
+                    }, { once: true });
+
                     modal.show();
                 });
             });
