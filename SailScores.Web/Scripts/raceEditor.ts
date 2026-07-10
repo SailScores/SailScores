@@ -516,6 +516,18 @@ function attachTimingEventHandlers(compListItem: HTMLLIElement) {
     elapsedInput?.addEventListener('change', onElapsedTimeChanged);
 }
 
+function focusAltSailNumberInput() {
+    const input = document.getElementById('altSailNumberInput') as HTMLInputElement | null;
+    if (!input) {
+        return;
+    }
+
+    window.setTimeout(() => {
+        input.focus({ preventScroll: true });
+        input.select();
+    }, 0);
+}
+
 function openAltSailNumberEditorFromButton(event: Event) {
     event.preventDefault();
     const button = (event.target as HTMLElement)?.closest('button.quick-comp') as HTMLButtonElement | null;
@@ -545,7 +557,11 @@ function openAltSailNumberEditorForCompetitor(competitorId: string | null) {
     $('#altSailNumberInput').val(competitor.alternativeSailNumber ?? '');
 
     const modal = $('#editAltSailNumberModal');
-    (<any>modal).modal('show');
+    modal.off('shown.bs.modal.altSailNumberFocus')
+        .one('shown.bs.modal.altSailNumberFocus', function () {
+            focusAltSailNumberInput();
+        });
+    (modal as any).modal('show');
 }
 
 function saveAlternativeSailNumber() {
@@ -578,7 +594,7 @@ function saveAlternativeSailNumber() {
         }
 
         const modal = $('#editAltSailNumberModal');
-        (<any>modal).modal('hide');
+        (modal as any).modal('hide');
     });
 }
 
