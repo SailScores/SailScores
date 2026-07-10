@@ -407,6 +407,12 @@ button.quick-comp {
     margin: 3px;
 }
 
+/* Inactive competitor added via the hidden includeInactive race-editor flag */
+button.quick-comp.quick-comp-inactive {
+    opacity: 0.6;
+    border-style: dashed;
+}
+
 /* SVG text rendering */
 svg text {
     font-family: "Open Sans", "Segoe UI", sans-serif;
