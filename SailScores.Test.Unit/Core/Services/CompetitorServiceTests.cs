@@ -168,5 +168,41 @@ namespace SailScores.Test.Unit.Core.Services
             Assert.NotEmpty(result);
         }
 
+        [Fact]
+        public async Task GetCompetitors_ForSelectedBoatsFleet_IncludeInactiveTrue_ReturnsInactiveCompetitorInThatFleet()
+        {
+            // arrange
+            var selectedBoatsFleet = await _context.Fleets.SingleAsync(
+                f => f.FleetType == FleetType.SelectedBoats
+                && f.ClubId == _clubId);
+            var inactiveCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive == false);
+
+            // act
+            var result = await _service.GetCompetitorsAsync(
+                _clubId, selectedBoatsFleet.Id, true);
+
+            // assert
+            Assert.Contains(result, c => c.Id == inactiveCompetitor.Id);
+        }
+
+        [Fact]
+        public async Task GetCompetitors_ForSelectedBoatsFleet_IncludeInactiveFalse_ExcludesInactiveCompetitorButKeepsActive()
+        {
+            // arrange
+            var selectedBoatsFleet = await _context.Fleets.SingleAsync(
+                f => f.FleetType == FleetType.SelectedBoats
+                && f.ClubId == _clubId);
+            var inactiveCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive == false);
+            var activeCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive != false);
+
+            // act
+            var result = await _service.GetCompetitorsAsync(
+                _clubId, selectedBoatsFleet.Id, false);
+
+            // assert
+            Assert.DoesNotContain(result, c => c.Id == inactiveCompetitor.Id);
+            Assert.Contains(result, c => c.Id == activeCompetitor.Id);
+        }
+
     }
 }
