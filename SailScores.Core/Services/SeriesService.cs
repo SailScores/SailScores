@@ -724,6 +724,7 @@ namespace SailScores.Core.Services
                     CompetitorId = kvp.Key.Id,
                     Rank = kvp.Value.Rank,
                     TotalScore = kvp.Value.TotalScore,
+                    TotalScoreIncludingDiscards = kvp.Value.TotalScoreIncludingDiscards,
                     Average = kvp.Value.Average,
                     PointsEarned = kvp.Value.PointsEarned,
                     PointsPossible = kvp.Value.PointsPossible,
@@ -1222,6 +1223,7 @@ namespace SailScores.Core.Services
             existingSeries.FleetId = model.FleetId;
             existingSeries.UseFullRaceScores = model.UseFullRaceScores;
             existingSeries.HandicapSystemId = model.HandicapSystemId;
+            existingSeries.SeriesResultsTemplateId = model.SeriesResultsTemplateId;
         }
 
         private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)

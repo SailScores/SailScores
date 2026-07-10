@@ -13,6 +13,7 @@ public class ClubBackupData
     public ClubBackupMetadata Metadata { get; set; }
 
     // Club settings
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public string Initials { get; set; }
     public string Description { get; set; }
@@ -22,11 +23,20 @@ public class ClubBackupData
     public bool? ShowCalendarInNav { get; set; }
     public string Url { get; set; }
     public string Locale { get; set; }
+    public bool? UseAdvancedFeatures { get; set; }
+    public bool? UseExperimentalFeatures { get; set; }
+    public DateTime? AdvancedFeaturesEnabledDate { get; set; }
+    public string SubscriptionType { get; set; }
     public int? DefaultRaceDateOffset { get; set; }
     public string StatisticsDescription { get; set; }
     public WeatherSettingsBackup WeatherSettings { get; set; }
     public Guid? LogoFileId { get; set; }
     public bool EnableHandicapScoring { get; set; }
+    public Guid? DefaultScoringSystemId { get; set; }
+    public Guid? DefaultHandicapSystemId { get; set; }
+    public bool? EnableAlternativeSailNumbers { get; set; }
+    public Guid? DefaultSeriesResultsTemplateId { get; set; }
+    public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
 
     // Referenced data
     public IList<BoatClassBackup> BoatClasses { get; set; }

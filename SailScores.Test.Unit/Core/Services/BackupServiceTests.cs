@@ -606,6 +606,7 @@ public class BackupServiceTests
     #region Field Coverage Tests
 
     [Theory]
+    [InlineData(typeof(Db.Club), typeof(ClubBackupData))]
     [InlineData(typeof(Db.Competitor), typeof(CompetitorBackup))]
     [InlineData(typeof(Db.Fleet), typeof(FleetBackup))]
     [InlineData(typeof(Db.BoatClass), typeof(BoatClassBackup))]
@@ -617,7 +618,10 @@ public class BackupServiceTests
     [InlineData(typeof(Db.Series), typeof(SeriesBackup))]
     [InlineData(typeof(Db.Race), typeof(RaceBackup))]
     [InlineData(typeof(Db.Score), typeof(ScoreBackup))]
+    [InlineData(typeof(Db.ChangeType), typeof(ChangeTypeBackup))]
+    [InlineData(typeof(Db.CompetitorChange), typeof(CompetitorChangeBackup))]
     [InlineData(typeof(Db.Weather), typeof(WeatherBackup))]
+    [InlineData(typeof(Db.WeatherSettings), typeof(WeatherSettingsBackup))]
     [InlineData(typeof(Db.Regatta), typeof(RegattaBackup))]
     [InlineData(typeof(Db.Announcement), typeof(AnnouncementBackup))]
     [InlineData(typeof(Db.Document), typeof(DocumentBackup))]
@@ -660,7 +664,10 @@ public class BackupServiceTests
             (typeof(Db.Series), typeof(SeriesBackup), new[] { "ClubId", "RaceSeries", "ChildLinks", "ParentLinks", "Season", "ScoringSystem" }),
             (typeof(Db.Race), typeof(RaceBackup), new[] { "ClubId", "Fleet", "Scores", "SeriesRaces", "Weather" }),
             (typeof(Db.Score), typeof(ScoreBackup), new[] { "Competitor", "Race" }),
+            (typeof(Db.ChangeType), typeof(ChangeTypeBackup), new string[0]),
+            (typeof(Db.CompetitorChange), typeof(CompetitorChangeBackup), new string[0]),
             (typeof(Db.Weather), typeof(WeatherBackup), new string[0]),
+            (typeof(Db.WeatherSettings), typeof(WeatherSettingsBackup), new string[0]),
             (typeof(Db.Regatta), typeof(RegattaBackup), new[] { "ClubId", "RegattaSeries", "RegattaFleet", "Season", "ScoringSystem" }),
             (typeof(Db.Announcement), typeof(AnnouncementBackup), new[] { "ClubId", "PreviousVersion", "IsDeleted" }),
             (typeof(Db.Document), typeof(DocumentBackup), new[] { "ClubId", "PreviousVersion" }),

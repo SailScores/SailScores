@@ -66,6 +66,10 @@
                         <th scope="col" class="@customField.Visibility.ToCssClass()">@headerText</th>
                     }
                     <th scope="col" class="text-center">@localizer["Total"]</th>
+                    @if (Model.ShowPreDiscardTotal && !(Model.Results.IsPercentSystem))
+                    {
+                        <th scope="col" class="text-center">@localizer["Pre-Discard Total"]</th>
+                    }
                     @{
                         var colCount = 0;
                         var needCompNameColumn = false;
@@ -306,6 +310,30 @@
                             }
                         </strong>
                     </td>
+                    @if (Model.ShowPreDiscardTotal && !(Model.Results.IsPercentSystem))
+                    {
+                        <td scope="row" class="text-center">
+                            <strong>
+                                @{
+                                    var preDiscardTotal = compScore?.TotalScoreIncludingDiscards;
+
+                                    // Fallback calculation if not available (for historical results before this feature)
+                                    if (!preDiscardTotal.HasValue && compScore?.Scores != null)
+                                    {
+                                        preDiscardTotal = compScore.Scores.Sum(s => s.ScoreValue ?? 0.0m);
+                                    }
+                                }
+                                @if (preDiscardTotal.HasValue)
+                                {
+                                    @String.Format("{0:0.###}", preDiscardTotal)
+                                }
+                                else
+                                {
+                                    @Html.Raw("&mdash;")
+                                }
+                            </strong>
+                        </td>
+                    }
                     @{
                         colCount = 0;
                         needCompNameColumn = false;

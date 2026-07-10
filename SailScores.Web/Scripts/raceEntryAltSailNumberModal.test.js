@@ -3,7 +3,7 @@ import path from 'path';
 
 describe('Race entry alt sail number modal partial', () => {
     test('contains required modal fields and actions', () => {
-        const viewPath = path.resolve(process.cwd(), 'Views/Race/_editAltSailNumberModal.cshtml');
+        const viewPath = path.resolve(process.cwd(), 'Views/Shared/_editAltSailNumberModal.cshtml');
         const content = fs.readFileSync(viewPath, 'utf8');
 
         expect(content).toContain('id="editAltSailNumberModal"');

@@ -16,6 +16,13 @@ let ocrModule: OcrRaceEntry | null = null;
 let previousDateValue = "";
 let suppressSeriesRemovalConfirmation = false;
 
+// Undocumented flag (see docs/Features-InactiveCompetitorsInRace.md) that lets old/retired
+// competitors, still restricted to the race's fleet, be added when backfilling historical races.
+let includeInactiveCompetitors = false;
+function detectIncludeInactiveCompetitors(): boolean {
+    return new URLSearchParams(window.location.search).get('includeInactive') === 'true';
+}
+
 interface seriesListResult {
     series: seriesDto[];
     noSeasonForDate: boolean;
@@ -95,6 +102,7 @@ function checkEnter(e: KeyboardEvent) {
 }
 
 export function initialize() {
+    includeInactiveCompetitors = detectIncludeInactiveCompetitors();
     document.querySelector('form')?.addEventListener('keypress', checkEnter);
     document.getElementById('startNowButton')?.addEventListener('click', startNow);
     document.getElementById('fleetId')?.addEventListener('change', loadFleet);
@@ -508,6 +516,18 @@ function attachTimingEventHandlers(compListItem: HTMLLIElement) {
     elapsedInput?.addEventListener('change', onElapsedTimeChanged);
 }
 
+function focusAltSailNumberInput() {
+    const input = document.getElementById('altSailNumberInput') as HTMLInputElement | null;
+    if (!input) {
+        return;
+    }
+
+    window.setTimeout(() => {
+        input.focus({ preventScroll: true });
+        input.select();
+    }, 0);
+}
+
 function openAltSailNumberEditorFromButton(event: Event) {
     event.preventDefault();
     const button = (event.target as HTMLElement)?.closest('button.quick-comp') as HTMLButtonElement | null;
@@ -537,7 +557,11 @@ function openAltSailNumberEditorForCompetitor(competitorId: string | null) {
     $('#altSailNumberInput').val(competitor.alternativeSailNumber ?? '');
 
     const modal = $('#editAltSailNumberModal');
-    (<any>modal).modal('show');
+    modal.off('shown.bs.modal.altSailNumberFocus')
+        .one('shown.bs.modal.altSailNumberFocus', function () {
+            focusAltSailNumberInput();
+        });
+    (modal as any).modal('show');
 }
 
 function saveAlternativeSailNumber() {
@@ -570,7 +594,7 @@ function saveAlternativeSailNumber() {
         }
 
         const modal = $('#editAltSailNumberModal');
-        (<any>modal).modal('hide');
+        (modal as any).modal('hide');
     });
 }
 
@@ -725,6 +749,9 @@ function getSuggestions(): AutocompleteSuggestion[] {
             } else if (c.sailNumber) {
                 comp.value = c.sailNumber + ' - ' + c.name;
             }
+            if (c.isActive === false) {
+                comp.value += ' (inactive)';
+            }
             competitorSuggestions.push(comp);
         }
     }
@@ -738,7 +765,8 @@ function getCompetitors(clubId: string, fleetId: string) {
         $.getJSON("/api/Competitors",
             {
                 clubId: clubId,
-                fleetId: fleetId
+                fleetId: fleetId,
+                includeInactive: includeInactiveCompetitors
             },
             function (data: competitorDto[]) {
                 allCompetitors = data;
@@ -906,6 +934,9 @@ function initializeButtonFooter() {
         } else {
             style += 'btn-primary add-comp-disabled';
         }
+        if (c.isActive === false) {
+            style += ' quick-comp-inactive';
+        }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitor-id="' + c.id + '" > ' +
             getCompetitorButtonDisplay(c) + ' </button>');
@@ -920,6 +951,9 @@ function updateButtonFooter() {
             style += 'btn-outline-primary add-comp-enabled';
         } else {
             style += 'btn-primary add-comp-disabled';
+        }
+        if (c.isActive === false) {
+            style += ' quick-comp-inactive';
         }
         $('#scoreButtonDiv').append('<button class="' + style +
             '" data-competitor-id="' + c.id + '" > ' +

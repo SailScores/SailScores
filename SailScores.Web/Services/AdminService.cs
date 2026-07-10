@@ -235,7 +235,7 @@ public class AdminService : IAdminService
             return false;
         }
 
-        var detectedType = DetermineContentType(fileContents);
+        var detectedType = CoreServices.ImageContentTypeDetector.Detect(fileContents);
         var normalizedContentType = contentType?.ToLowerInvariant();
 
         // Allow jpeg/jpg mismatch
@@ -260,7 +260,7 @@ public class AdminService : IAdminService
         var stream = new MemoryStream(file.FileContents, writable: false);
         
         // Determine content type from file content or default to PNG
-        var contentType = DetermineContentType(file.FileContents);
+        var contentType = CoreServices.ImageContentTypeDetector.Detect(file.FileContents);
         return new FileStreamResult(stream, contentType);
     }
 
@@ -279,28 +279,5 @@ public class AdminService : IAdminService
     public async Task<int> GetRaceCountAsync(Guid clubId)
     {
         return await _coreRaceService.GetRaceCountAsync(clubId);
-    }
-
-    private string DetermineContentType(byte[] fileContents)
-    {
-        if (fileContents == null || fileContents.Length < 4)
-        {
-            return "image/png"; // default
-        }
-
-        // Check file signatures (magic numbers) for supported formats only
-        if (fileContents[0] == 0x89 && fileContents[1] == 0x50 && fileContents[2] == 0x4E && fileContents[3] == 0x47)
-            return "image/png";
-        if (fileContents[0] == 0xFF && fileContents[1] == 0xD8 && fileContents[2] == 0xFF)
-            return "image/jpeg";
-        if (fileContents[0] == 0x47 && fileContents[1] == 0x49 && fileContents[2] == 0x46)
-            return "image/gif";
-        // WebP: RIFF....WEBP (check for "RIFF" at start and "WEBP" at bytes 8-11)
-        if (fileContents.Length >= 12 && 
-            fileContents[0] == 0x52 && fileContents[1] == 0x49 && fileContents[2] == 0x46 && fileContents[3] == 0x46 &&
-            fileContents[8] == 0x57 && fileContents[9] == 0x45 && fileContents[10] == 0x42 && fileContents[11] == 0x50)
-            return "image/webp";
-
-        return "image/png"; // default fallback
     }
 }

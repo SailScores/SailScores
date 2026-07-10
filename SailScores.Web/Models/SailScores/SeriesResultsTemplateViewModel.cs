@@ -36,6 +36,12 @@ public class SeriesResultsTemplateViewModel
     [Display(Name = "Competitor Club")]
     public ColumnVisibility CompetitorClubVisibility { get; set; } = ColumnVisibility.Hidden;
 
+    [Display(Name = "Show Pre-Discard Total")]
+    public bool ShowPreDiscardTotal { get; set; } = false;
+
+    [Display(Name = "Show Club Logo")]
+    public bool ShowClubLogo { get; set; }
+
     public IList<TemplateCustomFieldSelectionViewModel> CustomFieldSelections { get; set; } = new List<TemplateCustomFieldSelectionViewModel>();
 
     public IList<CompetitorFieldDefinition> AvailableCustomFields { get; set; } = new List<CompetitorFieldDefinition>();

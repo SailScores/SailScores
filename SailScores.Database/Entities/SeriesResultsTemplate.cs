@@ -30,5 +30,8 @@ public class SeriesResultsTemplate
 
     public ColumnVisibility CompetitorClubVisibility { get; set; }
 
+    public bool ShowPreDiscardTotal { get; set; } = false;
+    public bool ShowClubLogo { get; set; }
+
     public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 }

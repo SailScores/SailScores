@@ -567,6 +567,9 @@ namespace SailScores.Core.Services
             dbClub.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers;
             dbClub.EnableCustomCompetitorFields = club.EnableCustomCompetitorFields;
             dbClub.DefaultHandicapSystemId = club.DefaultHandicapSystemId;
+            dbClub.DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId;
+            dbClub.DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId;
+
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();
             dbClub.WeatherSettings.Latitude = club.WeatherSettings?.Latitude;
@@ -774,6 +777,18 @@ namespace SailScores.Core.Services
         public async Task<Db.File> GetFileAsync(Guid id)
         {
             return await _dbContext.Files.FirstOrDefaultAsync(f => f.Id == id);
+        }
+
+        public async Task<string> GetLogoDataUriAsync(Guid fileId)
+        {
+            var file = await GetFileAsync(fileId);
+            if (file?.FileContents == null)
+            {
+                return null;
+            }
+
+            var contentType = ImageContentTypeDetector.Detect(file.FileContents);
+            return $"data:{contentType};base64,{Convert.ToBase64String(file.FileContents)}";
         }
 
         public async Task ResetClubAsync(Guid clubId, Model.ResetLevel resetLevel)

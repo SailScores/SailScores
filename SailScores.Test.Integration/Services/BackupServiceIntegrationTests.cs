@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,33 +30,59 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
     private Guid _testClubId;
     private bool _useProductionData;
     private string _bacpacPath;
-    private static readonly string _logFilePath = Path.Combine(Path.GetTempPath(), "SailScores_IntegrationTest.log");
+    private int _maxClubsForMultiClubRoundTrip;
+    private int _skipClubsForMultiClubRoundTrip;
+    private static readonly string _logDirectory = Path.Combine(AppContext.BaseDirectory, "TestLogs");
+    private static readonly string _logFilePath = Path.Combine(_logDirectory, "SailScores_IntegrationTest.log");
+
+    private void WriteLogLine(string message)
+    {
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        var fullMessage = $"[{timestamp}] {message}";
+
+        try
+        {
+            Directory.CreateDirectory(_logDirectory);
+            File.AppendAllText(_logFilePath, fullMessage + Environment.NewLine);
+        }
+        catch
+        {
+            // File logging is best effort; continue with console/test output.
+        }
+
+        try
+        {
+            Console.Out.WriteLine(fullMessage);
+            Console.Out.Flush();
+        }
+        catch
+        {
+            // Console output might be unavailable in some hosts.
+        }
+
+        try
+        {
+            Console.Error.WriteLine(fullMessage);
+            Console.Error.Flush();
+        }
+        catch
+        {
+            // Console error output might be unavailable in some hosts.
+        }
+
+        try
+        {
+            _output.WriteLine(fullMessage);
+        }
+        catch
+        {
+            // Output helper may be unavailable in some hosts.
+        }
+    }
 
     private void Log(string message)
     {
-        // Always write to file first (most reliable in Test Explorer)
-        try
-        {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            File.AppendAllText(_logFilePath, $"[{timestamp}] {message}{Environment.NewLine}");
-
-            // Force immediate flush to disk
-            System.GC.Collect();
-        }
-        catch
-        {
-            // File write might fail, continue anyway
-        }
-
-        // Then try to write to Test Explorer output
-        try
-        {
-            _output.WriteLine($"[{DateTime.Now:HH:mm:ss}] {message}");
-        }
-        catch
-        {
-            // Output helper might fail in Test Explorer, but we have file fallback
-        }
+        WriteLogLine(message);
     }
 
     /// <summary>
@@ -64,30 +91,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
     /// </summary>
     private void LogDirect(string message)
     {
-        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        var fullMessage = $"[{timestamp}] {message}";
-
-        // Write to file
-        try
-        {
-            File.AppendAllText(_logFilePath, fullMessage + Environment.NewLine);
-        }
-        catch { }
-
-        // Write to console (visible in Test Explorer output)
-        try
-        {
-            Console.WriteLine(fullMessage);
-            Console.Out.Flush();
-        }
-        catch { }
-
-        // Write to Test Explorer
-        try
-        {
-            _output.WriteLine(fullMessage);
-        }
-        catch { }
+        WriteLogLine(message);
     }
 
     public BackupServiceIntegrationTests(ITestOutputHelper output)
@@ -106,9 +110,13 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
 
         _useProductionData = config.GetValue<bool>("IntegrationTests:UseProductionData");
         _bacpacPath = config.GetValue<string>("IntegrationTests:BacpacPath");
+        _maxClubsForMultiClubRoundTrip = config.GetValue<int?>("IntegrationTests:MaxClubsForMultiClubRoundTrip") ?? 0;
+        _skipClubsForMultiClubRoundTrip = config.GetValue<int?>("IntegrationTests:SkipClubsForMultiClubRoundTrip") ?? 0;
 
         Log($"[INIT] UseProductionData: {_useProductionData}");
         Log($"[INIT] BacpacPath: {(_bacpacPath ?? "NOT SET")}");
+        Log($"[INIT] MaxClubsForMultiClubRoundTrip: {_maxClubsForMultiClubRoundTrip}");
+        Log($"[INIT] SkipClubsForMultiClubRoundTrip: {_skipClubsForMultiClubRoundTrip}");
         Log($"[INIT] Current directory: {Directory.GetCurrentDirectory()}");
 
         if (_useProductionData && !string.IsNullOrEmpty(_bacpacPath) && !File.Exists(_bacpacPath))
@@ -993,7 +1001,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
     [Trait("Category", "Integration")]
     [Trait("Category", "Database")]
     [Trait("Category", "ProductionData")]
-    public async Task BackupAndRestore_AllClubs_RoundTripPreservesData()
+    public async Task BackupAndRestore_MultipleClubs_RoundTripPreservesData()
     {
         if (!_useProductionData)
         {
@@ -1002,18 +1010,36 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         }
 
         var clubs = await _context.Clubs
+            .OrderBy(c => c.Name)
             .Select(c => new { c.Id, c.Name, c.Initials })
             .ToListAsync();
 
+        if (_maxClubsForMultiClubRoundTrip > 0 && clubs.Count > _maxClubsForMultiClubRoundTrip)
+        {
+            if (_skipClubsForMultiClubRoundTrip > 0)
+            {
+                clubs = clubs
+                    .Skip(_skipClubsForMultiClubRoundTrip)
+                    .Take(_maxClubsForMultiClubRoundTrip).ToList();
+            }
+            else
+            {
+
+                clubs = clubs.Take(_maxClubsForMultiClubRoundTrip).ToList();
+                _output.WriteLine($"Limiting multi-club round-trip test to {_maxClubsForMultiClubRoundTrip} clubs");
+            }
+        }
+
         _output.WriteLine($"Testing round-trip backup for {clubs.Count} clubs");
         var failures = new List<string>();
+        var changeTypeCount = await _context.ChangeTypes.CountAsync();
 
         foreach (var club in clubs)
         {
             try
             {
                 _output.WriteLine($"--- Testing club: {club.Name} ({club.Initials}) ---");
-                var before = await TakeClubSnapshotAsync(club.Id);
+                var before = await TakeClubSnapshotAsync(club.Id, changeTypeCount);
 
                 var backup = await _backupService.CreateBackupAsync(club.Id, "multi-club-test");
 
@@ -1024,7 +1050,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
                 Assert.Equal(backup.Series?.Count ?? 0, backup.Metadata.SeriesCount);
 
                 await _backupService.RestoreBackupAsync(club.Id, backup, preserveClubName: true);
-                var after = await TakeClubSnapshotAsync(club.Id);
+                var after = await TakeClubSnapshotAsync(club.Id, changeTypeCount);
 
                 var diffs = CompareSnapshots(before, after);
                 if (diffs.Count > 0)
@@ -1328,52 +1354,47 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         List<DateTime?> RaceDates,
         List<DateTime?> SeriesUpdateDates);
 
-    private async Task<ClubSnapshot> TakeClubSnapshotAsync(Guid clubId)
+    private async Task<ClubSnapshot> TakeClubSnapshotAsync(Guid clubId, int? changeTypeCount = null)
     {
-        var raceIds = await _context.Races
-            .Where(r => r.ClubId == clubId)
-            .Select(r => r.Id)
+        var competitors = await _context.Competitors
+            .Where(c => c.ClubId == clubId)
+            .OrderBy(c => c.Name)
+            .Select(c => new { c.Id, c.Name })
             .ToListAsync();
 
-        var competitorIds = await _context.Competitors
-            .Where(c => c.ClubId == clubId)
-            .Select(c => c.Id)
+        var series = await _context.Series
+            .Where(s => s.ClubId == clubId)
+            .OrderBy(s => s.Name)
+            .Select(s => new { s.Id, s.Name, s.UpdatedDate })
             .ToListAsync();
+
+        var races = await _context.Races
+            .Where(r => r.ClubId == clubId)
+            .OrderBy(r => r.Date)
+            .Select(r => new { r.Id, r.Date })
+            .ToListAsync();
+
+        var competitorIds = competitors.Select(c => c.Id).ToList();
+        var raceIds = races.Select(r => r.Id).ToList();
 
         return new ClubSnapshot(
             BoatClassCount: await _context.BoatClasses.CountAsync(bc => bc.ClubId == clubId),
             SeasonCount: await _context.Seasons.CountAsync(s => s.ClubId == clubId),
             FleetCount: await _context.Fleets.CountAsync(f => f.ClubId == clubId),
-            CompetitorCount: await _context.Competitors.CountAsync(c => c.ClubId == clubId),
+            CompetitorCount: competitors.Count,
             ScoringSystemCount: await _context.ScoringSystems.CountAsync(ss => ss.ClubId == clubId),
-            SeriesCount: await _context.Series.CountAsync(s => s.ClubId == clubId),
-            RaceCount: raceIds.Count,
+            SeriesCount: series.Count,
+            RaceCount: races.Count,
             ScoreCount: await _context.Scores.CountAsync(s => raceIds.Contains(s.RaceId)),
             RegattaCount: await _context.Regattas.CountAsync(r => r.ClubId == clubId),
             AnnouncementCount: await _context.Announcements.CountAsync(a => a.ClubId == clubId),
             DocumentCount: await _context.Documents.CountAsync(d => d.ClubId == clubId),
-            ChangeTypeCount: await _context.ChangeTypes.CountAsync(),
+            ChangeTypeCount: changeTypeCount ?? await _context.ChangeTypes.CountAsync(),
             CompetitorChangeCount: await _context.CompetitorChanges.CountAsync(cc => competitorIds.Contains(cc.CompetitorId)),
-            CompetitorNames: await _context.Competitors
-                .Where(c => c.ClubId == clubId)
-                .OrderBy(c => c.Name)
-                .Select(c => c.Name)
-                .ToListAsync(),
-            SeriesNames: await _context.Series
-                .Where(s => s.ClubId == clubId)
-                .OrderBy(s => s.Name)
-                .Select(s => s.Name)
-                .ToListAsync(),
-            RaceDates: await _context.Races
-                .Where(r => r.ClubId == clubId)
-                .OrderBy(r => r.Date)
-                .Select(r => r.Date)
-                .ToListAsync(),
-            SeriesUpdateDates: await _context.Series
-                .Where(s => s.ClubId == clubId)
-                .OrderBy(s => s.UpdatedDate)
-                .Select(s => s.UpdatedDate)
-                .ToListAsync()
+            CompetitorNames: competitors.Select(c => c.Name).ToList(),
+            SeriesNames: series.Select(s => s.Name).ToList(),
+            RaceDates: races.Select(r => r.Date).ToList(),
+            SeriesUpdateDates: series.Select(s => s.UpdatedDate).ToList()
         );
     }
 

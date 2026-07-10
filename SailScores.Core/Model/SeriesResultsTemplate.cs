@@ -17,5 +17,7 @@ public class SeriesResultsTemplate
     public ColumnVisibility BoatNameVisibility { get; set; }
     public string BoatNameHeader { get; set; }
     public ColumnVisibility CompetitorClubVisibility { get; set; }
+    public bool ShowPreDiscardTotal { get; set; }
+    public bool ShowClubLogo { get; set; }
     public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 }

@@ -34,6 +34,8 @@ public class ResultsTableViewModel
 
     public bool PreferAlternativeSailNumbers { get; set; }
 
+    public bool ShowPreDiscardTotal { get; set; }
+
     public string TrendLegend { get; set; }
     public bool HideDncDiscards { get; set; }
     public DateTime? UpdatedDate { get; set; }

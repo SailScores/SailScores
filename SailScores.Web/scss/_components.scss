@@ -33,6 +33,25 @@ nav a {
     }
 }
 
+/* Competitor index alt sail number button */
+.comp-alt-sail-btn {
+    background-color: var(--bs-secondary-bg) !important;
+    border-color: var(--bs-border-color) !important;
+    color: var(--bs-body-color) !important;
+
+    .fas,
+    strong {
+        color: inherit;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--bs-tertiary-bg) !important;
+        border-color: var(--bs-primary) !important;
+        color: var(--bs-emphasis-color) !important;
+    }
+}
+
 /* Card headers with collapsible icon */
 .card-header .fas {
     transition: .3s transform ease-in-out;
@@ -386,6 +405,12 @@ button.close {
 /* Quick buttons */
 button.quick-comp {
     margin: 3px;
+}
+
+/* Inactive competitor added via the hidden includeInactive race-editor flag */
+button.quick-comp.quick-comp-inactive {
+    opacity: 0.6;
+    border-style: dashed;
 }
 
 /* SVG text rendering */

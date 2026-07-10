@@ -1,6 +1,7 @@
 @using SailScores.Api.Enumerations
 @using SailScores.Core.Model
 @using SailScores.Core.Scoring
+@using SailScores.Core.Services
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Extensions
 @using SailScores.Web.Resources
@@ -83,6 +84,8 @@
                         var competitorLabel = results.Competitors.Count() == 1 ? localizer["competitor"] : localizer["competitors"];
 
                         ViewData["IsExport"] = true;
+                        var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
+                            series.SeriesResultsTemplate, series.Type == SeriesType.Regatta);
                         string trendLegend = series.TrendOption.HasValue ?
                             localizer["Rank change from"] + " " +
                             localizer[EnumHelper<TrendOption>
@@ -93,16 +96,12 @@
                                 SeriesId = series.Id,
                                 Results = series.FlatResults,
                                 ShowTrend = false,
-                                SailNumberVisibility = series.SeriesResultsTemplate?.SailNumberVisibility
-                                    ?? SailScores.Api.Enumerations.ColumnVisibility.Always,
-                                CompetitorNameVisibility = series.SeriesResultsTemplate?.CompetitorNameVisibility
-                                    ?? SailScores.Api.Enumerations.ColumnVisibility.Always,
-                                CompetitorNameHeader = series.SeriesResultsTemplate?.CompetitorNameHeader ?? "Helm",
-                                BoatNameVisibility = series.SeriesResultsTemplate?.BoatNameVisibility
-                                    ?? SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens,
-                                BoatNameHeader = series.SeriesResultsTemplate?.BoatNameHeader ?? "Boat",
-                                CompetitorClubVisibility = series.SeriesResultsTemplate?.CompetitorClubVisibility
-                                    ?? SailScores.Api.Enumerations.ColumnVisibility.Hidden,
+                                SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
+                                CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
+                                CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
+                                BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
+                                BoatNameHeader = resolvedTemplate.BoatNameHeader,
+                                CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
                                 IsExport = true,
                                 ShowExportButtons = false,
                                 ExcludeCompetitorLinks = true,

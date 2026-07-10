@@ -58,7 +58,7 @@
                     {
                         <option value="@fleet.Id"
                                 data-boat-class-id="@(fleet.BoatClasses?.Count == 1 ? fleet.BoatClasses[0].Id.ToString():"")">
-                            @fleet.Name
+                            @fleet.Name @(fleet.IsActive ? "" : " (Inactive)")
                         </option>
                     }
                 </select>

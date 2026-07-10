@@ -315,13 +315,14 @@
                             BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
                             BoatNameHeader = resolvedTemplate.BoatNameHeader,
                             CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
+                            ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
                             IsExport = false,
                             ShowExportButtons = true,
                             ExcludeCompetitorLinks = true,
                             PreferAlternativeSailNumbers = currentSeries.PreferAlternativeSailNumbers ?? false,
                             TrendLegend = trendLegend,
                             HideDncDiscards = currentSeries.HideDncDiscards,
-                            UpdatedDate = currentSeries.UpdatedDate
+                            UpdatedDate = currentSeries.UpdatedDate,
                         };
 
                     @await Html.PartialAsync("_ResultsTable", tableModel)

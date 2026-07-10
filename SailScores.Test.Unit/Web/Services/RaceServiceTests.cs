@@ -2,10 +2,12 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SailScores.Core.Model;
+using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -153,5 +155,38 @@ public class RaceServiceTests
 
         Assert.False(result.ShowCorrectedTime);
         Assert.False(string.IsNullOrWhiteSpace(result.CorrectedTimeNote));
+    }
+
+    [Fact]
+    public async Task AddOptionsToRace_RaceUsesInactiveFleet_IncludesThatFleetInOptions()
+    {
+        var clubId = Guid.NewGuid();
+        var activeFleet = new Fleet { Id = Guid.NewGuid(), ShortName = "Active", IsActive = true };
+        var selectedInactiveFleet = new Fleet { Id = Guid.NewGuid(), ShortName = "Selected Inactive", IsActive = false };
+        var otherInactiveFleet = new Fleet { Id = Guid.NewGuid(), ShortName = "Other Inactive", IsActive = false };
+
+        _clubServiceMock.Setup(s => s.GetMinimalClub(clubId)).ReturnsAsync(new Club { Id = clubId });
+        _clubServiceMock.Setup(s => s.GetAllFleets(clubId)).ReturnsAsync(new List<Fleet>
+        {
+            activeFleet, selectedInactiveFleet, otherInactiveFleet
+        });
+        _clubServiceMock.Setup(s => s.GetAllBoatClasses(clubId)).ReturnsAsync(new List<BoatClass>());
+        _coreSeriesServiceMock
+            .Setup(s => s.GetAllSeriesAsync(clubId, It.IsAny<DateTime>(), true, false))
+            .ReturnsAsync(new List<Series>());
+        _coreScoringServiceMock.Setup(s => s.GetScoreCodesAsync(clubId)).ReturnsAsync(new List<ScoreCode>());
+        _weatherServiceMock.Setup(s => s.GetWeatherIconOptions()).Returns(new List<KeyValuePair<string, string>>());
+
+        var raceWithOptions = new RaceWithOptionsViewModel
+        {
+            ClubId = clubId,
+            FleetId = selectedInactiveFleet.Id
+        };
+
+        await _service.AddOptionsToRace(raceWithOptions);
+
+        Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == selectedInactiveFleet.Id);
+        Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == activeFleet.Id);
+        Assert.DoesNotContain(raceWithOptions.FleetOptions, f => f.Id == otherInactiveFleet.Id);
     }
 }
