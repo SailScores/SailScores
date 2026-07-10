@@ -279,8 +279,9 @@ public class RaceService : IRaceService
             }
         }
 
-        // Ensure default date falls within series date range.
-        // Prefer series enforced dates when DateRestricted is true.
+        // Ensure default date falls within the series date range only when the series
+        // is explicitly date restricted. Series start/end values are not used as a
+        // default date limit because they commonly reflect the last race in the series.
         DateTime candidateDate = model.Date ?? DateTime.Today;
         if (series.DateRestricted == true)
         {
@@ -288,19 +289,6 @@ public class RaceService : IRaceService
             if (restrictedDate != null)
             {
                 model.Date = restrictedDate;
-            }
-        }
-        else if (series.StartDate.HasValue && series.EndDate.HasValue)
-        {
-            var start = series.StartDate.Value.ToDateTime(TimeOnly.MinValue);
-            var end = series.EndDate.Value.ToDateTime(TimeOnly.MinValue);
-            if (candidateDate > end)
-            {
-                model.Date = end;
-            }
-            else if (candidateDate < start)
-            {
-                model.Date = start;
             }
         }
 
