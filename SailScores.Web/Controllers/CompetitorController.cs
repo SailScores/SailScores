@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Identity.Entities;
@@ -219,6 +220,12 @@ public class CompetitorController : Controller
             return View("CreateErrors", errors);
         }
 
+        var club = await _clubService.GetMinimalClub(clubId);
+        if (club.EnableCustomCompetitorFields)
+        {
+            await PopulateCustomFieldValuesAsync(comp, clubId, Guid.Empty);
+        }
+
         return View(comp);
     }
 
@@ -241,6 +248,14 @@ public class CompetitorController : Controller
             var fleets = (await _clubService.GetAllFleets(clubId))
                 .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
                 .OrderBy(f => f.Name);
+
+            var club = await _clubService.GetMinimalClub(clubId);
+            if (club.EnableCustomCompetitorFields && competitor.CustomFieldValues != null)
+            {
+                ValidateCustomFieldValues(competitor, ModelState);
+                EnsureCustomFieldValueRows(competitor);
+            }
+
             if (!ModelState.IsValid)
             {
                 competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
@@ -260,6 +275,13 @@ public class CompetitorController : Controller
             }
             await _competitorService.SaveAsync(competitor,
                 await GetUserStringAsync());
+
+            var saveClub = await _clubService.GetMinimalClub(clubId);
+            if (saveClub.EnableCustomCompetitorFields)
+            {
+                await SaveCustomFieldValuesAsync(competitor.Id, competitor);
+            }
+
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
                 return Redirect(returnUrl);
@@ -419,27 +441,7 @@ public class CompetitorController : Controller
 
         if (club.EnableCustomCompetitorFields)
         {
-            var definitions = await _competitorFieldService.GetFieldDefinitionsAsync(clubId);
-            var values = await _competitorFieldService.GetValuesForCompetitorAsync(id);
-            var valueLookup = values.ToDictionary(v => v.FieldDefinitionId, v => v);
-
-            compWithOptions.CustomFieldValues = definitions
-                .Select(definition =>
-                {
-                    var value = valueLookup.GetValueOrDefault(definition.Id);
-                    return new CompetitorCustomFieldViewModel
-                    {
-                        FieldDefinitionId = definition.Id,
-                        Name = definition.Name,
-                        DisplayHeader = definition.DisplayHeader,
-                        DataType = definition.DataType,
-                        Value = value?.Value,
-                        EffectiveFrom = value?.EffectiveFrom,
-                        EffectiveTo = value?.EffectiveTo,
-                        ShowDates = true
-                    };
-                })
-                .ToList();
+            await PopulateCustomFieldValuesAsync(compWithOptions, clubId, id);
         }
 
         return View(compWithOptions);
@@ -466,6 +468,13 @@ public class CompetitorController : Controller
                 }
             }
 
+            var club = await _clubService.GetMinimalClub(competitor.ClubId);
+            if (club.EnableCustomCompetitorFields && competitor.CustomFieldValues != null)
+            {
+                ValidateCustomFieldValues(competitor, ModelState);
+                EnsureCustomFieldValueRows(competitor);
+            }
+
             if (!ModelState.IsValid)
             {
                 competitor.BoatClassOptions =
@@ -480,42 +489,10 @@ public class CompetitorController : Controller
             }
             await _competitorService.SaveAsync(competitor, await GetUserStringAsync());
 
-            var club = await _clubService.GetMinimalClub(competitor.ClubId);
-            if (club.EnableCustomCompetitorFields && competitor.CustomFieldValues != null)
+            var saveClub = await _clubService.GetMinimalClub(competitor.ClubId);
+            if (saveClub.EnableCustomCompetitorFields)
             {
-                var existingValues = await _competitorFieldService.GetValuesForCompetitorAsync(competitor.Id);
-                var existingLookup = existingValues.ToDictionary(v => v.FieldDefinitionId, v => v);
-
-                foreach (var entry in competitor.CustomFieldValues)
-                {
-                    if (entry == null)
-                    {
-                        continue;
-                    }
-
-                    if (string.IsNullOrWhiteSpace(entry.Value)
-                        && !entry.EffectiveFrom.HasValue
-                        && !entry.EffectiveTo.HasValue)
-                    {
-                        if (existingLookup.TryGetValue(entry.FieldDefinitionId, out var existingValue))
-                        {
-                            await _competitorFieldService.DeleteValueAsync(existingValue.Id);
-                        }
-                        continue;
-                    }
-
-                    var modelValue = new Core.Model.CompetitorFieldValue
-                    {
-                        Id = existingLookup.TryGetValue(entry.FieldDefinitionId, out var currentValue) ? currentValue.Id : Guid.Empty,
-                        CompetitorId = competitor.Id,
-                        FieldDefinitionId = entry.FieldDefinitionId,
-                        Value = entry.Value,
-                        EffectiveFrom = entry.EffectiveFrom,
-                        EffectiveTo = entry.EffectiveTo
-                    };
-
-                    await _competitorFieldService.SaveValueAsync(modelValue);
-                }
+                await SaveCustomFieldValuesAsync(competitor.Id, competitor);
             }
 
             return RedirectToAction("Index", "Competitor");
@@ -989,6 +966,182 @@ public class CompetitorController : Controller
             // non-critical: redirect regardless
         }
         return RedirectToAction("Edit", new { clubInitials, id = competitorId });
+    }
+
+    private async Task PopulateCustomFieldValuesAsync(CompetitorWithOptionsViewModel model, Guid clubId, Guid competitorId)
+    {
+        var club = await _clubService.GetMinimalClub(clubId);
+        if (!club.EnableCustomCompetitorFields)
+        {
+            model.CustomFieldValues = new List<CompetitorCustomFieldViewModel>();
+            return;
+        }
+
+        var definitions = await _competitorFieldService.GetFieldDefinitionsAsync(clubId);
+        var values = competitorId != Guid.Empty
+            ? await _competitorFieldService.GetValuesForCompetitorAsync(competitorId)
+            : new List<Core.Model.CompetitorFieldValue>();
+
+        var valuesByDefinition = values
+            .GroupBy(v => v.FieldDefinitionId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        model.CustomFieldValues = definitions
+            .Select(definition =>
+            {
+                var existingValues = valuesByDefinition.TryGetValue(definition.Id, out var rows) && rows.Any()
+                    ? rows
+                    : new List<Core.Model.CompetitorFieldValue>();
+
+                return new CompetitorCustomFieldViewModel
+                {
+                    FieldDefinitionId = definition.Id,
+                    Name = definition.Name,
+                    DisplayHeader = definition.DisplayHeader,
+                    DataType = definition.DataType,
+                    Values = existingValues
+                        .Select(v => new CompetitorCustomFieldValueViewModel
+                        {
+                            Id = v.Id,
+                            Value = v.Value,
+                            EffectiveFrom = v.EffectiveFrom,
+                            EffectiveTo = v.EffectiveTo
+                        })
+                        .ToList(),
+                    ShowDates = true
+                };
+            })
+            .ToList();
+
+        EnsureCustomFieldValueRows(model);
+    }
+
+    private void EnsureCustomFieldValueRows(CompetitorWithOptionsViewModel model)
+    {
+        if (model.CustomFieldValues == null)
+        {
+            model.CustomFieldValues = new List<CompetitorCustomFieldViewModel>();
+            return;
+        }
+
+        foreach (var field in model.CustomFieldValues.Where(f => f != null))
+        {
+            if (field.Values == null)
+            {
+                field.Values = new List<CompetitorCustomFieldValueViewModel>();
+            }
+
+            if (!field.Values.Any())
+            {
+                field.Values.Add(new CompetitorCustomFieldValueViewModel());
+            }
+        }
+    }
+
+    private void ValidateCustomFieldValues(CompetitorWithOptionsViewModel competitor, ModelStateDictionary modelState)
+    {
+        if (competitor.CustomFieldValues == null)
+        {
+            return;
+        }
+
+        foreach (var field in competitor.CustomFieldValues.Where(f => f != null))
+        {
+            var rows = (field.Values ?? new List<CompetitorCustomFieldValueViewModel>())
+                .Where(v => v != null)
+                .Where(v => !string.IsNullOrWhiteSpace(v.Value)
+                    || v.EffectiveFrom.HasValue
+                    || v.EffectiveTo.HasValue)
+                .ToList();
+
+            for (var i = 0; i < rows.Count; i++)
+            {
+                if (rows[i].EffectiveFrom.HasValue && rows[i].EffectiveTo.HasValue && rows[i].EffectiveFrom > rows[i].EffectiveTo)
+                {
+                    modelState.AddModelError(string.Empty, $"The start date for '{field.Name}' must be on or before the end date.");
+                    continue;
+                }
+
+                for (var j = i + 1; j < rows.Count; j++)
+                {
+                    if (RangesOverlap(rows[i].EffectiveFrom, rows[i].EffectiveTo, rows[j].EffectiveFrom, rows[j].EffectiveTo))
+                    {
+                        modelState.AddModelError(string.Empty, $"Date ranges for '{field.Name}' must not overlap.");
+                    }
+                }
+            }
+        }
+    }
+
+    private static bool RangesOverlap(DateTime? effectiveFrom1, DateTime? effectiveTo1, DateTime? effectiveFrom2, DateTime? effectiveTo2)
+    {
+        var start1 = effectiveFrom1 ?? DateTime.MinValue.Date;
+        var end1 = effectiveTo1 ?? DateTime.MaxValue.Date;
+        var start2 = effectiveFrom2 ?? DateTime.MinValue.Date;
+        var end2 = effectiveTo2 ?? DateTime.MaxValue.Date;
+
+        return start1 <= end2 && start2 <= end1;
+    }
+
+    private async Task SaveCustomFieldValuesAsync(Guid competitorId, CompetitorWithOptionsViewModel competitor)
+    {
+        if (competitor.CustomFieldValues == null)
+        {
+            return;
+        }
+
+        var club = await _clubService.GetMinimalClub(competitor.ClubId);
+        if (!club.EnableCustomCompetitorFields)
+        {
+            return;
+        }
+
+        var existingValues = await _competitorFieldService.GetValuesForCompetitorAsync(competitorId);
+
+        foreach (var field in competitor.CustomFieldValues.Where(f => f != null))
+        {
+            var submittedRows = (field.Values ?? new List<CompetitorCustomFieldValueViewModel>())
+                .Where(v => v != null)
+                .Where(v => !string.IsNullOrWhiteSpace(v.Value)
+                    || v.EffectiveFrom.HasValue
+                    || v.EffectiveTo.HasValue)
+                .ToList();
+
+            var submittedValueIds = new HashSet<Guid>(submittedRows
+                .Where(v => v.Id != Guid.Empty)
+                .Select(v => v.Id));
+
+            foreach (var submittedRow in submittedRows)
+            {
+                var existingValue = existingValues.FirstOrDefault(v => v.Id == submittedRow.Id);
+
+                var modelValue = new Core.Model.CompetitorFieldValue
+                {
+                    Id = submittedRow.Id,
+                    CompetitorId = competitorId,
+                    FieldDefinitionId = field.FieldDefinitionId,
+                    Value = submittedRow.Value,
+                    EffectiveFrom = submittedRow.EffectiveFrom,
+                    EffectiveTo = submittedRow.EffectiveTo
+                };
+
+                if (existingValue != null)
+                {
+                    modelValue.Id = existingValue.Id;
+                }
+
+                await _competitorFieldService.SaveValueAsync(modelValue);
+            }
+
+            var existingFieldValues = existingValues
+                .Where(v => v.FieldDefinitionId == field.FieldDefinitionId)
+                .ToList();
+
+            foreach (var existingFieldValue in existingFieldValues.Where(v => !submittedValueIds.Contains(v.Id)))
+            {
+                await _competitorFieldService.DeleteValueAsync(existingFieldValue.Id);
+            }
+        }
     }
 
     private async Task<string> GetUserStringAsync()

@@ -329,16 +329,19 @@
                                data-bs-toggle="popover"
                                data-bs-placement="top"
                                data-bs-trigger="focus hover"
-                               data-bs-content="Adds club-defined custom fields to competitors and lets you include them in results templates.">
+                               data-bs-content="Turns on club-defined custom competitor fields. When enabled, scorekeepers can add date-based values for each field on competitor edit/create pages and include the fields in series results templates.">
                                 <span class="far fa-question-circle"></span>
                             </a>
                         </label>
                     </div>
-                    <div class="mb-3">
-                        <a asp-controller="CompetitorField" asp-action="Index" asp-route-clubInitials="@Model.Initials" class="btn btn-outline-primary btn-sm">
-                            Manage custom fields
-                        </a>
-                    </div>
+                    @if (Model.EnableCustomCompetitorFields)
+                    {
+                        <div class="mb-3">
+                            <a asp-controller="CompetitorField" asp-action="Index" asp-route-clubInitials="@Model.Initials" class="btn btn-outline-primary btn-sm">
+                                Manage custom fields
+                            </a>
+                        </div>
+                    }
 
                     <div class="mb-3" id="defaultHandicapSystemRow">
                         <label asp-for="DefaultHandicapSystemId" class="form-label">Default Handicap System</label>

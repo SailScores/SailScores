@@ -118,7 +118,7 @@ public class SeriesServiceTests
     public async Task GetSeriesDetailAsync_ReturnsFromDb()
     {
         // Arrange
-        var season = await _context.Seasons.FirstAsync();
+        var season = await _context.Seasons.FirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetSeriesDetailsAsync(
@@ -177,7 +177,7 @@ public class SeriesServiceTests
 
         _context.Series.Add(restrictedSeries);
         _context.Series.Add(nonRestrictedSeries);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - query with date within restricted series range
         var seriesWithinRange = await _service.GetAllSeriesAsync(clubId, testDate, false, false);
@@ -217,7 +217,7 @@ public class SeriesServiceTests
         };
 
         _context.Series.Add(restrictedSeries);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - query with null date
         var allSeries = await _service.GetAllSeriesAsync(clubId, null, false, false);
@@ -305,7 +305,7 @@ public class SeriesServiceTests
         };
 
         _context.CompetitorFieldDefinitions.Add(definition);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var mappedSeries = new SailScores.Core.Model.Series
         {
@@ -364,7 +364,7 @@ public class SeriesServiceTests
 
         _context.Series.Add(child1);
         _context.Series.Add(child2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var summary = new Series
         {
@@ -382,7 +382,7 @@ public class SeriesServiceTests
         // Assert
         var dbSummary = await _context.Series
             .Include(s => s.ChildLinks)
-            .SingleAsync(s => s.Id == summaryId);
+            .SingleAsync(s => s.Id == summaryId, TestContext.Current.CancellationToken);
 
         Assert.NotNull(dbSummary.ChildLinks);
         Assert.Contains(dbSummary.ChildLinks, l => l.ChildSeriesId == child1.Id);

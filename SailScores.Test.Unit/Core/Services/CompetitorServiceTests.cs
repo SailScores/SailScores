@@ -113,7 +113,7 @@ namespace SailScores.Test.Unit.Core.Services
         {
             // arrange
             var sailNumber = "tmpNum";
-            var boatClass = await _context.BoatClasses.FirstAsync();
+            var boatClass = await _context.BoatClasses.FirstAsync(TestContext.Current.CancellationToken);
             var newComp = new Competitor
             {
                 Name = "Newbie",
@@ -135,16 +135,16 @@ namespace SailScores.Test.Unit.Core.Services
         {
             // arrange
             var newName = "tmpName";
-            var existingComp = await _context.Competitors.FirstAsync();
+            var existingComp = await _context.Competitors.FirstAsync(TestContext.Current.CancellationToken);
 
-            var existingCompCount = await _context.Competitors.CountAsync();
+            var existingCompCount = await _context.Competitors.CountAsync(TestContext.Current.CancellationToken);
 
             var coreObject = _mapper.Map<Competitor>(existingComp);
             coreObject.Name = newName;
 
             // act
             await _service.SaveAsync(coreObject);
-            var newCompCount = await _context.Competitors.CountAsync();
+            var newCompCount = await _context.Competitors.CountAsync(TestContext.Current.CancellationToken);
 
             // assert
             Assert.Equal(existingCompCount, newCompCount);
@@ -158,7 +158,7 @@ namespace SailScores.Test.Unit.Core.Services
             // arrange
             var allBoatsFleet = await _context.Fleets.SingleAsync(
                 f => f.FleetType == FleetType.AllBoatsInClub
-                && f.ClubId == _clubId);
+                && f.ClubId == _clubId, TestContext.Current.CancellationToken);
 
             // act
             var result = await _service.GetCompetitorsAsync(
@@ -174,8 +174,8 @@ namespace SailScores.Test.Unit.Core.Services
             // arrange
             var selectedBoatsFleet = await _context.Fleets.SingleAsync(
                 f => f.FleetType == FleetType.SelectedBoats
-                && f.ClubId == _clubId);
-            var inactiveCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive == false);
+                && f.ClubId == _clubId, TestContext.Current.CancellationToken);
+            var inactiveCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive == false, TestContext.Current.CancellationToken);
 
             // act
             var result = await _service.GetCompetitorsAsync(
@@ -191,9 +191,9 @@ namespace SailScores.Test.Unit.Core.Services
             // arrange
             var selectedBoatsFleet = await _context.Fleets.SingleAsync(
                 f => f.FleetType == FleetType.SelectedBoats
-                && f.ClubId == _clubId);
-            var inactiveCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive == false);
-            var activeCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive != false);
+                && f.ClubId == _clubId, TestContext.Current.CancellationToken);
+            var inactiveCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive == false, TestContext.Current.CancellationToken);
+            var activeCompetitor = await _context.Competitors.SingleAsync(c => c.IsActive != false, TestContext.Current.CancellationToken);
 
             // act
             var result = await _service.GetCompetitorsAsync(

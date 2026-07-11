@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -25,7 +27,7 @@ namespace SailScores.Test.Integration
             var client = _factory.CreateClient();
 
             // Act
-            var response = await client.GetAsync(url);
+            var response = await client.GetAsync(url, GetTestCancellationToken());
 
             // Assert
             response.EnsureSuccessStatusCode(); // Status Code 200-299
@@ -41,7 +43,7 @@ namespace SailScores.Test.Integration
             var client = _factory.CreateClient();
 
             // Act
-            var response = await client.GetAsync(url);
+            var response = await client.GetAsync(url, GetTestCancellationToken());
 
             // Assert
             response.EnsureSuccessStatusCode(); // Status Code 200-299
@@ -57,12 +59,23 @@ namespace SailScores.Test.Integration
             var client = _factory.CreateClient();
 
             // Act
-            var response = await client.GetAsync(url);
+            var response = await client.GetAsync(url, GetTestCancellationToken());
 
             // Assert
             response.EnsureSuccessStatusCode(); // Status Code 200-299
             Assert.Contains("application/json",
                 response.Content.Headers.ContentType.ToString());
+        }
+
+        private static CancellationToken GetTestCancellationToken()
+        {
+            var testContextType = Type.GetType("Xunit.TestContext, xunit.v3", throwOnError: false);
+            var currentProperty = testContextType?.GetProperty("Current", BindingFlags.Public | BindingFlags.Static);
+            var currentContext = currentProperty?.GetValue(null);
+            var cancellationTokenProperty = currentContext?.GetType().GetProperty("CancellationToken");
+            return cancellationTokenProperty?.GetValue(currentContext) is CancellationToken token
+                ? token
+                : CancellationToken.None;
         }
     }
 }

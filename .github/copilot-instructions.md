@@ -217,6 +217,7 @@ The project uses libman for client-side libraries (Bootstrap, jQuery). Build err
 - Integration tests use actual database connections
 - Test naming: `MethodName_StateUnderTest_ExpectedBehavior`
 - Use xUnit for test framework
+- For async operations that accept `CancellationToken`, use `xUnit's TestContext.Current.CancellationToken` to allow tests to respond better to cancellation.
 
 ## CI/CD
 

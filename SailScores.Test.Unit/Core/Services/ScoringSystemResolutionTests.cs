@@ -135,7 +135,7 @@ public class ScoringSystemResolutionTests
             ScoringSystemId = _seriesScoringSystemId
         };
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var modelSeries = new SailScores.Core.Model.Series
         {
@@ -178,7 +178,7 @@ public class ScoringSystemResolutionTests
             ScoringSystemId = null // No scoring system set on series
         };
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var modelSeries = new SailScores.Core.Model.Series
         {
@@ -221,7 +221,7 @@ public class ScoringSystemResolutionTests
             ScoringSystemId = null // No scoring system set on series
         };
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var modelSeries = new SailScores.Core.Model.Series
         {
@@ -253,7 +253,7 @@ public class ScoringSystemResolutionTests
             DefaultScoringSystemId = _seasonScoringSystemId
         };
         _context.Seasons.Add(season);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.IsScoringSystemInUseAsync(_seasonScoringSystemId);
@@ -275,7 +275,7 @@ public class ScoringSystemResolutionTests
             DiscardPattern = "0"
         };
         _context.ScoringSystems.Add(unusedScoringSystem);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.IsScoringSystemInUseAsync(unusedScoringSystemId);
@@ -310,7 +310,7 @@ public class ScoringSystemResolutionTests
             ScoringSystemId = null // Empty/null guid means use default
         };
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var modelSeries = new SailScores.Core.Model.Series
         {

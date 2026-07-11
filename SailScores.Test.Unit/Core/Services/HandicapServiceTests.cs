@@ -44,7 +44,7 @@ public class HandicapServiceTests
         };
         _context.HandicapSystems.Add(baseSystem);
         _context.HandicapSystems.Add(clubSystem);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var result = await _service.GetBaseHandicapSystemsAsync();
 
@@ -71,7 +71,7 @@ public class HandicapServiceTests
         };
         _context.HandicapSystems.Add(baseSystem);
         _context.HandicapSystems.Add(clubSystem);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var result = await _service.GetHandicapSystemsAsync(_clubId);
 
@@ -90,7 +90,7 @@ public class HandicapServiceTests
             SystemType = SailScores.Database.Entities.HandicapSystemType.PhrfToT
         };
         _context.HandicapSystems.Add(baseSystem);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var created = await _service.CreateClubHandicapSystemAsync(
             _clubId,
@@ -117,7 +117,7 @@ public class HandicapServiceTests
             SystemType = SailScores.Database.Entities.HandicapSystemType.Portsmouth
         };
         _context.HandicapSystems.Add(nonBaseSystem);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.CreateClubHandicapSystemAsync(

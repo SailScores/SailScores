@@ -133,10 +133,6 @@
         .GetDisplayValue(Model.Item.TrendOption.Value)];
     }
 
-    // Resolve template settings
-    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(Model.Item.SeriesResultsTemplate)
-        ?? SeriesResultsTemplateHelper.GetDefaultTemplate(Model.Item.Type == SeriesType.Regatta);
-
     var customFieldDefinitions = new Dictionary<Guid, CompetitorFieldDefinition>();
     var customFieldColumns = new List<SeriesResultsTemplateCustomField>();
     if (Model.Item?.ClubId != Guid.Empty)

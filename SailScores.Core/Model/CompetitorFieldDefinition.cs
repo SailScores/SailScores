@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Core.Model;
 
@@ -6,10 +7,20 @@ public class CompetitorFieldDefinition
 {
     public Guid Id { get; set; }
     public Guid ClubId { get; set; }
+
+    [Display(Name = "Field name")]
     public string Name { get; set; }
+
+    [Display(Name = "Display label")]
     public string? DisplayHeader { get; set; }
+
+    [Display(Name = "Value type")]
     public CustomFieldDataType DataType { get; set; }
+
+    [Display(Name = "Display order")]
     public int DisplayOrder { get; set; }
+
+    [Display(Name = "Available to scorekeepers")]
     public bool IsActive { get; set; }
 }
 

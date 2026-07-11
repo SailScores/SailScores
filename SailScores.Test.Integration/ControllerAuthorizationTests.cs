@@ -1,4 +1,7 @@
+using System;
 using System.Net;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
@@ -27,7 +30,7 @@ namespace SailScores.Test.Integration
             });
 
             // Act
-            var response = await client.GetAsync(url);
+            var response = await client.GetAsync(url, GetTestCancellationToken());
 
             // Assert
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -42,11 +45,22 @@ namespace SailScores.Test.Integration
             var client = _factory.CreateClient();
 
             // Act
-            var response = await client.GetAsync(url);
+            var response = await client.GetAsync(url, GetTestCancellationToken());
 
             // Assert
             // Note: Api endpoints are configured in Startup.cs to return 401 instead of redirecting
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        private static CancellationToken GetTestCancellationToken()
+        {
+            var testContextType = Type.GetType("Xunit.TestContext, xunit.v3", throwOnError: false);
+            var currentProperty = testContextType?.GetProperty("Current", BindingFlags.Public | BindingFlags.Static);
+            var currentContext = currentProperty?.GetValue(null);
+            var cancellationTokenProperty = currentContext?.GetType().GetProperty("CancellationToken");
+            return cancellationTokenProperty?.GetValue(currentContext) is CancellationToken token
+                ? token
+                : CancellationToken.None;
         }
     }
 }

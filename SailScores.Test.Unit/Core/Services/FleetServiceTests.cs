@@ -100,8 +100,8 @@ public class FleetServiceTests
     public async Task Delete_Fleet_RemovesFromDb()
     {
         // Arrange
-        var boatClass = await _context.BoatClasses.FirstAsync();
-        var comp = await _context.Competitors.FirstAsync();
+        var boatClass = await _context.BoatClasses.FirstAsync(TestContext.Current.CancellationToken);
+        var comp = await _context.Competitors.FirstAsync(TestContext.Current.CancellationToken);
         var newFleet = new Fleet
         {
             Name = "myFleet",
@@ -150,7 +150,7 @@ public class FleetServiceTests
     public async Task Get_Fleet_ReturnsFromDb()
     {
         // Arrange
-        var boatClass = await _context.BoatClasses.FirstAsync();
+        var boatClass = await _context.BoatClasses.FirstAsync(TestContext.Current.CancellationToken);
         var newFleet = new Fleet
         {
             Name = "myFleet",
@@ -202,9 +202,9 @@ public class FleetServiceTests
     public async Task GetSeriesForFleet_returnsFromDb()
     {
         //Arrange
-        var race = await _context.Races.FirstAsync();
-        var fleet = await _context.Fleets.FirstAsync();
-        var series = await _context.Series.FirstAsync();
+        var race = await _context.Races.FirstAsync(TestContext.Current.CancellationToken);
+        var fleet = await _context.Fleets.FirstAsync(TestContext.Current.CancellationToken);
+        var series = await _context.Series.FirstAsync(TestContext.Current.CancellationToken);
 
         race.Fleet = fleet;
         series.RaceSeries = new List<Database.Entities.SeriesRace>
@@ -216,7 +216,7 @@ public class FleetServiceTests
 
             }
         };
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var returnedValue = await _service.GetSeriesForFleet(fleet.Id) ;
@@ -254,10 +254,10 @@ public class FleetServiceTests
     public async Task GetDeletableInfo_FleetUsedInRace_ReturnsNotDeletable()
     {
         // Arrange
-        var fleet = await _context.Fleets.FirstAsync();
-        var race = await _context.Races.FirstAsync();
+        var fleet = await _context.Fleets.FirstAsync(TestContext.Current.CancellationToken);
+        var race = await _context.Races.FirstAsync(TestContext.Current.CancellationToken);
         race.Fleet = fleet;
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = (await _service.GetDeletableInfo(_clubId)).ToList();
@@ -272,10 +272,10 @@ public class FleetServiceTests
     public async Task GetDeletableInfo_FleetUsedInSeries_ReturnsNotDeletable()
     {
         // Arrange
-        var fleet = await _context.Fleets.FirstAsync();
-        var series = await _context.Series.FirstAsync();
+        var fleet = await _context.Fleets.FirstAsync(TestContext.Current.CancellationToken);
+        var series = await _context.Series.FirstAsync(TestContext.Current.CancellationToken);
         series.FleetId = fleet.Id;
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = (await _service.GetDeletableInfo(_clubId)).ToList();
@@ -290,12 +290,12 @@ public class FleetServiceTests
     public async Task GetDeletableInfo_FleetUsedInBothRaceAndSeries_ReturnsNotDeletableWithBothReasons()
     {
         // Arrange
-        var fleet = await _context.Fleets.FirstAsync();
-        var race = await _context.Races.FirstAsync();
-        var series = await _context.Series.FirstAsync();
+        var fleet = await _context.Fleets.FirstAsync(TestContext.Current.CancellationToken);
+        var race = await _context.Races.FirstAsync(TestContext.Current.CancellationToken);
+        var series = await _context.Series.FirstAsync(TestContext.Current.CancellationToken);
         race.Fleet = fleet;
         series.FleetId = fleet.Id;
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = (await _service.GetDeletableInfo(_clubId)).ToList();

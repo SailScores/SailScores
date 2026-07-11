@@ -63,7 +63,7 @@ public class CompetitorFieldServiceTests
             Name = "Template"
         };
         _context.SeriesResultsTemplates.Add(template);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var firstField = new Database.Entities.CompetitorFieldDefinition
         {
@@ -93,7 +93,7 @@ public class CompetitorFieldServiceTests
             Visibility = SailScores.Api.Enumerations.ColumnVisibility.Hidden,
             DisplayOrder = 0
         });
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var selections = new List<SeriesResultsTemplateCustomField>
         {

@@ -91,6 +91,19 @@
                 </div>
             </div>
         </div>
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="ShowPreDiscardTotal" />
+                <label class="form-check-label" asp-for="ShowPreDiscardTotal">
+                    Show Pre-Discard Total Column
+                </label>
+                <small class="d-block form-text text-body-secondary mt-2">
+                    When enabled, results include the "Pre-Discard Total" showing each competitor's total score
+                    before applying discards. This option is only displayed for low-point scoring
+                    systems, not for percentage-based systems.
+                </small>
+            </div>
+        </div>
 
     <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
         <h2 class="h5 mb-3">Score display options</h2>
@@ -150,40 +163,15 @@
         </div>
     </div>
 
-    <div class="mb-3">
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Save Changes
-        </button>
-        <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-secondary">
-            <i class="fas fa-times"></i> Cancel
-        </a>
-    </div>
-</form>
-
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" asp-for="ShowPreDiscardTotal" />
-                    <label class="form-check-label" asp-for="ShowPreDiscardTotal">
-                        Show Pre-Discard Total Column
-                    </label>
-                    <small class="d-block form-text text-body-secondary mt-2">
-                        When enabled, results include the "Pre-Discard Total" showing each competitor's total score
-                        before applying discards. This option is only displayed for low-point scoring
-                        systems, not for percentage-based systems.
-                    </small>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex flex-wrap gap-2">
+      <div class="mb-3">
             <button type="submit" class="btn btn-primary">
                 Save
             </button>
             <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
                 Cancel
             </a>
-        </div>
-    </form>
+      </div>
+  </form>
 </div>
 
 @section Scripts {

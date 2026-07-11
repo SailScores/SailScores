@@ -15,10 +15,10 @@
     <table class="table table-sm table-striped">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Header</th>
-                <th>Type</th>
-                <th>Order</th>
+                <th>Field name</th>
+                <th>Display label</th>
+                <th>Value type</th>
+                <th>Display order</th>
                 <th></th>
             </tr>
         </thead>
@@ -31,12 +31,16 @@
                     <td>@field.DataType</td>
                     <td>@field.DisplayOrder</td>
                     <td>
-                        <a asp-action="Edit" asp-route-clubInitials="@ViewData["ClubInitials"]" asp-route-id="@field.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a asp-action="Edit" asp-route-clubInitials="@ViewData["ClubInitials"]" asp-route-id="@field.Id" class="btn btn-sm btn-outline-primary me-2" title="Edit">
+                            <span class="fas fa-pen"></span>
+                        </a>
                         <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Delete this field?');">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="clubInitials" value="@ViewData["ClubInitials"]" />
                             <input type="hidden" name="id" value="@field.Id" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <span class="fas fa-trash"></span>
+                            </button>
                         </form>
                     </td>
                 </tr>

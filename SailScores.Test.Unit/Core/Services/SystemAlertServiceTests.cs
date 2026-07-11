@@ -60,7 +60,7 @@ public class SystemAlertServiceTests
         _context.SystemAlerts.Add(activeAlert);
         _context.SystemAlerts.Add(expiredAlert);
         _context.SystemAlerts.Add(deletedAlert);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetActiveAlertsAsync();

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Test.Unit.Utilities;
@@ -39,14 +39,14 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task GetScoreCodesAsync_ReturnsOneDnc()
         {
-            var scoringSystem = await _context.ScoringSystems.FirstAsync(ss => ss.ClubId != null);
+            var scoringSystem = await _context.ScoringSystems.FirstAsync(ss => ss.ClubId != null, TestContext.Current.CancellationToken);
             _context.ScoreCodes.Add(new Database.Entities.ScoreCode
             {
                 ScoringSystemId = scoringSystem.Id,
                 Name = "DNC",
                 CameToStart = false
             });
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             // Act
             var results = await _service.GetScoreCodesAsync(scoringSystem.ClubId.Value);
@@ -59,7 +59,7 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task GetScoringSystemsAsync_ReturnsASystemWithDnc()
         {
-            var club = await _context.Clubs.FirstAsync();
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
 
             // Act
             var results = await _service.GetScoringSystemsAsync(club.Id, false);
@@ -73,7 +73,7 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task GetSiteDefaultSystemAsync_ReturnsOneSystem()
         {
-            var club = await _context.Clubs.FirstAsync();
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
 
             // Act
             var result = await _service.GetSiteDefaultSystemAsync();
@@ -86,14 +86,14 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task GetScoringSystemAsync_ReturnsNotNull()
         {
-            var scoringSystem = await _context.ScoringSystems.FirstAsync(ss => ss.ClubId != null);
+            var scoringSystem = await _context.ScoringSystems.FirstAsync(ss => ss.ClubId != null, TestContext.Current.CancellationToken);
             _context.ScoreCodes.Add(new Database.Entities.ScoreCode
             {
                 ScoringSystemId = scoringSystem.Id,
                 Name = "DNC",
                 CameToStart = false
             });
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             // Act
             var result = await _service.GetScoringSystemAsync(scoringSystem.Id);
@@ -144,7 +144,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task GetScoreCodeAsync_ReturnsFromDb()
         {
             // Arrange
-            var id = (await _context.ScoreCodes.FirstAsync()).Id;
+            var id = (await _context.ScoreCodes.FirstAsync(TestContext.Current.CancellationToken)).Id;
             // Act
             var result = _service.GetScoreCodeAsync(id);
             // Assert
@@ -155,7 +155,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task SaveScoreCodeAsync_NewCode_SavesToDb()
         {
             // Arrange
-            var system = await _context.ScoringSystems.FirstAsync();
+            var system = await _context.ScoringSystems.FirstAsync(TestContext.Current.CancellationToken);
             var code = new ScoreCode
             {
                 Name = "FIFO",
@@ -172,7 +172,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task SaveScoreCodeAsync_ExistingCode_SavesToDb()
         {
             // Arrange
-            var existingCode = await _context.ScoreCodes.FirstAsync();
+            var existingCode = await _context.ScoreCodes.FirstAsync(TestContext.Current.CancellationToken);
             existingCode.Name = "HMM";
 
             var code = _mapper.Map<ScoreCode>(existingCode);
@@ -188,7 +188,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task DeleteScoreCodeAsync_RemovesFromDb()
         {
             // Arrange
-            var existingCode = await _context.ScoreCodes.FirstAsync();
+            var existingCode = await _context.ScoreCodes.FirstAsync(TestContext.Current.CancellationToken);
             Assert.Contains(_context.ScoreCodes, sc => sc.Id == existingCode.Id);
 
             // Act
@@ -213,7 +213,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task IsScoringSystemInUseAsync_InUse_ReturnsTrue()
         {
             // Arrange
-            var existingClub = await _context.Clubs.FirstAsync();
+            var existingClub = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
 
             // Act
             var result = await _service.IsScoringSystemInUseAsync(existingClub.DefaultScoringSystemId.Value);
