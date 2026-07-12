@@ -88,16 +88,20 @@
                     }
                     @foreach (var fleet in Model.FleetOptions.OrderBy(f => f.Name))
                     {
-                        @if (Model.FleetOptions.Count == 1)
+                        var isSelected = Model.FleetId == fleet.Id
+                            || (Model.FleetOptions.Count == 1 && Model.FleetId == null);
+                        var boatClassId = fleet.BoatClasses?.Count == 1
+                            ? fleet.BoatClasses[0].Id.ToString()
+                            : string.Empty;
+                        if (isSelected)
                         {
-                            <option selected="selected" value="@fleet.Id"
-                                    data-boat-class-id="@(fleet.BoatClasses?.Count == 1 ? fleet.BoatClasses[0].Id.ToString():"")">
+                            <option value="@fleet.Id" selected="selected" data-boat-class-id="@boatClassId">
                                 @fleet.Name
                             </option>
                         }
                         else
                         {
-                            <option value="@fleet.Id">
+                            <option value="@fleet.Id" data-boat-class-id="@boatClassId">
                                 @fleet.Name
                             </option>
                         }

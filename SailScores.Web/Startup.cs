@@ -45,9 +45,12 @@ namespace SailScores.Web;
 
 public class Startup
 {
-    public Startup(IConfiguration configuration)
+    private readonly IWebHostEnvironment _environment;
+
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
         Configuration = configuration;
+        _environment = environment;
     }
 
     public IConfiguration Configuration { get; }
@@ -181,12 +184,17 @@ public class Startup
         // Add response caching services (required for VaryByQueryKeys)
         services.AddResponseCaching();
 
-        services
+        var mvcBuilder = services
             .AddMvc(option =>
             {
                 option.Filters.Add(new ResponseCacheAttribute() { NoStore = true, Location = ResponseCacheLocation.None });
                 option.Filters.Add<SailScores.Web.Filters.ReturnUrlViewDataFilter>();
             });
+
+        if (_environment.IsDevelopment())
+        {
+            mvcBuilder.AddRazorRuntimeCompilation();
+        }
 
         var mailchimpManager = new MailChimpManager(Configuration["MailchimpApiKey"]);
         services.AddSingleton<IMailChimpManager>(mailchimpManager);
