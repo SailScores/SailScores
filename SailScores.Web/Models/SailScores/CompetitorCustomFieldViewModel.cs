@@ -28,7 +28,7 @@ public class CompetitorCustomFieldViewModel
 
 public class CompetitorCustomFieldValueViewModel
 {
-    public Guid Id { get; set; }
+    public Guid? Id { get; set; }
 
     [Display(Name = "Value")]
     [StringLength(500)]

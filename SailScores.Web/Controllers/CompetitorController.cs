@@ -252,6 +252,7 @@ public class CompetitorController : Controller
             var club = await _clubService.GetMinimalClub(clubId);
             if (club.EnableCustomCompetitorFields && competitor.CustomFieldValues != null)
             {
+                await PopulatePostedCustomFieldDefinitionIdsAsync(competitor, clubId);
                 ValidateCustomFieldValues(competitor, ModelState);
                 EnsureCustomFieldValueRows(competitor);
             }
@@ -471,12 +472,28 @@ public class CompetitorController : Controller
             var club = await _clubService.GetMinimalClub(competitor.ClubId);
             if (club.EnableCustomCompetitorFields && competitor.CustomFieldValues != null)
             {
+                await PopulatePostedCustomFieldDefinitionIdsAsync(competitor, competitor.ClubId);
                 ValidateCustomFieldValues(competitor, ModelState);
                 EnsureCustomFieldValueRows(competitor);
             }
 
             if (!ModelState.IsValid)
             {
+                var modelStateErrors = ModelState
+                    .Where(kvp => kvp.Value?.Errors != null && kvp.Value.Errors.Count > 0)
+                    .SelectMany(kvp => kvp.Value.Errors.Select(error => $"{kvp.Key}: {error.ErrorMessage}"))
+                    .ToList();
+
+                foreach (var modelError in modelStateErrors)
+                {
+                    Console.WriteLine($"ModelState error: {modelError}");
+                }
+
+                if (modelStateErrors.Any())
+                {
+                    ModelState.AddModelError(string.Empty, "Validation failed: " + string.Join(" | ", modelStateErrors));
+                }
+
                 competitor.BoatClassOptions =
                     (await _clubService.GetAllBoatClasses(competitor.ClubId))
                     .OrderBy(c => c.Name);
@@ -497,10 +514,14 @@ public class CompetitorController : Controller
 
             return RedirectToAction("Index", "Competitor");
         }
-        catch
+        catch (Exception ex)
         {
             ModelState.AddModelError(String.Empty,
                 "An error occurred editing this competitor.");
+            if (!string.IsNullOrWhiteSpace(ex.Message))
+            {
+                ModelState.AddModelError(String.Empty, ex.Message);
+            }
             competitor.BoatClassOptions =
                 (await _clubService.GetAllBoatClasses(competitor.ClubId))
                 .OrderBy(c => c.Name);
@@ -1016,6 +1037,31 @@ public class CompetitorController : Controller
         EnsureCustomFieldValueRows(model);
     }
 
+    private async Task PopulatePostedCustomFieldDefinitionIdsAsync(CompetitorWithOptionsViewModel model, Guid clubId)
+    {
+        if (model.CustomFieldValues == null || !model.CustomFieldValues.Any())
+        {
+            return;
+        }
+
+        var definitions = await _competitorFieldService.GetFieldDefinitionsAsync(clubId);
+        var definitionsByIndex = definitions.ToList();
+
+        for (var i = 0; i < model.CustomFieldValues.Count; i++)
+        {
+            var field = model.CustomFieldValues[i];
+            if (field == null)
+            {
+                continue;
+            }
+
+            if (field.FieldDefinitionId == Guid.Empty && i < definitionsByIndex.Count)
+            {
+                field.FieldDefinitionId = definitionsByIndex[i].Id;
+            }
+        }
+    }
+
     private void EnsureCustomFieldValueRows(CompetitorWithOptionsViewModel model)
     {
         if (model.CustomFieldValues == null)
@@ -1108,16 +1154,18 @@ public class CompetitorController : Controller
                 .ToList();
 
             var submittedValueIds = new HashSet<Guid>(submittedRows
-                .Where(v => v.Id != Guid.Empty)
-                .Select(v => v.Id));
+                .Where(v => v.Id.HasValue)
+                .Select(v => v.Id.Value));
 
             foreach (var submittedRow in submittedRows)
             {
-                var existingValue = existingValues.FirstOrDefault(v => v.Id == submittedRow.Id);
+                var existingValue = submittedRow.Id.HasValue
+                    ? existingValues.FirstOrDefault(v => v.Id == submittedRow.Id.Value)
+                    : null;
 
                 var modelValue = new Core.Model.CompetitorFieldValue
                 {
-                    Id = submittedRow.Id,
+                    Id = submittedRow.Id ?? Guid.Empty,
                     CompetitorId = competitorId,
                     FieldDefinitionId = field.FieldDefinitionId,
                     Value = submittedRow.Value,

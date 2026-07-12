@@ -14,7 +14,7 @@
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Name" class="control-label
                        @(ViewData.ModelState["SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
