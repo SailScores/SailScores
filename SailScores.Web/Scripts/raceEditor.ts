@@ -20,7 +20,8 @@ let suppressSeriesRemovalConfirmation = false;
 // competitors, still restricted to the race's fleet, be added when backfilling historical races.
 let includeInactiveCompetitors = false;
 function detectIncludeInactiveCompetitors(): boolean {
-    return new URLSearchParams(window.location.search).get('includeInactive') === 'true';
+    const search = window.location.search || "";
+    return /(?:^|[?&])includeinactive=true(?:&|$)/i.test(search);
 }
 
 interface seriesListResult {
@@ -152,6 +153,7 @@ export function initialize() {
     $('#results').on('touchend touchcancel touchmove', '.sail-number-display', clearAltEditLongPress);
     $('#altSailNumberSaveButton').on('click', saveAlternativeSailNumber);
     $('#deleteConfirmed').click(deleteResult);
+    bindDeleteConfirmationKeyboardHandling();
     $('#closefooter').click(hideScoreButtonFooter);
     $('#compform').submit(compCreateSubmit);
     $("#raceform").submit(function (e) {
@@ -352,6 +354,21 @@ export function deleteResult() {
     (<any>modal).modal("hide");
 }
 
+function bindDeleteConfirmationKeyboardHandling() {
+    const modal = $('#deleteConfirm');
+    modal.on('shown.bs.modal', () => {
+        const confirmButton = document.getElementById('deleteConfirmed') as HTMLButtonElement | null;
+        confirmButton?.focus();
+    });
+    modal.on('keydown', (event: any) => {
+        if (event.key === 'Enter' || event.key === 'NumpadEnter') {
+            event.preventDefault();
+            event.stopPropagation();
+            deleteResult();
+        }
+    });
+}
+
 export function confirmDelete(event: Event) {
 
     let btn = event.target as Node;
@@ -365,7 +382,7 @@ export function confirmDelete(event: Event) {
     let modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
     modal.find('#compIdToDelete').val(compId);
-    modal.show();
+    (<any>modal).modal('show');
 }
 
 export function hideScoreButtonFooter() {
