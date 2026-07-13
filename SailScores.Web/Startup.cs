@@ -36,7 +36,6 @@ using WebMarkupMin.AspNetCoreLatest;
 using Microsoft.Extensions.Hosting;
 using MailChimp.Net.Interfaces;
 using MailChimp.Net;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using SailScores.Web.Resources;
 using SailScores.Web.Authorization;
@@ -232,32 +231,12 @@ public class Startup
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
-
         services.AddApplicationInsightsTelemetry(options =>
         {
             options.ConnectionString = Configuration["ApplicationInsights:ConnectionString"];
-
-            options.EnableAdaptiveSampling = true;
-            options.EnablePerformanceCounterCollectionModule = true;
-            options.EnableDependencyTrackingTelemetryModule = true;
-            options.EnableHeartbeat = true;
-            options.EnableAzureInstanceMetadataTelemetryModule = true;
-
-            // Enable QuickPulse (Live Metrics) for real-time monitoring
-            options.EnableQuickPulseMetricStream = true;
-
-            // Disable in development to avoid unnecessary telemetry costs
-            options.EnableActiveTelemetryConfigurationSetup = true;
+            options.EnableRequestTrackingTelemetryModule = true;
         });
 
-        // Configure sampling settings for better performance
-        services.Configure<TelemetryConfiguration>(config =>
-        {
-            config.DefaultTelemetrySink.TelemetryProcessorChainBuilder.Build();
-        });
-
-        services.AddSingleton<ITelemetryInitializer, SailScoresTelemetryInitializer>();
-        services.AddApplicationInsightsTelemetryProcessor<SailScoresTelemetryProcessor>();
         services.AddHttpContextAccessor();
     }
 
