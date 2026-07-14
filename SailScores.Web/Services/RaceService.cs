@@ -306,6 +306,11 @@ public class RaceService : IRaceService
             }
         }
 
+        if (model.Date.HasValue && model.Date.Value.Date != DateTime.Today.Date)
+        {
+            model.Weather = default;
+        }
+
         // If the series explicitly specifies a fleet, prefer that.
         if (series.FleetId.HasValue)
         {
