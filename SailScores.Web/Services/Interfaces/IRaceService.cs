@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 
 namespace SailScores.Web.Services.Interfaces;
@@ -15,12 +15,14 @@ public interface IRaceService
         string clubInitials,
         Guid? regattaId,
         Guid? seriesId,
-        Guid? fleetId = null);
+        Guid? fleetId = null,
+        bool includeInactive = false);
     Task SaveAsync(RaceWithOptionsViewModel race);
     Task Delete(Guid id, string userName);
-    Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions);
+    Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions, bool includeInactive = false);
     Task<Season> GetCurrentSeasonAsync(string clubInitials);
     Task<RaceWithOptionsViewModel> FixupRaceWithOptions(
         string clubInitials,
-        RaceWithOptionsViewModel race);
+        RaceWithOptionsViewModel race,
+        bool includeInactive = false);
 }

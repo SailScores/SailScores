@@ -108,6 +108,7 @@ public class RaceController : Controller
         string clubInitials,
         Guid? regattaId,
         Guid? seriesId,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -115,7 +116,9 @@ public class RaceController : Controller
             await _raceService.GetBlankRaceWithOptions(
                 clubInitials,
                 regattaId,
-                seriesId);
+                seriesId,
+                null,
+                includeInactive);
         var errors = _adminTipService.GetRaceCreateErrors(race);
         if (errors != null && errors.Count > 0)
         {
@@ -132,13 +135,14 @@ public class RaceController : Controller
     public async Task<ActionResult> Create(
         string clubInitials,
         RaceWithOptionsViewModel race,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
 
         if (!ModelState.IsValid)
         {
-            race = await _raceService.FixupRaceWithOptions(clubInitials, race);
+            race = await _raceService.FixupRaceWithOptions(clubInitials, race, includeInactive);
 
             return View(race);
         }
@@ -164,6 +168,7 @@ public class RaceController : Controller
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -181,7 +186,7 @@ public class RaceController : Controller
 
         var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
-        await _raceService.AddOptionsToRace(raceWithOptions);
+        await _raceService.AddOptionsToRace(raceWithOptions, includeInactive);
         raceWithOptions.UseAdvancedFeatures = club.UseAdvancedFeatures ?? false;
         raceWithOptions.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers ?? false;
 
@@ -195,6 +200,7 @@ public class RaceController : Controller
         string clubInitials,
         Guid id,
         RaceWithOptionsViewModel race,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -202,7 +208,7 @@ public class RaceController : Controller
 
         if (!ModelState.IsValid)
         {
-            race = await _raceService.FixupRaceWithOptions(clubInitials, race);
+            race = await _raceService.FixupRaceWithOptions(clubInitials, race, includeInactive);
 
             return View(race);
         }

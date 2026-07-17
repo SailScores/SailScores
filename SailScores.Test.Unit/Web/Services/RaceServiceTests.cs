@@ -189,4 +189,37 @@ public class RaceServiceTests
         Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == activeFleet.Id);
         Assert.DoesNotContain(raceWithOptions.FleetOptions, f => f.Id == otherInactiveFleet.Id);
     }
+
+    [Fact]
+    public async Task AddOptionsToRace_IncludeInactiveTrue_IncludesAllInactiveFleets()
+    {
+        var clubId = Guid.NewGuid();
+        var activeFleet = new Fleet { Id = Guid.NewGuid(), ShortName = "Active", IsActive = true };
+        var inactiveFleet = new Fleet { Id = Guid.NewGuid(), ShortName = "Inactive", IsActive = false };
+        var anotherInactiveFleet = new Fleet { Id = Guid.NewGuid(), ShortName = "Another Inactive", IsActive = false };
+
+        _clubServiceMock.Setup(s => s.GetMinimalClub(clubId)).ReturnsAsync(new Club { Id = clubId });
+        _clubServiceMock.Setup(s => s.GetAllFleets(clubId)).ReturnsAsync(new List<Fleet>
+        {
+            activeFleet, inactiveFleet, anotherInactiveFleet
+        });
+        _clubServiceMock.Setup(s => s.GetAllBoatClasses(clubId)).ReturnsAsync(new List<BoatClass>());
+        _coreSeriesServiceMock
+            .Setup(s => s.GetAllSeriesAsync(clubId, It.IsAny<DateTime>(), true, false))
+            .ReturnsAsync(new List<Series>());
+        _coreScoringServiceMock.Setup(s => s.GetScoreCodesAsync(clubId)).ReturnsAsync(new List<ScoreCode>());
+        _weatherServiceMock.Setup(s => s.GetWeatherIconOptions()).Returns(new List<KeyValuePair<string, string>>());
+
+        var raceWithOptions = new RaceWithOptionsViewModel
+        {
+            ClubId = clubId,
+            FleetId = inactiveFleet.Id
+        };
+
+        await _service.AddOptionsToRace(raceWithOptions, includeInactive: true);
+
+        Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == activeFleet.Id);
+        Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == inactiveFleet.Id);
+        Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == anotherInactiveFleet.Id);
+    }
 }

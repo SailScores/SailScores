@@ -120,30 +120,34 @@ public class RaceService : IRaceService
         string clubInitials,
         Guid? regattaId,
         Guid? seriesId,
-        Guid? fleetId = null)
+        Guid? fleetId = null,
+        bool includeInactive = false)
     {
         RaceWithOptionsViewModel returnRace;
         if (regattaId.HasValue)
         {
-            returnRace = await CreateRegattaRaceAsync(clubInitials, regattaId);
+            returnRace = await CreateRegattaRaceAsync(clubInitials, regattaId, includeInactive);
         }
         else if (seriesId.HasValue)
         {
-            returnRace = await CreateSeriesRaceAsync(clubInitials, seriesId.Value);
+            returnRace = await CreateSeriesRaceAsync(clubInitials, seriesId.Value, includeInactive);
         }
         else if (fleetId.HasValue)
         {
-            returnRace = await CreateClubRaceAsync(clubInitials, false, fleetId);
+            returnRace = await CreateClubRaceAsync(clubInitials, false, fleetId, includeInactive);
             if (returnRace.FleetOptions.Any(f => f.Id == fleetId.Value))
             {
                 returnRace.FleetId = fleetId.Value;
             }
 
-            returnRace.CompetitorOptions = await _coreCompetitorService.GetCompetitorsAsync(returnRace.ClubId, fleetId, false);
+            returnRace.CompetitorOptions = await _coreCompetitorService.GetCompetitorsAsync(
+                returnRace.ClubId,
+                fleetId,
+                includeInactive);
         }
         else
         {
-            returnRace = await CreateClubRaceAsync(clubInitials, false);
+            returnRace = await CreateClubRaceAsync(clubInitials, false, null, includeInactive);
         }
         if ((returnRace.FleetOptions?.Count ?? 0) == 1)
         {
@@ -162,7 +166,8 @@ public class RaceService : IRaceService
     private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(
         string clubInitials,
         bool isRegatta,
-        Guid? currentFleetId = null)
+        Guid? currentFleetId = null,
+        bool includeInactive = false)
     {
 
         var club = await _coreClubService.GetMinimalClub(clubInitials);
@@ -174,13 +179,15 @@ public class RaceService : IRaceService
             .Where(s => s.Type != SeriesType.Regatta)
             .ToList();
 
-        var fleetOptions = await _coreClubService.GetActiveFleets(club.Id, isRegatta);
+        var allFleets = await _coreClubService.GetAllFleets(club.Id);
+        var fleetOptions = includeInactive
+            ? allFleets
+            : await _coreClubService.GetActiveFleets(club.Id, isRegatta);
         if (currentFleetId.HasValue && !fleetOptions.Any(f => f.Id == currentFleetId.Value))
         {
             // Keep the race's currently-assigned fleet selectable even if it has since
             // been marked inactive, so re-rendering after a validation error doesn't drop it.
-            var currentFleet = (await _coreClubService.GetAllFleets(club.Id))
-                .FirstOrDefault(f => f.Id == currentFleetId.Value);
+            var currentFleet = allFleets.FirstOrDefault(f => f.Id == currentFleetId.Value);
             if (currentFleet != null)
             {
                 fleetOptions = fleetOptions.Append(currentFleet).ToList();
@@ -229,9 +236,10 @@ public class RaceService : IRaceService
 
     private async Task<RaceWithOptionsViewModel> CreateRegattaRaceAsync(
         string clubInitials,
-        Guid? regattaId)
+        Guid? regattaId,
+        bool includeInactive = false)
     {
-        var model = await CreateClubRaceAsync(clubInitials, true);
+        var model = await CreateClubRaceAsync(clubInitials, true, null, includeInactive);
         if (!regattaId.HasValue)
         {
             return model;
@@ -277,9 +285,10 @@ public class RaceService : IRaceService
 
     private async Task<RaceWithOptionsViewModel> CreateSeriesRaceAsync(
         string clubInitials,
-        Guid seriesId)
+        Guid seriesId,
+        bool includeInactive = false)
     {
-        var model = await CreateClubRaceAsync(clubInitials, false);
+        var model = await CreateClubRaceAsync(clubInitials, false, null, includeInactive);
         var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
         // Season doesn't include now. so use last race date or season start.
         if(series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)
@@ -379,7 +388,7 @@ public class RaceService : IRaceService
         return null;
     }
 
-    public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions)
+    public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions, bool includeInactive = false)
        {
            var club = await _coreClubService.GetMinimalClub(raceWithOptions.ClubId);
            raceWithOptions.EnableHandicapScoring = club.EnableHandicapScoring;
@@ -393,9 +402,11 @@ public class RaceService : IRaceService
                // Keep the race's currently-assigned fleet selectable even if it has since
                // been marked inactive, so editing the race doesn't silently drop it.
                var allFleets = await _coreClubService.GetAllFleets(raceWithOptions.ClubId);
-               raceWithOptions.FleetOptions = allFleets
-                   .Where(f => f.IsActive || f.Id == raceWithOptions.FleetId)
-                   .ToList();
+               raceWithOptions.FleetOptions = includeInactive
+                   ? allFleets.ToList()
+                   : allFleets
+                       .Where(f => f.IsActive || f.Id == raceWithOptions.FleetId)
+                       .ToList();
            }
            raceWithOptions.FleetOptions = raceWithOptions.FleetOptions.OrderBy(f => f.ShortName).ToList();
 
@@ -773,13 +784,15 @@ public class RaceService : IRaceService
 
     public async Task<RaceWithOptionsViewModel> FixupRaceWithOptions(
         string clubInitials,
-        RaceWithOptionsViewModel race)
+        RaceWithOptionsViewModel race,
+        bool includeInactive = false)
     {
         var blankRace = await GetBlankRaceWithOptions(
             clubInitials,
             race.RegattaId,
             race.SeriesIds?.FirstOrDefault(),
-            race.FleetId);
+            race.FleetId,
+            includeInactive);
         race.ScoreCodeOptions = blankRace.ScoreCodeOptions;
         race.FleetOptions = blankRace.FleetOptions;
         race.CompetitorBoatClassOptions = blankRace.CompetitorBoatClassOptions;
