@@ -155,7 +155,7 @@ namespace SailScores.Core.Services
             }
             var system = await GetScoringSystemAsync(scoringSystemId.Value, false)
                 .ConfigureAwait(false);
-            _cache.Set($"ScoringSystem-{series.Id}", system, TimeSpan.FromMinutes(2));
+            _cache.Set($"ScoringSystem-{series.Id}", system, TimeSpan.FromMinutes(1));
             return system;
         }
 

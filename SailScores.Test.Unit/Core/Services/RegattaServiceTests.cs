@@ -1,4 +1,6 @@
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using SailScores.Core.Mapping;
 using SailScores.Core.Services;
@@ -89,7 +91,8 @@ public class RegattaServiceTests
             _context,
             _mockCompetitorService.Object,
             _dbObjectBuilder,
-            _mapper
+            _mapper,
+            new MemoryCache(new MemoryCacheOptions())
             );
 
     }
@@ -189,5 +192,89 @@ public class RegattaServiceTests
 
         Assert.Contains(_context.Regattas.First().RegattaFleet, rf =>
                 rf.FleetId == fleet.Id);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenScoringSystemChanges_ClearsAssociatedSeriesScoringOverridesAndRecalculatesResults()
+    {
+        var club = _context.Clubs.First();
+        var season = _context.Seasons.First();
+        var originalScoringSystemId = Guid.NewGuid();
+        var newScoringSystemId = Guid.NewGuid();
+
+        var regatta = new Regatta
+        {
+            Id = Guid.NewGuid(),
+            ClubId = club.Id,
+            Name = "Scoring Update Regatta",
+            UrlName = "scoring-update-regatta",
+            Season = season,
+            ScoringSystemId = originalScoringSystemId,
+            RegattaSeries = new List<RegattaSeries>(),
+            RegattaFleet = new List<RegattaFleet>()
+        };
+
+        _context.Regattas.Add(regatta);
+        await _context.SaveChangesAsync();
+
+        var seriesWithRaces = new Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = club.Id,
+            Name = "Series With Races",
+            UrlName = "series-with-races",
+            Season = season,
+            ScoringSystemId = originalScoringSystemId,
+            RaceSeries = new List<SeriesRace>()
+        };
+
+        var seriesWithoutRaces = new Series
+        {
+            Id = Guid.NewGuid(),
+            ClubId = club.Id,
+            Name = "Series Without Races",
+            UrlName = "series-without-races",
+            Season = season,
+            ScoringSystemId = originalScoringSystemId,
+            RaceSeries = new List<SeriesRace>()
+        };
+
+        _context.Series.AddRange(seriesWithRaces, seriesWithoutRaces);
+        await _context.SaveChangesAsync();
+
+        _context.RegattaSeries.AddRange(
+            new RegattaSeries { RegattaId = regatta.Id, SeriesId = seriesWithRaces.Id },
+            new RegattaSeries { RegattaId = regatta.Id, SeriesId = seriesWithoutRaces.Id });
+
+        _context.SeriesRaces.Add(new SeriesRace
+        {
+            SeriesId = seriesWithRaces.Id,
+            RaceId = Guid.NewGuid()
+        });
+
+        await _context.SaveChangesAsync();
+
+        var model = new SailScores.Core.Model.Regatta
+        {
+            Id = regatta.Id,
+            ClubId = club.Id,
+            Name = regatta.Name,
+            UrlName = regatta.UrlName,
+            Season = new SailScores.Core.Model.Season { Id = season.Id },
+            ScoringSystemId = newScoringSystemId,
+            Fleets = new List<SailScores.Core.Model.Fleet>()
+        };
+
+        await _service.UpdateAsync(model);
+
+        var updatedRegatta = await _context.Regattas.SingleAsync(r => r.Id == regatta.Id);
+        var updatedSeriesWithRaces = await _context.Series.SingleAsync(s => s.Id == seriesWithRaces.Id);
+        var updatedSeriesWithoutRaces = await _context.Series.SingleAsync(s => s.Id == seriesWithoutRaces.Id);
+
+        Assert.Equal(newScoringSystemId, updatedRegatta.ScoringSystemId);
+        Assert.Null(updatedSeriesWithRaces.ScoringSystemId);
+        Assert.Null(updatedSeriesWithoutRaces.ScoringSystemId);
+        _mockSeriesService.Verify(s => s.UpdateSeriesResults(seriesWithRaces.Id, string.Empty, true), Times.Once);
+        _mockSeriesService.Verify(s => s.UpdateSeriesResults(seriesWithoutRaces.Id, string.Empty, true), Times.Never);
     }
 }

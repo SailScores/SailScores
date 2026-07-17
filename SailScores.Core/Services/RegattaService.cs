@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SailScores.Core.Model;
 using SailScores.Core.Utility;
 using SailScores.Database;
@@ -22,6 +23,7 @@ namespace SailScores.Core.Services
         private readonly ICompetitorService _competitorService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
 
         public RegattaService(
             ISeriesService seriesService,
@@ -29,7 +31,8 @@ namespace SailScores.Core.Services
             ISailScoresContext dbContext,
             ICompetitorService competitorService,
             IDbObjectBuilder dbObjBuilder,
-            IMapper mapper)
+            IMapper mapper,
+            IMemoryCache cache)
         {
             _seriesService = seriesService;
             _forwarderService = forwarderService;
@@ -37,6 +40,7 @@ namespace SailScores.Core.Services
             _competitorService = competitorService;
             _dbObjectBuilder = dbObjBuilder;
             _mapper = mapper;
+            _cache = cache;
         }
 
         public async Task<IList<Regatta>> GetAllRegattasAsync(Guid clubId)
@@ -227,6 +231,7 @@ namespace SailScores.Core.Services
 
             var existingRegatta = await _dbContext.Regattas
                 .Include(r => r.RegattaFleet)
+                .Include(r => r.RegattaSeries)
                 .SingleAsync(c => c.Id == model.Id)
                 .ConfigureAwait(false);
 
@@ -242,6 +247,7 @@ namespace SailScores.Core.Services
             existingRegatta.StartDate = model.StartDate;
             existingRegatta.EndDate = model.EndDate;
             existingRegatta.UpdatedDate = DateTime.UtcNow;
+            var existingScoringSystemId = existingRegatta.ScoringSystemId;
             existingRegatta.ScoringSystemId = model.ScoringSystemId;
             existingRegatta.PreferAlternateSailNumbers = model.PreferAlternateSailNumbers;
             existingRegatta.HideFromFrontPage = model.HideFromFrontPage;
@@ -255,6 +261,39 @@ namespace SailScores.Core.Services
             }
 
             CleanupFleets(model, existingRegatta);
+
+            if (existingScoringSystemId != model.ScoringSystemId)
+            {
+                var regattaSeriesIds = existingRegatta.RegattaSeries
+                    .Select(rs => rs.SeriesId)
+                    .ToList();
+
+                if (regattaSeriesIds.Count > 0)
+                {
+                    var associatedSeries = await _dbContext.Series
+                        .Where(s => regattaSeriesIds.Contains(s.Id))
+                        .ToListAsync()
+                        .ConfigureAwait(false);
+
+                    var seriesIdsWithRaces = await _dbContext.Series
+                        .Where(s => regattaSeriesIds.Contains(s.Id) && s.RaceSeries.Any())
+                        .Select(s => s.Id)
+                        .ToListAsync()
+                        .ConfigureAwait(false);
+
+                    foreach (var series in associatedSeries)
+                    {
+                        series.ScoringSystemId = null;
+                        _cache.Remove($"ScoringSystem-{series.Id}");
+
+                        if (seriesIdsWithRaces.Contains(series.Id))
+                        {
+                            await _seriesService.UpdateSeriesResults(series.Id, string.Empty)
+                                .ConfigureAwait(false);
+                        }
+                    }
+                }
+            }
 
             await _dbContext.SaveChangesAsync()
                 .ConfigureAwait(false);
