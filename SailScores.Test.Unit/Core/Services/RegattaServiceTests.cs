@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Mapping;
 using SailScores.Core.Services;
 using SailScores.Database;
@@ -192,6 +193,52 @@ public class RegattaServiceTests
 
         Assert.Contains(_context.Regattas.First().RegattaFleet, rf =>
                 rf.FleetId == fleet.Id);
+    }
+
+    [Fact]
+    public async Task GetRegattaAsync_ForSelectedBoatsFleet_IncludesInactiveCompetitors()
+    {
+        var club = _context.Clubs.First();
+        var season = _context.Seasons.First();
+        var inactiveCompetitor = _context.Competitors.First(c => c.IsActive == false);
+        var selectedBoatsFleet = new Fleet
+        {
+            Id = Guid.NewGuid(),
+            ClubId = club.Id,
+            Name = "Selected Boats Fleet",
+            FleetType = FleetType.SelectedBoats
+        };
+
+        _context.Fleets.Add(selectedBoatsFleet);
+        _context.CompetitorFleets.Add(new CompetitorFleet
+        {
+            FleetId = selectedBoatsFleet.Id,
+            CompetitorId = inactiveCompetitor.Id
+        });
+
+        var regatta = new Regatta
+        {
+            Id = Guid.NewGuid(),
+            ClubId = club.Id,
+            Name = "Inactive Competitor Regatta",
+            UrlName = "inactive-competitor-regatta",
+            Season = season,
+            RegattaFleet = new List<RegattaFleet>
+            {
+                new RegattaFleet
+                {
+                    Fleet = selectedBoatsFleet
+                }
+            },
+            RegattaSeries = new List<RegattaSeries>()
+        };
+
+        _context.Regattas.Add(regatta);
+        await _context.SaveChangesAsync();
+
+        var result = await _service.GetRegattaAsync(regatta.Id);
+
+        Assert.Contains(result.Fleets.Single().Competitors, c => c.Id == inactiveCompetitor.Id);
     }
 
     [Fact]

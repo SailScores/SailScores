@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Utility;
 using SailScores.Database;
@@ -111,9 +112,9 @@ namespace SailScores.Core.Services
 
             foreach (var fleet in fullRegatta.Fleets)
             {
-
+                var includeInactive = fleet.FleetType == FleetType.SelectedBoats;
                 fleet.Competitors =
-                    await _competitorService.GetCompetitorsAsync(regattaDb.ClubId, fleet.Id, false);
+                    await _competitorService.GetCompetitorsAsync(regattaDb.ClubId, fleet.Id, includeInactive);
                 // sort each fleet but allow for alternate sail numbers in sort
                 if (fullRegatta.PreferAlternateSailNumbers)
                 {

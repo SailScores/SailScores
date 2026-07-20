@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -26,6 +26,13 @@ public class RegattaWithOptionsViewModel : Core.Model.Regatta
 
     }
 
-    public IEnumerable<Fleet> FleetOptions { get; internal set; }
+    private IEnumerable<Fleet> _fleetOptions = System.Array.Empty<Fleet>();
+
+    public IEnumerable<Fleet> FleetOptions
+    {
+        get => _fleetOptions ?? System.Array.Empty<Fleet>();
+        internal set => _fleetOptions = value ?? System.Array.Empty<Fleet>();
+    }
+
     public IEnumerable<Guid> FleetIds { get; set; }
 }
