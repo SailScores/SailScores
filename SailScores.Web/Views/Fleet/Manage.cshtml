@@ -20,6 +20,49 @@
 }
 else
 {
+    <div class="row g-2 mb-3 align-items-end">
+        <div class="col-auto">
+            <label for="filter-competitor-status" class="form-label mb-0">Status</label>
+            <select id="filter-competitor-status" class="form-select form-select-sm">
+                <option value="all">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label for="filter-competitor-class" class="form-label mb-0">Class</label>
+            <select id="filter-competitor-class" class="form-select form-select-sm">
+                <option value="all">All Classes</option>
+                @foreach (var boatClass in Model.BoatClasses)
+                {
+                    <option value="@boatClass.Id">@boatClass.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <label for="filter-competitor-fleet" class="form-label mb-0">In Fleet</label>
+            <select id="filter-competitor-fleet" class="form-select form-select-sm">
+                <option value="all">Any Fleet</option>
+                @foreach (var fleet in Model.Fleets)
+                {
+                    <option value="@fleet.Id">@fleet.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <label for="filter-fleet-column" class="form-label mb-0">Show Fleets</label>
+            <select id="filter-fleet-column" class="form-select form-select-sm">
+                <option value="all">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                @foreach (var regatta in Model.Regattas)
+                {
+                    <option value="regatta:@regatta.Id">@regatta.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-bordered table-sm" id="fleetManagementGrid">
             <thead>
@@ -27,7 +70,11 @@ else
                     <th scope="col">Competitor</th>
                     @foreach (var fleet in Model.Fleets)
                     {
-                        <th scope="col" class="fleet-column-header" data-fleet-id="@fleet.Id">@fleet.Name</th>
+                        <th scope="col" class="fleet-column-header" data-fleet-id="@fleet.Id"
+                            data-active="@fleet.IsActive.ToString().ToLowerInvariant()"
+                            data-regatta-ids="@string.Join(",", fleet.RegattaIds)">
+                            @fleet.Name
+                        </th>
                     }
                 </tr>
             </thead>

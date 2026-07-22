@@ -155,11 +155,26 @@ public class FleetService : IFleetService
             .ToList();
 
         var membership = await _coreFleetService.GetCompetitorFleetMembership(clubId);
+        var regattaFleets = await _coreFleetService.GetClubRegattaFleets(clubId);
+        var boatClasses = (await _coreClubService.GetAllBoatClasses(clubId))
+            .OrderBy(c => c.Name)
+            .ToList();
+        var regattas = (await _regattaService.GetAllRegattaSummaryAsync(clubInitials)).ToList();
+
+        var fleetColumns = _mapper.Map<IList<FleetColumn>>(fleets);
+        foreach (var column in fleetColumns)
+        {
+            column.RegattaIds = regattaFleets.TryGetValue(column.Id, out var regattaIds)
+                ? regattaIds.ToList()
+                : new List<Guid>();
+        }
 
         return new FleetManagementViewModel
         {
             ClubInitials = clubInitials,
-            Fleets = _mapper.Map<IList<FleetColumn>>(fleets),
+            Fleets = fleetColumns,
+            BoatClasses = boatClasses,
+            Regattas = regattas,
             Competitors = competitors.Select(c => new CompetitorRow
             {
                 Id = c.Id,
