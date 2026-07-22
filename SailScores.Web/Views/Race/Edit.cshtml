@@ -394,6 +394,7 @@
                    asp-action="Delete"
                    asp-route-id="@Model.Id"
                    asp-route-returnUrl="@Context.Request.Path"
+                   asp-route-successUrl="@(ViewData["ReturnUrl"] as string)"
                    class="btn btn-danger btn-block"
                     >Delete</a>
             </div>

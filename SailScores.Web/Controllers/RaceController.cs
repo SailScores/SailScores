@@ -224,9 +224,11 @@ public class RaceController : Controller
     public async Task<ActionResult> Delete(
         string clubInitials,
         Guid id,
-        string returnUrl = null)
+        string returnUrl = null,
+        string successUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
+        ViewData["SuccessUrl"] = successUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
         var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
         if (race == null)
@@ -244,7 +246,11 @@ public class RaceController : Controller
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
-    public async Task<ActionResult> PostDelete(string clubInitials, Guid id, string returnUrl = null)
+    public async Task<ActionResult> PostDelete(
+        string clubInitials,
+        Guid id,
+        string returnUrl = null,
+        string successUrl = null)
     {
         try
         {
@@ -255,9 +261,18 @@ public class RaceController : Controller
             }
             await _raceService.Delete(id, await GetUserStringAsync());
 
-            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            // returnUrl often points at a page for this specific race (Details/Edit),
+            // which no longer exists once it's deleted. Prefer successUrl (the page the
+            // race's page was itself reached from), and skip any candidate that would
+            // send the browser back to the now-deleted race.
+            foreach (var candidate in new[] { successUrl, returnUrl })
             {
-                return Redirect(returnUrl);
+                if (!string.IsNullOrWhiteSpace(candidate)
+                    && Url.IsLocalUrl(candidate)
+                    && !PointsAtRace(candidate, id))
+                {
+                    return Redirect(candidate);
+                }
             }
 
             return RedirectToAction(nameof(Index), new { clubInitials });
@@ -267,6 +282,13 @@ public class RaceController : Controller
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
+    }
+
+    private static bool PointsAtRace(string url, Guid id)
+    {
+        var path = url.Split('?', '#')[0].TrimEnd('/');
+        return path.EndsWith("/" + id, StringComparison.OrdinalIgnoreCase)
+            && path.Contains("/Race/", StringComparison.OrdinalIgnoreCase);
     }
 
     [HttpGet]
