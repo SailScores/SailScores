@@ -329,4 +329,136 @@ public class FleetServiceTests
         Assert.True(fleetInfo.IsDeletable);
         Assert.Equal(string.Empty, fleetInfo.Reason);
     }
+
+    [Fact]
+    public async Task AddCompetitorToFleet_SelectedBoatsFleet_AddsCompetitorFleetRow()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.SingleAsync(
+            f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats,
+            TestContext.Current.CancellationToken);
+        var newCompetitor = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Not Yet In Fleet",
+            ClubId = _clubId
+        };
+        _context.Competitors.Add(newCompetitor);
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        await _service.AddCompetitorToFleet(fleet.Id, newCompetitor.Id);
+
+        // Assert
+        Assert.Contains(_context.CompetitorFleets,
+            cf => cf.FleetId == fleet.Id && cf.CompetitorId == newCompetitor.Id);
+    }
+
+    [Fact]
+    public async Task AddCompetitorToFleet_CompetitorAlreadyInFleet_IsIdempotent()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.SingleAsync(
+            f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats,
+            TestContext.Current.CancellationToken);
+        var existingMember = await _context.CompetitorFleets.FirstAsync(
+            cf => cf.FleetId == fleet.Id, TestContext.Current.CancellationToken);
+
+        // Act / Assert (no throw)
+        await _service.AddCompetitorToFleet(fleet.Id, existingMember.CompetitorId);
+
+        Assert.Single(_context.CompetitorFleets
+            .Where(cf => cf.FleetId == fleet.Id && cf.CompetitorId == existingMember.CompetitorId));
+    }
+
+    [Fact]
+    public async Task AddCompetitorToFleet_FleetNotSelectedBoatsType_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.FirstAsync(
+            f => f.FleetType == Api.Enumerations.FleetType.AllBoatsInClub && f.ClubId == _clubId,
+            TestContext.Current.CancellationToken);
+        var competitor = await _context.Competitors.FirstAsync(TestContext.Current.CancellationToken);
+
+        // Act / Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _service.AddCompetitorToFleet(fleet.Id, competitor.Id));
+    }
+
+    [Fact]
+    public async Task AddCompetitorToFleet_FleetDoesNotExist_ThrowsKeyNotFoundException()
+    {
+        var competitor = await _context.Competitors.FirstAsync(TestContext.Current.CancellationToken);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _service.AddCompetitorToFleet(Guid.NewGuid(), competitor.Id));
+    }
+
+    [Fact]
+    public async Task RemoveCompetitorFromFleet_SelectedBoatsFleet_RemovesCompetitorFleetRow()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.SingleAsync(
+            f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats,
+            TestContext.Current.CancellationToken);
+        var existingMember = await _context.CompetitorFleets.FirstAsync(
+            cf => cf.FleetId == fleet.Id, TestContext.Current.CancellationToken);
+
+        // Act
+        await _service.RemoveCompetitorFromFleet(fleet.Id, existingMember.CompetitorId);
+
+        // Assert
+        Assert.DoesNotContain(_context.CompetitorFleets,
+            cf => cf.FleetId == fleet.Id && cf.CompetitorId == existingMember.CompetitorId);
+    }
+
+    [Fact]
+    public async Task RemoveCompetitorFromFleet_CompetitorNotInFleet_IsIdempotent()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.SingleAsync(
+            f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats,
+            TestContext.Current.CancellationToken);
+
+        // Act / Assert (no throw)
+        await _service.RemoveCompetitorFromFleet(fleet.Id, Guid.NewGuid());
+    }
+
+    [Fact]
+    public async Task GetCompetitorFleetMembership_Always_GroupsFleetIdsByCompetitorId()
+    {
+        // Arrange
+        var fleet = await _context.Fleets.SingleAsync(
+            f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats,
+            TestContext.Current.CancellationToken);
+        var existingMember = await _context.CompetitorFleets.FirstAsync(
+            cf => cf.FleetId == fleet.Id, TestContext.Current.CancellationToken);
+
+        // Act
+        var membership = await _service.GetCompetitorFleetMembership(_clubId);
+
+        // Assert
+        Assert.True(membership.ContainsKey(existingMember.CompetitorId));
+        Assert.Contains(fleet.Id, membership[existingMember.CompetitorId]);
+    }
+
+    [Fact]
+    public async Task GetCompetitorFleetMembership_CompetitorInNoFleets_OmittedFromResult()
+    {
+        // Arrange
+        var newCompetitor = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "No Fleets",
+            ClubId = _clubId
+        };
+        _context.Competitors.Add(newCompetitor);
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        var membership = await _service.GetCompetitorFleetMembership(_clubId);
+
+        // Assert
+        Assert.False(membership.ContainsKey(newCompetitor.Id));
+    }
 }

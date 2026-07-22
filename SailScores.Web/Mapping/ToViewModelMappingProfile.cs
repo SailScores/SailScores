@@ -72,6 +72,7 @@ namespace SailScores.Web.Mapping
 
             CreateMap<Model.Fleet, FleetSummary>()
                 .ForMember(d => d.Series, o => o.Ignore());
+            CreateMap<Model.Fleet, FleetColumn>();
             CreateMap<Model.Fleet, FleetWithOptionsViewModel>()
                 .ForMember(d => d.BoatClassOptions, o => o.Ignore())
                 .ForMember(d => d.BoatClassIds, o => o.MapFrom(s =>

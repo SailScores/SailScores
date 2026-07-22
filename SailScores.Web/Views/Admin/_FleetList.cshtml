@@ -1,13 +1,21 @@
 @model IEnumerable<SailScores.Web.Models.SailScores.FleetDeleteViewModel>
 <div id="fleetsdiv">
     <div class="row">
-        <div class="col-2 col-sm-4 col-md-3">
+        <div class="col-4 col-sm-6 col-md-5">
             <a class="btn btn-primary"
                 asp-action="Create"
                 asp-controller="Fleet">
                 <span class="fas fa-plus"></span>
                 <span class="d-none d-sm-inline">
                     New Fleet
+                </span>
+            </a>
+            <a class="btn btn-outline-primary"
+                asp-action="Manage"
+                asp-controller="Fleet">
+                <span class="fas fa-users"></span>
+                <span class="d-none d-sm-inline">
+                    Manage Membership
                 </span>
             </a>
         </div>

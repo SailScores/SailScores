@@ -142,4 +142,35 @@ public class FleetService : IFleetService
         }
         return vm;
     }
+
+    public async Task<FleetManagementViewModel> GetFleetManagementViewModel(string clubInitials)
+    {
+        var clubId = await _coreClubService.GetClubId(clubInitials);
+
+        var fleets = (await _coreClubService.GetMinimalForSelectedBoatsFleets(clubId))
+            .OrderBy(f => f.Name)
+            .ToList();
+
+        var competitors = (await _coreCompetitorService.GetCompetitorsAsync(clubId, null, true))
+            .ToList();
+
+        var membership = await _coreFleetService.GetCompetitorFleetMembership(clubId);
+
+        return new FleetManagementViewModel
+        {
+            ClubInitials = clubInitials,
+            Fleets = _mapper.Map<IList<FleetColumn>>(fleets),
+            Competitors = competitors.Select(c => new CompetitorRow
+            {
+                Id = c.Id,
+                Name = c.Name,
+                SailNumber = c.SailNumber,
+                BoatClassId = c.BoatClassId,
+                IsActive = c.IsActive,
+                FleetMembership = fleets.ToDictionary(
+                    f => f.Id,
+                    f => membership.TryGetValue(c.Id, out var ids) && ids.Contains(f.Id))
+            }).ToList()
+        };
+    }
 }

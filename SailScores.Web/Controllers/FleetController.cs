@@ -181,6 +181,17 @@ public class FleetController : Controller
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+    public async Task<ActionResult> Manage(string clubInitials)
+    {
+        ViewData["ClubInitials"] = clubInitials;
+
+        var vm = await _fleetService.GetFleetManagementViewModel(clubInitials);
+        vm.ClubInitials = clubInitials;
+
+        return View(vm);
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         var fleet = await _fleetService.GetFleet(id);

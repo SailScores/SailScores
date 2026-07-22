@@ -1,0 +1,64 @@
+@model SailScores.Web.Models.SailScores.FleetManagementViewModel
+@{
+    ViewBag.Title = Model.ClubInitials + " Fleet Management";
+    Layout = "_ClubLayout";
+}
+
+<h2>Fleet Management</h2>
+<p class="text-muted">Check or uncheck a box to add or remove a competitor from a fleet. Changes save immediately.</p>
+
+<div id="fleetManagementAlert" class="alert alert-danger" style="display:none;" role="alert">
+    Something went wrong saving that change. Please try again.
+</div>
+
+@if (!Model.Fleets.Any())
+{
+    <p>
+        This club has no "Selected Boats" fleets yet.
+        <a asp-controller="Fleet" asp-action="Create">Create one</a> to manage its membership here.
+    </p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm" id="fleetManagementGrid">
+            <thead>
+                <tr>
+                    <th scope="col">Competitor</th>
+                    @foreach (var fleet in Model.Fleets)
+                    {
+                        <th scope="col" class="fleet-column-header" data-fleet-id="@fleet.Id">@fleet.Name</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var comp in Model.Competitors)
+                {
+                    <tr class="competitor-row" data-competitor-id="@comp.Id"
+                        data-boat-class-id="@comp.BoatClassId"
+                        data-active="@comp.IsActive.ToString().ToLowerInvariant()">
+                        <td>
+                            @comp.SailNumber - @comp.Name
+                            @if (!comp.IsActive)
+                            {
+                                <em class="text-warning">(inactive)</em>
+                            }
+                        </td>
+                        @foreach (var fleet in Model.Fleets)
+                        {
+                            <td class="fleet-cell" data-fleet-id="@fleet.Id">
+                                <input type="checkbox" class="fleet-membership-checkbox form-check-input"
+                                       data-competitor-id="@comp.Id" data-fleet-id="@fleet.Id"
+                                       checked="@(comp.FleetMembership.TryGetValue(fleet.Id, out var isMember) && isMember)" />
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/fleetManagement.min.js" asp-append-version="true"></script>
+}
