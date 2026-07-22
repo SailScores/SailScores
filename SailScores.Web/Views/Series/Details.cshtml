@@ -42,6 +42,13 @@
                     title="Edit">
                     <span class="fas fa-pen"></span>
                 </a>
+                <a class="btn btn-sm btn-outline-danger"
+                    asp-action="Delete"
+                    asp-controller="Series"
+                    asp-route-id="@Model.Item.Id"
+                    title="Delete">
+                    <span class="fas fa-trash"></span>
+                </a>
             }
         </h1>
         @if (!String.IsNullOrWhiteSpace(Model.Item.Description))
