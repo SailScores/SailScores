@@ -109,9 +109,12 @@
     @if (SignInManager.IsSignedIn(User))
     {
         var aiUser = await UserManager.GetUserAsync(User);
-        @if (aiUser?.EnableAppInsights ?? false)
+        var aiSnippet = Context.RequestServices.GetService(
+            typeof(Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet))
+            as Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet;
+        @if ((aiUser?.EnableAppInsights ?? false) && aiSnippet is not null)
         {
-            @Html.Raw(JavaScriptSnippet.FullScript)
+            @Html.Raw(aiSnippet.FullScript)
         }
     }
 
