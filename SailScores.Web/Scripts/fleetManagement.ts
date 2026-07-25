@@ -75,3 +75,16 @@ $(document).on(
     applyCompetitorFilters
 );
 $(document).on("change", "#filter-fleet-column", applyFleetFilters);
+
+function refreshGridFromFilters(): void {
+    applyCompetitorFilters();
+    applyFleetFilters();
+}
+
+$(() => {
+    refreshGridFromFilters();
+});
+
+$(window).on("pageshow", () => {
+    refreshGridFromFilters();
+});

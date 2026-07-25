@@ -40,6 +40,12 @@
                                     Utilities
                                 </button>
                                 <div class="dropdown-menu">
+                                  <a class="dropdown-item"
+                                     asp-action="Manage"
+                                     asp-controller="Fleet"
+                                     asp-route-clubInitials="@Model.ClubInitials">
+                                      Fleet Membership
+                                  </a>
                                     <a class="dropdown-item" asp-action="Options" asp-controller="MergeCompetitor">
                                         Merge Two Competitors
                                     </a>

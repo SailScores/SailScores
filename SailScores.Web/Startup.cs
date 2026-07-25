@@ -231,11 +231,13 @@ public class Startup
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
+#if !DEBUG
         services.AddApplicationInsightsTelemetry(options =>
         {
             options.ConnectionString = Configuration["ApplicationInsights:ConnectionString"];
             options.EnableRequestTrackingTelemetryModule = true;
         });
+#endif
 
         services.AddHttpContextAccessor();
     }

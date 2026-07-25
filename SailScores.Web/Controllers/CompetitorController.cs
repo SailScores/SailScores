@@ -407,8 +407,10 @@ public class CompetitorController : Controller
 
     // GET: Competitor/Edit/5
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
-    public async Task<ActionResult> Edit(string clubInitials, Guid id)
+    public async Task<ActionResult> Edit(string clubInitials, Guid id, string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
+
         var clubId = await _clubService.GetClubId(clubInitials);
 
         var compWithOptions = await _competitorService.GetCompetitorWithHistoryAsync(id);
@@ -454,10 +456,14 @@ public class CompetitorController : Controller
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Edit(
         Guid id,
-        CompetitorWithOptionsViewModel competitor)
+        CompetitorWithOptionsViewModel competitor,
+        string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
+
         try
         {
+
 
             IEnumerable<KeyValuePair<string, string>> errors =
                 await _competitorService.GetSaveErrors(competitor);
@@ -510,6 +516,11 @@ public class CompetitorController : Controller
             if (saveClub.EnableCustomCompetitorFields)
             {
                 await SaveCustomFieldValuesAsync(competitor.Id, competitor);
+            }
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
             }
 
             return RedirectToAction("Index", "Competitor");

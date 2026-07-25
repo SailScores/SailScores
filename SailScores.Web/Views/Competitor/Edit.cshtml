@@ -11,7 +11,8 @@
 <hr />
 <div class="row">
     <div class="col-12 col-lg-10 col-xl-8">
-        <form asp-action="Edit">
+        <form asp-action="Edit"
+              asp-route-returnUrl="@ViewData["ReturnUrl"]">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
             <div asp-validation-summary="All" class="text-danger"></div>
@@ -141,9 +142,17 @@
             <br />
             <div class="mb-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-controller="Competitor"
-                   asp-action="Index"
-                   class="btn btn-outline-primary">Cancel</a>
+                @if (String.IsNullOrWhiteSpace((String)ViewData["ReturnUrl"]))
+                {
+                    <a asp-controller="Competitor"
+                       asp-action="Index"
+                       class="btn btn-outline-primary">Cancel</a>
+                }
+                else
+                {
+                    <a href="@ViewData["ReturnUrl"]"
+                       class="btn btn-outline-primary">Cancel</a>
+                }
             </div>
         </form>
     </div>
