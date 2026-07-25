@@ -32,7 +32,7 @@ namespace SailScores.Test.Unit.Core.Scoring
                     PreserveResult = false,
                     Discardable = true,
                     Started = false,
-                    FormulaValue = 1,
+                    FormulaValue = 1m,
                     AdjustOtherScores = null,
                     CameToStart = false,
                     Finished = false,

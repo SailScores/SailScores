@@ -600,6 +600,10 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasForeignKey(ch => ch.HandicapSystemId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<ScoreCode>()
+            .Property(sc => sc.FormulaValueDecimal)
+            .HasColumnType("decimal(6, 3)");
+
         modelBuilder.Entity<CompetitorHandicap>()
             .Property(ch => ch.Value)
             .HasColumnType("decimal(18, 6)");

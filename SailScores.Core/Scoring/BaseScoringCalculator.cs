@@ -195,7 +195,7 @@ namespace SailScores.Core.Scoring
         protected virtual decimal? GetPenaltyScore(CalculatedScore score, Race race, ScoreCode scoreCode, SeriesResults seriesResults = null)
         {
             var dnfScore = GetDnfScore(race, seriesResults) ?? 1;
-            var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
+            var percentAdjustment = scoreCode?.FormulaValue ?? 20m;
             var percent = Math.Round(dnfScore * percentAdjustment / 100m, 1, MidpointRounding.AwayFromZero);
 
             return Math.Min(dnfScore, percent + (score.ScoreValue ?? score.RawScore.Place ?? 0));
@@ -223,7 +223,7 @@ namespace SailScores.Core.Scoring
                 ? race.Scores
                 : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
 
-            return relevantScores.Count(s => CountsAsStarted(s)) + dnfCode.FormulaValue;
+            return relevantScores.Count(s => CountsAsStarted(s)) + (dnfCode.FormulaValue ?? 0m);
         }
 
         protected virtual decimal? GetDefaultScore(Race race, SeriesResults resultsWorkInProgress)
@@ -247,14 +247,14 @@ namespace SailScores.Core.Scoring
             {
                 //Assume it's competitors plus for now. I suppose the default could be
                 // the competitors average, but that would create all sort of problems, I think.
-                return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0);
+                return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0m);
             }
 
             var relevantScores = (_useOriginalPlace || resultsWorkInProgress == null)
                 ? race.Scores
                 : race.Scores.Where(s => resultsWorkInProgress.Competitors.Any(c => c.Id == s.CompetitorId));
 
-            return relevantScores.Count(s => CountsAsStarted(s)) + defaultCode.FormulaValue;
+            return relevantScores.Count(s => CountsAsStarted(s)) + (defaultCode.FormulaValue ?? 0m);
         }
 
         protected bool IsAverage(string code)
@@ -505,7 +505,7 @@ namespace SailScores.Core.Scoring
                         Id = Guid.NewGuid(),
                         Name = "Default",
                         Formula = "FIN+",
-                        FormulaValue = 2,
+                        FormulaValue = 2m,
                         CameToStart = false,
                         Finished = false,
                         Discardable = true
@@ -606,7 +606,7 @@ namespace SailScores.Core.Scoring
         private string GetNumberIfExists(ScoreCode codeDef)
         {
 
-            if ((codeDef.FormulaValue ?? 0) == 0)
+            if ((codeDef.FormulaValue ?? 0m) == 0m)
             {
                 return string.Empty;
             }
@@ -847,7 +847,7 @@ namespace SailScores.Core.Scoring
                 AVERAGE_FORMULANAME => CalculateAverage(compResults),
                 AVE_AFTER_DISCARDS_FORMULANAME => CalculateAverageNoDiscards(compResults),
                 AVE_PRIOR_RACES_FORMULANAME => CalculateAverageOfPrior(compResults, race),
-                SERIESCOMPETITORS_FORMULANAME => GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0),
+                SERIESCOMPETITORS_FORMULANAME => GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0m),
                 _ => null,
             };
         }
@@ -912,10 +912,10 @@ namespace SailScores.Core.Scoring
             {
                 FINISHERSPLUS_FORMULANAME =>
                     relevantScores.Count(s => CountsAsFinished(s)) +
-                        scoreCode.FormulaValue,
+                        (scoreCode.FormulaValue ?? 0m),
                 CAMETOSTARTPLUS_FORMULANAME =>
                     relevantScores.Count(s => CameToStart(s)) +
-                        scoreCode.FormulaValue,
+                        (scoreCode.FormulaValue ?? 0m),
                 PLACEPLUSPERCENT_FORMULANAME =>
                     GetPenaltyScore(score, race, scoreCode, seriesResults),
                 _ =>

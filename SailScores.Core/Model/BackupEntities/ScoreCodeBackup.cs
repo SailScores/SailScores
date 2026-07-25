@@ -11,7 +11,7 @@ public class ScoreCodeBackup
     public string Name { get; set; }
     public string Description { get; set; }
     public string Formula { get; set; }
-    public int? FormulaValue { get; set; }
+    public decimal? FormulaValue { get; set; }
     public string ScoreLike { get; set; }
     public bool? Discardable { get; set; }
     public bool? CameToStart { get; set; }
