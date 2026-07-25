@@ -583,13 +583,13 @@ namespace SailScores.Core.Scoring
                     returnString.Append("Average of results in prior races");
                     break;
                 case "PLC%":
-                    returnString.Append($"Place + penalty ({codeDef.FormulaValue}% of DNF score)");
+                    returnString.Append($"Place + penalty ({codeDef.FormulaValue?.ToString("0.###")}% of DNF score)");
                     break;
                 case "MAN":
                     returnString.Append($"Manually entered value");
                     break;
                 case "FIX":
-                    returnString.Append($"Fixed at {codeDef.FormulaValue}");
+                    returnString.Append($"Fixed at {codeDef.FormulaValue?.ToString("0.###")}");
                     break;
                 case "TIE":
                     returnString.Append($"Average of tied places");
@@ -611,7 +611,7 @@ namespace SailScores.Core.Scoring
                 return string.Empty;
             }
 
-            return $" + {codeDef.FormulaValue}";
+            return $" + {codeDef.FormulaValue?.ToString("0.###")}";
         }
 
         private SeriesResults GetResults(Series series)
