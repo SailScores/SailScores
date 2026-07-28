@@ -18,16 +18,94 @@ public class AuthorizationService : IAuthorizationService
         _cache = cache;
     }
 
+    // opted for speedier code with few allocations over readability: this method will be called on every access from an
+    // authenticated user, so speed is paramount.
+    public string? GetUserEmailOrName(ClaimsPrincipal? claimsPrincipal)
+    {
+        string? fallback = null;
+
+        if (TryUseCandidate(claimsPrincipal?.FindFirst(ClaimTypes.Email)?.Value, ref fallback, out var value)) return value;
+        if (TryUseCandidate(claimsPrincipal?.FindFirst("email")?.Value, ref fallback, out value)) return value;
+        if (TryUseCandidate(claimsPrincipal?.FindFirst(ClaimTypes.Name)?.Value, ref fallback, out value)) return value;
+        if (TryUseCandidate(claimsPrincipal?.FindFirst("name")?.Value, ref fallback, out value)) return value;
+        if (TryUseCandidate(claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, ref fallback, out value))
+            return value;
+        if (TryUseCandidate(claimsPrincipal?.FindFirst("sub")?.Value, ref fallback, out value)) return value;
+        if (TryUseCandidate(claimsPrincipal?.Identity?.Name, ref fallback, out value)) return value;
+
+        return fallback;
+    }
+
+    private static bool TryUseCandidate(string? candidate, ref string? fallback, out string? email)
+    {
+        email = null;
+        if (string.IsNullOrWhiteSpace(candidate))
+        {
+            return false;
+        }
+
+        if (fallback is null)
+        {
+            fallback = candidate;
+        }
+
+        if (!LooksLikeEmail(candidate))
+        {
+            return false;
+        }
+
+        email = candidate;
+        return true;
+    }
+
+    private static bool LooksLikeEmail(string value)
+    {
+        var at = value.IndexOf('@');
+        if (at <= 0 || at != value.LastIndexOf('@') || at == value.Length - 1)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < at; i++)
+        {
+            if (char.IsWhiteSpace(value[i]))
+            {
+                return false;
+            }
+        }
+
+        var domain = value.AsSpan(at + 1);
+        var hasDot = false;
+
+        for (var i = 0; i < domain.Length; i++)
+        {
+            var c = domain[i];
+            if (char.IsWhiteSpace(c))
+            {
+                return false;
+            }
+
+            if (c != '.')
+            {
+                continue;
+            }
+
+            if (i == 0 || i == domain.Length - 1 || domain[i - 1] == '.')
+            {
+                return false;
+            }
+
+            hasDot = true;
+        }
+
+        return hasDot;
+    }
+
     public async Task<bool> CanUserEdit(
         ClaimsPrincipal claimsPrincipal,
         string clubInitials)
     {
-        var email = claimsPrincipal?.FindFirst("sub")?.Value;
-        if (String.IsNullOrWhiteSpace(email))
-        {
-            email = claimsPrincipal?.Identity?.Name;
-        }
-
+        var email = GetUserEmailOrName(claimsPrincipal);
         if (string.IsNullOrWhiteSpace(email))
         {
             return false;
@@ -48,11 +126,12 @@ public class AuthorizationService : IAuthorizationService
         ClaimsPrincipal claimsPrincipal,
         Guid clubId)
     {
-        var email = claimsPrincipal.FindFirst("sub")?.Value;
-        if (String.IsNullOrWhiteSpace(email))
+        var email = GetUserEmailOrName(claimsPrincipal);
+        if (string.IsNullOrWhiteSpace(email))
         {
-            email = claimsPrincipal.Identity.Name;
+            return false;
         }
+
         return await _userService.IsUserAllowedToEdit(
             email,
             clubId);
@@ -60,11 +139,12 @@ public class AuthorizationService : IAuthorizationService
 
     public async Task<bool> IsUserFullAdmin(ClaimsPrincipal user)
     {
-        var email = user.FindFirst("sub")?.Value;
-        if (String.IsNullOrWhiteSpace(email))
+        var email = GetUserEmailOrName(user);
+        if (string.IsNullOrWhiteSpace(email))
         {
-            email = user.Identity.Name;
+            return false;
         }
+
         return await _userService.IsUserFullAdmin(
             email);
     }
@@ -85,11 +165,7 @@ public class AuthorizationService : IAuthorizationService
         ClaimsPrincipal claimsPrincipal,
         Guid clubId)
     {
-        var email = claimsPrincipal?.FindFirst("sub")?.Value;
-        if (String.IsNullOrWhiteSpace(email))
-        {
-            email = claimsPrincipal?.Identity?.Name;
-        }
+        var email = GetUserEmailOrName(claimsPrincipal);
 
         if (string.IsNullOrWhiteSpace(email))
         {
@@ -103,11 +179,7 @@ public class AuthorizationService : IAuthorizationService
         ClaimsPrincipal claimsPrincipal,
         Guid clubId)
     {
-        var email = claimsPrincipal?.FindFirst("sub")?.Value;
-        if (String.IsNullOrWhiteSpace(email))
-        {
-            email = claimsPrincipal?.Identity?.Name;
-        }
+        var email = GetUserEmailOrName(claimsPrincipal);
 
         if (string.IsNullOrWhiteSpace(email))
         {
@@ -121,11 +193,7 @@ public class AuthorizationService : IAuthorizationService
         ClaimsPrincipal claimsPrincipal,
         string clubInitials)
     {
-        var email = claimsPrincipal?.FindFirst("sub")?.Value;
-        if (String.IsNullOrWhiteSpace(email))
-        {
-            email = claimsPrincipal?.Identity?.Name;
-        }
+        var email = GetUserEmailOrName(claimsPrincipal);
 
         if (string.IsNullOrWhiteSpace(email))
         {
@@ -147,11 +215,7 @@ public class AuthorizationService : IAuthorizationService
         ClaimsPrincipal claimsPrincipal,
         Guid clubId)
     {
-        var email = claimsPrincipal?.FindFirst("sub")?.Value;
-        if (String.IsNullOrWhiteSpace(email))
-        {
-            email = claimsPrincipal?.Identity?.Name;
-        }
+        var email = GetUserEmailOrName(claimsPrincipal);
 
         if (string.IsNullOrWhiteSpace(email))
         {
