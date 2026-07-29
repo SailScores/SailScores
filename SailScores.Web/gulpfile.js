@@ -64,11 +64,11 @@ gulp.task("min:js", function () {
 gulp.task("min:css", function () {
     // Concatenate CSS with `custom.css` emitted last so its rules (including dark-mode variables) win the cascade
     return gulp.src([
-        'wwwroot/css/bootstrap.min.css',            // bootstrap first
-        'wwwroot/css/*.css',                        // other css files
-        '!' + paths.minCss,                         // exclude previously generated min
-        '!' + 'wwwroot/css/custom.css',             // exclude custom so we can add it last
-        'wwwroot/css/custom.css'                    // add custom.css last
+        'wwwroot/vendor/bootstrap/css/bootstrap.css', // bootstrap first
+        'wwwroot/css/*.css',                          // other css files
+        '!' + paths.minCss,                           // exclude previously generated min
+        '!' + 'wwwroot/css/custom.css',               // exclude custom so we can add it last
+        'wwwroot/css/custom.css'                      // add custom.css last
     ], { allowEmpty: true })
         .pipe(concat(paths.concatCssDest))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
