@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
 
@@ -25,7 +25,9 @@ public class ScoreCodeViewModel
     public string Formula { get; set; }
 
     [Display(Name = "Formula Value")]
-    public int? FormulaValue { get; set; }
+    [Range(0, 999.999, ErrorMessage = "Formula Value must be between 0 and 999.999.")]
+    [DisplayFormat(DataFormatString = "{0:0.###}", ApplyFormatInEditMode = true)]
+    public decimal? FormulaValue { get; set; }
     [Display(Name = "Score like another code:")]
     public string ScoreLike { get; set; }
     [Display(Name = "Result can be discarded")]

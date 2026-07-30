@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Api.Dtos
@@ -12,7 +12,7 @@ namespace SailScores.Api.Dtos
         [StringLength(1000)]
         public String Description { get; set; }
         public string Formula { get; set; }
-        public int? FormulaValue { get; set; }
+        public decimal? FormulaValue { get; set; }
         public string ScoreLike { get; set; }
         public bool? Discardable { get; set; }
         public bool? CameToStart { get; set; }

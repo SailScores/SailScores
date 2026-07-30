@@ -213,7 +213,8 @@ public class BackupService : IBackupService
                 Name = sc.Name,
                 Description = sc.Description,
                 Formula = sc.Formula,
-                FormulaValue = sc.FormulaValue,
+                FormulaValue = sc.FormulaValueDecimal ??
+                    (sc.FormulaValue.HasValue ? Convert.ToDecimal(sc.FormulaValue.Value) : (decimal?)null),
                 ScoreLike = sc.ScoreLike,
                 Discardable = sc.Discardable,
                 CameToStart = sc.CameToStart,
@@ -1664,7 +1665,10 @@ public class BackupService : IBackupService
                 Name = sc.Name,
                 Description = sc.Description,
                 Formula = sc.Formula,
-                FormulaValue = sc.FormulaValue,
+                FormulaValueDecimal = sc.FormulaValue,
+                FormulaValue = sc.FormulaValue.HasValue
+                    ? Convert.ToInt32(decimal.Truncate(sc.FormulaValue.Value))
+                    : null,
                 ScoreLike = sc.ScoreLike,
                 Discardable = sc.Discardable,
                 CameToStart = sc.CameToStart,

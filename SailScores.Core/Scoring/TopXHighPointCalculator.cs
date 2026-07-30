@@ -176,7 +176,7 @@ public class TopXHighPointCalculator : BaseScoringCalculator
             : race.Scores.Where(s => seriesResults.Competitors.Any(c => c.Id == s.CompetitorId));
 
         var fleetSize = relevantScores.Count(s => CameToStart(s));
-        var percentAdjustment = Convert.ToDecimal(scoreCode?.FormulaValue ?? 20);
+        var percentAdjustment = scoreCode?.FormulaValue ?? 20m;
         var percent = Math.Round(fleetSize * percentAdjustment / 100m, MidpointRounding.AwayFromZero);
 
         return Math.Max(dnfScore, (score.ScoreValue ?? 0) - percent);

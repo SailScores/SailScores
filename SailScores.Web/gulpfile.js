@@ -9,7 +9,9 @@ var gulp = require("gulp"),
     named = require('vinyl-named'),
     rename = require('gulp-rename'),
     webpack = require('webpack-stream'),
-    exec = require('child_process').exec;
+    exec = require('child_process').exec,
+    fs = require('fs'),
+    path = require('path');
 
 var paths = {
     webroot: "./wwwroot/"
@@ -62,14 +64,22 @@ gulp.task("min:js", function () {
 });
 
 gulp.task("min:css", function () {
-    // Concatenate CSS with `custom.css` emitted last so its rules (including dark-mode variables) win the cascade
-    return gulp.src([
-        'wwwroot/css/bootstrap.min.css',            // bootstrap first
-        'wwwroot/css/*.css',                        // other css files
-        '!' + paths.minCss,                         // exclude previously generated min
-        '!' + 'wwwroot/css/custom.css',             // exclude custom so we can add it last
-        'wwwroot/css/custom.css'                    // add custom.css last
-    ], { allowEmpty: true })
+    // Include all non-minified CSS, then emit `custom.css` last so its rules win the cascade.
+    var cssDirectory = path.join(paths.webroot, "css");
+    var cssSources = fs.readdirSync(cssDirectory)
+        .filter(function (fileName) {
+            var lowerName = fileName.toLowerCase();
+            return lowerName.endsWith(".css") &&
+                !lowerName.endsWith(".min.css") &&
+                lowerName !== "custom.css";
+        })
+        .map(function (fileName) {
+            return path.posix.join("wwwroot/css", fileName);
+        });
+
+    cssSources.push("wwwroot/css/custom.css");
+
+    return gulp.src(cssSources, { allowEmpty: true })
         .pipe(concat(paths.concatCssDest))
         .pipe(cleanCSS({ compatibility: 'ie8' }))
         .pipe(gulp.dest("."));

@@ -132,7 +132,7 @@
                                 @code.Name
                             </td>
                             <td>@code.Description</td>
-                            <td>@code.Formula@code.FormulaValue</td>
+                            <td>@code.Formula@(code.FormulaValue?.ToString("0.###") ?? string.Empty)</td>
                             <td>@((code.Discardable ?? false) ? "Yes" : "No")</td>
                             <td>@((code.CameToStart ?? false) ? "Yes" : "No")</td>
                             <td>@((code.Started ?? false) ? "Yes" : "No")</td>
@@ -159,7 +159,7 @@
                             </td>
                             <td>@code.Name</td>
                             <td>@code.Description</td>
-                            <td>@code.Formula@code.FormulaValue</td>
+                            <td>@code.Formula@(code.FormulaValue?.ToString("0.###") ?? string.Empty)</td>
                             <td>@((code.Discardable ?? false) ? "Yes" : "No")</td>
                             <td>@((code.CameToStart ?? false) ? "Yes" : "No")</td>
                             <td>@((code.Started ?? false) ? "Yes" : "No")</td>

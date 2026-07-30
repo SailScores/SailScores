@@ -1,9 +1,11 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
 namespace SailScores.Web.Services.Interfaces;
 
 public interface IAuthorizationService
 {
+    string? GetUserEmailOrName(ClaimsPrincipal? claimsPrincipal);
+
     Task<bool> CanUserEdit(
         ClaimsPrincipal claimsPrincipal,
         string clubInitials);
