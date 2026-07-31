@@ -80,8 +80,9 @@ public class RaceController : Controller
         });
     }
 
-    public async Task<ActionResult> Details(string clubInitials, Guid id)
+    public async Task<ActionResult> Details(string clubInitials, Guid id, string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
 
         if (race == null)
@@ -237,7 +238,7 @@ public class RaceController : Controller
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
-    public async Task<ActionResult> PostDelete(string clubInitials, Guid id)
+    public async Task<ActionResult> PostDelete(string clubInitials, Guid id, string returnUrl = null)
     {
         try
         {
@@ -248,10 +249,16 @@ public class RaceController : Controller
             }
             await _raceService.Delete(id, await GetUserStringAsync());
 
-            return RedirectToAction("Index", "Race");
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction(nameof(Index), new { clubInitials });
         }
         catch
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
     }

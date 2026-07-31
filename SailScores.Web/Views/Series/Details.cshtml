@@ -17,11 +17,15 @@
     ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} Scores - {Model.ClubInitials}";
     Layout = "_ClubLayout";
     ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
-    ViewData["MetaDescription"] = 
+    ViewData["MetaDescription"] =
         $"Results for {Model.Item.Season?.Name} {Model.Item.Name} series racing at {Model.ClubName}";
+
+    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
+        Model.Item.SeriesResultsTemplate, Model.Item.Type == SeriesType.Regatta);
 }
 
-<div class="row">
+<div class="d-flex justify-content-between align-items-start">
+<div class="row flex-grow-1">
     <div class="col-md-8">
         @Model.Item.Season.Name
         <h1 class="h2">
@@ -107,6 +111,12 @@
         }
     </div>
 </div>
+    @if (resolvedTemplate.ShowClubLogo && Model.ClubLogoFileId.HasValue)
+    {
+        <img src="@Url.Action("GetLogo", "Admin", new { id = Model.ClubLogoFileId })"
+             class="series-club-logo ms-3" alt="@Model.ClubName logo" />
+    }
+</div>
 @{
     bool showTrend = (Model.Item.TrendOption ?? TrendOption.None) != TrendOption.None
                 && (Model.Item.FlatResults?.Races?.DefaultIfEmpty().Max(r => r?.Date ?? DateTime.MinValue) ?? DateTime.MinValue)
@@ -121,10 +131,6 @@
         .GetDisplayValue(Model.Item.TrendOption.Value)];
     }
 
-    // Resolve template settings
-    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(Model.Item.SeriesResultsTemplate)
-        ?? SeriesResultsTemplateHelper.GetDefaultTemplate(Model.Item.Type == SeriesType.Regatta);
-
     var tableModel = new ResultsTableViewModel
     {
         SeriesId = Model.Item.Id,
@@ -136,6 +142,7 @@
         BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
         BoatNameHeader = resolvedTemplate.BoatNameHeader,
         CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
+        ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
         IsExport = false,
         ShowExportButtons = true,
         ExcludeCompetitorLinks = false,

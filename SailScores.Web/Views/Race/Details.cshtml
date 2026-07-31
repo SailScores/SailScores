@@ -8,6 +8,11 @@
     ViewBag.Title = Model.ClubInitials + " " + localizer.GetFullRaceName(Model.Item);
     ViewData["MetaDescription"] = $"{Model.ClubInitials} {localizer.GetFullRaceName(Model.Item)} Race Results";
     Layout = "_ClubLayout";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+    if (string.IsNullOrWhiteSpace(returnUrl))
+    {
+        returnUrl = Context.Request.Path;
+    }
 }
 <div class="container">
     <div class="row">
@@ -28,7 +33,7 @@
                 <a class="btn btn-outline-danger btn-sm"
                    asp-area=""
                    asp-action="Delete"
-                   asp-route-returnUrl="@Context.Request.Path"
+                   asp-route-returnUrl="@returnUrl"
                    asp-route-id="@Model.Item.Id">Delete</a>
             }
             @if (Model.Item.Regatta != null)

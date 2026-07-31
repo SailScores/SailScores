@@ -133,7 +133,7 @@ public class RaceService : IRaceService
         }
         else if (fleetId.HasValue)
         {
-            returnRace = await CreateClubRaceAsync(clubInitials, false);
+            returnRace = await CreateClubRaceAsync(clubInitials, false, fleetId);
             if (returnRace.FleetOptions.Any(f => f.Id == fleetId.Value))
             {
                 returnRace.FleetId = fleetId.Value;
@@ -161,7 +161,8 @@ public class RaceService : IRaceService
 
     private async Task<RaceWithOptionsViewModel> CreateClubRaceAsync(
         string clubInitials,
-        bool isRegatta)
+        bool isRegatta,
+        Guid? currentFleetId = null)
     {
 
         var club = await _coreClubService.GetMinimalClub(clubInitials);
@@ -173,10 +174,23 @@ public class RaceService : IRaceService
             .Where(s => s.Type != SeriesType.Regatta)
             .ToList();
 
+        var fleetOptions = await _coreClubService.GetActiveFleets(club.Id, isRegatta);
+        if (currentFleetId.HasValue && !fleetOptions.Any(f => f.Id == currentFleetId.Value))
+        {
+            // Keep the race's currently-assigned fleet selectable even if it has since
+            // been marked inactive, so re-rendering after a validation error doesn't drop it.
+            var currentFleet = (await _coreClubService.GetAllFleets(club.Id))
+                .FirstOrDefault(f => f.Id == currentFleetId.Value);
+            if (currentFleet != null)
+            {
+                fleetOptions = fleetOptions.Append(currentFleet).ToList();
+            }
+        }
+
         var model = new RaceWithOptionsViewModel
         {
             ClubId = club.Id,
-            FleetOptions = await _coreClubService.GetActiveFleets(club.Id, isRegatta),
+            FleetOptions = fleetOptions,
             SeriesOptions = filteredSeries,
             ScoreCodeOptions = (await _coreScoringService.GetScoreCodesAsync(club.Id))
                 .OrderBy(s => s.Name).ToList(),
@@ -279,8 +293,9 @@ public class RaceService : IRaceService
             }
         }
 
-        // Ensure default date falls within series date range.
-        // Prefer series enforced dates when DateRestricted is true.
+        // Ensure default date falls within the series date range only when the series
+        // is explicitly date restricted. Series start/end values are not used as a
+        // default date limit because they commonly reflect the last race in the series.
         DateTime candidateDate = model.Date ?? DateTime.Today;
         if (series.DateRestricted == true)
         {
@@ -288,19 +303,6 @@ public class RaceService : IRaceService
             if (restrictedDate != null)
             {
                 model.Date = restrictedDate;
-            }
-        }
-        else if (series.StartDate.HasValue && series.EndDate.HasValue)
-        {
-            var start = series.StartDate.Value.ToDateTime(TimeOnly.MinValue);
-            var end = series.EndDate.Value.ToDateTime(TimeOnly.MinValue);
-            if (candidateDate > end)
-            {
-                model.Date = end;
-            }
-            else if (candidateDate < start)
-            {
-                model.Date = start;
             }
         }
 
@@ -383,7 +385,12 @@ public class RaceService : IRaceService
            }
            else
            {
-               raceWithOptions.FleetOptions = await _coreClubService.GetActiveFleets(raceWithOptions.ClubId);
+               // Keep the race's currently-assigned fleet selectable even if it has since
+               // been marked inactive, so editing the race doesn't silently drop it.
+               var allFleets = await _coreClubService.GetAllFleets(raceWithOptions.ClubId);
+               raceWithOptions.FleetOptions = allFleets
+                   .Where(f => f.IsActive || f.Id == raceWithOptions.FleetId)
+                   .ToList();
            }
            raceWithOptions.FleetOptions = raceWithOptions.FleetOptions.OrderBy(f => f.ShortName).ToList();
 

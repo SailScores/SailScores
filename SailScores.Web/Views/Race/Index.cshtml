@@ -15,6 +15,7 @@
     ViewData["MetaDescription"] = $"{Model.ClubName} {localizer["Races"]} list";
     Layout = "_ClubLayout";
     bool hasExcluded = false;
+    var returnUrl = settingsService.GetRelativeUri(Context.Request);
 }
 
 @section Sidebar {
@@ -77,6 +78,7 @@
                     asp-action="Delete"
                     asp-controller="Race"
                     asp-route-id="@race.Id"
+                    asp-route-returnUrl="@returnUrl"
                     title="Delete"><span class="fas fa-trash"></span></a>
                     &nbsp;
                     <a class="btn btn-sm btn-outline-primary"
@@ -95,7 +97,8 @@
                             <a id="smallracelink_@race.Id"
                             asp-action="Details"
                             asp-controller="Race"
-                            asp-route-id=@race.Id>
+                            asp-route-id=@race.Id
+                            asp-route-returnUrl="@returnUrl">
                                 @race.FleetName:
                                 @race.SuperShortName
                             </a>
@@ -104,7 +107,8 @@
                             <a id="racelink_@race.Id"
                             asp-action="Details"
                             asp-controller="Race"
-                            asp-route-id=@race.Id>
+                            asp-route-id=@race.Id
+                            asp-route-returnUrl="@returnUrl">
                                 @race.FleetName:
                                 @race.CalculatedMediumName
                             </a>

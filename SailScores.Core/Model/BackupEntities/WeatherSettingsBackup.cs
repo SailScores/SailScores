@@ -1,3 +1,5 @@
+using System;
+
 namespace SailScores.Core.Model.BackupEntities;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace SailScores.Core.Model.BackupEntities;
 /// </summary>
 public class WeatherSettingsBackup
 {
+    public Guid Id { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
     public string TemperatureUnits { get; set; }

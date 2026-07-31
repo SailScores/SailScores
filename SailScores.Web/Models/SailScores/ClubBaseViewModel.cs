@@ -6,6 +6,8 @@ public abstract class ClubBaseViewModel
 
     public string ClubName;
 
+    public Guid? ClubLogoFileId { get; set; }
+
     public bool CanEdit { get; set; }
 
     public bool CanEditSeries { get; set; }
