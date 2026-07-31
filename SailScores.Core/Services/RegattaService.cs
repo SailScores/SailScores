@@ -233,6 +233,7 @@ namespace SailScores.Core.Services
             var existingRegatta = await _dbContext.Regattas
                 .Include(r => r.RegattaFleet)
                 .Include(r => r.RegattaSeries)
+                .AsSplitQuery()
                 .SingleAsync(c => c.Id == model.Id)
                 .ConfigureAwait(false);
 
