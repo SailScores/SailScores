@@ -1,5 +1,6 @@
-using SailScores.Api.Enumerations;
 using System;
+using System.Collections.Generic;
+using SailScores.Api.Enumerations;
 
 namespace SailScores.Core.Model;
 
@@ -18,4 +19,5 @@ public class SeriesResultsTemplate
     public ColumnVisibility CompetitorClubVisibility { get; set; }
     public bool ShowPreDiscardTotal { get; set; }
     public bool ShowClubLogo { get; set; }
+    public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 }

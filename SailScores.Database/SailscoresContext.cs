@@ -48,6 +48,9 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<SeriesToSeriesLink> SeriesToSeriesLinks { get; set; }
 
     public DbSet<SeriesResultsTemplate> SeriesResultsTemplates { get; set; }
+    public DbSet<CompetitorFieldDefinition> CompetitorFieldDefinitions { get; set; }
+    public DbSet<CompetitorFieldValue> CompetitorFieldValues { get; set; }
+    public DbSet<SeriesResultsTemplateCustomField> SeriesResultsTemplateCustomFields { get; set; }
 
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
@@ -342,6 +345,48 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasForeignKey(t => t.ClubId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<CompetitorFieldDefinition>()
+            .HasOne(d => d.Club)
+            .WithMany(c => c.CompetitorFieldDefinitions)
+            .HasForeignKey(d => d.ClubId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CompetitorFieldValue>()
+            .HasOne(v => v.Competitor)
+            .WithMany(c => c.CustomFieldValues)
+            .HasForeignKey(v => v.CompetitorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<CompetitorFieldValue>()
+            .HasOne(v => v.FieldDefinition)
+            .WithMany(d => d.Values)
+            .HasForeignKey(v => v.FieldDefinitionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SeriesResultsTemplateCustomField>()
+            .HasOne(f => f.SeriesResultsTemplate)
+            .WithMany(t => t.CustomFields)
+            .HasForeignKey(f => f.SeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SeriesResultsTemplateCustomField>()
+            .HasOne(f => f.FieldDefinition)
+            .WithMany(d => d.TemplateFields)
+            .HasForeignKey(f => f.FieldDefinitionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CompetitorFieldDefinition>()
+            .HasIndex(d => new { d.ClubId, d.DisplayOrder })
+            .HasDatabaseName("IX_CompetitorFieldDefinition_ClubOrder");
+
+        modelBuilder.Entity<CompetitorFieldValue>()
+            .HasIndex(v => new { v.CompetitorId, v.FieldDefinitionId })
+            .HasDatabaseName("IX_CompetitorFieldValue_CompetitorField");
+
+        modelBuilder.Entity<SeriesResultsTemplateCustomField>()
+            .HasIndex(f => new { f.SeriesResultsTemplateId, f.FieldDefinitionId })
+            .HasDatabaseName("IX_TemplateCustomField_TemplateField");
+
         modelBuilder.Entity<Series>()
             .HasOne(s => s.SeriesResultsTemplate)
             .WithMany()
@@ -554,6 +599,10 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .WithMany()
             .HasForeignKey(ch => ch.HandicapSystemId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ScoreCode>()
+            .Property(sc => sc.FormulaValueDecimal)
+            .HasColumnType("decimal(6, 3)");
 
         modelBuilder.Entity<CompetitorHandicap>()
             .Property(ch => ch.Value)

@@ -70,7 +70,7 @@ public class SupporterServiceTests
         _context.Supporters.Add(expiredSupporter);
         _context.Supporters.Add(hiddenSupporter);
         _context.Supporters.Add(noExpirationSupporter);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetVisibleSupportersAsync();
@@ -105,7 +105,7 @@ public class SupporterServiceTests
 
         _context.Supporters.Add(supporter1);
         _context.Supporters.Add(supporter2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetAllSupportersAsync();
@@ -130,7 +130,7 @@ public class SupporterServiceTests
         };
 
         _context.Supporters.Add(supporter);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetSupporterAsync(supporterId);
@@ -156,7 +156,7 @@ public class SupporterServiceTests
         };
 
         _context.Supporters.Add(supporter);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.DeleteSupporter(supporterId);

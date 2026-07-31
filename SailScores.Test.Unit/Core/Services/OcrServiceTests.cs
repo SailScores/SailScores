@@ -26,9 +26,15 @@ public class OcrServiceTests
     {
         private readonly HttpResponseMessage _response;
         public TestHandler(HttpResponseMessage response) => _response = response;
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        => Task.FromResult(_response);
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(_response);
+        }
     }
+
 
     [Fact]
     public async Task AnalyzeImageAsync_Returns_AllLines_InOrder()

@@ -34,7 +34,7 @@ public class BackupServiceTests
     public async Task CreateBackupAsync_WithValidClub_ReturnsBackupData()
     {
         // Act
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(backup);
@@ -52,14 +52,14 @@ public class BackupServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _service.CreateBackupAsync(invalidClubId, "testuser"));
+            () => _service.CreateBackupAsync(invalidClubId, "testuser", TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public async Task CreateBackupAsync_WithClubData_BacksUpAllEntities()
     {
         // Act
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Assert - Verify all collections are populated or at least initialized
         Assert.NotNull(backup.BoatClasses);
@@ -102,10 +102,10 @@ public class BackupServiceTests
             ParentSystemId = parentSystem.Id
         };
         _context.ScoringSystems.Add(childSystem);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Assert
         var backedUpChild = backup.ScoringSystems.FirstOrDefault(s => s.Name == "Child System");
@@ -127,7 +127,7 @@ public class BackupServiceTests
         };
         _context.HandicapSystems.Add(clubSystem);
 
-        var competitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId);
+        var competitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId, TestContext.Current.CancellationToken);
         _context.CompetitorHandicaps.Add(new Db.CompetitorHandicap
         {
             Id = Guid.NewGuid(),
@@ -138,10 +138,10 @@ public class BackupServiceTests
             Notes = "Test handicap"
         });
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Contains(backup.HandicapSystems, hs => hs.Name == "Club Handicap");
@@ -229,10 +229,10 @@ public class BackupServiceTests
     public async Task RestoreBackupAsync_WithValidBackup_RestoresData()
     {
         // Arrange
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        var result = await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(result);
@@ -246,25 +246,25 @@ public class BackupServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _service.RestoreBackupAsync(_clubId, invalidBackup));
+            () => _service.RestoreBackupAsync(_clubId, invalidBackup, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public async Task RestoreBackupAsync_PreserveClubName_KeepsClubName()
     {
         // Arrange
-        var club = await _context.Clubs.FindAsync(_clubId);
+        var club = await _context.Clubs.FirstAsync(c => c.Id == _clubId, TestContext.Current.CancellationToken);
         var originalName = club.Name;
         var originalInitials = club.Initials;
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
         backup.Name = "Different Name";
         backup.Url = "http://different.url";
 
         // Act
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var restoredClub = await _context.Clubs.FindAsync(_clubId);
+        var restoredClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId, TestContext.Current.CancellationToken);
         Assert.Equal(originalName, restoredClub.Name); // Name is preserved
         Assert.Equal("http://different.url", restoredClub.Url); // URL is always updated
         Assert.Equal(originalInitials, restoredClub.Initials); // Initials are always preserved
@@ -274,18 +274,18 @@ public class BackupServiceTests
     public async Task RestoreBackupAsync_DontPreserveClubName_UpdatesClubNameButNotUrl()
     {
         // Arrange
-        var club = await _context.Clubs.FindAsync(_clubId);
+        var club = await _context.Clubs.FirstAsync(c => c.Id == _clubId, TestContext.Current.CancellationToken);
         var originalInitials = club.Initials;
         var originalUrl = club.Url;
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
         backup.Name = "Different Name";
         backup.Url = "http://different.url";
 
         // Act
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: false);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: false, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var restoredClub = await _context.Clubs.FindAsync(_clubId);
+        var restoredClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId, TestContext.Current.CancellationToken);
         Assert.Equal("Different Name", restoredClub.Name); // Name is updated
         Assert.Equal("http://different.url", restoredClub.Url); // URL is always updated
         Assert.Equal(originalInitials, restoredClub.Initials); // Initials are always preserved
@@ -295,8 +295,8 @@ public class BackupServiceTests
     public async Task RestoreBackupAsync_ClearsExistingData_BeforeRestore()
     {
         // Arrange
-        var initialCompetitorCount = await _context.Competitors.CountAsync(c => c.ClubId == _clubId);
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var initialCompetitorCount = await _context.Competitors.CountAsync(c => c.ClubId == _clubId, TestContext.Current.CancellationToken);
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Add a new competitor
         _context.Competitors.Add(new Db.Competitor
@@ -307,16 +307,16 @@ public class BackupServiceTests
             SailNumber = "999",
             BoatClassId = _context.BoatClasses.First(bc => bc.ClubId == _clubId).Id
         });
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var beforeRestoreCount = await _context.Competitors.CountAsync(c => c.ClubId == _clubId);
+        var beforeRestoreCount = await _context.Competitors.CountAsync(c => c.ClubId == _clubId, TestContext.Current.CancellationToken);
         Assert.Equal(initialCompetitorCount + 1, beforeRestoreCount);
 
         // Act
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - Should be back to original count (new GUIDs but same data)
-        var afterRestoreCount = await _context.Competitors.CountAsync(c => c.ClubId == _clubId);
+        var afterRestoreCount = await _context.Competitors.CountAsync(c => c.ClubId == _clubId, TestContext.Current.CancellationToken);
         Assert.Equal(initialCompetitorCount, afterRestoreCount);
     }
 
@@ -331,18 +331,18 @@ public class BackupServiceTests
         var originalCompetitors = await _context.Competitors
             .Where(c => c.ClubId == _clubId)
             .AsNoTracking()
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
 
         // Act - Backup
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Act - Restore
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var restoredCompetitors = await _context.Competitors
             .Where(c => c.ClubId == _clubId)
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(originalCompetitors.Count, restoredCompetitors.Count);
 
@@ -368,16 +368,16 @@ public class BackupServiceTests
         var originalBoatClasses = await _context.BoatClasses
             .Where(bc => bc.ClubId == _clubId)
             .AsNoTracking()
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
         
         // Assert
         var restoredBoatClasses = await _context.BoatClasses
             .Where(bc => bc.ClubId == _clubId)
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
         
         Assert.Equal(originalBoatClasses.Count, restoredBoatClasses.Count);
         
@@ -396,16 +396,16 @@ public class BackupServiceTests
         var originalSeasons = await _context.Seasons
             .Where(s => s.ClubId == _clubId)
             .AsNoTracking()
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var restoredSeasons = await _context.Seasons
             .Where(s => s.ClubId == _clubId)
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(originalSeasons.Count, restoredSeasons.Count);
 
@@ -441,17 +441,17 @@ public class BackupServiceTests
             ParentSystemId = parentSystem.Id
         };
         _context.ScoringSystems.Add(childSystem);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         var restoredParent = await _context.ScoringSystems
-            .FirstOrDefaultAsync(s => s.ClubId == _clubId && s.Name == "Test Parent System");
+            .FirstOrDefaultAsync(s => s.ClubId == _clubId && s.Name == "Test Parent System", TestContext.Current.CancellationToken);
         var restoredChild = await _context.ScoringSystems
-            .FirstOrDefaultAsync(s => s.ClubId == _clubId && s.Name == "Test Child System");
+            .FirstOrDefaultAsync(s => s.ClubId == _clubId && s.Name == "Test Child System", TestContext.Current.CancellationToken);
 
         Assert.NotNull(restoredParent);
         Assert.NotNull(restoredChild);
@@ -462,11 +462,11 @@ public class BackupServiceTests
     public async Task RestoreBackupAsync_RestoresHandicapSystemsAndReferences()
     {
         // Arrange
-        var sourceClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId);
+        var sourceClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId, TestContext.Current.CancellationToken);
         sourceClub.EnableHandicapScoring = true;
 
         var siteWideParent = await _context.HandicapSystems
-            .FirstOrDefaultAsync(h => h.ClubId == null && h.SystemType == Db.HandicapSystemType.PhrfToT);
+            .FirstOrDefaultAsync(h => h.ClubId == null && h.SystemType == Db.HandicapSystemType.PhrfToT, TestContext.Current.CancellationToken);
 
         if (siteWideParent == null)
         {
@@ -503,13 +503,13 @@ public class BackupServiceTests
 
         sourceClub.DefaultHandicapSystemId = clubHandicapChild.Id;
 
-        var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId);
+        var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId, TestContext.Current.CancellationToken);
         fleet.DefaultHandicapSystemId = clubHandicapChild.Id;
 
-        var series = await _context.Series.FirstAsync(s => s.ClubId == _clubId);
+        var series = await _context.Series.FirstAsync(s => s.ClubId == _clubId, TestContext.Current.CancellationToken);
         series.HandicapSystemId = clubHandicapChild.Id;
 
-        var competitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId);
+        var competitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId, TestContext.Current.CancellationToken);
         _context.CompetitorHandicaps.Add(new Db.CompetitorHandicap
         {
             Id = Guid.NewGuid(),
@@ -519,9 +519,9 @@ public class BackupServiceTests
             Notes = "Round-trip"
         });
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
 
         // Force fallback path for child's parent resolution by removing restored parent from payload.
         backup.HandicapSystems = backup.HandicapSystems
@@ -529,31 +529,31 @@ public class BackupServiceTests
             .ToList();
 
         // Act
-        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        var restoredClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId);
+        var restoredClub = await _context.Clubs.FirstAsync(c => c.Id == _clubId, TestContext.Current.CancellationToken);
         Assert.True(restoredClub.EnableHandicapScoring);
         Assert.True(restoredClub.DefaultHandicapSystemId.HasValue);
 
         var restoredChild = await _context.HandicapSystems
-            .FirstAsync(h => h.ClubId == _clubId && h.Name == "Club Child");
+            .FirstAsync(h => h.ClubId == _clubId && h.Name == "Club Child", TestContext.Current.CancellationToken);
         Assert.True(restoredChild.ParentSystemId.HasValue);
 
         var restoredParent = await _context.HandicapSystems
-            .FirstOrDefaultAsync(h => h.Id == restoredChild.ParentSystemId.Value);
+            .FirstOrDefaultAsync(h => h.Id == restoredChild.ParentSystemId.Value, TestContext.Current.CancellationToken);
         Assert.NotNull(restoredParent);
         Assert.Equal(Db.HandicapSystemType.PhrfToT, restoredParent.SystemType);
 
-        var restoredFleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId);
+        var restoredFleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId, TestContext.Current.CancellationToken);
         Assert.Equal(restoredChild.Id, restoredFleet.DefaultHandicapSystemId);
 
-        var restoredSeries = await _context.Series.FirstAsync(s => s.ClubId == _clubId);
+        var restoredSeries = await _context.Series.FirstAsync(s => s.ClubId == _clubId, TestContext.Current.CancellationToken);
         Assert.Equal(restoredChild.Id, restoredSeries.HandicapSystemId);
 
-        var restoredCompetitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId);
+        var restoredCompetitor = await _context.Competitors.FirstAsync(c => c.ClubId == _clubId, TestContext.Current.CancellationToken);
         var restoredCompetitorHandicap = await _context.CompetitorHandicaps
-            .FirstOrDefaultAsync(ch => ch.CompetitorId == restoredCompetitor.Id);
+            .FirstOrDefaultAsync(ch => ch.CompetitorId == restoredCompetitor.Id, TestContext.Current.CancellationToken);
         Assert.NotNull(restoredCompetitorHandicap);
         Assert.Equal(restoredChild.Id, restoredCompetitorHandicap.HandicapSystemId);
         Assert.Equal(123.45m, restoredCompetitorHandicap.Value);
@@ -563,13 +563,13 @@ public class BackupServiceTests
     public async Task RestoreBackupAsync_OlderBackupWithoutHandicapData_DoesNotThrow()
     {
         // Arrange
-        var backup = await _service.CreateBackupAsync(_clubId, "testuser");
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
         backup.HandicapSystems = null;
         backup.CompetitorHandicaps = null;
         backup.DefaultHandicapSystemName = null;
 
         // Act
-        var result = await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+        var result = await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(result);
@@ -581,20 +581,20 @@ public class BackupServiceTests
         // Arrange
         var fleet = await _context.Fleets
             .Include(f => f.FleetBoatClasses)
-            .FirstOrDefaultAsync(f => f.ClubId == _clubId);
+            .FirstOrDefaultAsync(f => f.ClubId == _clubId, TestContext.Current.CancellationToken);
 
         if (fleet != null && fleet.FleetBoatClasses?.Any() == true)
         {
             var originalAssociationCount = fleet.FleetBoatClasses.Count;
 
             // Act
-            var backup = await _service.CreateBackupAsync(_clubId, "testuser");
-            await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true);
+            var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+            await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
 
             // Assert
             var restoredFleet = await _context.Fleets
                 .Include(f => f.FleetBoatClasses)
-                .FirstOrDefaultAsync(f => f.ClubId == _clubId && f.Name == fleet.Name);
+                .FirstOrDefaultAsync(f => f.ClubId == _clubId && f.Name == fleet.Name, TestContext.Current.CancellationToken);
 
             Assert.NotNull(restoredFleet);
             Assert.Equal(originalAssociationCount, restoredFleet.FleetBoatClasses.Count);

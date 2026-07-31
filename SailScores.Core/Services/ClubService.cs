@@ -565,6 +565,7 @@ namespace SailScores.Core.Services
             dbClub.ShowCalendarInNav = club.ShowCalendarInNav;
             dbClub.EnableHandicapScoring = club.EnableHandicapScoring;
             dbClub.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers;
+            dbClub.EnableCustomCompetitorFields = club.EnableCustomCompetitorFields;
             dbClub.DefaultHandicapSystemId = club.DefaultHandicapSystemId;
             dbClub.DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId;
             dbClub.DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId;
@@ -593,6 +594,7 @@ namespace SailScores.Core.Services
                 .ThenInclude(f => f.FleetBoatClasses)
                 .Include(c => c.BoatClasses)
                 .Include(c => c.Seasons)
+                .AsSplitQuery()
                 .FirstAsync()
                 .ConfigureAwait(false);
 

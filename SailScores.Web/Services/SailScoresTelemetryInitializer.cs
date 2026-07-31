@@ -1,6 +1,5 @@
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
@@ -10,7 +9,7 @@ namespace SailScores.Web.Services;
 /// Custom telemetry initializer for Application Insights that adds SailScores-specific context
 /// and filters unnecessary telemetry for cost optimization
 /// </summary>
-public class SailScoresTelemetryInitializer : ITelemetryInitializer
+public class SailScoresTelemetryInitializer
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 

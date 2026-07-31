@@ -509,6 +509,13 @@ public class CompetitorService : ICompetitorService
             .Competitors
             .SingleAsync(c => c.Id == competitorId)
             .ConfigureAwait(false);
+
+        var customFieldValues = await _dbContext.CompetitorFieldValues
+            .Where(v => v.CompetitorId == competitorId)
+            .ToListAsync()
+            .ConfigureAwait(false);
+        _dbContext.CompetitorFieldValues.RemoveRange(customFieldValues);
+
         _dbContext.Competitors.Remove(dbComp);
         await _dbContext.SaveChangesAsync()
             .ConfigureAwait(false);

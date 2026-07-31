@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SailScores.Core.Services;
 using SailScores.Database;
 using SailScores.Test.Unit.Utilities;
@@ -53,7 +53,7 @@ namespace SailScores.Test.Unit.Core.Services
         public async Task BuildDbSeries_Always_AddsRaces()
         {
             // arrange
-            var clubId = (await _context.Clubs.FirstAsync()).Id;
+            var clubId = (await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken)).Id;
 
             var series = 
                 new Series
@@ -76,7 +76,7 @@ namespace SailScores.Test.Unit.Core.Services
                                     {
                                         ClubId = clubId,
                                         Id =(await _context
-                                            .Competitors.FirstAsync()).Id
+                                            .Competitors.FirstAsync(TestContext.Current.CancellationToken)).Id
                                     }
                                 }
                             }
@@ -109,7 +109,7 @@ namespace SailScores.Test.Unit.Core.Services
                             Competitor = new Competitor
                             {
                                 Id =(await _context
-                                .Competitors.FirstAsync()).Id
+                                .Competitors.FirstAsync(TestContext.Current.CancellationToken)).Id
                             }
                         }
                     }
@@ -117,7 +117,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             // act
             var result = await _service.BuildDbRaceObj(
-                (await _context.Clubs.FirstAsync()).Id,
+                (await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken)).Id,
                 race);
 
             // assert

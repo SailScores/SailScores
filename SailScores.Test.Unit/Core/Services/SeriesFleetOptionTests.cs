@@ -97,7 +97,7 @@ public class SeriesFleetOptionTests
         var seriesId = await _seriesService.SaveNewSeries(series);
 
         // Assert - FleetId should be persisted
-        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId);
+        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken);
         Assert.Equal(fleet.Id, dbSeries.FleetId);
     }
 
@@ -125,7 +125,7 @@ public class SeriesFleetOptionTests
         var seriesId = await _seriesService.SaveNewSeries(series);
 
         // Assert - UseFullRaceScores should be persisted as true
-        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId);
+        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken);
         Assert.True(dbSeries.UseFullRaceScores);
     }
 
@@ -153,7 +153,7 @@ public class SeriesFleetOptionTests
         var seriesId = await _seriesService.SaveNewSeries(series);
 
         // Assert - UseFullRaceScores should be persisted as false
-        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId);
+        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken);
         Assert.False(dbSeries.UseFullRaceScores == true);
     }
 
@@ -180,7 +180,7 @@ public class SeriesFleetOptionTests
         var seriesId = await _seriesService.SaveNewSeries(series);
 
         // Assert - FleetId should remain null
-        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId);
+        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken);
         Assert.Null(dbSeries.FleetId);
     }
 
@@ -206,7 +206,7 @@ public class SeriesFleetOptionTests
             RaceSeries = new List<Database.Entities.SeriesRace>()
         };
         _context.Series.Add(dbSeries);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var series = await _seriesService.GetSeriesDetailsAsync(clubInitials, season.UrlName, "test-series");
@@ -235,7 +235,7 @@ public class SeriesFleetOptionTests
             FleetType = Api.Enumerations.FleetType.SelectedBoats
         };
         _context.Fleets.Add(fleet2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Create series with first fleet
         var series = new Series
@@ -252,13 +252,13 @@ public class SeriesFleetOptionTests
         var seriesId = await _seriesService.SaveNewSeries(series);
 
         // Act - Update series to use second fleet
-        var seriesToUpdate = _mapper.Map<Series>(await _context.Series.SingleAsync(s => s.Id == seriesId));
+        var seriesToUpdate = _mapper.Map<Series>(await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken));
         seriesToUpdate.FleetId = fleet2.Id;
         seriesToUpdate.UseFullRaceScores = true;
         await _seriesService.Update(seriesToUpdate);
 
         // Assert - Changes should be persisted
-        var dbUpdated = await _context.Series.SingleAsync(s => s.Id == seriesId);
+        var dbUpdated = await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken);
         Assert.Equal(fleet2.Id, dbUpdated.FleetId);
         Assert.True(dbUpdated.UseFullRaceScores);
     }
@@ -285,13 +285,13 @@ public class SeriesFleetOptionTests
         var seriesId = await _seriesService.SaveNewSeries(series);
 
         // Act - Remove fleet filter
-        var seriesToUpdate = _mapper.Map<Series>(await _context.Series.SingleAsync(s => s.Id == seriesId));
+        var seriesToUpdate = _mapper.Map<Series>(await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken));
         seriesToUpdate.FleetId = null;
         seriesToUpdate.UseFullRaceScores = null;
         await _seriesService.Update(seriesToUpdate);
 
         // Assert - FleetId should be null
-        var dbUpdated = await _context.Series.SingleAsync(s => s.Id == seriesId);
+        var dbUpdated = await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken);
         Assert.Null(dbUpdated.FleetId);
     }
 
@@ -312,7 +312,7 @@ public class SeriesFleetOptionTests
             FleetType = Api.Enumerations.FleetType.SelectedBoats
         };
         _context.Fleets.Add(inactiveFleet);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var series = new Series
         {
@@ -330,7 +330,7 @@ public class SeriesFleetOptionTests
         var seriesId = await _seriesService.SaveNewSeries(series);
 
         // Assert - Should persist inactive fleet reference
-        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId);
+        var dbSeries = await _context.Series.SingleAsync(s => s.Id == seriesId, TestContext.Current.CancellationToken);
         Assert.Equal(inactiveFleet.Id, dbSeries.FleetId);
     }
 

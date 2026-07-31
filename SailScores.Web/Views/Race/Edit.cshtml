@@ -54,12 +54,25 @@
                 </a>
                 <select id="fleetId" asp-for="FleetId" class="form-select">
                     <option selected="selected">Select a fleet...</option>
-                    @foreach (var fleet in Model.FleetOptions)
+                    @foreach (var fleet in Model.FleetOptions.OrderBy(f => f.Name))
                     {
-                        <option value="@fleet.Id"
-                                data-boat-class-id="@(fleet.BoatClasses?.Count == 1 ? fleet.BoatClasses[0].Id.ToString():"")">
-                            @fleet.Name @(fleet.IsActive ? "" : " (Inactive)")
-                        </option>
+                      var isSelected = Model.FleetId == fleet.Id
+                            || (Model.FleetOptions.Count == 1 && Model.FleetId == null);
+                        var boatClassId = fleet.BoatClasses?.Count == 1
+                            ? fleet.BoatClasses[0].Id.ToString()
+                            : string.Empty;
+                        if (isSelected)
+                        {
+                            <option value="@fleet.Id" selected="selected" data-boat-class-id="@boatClassId">
+                                @fleet.Name @(fleet.IsActive ? "" : " (Inactive)")
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@fleet.Id" data-boat-class-id="@boatClassId">
+                                @fleet.Name @(fleet.IsActive ? "" : " (Inactive)")
+                            </option>
+                        }
                     }
                 </select>
                 <span asp-validation-for="FleetId" class="text-danger"></span>
@@ -381,6 +394,7 @@
                    asp-action="Delete"
                    asp-route-id="@Model.Id"
                    asp-route-returnUrl="@Context.Request.Path"
+                   asp-route-successUrl="@(ViewData["ReturnUrl"] as string)"
                    class="btn btn-danger btn-block"
                     >Delete</a>
             </div>

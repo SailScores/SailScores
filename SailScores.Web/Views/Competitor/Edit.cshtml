@@ -10,11 +10,11 @@
 <h2>Edit Competitor</h2>
 <hr />
 <div class="row">
-    <div class="col-12 col-md-8 col-lg-6 col-xl-4">
+    <div class="col-12 col-lg-10 col-xl-8">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ClubId" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Name" class="control-label
                        @(ViewData.ModelState["SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
@@ -82,6 +82,53 @@
                                 <label asp-for="IsActive" class="form-check-label"></label>
                                 <span asp-validation-for="IsActive" class="text-danger"></span>
                             </div>
+                            @if (Model.CustomFieldValues != null && Model.CustomFieldValues.Any())
+                            {
+                                <div class="mb-3">
+                                    <h5 class="h6">Custom Fields</h5>
+                                    @for (var fieldIndex = 0; fieldIndex < Model.CustomFieldValues.Count; fieldIndex++)
+                                    {
+                                        var field = Model.CustomFieldValues[fieldIndex];
+                                        <div class="border rounded p-3 mb-3">
+                                            <div class="fw-bold mb-2">@(string.IsNullOrWhiteSpace(field.DisplayHeader) ? field.Name : field.DisplayHeader)</div>
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].FieldDefinitionId" />
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].DisplayHeader" />
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].DataType" />
+                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].ShowDates" />
+
+                                            <div class="custom-field-value-rows">
+                                                @for (var valueIndex = 0; valueIndex < field.Values.Count; valueIndex++)
+                                                {
+                                                    var valueRow = field.Values[valueIndex];
+                                                    <div class="row g-2 align-items-end mb-2 custom-field-value-row">
+                                                        <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].Id" />
+                                                        <div class="col-12 col-lg-5">
+                                                            <label class="form-label">Value</label>
+                                                            <input asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].Value" class="form-control" type="@(field.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")" />
+                                                        </div>
+                                                        <div class="col-6 col-lg-3">
+                                                            <label class="form-label">Effective From</label>
+                                                            <input asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].EffectiveFrom" class="form-control" type="date" />
+                                                        </div>
+                                                        <div class="col-6 col-lg-3">
+                                                            <label class="form-label">Effective To</label>
+                                                            <input asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].EffectiveTo" class="form-control" type="date" />
+                                                        </div>
+                                                        <div class="col-12 col-lg-1 d-flex align-items-end">
+                                                            <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()" title="Remove">
+                                                                <span class="fas fa-trash"></span>
+                                                                <span class="visually-hidden">Remove</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addCustomFieldValueRow(this, '@fieldIndex', '@(field.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")')">Add Value</button>
+                                        </div>
+                                    }
+                                </div>
+                            }
                             <div class="mb-3">
                                 <label asp-for="Notes" class="control-label"></label>
                                 <input asp-for="Notes" class="form-control" />
@@ -262,4 +309,42 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script src="~/vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+<script>
+function addCustomFieldValueRow(button, fieldIndex, fieldDataType) {
+    const fieldContainer = button.parentElement;
+    const rowContainer = fieldContainer.querySelector('.custom-field-value-rows');
+    if (!rowContainer) {
+        return;
+    }
+
+    const existingRows = rowContainer.querySelectorAll('.custom-field-value-row');
+    const nextIndex = existingRows.length;
+    const inputType = fieldDataType === 'number' ? 'number' : 'text';
+
+    const rowMarkup = `
+        <div class="row g-2 align-items-end mb-2 custom-field-value-row">
+            <input type="hidden" name="CustomFieldValues[${fieldIndex}].Values[${nextIndex}].Id" value="" />
+            <div class="col-12 col-lg-5">
+                <label class="form-label">Value</label>
+                <input name="CustomFieldValues[${fieldIndex}].Values[${nextIndex}].Value" class="form-control" type="${inputType}" />
+            </div>
+            <div class="col-6 col-lg-3">
+                <label class="form-label">Effective From</label>
+                <input name="CustomFieldValues[${fieldIndex}].Values[${nextIndex}].EffectiveFrom" class="form-control" type="date" />
+            </div>
+            <div class="col-6 col-lg-3">
+                <label class="form-label">Effective To</label>
+                <input name="CustomFieldValues[${fieldIndex}].Values[${nextIndex}].EffectiveTo" class="form-control" type="date" />
+            </div>
+            <div class="col-12 col-lg-1 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()" title="Remove">
+                    <span class="fas fa-trash"></span>
+                    <span class="visually-hidden">Remove</span>
+                </button>
+            </div>
+        </div>`;
+
+    rowContainer.insertAdjacentHTML('beforeend', rowMarkup);
+}
+</script>
 }

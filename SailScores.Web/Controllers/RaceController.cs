@@ -108,6 +108,7 @@ public class RaceController : Controller
         string clubInitials,
         Guid? regattaId,
         Guid? seriesId,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -115,7 +116,9 @@ public class RaceController : Controller
             await _raceService.GetBlankRaceWithOptions(
                 clubInitials,
                 regattaId,
-                seriesId);
+                seriesId,
+                null,
+                includeInactive);
         var errors = _adminTipService.GetRaceCreateErrors(race);
         if (errors != null && errors.Count > 0)
         {
@@ -132,13 +135,14 @@ public class RaceController : Controller
     public async Task<ActionResult> Create(
         string clubInitials,
         RaceWithOptionsViewModel race,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
 
         if (!ModelState.IsValid)
         {
-            race = await _raceService.FixupRaceWithOptions(clubInitials, race);
+            race = await _raceService.FixupRaceWithOptions(clubInitials, race, includeInactive);
 
             return View(race);
         }
@@ -164,6 +168,7 @@ public class RaceController : Controller
     public async Task<ActionResult> Edit(
         string clubInitials,
         Guid id,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -181,7 +186,7 @@ public class RaceController : Controller
 
         var raceWithOptions = _mapper.Map<RaceWithOptionsViewModel>(race);
 
-        await _raceService.AddOptionsToRace(raceWithOptions);
+        await _raceService.AddOptionsToRace(raceWithOptions, includeInactive);
         raceWithOptions.UseAdvancedFeatures = club.UseAdvancedFeatures ?? false;
         raceWithOptions.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers ?? false;
 
@@ -195,6 +200,7 @@ public class RaceController : Controller
         string clubInitials,
         Guid id,
         RaceWithOptionsViewModel race,
+        bool includeInactive = false,
         string returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -202,7 +208,7 @@ public class RaceController : Controller
 
         if (!ModelState.IsValid)
         {
-            race = await _raceService.FixupRaceWithOptions(clubInitials, race);
+            race = await _raceService.FixupRaceWithOptions(clubInitials, race, includeInactive);
 
             return View(race);
         }
@@ -218,9 +224,11 @@ public class RaceController : Controller
     public async Task<ActionResult> Delete(
         string clubInitials,
         Guid id,
-        string returnUrl = null)
+        string returnUrl = null,
+        string successUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
+        ViewData["SuccessUrl"] = successUrl;
         var clubId = await _clubService.GetClubId(clubInitials);
         var race = await _raceService.GetSingleRaceDetailsAsync(clubInitials, id);
         if (race == null)
@@ -238,7 +246,11 @@ public class RaceController : Controller
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
-    public async Task<ActionResult> PostDelete(string clubInitials, Guid id, string returnUrl = null)
+    public async Task<ActionResult> PostDelete(
+        string clubInitials,
+        Guid id,
+        string returnUrl = null,
+        string successUrl = null)
     {
         try
         {
@@ -249,9 +261,18 @@ public class RaceController : Controller
             }
             await _raceService.Delete(id, await GetUserStringAsync());
 
-            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            // returnUrl often points at a page for this specific race (Details/Edit),
+            // which no longer exists once it's deleted. Prefer successUrl (the page the
+            // race's page was itself reached from), and skip any candidate that would
+            // send the browser back to the now-deleted race.
+            foreach (var candidate in new[] { successUrl, returnUrl })
             {
-                return Redirect(returnUrl);
+                if (!string.IsNullOrWhiteSpace(candidate)
+                    && Url.IsLocalUrl(candidate)
+                    && !PointsAtRace(candidate, id))
+                {
+                    return Redirect(candidate);
+                }
             }
 
             return RedirectToAction(nameof(Index), new { clubInitials });
@@ -261,6 +282,13 @@ public class RaceController : Controller
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
+    }
+
+    private static bool PointsAtRace(string url, Guid id)
+    {
+        var path = url.Split('?', '#')[0].TrimEnd('/');
+        return path.EndsWith("/" + id, StringComparison.OrdinalIgnoreCase)
+            && path.Contains("/Race/", StringComparison.OrdinalIgnoreCase);
     }
 
     [HttpGet]

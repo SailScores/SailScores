@@ -1,4 +1,5 @@
 using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
@@ -40,6 +41,10 @@ public class SeriesResultsTemplateViewModel
 
     [Display(Name = "Show Club Logo")]
     public bool ShowClubLogo { get; set; }
+
+    public IList<TemplateCustomFieldSelectionViewModel> CustomFieldSelections { get; set; } = new List<TemplateCustomFieldSelectionViewModel>();
+
+    public IList<CompetitorFieldDefinition> AvailableCustomFields { get; set; } = new List<CompetitorFieldDefinition>();
 
     // Used in delete view to show warning
     public bool IsClubDefault { get; set; }

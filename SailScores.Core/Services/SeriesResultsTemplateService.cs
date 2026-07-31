@@ -28,6 +28,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
     public async Task<IEnumerable<SeriesResultsTemplate>> GetTemplatesForClubAsync(Guid clubId)
     {
         var dbTemplates = await _dbContext.SeriesResultsTemplates
+            .Include(t => t.CustomFields)
             .Where(t => t.ClubId == clubId)
             .OrderBy(t => t.Name)
             .ToListAsync()
@@ -39,6 +40,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
     public async Task<SeriesResultsTemplate> GetTemplateAsync(Guid templateId)
     {
         var dbTemplate = await _dbContext.SeriesResultsTemplates
+            .Include(t => t.CustomFields)
             .FirstOrDefaultAsync(t => t.Id == templateId)
             .ConfigureAwait(false);
 

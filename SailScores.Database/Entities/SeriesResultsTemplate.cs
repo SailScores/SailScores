@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using SailScores.Api.Enumerations;
 
 namespace SailScores.Database.Entities;
@@ -29,4 +32,6 @@ public class SeriesResultsTemplate
 
     public bool ShowPreDiscardTotal { get; set; } = false;
     public bool ShowClubLogo { get; set; }
+
+    public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 }

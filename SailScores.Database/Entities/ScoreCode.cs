@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace SailScores.Database.Entities;
 
 public class ScoreCode
@@ -10,6 +12,8 @@ public class ScoreCode
     public String Description { get; set; }
     [StringLength(100)]
     public string Formula { get; set; }
+    [Column("FormulaValue_Decimal", TypeName = "decimal(6,3)")]
+    public decimal? FormulaValueDecimal { get; set; }
     public int? FormulaValue { get; set; }
     public string ScoreLike { get; set; }
     public bool? Discardable { get; set; }

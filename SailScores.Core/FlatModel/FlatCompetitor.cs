@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 
 namespace SailScores.Core.FlatModel
 {
@@ -12,6 +13,7 @@ namespace SailScores.Core.FlatModel
         public String HomeClubName { get; set; }
 
         public String UrlName { get; set; }
+        public IDictionary<Guid, string> CustomFieldValues { get; set; } = new Dictionary<Guid, string>();
 
     }
 }

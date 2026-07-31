@@ -91,6 +91,7 @@ public class SeriesServiceFleetFilteringTests
                 Discardable = true,
                 Started = false,
                 FormulaValue = 1,
+                FormulaValueDecimal = 1m,
                 AdjustOtherScores = null,
                 CameToStart = false,
                 Finished = false,
@@ -106,6 +107,7 @@ public class SeriesServiceFleetFilteringTests
                 Discardable = true,
                 Started = true,
                 FormulaValue = 1,
+                FormulaValueDecimal = 1m,
                 AdjustOtherScores = null,
                 CameToStart = true,
                 Finished = false,
@@ -121,6 +123,7 @@ public class SeriesServiceFleetFilteringTests
                 Discardable = true,
                 Started = false,
                 FormulaValue = 1,
+                FormulaValueDecimal = 1m,
                 AdjustOtherScores = null,
                 CameToStart = true,
                 Finished = false,
@@ -136,6 +139,7 @@ public class SeriesServiceFleetFilteringTests
                 Discardable = true,
                 Started = true,
                 FormulaValue = 1,
+                FormulaValueDecimal = 1m,
                 AdjustOtherScores = true,
                 CameToStart = true,
                 Finished = true,
@@ -157,7 +161,7 @@ public class SeriesServiceFleetFilteringTests
         var scoringSystem = CreateAppendixAScoringSystem();
 
         // Try to look it up directly
-        var loaded = await _context.ScoringSystems.FirstAsync(s => s.Id == scoringSystem.Id);
+        var loaded = await _context.ScoringSystems.FirstAsync(s => s.Id == scoringSystem.Id, TestContext.Current.CancellationToken);
         Assert.NotNull(loaded);
         Assert.Equal("Appendix A Low Point", loaded.Name);
     }
@@ -289,15 +293,15 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Verify series was saved correctly
-        var dbSeries = await _context.Series.FirstAsync(s => s.Id == series.Id);
+        var dbSeries = await _context.Series.FirstAsync(s => s.Id == series.Id, TestContext.Current.CancellationToken);
         Assert.NotNull(dbSeries.ScoringSystemId);
         Assert.Equal(scoringSystem.Id, dbSeries.ScoringSystemId);
 
         // Verify scoring system exists and has proper data
-        var scoringSystemFromDb = await _context.ScoringSystems.FirstAsync(s => s.Id == scoringSystem.Id);
+        var scoringSystemFromDb = await _context.ScoringSystems.FirstAsync(s => s.Id == scoringSystem.Id, TestContext.Current.CancellationToken);
         Assert.NotNull(scoringSystemFromDb);
         Assert.NotNull(scoringSystemFromDb.Name);
 
@@ -421,7 +425,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -541,7 +545,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -660,7 +664,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -805,7 +809,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -961,7 +965,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -1142,7 +1146,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -1259,7 +1263,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -1377,7 +1381,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -1520,7 +1524,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - Update series results which calls PopulateCompetitorsAsync
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -1658,7 +1662,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - Update series results which calls PopulateCompetitorsAsync
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -1795,7 +1799,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - Update series results which calls PopulateCompetitorsAsync
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -1933,7 +1937,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - Update series results which calls PopulateCompetitorsAsync
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -2087,7 +2091,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - Update series results which calls PopulateCompetitorsAsync
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -2235,7 +2239,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - Update series results
         await _service.UpdateSeriesResults(series.Id, "test");
@@ -2390,7 +2394,7 @@ public class SeriesServiceFleetFilteringTests
         };
 
         _context.Series.Add(series);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act - Update series results
         await _service.UpdateSeriesResults(series.Id, "test");

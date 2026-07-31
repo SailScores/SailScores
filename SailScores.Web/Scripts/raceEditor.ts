@@ -20,7 +20,8 @@ let suppressSeriesRemovalConfirmation = false;
 // competitors, still restricted to the race's fleet, be added when backfilling historical races.
 let includeInactiveCompetitors = false;
 function detectIncludeInactiveCompetitors(): boolean {
-    return new URLSearchParams(window.location.search).get('includeInactive') === 'true';
+    const search = window.location.search || "";
+    return /(?:^|[?&])includeinactive=true(?:&|$)/i.test(search);
 }
 
 interface seriesListResult {
@@ -136,7 +137,7 @@ export function initialize() {
 
     document.querySelectorAll('#results input[name="ElapsedTime"]').forEach(el => el.addEventListener('change', onElapsedTimeChanged));
 
-    $('#raceState').data("previous", $('#raceState').val());
+    $('#raceState').data("previous", $('#raceState').val()?.toString() ?? "");
     document.getElementById('raceState')?.addEventListener('change', raceStateChanged);
     document.querySelectorAll('.weather-input').forEach(el => el.addEventListener('change', weatherChanged));
     $('#results').on('click', '.select-code', calculatePlaces);
@@ -152,8 +153,9 @@ export function initialize() {
     $('#results').on('touchend touchcancel touchmove', '.sail-number-display', clearAltEditLongPress);
     $('#altSailNumberSaveButton').on('click', saveAlternativeSailNumber);
     $('#deleteConfirmed').click(deleteResult);
+    bindDeleteConfirmationKeyboardHandling();
     $('#closefooter').click(hideScoreButtonFooter);
-    $('#compform').submit(compCreateSubmit);
+    $('#compform').submit(compCreateSubmit as any);
     $("#raceform").submit(function (e) {
         let waiting = $('#ssWaitingModal');
         if (waiting) {
@@ -168,7 +170,7 @@ export function initialize() {
     $("#submitButton").prop("disabled", false);
     $("#submitDisabledMessage").prop("hidden", true);
 
-    RequestAuthorizationToken(null);
+    RequestAuthorizationToken();
 
     window.addEventListener('load', function () {
         loadFleet();
@@ -265,7 +267,7 @@ export function weatherChanged() {
 
 export function raceStateChanged() {
 
-    let state = $("#raceState").val();
+    const state = $("#raceState").val()?.toString() ?? "";
     if (state === "2") {
         clearWeatherFields();
     }
@@ -275,11 +277,11 @@ export function raceStateChanged() {
     $("#raceState").data("previous", state);
 }
 
-export function compCreateSubmit(e: any) {
+export function compCreateSubmit(this: HTMLFormElement, e: JQuery.Event) {
 
     e.preventDefault();
     $("#compLoading").show();
-    let form = $(this as HTMLFormElement);
+    let form = $(this);
     let url = form.attr("data-submit-url");
 
     let prep = function (xhr: any) {
@@ -352,6 +354,21 @@ export function deleteResult() {
     (<any>modal).modal("hide");
 }
 
+function bindDeleteConfirmationKeyboardHandling() {
+    const modal = $('#deleteConfirm');
+    modal.on('shown.bs.modal', () => {
+        const confirmButton = document.getElementById('deleteConfirmed') as HTMLButtonElement | null;
+        confirmButton?.focus();
+    });
+    modal.on('keydown', (event: any) => {
+        if (event.key === 'Enter' || event.key === 'NumpadEnter') {
+            event.preventDefault();
+            event.stopPropagation();
+            deleteResult();
+        }
+    });
+}
+
 export function confirmDelete(event: Event) {
 
     let btn = event.target as Node;
@@ -362,10 +379,10 @@ export function confirmDelete(event: Event) {
     if (!compName) {
      compName = resultItem.find(".sail-number").text();
     }
-    let modal = $('#deleteConfirm');
+    const modal = $('#deleteConfirm');
     modal.find('#competitorNameToDelete').text(compName);
-    modal.find('#compIdToDelete').val(compId);
-    modal.show();
+    modal.find('#compIdToDelete').val(compId ?? "");
+    (<any>modal).modal('show');
 }
 
 export function hideScoreButtonFooter() {
@@ -418,17 +435,23 @@ export function addNewCompetitorFromButton(event: Event) {
         return;
     }
 
-    let competitorId = button.dataset['competitorId'];
-    let comp = allCompetitors.find(c => c.id.toString() === competitorId);
+    const competitorId = button.dataset['competitorId'];
+    const comp = allCompetitors.find(c => c.id.toString() === competitorId);
+    if (!comp) {
+        return;
+    }
     addNewCompetitor(comp);
 }
 
 function addNewCompetitor(competitor: competitorDto) {
     isDirty = true; // Mark page as dirty when adding competitor
-    let c: number = 0;
-    let resultDiv = document.getElementById("results");
-    let compTemplate = document.getElementById("competitorTemplate");
-    let compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
+    const c: number = 0;
+    const resultDiv = document.getElementById("results");
+    const compTemplate = document.getElementById("competitorTemplate");
+    if (!resultDiv || !compTemplate) {
+        return;
+    }
+    const compListItem = (compTemplate.cloneNode(true) as HTMLLIElement);
     compListItem.id = competitor.id.toString();
     compListItem.dataset.competitorId = competitor.id.toString();
 
@@ -624,8 +647,9 @@ function updateResultRowSailNumber(competitor: competitorDto) {
 
 function finalizeCompetitorAdd(compListItem: HTMLLIElement) {
     calculatePlaces();
+    const offset = $(compListItem).offset();
     $('html, body').animate({
-        scrollTop: $(compListItem).offset().top - 150
+        scrollTop: (offset?.top ?? 0) - 150
     }, 300);
     $('#newCompetitor').val("");
     initializeAutoComplete();
@@ -636,35 +660,38 @@ function finalizeCompetitorAdd(compListItem: HTMLLIElement) {
 function addScoresFieldsToForm(form: HTMLFormElement) {
     //clear out old fields first:
     removeScoresFieldsFromForm(form);
-    let resultList = document.getElementById("results");
-    let resultItems = resultList.getElementsByTagName("li");
+    const resultList = document.getElementById("results");
+    if (!resultList) {
+        return;
+    }
+    const resultItems = Array.from(resultList.getElementsByTagName("li")) as HTMLLIElement[];
 
     for (let i = 1; i < resultItems.length; i++) {
         const listIndex = (i - 1).toString();
         let input = document.createElement("input");
         input.type = "hidden";
         input.name = "Scores[" + listIndex + "].competitorId";
-        input.value = resultItems[i].dataset.competitorId;
+        input.value = resultItems[i].dataset.competitorId ?? "";
         form.appendChild(input);
 
         input = document.createElement("input");
         input.type = "hidden";
         input.name = "Scores[" + listIndex + "].place";
         if (shouldCompKeepScore(resultItems[i])) {
-            input.value = resultItems[i].dataset.place;
+            input.value = resultItems[i].dataset.place ?? "";
         }
         form.appendChild(input);
 
         input = document.createElement("input");
         input.type = "hidden";
         input.name = "Scores[" + listIndex + "].code";
-        input.value = getCompetitorCode(resultItems[i]);
+        input.value = getCompetitorCode(resultItems[i]) ?? "";
         form.appendChild(input);
 
         input = document.createElement("input");
         input.type = "hidden";
         input.name = "Scores[" + listIndex + "].codePointsString";
-        input.value = getCompetitorCodePoints(resultItems[i]);
+        input.value = getCompetitorCodePoints(resultItems[i]) ?? "";
         form.appendChild(input);
 
         // Add FinishTime and ElapsedTime if present
@@ -1022,13 +1049,13 @@ function shouldHaveManualEntry(compListItem: HTMLLIElement): boolean {
 function clearWeatherFields() {
     $("#weatherIcon").val("Select...");
     //$("#weatherIcon").selectpicker("refresh");
-    $("#weatherDescription").val(null);
-    $("#windSpeed").val(null);
-    $("#windGust").val(null);
-    $("#windDirection").val(null);
-    $("#temperature").val(null);
-    $("#humidity").val(null);
-    $("#cloudcover").val(null);
+    $("#weatherDescription").val("");
+    $("#windSpeed").val("");
+    $("#windGust").val("");
+    $("#windDirection").val("");
+    $("#temperature").val("");
+    $("#humidity").val("");
+    $("#cloudcover").val("");
 }
 
 function populateEmptyWeatherFields() {
@@ -1036,30 +1063,30 @@ function populateEmptyWeatherFields() {
     $.getJSON("/" + initials +"/weather/current/",
         {},
         function (data: any) {
-            if (data.icon && $("#weatherIcon").val(null)) {
+            if (data.icon) {
                 $("#weatherIcon").val(data.icon);
 
                 //$("#weatherIcon").selectpicker("refresh");
             }
-            if (data.description && $("#weatherDescription").val(null)) {
+            if (data.description) {
                 $("#weatherDescription").val(data.description);
             }
-            if (data.windSpeed && $("#windSpeed").val(null)) {
+            if (data.windSpeed) {
                 $("#windSpeed").val(data.windSpeed);
             }
-            if (data.windGust && $("#windGust").val(null)) {
+            if (data.windGust) {
                 $("#windGust").val(data.windGust);
             }
-            if (data.windDirection && $("#windDirection").val(null)) {
+            if (data.windDirection) {
                 $("#windDirection").val(data.windDirection);
             }
-            if (data.temperature && $("#temperature").val(null)) {
+            if (data.temperature) {
                 $("#temperature").val(data.temperature);
             }
-            if (data.humidity && $("#humidity").val(null)) {
+            if (data.humidity) {
                 $("#humidity").val(data.humidity);
             }
-            if (data.cloudCoverPercent && $("#cloudCover").val(null)) {
+            if (data.cloudCoverPercent) {
                 $("#cloudCover").val(data.cloudCoverPercent);
             }
         });
@@ -1190,7 +1217,7 @@ function updateAllScoreTimesForStartTimeChange() {
                     updateTimeInput(finishInput, formatTimeForInput(finish));
                 }
             } else if (hasFinish) {
-                let finish = parseTimeStringToDate(finishInput.value, start);
+                let finish = parseTimeStringToDate(finishInput.value, start ?? undefined);
                 if (finish) {
                     if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
                     const elapsedMs = finish.getTime() - start.getTime();
@@ -1200,7 +1227,7 @@ function updateAllScoreTimesForStartTimeChange() {
             }
         } else { // lastEdited === "finish"
             if (hasFinish) {
-                let finish = parseTimeStringToDate(finishInput.value, start);
+                let finish = parseTimeStringToDate(finishInput.value, start ?? undefined);
                 if (finish) {
                     if (finish < start) finish = new Date(finish.getTime() + 24 * 3600 * 1000);
                     const elapsedMs = finish.getTime() - start.getTime();
@@ -1228,7 +1255,7 @@ function onFinishTimeChanged(this: HTMLInputElement) {
     if (!startTimeInput || !startTimeInput.value || !finishInput.value) return;
     // Parse StartTime and FinishTime
     const start = parseTimeStringToDate(startTimeInput.value);
-    const finish = parseTimeStringToDate(finishInput.value, start);
+    const finish = parseTimeStringToDate(finishInput.value, start ?? undefined);
     if (!start || !finish) return;
     let elapsedMs = finish.getTime() - start.getTime();
     if (elapsedMs < 0) elapsedMs += 24 * 3600 * 1000; // handle midnight wrap
@@ -1325,7 +1352,7 @@ declare global {
     }
 }
 
-function RequestAuthorizationToken(continuation: () => any) {
+function RequestAuthorizationToken(continuation?: () => any) {
 
     let prep = function (xhr: any) {
         xhr.setRequestHeader("Accept", "application/json");
@@ -1544,11 +1571,11 @@ function addPotentialMatches(result: string) {
     stopIfTimedOut();
 }
 
-function normalizeText(fullText: string) {
-    if (fullText) {
+function normalizeText(fullText: string | null | undefined): string {
+    if (typeof fullText === "string" && fullText.length > 0) {
         return fullText.replace(/[.?,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toUpperCase();
     }
-    return null;
+    return "";
 }
 
 function onSessionStarted(sender: any, sessionEventArgs: any) {

@@ -52,7 +52,7 @@
                 <label asp-for="FleetIds" class="control-label">Fleets</label>
                 <small>Each fleet will be scored separately.</small>
                 <select multiple asp-for="FleetIds" class="form-select">
-                    @foreach (var fleet in Model.FleetOptions.OrderBy(c => c.Name))
+                    @foreach (var fleet in (Model.FleetOptions ?? System.Array.Empty<SailScores.Core.Model.Fleet>()).OrderBy(c => c.Name))
                     {
                         <option value="@fleet.Id">
                             @fleet.Name

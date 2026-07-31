@@ -36,7 +36,6 @@ using WebMarkupMin.AspNetCoreLatest;
 using Microsoft.Extensions.Hosting;
 using MailChimp.Net.Interfaces;
 using MailChimp.Net;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using SailScores.Web.Resources;
 using SailScores.Web.Authorization;
@@ -45,9 +44,12 @@ namespace SailScores.Web;
 
 public class Startup
 {
-    public Startup(IConfiguration configuration)
+    private readonly IWebHostEnvironment _environment;
+
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
         Configuration = configuration;
+        _environment = environment;
     }
 
     public IConfiguration Configuration { get; }
@@ -181,12 +183,17 @@ public class Startup
         // Add response caching services (required for VaryByQueryKeys)
         services.AddResponseCaching();
 
-        services
+        var mvcBuilder = services
             .AddMvc(option =>
             {
                 option.Filters.Add(new ResponseCacheAttribute() { NoStore = true, Location = ResponseCacheLocation.None });
                 option.Filters.Add<SailScores.Web.Filters.ReturnUrlViewDataFilter>();
             });
+
+        if (_environment.IsDevelopment())
+        {
+            mvcBuilder.AddRazorRuntimeCompilation();
+        }
 
         var mailchimpManager = new MailChimpManager(Configuration["MailchimpApiKey"]);
         services.AddSingleton<IMailChimpManager>(mailchimpManager);
@@ -224,32 +231,14 @@ public class Startup
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
-
+#if !DEBUG
         services.AddApplicationInsightsTelemetry(options =>
         {
             options.ConnectionString = Configuration["ApplicationInsights:ConnectionString"];
-
-            options.EnableAdaptiveSampling = true;
-            options.EnablePerformanceCounterCollectionModule = true;
-            options.EnableDependencyTrackingTelemetryModule = true;
-            options.EnableHeartbeat = true;
-            options.EnableAzureInstanceMetadataTelemetryModule = true;
-
-            // Enable QuickPulse (Live Metrics) for real-time monitoring
-            options.EnableQuickPulseMetricStream = true;
-
-            // Disable in development to avoid unnecessary telemetry costs
-            options.EnableActiveTelemetryConfigurationSetup = true;
+            options.EnableRequestTrackingTelemetryModule = true;
         });
+#endif
 
-        // Configure sampling settings for better performance
-        services.Configure<TelemetryConfiguration>(config =>
-        {
-            config.DefaultTelemetrySink.TelemetryProcessorChainBuilder.Build();
-        });
-
-        services.AddSingleton<ITelemetryInitializer, SailScoresTelemetryInitializer>();
-        services.AddApplicationInsightsTelemetryProcessor<SailScoresTelemetryProcessor>();
         services.AddHttpContextAccessor();
     }
 

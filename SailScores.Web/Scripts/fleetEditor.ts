@@ -10,7 +10,7 @@ import { competitorDto} from "./interfaces/server";
 import { Guid } from "./guid";
 
 export function initialize() {
-    $('#compform').submit(compCreateSubmit);
+    $('#compform').submit(compCreateSubmit as any);
     $("#submitButton").prop("disabled", false);
     $("#submitDisabledMessage").prop("hidden", true);
 }
@@ -20,11 +20,11 @@ export function loadFleet() {
     getCompetitors(clubId);
 }
 
-export function compCreateSubmit(e: any) {
+export function compCreateSubmit(this: HTMLFormElement, e: JQuery.Event) {
 
     e.preventDefault();
     $("#compLoading").show();
-    var form = $(this as HTMLFormElement);
+    var form = $(this);
     var url = form.attr("data-submit-url");
 
     var prep = function (xhr: any) {
@@ -78,9 +78,8 @@ function getCompetitors(clubId: string) {
 }
 
 function addMissingToCompetitorList() {
-    var oldOptions = $("#CompetitorIds>option");
-    var oldIds = oldOptions.map((i, e: HTMLOptionElement) => e.value) as unknown as Array<string>;
-    var missing = allCompetitors.filter(c => $.inArray('' + c.id, oldIds)=== -1);
+    const oldIds = $("#CompetitorIds>option").toArray().map((e) => (e as HTMLOptionElement).value);
+    const missing = allCompetitors.filter(c => $.inArray('' + c.id, oldIds)=== -1);
 
     var compSelect = document.getElementById("competitorIds") as HTMLSelectElement;
     var classSelection = document.getElementById("createCompBoatClassSelect") as HTMLSelectElement;

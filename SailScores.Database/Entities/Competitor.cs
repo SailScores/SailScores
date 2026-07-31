@@ -1,4 +1,8 @@
-﻿namespace SailScores.Database.Entities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace SailScores.Database.Entities;
 
 public class Competitor
 {
@@ -29,6 +33,7 @@ public class Competitor
     public IList<CompetitorHandicap> Handicaps { get; set; }
 
     public IList<CompetitorChange> ChangeHistory { get; set; }
+    public IList<CompetitorFieldValue> CustomFieldValues { get; set; }
 
     [StringLength(20)]
     public String UrlName { get; set; }

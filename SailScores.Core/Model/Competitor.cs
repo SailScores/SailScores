@@ -1,4 +1,3 @@
-using Microsoft.Identity.Client;
 using SailScores.Core.Utility;
 using System;
 using System.Collections.Generic;
@@ -49,6 +48,7 @@ namespace SailScores.Core.Model
         public DateTime? Created { get; set; }
 
         public IList<CompetitorChange> ChangeHistory { get; set; }
+        public IList<CompetitorFieldValue> CustomFieldValues { get; set; }
 
         public int CompareTo(Competitor other)
         {

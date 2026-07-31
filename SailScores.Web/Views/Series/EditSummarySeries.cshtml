@@ -6,6 +6,8 @@
 @{
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
+    var clubInitials = ViewContext.RouteData.Values["clubInitials"]?.ToString()
+        ?? ViewContext.RouteData.Values["ClubInitials"]?.ToString();
 }
 
 <h3>Edit Summary Series Properties</h3>
@@ -121,7 +123,18 @@
                                             }
                                         </select>
                                         <span asp-validation-for="SeriesResultsTemplateId" class="text-danger"></span>
-                                        <small class="form-text text-muted">Create templates in the Club Info page.</small>
+                                        <small class="form-text text-muted">
+                                            Create
+                                            <a asp-controller="SeriesResultsTemplate"
+                                               asp-action="Index"
+                                               asp-route-clubInitials="@clubInitials"
+                                               class="text-primary">templates</a>
+                                            in the
+                                            <a asp-controller="Admin"
+                                               asp-action="Edit"
+                                               asp-route-clubInitials="@clubInitials"
+                                               class="text-primary">Club Info page</a>.
+                                        </small>
                                     </div>
                                 }
                             </div>

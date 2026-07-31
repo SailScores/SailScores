@@ -244,6 +244,8 @@ namespace SailScores.Test.Unit.Core.Services
             public TResult Execute<TResult>(Expression e) => _inner.Execute<TResult>(e);
             public TResult ExecuteAsync<TResult>(Expression e, CancellationToken ct = default)
             {
+                ct.ThrowIfCancellationRequested();
+
                 var itemType = typeof(TResult).GetGenericArguments()[0];
                 var executeGeneric = typeof(IQueryProvider)
                     .GetMethods()
@@ -255,6 +257,7 @@ namespace SailScores.Test.Unit.Core.Services
                     .MakeGenericMethod(itemType)
                     .Invoke(null, new[] { value });
             }
+
         }
 
         private sealed class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
@@ -262,8 +265,12 @@ namespace SailScores.Test.Unit.Core.Services
             public TestAsyncEnumerable(IEnumerable<T> items) : base(items) { }
             public TestAsyncEnumerable(Expression e) : base(e) { }
             IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(this);
-            public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken ct = default) =>
-                new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
+            public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken ct = default)
+            {
+                ct.ThrowIfCancellationRequested();
+                return new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
+            }
+
         }
 
         private sealed class TestAsyncEnumerator<T> : IAsyncEnumerator<T>

@@ -40,6 +40,7 @@ namespace SailScores.Core.Extensions
             services.AddScoped<IIndexNowService, IndexNowService>();
             services.AddScoped<IHandicapService, HandicapService>();
             services.AddScoped<ISeriesResultsTemplateService, SeriesResultsTemplateService>();
+            services.AddScoped<ICompetitorFieldService, CompetitorFieldService>();
 
         }
     }

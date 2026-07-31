@@ -137,9 +137,9 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task GetRaceHandicapSystemsAsync_WithSingleEffectiveSystem_ReturnsOne()
         {
-            var club = await _context.Clubs.FirstAsync();
-            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == club.Id);
-            var season = await _context.Seasons.FirstAsync(s => s.ClubId == club.Id);
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == club.Id, TestContext.Current.CancellationToken);
+            var season = await _context.Seasons.FirstAsync(s => s.ClubId == club.Id, TestContext.Current.CancellationToken);
 
             var baseSystem = new SailScores.Database.Entities.HandicapSystem
             {
@@ -174,7 +174,7 @@ namespace SailScores.Test.Unit.Core.Services
                 RaceId = race.Id,
                 SeriesId = series.Id
             });
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var result = await _service.GetRaceHandicapSystemsAsync(race.Id);
 
@@ -185,9 +185,9 @@ namespace SailScores.Test.Unit.Core.Services
         [Fact]
         public async Task GetRaceHandicapSystemsAsync_WithMultipleDistinctSystems_ReturnsDistinctSet()
         {
-            var club = await _context.Clubs.FirstAsync();
-            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == club.Id);
-            var season = await _context.Seasons.FirstAsync(s => s.ClubId == club.Id);
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == club.Id, TestContext.Current.CancellationToken);
+            var season = await _context.Seasons.FirstAsync(s => s.ClubId == club.Id, TestContext.Current.CancellationToken);
 
             var systemA = new SailScores.Database.Entities.HandicapSystem
             {
@@ -245,7 +245,7 @@ namespace SailScores.Test.Unit.Core.Services
                 RaceId = race.Id,
                 SeriesId = seriesB.Id
             });
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var result = await _service.GetRaceHandicapSystemsAsync(race.Id);
 

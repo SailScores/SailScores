@@ -91,37 +91,87 @@
                 </div>
             </div>
         </div>
-
-        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
-            <h2 class="h5 mb-3">Score display options</h2>
-            <p class="text-body-secondary small mb-3">
-                Configure additional scoring display options.
-            </p>
-
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" asp-for="ShowPreDiscardTotal" />
-                    <label class="form-check-label" asp-for="ShowPreDiscardTotal">
-                        Show Pre-Discard Total Column
-                    </label>
-                    <small class="d-block form-text text-body-secondary mt-2">
-                        When enabled, results include the "Pre-Discard Total" showing each competitor's total score
-                        before applying discards. This option is only displayed for low-point scoring
-                        systems, not for percentage-based systems.
-                    </small>
-                </div>
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="ShowPreDiscardTotal" />
+                <label class="form-check-label" asp-for="ShowPreDiscardTotal">
+                    Show Pre-Discard Total Column
+                </label>
+                <small class="d-block form-text text-body-secondary mt-2">
+                    When enabled, results include the "Pre-Discard Total" showing each competitor's total score
+                    before applying discards. This option is only displayed for low-point scoring
+                    systems, not for percentage-based systems.
+                </small>
             </div>
         </div>
 
-        <div class="d-flex flex-wrap gap-2">
+    <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+        <h2 class="h5 mb-3">Score display options</h2>
+        <p class="text-body-secondary small mb-3">
+            Configure additional scoring display options.
+        </p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Custom Competitor Fields</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">
+                Select which custom competitor fields should appear in this results view.
+            </p>
+            @if (Model.AvailableCustomFields != null && Model.AvailableCustomFields.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Include</th>
+                                <th scope="col">Field</th>
+                                <th scope="col">Visibility</th>
+                                <th scope="col">Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
+                            {
+                                var selection = Model.CustomFieldSelections[index];
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="form-check-input" asp-for="@Model.CustomFieldSelections[index].Selected" />
+                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
+                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
+                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
+                                    </td>
+                                    <td>@(string.IsNullOrWhiteSpace(selection.DisplayHeader) ? selection.Name : selection.DisplayHeader)</td>
+                                    <td>
+                                        <select class="form-select form-select-sm" asp-for="@Model.CustomFieldSelections[index].Visibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()"></select>
+                                    </td>
+                                    <td>
+                                        <input class="form-control form-control-sm" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No custom competitor fields are available for this club yet.</p>
+            }
+        </div>
+    </div>
+
+      <div class="mb-3">
             <button type="submit" class="btn btn-primary">
                 Save
             </button>
             <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
                 Cancel
             </a>
-        </div>
-    </form>
+      </div>
+  </form>
 </div>
 
 @section Scripts {

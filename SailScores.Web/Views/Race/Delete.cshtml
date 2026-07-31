@@ -4,6 +4,7 @@
     ViewBag.Title = "Delete Race";
     Layout = "_ClubLayout";
     var returnUrl = ViewData["ReturnUrl"] as string;
+    var successUrl = ViewData["SuccessUrl"] as string;
 }
 
 @model SailScores.Web.Models.SailScores.RaceViewModel
@@ -44,9 +45,10 @@
         </dd>
     </dl>
     
-    <form id="deleteForm" 
+    <form id="deleteForm"
         asp-action="Delete"
-        asp-route-returnUrl="@returnUrl">
+        asp-route-returnUrl="@returnUrl"
+        asp-route-successUrl="@successUrl">
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="ClubId" />
         <input type="submit" value="Delete" class="btn btn-danger" />

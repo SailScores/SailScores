@@ -54,6 +54,56 @@
         <script type="text/javascript">(function ($) { window.fnames = new Array(); window.ftypes = new Array(); fnames[0] = 'EMAIL'; ftypes[0] = 'email'; fnames[1] = 'FNAME'; ftypes[1] = 'text'; fnames[2] = 'LNAME'; ftypes[2] = 'text'; fnames[3] = 'ADDRESS'; ftypes[3] = 'address'; fnames[4] = 'PHONE'; ftypes[4] = 'phone'; fnames[5] = 'BIRTHDAY'; ftypes[5] = 'birthday'; fnames[6] = 'MMERGE6'; ftypes[6] = 'text'; }(jQuery)); var $mcj = jQuery.noConflict(true);</script>
     </div>
     <hr />
+    <h3>July 11th, 2026</h3>
+    <h5>&#x1F5BC; Series Results Templates</h5>
+    <p>
+        Results can now be customized with a new <strong>Series Results Template</strong> feature.
+        A template controls:
+        <ul>
+            <li>Whether the Sail Number, Competitor Name, Boat Name, and Competitor's Home Club columns are shown,
+                hidden, or only shown on larger screens. We suspect many clubs will choose to hide the "Boat" column.</li>
+            <li>Custom headers for the competitor and boat columns &mdash; "Helm" and "Boat" by default, but
+                rename them to whatever fits your club, such as "Skipper" or "Name."</li>
+            <li>An optional pre-discard total column, showing standings before discards are applied alongside the
+                final, discard-adjusted total. (Don't use this column. It only frustrates competitors when they see it
+                isn't used for Racing Rules of Sailing tiebreakers.)</li>
+            <li>Your club's logo, shown at the top of the results page, HTML exports, and printouts.</li>
+        </ul>
+        A template can be set as a club-wide default &mdash; with separate defaults for regular series and
+        regattas &mdash; and individual series can override that default with a template of their own.
+    </p>
+    <p>
+        We expect this is a "Set it and forget it" feature, so rather than clutter the usual series options, it's
+        tucked away: from your Club Admin page, look for "Edit result view templates" in the
+        "Result views" section to create and manage templates.
+    </p>
+    <p>
+        Also new: a series that belongs to a Summary Series now shows a "Part of:" link back to that summary
+        series, right below the series name, making it easier to navigate between the two.
+    </p>
+    <h5>&#x2696;&#xFE0F; Handicap Improvements</h5>
+    <p>
+        Handicap scoring keeps moving forward. <strong>D-PY</strong> has been added as a supported handicap
+        system, and boat classes can now be assigned a handicap directly, so competitors sailing a standard
+        class don't need an individual override. Class handicaps are shown on the competitor's page,
+        making it easy to confirm what value is in use. A number of smaller calculation and display fixes
+        went in as well, including how handicaps are handled in Summary Series and on competitor stats pages.
+        There's more on the way, but this update brings SailScores a good step closer to full handicap support.
+    </p>
+    <h5>&#x1F6E0;&#xFE0F; Regatta &amp; Summary Series Fixes</h5>
+    <p>
+        A batch of fixes went out for regattas and Summary Series: regatta races that weren't showing up on
+        the front page now do, several display issues within regattas were resolved, and Summary Series
+        scoring was tightened up, especially where handicaps are involved.
+    </p>
+    <h5>&#x2699;&#xFE0F; Performance &amp; Quality Improvements</h5>
+    <p>
+        Alternative Sail Number editing (added this spring) is now faster, with a few focus and dark-mode
+        display bugs fixed along the way. The public API's payloads were cleaned up to remove duplicated
+        data, and error messages around race and season dates are clearer. As always, a collection of
+        smaller bug fixes went out too, across the admin and scoring tools.
+    </p>
+    <br />
     <h3>March 22nd, 2026</h3>
     <h5>🌱 Spring Admin Changes and New Features</h5>
     <p>

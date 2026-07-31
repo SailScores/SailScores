@@ -300,9 +300,9 @@
                     string trendLegend = localizer["Rank change from"] + " " +
                         localizer[EnumHelper<TrendOption>.GetDisplayValue(currentSeries.TrendOption.Value)];
 
-                    // Resolve template settings
-                    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(currentSeries.SeriesResultsTemplate)
-                        ?? SeriesResultsTemplateHelper.GetDefaultTemplate(true); // Regatta default
+                    // Resolve template settings, passing isRegatta: true so the default shows competitor club column
+                    var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
+                        currentSeries.SeriesResultsTemplate, isRegatta: true);
 
                     var tableModel = new ResultsTableViewModel
                         {

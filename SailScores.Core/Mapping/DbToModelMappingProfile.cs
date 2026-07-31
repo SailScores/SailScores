@@ -82,7 +82,13 @@ namespace SailScores.Core.Mapping
                 .ReverseMap();
             CreateMap<Db.ScoreCode, Model.ScoreCode>()
                 .ForMember(d => d.ClubId, o => o.Ignore())
-                .ReverseMap();
+                .ForMember(d => d.FormulaValue, o => o.MapFrom(s =>
+                    s.FormulaValueDecimal ?? (s.FormulaValue.HasValue
+                        ? Convert.ToDecimal(s.FormulaValue.Value)
+                        : (decimal?)null)))
+                .ReverseMap()
+                .ForMember(d => d.FormulaValueDecimal, o => o.MapFrom(s => s.FormulaValue))
+                .ForMember(d => d.FormulaValue, o => o.Ignore());
             CreateMap<Db.HandicapSystem, Model.HandicapSystem>()
                 .ReverseMap();
             CreateMap<Db.CompetitorHandicap, Model.CompetitorHandicap>()
@@ -102,6 +108,13 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.CompetitorStatsSummary, Model.CompetitorSeasonStats>();
 
             CreateMap<Db.SeriesResultsTemplate, Model.SeriesResultsTemplate>()
+                .ReverseMap();
+
+            CreateMap<Db.CompetitorFieldDefinition, Model.CompetitorFieldDefinition>()
+                .ReverseMap();
+            CreateMap<Db.CompetitorFieldValue, Model.CompetitorFieldValue>()
+                .ReverseMap();
+            CreateMap<Db.SeriesResultsTemplateCustomField, Model.SeriesResultsTemplateCustomField>()
                 .ReverseMap();
         }
     }

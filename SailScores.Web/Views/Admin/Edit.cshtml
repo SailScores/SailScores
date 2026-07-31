@@ -150,7 +150,7 @@
                         <span asp-validation-for="LogoFile" class="text-danger"></span>
                         <small class="form-text text-body-secondary">
                             Upload a burgee or logo image (max 2 MB, recommended 64x64px or larger). PNG or WebP with a transparent background is recommended.
-                            The preview tiles below show how it will look on light and dark surfaces.
+                            Preview tiles will show how it will look in light and dark themes.
                         </small>
                     </div>
 
@@ -319,6 +319,29 @@
                             </a>
                         </label>
                     </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="EnableCustomCompetitorFields" class="form-check-input" id="EnableCustomCompetitorFields" />
+                        <label class="form-check-label" for="EnableCustomCompetitorFields">
+                            Enable Custom Competitor Fields
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Turns on club-defined custom competitor fields. When enabled, scorekeepers can add date-based values for each field on competitor edit/create pages and include the fields in series results templates.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
+                    </div>
+                    @if (Model.EnableCustomCompetitorFields)
+                    {
+                        <div class="mb-3">
+                            <a asp-controller="CompetitorField" asp-action="Index" asp-route-clubInitials="@Model.Initials" class="btn btn-outline-primary btn-sm">
+                                Manage custom fields
+                            </a>
+                        </div>
+                    }
 
                     <div class="mb-3" id="defaultHandicapSystemRow">
                         <label asp-for="DefaultHandicapSystemId" class="form-label">Default Handicap System</label>

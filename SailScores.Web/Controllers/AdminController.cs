@@ -109,6 +109,7 @@ public class AdminController : Controller
             clubObject.DefaultScoringSystemId =
                 clubAdmin.DefaultScoringSystemId;
             clubObject.DefaultHandicapSystemId = clubAdmin.DefaultHandicapSystemId;
+            clubObject.EnableCustomCompetitorFields = clubAdmin.EnableCustomCompetitorFields;
             clubObject.DefaultSeriesResultsTemplateId = clubAdmin.DefaultSeriesResultsTemplateId;
             clubObject.DefaultRegattaSeriesResultsTemplateId = clubAdmin.DefaultRegattaSeriesResultsTemplateId;
             clubObject.WeatherSettings = new WeatherSettings
