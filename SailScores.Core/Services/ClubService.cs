@@ -594,6 +594,7 @@ namespace SailScores.Core.Services
                 .ThenInclude(f => f.FleetBoatClasses)
                 .Include(c => c.BoatClasses)
                 .Include(c => c.Seasons)
+                .AsSplitQuery()
                 .FirstAsync()
                 .ConfigureAwait(false);
 

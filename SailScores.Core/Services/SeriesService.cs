@@ -808,10 +808,10 @@ namespace SailScores.Core.Services
                     var customFieldValues = new Dictionary<Guid, string>();
                     var raceDates = raceDatesByCompetitor.TryGetValue(c.Id, out var dates) ? dates : new List<DateTime>();
 
-                    foreach (var definition in fieldDefinitions)
+                    foreach (var definitionId in fieldDefinitions.Select(d => d.Id))
                     {
                         var availableValues = (c.CustomFieldValues ?? Enumerable.Empty<CompetitorFieldValue>())
-                            .Where(v => v.FieldDefinitionId == definition.Id)
+                            .Where(v => v.FieldDefinitionId == definitionId)
                             .ToList();
 
                         if (availableValues.Count == 0)
@@ -835,11 +835,11 @@ namespace SailScores.Core.Services
 
                         if (matchedValues.Count == 1)
                         {
-                            customFieldValues[definition.Id] = matchedValues.Single();
+                            customFieldValues[definitionId] = matchedValues.Single();
                         }
                         else if (matchedValues.Count > 1)
                         {
-                            customFieldValues[definition.Id] = "-multiple-";
+                            customFieldValues[definitionId] = "-multiple-";
                         }
                     }
 
@@ -976,7 +976,9 @@ namespace SailScores.Core.Services
                         }
                     }
 
-                    dbCompetitors = await query.ToListAsync()
+                    dbCompetitors = await query
+                        .AsSplitQuery()
+                        .ToListAsync()
                         .ConfigureAwait(false);
                     competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
                     if (competitor == null)
