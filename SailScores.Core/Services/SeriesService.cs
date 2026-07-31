@@ -1134,6 +1134,7 @@ namespace SailScores.Core.Services
             existingSeries.FleetId = model.FleetId;
             existingSeries.UseFullRaceScores = model.UseFullRaceScores;
             existingSeries.HandicapSystemId = model.HandicapSystemId;
+            existingSeries.SeriesResultsTemplateId = model.SeriesResultsTemplateId;
         }
 
         private void UpdateSeriesRaces(Series model, dbObj.Series existingSeries)
