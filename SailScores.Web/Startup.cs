@@ -1,8 +1,9 @@
+using AspNet.Security.OAuth.Apple;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
-using AspNet.Security.OAuth.Apple;
+using Microsoft.AspNetCore.DataProtection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.FileProviders;
@@ -58,6 +59,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         ConfigureAppInsightsTelemetry(services);
+        ConfigureDataProtection(services);
 
         services.AddLocalization();
 
@@ -223,10 +225,39 @@ public class Startup
 
         services.AddHealthChecks();
 
+        ConfigureDataProtection(services);
+
         RegisterSailScoresServices(services);
 
         RegisterBackgroundQueueServices(services);
 
+    }
+
+    private void ConfigureDataProtection(IServiceCollection services)
+    {
+        var appName = Configuration["DataProtection:ApplicationName"] ?? "SailScores";
+        var dataProtectionBuilder = services.AddDataProtection()
+            .SetApplicationName(appName);
+
+        var useBlobStorage = Configuration.GetValue<bool>("DataProtection:UseBlobStorage");
+        if (useBlobStorage)
+        {
+            var blobUri = Configuration["DataProtection:BlobUri"];
+            if (string.IsNullOrWhiteSpace(blobUri))
+            {
+                throw new InvalidOperationException(
+                    "DataProtection:BlobUri must be configured when DataProtection:UseBlobStorage is true.");
+            }
+
+            var storageAccountUri = new Uri(blobUri, UriKind.Absolute);
+            dataProtectionBuilder.PersistKeysToAzureBlobStorage(storageAccountUri);
+        }
+
+        if (Configuration.GetValue<bool>("DataProtection:DiagnosticsEnabled"))
+        {
+            services.AddHealthChecks()
+                .AddCheck<DataProtectionHealthCheck>("dataprotection");
+        }
     }
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
