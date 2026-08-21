@@ -50,6 +50,7 @@ public class BackupService : IBackupService
         public Guid? DefaultScoringSystemId { get; set; }
         public Guid? DefaultHandicapSystemId { get; set; }
         public bool? EnableAlternativeSailNumbers { get; set; }
+        public bool EnableCustomCompetitorFields { get; set; }
         public Guid? DefaultSeriesResultsTemplateId { get; set; }
         public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
     }
@@ -160,6 +161,7 @@ public class BackupService : IBackupService
             DefaultScoringSystemId = club.DefaultScoringSystemId,
             DefaultHandicapSystemId = club.DefaultHandicapSystemId,
             EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers,
+            EnableCustomCompetitorFields = club.EnableCustomCompetitorFields,
             DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
             DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId
         };
@@ -215,6 +217,7 @@ public class BackupService : IBackupService
                 Formula = sc.Formula,
                 FormulaValue = sc.FormulaValueDecimal ??
                     (sc.FormulaValue.HasValue ? Convert.ToDecimal(sc.FormulaValue.Value) : (decimal?)null),
+                FormulaValueDecimal = sc.FormulaValueDecimal,
                 ScoreLike = sc.ScoreLike,
                 Discardable = sc.Discardable,
                 CameToStart = sc.CameToStart,
@@ -1220,6 +1223,15 @@ public class BackupService : IBackupService
         await AddAssignmentIfColumnExistsAsync(
             assignments,
             parameters,
+            "EnableCustomCompetitorFields",
+            "EnableCustomCompetitorFields = @enableCustomCompetitorFields",
+            "@enableCustomCompetitorFields",
+            backup.EnableCustomCompetitorFields,
+            cancellationToken).ConfigureAwait(false);
+
+        await AddAssignmentIfColumnExistsAsync(
+            assignments,
+            parameters,
             "DefaultSeriesResultsTemplateId",
             "DefaultSeriesResultsTemplateId = @defaultSeriesResultsTemplateId",
             "@defaultSeriesResultsTemplateId",
@@ -1665,7 +1677,7 @@ public class BackupService : IBackupService
                 Name = sc.Name,
                 Description = sc.Description,
                 Formula = sc.Formula,
-                FormulaValueDecimal = sc.FormulaValue,
+                FormulaValueDecimal = sc.FormulaValueDecimal ?? sc.FormulaValue,
                 FormulaValue = sc.FormulaValue.HasValue
                     ? Convert.ToInt32(decimal.Truncate(sc.FormulaValue.Value))
                     : null,

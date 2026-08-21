@@ -35,6 +35,7 @@ public class ClubBackupData
     public Guid? DefaultScoringSystemId { get; set; }
     public Guid? DefaultHandicapSystemId { get; set; }
     public bool? EnableAlternativeSailNumbers { get; set; }
+    public bool EnableCustomCompetitorFields { get; set; }
     public Guid? DefaultSeriesResultsTemplateId { get; set; }
     public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
 
