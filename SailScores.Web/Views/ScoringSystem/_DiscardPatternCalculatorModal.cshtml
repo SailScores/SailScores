@@ -1,0 +1,190 @@
+<!-- Discard Pattern Calculator Modal -->
+<div class="modal fade" id="discardCalcModal" tabindex="-1" aria-labelledby="discardCalcModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="discardCalcModalLabel">Calculate Discard Pattern</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Enter the percentage of races that should <strong>count</strong> toward a competitor's score.
+                    A suggested discard pattern for up to 50 races will be calculated.
+                </p>
+                <p class="small text-body-secondary">
+                    For example, to count 60% of races: with 10 races sailed, 6 count and 4 are discarded.
+                </p>
+                <div class="mb-3 row align-items-center">
+                    <label for="discardCalcPercent" class="col-sm-auto col-form-label">
+                        Percentage of races to count
+                    </label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="number" id="discardCalcPercent" class="form-control"
+                                   min="1" max="99" value="60" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-auto">
+                        <button type="button" class="btn btn-secondary" id="discardCalcButton">
+                            Calculate
+                        </button>
+                    </div>
+                </div>
+                <div id="discardCalcResult" class="d-none">
+                    <div class="mb-2">
+                        <strong>Suggested discard pattern (50 races):</strong>
+                    </div>
+                    <div class="p-2 border rounded bg-body-secondary font-monospace small mb-3 text-break"
+                         id="discardCalcPattern" style="word-break: break-all;"></div>
+                    <hr />
+                    <h6>Test</h6>
+                    <div class="row align-items-center mb-2">
+                        <label for="discardCalcTestRaces" class="col-sm-auto col-form-label">
+                            Number of races sailed
+                        </label>
+                        <div class="col-sm-3">
+                            <input type="number" id="discardCalcTestRaces" class="form-control"
+                                   min="1" max="50" placeholder="e.g. 10" />
+                        </div>
+                    </div>
+                    <div id="discardCalcTestResult" class="d-none">
+                        <p class="mb-1">
+                            With <strong><span id="discardCalcTestRaceDisplay"></span></strong> races:
+                            <strong><span id="discardCalcTestDiscards"></span></strong> discard(s),
+                            <strong><span id="discardCalcTestCounts"></span></strong> race(s) count.
+                        </p>
+                        <p class="small text-body-secondary mb-0">
+                            The highlighted entry below shows the active value in the pattern:
+                        </p>
+                        <div class="p-2 border rounded bg-body-secondary font-monospace small mt-1 text-break"
+                             id="discardCalcPatternHighlighted" style="word-break: break-all;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary d-none" id="discardCalcUseButton">
+                    Use Discard Pattern
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var currentPattern = [];
+
+        function calculatePattern(pct) {
+            var values = [];
+            for (var i = 1; i <= 50; i++) {
+                values.push(Math.floor(i * (1 - pct / 100)));
+            }
+            return values;
+        }
+
+        function renderPattern(values) {
+            return values.join(',');
+        }
+
+        function buildHighlightedPattern(values, highlightIndex) {
+            // highlightIndex is 0-based
+            var parts = values.map(function (v, i) {
+                if (i === highlightIndex) {
+                    return '<mark class="px-0 fw-bold">' + v + '</mark>';
+                }
+                return String(v);
+            });
+            return parts.join(',');
+        }
+
+        function updateTestResult() {
+            var testInput = document.getElementById('discardCalcTestRaces');
+            var testResult = document.getElementById('discardCalcTestResult');
+            if (!testInput || currentPattern.length === 0) { return; }
+            var races = parseInt(testInput.value, 10);
+            if (isNaN(races) || races < 1) {
+                testResult.classList.add('d-none');
+                return;
+            }
+            // Pattern is 1-based: index (races-1), capped at pattern length
+            var idx = Math.min(races, currentPattern.length) - 1;
+            var discards = currentPattern[idx];
+            var counts = races - discards;
+            document.getElementById('discardCalcTestRaceDisplay').textContent = races;
+            document.getElementById('discardCalcTestDiscards').textContent = discards;
+            document.getElementById('discardCalcTestCounts').textContent = counts;
+            document.getElementById('discardCalcPatternHighlighted').innerHTML =
+                buildHighlightedPattern(currentPattern, idx);
+            testResult.classList.remove('d-none');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calcBtn = document.getElementById('discardCalcButton');
+            var useBtn = document.getElementById('discardCalcUseButton');
+            var patternDisplay = document.getElementById('discardCalcPattern');
+            var resultDiv = document.getElementById('discardCalcResult');
+            var percentInput = document.getElementById('discardCalcPercent');
+            var testRacesInput = document.getElementById('discardCalcTestRaces');
+            var testResult = document.getElementById('discardCalcTestResult');
+
+            // Auto-calculate when modal opens
+            var modal = document.getElementById('discardCalcModal');
+            if (modal) {
+                modal.addEventListener('show.bs.modal', function () {
+                    runCalculation();
+                });
+            }
+
+            function runCalculation() {
+                var pct = parseFloat(percentInput.value);
+                if (isNaN(pct) || pct <= 0 || pct >= 100) {
+                    alert('Please enter a percentage between 1 and 99.');
+                    return;
+                }
+                currentPattern = calculatePattern(pct);
+                patternDisplay.textContent = renderPattern(currentPattern);
+                // Reset test section
+                if (testResult) { testResult.classList.add('d-none'); }
+                if (testRacesInput) { testRacesInput.value = ''; }
+                resultDiv.classList.remove('d-none');
+                useBtn.classList.remove('d-none');
+            }
+
+            if (calcBtn) {
+                calcBtn.addEventListener('click', runCalculation);
+            }
+
+            if (percentInput) {
+                percentInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        runCalculation();
+                    }
+                });
+            }
+
+            if (testRacesInput) {
+                testRacesInput.addEventListener('input', updateTestResult);
+                testRacesInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') { e.preventDefault(); }
+                });
+            }
+
+            if (useBtn) {
+                useBtn.addEventListener('click', function () {
+                    var pattern = patternDisplay.textContent;
+                    var targetInput = document.getElementById('DiscardPattern');
+                    if (targetInput) {
+                        targetInput.value = pattern;
+                    }
+                    var bsModal = bootstrap.Modal.getInstance(document.getElementById('discardCalcModal'));
+                    if (bsModal) {
+                        bsModal.hide();
+                    }
+                });
+            }
+        });
+    })();
+</script>

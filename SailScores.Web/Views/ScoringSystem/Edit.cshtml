@@ -32,7 +32,14 @@
             </div>
             <div class="mb-3">
                 <label asp-for="DiscardPattern" class="control-label"></label>
-                <input asp-for="DiscardPattern" class="form-control" />
+                <div class="input-group">
+                    <input asp-for="DiscardPattern" class="form-control" />
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-toggle="modal" data-bs-target="#discardCalcModal"
+                            title="Calculate a suggested discard pattern">
+                        <span class="fas fa-calculator"></span> Calculate Pattern
+                    </button>
+                </div>
                 <span asp-validation-for="DiscardPattern" class="text-danger"></span>
                 <p class="small mx-3">
                     A series of numbers indicating how many races should be discarded.
@@ -63,8 +70,12 @@
 
             <div class="mb-3">
                 <label asp-for="ParticipationPercent" class="control-label"></label>
-                <span class="small"><em>&ensp;Used for High Score Percent systems (including Cox-Sprague)</em></span>
-                <input asp-for="ParticipationPercent" class="form-control" type="number" />
+                <span class="small"><em>&ensp;Optional: Required participation for a rank.</em></span>
+                <div class="input-group">
+                    <input asp-for="ParticipationPercent" class="form-control" type="number"
+                           min="0" max="99" />
+                    <span class="input-group-text">%</span>
+                </div>
                 <span asp-validation-for="ParticipationPercent" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -172,8 +183,10 @@
                 </tbody>
             </table>
         </div>
-        </div>
+    </div>
 
-        @section Scripts {
-            @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-        }
+@await Html.PartialAsync("_DiscardPatternCalculatorModal")
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
