@@ -33,7 +33,7 @@
                 </div>
                 <div id="discardCalcResult" class="d-none">
                     <div class="mb-2">
-                        <strong>Suggested discard pattern (10050 races):</strong>
+                        <strong>Suggested discard pattern (100 races):</strong>
                     </div>
                     <div class="p-2 border rounded bg-body-secondary font-monospace small mb-3 text-break"
                          id="discardCalcPattern" style="word-break: break-all;"></div>
@@ -78,7 +78,7 @@
 
         function calculatePattern(pct) {
             var values = [];
-            for (var i = 1; i <= 10050; i++) {
+            for (var i = 1; i <= 100; i++) {
                 values.push(Math.floor(i * (1 - pct / 100)));
             }
             return values;
