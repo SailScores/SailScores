@@ -9,7 +9,7 @@
             <div class="modal-body">
                 <p>
                     Enter the percentage of races that should <strong>count</strong> toward a competitor's score.
-                    A suggested discard pattern for up to 50 races will be calculated.
+                    A suggested discard pattern for up to 100 races will be calculated.
                 </p>
                 <p class="small text-body-secondary">
                     For example, to count 60% of races: with 10 races sailed, 6 count and 4 are discarded.
@@ -33,7 +33,7 @@
                 </div>
                 <div id="discardCalcResult" class="d-none">
                     <div class="mb-2">
-                        <strong>Suggested discard pattern (50 races):</strong>
+                        <strong>Suggested discard pattern (10050 races):</strong>
                     </div>
                     <div class="p-2 border rounded bg-body-secondary font-monospace small mb-3 text-break"
                          id="discardCalcPattern" style="word-break: break-all;"></div>
@@ -45,7 +45,7 @@
                         </label>
                         <div class="col-sm-3">
                             <input type="number" id="discardCalcTestRaces" class="form-control"
-                                   min="1" max="50" placeholder="e.g. 10" />
+                                   min="1" max="100" placeholder="e.g. 10" />
                         </div>
                     </div>
                     <div id="discardCalcTestResult" class="d-none">
@@ -78,7 +78,7 @@
 
         function calculatePattern(pct) {
             var values = [];
-            for (var i = 1; i <= 50; i++) {
+            for (var i = 1; i <= 10050; i++) {
                 values.push(Math.floor(i * (1 - pct / 100)));
             }
             return values;
