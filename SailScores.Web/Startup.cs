@@ -1,13 +1,18 @@
+using AspNet.Security.OAuth.Apple;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
-using AspNet.Security.OAuth.Apple;
+using Azure.Core;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.Repositories;
+using System.Reflection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
@@ -29,6 +35,7 @@ using SailScores.Web.Mapping;
 using SailScores.Web.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using SailScores.Web.Services.Interfaces;
@@ -223,10 +230,124 @@ public class Startup
 
         services.AddHealthChecks();
 
+        ConfigureDataProtection(services);
+
         RegisterSailScoresServices(services);
 
         RegisterBackgroundQueueServices(services);
 
+    }
+
+    private void ConfigureDataProtection(IServiceCollection services)
+    {
+        var appName = Configuration["DataProtection:ApplicationName"] ?? "SailScores";
+        var dataProtectionBuilder = services.AddDataProtection()
+            .SetApplicationName(appName);
+
+        var useBlobStorage = Configuration.GetValue<bool>("DataProtection:UseBlobStorage");
+        if (useBlobStorage)
+        {
+            var blobUri = Configuration["DataProtection:BlobUri"];
+            if (string.IsNullOrWhiteSpace(blobUri))
+            {
+                throw new InvalidOperationException(
+                    "DataProtection:BlobUri must be configured when DataProtection:UseBlobStorage is true.");
+            }
+
+            try
+            {
+                LogDataProtectionEvent(
+                    $"Blob storage persistence enabled. ApplicationName={appName}; BlobUri={MaskBlobUri(blobUri)}");
+
+                var storageAccountUri = new Uri(blobUri, UriKind.Absolute);
+                var credential = CreateDefaultAzureCredential();
+                LogDataProtectionEvent("Calling PersistKeysToAzureBlobStorage with Azure.Identity credential.");
+                dataProtectionBuilder.PersistKeysToAzureBlobStorage(storageAccountUri, credential);
+                dataProtectionBuilder.SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+            }
+            catch (Exception ex)
+            {
+                LogDataProtectionEvent(
+                    $"Failed to configure DataProtection blob storage. {ex.GetType().Name}: {ex.Message}",
+                    ex);
+                throw;
+            }
+        }
+
+        if (Configuration.GetValue<bool>("DataProtection:DiagnosticsEnabled"))
+        {
+            services.AddHealthChecks()
+                .AddCheck<DataProtectionHealthCheck>("dataprotection");
+        }
+    }
+
+    private static TokenCredential CreateDefaultAzureCredential()
+    {
+        var identityAssembly = Assembly.Load("Azure.Identity");
+        LogDataProtectionEvent($"Loaded Azure.Identity assembly '{identityAssembly.FullName}'.");
+
+        var credentialType = identityAssembly.GetType("Azure.Identity.DefaultAzureCredential", throwOnError: true);
+        LogDataProtectionEvent($"Resolved credential type '{credentialType.FullName}'.");
+
+        var constructors = credentialType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var constructor in constructors)
+        {
+            LogDataProtectionEvent($"Credential constructor: {constructor}");
+        }
+
+        var boolConstructor = constructors.FirstOrDefault(constructor =>
+            constructor.GetParameters().Length == 1 && constructor.GetParameters()[0].ParameterType == typeof(bool));
+        if (boolConstructor is not null)
+        {
+            LogDataProtectionEvent("Using DefaultAzureCredential(bool) constructor.");
+            return (TokenCredential)boolConstructor.Invoke(new object[] { false })!;
+        }
+
+        var optionsConstructor = constructors.FirstOrDefault(constructor =>
+            constructor.GetParameters().Length == 1 &&
+            constructor.GetParameters()[0].ParameterType.FullName?.Contains("DefaultAzureCredentialOptions") == true);
+        if (optionsConstructor is not null)
+        {
+            var optionsType = identityAssembly.GetType("Azure.Identity.DefaultAzureCredentialOptions", throwOnError: true);
+            var options = Activator.CreateInstance(optionsType);
+            LogDataProtectionEvent("Using DefaultAzureCredential(DefaultAzureCredentialOptions) constructor.");
+            return (TokenCredential)optionsConstructor.Invoke(new[] { options })!;
+        }
+
+        throw new MissingMethodException(credentialType.FullName, ".ctor");
+    }
+
+    private static void LogDataProtectionEvent(string message, Exception? exception = null)
+    {
+        var prefix = "[DataProtection]";
+        var details = exception is null
+            ? $"{prefix} {message}"
+            : $"{prefix} {message} Exception={exception.GetType().FullName}: {exception.Message}";
+
+        Console.Error.WriteLine(details);
+
+        if (exception?.InnerException is not null)
+        {
+            Console.Error.WriteLine(
+                $"{prefix} InnerException={exception.InnerException.GetType().FullName}: {exception.InnerException.Message}");
+        }
+    }
+
+    private static string MaskBlobUri(string? blobUri)
+    {
+        if (string.IsNullOrWhiteSpace(blobUri))
+        {
+            return "(empty)";
+        }
+
+        try
+        {
+            return new Uri(blobUri, UriKind.Absolute).GetComponents(UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.UriEscaped);
+        }
+        catch
+        {
+            return blobUri;
+        }
     }
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
@@ -308,7 +429,13 @@ public class Startup
 
         app.UseCookiePolicy();
 
-        app.UseWebMarkupMin();
+        app.UseWhen(
+            context => !context.Request.Path.StartsWithSegments("/health", StringComparison.OrdinalIgnoreCase),
+            branch =>
+            {
+                branch.UseWebMarkupMin();
+            });
+
         AddRoutes(app);
 
     }
@@ -332,7 +459,6 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            // Health check endpoint for monitoring
             endpoints.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
             {
                 Predicate = _ => true,

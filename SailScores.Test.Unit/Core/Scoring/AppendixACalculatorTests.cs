@@ -475,8 +475,8 @@ namespace SailScores.Test.Unit.Core.Scoring
 
         // Example 1: 23 boats entered the series. Boat A finishes 3rd in the race but is ZFP. The penalty is 20% of 23 = 4.6 places,
         // rounded to 5 places so she receives points for the place equal to her finishing place of 3rd plus 5 penalty places - 8th place.
-        // Under the Low Point System, 8th place receives 8 points so points for the race are: 1, 2, 4, 5, 6, 7, 8, [8], 9, 10 … 23. (The
-        // boxed number is A’s score.) The two boats scoring 8 points will share any race prize for 7th place; the boat scoring 9 points will
+        // Under the Low Point System, 8th place receives 8 points so points for the race are: 1, 2, 4, 5, 6, 7, 8, [8], 9, 10 â€¦ 23. (The
+        // boxed number is Aâ€™s score.) The two boats scoring 8 points will share any race prize for 7th place; the boat scoring 9 points will
         // receive any race prize for 9th place.Remember that under rule 44.3 (and therefore under rule 30.2) a boat shall not receive a
         // score that is worse than DNF would receive.A DNF score in this race would be 24 (23 series entrants, plus 1), which would be
         // the penalty for a ZFP boat with a finishing position of 20th or worse.
@@ -518,7 +518,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         //Example 2: Same as Example 1 above except that boat A also takes a 20% SCP under rule 44.3. She receives two penalties
         //of 5 places each for a total of 10 places(not a 40% penalty of 9.2 places rounded to 9 places). Her score would be the score for
         //13th place, namely her finishing place of 3rd plus 10 penalty places.Points for the race are: 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-        //13, 14, 15… 
+        //13, 14, 15â€¦ 
 
         // SailScores does not currently have a way to indicate multiple penalties: score codes are assigned one per result. The current work-around is manually scoring a result.
         // putting the test in here with an ignore as a note for future desireability.
@@ -541,8 +541,8 @@ namespace SailScores.Test.Unit.Core.Scoring
         // The score of a boat receiving a scoring penalty may be affected by the disqualification of a boat whose finishing place is ahead of her.
         // Example 3: Same as Example 1 above except that the boat that finished second is disqualified(and receives 24 points). All
         // boats with a finishing place after the disqualified boat move up one place(see rule A6(1)). Boat A receives points for 7th place,
-        // namely her adjusted finishing place of 2nd(as a result of the disqualification) plus 5 penalty places, leaving that ‘ 2 point slot’
-        // vacant.Points for that race would be: 1, 3, 4, 5, 6, 7, 7, 8, 9, … 22, 24. 
+        // namely her adjusted finishing place of 2nd(as a result of the disqualification) plus 5 penalty places, leaving that â€˜ 2 point slotâ€™
+        // vacant.Points for that race would be: 1, 3, 4, 5, 6, 7, 7, 8, 9, â€¦ 22, 24. 
 
         [Fact]
         public void CalculateResults_Dsq_IgnoredForPenaltyAfter()
@@ -584,7 +584,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         // Example 4: Same as Example 3 above except that the boat that is disqualified finished sixth(not second). All boats with a
         // finishing place after the disqualified boat move up one place(see rule A6(1)). Boat A receives points for 8th place, namely her
         // finishing place of 3rd(not changed as the result of the disqualification of a boat whose finishing place is after her) plus 5 penalty
-        // places.The ‘3 point slot’ remains vacant. Points for that race would be: 1, 2, 4, 5, 6, 7, 8, 8, 9, … 22, 24.
+        // places.The â€˜3 point slotâ€™ remains vacant. Points for that race would be: 1, 2, 4, 5, 6, 7, 8, 8, 9, â€¦ 22, 24.
         [Fact]
         public void CalculateResults_SixthDsq_DoesNotChangethirdPlusPenalty()
         {
@@ -639,12 +639,12 @@ namespace SailScores.Test.Unit.Core.Scoring
 
         // https://www.rya.org.uk/SiteCollectionDocuments/Racing/RacingInformation/RaceOfficials/Resource%20Centre/Best%20Practice%20Guidelines%20Policies/Scoring.pdf
 
-        // Example: Scoring: Low Point – one score excluded
+        // Example: Scoring: Low Point â€“ one score excluded
         // Race No: 1 2 3 4 5 6 TOTAL REORDERED COUNTING SCORES SCORES NOT USED
         // Boat A 3 4 1 6 2 7 16 1 2 3 4 6 7
         // Boat B 4 3 2 1 6 6 16 1 2 3 4 6 6
         // Boat C 1 2 7 3 3 14 16 1 2 3 3 7 14
-        // Rule A8.1 is sometimes known as ‘most firsts, etc.’ It breaks the tie between C and the two other boats in C’s favour.It does not
+        // Rule A8.1 is sometimes known as â€˜most firsts, etc.â€™ It breaks the tie between C and the two other boats in Câ€™s favour.It does not
         // break the tie between A and B. Rule A8.2 must now be applied to break that tie (in favour of B, for her better last race score). 
         [Fact]
         public void CalculateResults_SeriesTieBreaker_IgnoresDiscards()
@@ -697,14 +697,14 @@ namespace SailScores.Test.Unit.Core.Scoring
             Assert.True(results.Results[thirdComp].Rank < results.Results[firstComp].Rank);
         }
 
-        // Example: Scoring: Low Point – one score excluded.
+        // Example: Scoring: Low Point â€“ one score excluded.
         // Race No:  1  2  3  4  TOTAL
         // Boat A    3  4  5  10 12
         // Boat B    11 3  4  5  12
         // Boat C    5  15 3  4  12
         // Boat D    4  5  6  3  12
         // A8.1 does not break any tie, as they each have scores of 3, 4, 5 that count.
-        // A8.2 applies, and the tie is broken in the order of D, C, B, A, the order of their last race scores.Note that A’s race 4 result was
+        // A8.2 applies, and the tie is broken in the order of D, C, B, A, the order of their last race scores.Note that Aâ€™s race 4 result was
         // her discard, but it is still used to break the tie.
 
         // Normally, the last race will resolve most ties.The next-to-last race (and so on) will need to be used only if two boats have the
@@ -870,6 +870,111 @@ namespace SailScores.Test.Unit.Core.Scoring
                 Results = null
 
             };
+        }
+
+        private Series GetSeriesWithParticipation(int competitorCount, int raceCount, int participatedInAll)
+        {
+            var competitors = new List<Competitor>();
+            for (int i = 0; i < competitorCount; i++)
+            {
+                competitors.Add(new Competitor { Id = Guid.NewGuid(), Name = $"Competitor {i}" });
+            }
+            var races = new List<Race>();
+            for (int i = 0; i < raceCount; i++)
+            {
+                var race = new Race
+                {
+                    Id = Guid.NewGuid(),
+                    Name = $"Race {i}",
+                    Order = i + 1,
+                    Date = DateTime.UtcNow.AddDays(i)
+                };
+                var scores = new List<Score>();
+                for (int j = 0; j < competitors.Count; j++)
+                {
+                    scores.Add(new Score
+                    {
+                        Competitor = competitors[j],
+                        Race = race,
+                        Place = (j < participatedInAll) ? j + 1 : null,
+                        Code = (j < participatedInAll) ? null : "DNC"
+                    });
+                }
+                race.Scores = scores;
+                races.Add(race);
+            }
+            var system = MakeDefaultScoringSystem();
+            system.ParticipationPercent = 60m;
+            return new Series
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Series",
+                Races = races,
+                Competitors = competitors,
+                ScoringSystem = system,
+                Results = null
+            };
+        }
+
+        [Fact]
+        public void Competitors_BelowParticipationRequirement_AreNotRanked()
+        {
+            // Arrange: Only first competitor participates in all races, others are DNC
+            var series = GetSeriesWithParticipation(3, 5, 1);
+            var calculator = new AppendixACalculator(series.ScoringSystem);
+
+            // Act
+            var results = calculator.CalculateResults(series);
+
+            // Assert
+            var ranked = results.Results.Where(r => r.Value.Rank.HasValue).ToList();
+            Assert.Single(ranked);
+            Assert.Equal("Competitor 0", ranked[0].Key.Name);
+        }
+
+        [Fact]
+        public void Competitors_MeetingParticipationRequirement_AreAllRanked()
+        {
+            // Arrange: All competitors participate in all races
+            var series = GetSeriesWithParticipation(3, 5, 3);
+            var calculator = new AppendixACalculator(series.ScoringSystem);
+
+            // Act
+            var results = calculator.CalculateResults(series);
+
+            // Assert
+            var ranked = results.Results.Where(r => r.Value.Rank.HasValue).ToList();
+            Assert.Equal(3, ranked.Count);
+        }
+
+        [Fact]
+        public void Results_WithParticipationPercent_SetsPercentRequired()
+        {
+            // Arrange
+            var series = GetSeriesWithParticipation(2, 5, 2);
+            var calculator = new AppendixACalculator(series.ScoringSystem);
+
+            // Act
+            var results = calculator.CalculateResults(series);
+
+            // Assert
+            Assert.Equal(60m, results.PercentRequired);
+        }
+
+        [Fact]
+        public void Results_WithoutParticipationPercent_AllCompetitorsRanked()
+        {
+            // Arrange: no participation percent set; one competitor DNCs all races
+            var series = GetSeriesWithParticipation(3, 5, 1);
+            series.ScoringSystem.ParticipationPercent = null;
+            var calculator = new AppendixACalculator(series.ScoringSystem);
+
+            // Act
+            var results = calculator.CalculateResults(series);
+
+            // Assert: all competitors should be ranked because no threshold is set
+            var ranked = results.Results.Where(r => r.Value.Rank.HasValue).ToList();
+            Assert.Equal(3, ranked.Count);
         }
     }
 }
