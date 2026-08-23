@@ -589,6 +589,15 @@ namespace SailScores.Core.Scoring
                 case "AVE P":
                     returnString.Append("Average of results in prior races");
                     break;
+                case "AVE W":
+                    returnString.Append("Average of results rounded to a whole number");
+                    break;
+                case "AVE W ND":
+                    returnString.Append("Average of non-discarded results rounded to a whole number");
+                    break;
+                case "AVE W P":
+                    returnString.Append("Average of results in prior races rounded to a whole number");
+                    break;
                 case "PLC%":
                     returnString.Append($"Place + penalty ({codeDef.FormulaValue?.ToString("0.###")}% of DNF score)");
                     break;
