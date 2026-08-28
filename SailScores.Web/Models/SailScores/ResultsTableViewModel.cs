@@ -39,4 +39,5 @@ public class ResultsTableViewModel
     public string TrendLegend { get; set; }
     public bool HideDncDiscards { get; set; }
     public DateTime? UpdatedDate { get; set; }
+    public string DefaultDateFormat { get; set; }
 }

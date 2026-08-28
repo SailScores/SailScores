@@ -8,6 +8,7 @@ using SailScores.Database.Migrations;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Resources;
 using SailScores.Web.Services.Interfaces;
+using SailScores.Core.Utility;
 
 namespace SailScores.Web.Services;
 
@@ -175,6 +176,12 @@ public class AdminService : IAdminService
         // Map the posted long name to a proper culture code
         var shortLocale = _localizerService.GetLocaleShortName(clubObject.Locale);
         clubObject.Locale = shortLocale;
+        if (!ClubDateFormatUtility.TryNormalize(clubObject.DefaultDateFormat, out var normalizedFormat, out var error))
+        {
+            throw new InvalidOperationException(error);
+        }
+
+        clubObject.DefaultDateFormat = normalizedFormat;
 
         await _localizerService.UpdateCulture(clubObject.Initials, shortLocale);
         await _coreClubService.UpdateClub(clubObject);

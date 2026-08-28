@@ -65,6 +65,8 @@ public class RegattaController : Controller
                 return Redirect($"/{Uri.EscapeDataString(forward.NewClubInitials)}/Regatta/" +
                     $"{forward.NewSeasonUrlName}/{forward.NewRegattaUrlName}");
             }
+            var club = await _clubService.GetMinimalClub(clubInitials);
+            ViewData["DefaultDateFormat"] = club.DefaultDateFormat;
             return NotFound();
         }
 
@@ -249,6 +251,8 @@ public class RegattaController : Controller
         {
             return NotFound();
         }
+        var club = await _clubService.GetMinimalClub(clubInitials);
+        ViewData["DefaultDateFormat"] = club.DefaultDateFormat;
 
         var filename = System.Web.HttpUtility.UrlEncode($"{regatta.Name}.html", System.Text.Encoding.UTF8);
         filename = filename.Replace("+", " ");

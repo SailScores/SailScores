@@ -46,6 +46,8 @@ public class WhatIfController : Controller
         var clubId = await _clubService.GetClubId(clubInitials);
 
         var series = await _seriesService.GetSeriesAsync(seriesId);
+        var club = await _clubService.GetMinimalClub(clubId);
+        ViewData["DefaultDateFormat"] = club.DefaultDateFormat;
 
         var vm = new WhatIfViewModel
         {
@@ -70,6 +72,11 @@ public class WhatIfController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
         var vm = await _whatIfService.GetResults(options);
+        if (vm.Series != null)
+        {
+            var club = await _clubService.GetMinimalClub(vm.Series.ClubId);
+            ViewData["DefaultDateFormat"] = club.DefaultDateFormat;
+        }
         return View("Results", vm);
     }
 }

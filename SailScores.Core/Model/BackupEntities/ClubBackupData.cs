@@ -23,6 +23,7 @@ public class ClubBackupData
     public bool? ShowCalendarInNav { get; set; }
     public string Url { get; set; }
     public string Locale { get; set; }
+    public string DefaultDateFormat { get; set; }
     public bool? UseAdvancedFeatures { get; set; }
     public bool? UseExperimentalFeatures { get; set; }
     public DateTime? AdvancedFeaturesEnabledDate { get; set; }
