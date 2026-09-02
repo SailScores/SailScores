@@ -121,7 +121,7 @@
                     @foreach (var code in Model.ScoreCodes.OrderBy(c => c.Name))
                     {
                         <tr>
-                            <td>
+                            <td class="pe-0">
                                 <a class="btn btn-sm btn-outline-danger"
                                    asp-action="Delete"
                                    asp-controller="ScoreCode"
@@ -129,7 +129,7 @@
                                    asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"
                                    title="Delete">
                                     <span class="fas fa-trash"></span>
-                                </a> &nbsp;
+                                </a> 
                                 <a class="btn btn-sm btn-outline-primary"
                                    asp-action="Edit"
                                    asp-controller="ScoreCode"
@@ -162,7 +162,7 @@
                     @foreach (var code in Model.InheritedScoreCodes.OrderBy(c => c.Name))
                     {
                         <tr>
-                            <td>
+                            <td class="pe-0">
                                 <a asp-action="Override" asp-controller="ScoreCode"
                                    asp-route-code="@code.Name"
                                    asp-route-scoringsystemid="@Model.Id"

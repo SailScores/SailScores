@@ -13,6 +13,9 @@ namespace SailScores.Core.Scoring
         protected const string AVERAGE_FORMULANAME = "AVE";
         protected const string AVE_AFTER_DISCARDS_FORMULANAME = "AVE ND";
         protected const string AVE_PRIOR_RACES_FORMULANAME = "AVE P";
+        protected const string AVE_WHOLE_FORMULANAME = "AVE W";
+        protected const string AVE_WHOLE_ND_FORMULANAME = "AVE W ND";
+        protected const string AVE_WHOLE_P_FORMULANAME = "AVE W P";
         protected const string SERIESCOMPETITORS_FORMULANAME = "SER+";
         protected const string MANUAL_FORMULANAME = "MAN";
         protected const string FINISHERSPLUS_FORMULANAME = "FIN+";
@@ -266,7 +269,10 @@ namespace SailScores.Core.Scoring
             var scoreCode = GetScoreCode(code);
             return scoreCode.Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
                 || scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
+                || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_ND_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_P_FORMULANAME, CASE_INSENSITIVE);
         }
 
         protected bool IsNonDiscardAverage(string code)
@@ -276,7 +282,8 @@ namespace SailScores.Core.Scoring
                 return false;
             }
             var scoreCode = GetScoreCode(code);
-            return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE);
+            return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_ND_FORMULANAME, CASE_INSENSITIVE);
         }
 
         protected bool CountsAsFinished(Score s)
@@ -582,6 +589,15 @@ namespace SailScores.Core.Scoring
                 case "AVE P":
                     returnString.Append("Average of results in prior races");
                     break;
+                case "AVE W":
+                    returnString.Append("Average of results rounded to a whole number");
+                    break;
+                case "AVE W ND":
+                    returnString.Append("Average of non-discarded results rounded to a whole number");
+                    break;
+                case "AVE W P":
+                    returnString.Append("Average of results in prior races rounded to a whole number");
+                    break;
                 case "PLC%":
                     returnString.Append($"Place + penalty ({codeDef.FormulaValue?.ToString("0.###")}% of DNF score)");
                     break;
@@ -847,6 +863,9 @@ namespace SailScores.Core.Scoring
                 AVERAGE_FORMULANAME => CalculateAverage(compResults),
                 AVE_AFTER_DISCARDS_FORMULANAME => CalculateAverageNoDiscards(compResults),
                 AVE_PRIOR_RACES_FORMULANAME => CalculateAverageOfPrior(compResults, race),
+                AVE_WHOLE_FORMULANAME => CalculateAverage(compResults, decimals: 0),
+                AVE_WHOLE_ND_FORMULANAME => CalculateAverageNoDiscards(compResults, decimals: 0),
+                AVE_WHOLE_P_FORMULANAME => CalculateAverageOfPrior(compResults, race, decimals: 0),
                 SERIESCOMPETITORS_FORMULANAME => GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0m),
                 _ => null,
             };
@@ -858,7 +877,10 @@ namespace SailScores.Core.Scoring
             string formula = scoreCode?.Formula ?? String.Empty;
             bool average = formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
                 || formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
-                || formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
+                || formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_WHOLE_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_WHOLE_ND_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_WHOLE_P_FORMULANAME, CASE_INSENSITIVE);
             bool seriesCompPlus = scoreCode?.Formula?.Equals(SERIESCOMPETITORS_FORMULANAME, CASE_INSENSITIVE)
                 ?? false;
             return average || seriesCompPlus;
@@ -937,18 +959,20 @@ namespace SailScores.Core.Scoring
 
 
         private decimal? CalculateAverage(
-            SeriesCompetitorResults compResults)
+            SeriesCompetitorResults compResults,
+            int decimals = 1)
         {
             var average = compResults.CalculatedScores.Values
                 .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                 .Average(s => s.ScoreValue) ?? 0m;
 
-            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+            return Math.Round(average, decimals, MidpointRounding.AwayFromZero);
 
         }
 
         private decimal? CalculateAverageNoDiscards(
-            SeriesCompetitorResults compResults)
+            SeriesCompetitorResults compResults,
+            int decimals = 1)
         {
             int numAverages = compResults.CalculatedScores
                     .Values.Count(s =>
@@ -974,13 +998,14 @@ namespace SailScores.Core.Scoring
                    .Take(compResults.CalculatedScores.Count - numAverages - discards)
                    .Average(s => s.ScoreValue) ?? 0m;
             }
-            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+            return Math.Round(average, decimals, MidpointRounding.AwayFromZero);
 
         }
 
         private decimal? CalculateAverageOfPrior(
             SeriesCompetitorResults compResults,
-            Race race)
+            Race race,
+            int decimals = 1)
         {
             var beforeDate = race.Date;
             var beforeOrder = race.Order;
@@ -995,7 +1020,7 @@ namespace SailScores.Core.Scoring
                 .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                 .Average(s => s.ScoreValue) ?? 0m;
 
-            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+            return Math.Round(average, decimals, MidpointRounding.AwayFromZero);
 
         }
     }
