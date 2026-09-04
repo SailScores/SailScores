@@ -321,7 +321,7 @@
                         </label>
                     </div>
 
-                    <div class="form-check mb-3">
+                    <div class="form-check mb-2">
                         <input asp-for="EnableCustomCompetitorFields" class="form-check-input" id="EnableCustomCompetitorFields" />
                         <label class="form-check-label" for="EnableCustomCompetitorFields">
                             Enable Custom Competitor Fields
@@ -335,14 +335,21 @@
                             </a>
                         </label>
                     </div>
-                    @if (Model.EnableCustomCompetitorFields)
-                    {
-                        <div class="mb-3">
-                            <a asp-controller="CompetitorField" asp-action="Index" asp-route-clubInitials="@Model.Initials" class="btn btn-outline-primary btn-sm">
-                                Manage custom fields
-                            </a>
-                        </div>
-                    }
+                    <div class="small text-body-secondary mb-3" id="customCompetitorFieldsNote">
+                        Turn this on to edit field definitions below. This setting saves immediately when changed.
+                    </div>
+                    <div class="mb-3">
+                        <a asp-controller="CompetitorField"
+                           asp-action="Index"
+                           asp-route-clubInitials="@Model.Initials"
+                           class="btn btn-outline-primary btn-sm@(Model.EnableCustomCompetitorFields ? string.Empty : " disabled")"
+                           id="manageCustomFieldsButton"
+                           aria-disabled="@(!Model.EnableCustomCompetitorFields).ToString().ToLowerInvariant()"
+                           tabindex="@(Model.EnableCustomCompetitorFields ? "0" : "-1")">
+                            Manage custom fields
+                        </a>
+                        <div class="small text-body-secondary mt-2" id="customCompetitorFieldsStatus"></div>
+                    </div>
 
                     <div class="mb-3" id="defaultHandicapSystemRow">
                         <label asp-for="DefaultHandicapSystemId" class="form-label">Default Handicap System</label>
@@ -438,13 +445,16 @@
                             </a>
                         </label>
                         <div class="input-group">
-                            <input asp-for="DefaultDateFormat" class="form-control" placeholder="dd/MM/yyyy" autocomplete="off" />
+                            <input asp-for="DefaultDateFormat" class="form-control" placeholder="MM/dd" autocomplete="off" />
                             <button type="button" class="btn btn-outline-secondary" id="clearDateFormatButton">Use locale default</button>
                         </div>
                         <span asp-validation-for="DefaultDateFormat" class="text-danger"></span>
                         <div class="small text-muted">
-                            Supported tokens: d, dd, M, MM, MMM, MMMM, yy, yyyy. Example formats:
-                            <code>dd/MM/yyyy</code>, <code>MM-dd-yyyy</code>, <code>d MMM yyyy</code>.
+                            Supported tokens: d, dd, M, MM, MMM, MMMM, yy, yyyy. For example, 'M' uses a
+                            single-digit month when possible, while 'MM' always uses two digits, and 'MMM' uses the
+                            name abbreviation. Popular formats:
+                            <code>M/d</code>, <code>dd.MM</code>, or <code>d MMM</code>.<br />
+                            This format will be used in series race headings.
                         </div>
                         @{
                             string preview = "Uses localization default.";
@@ -588,6 +598,70 @@
             cb.addEventListener('change', toggle);
         })();
 
+        (function () {
+            var checkbox = document.getElementById('EnableCustomCompetitorFields');
+            var manageButton = document.getElementById('manageCustomFieldsButton');
+            var status = document.getElementById('customCompetitorFieldsStatus');
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            var updateUrl = '@Url.Action("SetCustomCompetitorFieldsEnabled", "Admin", new { clubInitials = Model.Initials })';
+
+            function setManageButtonState(isEnabled) {
+                manageButton.classList.toggle('disabled', !isEnabled);
+                manageButton.setAttribute('aria-disabled', (!isEnabled).toString());
+                manageButton.setAttribute('tabindex', isEnabled ? '0' : '-1');
+            }
+
+            function setStatus(message, isError) {
+                status.textContent = message;
+                status.classList.toggle('text-danger', isError);
+            }
+
+            setManageButtonState(checkbox.checked);
+
+            manageButton.addEventListener('click', function (event) {
+                if (manageButton.getAttribute('aria-disabled') === 'true') {
+                    event.preventDefault();
+                }
+            });
+
+            checkbox.addEventListener('change', async function () {
+                var isEnabled = checkbox.checked;
+                var previousValue = !isEnabled;
+
+                checkbox.disabled = true;
+                setStatus('Saving setting...', false);
+
+                try {
+                    var response = await fetch(updateUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                        },
+                        body: '__RequestVerificationToken=' + encodeURIComponent(token)
+                            + '&isEnabled=' + encodeURIComponent(isEnabled)
+                    });
+                    var result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.message || 'Unable to save setting.');
+                    }
+
+                    setManageButtonState(result.isEnabled);
+                    setStatus(
+                        result.isEnabled
+                            ? 'Saved. You can now manage custom fields.'
+                            : 'Saved.',
+                        false);
+                } catch (error) {
+                    checkbox.checked = previousValue;
+                    setManageButtonState(previousValue);
+                    setStatus(error.message || 'Unable to save setting.', true);
+                } finally {
+                    checkbox.disabled = false;
+                }
+            });
+        })();
+
         document.getElementById('logoFileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const preview = document.getElementById('newLogoPreview');
@@ -614,7 +688,9 @@
             var input = document.getElementById('DefaultDateFormat');
             var clearButton = document.getElementById('clearDateFormatButton');
             var preview = document.getElementById('dateFormatPreview');
-            var sampleDate = new Date(2026, 0, 23);
+            // set the sample to today:
+            var sampleDate = Date.Today;
+//            var sampleDate = new Date(2026, 0, 23);
 
             function formatSampleDate(pattern) {
                 if (!pattern || !pattern.trim()) {

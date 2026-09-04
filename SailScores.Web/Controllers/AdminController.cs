@@ -155,6 +155,27 @@ public class AdminController : Controller
         }
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+    public async Task<IActionResult> SetCustomCompetitorFieldsEnabled(string clubInitials, bool isEnabled)
+    {
+        try
+        {
+            var club = await _adminService.GetClubForEdit(clubInitials);
+            var clubObject = _mapper.Map<Club>(club);
+            clubObject.Initials = clubInitials;
+            clubObject.EnableCustomCompetitorFields = isEnabled;
+            await _adminService.UpdateClub(clubObject);
+
+            return Json(new { success = true, isEnabled });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+    }
+
     [AllowAnonymous]
     public async Task<IActionResult> GetLogo(Guid id)
     {

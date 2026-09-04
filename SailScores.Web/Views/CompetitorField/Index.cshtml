@@ -15,13 +15,13 @@
     <table class="table table-sm table-striped">
         <thead>
             <tr>
+                <th></th>
                 <th>Field name</th>
                 <th>Display label</th>
                 <th>Value type</th>
                 <th>Display order</th>
                 <th>Active?</th>
                 <th>Highly visible</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -32,28 +32,6 @@
                         <a asp-action="Edit" asp-route-clubInitials="@ViewData["ClubInitials"]" asp-route-id="@field.Id" class="btn btn-sm btn-outline-primary me-2" title="Edit">
                             <span class="fas fa-pen"></span>
                         </a>
-                        @if (field.IsActive)
-                        {
-                            <form asp-action="Inactivate" method="post" style="display:inline;" onsubmit="return confirm('Mark this field as inactive?');">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="clubInitials" value="@ViewData["ClubInitials"]" />
-                                <input type="hidden" name="id" value="@field.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Inactivate">
-                                    <span class="fas fa-eye-slash"></span>
-                                </button>
-                            </form>
-                        }
-                        else
-                        {
-                            <form asp-action="Reactivate" method="post" style="display:inline;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="clubInitials" value="@ViewData["ClubInitials"]" />
-                                <input type="hidden" name="id" value="@field.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-success" title="Reactivate">
-                                    <span class="fas fa-undo"></span>
-                                </button>
-                            </form>
-                        }
                         <form asp-action="DeletePermanent" method="post" style="display:inline;" onsubmit="return confirm('Permanently delete this field and all values? This cannot be undone.');">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="clubInitials" value="@ViewData["ClubInitials"]" />
