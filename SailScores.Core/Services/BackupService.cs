@@ -43,6 +43,7 @@ public class BackupService : IBackupService
         public bool? ShowCalendarInNav { get; set; }
         public string Url { get; set; }
         public string Locale { get; set; }
+        public string DefaultDateFormat { get; set; }
         public int? DefaultRaceDateOffset { get; set; }
         public string StatisticsDescription { get; set; }
         public Guid? LogoFileId { get; set; }
@@ -154,6 +155,7 @@ public class BackupService : IBackupService
             ShowCalendarInNav = club.ShowCalendarInNav,
             Url = club.Url,
             Locale = club.Locale,
+            DefaultDateFormat = club.DefaultDateFormat,
             DefaultRaceDateOffset = club.DefaultRaceDateOffset,
             StatisticsDescription = club.StatisticsDescription,
             LogoFileId = club.LogoFileId,
@@ -1116,6 +1118,7 @@ public class BackupService : IBackupService
         club.ShowClubInResults = backup.ShowClubInResults;
         club.ShowCalendarInNav = backup.ShowCalendarInNav;
         club.Locale = backup.Locale;
+        club.DefaultDateFormat = backup.DefaultDateFormat;
         club.DefaultRaceDateOffset = backup.DefaultRaceDateOffset;
         club.StatisticsDescription = backup.StatisticsDescription;
         club.EnableHandicapScoring = backup.EnableHandicapScoring;
@@ -1157,6 +1160,15 @@ public class BackupService : IBackupService
         Guid? defaultHandicapSystemId,
         CancellationToken cancellationToken)
     {
+        await AddAssignmentIfColumnExistsAsync(
+            assignments,
+            parameters,
+            "DefaultDateFormat",
+            "DefaultDateFormat = @defaultDateFormat",
+            "@defaultDateFormat",
+            backup.DefaultDateFormat ?? (object)DBNull.Value,
+            cancellationToken).ConfigureAwait(false);
+
         await AddAssignmentIfColumnExistsAsync(
             assignments,
             parameters,
@@ -1346,6 +1358,7 @@ public class BackupService : IBackupService
             ShowCalendarInNav = club.ShowCalendarInNav,
             Url = club.Url,
             Locale = club.Locale,
+            DefaultDateFormat = club.DefaultDateFormat,
             DefaultRaceDateOffset = club.DefaultRaceDateOffset,
             StatisticsDescription = club.StatisticsDescription,
             LogoFileId = club.LogoFileId,
@@ -1374,6 +1387,7 @@ public class BackupService : IBackupService
             "LogoFileId"
         };
 
+        await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "DefaultDateFormat", cancellationToken).ConfigureAwait(false);
         await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "ShowClubInResults", cancellationToken).ConfigureAwait(false);
         await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "ShowCalendarInNav", cancellationToken).ConfigureAwait(false);
         await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "DefaultRaceDateOffset", cancellationToken).ConfigureAwait(false);
@@ -1423,6 +1437,13 @@ public class BackupService : IBackupService
         IReadOnlyCollection<string> requestedColumns,
         DbDataReader reader)
     {
+        ApplyOptionalSnapshotValue(
+            snapshot,
+            requestedColumns,
+            reader,
+            "DefaultDateFormat",
+            (s, value) => s.DefaultDateFormat = value,
+            ReadOptionalString);
         ApplyOptionalSnapshotValue(
             snapshot,
             requestedColumns,

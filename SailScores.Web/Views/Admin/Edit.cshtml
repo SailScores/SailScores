@@ -1,4 +1,5 @@
 @model SailScores.Web.Models.SailScores.AdminEditViewModel
+@using SailScores.Core.Utility
 
 @{
     ViewData["Title"] = "Edit " + Model.Name;
@@ -423,6 +424,38 @@
                         <select id="locale" asp-for="Locale" class="form-select" asp-items="new SelectList(Model.LocaleOptions)"></select>
                         <span asp-validation-for="Locale" class="text-danger"></span>
                     </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DefaultDateFormat" class="form-label">
+                            Default Date Format
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Overrides default race date formatting in results headers for this club. Leave blank to use localization defaults.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="DefaultDateFormat" class="form-control" placeholder="dd/MM/yyyy" autocomplete="off" />
+                            <button type="button" class="btn btn-outline-secondary" id="clearDateFormatButton">Use locale default</button>
+                        </div>
+                        <span asp-validation-for="DefaultDateFormat" class="text-danger"></span>
+                        <div class="small text-muted">
+                            Supported tokens: d, dd, M, MM, MMM, MMMM, yy, yyyy. Example formats:
+                            <code>dd/MM/yyyy</code>, <code>MM-dd-yyyy</code>, <code>d MMM yyyy</code>.
+                        </div>
+                        @{
+                            string preview = "Uses localization default.";
+                            if (ClubDateFormatUtility.TryNormalize(Model.DefaultDateFormat, out var normalizedFormat, out _)
+                                && !string.IsNullOrWhiteSpace(normalizedFormat))
+                            {
+                                preview = $"Example: {DateTime.Today.ToString(normalizedFormat)}";
+                            }
+                        }
+                        <div class="small text-body-secondary mt-1" id="dateFormatPreview">@preview</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -576,5 +609,52 @@
                 preview.style.display = 'none';
             }
         });
+
+        (function () {
+            var input = document.getElementById('DefaultDateFormat');
+            var clearButton = document.getElementById('clearDateFormatButton');
+            var preview = document.getElementById('dateFormatPreview');
+            var sampleDate = new Date(2026, 0, 23);
+
+            function formatSampleDate(pattern) {
+                if (!pattern || !pattern.trim()) {
+                    return 'Uses localization default.';
+                }
+
+                var month = sampleDate.getMonth() + 1;
+                var day = sampleDate.getDate();
+                var year = sampleDate.getFullYear();
+
+                var shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                var longMonthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+
+                var output = pattern;
+                output = output.replace(/yyyy/g, String(year));
+                output = output.replace(/yy/g, String(year).slice(-2));
+                output = output.replace(/MMMM/g, longMonthNames[month - 1]);
+                output = output.replace(/MMM/g, shortMonthNames[month - 1]);
+                output = output.replace(/MM/g, String(month).padStart(2, '0'));
+                output = output.replace(/M/g, String(month));
+                output = output.replace(/dd/g, String(day).padStart(2, '0'));
+                output = output.replace(/d/g, String(day));
+
+                return 'Example: ' + output;
+            }
+
+            function updatePreview() {
+                preview.textContent = formatSampleDate(input.value);
+            }
+
+            clearButton.addEventListener('click', function () {
+                input.value = '';
+                updatePreview();
+            });
+
+            input.addEventListener('input', updatePreview);
+            updatePreview();
+        })();
     </script>
 }
