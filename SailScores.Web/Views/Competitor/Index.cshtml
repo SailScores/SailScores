@@ -127,6 +127,18 @@
                         <option value="sail">Sail Number</option>
                         <option value="created">Creation Date (Descending)</option>
                         <option value="class">Class</option>
+                        @* Append HighlyVisible field names as additional sort options *@
+                        @if (Model.List != null && Model.List.Any())
+                        {
+                            var hvFields = Model.List.SelectMany(i => i.HighlyVisibleCustomFieldValues)
+                                .Select(f => f.Label)
+                                .Distinct()
+                                .ToList();
+                            foreach (var label in hvFields)
+                            {
+                                <option value="hv:@label">@label</option>
+                            }
+                        }
                     </select>
                 </div>
             </div>
@@ -224,33 +236,56 @@
                         <div class="col-12 col-md-6">
                             <small>@Html.DisplayFor(modelItem => item.BoatClass.Name)</small>
                             <em>@Html.DisplayFor(modelItem => item.BoatName)</em>
+
                             @if(Model.CanEdit) {
                             <div class="form-check form-check-inline float-end">
                                 <input class="form-check-input comp-active-switch" type="checkbox"
-                                       @(item.IsActive ? "checked" : "")
-                                       data-ss-competitorid="@item.Id">
-                                <label class="form-check-label" for="switchCheckChecked"><em>Active</em></label>
-                                </div>
+                                        id="comp-active-@item.Id"
+                                        @(item.IsActive ? "checked" : "")
+                                        data-ss-competitorid="@item.Id">
+                                <label class="form-check-label" for="comp-active-@item.Id"><em>Active</em></label>
+                            </div>
                             } else
                             {
-                                <em class="text-warning small float-end">@(item.IsActive ? "" : "Inactive")</em>
+                            <em class="text-warning small float-end">@(item.IsActive ? "" : "Inactive")</em>
                             }
 
                         </div>
-                            
+
                         <div class="d-none d-md-block col-md-12 col-lg-9 ">
                             @Html.DisplayFor(modelItem => item.Notes)
                         </div>
 
-                        <div class="d-none d-lg-inline col-3">
-                            <span class="small text-muted float-end">
-                            @if (item.Created.HasValue)
-                            {
-                                @localizer["created"]
-                                @Html.Raw(" ")
-                                @item.Created.Value.ToString("d")
-                                }
-                            </span>
+                        <div class="col-12 mt-1">
+                            <div class="row g-1">
+                                <div class="col-12 col-lg-9">
+                                    @if (item.HighlyVisibleCustomFieldValues != null
+                                        && item.HighlyVisibleCustomFieldValues.Any())
+                                    {
+                                        <div class="row g-1">
+                                            @foreach (var fieldValue in item.HighlyVisibleCustomFieldValues)
+                                            {
+                                                <div class="col-6 col-lg-4 hv-field"
+                                                     data-hv-label="@fieldValue.Label"
+                                                     data-hv-value="@fieldValue.Value">
+                                                    <small class="text-muted">@fieldValue.Label</small>
+                                                    <span class="ms-1">@fieldValue.Value</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-12 col-lg-3 text-lg-end">
+                                    <span class="small text-muted">
+                                    @if (item.Created.HasValue)
+                                    {
+                                        @localizer["created"]
+                                        @Html.Raw(" ")
+                                        @item.Created.Value.ToString("d")
+                                    }
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -354,6 +389,28 @@
                 );
             }
 
+            // Support sorting by highly visible field: option value will be 'hv:Field Label'
+            if (selectedSort && selectedSort.startsWith('hv:')) {
+                const label = selectedSort.substring(3).trim().toLocaleLowerCase();
+
+                function findFieldValue(container) {
+                    let found = '';
+                    container.find('.hv-field').each(function () {
+                        const currentLabel = (this.dataset.hvLabel || '').trim().toLocaleLowerCase();
+                        if (currentLabel === label) {
+                            found = (this.dataset.hvValue || '').trim();
+                            return false;
+                        }
+                    });
+
+                    return normalizeSortValue(found);
+                }
+
+                const aVal = findFieldValue($(a));
+                const bVal = findFieldValue($(b));
+                return alphanumericCompare(aVal, bVal);
+            }
+
             return alphanumericCompare(
                 normalizeSortValue($(a).data('name')),
                 normalizeSortValue($(b).data('name'))
@@ -398,7 +455,7 @@
                 speed = 300;
             }
 
-            if($('#show-inactive').is(":checked") ) {
+            if ($('#show-inactive').is(":checked")) {
                 $('.comp-row').show(speed);
                 setCookie('showInactiveComps', true, 30);
             } else {

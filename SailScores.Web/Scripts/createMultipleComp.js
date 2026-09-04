@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     var allCompDiv = document.getElementsByName("competitors[0].Name")[0];
     allCompDiv = document.getElementById('allCompetitors');
     if (allCompDiv) {
@@ -22,10 +22,12 @@
             var startColumn = Number(event.target.dataset.column) || 0;
             var startRow = Number(event.target.dataset.row) || 0;
 
+            var totalColumns = Number(allCompDiv.dataset.totalColumns) || 4;
+
             // paste the array:
             for (i = 0; i < clipRows.length; i++) {
                 for (var j = 0; j < clipRows[i].length; j++) {
-                    if (startColumn + j < 4) {
+                    if (startColumn + j < totalColumns) {
                         getInputAtRowColumn(startRow + i, startColumn + j).value = clipRows[i][j];
                     }
                 }
@@ -72,28 +74,19 @@ function addNewRow() {
     if (rowIndex < 0) rowIndex = 0;
     var namePrefix = "competitors[" + rowIndex + "].";
 
-    var sail = compListItem.querySelectorAll('input[name="template.SailNumber"]')[0];
-    sail.name = namePrefix + "SailNumber";
-    sail.dataset.column = 0;
-    sail.dataset.row = rowIndex;
-
-    var name = compListItem.querySelectorAll('input[name="template.Name"]')[0];
-    name.name = namePrefix + "Name";
-    name.dataset.column = 1;
-    name.dataset.row = rowIndex;
-
-    var boat = compListItem.querySelectorAll('input[name="template.BoatName"]')[0];
-    boat.name = namePrefix + "BoatName";
-    boat.dataset.column = 2;
-    boat.dataset.row = rowIndex;
-
-    var club = compListItem.querySelectorAll('input[name="template.HomeClubName"]')[0];
-    club.name = namePrefix + "HomeClubName";
-    club.dataset.column = 3;
-    club.dataset.row = rowIndex;
+    var templateFields = compListItem.querySelectorAll('[data-template-field]');
+    templateFields.forEach(function (field) {
+        field.name = namePrefix + field.dataset.templateField;
+        if (field.dataset.column) {
+            field.dataset.row = rowIndex;
+        }
+    });
 
     compListItem.style.display = "";
     allCompDiv.appendChild(compListItem);
 
-    sail.focus();
+    var sail = compListItem.querySelectorAll('input[name="' + namePrefix + 'SailNumber"]')[0];
+    if (sail) {
+        sail.focus();
+    }
 }

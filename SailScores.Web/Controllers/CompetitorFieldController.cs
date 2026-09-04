@@ -25,7 +25,8 @@ public class CompetitorFieldController : Controller
     {
         ViewData["ClubInitials"] = clubInitials;
         var clubId = await _clubService.GetClubId(clubInitials);
-        var fields = await _competitorFieldService.GetFieldDefinitionsAsync(clubId);
+        // Admin index should show all definitions (including inactive) so admins can reactivate if needed
+        var fields = await _competitorFieldService.GetAllFieldDefinitionsAsync(clubId);
         return View(fields);
     }
 
@@ -33,7 +34,14 @@ public class CompetitorFieldController : Controller
     {
         ViewData["ClubInitials"] = clubInitials;
         var clubId = await _clubService.GetClubId(clubInitials);
-        return View(new CompetitorFieldDefinition { ClubId = clubId, DataType = CustomFieldDataType.Text, DisplayOrder = 0 });
+        return View(new CompetitorFieldDefinition
+        {
+            ClubId = clubId,
+            DataType = CustomFieldDataType.Text,
+            DisplayOrder = 0,
+            IsActive = true,
+            HighlyVisible = false
+        });
     }
 
     [HttpPost]
@@ -48,6 +56,9 @@ public class CompetitorFieldController : Controller
 
         var clubId = await _clubService.GetClubId(clubInitials);
         model.ClubId = clubId;
+        // Correctly interpret checkbox inputs which may post multiple values (hidden + checkbox)
+        var hvValues = Request.Form["HighlyVisible"];
+        model.HighlyVisible = hvValues.Any(v => string.Equals(v, "true", StringComparison.OrdinalIgnoreCase));
         await _competitorFieldService.SaveFieldDefinitionAsync(model);
         return RedirectToAction(nameof(Index), new { clubInitials });
     }
@@ -77,6 +88,9 @@ public class CompetitorFieldController : Controller
         model.Id = id;
         var clubId = await _clubService.GetClubId(clubInitials);
         model.ClubId = clubId;
+        // Correctly interpret checkbox inputs which may post multiple values (hidden + checkbox)
+        var hvValues = Request.Form["HighlyVisible"];
+        model.HighlyVisible = hvValues.Any(v => string.Equals(v, "true", StringComparison.OrdinalIgnoreCase));
         await _competitorFieldService.SaveFieldDefinitionAsync(model);
         return RedirectToAction(nameof(Index), new { clubInitials });
     }
@@ -85,7 +99,32 @@ public class CompetitorFieldController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string clubInitials, Guid id)
     {
-        await _competitorFieldService.DeleteFieldDefinitionAsync(id);
+        // Keep Delete action for backward compatibility: mark inactive
+        await _competitorFieldService.SetFieldActiveStateAsync(id, false);
+        return RedirectToAction(nameof(Index), new { clubInitials });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Inactivate(string clubInitials, Guid id)
+    {
+        await _competitorFieldService.SetFieldActiveStateAsync(id, false);
+        return RedirectToAction(nameof(Index), new { clubInitials });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeletePermanent(string clubInitials, Guid id)
+    {
+        await _competitorFieldService.DeleteFieldDefinitionPermanentlyAsync(id);
+        return RedirectToAction(nameof(Index), new { clubInitials });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reactivate(string clubInitials, Guid id)
+    {
+        await _competitorFieldService.SetFieldActiveStateAsync(id, true);
         return RedirectToAction(nameof(Index), new { clubInitials });
     }
 }

@@ -46,6 +46,24 @@
                 </select>
                 <span asp-validation-for="BoatClassId" class="text-danger"></span>
             </div>
+            @if (Model.CustomFieldValues != null && Model.CustomFieldValues.Any(f => f?.IsHighlyVisible == true))
+            {
+                <div class="mb-3">
+                    <h5 class="h6">Highly Visible Custom Fields</h5>
+                    @for (var fieldIndex = 0; fieldIndex < Model.CustomFieldValues.Count; fieldIndex++)
+                    {
+                        var field = Model.CustomFieldValues[fieldIndex];
+                        if (field?.IsHighlyVisible == true)
+                        {
+                            await Html.RenderPartialAsync("_CompetitorCustomFieldEditorRow", new SailScores.Web.Models.SailScores.CompetitorCustomFieldEditorRowViewModel
+                            {
+                                FieldIndex = fieldIndex,
+                                Field = field
+                            });
+                        }
+                    }
+                </div>
+            }
             <div id="advancedFields" role="tablist">
                 <div class="card">
                     <div class="card-header" role="tab" id="advancedHeading">
@@ -83,50 +101,21 @@
                                 <label asp-for="IsActive" class="form-check-label"></label>
                                 <span asp-validation-for="IsActive" class="text-danger"></span>
                             </div>
-                            @if (Model.CustomFieldValues != null && Model.CustomFieldValues.Any())
+                            @if (Model.CustomFieldValues != null && Model.CustomFieldValues.Any(f => f?.IsHighlyVisible != true))
                             {
                                 <div class="mb-3">
                                     <h5 class="h6">Custom Fields</h5>
                                     @for (var fieldIndex = 0; fieldIndex < Model.CustomFieldValues.Count; fieldIndex++)
                                     {
                                         var field = Model.CustomFieldValues[fieldIndex];
-                                        <div class="border rounded p-3 mb-3">
-                                            <div class="fw-bold mb-2">@(string.IsNullOrWhiteSpace(field.DisplayHeader) ? field.Name : field.DisplayHeader)</div>
-                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].FieldDefinitionId" />
-                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].DisplayHeader" />
-                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].DataType" />
-                                            <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].ShowDates" />
-
-                                            <div class="custom-field-value-rows">
-                                                @for (var valueIndex = 0; valueIndex < field.Values.Count; valueIndex++)
-                                                {
-                                                    var valueRow = field.Values[valueIndex];
-                                                    <div class="row g-2 align-items-end mb-2 custom-field-value-row">
-                                                        <input type="hidden" asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].Id" />
-                                                        <div class="col-12 col-lg-5">
-                                                            <label class="form-label">Value</label>
-                                                            <input asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].Value" class="form-control" type="@(field.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")" />
-                                                        </div>
-                                                        <div class="col-6 col-lg-3">
-                                                            <label class="form-label">Effective From</label>
-                                                            <input asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].EffectiveFrom" class="form-control" type="date" />
-                                                        </div>
-                                                        <div class="col-6 col-lg-3">
-                                                            <label class="form-label">Effective To</label>
-                                                            <input asp-for="@Model.CustomFieldValues[fieldIndex].Values[valueIndex].EffectiveTo" class="form-control" type="date" />
-                                                        </div>
-                                                        <div class="col-12 col-lg-1 d-flex align-items-end">
-                                                            <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.parentElement.parentElement.remove()" title="Remove">
-                                                                <span class="fas fa-trash"></span>
-                                                                <span class="visually-hidden">Remove</span>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
-
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addCustomFieldValueRow(this, '@fieldIndex', '@(field.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")')">Add Value</button>
-                                        </div>
+                                        if (field?.IsHighlyVisible != true)
+                                        {
+                                            await Html.RenderPartialAsync("_CompetitorCustomFieldEditorRow", new SailScores.Web.Models.SailScores.CompetitorCustomFieldEditorRowViewModel
+                                            {
+                                                FieldIndex = fieldIndex,
+                                                Field = field
+                                            });
+                                        }
                                     }
                                 </div>
                             }

@@ -110,6 +110,7 @@ namespace SailScores.Web.Mapping
                 .ForMember(d => d.BoatClassId, o => o.Ignore())
                 .ForMember(d => d.BoatClass, o => o.Ignore())
                 .ForMember(d => d.Fleets, o => o.Ignore())
+                .ForMember(d => d.CustomFieldValues, o => o.Ignore())
                 .ReverseMap();
             CreateMap<Model.Competitor, CompetitorStatsViewModel>()
                 .ForMember(d => d.SeasonStats, o => o.Ignore());
