@@ -52,9 +52,7 @@ public sealed class DataProtectionHealthCheck : IHealthCheck
         }
         catch (Exception ex)
         {
-            var description = useBlobStorage
-                ? $"Data protection health check failed. ApplicationName={applicationName}; Error={ex.Message}"
-                : $"Data protection health check failed. ApplicationName={applicationName}; Error={ex.Message}";
+            var description = $"Data protection health check failed. ApplicationName={applicationName}; Error={ex.Message}";
 
             return HealthCheckResult.Unhealthy(description, ex);
         }

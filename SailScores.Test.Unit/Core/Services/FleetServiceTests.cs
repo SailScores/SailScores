@@ -419,9 +419,30 @@ public class FleetServiceTests
         var fleet = await _context.Fleets.SingleAsync(
             f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats,
             TestContext.Current.CancellationToken);
+        var competitorNotInFleet = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(),
+            Name = "Not In Fleet",
+            ClubId = _clubId
+        };
+        _context.Competitors.Add(competitorNotInFleet);
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        // Act / Assert (no throw)
-        await _service.RemoveCompetitorFromFleet(fleet.Id, Guid.NewGuid());
+        var memberCountBefore = await _context.CompetitorFleets.CountAsync(
+            cf => cf.FleetId == fleet.Id,
+            TestContext.Current.CancellationToken);
+
+        // Act
+        await _service.RemoveCompetitorFromFleet(fleet.Id, competitorNotInFleet.Id);
+
+        // Assert
+        var memberCountAfter = await _context.CompetitorFleets.CountAsync(
+            cf => cf.FleetId == fleet.Id,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(memberCountBefore, memberCountAfter);
+        Assert.DoesNotContain(_context.CompetitorFleets,
+            cf => cf.FleetId == fleet.Id && cf.CompetitorId == competitorNotInFleet.Id);
     }
 
     [Fact]
