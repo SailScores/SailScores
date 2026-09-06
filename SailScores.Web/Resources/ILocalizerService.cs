@@ -12,6 +12,7 @@ namespace SailScores.Web.Resources
         public string DefaultLocalization { get; }
 
         public string GetShortName(FlatRace race);
+        public string GetShortName(FlatRace race, string defaultDateFormat);
 
         public string GetFullRaceName(RaceViewModel race);
 

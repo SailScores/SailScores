@@ -74,7 +74,7 @@ public class MatchingServiceTests
     {
         var comps = GetHarriet15s();
         var suggestions = _service.GetSuggestions(input, comps).ToList();
-        Assert.Empty(suggestions.Where(s => s.Confidence > .5));
+        Assert.DoesNotContain(suggestions, s => s.Confidence > .5);
     }
 
     private IEnumerable<Competitor> GetHarriet15s() => new List<Competitor>

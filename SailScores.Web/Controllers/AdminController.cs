@@ -5,6 +5,7 @@ using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
+using SailScores.Core.Utility;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
@@ -85,6 +86,22 @@ public class AdminController : Controller
                 return View(clubAdmin);
             }
 
+            if (!ClubDateFormatUtility.TryNormalize(clubAdmin.DefaultDateFormat, out var normalizedDateFormat, out var dateFormatError))
+            {
+                ModelState.AddModelError(nameof(clubAdmin.DefaultDateFormat), dateFormatError);
+                var club = await _adminService.GetClubForEdit(clubInitials);
+                clubAdmin.Seasons = club.Seasons;
+                clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
+                clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
+                clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
+                clubAdmin.LocaleOptions = club.LocaleOptions;
+                clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
+                clubAdmin.TemplateOptions = club.TemplateOptions;
+                return View(clubAdmin);
+            }
+
+            clubAdmin.DefaultDateFormat = normalizedDateFormat;
+
             try
             {
                 // Process logo file upload if provided
@@ -135,6 +152,27 @@ public class AdminController : Controller
             clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
             clubAdmin.TemplateOptions = club.TemplateOptions;
             return View(clubAdmin);
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
+    public async Task<IActionResult> SetCustomCompetitorFieldsEnabled(string clubInitials, bool isEnabled)
+    {
+        try
+        {
+            var club = await _adminService.GetClubForEdit(clubInitials);
+            var clubObject = _mapper.Map<Club>(club);
+            clubObject.Initials = clubInitials;
+            clubObject.EnableCustomCompetitorFields = isEnabled;
+            await _adminService.UpdateClub(clubObject);
+
+            return Json(new { success = true, isEnabled });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
         }
     }
 

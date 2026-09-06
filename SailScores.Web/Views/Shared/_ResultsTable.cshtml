@@ -92,16 +92,16 @@
                             <th class="text-center d-none d-sm-table-cell" scope="col">
                                 @if (Model.IsExport)
                                 {
-                                    @localizer.GetShortName(race)
+                                    @localizer.GetShortName(race, Model.DefaultDateFormat)
                                 }
                                 else
                                 {
                                     if(race.IsSeries ?? false)
                                     {
-                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@localizer.GetShortName(race)</a>
+                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@localizer.GetShortName(race, Model.DefaultDateFormat)</a>
                                     } else {
                                     @Html.ActionLink(
-                                                 @localizer.GetShortName(race)
+                                                 @localizer.GetShortName(race, Model.DefaultDateFormat)
                                                  , "Details", "Race", new { id = race.Id })
                                     }
                                     <div class="weather">
@@ -130,18 +130,18 @@
                             <th class="text-center" scope="col">
                                 @if (Model.IsExport)
                                 {
-                    @localizer.GetShortName(race)
+                    @localizer.GetShortName(race, Model.DefaultDateFormat)
                                 }
                                 else
                                 {
                                     if (race.IsSeries ?? false)
                                     {
-                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@localizer.GetShortName(race)</a>
+                                        <a href="~/@ViewContext.RouteData.Values["ClubInitials"]/@race.seriesUrlName">@localizer.GetShortName(race, Model.DefaultDateFormat)</a>
                                     }
                                     else
                                     {
                                         @Html.ActionLink(
-                                        @localizer.GetShortName(race)
+                                        @localizer.GetShortName(race, Model.DefaultDateFormat)
                                         , "Details", "Race", new { id = race.Id })
                                     }
                                     <br />

@@ -20,8 +20,11 @@ public class CompetitorFieldDefinition
     [Display(Name = "Display order")]
     public int DisplayOrder { get; set; }
 
-    [Display(Name = "Available to scorekeepers")]
+    [Display(Name = "Currently Enabled")]
     public bool IsActive { get; set; }
+
+    [Display(Name = "Highly visible")]
+    public bool HighlyVisible { get; set; }
 }
 
 public enum CustomFieldDataType

@@ -243,6 +243,10 @@ namespace SailScores.Database.Migrations
                     b.Property<DateTime?>("AdvancedFeaturesEnabledDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DefaultDateFormat")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<Guid?>("DefaultHandicapSystemId")
                         .HasColumnType("uniqueidentifier");
 
@@ -602,6 +606,9 @@ namespace SailScores.Database.Migrations
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("HighlyVisible")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");

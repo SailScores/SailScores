@@ -33,6 +33,7 @@ public class CompetitorController : Controller
     private readonly ICsvService _csvService;
     private readonly IAdminTipService _adminTipService;
     private readonly IForwarderService _forwarderService;
+    private readonly IRedirectHelper _redirectHelper;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public CompetitorController(
@@ -44,6 +45,7 @@ public class CompetitorController : Controller
         IAuthorizationService authService,
         ICsvService csvService,
         IAdminTipService adminTipService,
+        IRedirectHelper redirectHelper,
         UserManager<ApplicationUser> userManager,
         IMapper mapper)
     {
@@ -55,6 +57,7 @@ public class CompetitorController : Controller
         _authService = authService;
         _csvService = csvService;
         _adminTipService = adminTipService;
+        _redirectHelper = redirectHelper;
         _userManager = userManager;
         _mapper = mapper;
     }
@@ -96,6 +99,7 @@ public class CompetitorController : Controller
             .ToList();
 
         var club = await _clubService.GetMinimalClub(clubInitials);
+        await PopulateHighlyVisibleCustomFieldValuesForIndexAsync(clubId, competitors);
 
         var vm = new ClubCollectionViewModel<CompetitorIndexViewModel>
         {
@@ -327,6 +331,8 @@ public class CompetitorController : Controller
             return View("CreateErrors", errors);
         }
 
+        await PopulateHighlyVisibleCreateMultipleFieldsAsync(vm, clubId);
+
         return View(vm);
     }
 
@@ -342,6 +348,8 @@ public class CompetitorController : Controller
         var clubId = await _clubService.GetClubId(clubInitials);
         try
         {
+            await PopulateHighlyVisibleCreateMultipleFieldsAsync(competitorsVm, clubId);
+
             // we check for errors against previously saved competitors
             // but we don't check for errors against other competitors
             // currently being saved.
@@ -407,8 +415,10 @@ public class CompetitorController : Controller
 
     // GET: Competitor/Edit/5
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
-    public async Task<ActionResult> Edit(string clubInitials, Guid id)
+    public async Task<ActionResult> Edit(string clubInitials, Guid id, string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
+
         var clubId = await _clubService.GetClubId(clubInitials);
 
         var compWithOptions = await _competitorService.GetCompetitorWithHistoryAsync(id);
@@ -454,84 +464,105 @@ public class CompetitorController : Controller
     [Authorize(Policy = AuthorizationPolicies.RaceScorekeeper)]
     public async Task<ActionResult> Edit(
         Guid id,
-        CompetitorWithOptionsViewModel competitor)
+        CompetitorWithOptionsViewModel competitor,
+        string returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
+
         try
         {
-
-            IEnumerable<KeyValuePair<string, string>> errors =
-                await _competitorService.GetSaveErrors(competitor);
-            if(errors != null)
-            {
-                foreach(var error in errors)
-                {
-                    ModelState.AddModelError(error.Key, error.Value);
-                }
-            }
+            await AddSaveErrorsToModelStateAsync(competitor);
 
             var club = await _clubService.GetMinimalClub(competitor.ClubId);
-            if (club.EnableCustomCompetitorFields && competitor.CustomFieldValues != null)
-            {
-                await PopulatePostedCustomFieldDefinitionIdsAsync(competitor, competitor.ClubId);
-                ValidateCustomFieldValues(competitor, ModelState);
-                EnsureCustomFieldValueRows(competitor);
-            }
+            await ValidateEditCustomFieldValuesAsync(competitor, club.EnableCustomCompetitorFields);
 
             if (!ModelState.IsValid)
             {
-                var modelStateErrors = ModelState
-                    .Where(kvp => kvp.Value?.Errors != null && kvp.Value.Errors.Count > 0)
-                    .SelectMany(kvp => kvp.Value.Errors.Select(error => $"{kvp.Key}: {error.ErrorMessage}"))
-                    .ToList();
-
-                foreach (var modelError in modelStateErrors)
-                {
-                    Console.WriteLine($"ModelState error: {modelError}");
-                }
-
-                if (modelStateErrors.Any())
-                {
-                    ModelState.AddModelError(string.Empty, "Validation failed: " + string.Join(" | ", modelStateErrors));
-                }
-
-                competitor.BoatClassOptions =
-                    (await _clubService.GetAllBoatClasses(competitor.ClubId))
-                    .OrderBy(c => c.Name);
-                var fleets =
-                    (await _clubService.GetAllFleets(competitor.ClubId))
-                    .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
-                    .OrderBy(f => f.Name);
-                competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+                AddModelStateValidationSummary();
+                await PopulateEditOptionsAsync(competitor);
                 return View(competitor);
             }
+
             await _competitorService.SaveAsync(competitor, await GetUserStringAsync());
 
-            var saveClub = await _clubService.GetMinimalClub(competitor.ClubId);
-            if (saveClub.EnableCustomCompetitorFields)
+            if (club.EnableCustomCompetitorFields)
             {
                 await SaveCustomFieldValuesAsync(competitor.Id, competitor);
             }
 
-            return RedirectToAction("Index", "Competitor");
+            return _redirectHelper.SafeRedirect(Url, Request, returnUrl, "Index", "Competitor");
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError(String.Empty,
-                "An error occurred editing this competitor.");
+            ModelState.AddModelError(string.Empty, "An error occurred editing this competitor.");
             if (!string.IsNullOrWhiteSpace(ex.Message))
             {
-                ModelState.AddModelError(String.Empty, ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
-            competitor.BoatClassOptions =
-                (await _clubService.GetAllBoatClasses(competitor.ClubId))
-                .OrderBy(c => c.Name);
-                        var fleets =
-                            (await _clubService.GetAllFleets(competitor.ClubId))
-                            .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
-                            .OrderBy(f => f.Name);
-                        competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
+
+            await PopulateEditOptionsAsync(competitor);
             return View(competitor);
         }
+    }
+
+    private async Task AddSaveErrorsToModelStateAsync(CompetitorWithOptionsViewModel competitor)
+    {
+        var errors = await _competitorService.GetSaveErrors(competitor);
+        if (errors == null)
+        {
+            return;
+        }
+
+        foreach (var error in errors)
+        {
+            ModelState.AddModelError(error.Key, error.Value);
+        }
+    }
+
+    private async Task ValidateEditCustomFieldValuesAsync(
+        CompetitorWithOptionsViewModel competitor,
+        bool enableCustomCompetitorFields)
+    {
+        if (!enableCustomCompetitorFields || competitor.CustomFieldValues == null)
+        {
+            return;
+        }
+
+        await PopulatePostedCustomFieldDefinitionIdsAsync(competitor, competitor.ClubId);
+        ValidateCustomFieldValues(competitor, ModelState);
+        EnsureCustomFieldValueRows(competitor);
+    }
+
+    private void AddModelStateValidationSummary()
+    {
+        var modelStateErrors = ModelState
+            .Where(kvp => kvp.Value?.Errors != null && kvp.Value.Errors.Count > 0)
+            .SelectMany(kvp => kvp.Value.Errors.Select(error => $"{kvp.Key}: {error.ErrorMessage}"))
+            .ToList();
+
+        foreach (var modelError in modelStateErrors)
+        {
+            Console.WriteLine($"ModelState error: {modelError}");
+        }
+
+        if (modelStateErrors.Any())
+        {
+            ModelState.AddModelError(string.Empty, "Validation failed: " + string.Join(" | ", modelStateErrors));
+        }
+    }
+
+    private async Task PopulateEditOptionsAsync(CompetitorWithOptionsViewModel competitor)
+    {
+        competitor.BoatClassOptions =
+            (await _clubService.GetAllBoatClasses(competitor.ClubId))
+            .OrderBy(c => c.Name);
+
+        var fleets =
+            (await _clubService.GetAllFleets(competitor.ClubId))
+            .Where(f => f.FleetType == Api.Enumerations.FleetType.SelectedBoats)
+            .OrderBy(f => f.Name);
+
+        competitor.FleetOptions = _mapper.Map<List<FleetSummary>>(fleets);
     }
 
     [HttpPost]
@@ -989,6 +1020,137 @@ public class CompetitorController : Controller
         return RedirectToAction("Edit", new { clubInitials, id = competitorId });
     }
 
+    private async Task PopulateHighlyVisibleCustomFieldValuesForIndexAsync(
+        Guid clubId,
+        IList<CompetitorIndexViewModel> competitors)
+    {
+        if (competitors == null || competitors.Count == 0)
+        {
+            return;
+        }
+
+        var club = await _clubService.GetMinimalClub(clubId);
+        if (!club.EnableCustomCompetitorFields)
+        {
+            foreach (var competitor in competitors)
+            {
+                competitor.HighlyVisibleCustomFieldValues = new List<CompetitorIndexCustomFieldValueViewModel>();
+            }
+
+            return;
+        }
+
+        var visibleDefinitions = (await _competitorFieldService.GetFieldDefinitionsAsync(clubId))
+            .Where(d => d.HighlyVisible == true)
+            .OrderBy(d => d.DisplayOrder)
+            .ThenBy(d => d.Name)
+            .ToList();
+
+        foreach (var competitor in competitors)
+        {
+            var values = await _competitorFieldService.GetValuesForCompetitorAsync(competitor.Id);
+            competitor.HighlyVisibleCustomFieldValues = visibleDefinitions
+                .Select(definition => new CompetitorIndexCustomFieldValueViewModel
+                {
+                    Label = string.IsNullOrWhiteSpace(definition.DisplayHeader)
+                        ? definition.Name
+                        : definition.DisplayHeader,
+                    Value = ResolveCurrentCustomFieldValue(values, definition.Id)
+                })
+                .ToList();
+        }
+    }
+
+    private static string ResolveCurrentCustomFieldValue(
+        IList<Core.Model.CompetitorFieldValue> values,
+        Guid fieldDefinitionId)
+    {
+        var fieldValues = (values ?? new List<Core.Model.CompetitorFieldValue>())
+            .Where(v => v.FieldDefinitionId == fieldDefinitionId)
+            .Where(v => !string.IsNullOrWhiteSpace(v.Value))
+            .ToList();
+
+        if (!fieldValues.Any())
+        {
+            return "—";
+        }
+
+        var undated = fieldValues.FirstOrDefault(v => !v.EffectiveFrom.HasValue && !v.EffectiveTo.HasValue);
+        if (undated != null)
+        {
+            return undated.Value;
+        }
+
+        var today = DateTime.UtcNow.Date;
+        var currentValue = fieldValues
+            .Where(v => (!v.EffectiveFrom.HasValue || v.EffectiveFrom.Value.Date <= today)
+                && (!v.EffectiveTo.HasValue || v.EffectiveTo.Value.Date >= today))
+            .OrderByDescending(v => v.EffectiveFrom ?? DateTime.MinValue)
+            .ThenByDescending(v => v.EffectiveTo ?? DateTime.MaxValue)
+            .FirstOrDefault();
+
+        if (currentValue != null)
+        {
+            return currentValue.Value;
+        }
+
+        var mostRecent = fieldValues
+            .OrderByDescending(v => v.EffectiveFrom ?? DateTime.MinValue)
+            .ThenByDescending(v => v.EffectiveTo ?? DateTime.MaxValue)
+            .First();
+
+        return mostRecent?.Value ?? "—";
+    }
+
+    private async Task PopulateHighlyVisibleCreateMultipleFieldsAsync(
+        MultipleCompetitorsWithOptionsViewModel model,
+        Guid clubId)
+    {
+        var club = await _clubService.GetMinimalClub(clubId);
+        if (!club.EnableCustomCompetitorFields)
+        {
+            model.HighlyVisibleFieldDefinitions = new List<CompetitorFieldDefinition>();
+            return;
+        }
+
+        var visibleDefinitions = (await _competitorFieldService.GetFieldDefinitionsAsync(clubId))
+            .Where(d => d.HighlyVisible == true)
+            .OrderBy(d => d.DisplayOrder)
+            .ThenBy(d => d.Name)
+            .ToList();
+
+        model.HighlyVisibleFieldDefinitions = visibleDefinitions;
+
+        if (model.Competitors == null)
+        {
+            model.Competitors = new List<CompetitorViewModel>();
+            return;
+        }
+
+        foreach (var competitor in model.Competitors.Where(c => c != null))
+        {
+            var existingByField = (competitor.CustomFieldValues ?? new List<CompetitorCustomFieldInputViewModel>())
+                .Where(v => v != null)
+                .GroupBy(v => v.FieldDefinitionId)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            competitor.CustomFieldValues = visibleDefinitions
+                .Select(definition =>
+                {
+                    existingByField.TryGetValue(definition.Id, out var existingValue);
+                    return new CompetitorCustomFieldInputViewModel
+                    {
+                        FieldDefinitionId = definition.Id,
+                        Name = definition.Name,
+                        DisplayHeader = definition.DisplayHeader,
+                        DataType = definition.DataType,
+                        Value = existingValue?.Value
+                    };
+                })
+                .ToList();
+        }
+    }
+
     private async Task PopulateCustomFieldValuesAsync(CompetitorWithOptionsViewModel model, Guid clubId, Guid competitorId)
     {
         var club = await _clubService.GetMinimalClub(clubId);
@@ -1029,7 +1191,8 @@ public class CompetitorController : Controller
                             EffectiveTo = v.EffectiveTo
                         })
                         .ToList(),
-                    ShowDates = true
+                    ShowDates = true,
+                    IsHighlyVisible = definition.HighlyVisible == true
                 };
             })
             .ToList();
@@ -1055,9 +1218,15 @@ public class CompetitorController : Controller
                 continue;
             }
 
-            if (field.FieldDefinitionId == Guid.Empty && i < definitionsByIndex.Count)
+            if (i < definitionsByIndex.Count)
             {
-                field.FieldDefinitionId = definitionsByIndex[i].Id;
+                if (field.FieldDefinitionId == Guid.Empty)
+                {
+                    field.FieldDefinitionId = definitionsByIndex[i].Id;
+                }
+
+                field.ShowDates = true;
+                field.IsHighlyVisible = definitionsByIndex[i].HighlyVisible == true;
             }
         }
     }

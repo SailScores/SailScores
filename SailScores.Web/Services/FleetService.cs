@@ -142,4 +142,50 @@ public class FleetService : IFleetService
         }
         return vm;
     }
+
+    public async Task<FleetManagementViewModel> GetFleetManagementViewModel(string clubInitials)
+    {
+        var clubId = await _coreClubService.GetClubId(clubInitials);
+
+        var fleets = (await _coreClubService.GetMinimalForSelectedBoatsFleets(clubId))
+            .OrderBy(f => f.Name)
+            .ToList();
+
+        var competitors = (await _coreCompetitorService.GetCompetitorsAsync(clubId, null, true))
+            .ToList();
+
+        var membership = await _coreFleetService.GetCompetitorFleetMembership(clubId);
+        var regattaFleets = await _coreFleetService.GetClubRegattaFleets(clubId);
+        var boatClasses = (await _coreClubService.GetAllBoatClasses(clubId))
+            .OrderBy(c => c.Name)
+            .ToList();
+        var regattas = (await _regattaService.GetAllRegattaSummaryAsync(clubInitials)).ToList();
+
+        var fleetColumns = _mapper.Map<IList<FleetColumn>>(fleets);
+        foreach (var column in fleetColumns)
+        {
+            column.RegattaIds = regattaFleets.TryGetValue(column.Id, out var regattaIds)
+                ? regattaIds.ToList()
+                : new List<Guid>();
+        }
+
+        return new FleetManagementViewModel
+        {
+            ClubInitials = clubInitials,
+            Fleets = fleetColumns,
+            BoatClasses = boatClasses,
+            Regattas = regattas,
+            Competitors = competitors.Select(c => new CompetitorRow
+            {
+                Id = c.Id,
+                Name = c.Name,
+                SailNumber = c.SailNumber,
+                BoatClassId = c.BoatClassId,
+                IsActive = c.IsActive,
+                FleetMembership = fleets.ToDictionary(
+                    f => f.Id,
+                    f => membership.TryGetValue(c.Id, out var ids) && ids.Contains(f.Id))
+            }).ToList()
+        };
+    }
 }

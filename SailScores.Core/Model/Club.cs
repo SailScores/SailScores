@@ -32,6 +32,8 @@ namespace SailScores.Core.Model
         public WeatherSettings WeatherSettings { get; set; }
 
         public String Locale { get; set; }
+        [StringLength(30)]
+        public String DefaultDateFormat { get; set; }
 
         public IList<Fleet> Fleets { get; set; }
         public IList<Competitor> Competitors { get; set; }

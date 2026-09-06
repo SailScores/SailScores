@@ -1,0 +1,154 @@
+@model SailScores.Web.Models.SailScores.FleetManagementViewModel
+@{
+    ViewBag.Title = Model.ClubInitials + " Fleet Management";
+    Layout = "_ClubLayout";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+
+<h2>Fleet Management</h2>
+<p class="text-muted">Add or remove competitors from fleets. Changes save immediately.</p>
+
+<div id="fleetManagementAlert" class="alert alert-danger" style="display:none;" role="alert">
+    Something went wrong saving that change. Please try again.
+</div>
+
+@if (!Model.Fleets.Any())
+{
+    <p>
+        This club has no "Selected Boats" fleets yet.
+        <a asp-controller="Fleet" asp-action="Create">Create one</a> to manage its membership here.
+    </p>
+}
+else
+{
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-xl-8">
+            <div class="border rounded-3 p-3 h-100">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <h3 class="h6 mb-0">Competitor row filters</h3>
+                    <span class="badge text-bg-secondary">Rows</span>
+                </div>
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <label for="filter-competitor-status" class="form-label mb-0">Status</label>
+                        <select id="filter-competitor-status" class="form-select form-select-sm">
+                            <option value="all">All</option>
+                            <option value="active" selected>Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <label for="filter-competitor-class" class="form-label mb-0">Class</label>
+                        <select id="filter-competitor-class" class="form-select form-select-sm">
+                            <option value="all">All Classes</option>
+                            @foreach (var boatClass in Model.BoatClasses)
+                            {
+                                <option value="@boatClass.Id">@boatClass.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <label for="filter-competitor-fleet" class="form-label mb-0">In Fleet</label>
+                        <select id="filter-competitor-fleet" class="form-select form-select-sm">
+                            <option value="all">Any Fleet</option>
+                            @foreach (var fleet in Model.Fleets)
+                            {
+                                <option value="@fleet.Id">@fleet.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-4">
+            <div class="border rounded-3 p-3 h-100">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <h3 class="h6 mb-0">Fleet column filters</h3>
+                    <span class="badge text-bg-info">Columns</span>
+                </div>
+                <div>
+                    <label for="filter-fleet-column" class="form-label mb-0">Show Fleets</label>
+                    <select id="filter-fleet-column" class="form-select form-select-sm">
+                        <option value="all">All</option>
+                        <option value="active" selected>Active</option>
+                        <option value="inactive">Inactive</option>
+                        @foreach (var regatta in Model.Regattas)
+                        {
+                            <option value="regatta:@regatta.Id">@regatta.Season?.Name @regatta.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm" id="fleetManagementGrid">
+            <thead>
+                <tr>
+                    <th scope="col">Competitor</th>
+                    @foreach (var fleet in Model.Fleets)
+                    {
+                        <th scope="col" class="fleet-column-header" data-fleet-id="@fleet.Id"
+                            data-active="@fleet.IsActive.ToString().ToLowerInvariant()"
+                            data-regatta-ids="@string.Join(",", fleet.RegattaIds)">
+                            <div class="d-inline-flex align-items-center gap-1 flex-wrap">
+                                <span>@fleet.Name</span>
+                                <a asp-controller="Fleet"
+                                   asp-action="Edit"
+                                   asp-route-clubInitials="@Model.ClubInitials"
+                                   asp-route-id="@fleet.Id"
+                                   asp-route-returnUrl="@returnUrl"
+                                   class="text-decoration-none small"
+                                   title="Edit fleet @fleet.Name"
+                                   aria-label="Edit fleet @fleet.Name">
+                                    <span class="fas fa-pen"></span>
+                                </a>
+                            </div>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var comp in Model.Competitors)
+                {
+                    <tr class="competitor-row" data-competitor-id="@comp.Id"
+                        data-boat-class-id="@comp.BoatClassId"
+                        data-active="@comp.IsActive.ToString().ToLowerInvariant()">
+                        <th scope="row">
+                            <div class="d-inline-flex align-items-center gap-1 flex-wrap">
+                                <span>@comp.SailNumber - @comp.Name</span>
+                                <a asp-controller="Competitor"
+                                   asp-action="Edit"
+                                   asp-route-clubInitials="@Model.ClubInitials"
+                                   asp-route-id="@comp.Id"
+                                   asp-route-returnUrl="@returnUrl"
+                                   class="text-decoration-none small"
+                                   title="Edit competitor @comp.Name"
+                                   aria-label="Edit competitor @comp.Name">
+                                    <span class="fas fa-pen"></span>
+                                </a>
+                                @if (!comp.IsActive)
+                                {
+                                    <em class="text-warning">(inactive)</em>
+                                }
+                            </div>
+                        </th>
+                        @foreach (var fleet in Model.Fleets)
+                        {
+                            <td class="fleet-cell text-center" data-fleet-id="@fleet.Id">
+                                <input type="checkbox" class="fleet-membership-checkbox form-check-input mt-0"
+                                       data-competitor-id="@comp.Id" data-fleet-id="@fleet.Id"
+                                       checked="@(comp.FleetMembership.TryGetValue(fleet.Id, out var isMember) && isMember)" />
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/fleetManagement.min.js" asp-append-version="true"></script>
+}
