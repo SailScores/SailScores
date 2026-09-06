@@ -56,9 +56,6 @@ public class CompetitorFieldController : Controller
 
         var clubId = await _clubService.GetClubId(clubInitials);
         model.ClubId = clubId;
-        // Correctly interpret checkbox inputs which may post multiple values (hidden + checkbox)
-        var hvValues = Request.Form["HighlyVisible"];
-        model.HighlyVisible = hvValues.Any(v => string.Equals(v, "true", StringComparison.OrdinalIgnoreCase));
         await _competitorFieldService.SaveFieldDefinitionAsync(model);
         return RedirectToAction(nameof(Index), new { clubInitials });
     }
@@ -88,9 +85,6 @@ public class CompetitorFieldController : Controller
         model.Id = id;
         var clubId = await _clubService.GetClubId(clubInitials);
         model.ClubId = clubId;
-        // Correctly interpret checkbox inputs which may post multiple values (hidden + checkbox)
-        var hvValues = Request.Form["HighlyVisible"];
-        model.HighlyVisible = hvValues.Any(v => string.Equals(v, "true", StringComparison.OrdinalIgnoreCase));
         await _competitorFieldService.SaveFieldDefinitionAsync(model);
         return RedirectToAction(nameof(Index), new { clubInitials });
     }

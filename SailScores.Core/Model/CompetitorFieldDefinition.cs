@@ -24,7 +24,7 @@ public class CompetitorFieldDefinition
     public bool IsActive { get; set; }
 
     [Display(Name = "Highly visible")]
-    public bool? HighlyVisible { get; set; } = false;
+    public bool HighlyVisible { get; set; }
 }
 
 public enum CustomFieldDataType

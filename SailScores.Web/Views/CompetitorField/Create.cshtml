@@ -36,20 +36,16 @@
             <span asp-validation-for="DisplayOrder" class="text-danger"></span>
         </div>
         <div class="mb-3 col-12 col-md-6 col-lg-3">
+            <span class="d-none d-lg-inline"><br /></span>
             <div class="form-check">
                 <input asp-for="IsActive" class="form-check-input" />
                 <label asp-for="IsActive" class="form-check-label"></label>
             </div>
         </div>
         <div class="mb-3 col-12 col-md-6 col-lg-3">
+            <span class="d-none d-lg-inline"><br /></span>
             <div class="form-check">
-                <input type="hidden" name="HighlyVisible" value="false" />
-                <input type="checkbox"
-                       id="HighlyVisible"
-                       name="HighlyVisible"
-                       value="true"
-                       class="form-check-input"
-                       @(Model.HighlyVisible == true ? "checked" : null) />
+                <input asp-for="HighlyVisible" class="form-check-input" />
                 <label asp-for="HighlyVisible" class="form-check-label"></label>
             </div>
         </div>

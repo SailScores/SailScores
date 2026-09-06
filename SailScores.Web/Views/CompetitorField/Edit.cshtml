@@ -24,33 +24,29 @@
             <input asp-for="DisplayHeader" class="form-control" />
             <span asp-validation-for="DisplayHeader" class="text-danger"></span>
         </div>
-        <div class="mb-3 col-12 col-md-6">
+        <div class="mb-3 col-12 col-md-6 col-lg-3">
             <label asp-for="DataType" class="form-label"></label>
             <select asp-for="DataType" class="form-select">
                 <option value="0">Text</option>
                 <option value="1">Number</option>
             </select>
         </div>
-        <div class="mb-3 col-12 col-md-6">
+        <div class="mb-3 col-12 col-md-6 col-lg-3">
             <label asp-for="DisplayOrder" class="form-label"></label>
             <input asp-for="DisplayOrder" class="form-control" />
             <span asp-validation-for="DisplayOrder" class="text-danger"></span>
         </div>
-        <div class="mb-3 col-12 col-md-6">
+        <div class="mb-3 col-12 col-md-6 col-lg-3">
+            <span class="d-none d-lg-inline"><br /></span>
             <div class="form-check">
                 <input asp-for="IsActive" class="form-check-input" />
                 <label asp-for="IsActive" class="form-check-label"></label>
             </div>
         </div>
-        <div class="mb-3 col-12 col-md-6">
+        <div class="mb-3 col-12 col-md-6 col-lg-3">
+            <span class="d-none d-lg-inline"><br /></span>
             <div class="form-check">
-                <input type="hidden" name="HighlyVisible" value="false" />
-                <input type="checkbox"
-                       id="HighlyVisible"
-                       name="HighlyVisible"
-                       value="true"
-                       class="form-check-input"
-                       @(Model.HighlyVisible == true ? "checked" : null) />
+                <input asp-for="HighlyVisible" class="form-check-input" />
                 <label asp-for="HighlyVisible" class="form-check-label"></label>
             </div>
         </div>
