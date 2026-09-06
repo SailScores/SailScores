@@ -1949,7 +1949,7 @@ public class SeriesServiceFleetFilteringTests
         Assert.NotNull(result.FlatResults);
 
         // Should only have 1 competitors (from fleet2), not 3
-        Assert.Equal(1, result.FlatResults.Competitors.Count());
+        Assert.Single(result.FlatResults.Competitors);
         Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp1.Id);
         Assert.DoesNotContain(result.FlatResults.Competitors, c => c.Id == comp2.Id);
         Assert.Contains(result.FlatResults.Competitors, c => c.Id == comp3.Id);

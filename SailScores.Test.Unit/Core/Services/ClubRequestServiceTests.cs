@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Mapping;
 using SailScores.Core.Model;
@@ -93,7 +93,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             await _service.Submit(newCompletedClubRequest);
 
-            Assert.Equal(3, _context.ClubRequests.Count());
+            Assert.Equal(3, await _context.ClubRequests.CountAsync(TestContext.Current.CancellationToken));
         }
 
         [Fact]
@@ -108,10 +108,10 @@ namespace SailScores.Test.Unit.Core.Services
 
             await _service.UpdateRequest(changedClubRequest);
 
-            Assert.Equal(2, _context.ClubRequests.Count());
+            Assert.Equal(2, await _context.ClubRequests.CountAsync(TestContext.Current.CancellationToken));
             Assert.Equal("NewName",
-                _context.ClubRequests.FirstOrDefault(c =>
-                    c.Id == _fakeCompletedClubRequest.Id).ClubName);
+                (await _context.ClubRequests.FirstOrDefaultAsync(c =>
+                    c.Id == _fakeCompletedClubRequest.Id, TestContext.Current.CancellationToken)).ClubName);
         }
     }
 }

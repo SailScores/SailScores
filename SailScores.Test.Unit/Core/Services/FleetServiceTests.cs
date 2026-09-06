@@ -65,8 +65,8 @@ public class FleetServiceTests
 
         await _service.SaveNew(newFleet);
 
-        var savedFleet = _context.Fleets
-            .FirstOrDefault(f => f.Name == newFleet.Name);
+        var savedFleet = await _context.Fleets
+            .FirstOrDefaultAsync(f => f.Name == newFleet.Name, TestContext.Current.CancellationToken);
         
         Assert.NotNull(savedFleet);
         Assert.Equal("my-fleet-with-spaces", savedFleet.ShortName);
@@ -133,8 +133,8 @@ public class FleetServiceTests
             .Where(f => f.Name == newFleet.Name).SelectMany(
             f => f.FleetBoatClasses));
 
-        var newFleetId = _context.Fleets
-            .Where(f => f.Name == newFleet.Name).First().Id;
+        var newFleetId = (await _context.Fleets
+            .Where(f => f.Name == newFleet.Name).FirstAsync(TestContext.Current.CancellationToken)).Id;
 
         //Act 
         await _service.Delete(newFleetId);

@@ -95,8 +95,10 @@
                         </div>
                         <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.SailNumber" class="form-control"
-                                       data-template-field="SailNumber" data-column="0" />
+                                <label class="visually-hidden" data-template-label-for="SailNumber"
+                                       for="template_SailNumber">@localizer["Sail"]</label>
+                                <input id="template_SailNumber" type="text" name="template.SailNumber"
+                                       class="form-control" data-template-field="SailNumber" data-column="0" />
                             </div>
                         </div>
                         <div class="col-3 d-md-none">
@@ -104,7 +106,9 @@
                         </div>
                         <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.Name" class="form-control"
+                                <label class="visually-hidden" data-template-label-for="Name"
+                                       for="template_Name">@localizer["Helm"]</label>
+                                <input id="template_Name" type="text" name="template.Name" class="form-control"
                                        data-template-field="Name" data-column="1" />
                             </div>
                         </div>
@@ -113,8 +117,10 @@
                         </div>
                         <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.BoatName" class="form-control"
-                                       data-template-field="BoatName" data-column="2" />
+                                <label class="visually-hidden" data-template-label-for="BoatName"
+                                       for="template_BoatName">@localizer["Boat"]</label>
+                                <input id="template_BoatName" type="text" name="template.BoatName"
+                                       class="form-control" data-template-field="BoatName" data-column="2" />
                             </div>
                         </div>
                         <div class="col-3 d-md-none">
@@ -122,8 +128,10 @@
                         </div>
                         <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.HomeClubName" class="form-control"
-                                       data-template-field="HomeClubName" data-column="3" />
+                                <label class="visually-hidden" data-template-label-for="HomeClubName"
+                                       for="template_HomeClubName">Home Club</label>
+                                <input id="template_HomeClubName" type="text" name="template.HomeClubName"
+                                       class="form-control" data-template-field="HomeClubName" data-column="3" />
                             </div>
                         </div>
                         @for (var fieldIndex = 0; fieldIndex < Model.HighlyVisibleFieldDefinitions.Count; fieldIndex++)
@@ -141,7 +149,11 @@
                             </div>
                             <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
+                                    <label class="visually-hidden"
+                                           data-template-label-for="CustomFieldValues[@fieldIndex].Value"
+                                           for="template_CustomFieldValues_@(fieldIndex)__Value">@fieldLabel</label>
+                                    <input id="template_CustomFieldValues_@(fieldIndex)__Value"
+                                           type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
                                            name="template.CustomFieldValues[@fieldIndex].Value"
                                            class="form-control"
                                            data-template-field="CustomFieldValues[@fieldIndex].Value"
@@ -163,7 +175,9 @@
                                 </div>
                                 <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].SailNumber" class="form-control
+                                        <label class="visually-hidden" for="competitors_@(i)__SailNumber">@localizer["Sail"]</label>
+                                        <input id="competitors_@(i)__SailNumber" type="text" name="competitors[@i].SailNumber"
+                                               class="form-control
                                                @(ViewData.ModelState[$"competitors[{i}].SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
                                                data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber" />
                                         <span asp-validation-for="Competitors[i].SailNumber" class="text-danger"></span>
@@ -174,8 +188,10 @@
                                 </div>
                                 <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].Name" class="form-control"
-                                               data-column="1" data-row="@i" value="@Model.Competitors[i].Name" />
+                                        <label class="visually-hidden" for="competitors_@(i)__Name">@localizer["Helm"]</label>
+                                        <input id="competitors_@(i)__Name" type="text" name="competitors[@i].Name"
+                                               class="form-control" data-column="1" data-row="@i"
+                                               value="@Model.Competitors[i].Name" />
                                     </div>
                                 </div>
                                 <div class="col-3 d-md-none">
@@ -183,8 +199,10 @@
                                 </div>
                                 <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].BoatName" class="form-control"
-                                               data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName" />
+                                        <label class="visually-hidden" for="competitors_@(i)__BoatName">@localizer["Boat"]</label>
+                                        <input id="competitors_@(i)__BoatName" type="text" name="competitors[@i].BoatName"
+                                               class="form-control" data-column="2" data-row="@i"
+                                               value="@Model.Competitors[i].BoatName" />
                                     </div>
                                 </div>
                                 <div class="col-3 d-md-none">
@@ -192,8 +210,10 @@
                                 </div>
                                 <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].HomeClubName" class="form-control"
-                                               data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName" />
+                                        <label class="visually-hidden" for="competitors_@(i)__HomeClubName">Home Club</label>
+                                        <input id="competitors_@(i)__HomeClubName" type="text" name="competitors[@i].HomeClubName"
+                                               class="form-control" data-column="3" data-row="@i"
+                                               value="@Model.Competitors[i].HomeClubName" />
                                     </div>
                                 </div>
                                 @for (var fieldIndex = 0; fieldIndex < Model.HighlyVisibleFieldDefinitions.Count; fieldIndex++)
@@ -214,7 +234,10 @@
                                     </div>
                                     <div class="col-9 col-md">
                                         <div class="mb-3">
-                                            <input type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
+                                            <label class="visually-hidden"
+                                                   for="competitors_@(i)__CustomFieldValues_@(fieldIndex)__Value">@fieldLabel</label>
+                                            <input id="competitors_@(i)__CustomFieldValues_@(fieldIndex)__Value"
+                                                   type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
                                                    name="competitors[@i].CustomFieldValues[@fieldIndex].Value"
                                                    class="form-control"
                                                    data-column="@columnIndex"
@@ -237,8 +260,9 @@
                             </div>
                             <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].SailNumber" class="form-control"
-                                           data-column="0" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__SailNumber">@localizer["Sail"]</label>
+                                    <input id="competitors_0__SailNumber" type="text" name="competitors[0].SailNumber"
+                                           class="form-control" data-column="0" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">
@@ -246,8 +270,9 @@
                             </div>
                             <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].Name" class="form-control"
-                                           data-column="1" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__Name">@localizer["Helm"]</label>
+                                    <input id="competitors_0__Name" type="text" name="competitors[0].Name"
+                                           class="form-control" data-column="1" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">
@@ -255,8 +280,9 @@
                             </div>
                             <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].BoatName" class="form-control"
-                                           data-column="2" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__BoatName">@localizer["Boat"]</label>
+                                    <input id="competitors_0__BoatName" type="text" name="competitors[0].BoatName"
+                                           class="form-control" data-column="2" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">
@@ -264,8 +290,9 @@
                             </div>
                             <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].HomeClubName" class="form-control"
-                                           data-column="3" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__HomeClubName">Home Club</label>
+                                    <input id="competitors_0__HomeClubName" type="text" name="competitors[0].HomeClubName"
+                                           class="form-control" data-column="3" data-row="0" />
                                 </div>
                             </div>
                             @for (var fieldIndex = 0; fieldIndex < Model.HighlyVisibleFieldDefinitions.Count; fieldIndex++)
@@ -283,7 +310,10 @@
                                 </div>
                                 <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
+                                        <label class="visually-hidden"
+                                               for="competitors_0__CustomFieldValues_@(fieldIndex)__Value">@fieldLabel</label>
+                                        <input id="competitors_0__CustomFieldValues_@(fieldIndex)__Value"
+                                               type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
                                                name="competitors[0].CustomFieldValues[@fieldIndex].Value"
                                                class="form-control"
                                                data-column="@columnIndex"
