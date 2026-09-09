@@ -14,6 +14,7 @@
 @{
     ViewBag.Title = Model.ClubInitials + " " + localizer["Competitors"];
     Layout = "_ClubLayout";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 <div class="container-lg px-0 px-sm-2">
     @if (Model.CanEdit)
@@ -196,6 +197,7 @@
                            asp-action="Edit"
                            asp-controller="Competitor"
                            asp-route-id="@item.Id"
+                           asp-route-returnUrl="@returnUrl"
                            title="Edit">
                             <span class="fas fa-pen"></span>
                         </a>

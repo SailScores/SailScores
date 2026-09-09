@@ -151,4 +151,93 @@ else
 
 @section Scripts {
     <script src="~/js/fleetManagement.min.js" asp-append-version="true"></script>
+    <script>
+        (() => {
+            const storageKey = `fleetManagementFilters:${window.location.pathname.toLowerCase()}`;
+            const selectors = {
+                status: '#filter-competitor-status',
+                classId: '#filter-competitor-class',
+                fleetId: '#filter-competitor-fleet',
+                fleetColumn: '#filter-fleet-column'
+            };
+
+            function readStoredFilters() {
+                try {
+                    return localStorage.getItem(storageKey);
+                } catch (error) {
+                    console.warn('Fleet management filter restore skipped: localStorage unavailable.', error);
+                    return null;
+                }
+            }
+
+            function writeStoredFilters(value) {
+                try {
+                    localStorage.setItem(storageKey, value);
+                } catch (error) {
+                    console.warn('Fleet management filter save skipped: localStorage unavailable.', error);
+                }
+            }
+
+            function clearStoredFilters() {
+                try {
+                    localStorage.removeItem(storageKey);
+                } catch (error) {
+                    console.warn('Fleet management filter clear skipped: localStorage unavailable.', error);
+                }
+            }
+
+            function saveFilters() {
+                const filterState = {
+                    status: $(selectors.status).val(),
+                    classId: $(selectors.classId).val(),
+                    fleetId: $(selectors.fleetId).val(),
+                    fleetColumn: $(selectors.fleetColumn).val()
+                };
+
+                writeStoredFilters(JSON.stringify(filterState));
+            }
+
+            function applySavedFilter(selector, value) {
+                if (!value) {
+                    return;
+                }
+
+                const hasOption = $(`${selector} option[value="${value}"]`).length > 0;
+                if (hasOption) {
+                    $(selector).val(value);
+                }
+            }
+
+            function restoreFilters() {
+                const saved = readStoredFilters();
+                if (!saved) {
+                    return;
+                }
+
+                try {
+                    const state = JSON.parse(saved);
+                    applySavedFilter(selectors.status, state.status);
+                    applySavedFilter(selectors.classId, state.classId);
+                    applySavedFilter(selectors.fleetId, state.fleetId);
+                    applySavedFilter(selectors.fleetColumn, state.fleetColumn);
+                } catch (error) {
+                    console.warn('Fleet management filters were invalid and have been reset.', error);
+                    clearStoredFilters();
+                }
+
+                $(selectors.status).trigger('change');
+                $(selectors.classId).trigger('change');
+                $(selectors.fleetId).trigger('change');
+                $(selectors.fleetColumn).trigger('change');
+            }
+
+            $(document).ready(function () {
+                const filterSelector = '#filter-competitor-status, #filter-competitor-class, '
+                    + '#filter-competitor-fleet, #filter-fleet-column';
+
+                restoreFilters();
+                $(document).on('change', filterSelector, saveFilters);
+            });
+        })();
+    </script>
 }
