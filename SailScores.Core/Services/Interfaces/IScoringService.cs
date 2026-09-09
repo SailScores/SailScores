@@ -28,5 +28,9 @@ namespace SailScores.Core.Services
         /// Returns a list of created systems where the first is the series default and second (if present) is for regattas.
         /// </summary>
         Task<IList<ScoringSystem>> CreateDefaultScoringSystemsAsync(Guid clubId, string clubInitials);
+
+        Task<ScoreCodeGroup> GetScoreCodeGroupAsync(Guid id);
+        Task SaveScoreCodeGroupAsync(ScoreCodeGroup group);
+        Task DeleteScoreCodeGroupAsync(Guid id);
     }
 }

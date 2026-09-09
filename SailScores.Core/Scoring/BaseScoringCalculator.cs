@@ -80,6 +80,8 @@ namespace SailScores.Core.Scoring
                 DiscardScores(resultsWorkInProgress, compResults);
                 resultsWorkInProgress.Results[comp] = compResults;
             }
+            // Apply score code group limits after discards are calculated
+            ApplyScoreCodeGroupLimits(resultsWorkInProgress, scores);
             // Next two are virtual
             CalculateTotals(resultsWorkInProgress, scores);
             CalculateRanks(resultsWorkInProgress);
@@ -143,6 +145,167 @@ namespace SailScores.Core.Scoring
             foreach (var score in compResultsOrdered.Take(numOfDiscards))
             {
                 score.Discard = true;
+            }
+        }
+
+        /// <summary>
+        /// Apply score code group limitations. After this method runs, scores that exceed the group
+        /// limitation will have their Code changed to the overage code and will need re-scoring.
+        /// </summary>
+        protected virtual void ApplyScoreCodeGroupLimits(SeriesResults results, IEnumerable<Score> scores)
+        {
+            if (ScoringSystem?.ScoreCodeGroups == null || ScoringSystem.ScoreCodeGroups.Count == 0)
+            {
+                return;
+            }
+
+            var allScoreCodeGroups = new List<ScoreCodeGroup>(ScoringSystem.ScoreCodeGroups);
+            if (ScoringSystem.InheritedScoreCodeGroups != null)
+            {
+                allScoreCodeGroups.AddRange(ScoringSystem.InheritedScoreCodeGroups);
+            }
+
+            foreach (var competitor in results.Competitors)
+            {
+                var compResults = results.Results[competitor];
+
+                foreach (var group in allScoreCodeGroups)
+                {
+                    ApplyGroupLimitToCompetitor(compResults, group, results.SailedRaces.Count(), results, scores);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Apply a single score code group limitation to a competitor's scores.
+        /// </summary>
+        private void ApplyGroupLimitToCompetitor(
+            SeriesCompetitorResults compResults,
+            ScoreCodeGroup group,
+            int totalRaces,
+            SeriesResults results,
+            IEnumerable<Score> scores)
+        {
+            // Get all scores for this competitor that are NOT already discarded
+            var groupScores = compResults.CalculatedScores.Values
+                .Where(cs => !cs.Discard && group.IncludedCodeNames.Contains(cs.RawScore.Code, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (groupScores.Count == 0)
+            {
+                return;
+            }
+
+            // Calculate how many scores are allowed
+            int allowedCount = CalculateAllowedCountForGroup(group, compResults, totalRaces, results);
+
+            if (groupScores.Count <= allowedCount)
+            {
+                return; // No overage
+            }
+
+            // Identify which scores to mark as overage
+            var overageScores = SelectOverageScores(groupScores, group, allowedCount);
+
+            // Mark overage scores with the overage code
+            foreach (var overageScore in overageScores)
+            {
+                overageScore.RawScore.Code = group.OverageCodeName ?? DEFAULT_CODE;
+                // Re-score this score with the new code
+                var scoreCode = GetScoreCode(overageScore.RawScore);
+                if (scoreCode != null)
+                {
+                    overageScore.ScoreValue = GetBasicScore(scores, overageScore.RawScore);
+                }
+                else
+                {
+                    // If no score code found, use default score from race results
+                    overageScore.ScoreValue = GetDefaultScore(overageScore.RawScore.Race, results);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculate how many scores from a group are allowed for a competitor.
+        /// </summary>
+        private int CalculateAllowedCountForGroup(
+            ScoreCodeGroup group,
+            SeriesCompetitorResults compResults,
+            int totalRaces,
+            SeriesResults results)
+        {
+            switch (group.LimitationType)
+            {
+                case ScoreCodeGroupLimitationType.NumberOfRaces:
+                    return (int)group.LimitationValue;
+
+                case ScoreCodeGroupLimitationType.PercentOfRaces:
+                    {
+                        int denominator;
+                        if (group.UseNonDiscardedRaces)
+                        {
+                            // Count non-discarded scores
+                            denominator = compResults.CalculatedScores.Values
+                                .Count(cs => !cs.Discard);
+                        }
+                        else
+                        {
+                            // Use total races
+                            denominator = totalRaces;
+                        }
+
+                        return (int)Math.Floor(group.LimitationValue / 100m * denominator);
+                    }
+
+                case ScoreCodeGroupLimitationType.NumberOfDates:
+                    {
+                        // Count distinct race dates for non-discarded scores in this group
+                        var distinctDates = compResults.CalculatedScores.Values
+                            .Where(cs => !cs.Discard && group.IncludedCodeNames.Contains(cs.RawScore.Code, StringComparer.OrdinalIgnoreCase))
+                            .Select(cs => cs.RawScore.Race?.Date)
+                            .Where(d => d.HasValue)
+                            .Distinct()
+                            .Count();
+
+                        // The allowed count is the limit; dates beyond that are overage
+                        return (int)group.LimitationValue;
+                    }
+
+                default:
+                    return int.MaxValue; // No limit
+            }
+        }
+
+        /// <summary>
+        /// Select which scores from the group should be marked as overage based on the overage selection method.
+        /// </summary>
+        private List<CalculatedScore> SelectOverageScores(
+            List<CalculatedScore> groupScores,
+            ScoreCodeGroup group,
+            int allowedCount)
+        {
+            var overageCount = groupScores.Count - allowedCount;
+
+            switch (group.OverageSelectionMethod)
+            {
+                case ScoreCodeGroupOverageSelection.LatestFirst:
+                    // Latest first means we keep the earliest and mark latest as overage
+                    // Sort by date DESC, then by race order DESC
+                    var sortedByLatest = groupScores
+                        .OrderByDescending(cs => cs.RawScore.Race?.Date)
+                        .ThenByDescending(cs => cs.RawScore.Race?.Order)
+                        .Take(overageCount)
+                        .ToList();
+                    return sortedByLatest;
+
+                case ScoreCodeGroupOverageSelection.WorstFirst:
+                default:
+                    // Worst first means highest score values (worst in low-point scoring)
+                    var sortedByWorst = groupScores
+                        .OrderByDescending(cs => cs.ScoreValue ?? 0m)
+                        .Take(overageCount)
+                        .ToList();
+                    return sortedByWorst;
             }
         }
 

@@ -185,6 +185,132 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-12">
+            <h3>Score Code Groups
+            <a class="btn btn-primary"
+               asp-action="Create"
+               asp-controller="ScoreCodeGroup"
+               asp-route-scoringsystemid="@Model.Id"
+               asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">
+                <span class="fas fa-plus"></span>
+                <span class="d-none d-sm-inline">
+                    New Score Code Group
+                </span>
+            </a></h3>
+
+            @if (Model.ScoreCodeGroups != null && Model.ScoreCodeGroups.Count > 0)
+            {
+                <table class="table table-sm" summary="Score Code Groups">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Codes</th>
+                            <th scope="col">Limitation</th>
+                            <th scope="col">Overage Code</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var group in Model.ScoreCodeGroups.OrderBy(g => g.DisplayName))
+                        {
+                            <tr>
+                                <td class="pe-0">
+                                    <a class="btn btn-sm btn-outline-danger"
+                                       asp-action="Delete"
+                                       asp-controller="ScoreCodeGroup"
+                                       asp-route-id="@group.Id"
+                                       asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"
+                                       title="Delete">
+                                        <span class="fas fa-trash"></span>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       asp-action="Edit"
+                                       asp-controller="ScoreCodeGroup"
+                                       asp-route-id="@group.Id"
+                                       asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"
+                                       title="Edit">
+                                        <span class="fas fa-pen"></span>
+                                    </a>
+                                </td>
+                                <td>@group.DisplayName</td>
+                                <td>
+                                    @if (group.IncludedCodeNames?.Count > 0)
+                                    {
+                                        <span>@string.Join(", ", group.IncludedCodeNames.OrderBy(c => c))</span>
+                                    }
+                                </td>
+                                <td>
+                                    @switch (group.LimitationType)
+                                    {
+                                        case SailScores.Core.Model.ScoreCodeGroupLimitationType.NumberOfRaces:
+                                            <span>@group.LimitationValue races</span>
+                                            break;
+                                        case SailScores.Core.Model.ScoreCodeGroupLimitationType.PercentOfRaces:
+                                            <span>@group.LimitationValue% of @(group.UseNonDiscardedRaces ? "non-discarded" : "all") races</span>
+                                            break;
+                                        case SailScores.Core.Model.ScoreCodeGroupLimitationType.NumberOfDates:
+                                            <span>@group.LimitationValue dates</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@group.OverageCodeName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">No score code groups defined for this scoring system.</p>
+            }
+
+            @if (Model.InheritedScoreCodeGroups != null && Model.InheritedScoreCodeGroups.Any())
+            {
+                <h4 class="mt-4">Inherited Score Code Groups</h4>
+                <table class="table table-sm" summary="Inherited Score Code Groups">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Codes</th>
+                            <th scope="col">Limitation</th>
+                            <th scope="col">Overage Code</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var group in Model.InheritedScoreCodeGroups.OrderBy(g => g.DisplayName))
+                        {
+                            <tr class="table-secondary">
+                                <td>@group.DisplayName</td>
+                                <td>
+                                    @if (group.IncludedCodeNames?.Count > 0)
+                                    {
+                                        <span>@string.Join(", ", group.IncludedCodeNames.OrderBy(c => c))</span>
+                                    }
+                                </td>
+                                <td>
+                                    @switch (group.LimitationType)
+                                    {
+                                        case SailScores.Core.Model.ScoreCodeGroupLimitationType.NumberOfRaces:
+                                            <span>@group.LimitationValue races</span>
+                                            break;
+                                        case SailScores.Core.Model.ScoreCodeGroupLimitationType.PercentOfRaces:
+                                            <span>@group.LimitationValue% of @(group.UseNonDiscardedRaces ? "non-discarded" : "all") races</span>
+                                            break;
+                                        case SailScores.Core.Model.ScoreCodeGroupLimitationType.NumberOfDates:
+                                            <span>@group.LimitationValue dates</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@group.OverageCodeName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
 @await Html.PartialAsync("_DiscardPatternCalculatorModal")
 
 @section Scripts {

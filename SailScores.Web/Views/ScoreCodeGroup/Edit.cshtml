@@ -1,0 +1,142 @@
+@model SailScores.Web.Models.SailScores.ScoreCodeGroupViewModel
+
+@{
+    ViewData["Title"] = "Edit Score Code Group";
+    Layout = "~/Views/Shared/_ClubLayout.cshtml";
+}
+
+<h4>Edit Score Code Group</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ScoringSystemId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" 
+                       placeholder="Optional: Leave blank to auto-generate from code names" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+                <small class="form-text text-muted">
+                    If not specified, the group display name will be the included code names joined by commas.
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Included Score Codes</label>
+                <div class="list-group">
+                    @foreach (var code in Model.AvailableCodes.OrderBy(c => c.Name))
+                    {
+                        <label class="list-group-item">
+                            <input type="checkbox" class="form-check-input me-2"
+                                   name="IncludedCodeNames"
+                                   value="@code.Name"
+                                   @(Model.IncludedCodeNames?.Contains(code.Name) ?? false ? "checked" : "") />
+                            <strong>@code.Name</strong> - @code.Description
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="IncludedCodeNames" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="LimitationType" class="form-label"></label>
+                <select asp-for="LimitationType" class="form-select" id="limitationType">
+                    <option value="0">Number of Races</option>
+                    <option value="1">Percent of Races</option>
+                    <option value="2">Number of Dates</option>
+                </select>
+                <span asp-validation-for="LimitationType" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="LimitationValue" class="form-label"></label>
+                <input asp-for="LimitationValue" class="form-control" type="number" 
+                       step="0.01" min="0" />
+                <span asp-validation-for="LimitationValue" class="text-danger"></span>
+                <small class="form-text text-muted">
+                    <span id="limitationHelpText">
+                        Maximum number of races that these score codes may be given.
+                    </span>
+                </small>
+            </div>
+
+            <div class="mb-3" id="useNonDiscardedDiv" style="display: none;">
+                <div class="form-check">
+                    <input asp-for="UseNonDiscardedRaces" class="form-check-input" />
+                    <label asp-for="UseNonDiscardedRaces" class="form-check-label"></label>
+                    <small class="form-text text-muted">
+                        If checked, percentage is calculated against non-discarded races.
+                        If unchecked, percentage is calculated against all races.
+                    </small>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="OverageCodeName" class="form-label"></label>
+                <select asp-for="OverageCodeName" class="form-select">
+                    @foreach (var code in Model.AvailableCodes.OrderBy(c => c.Name))
+                    {
+                        var isSelected = Model.OverageCodeName == code.Name;
+                        <option value="@code.Name" asp-selected="@isSelected">
+                            @code.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="OverageCodeName" class="text-danger"></span>
+                <small class="form-text text-muted">
+                    Score code to use for races beyond the limitation.
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="OverageSelectionMethod" class="form-label"></label>
+                <select asp-for="OverageSelectionMethod" class="form-select">
+                    <option value="0">Latest First (Preserve Earliest)</option>
+                    <option value="1">Worst First (Highest Score)</option>
+                </select>
+                <span asp-validation-for="OverageSelectionMethod" class="text-danger"></span>
+                <small class="form-text text-muted">
+                    When the limitation is exceeded, which races receive the overage code?
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="@ViewBag.ReturnUrl" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updateLimitationHelp() {
+            const limitationType = document.getElementById('limitationType').value;
+            const helpText = document.getElementById('limitationHelpText');
+            const useNonDiscardedDiv = document.getElementById('useNonDiscardedDiv');
+
+            switch (limitationType) {
+                case '0':
+                    helpText.textContent = 'Maximum number of races that these score codes may be given.';
+                    useNonDiscardedDiv.style.display = 'none';
+                    break;
+                case '1':
+                    helpText.textContent = 'Maximum percent (0-100) of races that these score codes may be given.';
+                    useNonDiscardedDiv.style.display = 'block';
+                    break;
+                case '2':
+                    helpText.textContent = 'Maximum number of distinct dates that these score codes may be given.';
+                    useNonDiscardedDiv.style.display = 'none';
+                    break;
+            }
+        }
+
+        document.getElementById('limitationType').addEventListener('change', updateLimitationHelp);
+        updateLimitationHelp(); // Call on page load
+    </script>
+}

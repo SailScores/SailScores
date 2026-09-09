@@ -37,6 +37,10 @@ namespace SailScores.Database
         DbSet<Document> Documents { get; set; }
         DbSet<ScoringSystem> ScoringSystems { get; set; }
 
+        DbSet<ScoreCodeGroup> ScoreCodeGroups { get; set; }
+
+        DbSet<ScoreCodeGroupCode> ScoreCodeGroupCodes { get; set; }
+
         DbSet<Weather> Weather { get; set; }
 
         DbSet<HistoricalResults> HistoricalResults { get; set; }
