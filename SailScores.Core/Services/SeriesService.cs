@@ -461,6 +461,9 @@ namespace SailScores.Core.Services
                     .Include(s => s.RaceSeries)
                         .ThenInclude(rs => rs.Race)
                             .ThenInclude(r => r.Scores)
+                    .Include(s => s.RaceSeries)
+                        .ThenInclude(rs => rs.Race)
+                            .ThenInclude(r => r.Weather)
                     .AsSplitQuery()
                     .SingleAsync(s => s.Id == childLink)
                     .ConfigureAwait(false);
@@ -488,6 +491,9 @@ namespace SailScores.Core.Services
                     .Include(s => s.RaceSeries)
                         .ThenInclude(rs => rs.Race)
                             .ThenInclude(r => r.Scores)
+                    .Include(s => s.RaceSeries)
+                        .ThenInclude(rs => rs.Race)
+                            .ThenInclude(r => r.Weather)
                     .AsSplitQuery()
                     .SingleAsync(s => s.Id == childLink)
                     .ConfigureAwait(false);

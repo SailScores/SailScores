@@ -75,7 +75,7 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="OverageCodeName" class="form-label"></label>
+                <label asp-for="OverageCodeName" class="form-label">Overage Code</label>
                 <select asp-for="OverageCodeName" class="form-select">
                     @foreach (var code in Model.AvailableCodes.OrderBy(c => c.Name))
                     {
@@ -92,7 +92,7 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="OverageSelectionMethod" class="form-label"></label>
+                <label asp-for="OverageSelectionMethod" class="form-label">Overage Selection</label>
                 <select asp-for="OverageSelectionMethod" class="form-select">
                     <option value="0">Latest First (Preserve Earliest)</option>
                     <option value="1">Worst First (Highest Score)</option>

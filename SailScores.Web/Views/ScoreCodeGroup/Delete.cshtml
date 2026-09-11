@@ -31,17 +31,17 @@
             </dd>
 
             <dt class="col-sm-3">Limitation</dt>
-            <dd class="col-sm-9">
+             <dd class="col-sm-9">
                 @switch (Model.LimitationType)
                 {
                     case SailScores.Core.Model.ScoreCodeGroupLimitationType.NumberOfRaces:
-                        <span>Maximum @Model.LimitationValue races</span>
+                        <span>Maximum @Model.LimitationValue.ToString("0.###") races</span>
                         break;
                     case SailScores.Core.Model.ScoreCodeGroupLimitationType.PercentOfRaces:
-                        <span>Maximum @Model.LimitationValue% of @(Model.UseNonDiscardedRaces ? "non-discarded" : "all") races</span>
+                        <span>Maximum @Model.LimitationValue.ToString("0.###")% of @(Model.UseNonDiscardedRaces ? "non-discarded" : "all") races</span>
                         break;
                     case SailScores.Core.Model.ScoreCodeGroupLimitationType.NumberOfDates:
-                        <span>Maximum @Model.LimitationValue dates</span>
+                        <span>Maximum @Model.LimitationValue.ToString("0.###") dates</span>
                         break;
                 }
             </dd>

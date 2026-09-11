@@ -69,6 +69,8 @@ public class ScoreCodeGroupController : Controller
             return Unauthorized();
         }
 
+        ValidateScoreCodeGroupConflicts(model, scoringSystem, null);
+
         if (!ModelState.IsValid)
         {
             var allScoreCodes = scoringSystem.ScoreCodes.Concat(scoringSystem.InheritedScoreCodes).ToList();
@@ -138,6 +140,8 @@ public class ScoreCodeGroupController : Controller
             return Unauthorized();
         }
 
+        ValidateScoreCodeGroupConflicts(model, scoringSystem, model.Id);
+
         if (!ModelState.IsValid)
         {
             var allScoreCodes = scoringSystem.ScoreCodes.Concat(scoringSystem.InheritedScoreCodes).ToList();
@@ -184,6 +188,81 @@ public class ScoreCodeGroupController : Controller
 
         ViewBag.ReturnUrl = returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{group.ScoringSystemId}";
         return View(group);
+    }
+
+    /// <summary>
+    /// Validates that the overage code and included codes don't conflict with other groups.
+    /// Checks this system and all parent systems.
+    /// </summary>
+    private void ValidateScoreCodeGroupConflicts(
+        ScoreCodeGroupViewModel model,
+        ScoringSystem scoringSystem,
+        Guid? currentGroupId)
+    {
+        var includedCodes = model.IncludedCodeNames ?? new List<string>();
+        var overageCode = model.OverageCodeName;
+
+        // Get all groups in this system and parent systems
+        var allGroups = GetAllGroupsInHierarchy(scoringSystem);
+
+        // Exclude the current group if editing
+        var otherGroups = allGroups
+            .Where(g => g.Id != currentGroupId)
+            .ToList();
+
+        // Check 1: Overage code should not be in this group's included codes
+        if (includedCodes.Contains(overageCode))
+        {
+            ModelState.AddModelError(
+                nameof(model.OverageCodeName),
+                "The overage code cannot be one of the included codes in this group.");
+        }
+
+        // Check 2: Overage code should not be used as overage code in any other group
+        var conflictingOverageGroups = otherGroups
+            .Where(g => g.OverageCodeName == overageCode)
+            .ToList();
+
+        if (conflictingOverageGroups.Any())
+        {
+            var groupNames = string.Join(", ", conflictingOverageGroups.Select(g => g.DisplayName));
+            ModelState.AddModelError(
+                nameof(model.OverageCodeName),
+                $"The code '{overageCode}' is already used as the overage code in these groups: {groupNames}");
+        }
+
+        // Check 3: Included codes should not be used as overage code in any other group
+        var conflictingIncludedCodes = includedCodes
+            .Where(code => otherGroups.Any(g => g.OverageCodeName == code))
+            .ToList();
+
+        if (conflictingIncludedCodes.Any())
+        {
+            var codeList = string.Join(", ", conflictingIncludedCodes);
+            ModelState.AddModelError(
+                nameof(model.IncludedCodeNames),
+                $"These codes are already used as overage codes in other groups: {codeList}");
+        }
+    }
+
+    /// <summary>
+    /// Gets all score code groups in this system and all parent systems.
+    /// </summary>
+    private static List<ScoreCodeGroup> GetAllGroupsInHierarchy(ScoringSystem system)
+    {
+        var allGroups = new List<ScoreCodeGroup>();
+
+        if (system?.ScoreCodeGroups != null)
+        {
+            allGroups.AddRange(system.ScoreCodeGroups);
+        }
+
+        if (system?.InheritedScoreCodeGroups != null)
+        {
+            allGroups.AddRange(system.InheritedScoreCodeGroups);
+        }
+
+        return allGroups;
     }
 
     [HttpPost]

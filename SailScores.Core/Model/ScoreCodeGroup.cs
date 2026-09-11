@@ -63,24 +63,36 @@ public class ScoreCodeGroup
     [StringLength(200)]
     public string Name { get; set; }
 
+
+    [Display(Name = "Limit Type")]
     public ScoreCodeGroupLimitationType LimitationType { get; set; }
 
+    [DisplayFormat(DataFormatString = "{0:#.##}")]
+    [Display(Name = "Limit Value")]
     public decimal LimitationValue { get; set; }
 
     /// <summary>
     /// When LimitationType is PercentOfRaces: if true, calculate percent against non-discarded
     /// races; if false, calculate against all races. Ignored for other limitation types.
     /// </summary>
+    /// 
+    [Display(Name = "Use Discard Races Only")]
     public bool UseNonDiscardedRaces { get; set; } = true;
 
     [StringLength(20)]
+
+    [Display(Name = "Overage Code")]
     public string OverageCodeName { get; set; } = "DNC";
 
+
+    [Display(Name = "Overage Selection")]
     public ScoreCodeGroupOverageSelection OverageSelectionMethod { get; set; } = ScoreCodeGroupOverageSelection.LatestFirst;
 
     /// <summary>
     /// List of score code names included in this group.
     /// </summary>
+    /// 
+    [Display(Name = "Included Codes")]
     public IList<string> IncludedCodeNames { get; set; } = new List<string>();
 
     /// <summary>
