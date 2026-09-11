@@ -53,10 +53,35 @@ namespace SailScores.Core.Scoring
 
         public SeriesResults CalculateResults(Series series)
         {
-            SeriesResults returnResults = GetResults(series);
-            AddCodesUsed(returnResults);
-            AddTrend(returnResults, series);
-            return returnResults;
+            var originalCodes = CaptureOriginalScoreCodes(series);
+            try
+            {
+                SeriesResults returnResults = GetResults(series);
+                AddCodesUsed(returnResults);
+                RestoreOriginalScoreCodes(originalCodes);
+                AddTrend(returnResults, series);
+                return returnResults;
+            }
+            finally
+            {
+                RestoreOriginalScoreCodes(originalCodes);
+            }
+        }
+
+        private static Dictionary<Score, string> CaptureOriginalScoreCodes(Series series)
+        {
+            return series.Races
+                .SelectMany(r => r.Scores)
+                .Distinct()
+                .ToDictionary(score => score, score => score.Code);
+        }
+
+        private static void RestoreOriginalScoreCodes(IReadOnlyDictionary<Score, string> originalCodes)
+        {
+            foreach (var originalCode in originalCodes)
+            {
+                originalCode.Key.Code = originalCode.Value;
+            }
         }
 
 
@@ -70,6 +95,11 @@ namespace SailScores.Core.Scoring
             {
                 // virtual and calls abstract GetBasicScore
                 SeriesCompetitorResults compResults = CalculateSimpleScores(comp, scores);
+
+                // Apply score code group limits early, before other score calculations.
+                // Use the expected number of discards (not actual), then recalculate scores.
+                var changes = ApplyScoreCodeGroupLimits(resultsWorkInProgress, compResults);
+
                 // the next three are private, so in BaseScoringCalculator
                 AddDefaultScores(resultsWorkInProgress, compResults);
                 CalculateRaceDependentScores(resultsWorkInProgress, compResults);
@@ -78,10 +108,11 @@ namespace SailScores.Core.Scoring
                 // these are virtual
                 CalculateOverrides(resultsWorkInProgress, compResults);
                 DiscardScores(resultsWorkInProgress, compResults);
+
                 resultsWorkInProgress.Results[comp] = compResults;
             }
-            // Apply score code group limits after discards are calculated
-            ApplyScoreCodeGroupLimits(resultsWorkInProgress, scores);
+
+
             // Next two are virtual
             CalculateTotals(resultsWorkInProgress, scores);
             CalculateRanks(resultsWorkInProgress);
@@ -152,11 +183,13 @@ namespace SailScores.Core.Scoring
         /// Apply score code group limitations. After this method runs, scores that exceed the group
         /// limitation will have their Code changed to the overage code and will need re-scoring.
         /// </summary>
-        protected virtual void ApplyScoreCodeGroupLimits(SeriesResults results, IEnumerable<Score> scores)
+        protected virtual bool ApplyScoreCodeGroupLimits(
+            SeriesResults results,
+            SeriesCompetitorResults compResults)
         {
             if (ScoringSystem?.ScoreCodeGroups == null || ScoringSystem.ScoreCodeGroups.Count == 0)
             {
-                return;
+                return false;
             }
 
             var allScoreCodeGroups = new List<ScoreCodeGroup>(ScoringSystem.ScoreCodeGroups);
@@ -165,26 +198,36 @@ namespace SailScores.Core.Scoring
                 allScoreCodeGroups.AddRange(ScoringSystem.InheritedScoreCodeGroups);
             }
 
-            foreach (var competitor in results.Competitors)
-            {
-                var compResults = results.Results[competitor];
+            var returnValue = false;
+            int expectedNumberOfDiscards = GetNumberOfDiscards(results.SailedRaces.Count());
 
-                foreach (var group in allScoreCodeGroups)
+            foreach (var group in allScoreCodeGroups)
+            {
+                var thisCompChanges = ApplyGroupLimitToCompetitor(
+                    compResults,
+                    group,
+                    results.SailedRaces.Count(),
+                    results,
+                    expectedNumberOfDiscards);
+                if (thisCompChanges)
                 {
-                    ApplyGroupLimitToCompetitor(compResults, group, results.SailedRaces.Count(), results, scores);
+                    AddAppliedScoreCodeGroupSummary(results, group);
                 }
+                returnValue = returnValue || thisCompChanges;
             }
+
+            return returnValue;
         }
 
         /// <summary>
         /// Apply a single score code group limitation to a competitor's scores.
         /// </summary>
-        private void ApplyGroupLimitToCompetitor(
+        private bool ApplyGroupLimitToCompetitor(
             SeriesCompetitorResults compResults,
             ScoreCodeGroup group,
             int totalRaces,
             SeriesResults results,
-            IEnumerable<Score> scores)
+            int expectedNumberOfDiscards)
         {
             // Get all scores for this competitor that are NOT already discarded
             var groupScores = compResults.CalculatedScores.Values
@@ -193,15 +236,15 @@ namespace SailScores.Core.Scoring
 
             if (groupScores.Count == 0)
             {
-                return;
+                return false;
             }
 
             // Calculate how many scores are allowed
-            int allowedCount = CalculateAllowedCountForGroup(group, compResults, totalRaces, results);
+            int allowedCount = CalculateAllowedCountForGroup(group, compResults, totalRaces, results, expectedNumberOfDiscards);
 
             if (groupScores.Count <= allowedCount)
             {
-                return; // No overage
+                return false; // No overage
             }
 
             // Identify which scores to mark as overage
@@ -211,18 +254,8 @@ namespace SailScores.Core.Scoring
             foreach (var overageScore in overageScores)
             {
                 overageScore.RawScore.Code = group.OverageCodeName ?? DEFAULT_CODE;
-                // Re-score this score with the new code
-                var scoreCode = GetScoreCode(overageScore.RawScore);
-                if (scoreCode != null)
-                {
-                    overageScore.ScoreValue = GetBasicScore(scores, overageScore.RawScore);
-                }
-                else
-                {
-                    // If no score code found, use default score from race results
-                    overageScore.ScoreValue = GetDefaultScore(overageScore.RawScore.Race, results);
-                }
             }
+            return true;
         }
 
         /// <summary>
@@ -232,7 +265,8 @@ namespace SailScores.Core.Scoring
             ScoreCodeGroup group,
             SeriesCompetitorResults compResults,
             int totalRaces,
-            SeriesResults results)
+            SeriesResults results,
+            int expectedNumberOfDiscards)
         {
             switch (group.LimitationType)
             {
@@ -244,9 +278,8 @@ namespace SailScores.Core.Scoring
                         int denominator;
                         if (group.UseNonDiscardedRaces)
                         {
-                            // Count non-discarded scores
-                            denominator = compResults.CalculatedScores.Values
-                                .Count(cs => !cs.Discard);
+                            // Use total races minus expected discards
+                            denominator = totalRaces - expectedNumberOfDiscards;
                         }
                         else
                         {
@@ -708,6 +741,19 @@ namespace SailScores.Core.Scoring
                 }
 
             results.ScoreCodesUsed = scoreCodes;
+        }
+
+        private void AddAppliedScoreCodeGroupSummary(SeriesResults results, ScoreCodeGroup group)
+        {
+            results.AppliedScoreCodeGroupSummaries ??= new List<AppliedScoreCodeGroupSummary>();
+            var summary = AppliedScoreCodeGroupSummary.FromGroup(group);
+
+            if (results.AppliedScoreCodeGroupSummaries.Any(s => s.Description == summary.Description))
+            {
+                return;
+            }
+
+            results.AppliedScoreCodeGroupSummaries.Add(summary);
         }
 
         protected virtual ScoreCodeSummary GetScoreCodeSummary(string code)

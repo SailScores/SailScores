@@ -104,6 +104,7 @@ namespace SailScores.Core.Services
                 .Include(s => s.ScoreCodes)
                 .Include(s => s.ScoreCodeGroups)
                     .ThenInclude(g => g.Codes)
+                .AsSplitQuery()
                 .SingleAsync(s => s.Id == scoringSystemId)
                 .ConfigureAwait(false);
 

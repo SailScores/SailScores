@@ -976,5 +976,40 @@ namespace SailScores.Test.Unit.Core.Scoring
             var ranked = results.Results.Where(r => r.Value.Rank.HasValue).ToList();
             Assert.Equal(3, ranked.Count);
         }
+
+        [Fact]
+        public void CalculateResults_WithScoreCodeGroupLimit_RestoresOriginalCodesAfterCalculation()
+        {
+            var series = GetBasicSeries(2, 4);
+            series.ScoringSystem = MakeDefaultScoringSystem();
+            series.ScoringSystem.DiscardPattern = "0,0,1";
+            series.TrendOption = Api.Enumerations.TrendOption.PreviousRace;
+            series.ScoringSystem.ScoreCodeGroups =
+            [
+                new ScoreCodeGroup
+                {
+                    IncludedCodeNames = ["RC"],
+                    LimitationType = ScoreCodeGroupLimitationType.NumberOfRaces,
+                    LimitationValue = 1m,
+                    OverageCodeName = "DNE",
+                    OverageSelectionMethod = ScoreCodeGroupOverageSelection.WorstFirst
+                }
+            ];
+
+            var competitor = series.Competitors.First();
+            var firstRaceScore = series.Races[0].Scores.First(s => s.Competitor == competitor);
+            firstRaceScore.Code = "RC";
+            firstRaceScore.Place = null;
+            var lastRaceScore = series.Races[3].Scores.First(s => s.Competitor == competitor);
+            lastRaceScore.Code = "RC";
+            lastRaceScore.Place = null;
+
+            var calculator = new AppendixACalculator(series.ScoringSystem);
+
+            calculator.CalculateResults(series);
+
+            Assert.Equal("RC", firstRaceScore.Code);
+            Assert.Equal("RC", lastRaceScore.Code);
+        }
     }
 }

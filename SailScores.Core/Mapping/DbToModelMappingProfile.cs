@@ -80,6 +80,10 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.ScoringSystem, Model.ScoringSystem>()
                 .ForMember(d => d.InheritedScoreCodes, o => o.Ignore())
                 .ReverseMap();
+            CreateMap<Db.ScoreCodeGroup, Model.ScoreCodeGroup>()
+                .ConstructUsing(s => new Model.ScoreCodeGroup(s))
+                .ReverseMap()
+                .ConstructUsing(s => s.ToDbObject());
             CreateMap<Db.ScoreCode, Model.ScoreCode>()
                 .ForMember(d => d.ClubId, o => o.Ignore())
                 .ForMember(d => d.FormulaValue, o => o.MapFrom(s =>

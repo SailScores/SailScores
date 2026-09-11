@@ -13,7 +13,7 @@ public class ScoreCodeGroup
     public ScoreCodeGroup() { }
 
     /// <summary>
-    /// Parameterized constructor for mapping from database entity.
+    /// Parameterized constructor for explicit field initialization.
     /// </summary>
     public ScoreCodeGroup(
         Guid id,
@@ -35,6 +35,22 @@ public class ScoreCodeGroup
         OverageCodeName = overageCodeName;
         OverageSelectionMethod = overageSelectionMethod;
         IncludedCodeNames = includedCodeNames ?? new List<string>();
+    }
+
+    /// <summary>
+    /// Constructor for mapping from database entity.
+    /// </summary>
+    public ScoreCodeGroup(SailScores.Database.Entities.ScoreCodeGroup dbEntity)
+    {
+        Id = dbEntity.Id;
+        ScoringSystemId = dbEntity.ScoringSystemId;
+        Name = dbEntity.Name;
+        LimitationType = (ScoreCodeGroupLimitationType)dbEntity.LimitationType;
+        LimitationValue = dbEntity.LimitationValue;
+        UseNonDiscardedRaces = dbEntity.UseNonDiscardedRaces;
+        OverageCodeName = dbEntity.OverageCodeName;
+        OverageSelectionMethod = (ScoreCodeGroupOverageSelection)dbEntity.OverageSelectionMethod;
+        IncludedCodeNames = dbEntity.Codes?.Select(c => c.CodeName).ToList() ?? new List<string>();
     }
 
     public Guid Id { get; set; }
@@ -82,5 +98,26 @@ public class ScoreCodeGroup
                 ? string.Join(", ", IncludedCodeNames.OrderBy(c => c))
                 : "(No codes)";
         }
+    }
+
+    /// <summary>
+    /// Converts this model to a database entity.
+    /// </summary>
+    public SailScores.Database.Entities.ScoreCodeGroup ToDbObject()
+    {
+        return new SailScores.Database.Entities.ScoreCodeGroup(
+            Id,
+            ScoringSystemId,
+            Name,
+            (int)LimitationType,
+            LimitationValue,
+            UseNonDiscardedRaces,
+            OverageCodeName,
+            (int)OverageSelectionMethod)
+        {
+            Codes = (IncludedCodeNames ?? new List<string>())
+                .Select(codeName => new SailScores.Database.Entities.ScoreCodeGroupCode { CodeName = codeName })
+                .ToList()
+        };
     }
 }

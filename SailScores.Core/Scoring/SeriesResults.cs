@@ -25,6 +25,8 @@ namespace SailScores.Core.Scoring
 
         public Dictionary<string,ScoreCodeSummary> ScoreCodesUsed { get; set; }
 
+        public IList<AppliedScoreCodeGroupSummary> AppliedScoreCodeGroupSummaries { get; set; }
+
         public CalculatedScore GetResult(
             Competitor comp,
             Race race)

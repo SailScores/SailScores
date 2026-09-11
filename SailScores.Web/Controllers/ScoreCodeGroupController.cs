@@ -47,7 +47,8 @@ public class ScoreCodeGroupController : Controller
             allScoreCodes);
 
         vm.IncludedCodeNames = new List<string>();
-        ViewBag.ReturnUrl = returnUrl ?? $"/Admin/Index#{scoringSystemId}";
+        ViewBag.ReturnUrl = returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{scoringSystemId}";
+
 
         return View(vm);
     }
@@ -72,7 +73,7 @@ public class ScoreCodeGroupController : Controller
         {
             var allScoreCodes = scoringSystem.ScoreCodes.Concat(scoringSystem.InheritedScoreCodes).ToList();
             model.AvailableCodes = allScoreCodes;
-            ViewBag.ReturnUrl = returnUrl ?? $"/Admin/Index#{model.ScoringSystemId}";
+            ViewBag.ReturnUrl = returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{model.ScoringSystemId}";
             return View(model);
         }
 
@@ -91,7 +92,7 @@ public class ScoreCodeGroupController : Controller
 
         await _scoringService.SaveScoreCodeGroupAsync(coreGroup);
 
-        return Redirect(returnUrl ?? $"/Admin/Index#{model.ScoringSystemId}");
+        return Redirect(returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{model.ScoringSystemId}");
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -116,7 +117,7 @@ public class ScoreCodeGroupController : Controller
 
         var allScoreCodes = scoringSystem.ScoreCodes.Concat(scoringSystem.InheritedScoreCodes).ToList();
         var vm = new ScoreCodeGroupViewModel(group, allScoreCodes);
-        ViewBag.ReturnUrl = returnUrl ?? $"/Admin/Index#{group.ScoringSystemId}";
+        ViewBag.ReturnUrl = returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{group.ScoringSystemId}";
 
         return View(vm);
     }
@@ -141,7 +142,7 @@ public class ScoreCodeGroupController : Controller
         {
             var allScoreCodes = scoringSystem.ScoreCodes.Concat(scoringSystem.InheritedScoreCodes).ToList();
             model.AvailableCodes = allScoreCodes;
-            ViewBag.ReturnUrl = returnUrl ?? $"/Admin/Index#{model.ScoringSystemId}";
+            ViewBag.ReturnUrl = returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{model.ScoringSystemId}";
             return View(model);
         }
 
@@ -158,7 +159,7 @@ public class ScoreCodeGroupController : Controller
 
         await _scoringService.SaveScoreCodeGroupAsync(coreGroup);
 
-        return Redirect(returnUrl ?? $"/Admin/Index#{model.ScoringSystemId}");
+        return Redirect(returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{model.ScoringSystemId}");
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -181,7 +182,7 @@ public class ScoreCodeGroupController : Controller
             return Unauthorized();
         }
 
-        ViewBag.ReturnUrl = returnUrl ?? $"/Admin/Index#{group.ScoringSystemId}";
+        ViewBag.ReturnUrl = returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{group.ScoringSystemId}";
         return View(group);
     }
 
@@ -210,6 +211,6 @@ public class ScoreCodeGroupController : Controller
         var scoringSystemId = group.ScoringSystemId;
         await _scoringService.DeleteScoreCodeGroupAsync(id);
 
-        return Redirect(returnUrl ?? $"/Admin/Index#{scoringSystemId}");
+        return Redirect(returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{scoringSystemId}");
     }
 }

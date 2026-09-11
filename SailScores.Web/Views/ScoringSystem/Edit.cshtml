@@ -219,19 +219,21 @@
                                     <a class="btn btn-sm btn-outline-danger"
                                        asp-action="Delete"
                                        asp-controller="ScoreCodeGroup"
+                                       asp-route-clubInitials="@ViewContext.RouteData.Values["clubInitials"]"
                                        asp-route-id="@group.Id"
                                        asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"
                                        title="Delete">
-                                        <span class="fas fa-trash"></span>
-                                    </a>
+                                          <span class="fas fa-trash"></span>
+                                      </a>
                                     <a class="btn btn-sm btn-outline-primary"
                                        asp-action="Edit"
                                        asp-controller="ScoreCodeGroup"
+                                       asp-route-clubInitials="@ViewContext.RouteData.Values["clubInitials"]"
                                        asp-route-id="@group.Id"
                                        asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"
                                        title="Edit">
-                                        <span class="fas fa-pen"></span>
-                                    </a>
+                                          <span class="fas fa-pen"></span>
+                                     </a>
                                 </td>
                                 <td>@group.DisplayName</td>
                                 <td>
