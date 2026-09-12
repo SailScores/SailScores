@@ -345,4 +345,29 @@ public class ScoreCodeGroupTests
 
         Assert.Equal(1, overageCount);
     }
+
+    /// <summary>
+    /// Test AllowedCountInfo factory methods for creating race-based and date-based info.
+    /// </summary>
+    [Fact]
+    public void AllowedCountInfo_RaceBased_CreatesCorrectObject()
+    {
+        var info = AllowedCountInfo.RaceBased(5);
+
+        Assert.False(info.IsDateBased);
+        Assert.Equal(5, info.AllowedCount);
+    }
+
+    /// <summary>
+    /// Test AllowedCountInfo for date-based limitations.
+    /// </summary>
+    [Fact]
+    public void AllowedCountInfo_DateBased_CreatesCorrectObject()
+    {
+        var info = AllowedCountInfo.DateBased(3, ScoreCodeGroupOverageSelection.WorstFirst);
+
+        Assert.True(info.IsDateBased);
+        Assert.Equal(3, info.AllowedCount);
+        Assert.Equal(ScoreCodeGroupOverageSelection.WorstFirst, info.OverageSelectionMethod);
+    }
 }

@@ -240,15 +240,31 @@ namespace SailScores.Core.Scoring
             }
 
             // Calculate how many scores are allowed
-            int allowedCount = CalculateAllowedCountForGroup(group, compResults, totalRaces, results, expectedNumberOfDiscards);
+            var allowedCountInfo = CalculateAllowedCountForGroup(
+                group, compResults, totalRaces, results, expectedNumberOfDiscards);
 
-            if (groupScores.Count <= allowedCount)
+            // For date-based limitations, count distinct dates; otherwise count scores
+            int effectiveScoreCount;
+            if (allowedCountInfo.IsDateBased)
+            {
+                effectiveScoreCount = groupScores
+                    .Select(cs => cs.RawScore.Race?.Date)
+                    .Where(d => d.HasValue)
+                    .Distinct()
+                    .Count();
+            }
+            else
+            {
+                effectiveScoreCount = groupScores.Count;
+            }
+
+            if (effectiveScoreCount <= allowedCountInfo.AllowedCount)
             {
                 return false; // No overage
             }
 
             // Identify which scores to mark as overage
-            var overageScores = SelectOverageScores(groupScores, group, allowedCount);
+            var overageScores = SelectOverageScores(groupScores, group, allowedCountInfo);
 
             // Mark overage scores with the overage code
             foreach (var overageScore in overageScores)
@@ -260,8 +276,10 @@ namespace SailScores.Core.Scoring
 
         /// <summary>
         /// Calculate how many scores from a group are allowed for a competitor.
+        /// Returns an AllowedCountInfo object that distinguishes between race-based and
+        /// date-based limitations.
         /// </summary>
-        private int CalculateAllowedCountForGroup(
+        private AllowedCountInfo CalculateAllowedCountForGroup(
             ScoreCodeGroup group,
             SeriesCompetitorResults compResults,
             int totalRaces,
@@ -271,7 +289,7 @@ namespace SailScores.Core.Scoring
             switch (group.LimitationType)
             {
                 case ScoreCodeGroupLimitationType.NumberOfRaces:
-                    return (int)group.LimitationValue;
+                    return AllowedCountInfo.RaceBased((int)group.LimitationValue);
 
                 case ScoreCodeGroupLimitationType.PercentOfRaces:
                     {
@@ -287,38 +305,55 @@ namespace SailScores.Core.Scoring
                             denominator = totalRaces;
                         }
 
-                        return (int)Math.Floor(group.LimitationValue / 100m * denominator);
+                        int allowedCount = (int)Math.Floor(
+                            group.LimitationValue / 100m * denominator);
+                        return AllowedCountInfo.RaceBased(allowedCount);
                     }
 
                 case ScoreCodeGroupLimitationType.NumberOfDates:
                     {
-                        // Count distinct race dates for non-discarded scores in this group
-                        var distinctDates = compResults.CalculatedScores.Values
-                            .Where(cs => !cs.Discard && group.IncludedCodeNames.Contains(cs.RawScore.Code, StringComparer.OrdinalIgnoreCase))
-                            .Select(cs => cs.RawScore.Race?.Date)
-                            .Where(d => d.HasValue)
-                            .Distinct()
-                            .Count();
-
-                        // The allowed count is the limit; dates beyond that are overage
-                        return (int)group.LimitationValue;
+                        // For date-based limitations, the allowed count is the number of
+                        // distinct dates allowed.
+                        return AllowedCountInfo.DateBased(
+                            (int)group.LimitationValue,
+                            group.OverageSelectionMethod);
                     }
 
                 default:
-                    return int.MaxValue; // No limit
+                    return AllowedCountInfo.RaceBased(int.MaxValue); // No limit
             }
         }
 
         /// <summary>
-        /// Select which scores from the group should be marked as overage based on the overage selection method.
+        /// Select which scores from the group should be marked as overage based on the
+        /// overage selection method and limitation type.
         /// </summary>
         private List<CalculatedScore> SelectOverageScores(
             List<CalculatedScore> groupScores,
             ScoreCodeGroup group,
-            int allowedCount)
+            AllowedCountInfo allowedCountInfo)
         {
-            var overageCount = groupScores.Count - allowedCount;
+            if (allowedCountInfo.IsDateBased)
+            {
+                return SelectOverageScoresByDate(
+                    groupScores,
+                    allowedCountInfo.AllowedCount,
+                    allowedCountInfo.OverageSelectionMethod);
+            }
+            else
+            {
+                return SelectOverageScoresByCount(groupScores, group, groupScores.Count - allowedCountInfo.AllowedCount);
+            }
+        }
 
+        /// <summary>
+        /// Select overage scores when limitation is based on number of races/scores.
+        /// </summary>
+        private List<CalculatedScore> SelectOverageScoresByCount(
+            List<CalculatedScore> groupScores,
+            ScoreCodeGroup group,
+            int overageCount)
+        {
             switch (group.OverageSelectionMethod)
             {
                 case ScoreCodeGroupOverageSelection.LatestFirst:
@@ -340,6 +375,53 @@ namespace SailScores.Core.Scoring
                         .ToList();
                     return sortedByWorst;
             }
+        }
+
+        /// <summary>
+        /// Select overage scores when limitation is based on number of distinct dates.
+        /// First identifies which dates are overage based on the overage selection method,
+        /// then returns all scores from those overage dates.
+        /// </summary>
+        private List<CalculatedScore> SelectOverageScoresByDate(
+            List<CalculatedScore> groupScores,
+            int allowedDateCount,
+            ScoreCodeGroupOverageSelection overageSelectionMethod)
+        {
+            // Group scores by date
+            var scoresByDate = groupScores
+                .GroupBy(cs => cs.RawScore.Race?.Date ?? DateTime.MinValue)
+                .ToList();
+
+            // Select which dates are overage based on selection method
+            IEnumerable<IGrouping<DateTime, CalculatedScore>> overageDateGroups;
+
+            switch (overageSelectionMethod)
+            {
+                case ScoreCodeGroupOverageSelection.LatestFirst:
+                    // Latest first means we keep the earliest dates and discard the latest dates.
+                    // Sort by date DESC, take the ones beyond allowedDateCount (the most recent dates).
+                    overageDateGroups = scoresByDate
+                        .OrderByDescending(g => g.Key)
+                        .Take(scoresByDate.Count - allowedDateCount);
+                    break;
+
+                case ScoreCodeGroupOverageSelection.WorstFirst:
+                default:
+                    // Worst first means we prioritize marking fewer races as overage by
+                    // selecting dates with the fewest races. If multiple dates have the same
+                    // number of races, we select the most recent dates (which are often less
+                    // critical or more flexible to mark as overage).
+                    overageDateGroups = scoresByDate
+                        .OrderBy(g => g.Count())      // Fewest races first
+                        .ThenByDescending(g => g.Key) // Then most recent date
+                        .Take(scoresByDate.Count - allowedDateCount);
+                    break;
+            }
+
+            // Return all scores from overage dates
+            return overageDateGroups
+                .SelectMany(g => g)
+                .ToList();
         }
 
         protected virtual void CalculateTotals(
