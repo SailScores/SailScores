@@ -317,3 +317,5 @@ SailScores.Web/appsettings.Development.json
 *.bacpac
 
 *.lscache
+
+*.scmp
