@@ -10,6 +10,7 @@ using SailScores.Core.Model;
 using Xunit;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
+using System.Collections.Generic;
 
 namespace SailScores.Test.Unit.Core.Services
 {
@@ -100,6 +101,38 @@ namespace SailScores.Test.Unit.Core.Services
 
             // Assert
             Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task GetScoringSystemAsync_WithGroupMappings_ReturnsMappedScoreCodeGroups()
+        {
+            var scoringSystem = await _context.ScoringSystems.FirstAsync(ss => ss.ClubId != null, TestContext.Current.CancellationToken);
+            var dbGroup = new Database.Entities.ScoreCodeGroup
+            {
+                Id = Guid.NewGuid(),
+                ScoringSystemId = scoringSystem.Id,
+                Name = "Top two finishes",
+                LimitationType = (int)ScoreCodeGroupLimitationType.NumberOfRaces,
+                LimitationValue = 2M,
+                UseNonDiscardedRaces = true,
+                OverageCodeName = "DNC",
+                OverageSelectionMethod = (int)ScoreCodeGroupOverageSelection.LatestFirst,
+                Codes = new List<Database.Entities.ScoreCodeGroupCode>
+                {
+                    new() { CodeName = "DNC" },
+                    new() { CodeName = "DNF" }
+                }
+            };
+
+            _context.ScoreCodeGroups.Add(dbGroup);
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var result = await _service.GetScoringSystemAsync(scoringSystem.Id);
+
+            Assert.Contains(result.ScoreCodeGroups, g =>
+                g.Name == "Top two finishes" &&
+                g.IncludedCodeNames.Contains("DNC") &&
+                g.LimitationType == ScoreCodeGroupLimitationType.NumberOfRaces);
         }
 
         [Fact]

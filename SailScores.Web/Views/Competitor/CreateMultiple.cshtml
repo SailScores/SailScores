@@ -17,6 +17,10 @@
 
     <form asp-action="CreateMultiple"
           asp-route-returnurl="@ViewData["ReturnUrl"]">
+        @{ 
+            var baseColumnCount = 4;
+            var totalColumns = baseColumnCount + Model.HighlyVisibleFieldDefinitions.Count;
+        }
         <div class="row">
             <div class="col-md-4">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -50,62 +54,113 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <div id="allCompetitors">
+                <div id="allCompetitors" data-total-columns="@totalColumns">
                     <div class="row d-none d-md-flex">
-                        <div class="col-md-3">
+                        <div class="col-md">
                             <div class="mb-3">
                                 @localizer["Sail"]
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md">
                             <div class="mb-3">
                                 @localizer["Helm"]
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md">
                             <div class="mb-3">
                                 @localizer["Boat Name"]
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md">
                             <div class="mb-3">
                                 Home Club <span class="small muted"><em>Optional - for regattas</em></span>
                             </div>
                         </div>
+                        @for (var fieldIndex = 0; fieldIndex < Model.HighlyVisibleFieldDefinitions.Count; fieldIndex++)
+                        {
+                            var definition = Model.HighlyVisibleFieldDefinitions[fieldIndex];
+                            var fieldLabel = string.IsNullOrWhiteSpace(definition.DisplayHeader)
+                                ? definition.Name
+                                : definition.DisplayHeader;
+                            <div class="col-md">
+                                <div class="mb-3">
+                                    @fieldLabel
+                                </div>
+                            </div>
+                        }
                     </div>
                     <div class="row" id="compRowTemplate" style="display: none">
                         <div class="col-3 d-md-none">
                             @localizer["Sail"]
                         </div>
-                        <div class="col-9 col-md-3">
+                        <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.SailNumber" class="form-control" />
+                                <label class="visually-hidden" data-template-label-for="SailNumber"
+                                       for="template_SailNumber">@localizer["Sail"]</label>
+                                <input id="template_SailNumber" type="text" name="template.SailNumber"
+                                       class="form-control" data-template-field="SailNumber" data-column="0" />
                             </div>
                         </div>
                         <div class="col-3 d-md-none">
                             @localizer["Helm"]
                         </div>
-                        <div class="col-9 col-md-3">
+                        <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.Name" class="form-control" />
+                                <label class="visually-hidden" data-template-label-for="Name"
+                                       for="template_Name">@localizer["Helm"]</label>
+                                <input id="template_Name" type="text" name="template.Name" class="form-control"
+                                       data-template-field="Name" data-column="1" />
                             </div>
                         </div>
                         <div class="col-3 d-md-none">
                             @localizer["Boat"]
                         </div>
-                        <div class="col-9 col-md-3">
+                        <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.BoatName" class="form-control" />
+                                <label class="visually-hidden" data-template-label-for="BoatName"
+                                       for="template_BoatName">@localizer["Boat"]</label>
+                                <input id="template_BoatName" type="text" name="template.BoatName"
+                                       class="form-control" data-template-field="BoatName" data-column="2" />
                             </div>
                         </div>
                         <div class="col-3 d-md-none">
                             Home Club
                         </div>
-                        <div class="col-9 col-md-3">
+                        <div class="col-9 col-md">
                             <div class="mb-3">
-                                <input type="text" name="template.HomeClubName" class="form-control" />
+                                <label class="visually-hidden" data-template-label-for="HomeClubName"
+                                       for="template_HomeClubName">Home Club</label>
+                                <input id="template_HomeClubName" type="text" name="template.HomeClubName"
+                                       class="form-control" data-template-field="HomeClubName" data-column="3" />
                             </div>
                         </div>
+                        @for (var fieldIndex = 0; fieldIndex < Model.HighlyVisibleFieldDefinitions.Count; fieldIndex++)
+                        {
+                            var definition = Model.HighlyVisibleFieldDefinitions[fieldIndex];
+                            var fieldLabel = string.IsNullOrWhiteSpace(definition.DisplayHeader)
+                                ? definition.Name
+                                : definition.DisplayHeader;
+                            var columnIndex = baseColumnCount + fieldIndex;
+                            <input type="hidden" name="template.CustomFieldValues[@fieldIndex].FieldDefinitionId"
+                                   value="@definition.Id"
+                                   data-template-field="CustomFieldValues[@fieldIndex].FieldDefinitionId" />
+                            <div class="col-3 d-md-none">
+                                @fieldLabel
+                            </div>
+                            <div class="col-9 col-md">
+                                <div class="mb-3">
+                                    <label class="visually-hidden"
+                                           data-template-label-for="CustomFieldValues[@fieldIndex].Value"
+                                           for="template_CustomFieldValues_@(fieldIndex)__Value">@fieldLabel</label>
+                                    <input id="template_CustomFieldValues_@(fieldIndex)__Value"
+                                           type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
+                                           name="template.CustomFieldValues[@fieldIndex].Value"
+                                           class="form-control"
+                                           data-template-field="CustomFieldValues[@fieldIndex].Value"
+                                           data-column="@columnIndex" />
+                                </div>
+                            </div>
+                        }
                         <div class="col-12 d-md-none">
                             <hr class="d-md-none" />
                         </div>
@@ -118,9 +173,11 @@
                                 <div class="col-3 d-md-none">
                                     @localizer["Sail"]
                                 </div>
-                                <div class="col-9 col-md-3">
+                                <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].SailNumber" class="form-control
+                                        <label class="visually-hidden" for="competitors_@(i)__SailNumber">@localizer["Sail"]</label>
+                                        <input id="competitors_@(i)__SailNumber" type="text" name="competitors[@i].SailNumber"
+                                               class="form-control
                                                @(ViewData.ModelState[$"competitors[{i}].SailNumber"]?.ValidationState == ModelValidationState.Invalid ? "is-invalid": string.Empty)"
                                                data-column="0" data-row="@i" value="@Model.Competitors[i].SailNumber" />
                                         <span asp-validation-for="Competitors[i].SailNumber" class="text-danger"></span>
@@ -129,30 +186,66 @@
                                 <div class="col-3 d-md-none">
                                     @localizer["Helm"]
                                 </div>
-                                <div class="col-9 col-md-3">
+                                <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].Name" class="form-control"
-                                               data-column="1" data-row="@i" value="@Model.Competitors[i].Name" />
+                                        <label class="visually-hidden" for="competitors_@(i)__Name">@localizer["Helm"]</label>
+                                        <input id="competitors_@(i)__Name" type="text" name="competitors[@i].Name"
+                                               class="form-control" data-column="1" data-row="@i"
+                                               value="@Model.Competitors[i].Name" />
                                     </div>
                                 </div>
                                 <div class="col-3 d-md-none">
                                     @localizer["Boat"]
                                 </div>
-                                <div class="col-9 col-md-3">
+                                <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].BoatName" class="form-control"
-                                               data-column="2" data-row="@i" value="@Model.Competitors[i].BoatName" />
+                                        <label class="visually-hidden" for="competitors_@(i)__BoatName">@localizer["Boat"]</label>
+                                        <input id="competitors_@(i)__BoatName" type="text" name="competitors[@i].BoatName"
+                                               class="form-control" data-column="2" data-row="@i"
+                                               value="@Model.Competitors[i].BoatName" />
                                     </div>
                                 </div>
                                 <div class="col-3 d-md-none">
                                     Home Club
                                 </div>
-                                <div class="col-9 col-md-3">
+                                <div class="col-9 col-md">
                                     <div class="mb-3">
-                                        <input type="text" name="competitors[@i].HomeClubName" class="form-control"
-                                               data-column="3" data-row="@i" value="@Model.Competitors[i].HomeClubName" />
+                                        <label class="visually-hidden" for="competitors_@(i)__HomeClubName">Home Club</label>
+                                        <input id="competitors_@(i)__HomeClubName" type="text" name="competitors[@i].HomeClubName"
+                                               class="form-control" data-column="3" data-row="@i"
+                                               value="@Model.Competitors[i].HomeClubName" />
                                     </div>
                                 </div>
+                                @for (var fieldIndex = 0; fieldIndex < Model.HighlyVisibleFieldDefinitions.Count; fieldIndex++)
+                                {
+                                    var definition = Model.HighlyVisibleFieldDefinitions[fieldIndex];
+                                    var fieldLabel = string.IsNullOrWhiteSpace(definition.DisplayHeader)
+                                        ? definition.Name
+                                        : definition.DisplayHeader;
+                                    var columnIndex = baseColumnCount + fieldIndex;
+                                    var fieldValue = Model.Competitors[i].CustomFieldValues.Count > fieldIndex
+                                        ? Model.Competitors[i].CustomFieldValues[fieldIndex].Value
+                                        : null;
+                                    <input type="hidden"
+                                           name="competitors[@i].CustomFieldValues[@fieldIndex].FieldDefinitionId"
+                                           value="@definition.Id" />
+                                    <div class="col-3 d-md-none">
+                                        @fieldLabel
+                                    </div>
+                                    <div class="col-9 col-md">
+                                        <div class="mb-3">
+                                            <label class="visually-hidden"
+                                                   for="competitors_@(i)__CustomFieldValues_@(fieldIndex)__Value">@fieldLabel</label>
+                                            <input id="competitors_@(i)__CustomFieldValues_@(fieldIndex)__Value"
+                                                   type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
+                                                   name="competitors[@i].CustomFieldValues[@fieldIndex].Value"
+                                                   class="form-control"
+                                                   data-column="@columnIndex"
+                                                   data-row="@i"
+                                                   value="@fieldValue" />
+                                        </div>
+                                    </div>
+                                }
                                 <div class="col-12 d-md-none">
                                     <hr class="d-md-none" />
                                 </div>
@@ -165,39 +258,69 @@
                             <div class="col-3 d-md-none">
                                 @localizer["Sail"]
                             </div>
-                            <div class="col-9 col-md-3">
+                            <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].SailNumber" class="form-control"
-                                           data-column="0" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__SailNumber">@localizer["Sail"]</label>
+                                    <input id="competitors_0__SailNumber" type="text" name="competitors[0].SailNumber"
+                                           class="form-control" data-column="0" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">
                                 @localizer["Helm"]
                             </div>
-                            <div class="col-9 col-md-3">
+                            <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].Name" class="form-control"
-                                           data-column="1" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__Name">@localizer["Helm"]</label>
+                                    <input id="competitors_0__Name" type="text" name="competitors[0].Name"
+                                           class="form-control" data-column="1" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">
                                 @localizer["Boat"]
                             </div>
-                            <div class="col-9 col-md-3">
+                            <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].BoatName" class="form-control"
-                                           data-column="2" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__BoatName">@localizer["Boat"]</label>
+                                    <input id="competitors_0__BoatName" type="text" name="competitors[0].BoatName"
+                                           class="form-control" data-column="2" data-row="0" />
                                 </div>
                             </div>
                             <div class="col-3 d-md-none">
                                 Home Club
                             </div>
-                            <div class="col-9 col-md-3">
+                            <div class="col-9 col-md">
                                 <div class="mb-3">
-                                    <input type="text" name="competitors[0].HomeClubName" class="form-control"
-                                           data-column="3" data-row="0" />
+                                    <label class="visually-hidden" for="competitors_0__HomeClubName">Home Club</label>
+                                    <input id="competitors_0__HomeClubName" type="text" name="competitors[0].HomeClubName"
+                                           class="form-control" data-column="3" data-row="0" />
                                 </div>
                             </div>
+                            @for (var fieldIndex = 0; fieldIndex < Model.HighlyVisibleFieldDefinitions.Count; fieldIndex++)
+                            {
+                                var definition = Model.HighlyVisibleFieldDefinitions[fieldIndex];
+                                var fieldLabel = string.IsNullOrWhiteSpace(definition.DisplayHeader)
+                                    ? definition.Name
+                                    : definition.DisplayHeader;
+                                var columnIndex = baseColumnCount + fieldIndex;
+                                <input type="hidden"
+                                       name="competitors[0].CustomFieldValues[@fieldIndex].FieldDefinitionId"
+                                       value="@definition.Id" />
+                                <div class="col-3 d-md-none">
+                                    @fieldLabel
+                                </div>
+                                <div class="col-9 col-md">
+                                    <div class="mb-3">
+                                        <label class="visually-hidden"
+                                               for="competitors_0__CustomFieldValues_@(fieldIndex)__Value">@fieldLabel</label>
+                                        <input id="competitors_0__CustomFieldValues_@(fieldIndex)__Value"
+                                               type="@(definition.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text")"
+                                               name="competitors[0].CustomFieldValues[@fieldIndex].Value"
+                                               class="form-control"
+                                               data-column="@columnIndex"
+                                               data-row="0" />
+                                    </div>
+                                </div>
+                            }
                             <div class="col-12 d-md-none">
                                 <hr class="d-md-none" />
                             </div>

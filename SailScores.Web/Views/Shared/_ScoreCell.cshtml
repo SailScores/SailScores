@@ -63,7 +63,7 @@
                     var muteText = (Model.IsPercentSystem && Model.Result.Code == "DNC") ? "discardmuted" : "";
                     @Html.Raw($"<span title=\"{Model.ScoreCodesUsed[Model.Result.Code].Description}\" class=\"{muteText}\">")
                 }
-                @Model.Result.Code
+                @Model.Result.Code 
                 @if (Model.Result.Code != null
                    && Model.ScoreCodesUsed != null
                    && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))

@@ -56,7 +56,8 @@
             ExcludeCompetitorLinks = true,
             PreferAlternativeSailNumbers = Model.Series.PreferAlternativeSailNumbers ?? false,
             TrendLegend = "Rank change from existing scoring method.",
-            UpdatedDate = null
+            UpdatedDate = null,
+            DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
         };
 }
 @await Html.PartialAsync("_ResultsTable", previewModel)
@@ -97,7 +98,8 @@
             ExcludeCompetitorLinks = true,
             PreferAlternativeSailNumbers = Model.Series.PreferAlternativeSailNumbers ?? false,
             TrendLegend = String.Empty,
-            UpdatedDate = null
+            UpdatedDate = null,
+            DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
         };
 }
 @await Html.PartialAsync("_ResultsTable", currentResults)
@@ -202,5 +204,4 @@
         })();
     </script>
 }
-
 

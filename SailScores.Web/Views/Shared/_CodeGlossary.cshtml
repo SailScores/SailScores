@@ -3,9 +3,13 @@
 
 @model Series
 
+@{
+    var scoreCodesUsed = Model?.FlatResults?.ScoreCodesUsed;
+    var appliedGroups = Model?.FlatResults?.AppliedScoreCodeGroupSummaries;
+}
+
 @if (Model != null
-   && Model.FlatResults?.ScoreCodesUsed != null
-   && Model.FlatResults.ScoreCodesUsed.Count > 0)
+   && ((scoreCodesUsed?.Count ?? 0) > 0 || (appliedGroups?.Count ?? 0) > 0))
 {
     <div class="container">
         Scored using @Model.FlatResults?.ScoringSystemName
@@ -18,13 +22,27 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var code in Model.FlatResults.ScoreCodesUsed.OrderBy(c => c.Key))
+
+                @if (scoreCodesUsed != null)
                 {
-                    <tr>
-                        <th scope="row">@code.Key</th>
-                        <td>@code.Value.Description</td>
-                        <td>@code.Value.Formula</td>
-                    </tr>
+                    @foreach (var code in scoreCodesUsed.OrderBy(c => c.Key))
+                    {
+                        <tr>
+                            <th scope="row">@code.Key</th>
+                            <td>@code.Value.Description</td>
+                            <td>@code.Value.Formula</td>
+                        </tr>
+                    }
+                }
+                @if (appliedGroups != null)
+                {
+                    foreach (var appliedGroup in appliedGroups.OrderBy(g => g.Description))
+                    {
+                        <tr>
+                            <th scope="row">Limit</th>
+                            <td colspan="2">@appliedGroup.Description</td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

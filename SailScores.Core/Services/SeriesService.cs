@@ -461,6 +461,9 @@ namespace SailScores.Core.Services
                     .Include(s => s.RaceSeries)
                         .ThenInclude(rs => rs.Race)
                             .ThenInclude(r => r.Scores)
+                    .Include(s => s.RaceSeries)
+                        .ThenInclude(rs => rs.Race)
+                            .ThenInclude(r => r.Weather)
                     .AsSplitQuery()
                     .SingleAsync(s => s.Id == childLink)
                     .ConfigureAwait(false);
@@ -488,6 +491,9 @@ namespace SailScores.Core.Services
                     .Include(s => s.RaceSeries)
                         .ThenInclude(rs => rs.Race)
                             .ThenInclude(r => r.Scores)
+                    .Include(s => s.RaceSeries)
+                        .ThenInclude(rs => rs.Race)
+                            .ThenInclude(r => r.Weather)
                     .AsSplitQuery()
                     .SingleAsync(s => s.Id == childLink)
                     .ConfigureAwait(false);
@@ -706,6 +712,7 @@ namespace SailScores.Core.Services
                 PercentRequired = series.Results.PercentRequired,
                 ScoringSystemName = series.ScoringSystem?.Name,
                 ScoreCodesUsed = series.Results.ScoreCodesUsed,
+                AppliedScoreCodeGroupSummaries = series.Results.AppliedScoreCodeGroupSummaries,
                 IsPreliminary = series.Races.Any(r => r.State == RaceState.Preliminary),
                 UpdatedBy =series.UpdatedBy
             };

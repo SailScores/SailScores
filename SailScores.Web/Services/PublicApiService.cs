@@ -313,6 +313,9 @@ public class PublicApiService : IPublicApiService
                 : null,
             ScoreCodesUsed = includeRaces
                 ? MapScoreCodes(series.FlatResults?.ScoreCodesUsed)
+                : null,
+            AppliedScoreCodeGroups = includeRaces
+                ? MapAppliedScoreCodeGroups(series.FlatResults?.AppliedScoreCodeGroupSummaries)
                 : null
         };
     }
@@ -603,6 +606,18 @@ public class PublicApiService : IPublicApiService
                 Code = c.Key,
                 Description = c.Value?.Description,
                 Formula = c.Value?.Formula
+            })
+            .ToList();
+    }
+
+    private static List<PublicSeriesScoreCodeGroupDto> MapAppliedScoreCodeGroups(
+        IEnumerable<Core.Scoring.AppliedScoreCodeGroupSummary> groups)
+    {
+        return (groups ?? [])
+            .OrderBy(g => g.Description)
+            .Select(g => new PublicSeriesScoreCodeGroupDto
+            {
+                Description = g.Description
             })
             .ToList();
     }

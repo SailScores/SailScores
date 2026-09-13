@@ -41,7 +41,8 @@ public class CompetitorFieldServiceTests
             DisplayHeader = "Boat Type",
             DataType = CustomFieldDataType.Text,
             DisplayOrder = 3,
-            IsActive = true
+            IsActive = true,
+            HighlyVisible = true
         };
 
         var result = await _service.SaveFieldDefinitionAsync(definition);
@@ -49,6 +50,10 @@ public class CompetitorFieldServiceTests
         Assert.NotEqual(Guid.Empty, result.Id);
         Assert.Equal("Boat Type", result.Name);
         Assert.Equal(clubId, result.ClubId);
+        Assert.True(result.HighlyVisible);
+
+        var savedDefinition = _context.CompetitorFieldDefinitions.Single(d => d.ClubId == clubId);
+        Assert.True(savedDefinition.HighlyVisible);
         Assert.Single(_context.CompetitorFieldDefinitions.Where(d => d.ClubId == clubId));
     }
 

@@ -58,6 +58,7 @@ public class AdminViewModel
     public int? DefaultRaceDateOffset { get; set; }
 
     public string Locale { get; set; }
+    public string DefaultDateFormat { get; set; }
     public IList<string> LocaleOptions { get; set; }
 
     public Guid? DefaultSeriesResultsTemplateId { get; set; }

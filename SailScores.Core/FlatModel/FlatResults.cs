@@ -23,6 +23,7 @@ namespace SailScores.Core.FlatModel
 
         public String UpdatedBy { get; set; }
         public Dictionary<string, ScoreCodeSummary> ScoreCodesUsed { get; set; }
+        public IList<AppliedScoreCodeGroupSummary> AppliedScoreCodeGroupSummaries { get; set; }
 
         public FlatSeriesScore GetScore(FlatCompetitor comp)
         {

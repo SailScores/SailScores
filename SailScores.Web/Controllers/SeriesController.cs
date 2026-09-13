@@ -112,6 +112,7 @@ public class SeriesController : Controller
         }
 
         var club = await _clubService.GetMinimalClub(clubInitials);
+        ViewData["DefaultDateFormat"] = club.DefaultDateFormat;
 
         var canEdit = false;
         var canEditSeries = false;
@@ -161,6 +162,8 @@ public class SeriesController : Controller
         {
             return new NotFoundResult();
         }
+        var club = await _clubService.GetMinimalClub(series.ClubId);
+        ViewData["DefaultDateFormat"] = club.DefaultDateFormat;
         var filename = series.Name.Contains(series.Season.Name) ? series.Name : $"{series.Season.Name} {series.Name}";
         // urlencode helps with unicode values, but replaces (valid) spaces.
         filename = HttpUtility.UrlEncode(filename + ".html", Encoding.UTF8);

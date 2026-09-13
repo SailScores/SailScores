@@ -34,6 +34,18 @@ public class CompetitorFieldService : ICompetitorFieldService
         return _mapper.Map<List<CompetitorFieldDefinition>>(definitions);
     }
 
+    public async Task<IList<CompetitorFieldDefinition>> GetAllFieldDefinitionsAsync(Guid clubId)
+    {
+        var definitions = await _dbContext.CompetitorFieldDefinitions
+            .Where(d => d.ClubId == clubId)
+            .OrderBy(d => d.DisplayOrder)
+            .ThenBy(d => d.Name)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return _mapper.Map<List<CompetitorFieldDefinition>>(definitions);
+    }
+
     public async Task<CompetitorFieldDefinition> GetFieldDefinitionAsync(Guid fieldDefinitionId)
     {
         var definition = await _dbContext.CompetitorFieldDefinitions
@@ -77,6 +89,39 @@ public class CompetitorFieldService : ICompetitorFieldService
         if (definition != null)
         {
             definition.IsActive = false;
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+    }
+
+    public async Task SetFieldActiveStateAsync(Guid fieldDefinitionId, bool isActive)
+    {
+        var definition = await _dbContext.CompetitorFieldDefinitions
+            .FirstOrDefaultAsync(d => d.Id == fieldDefinitionId)
+            .ConfigureAwait(false);
+
+        if (definition != null)
+        {
+            definition.IsActive = isActive;
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+    }
+
+    public async Task DeleteFieldDefinitionPermanentlyAsync(Guid fieldDefinitionId)
+    {
+        var definition = await _dbContext.CompetitorFieldDefinitions
+            .FirstOrDefaultAsync(d => d.Id == fieldDefinitionId)
+            .ConfigureAwait(false);
+
+        if (definition != null)
+        {
+            // Remove any related values first to satisfy FK constraints
+            var values = await _dbContext.CompetitorFieldValues
+                .Where(v => v.FieldDefinitionId == fieldDefinitionId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            _dbContext.CompetitorFieldValues.RemoveRange(values);
+
+            _dbContext.CompetitorFieldDefinitions.Remove(definition);
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
     }

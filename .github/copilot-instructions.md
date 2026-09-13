@@ -44,6 +44,7 @@ SailScores follows an ASP.NET Core MVC pattern with layered architecture:
 - **Administrative features** must always use restrictive authorization policies (e.g., `[Authorize(Policy = AuthorizationPolicies.ClubAdmin)]`).
 - **UI Changes**: Support dark mode; avoid forcing light-only styling and prefer theme-aware options like auto/adaptive themes.
 - **Line Length**: Keep line length at 120 characters or less in all files and honor all .editorconfig settings.
+- **Model-to-ViewModel Mappings**: Migrate away from AutoMapper for new mappings. Implement model-to-ViewModel mappings using constructor-based manual mapping. Ensure both parameterless and parameterized constructors exist on mapped types to support various initialization patterns.
 
 ## Development Setup
 

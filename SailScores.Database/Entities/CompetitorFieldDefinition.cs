@@ -24,6 +24,8 @@ public class CompetitorFieldDefinition
 
     public bool IsActive { get; set; } = true;
 
+    public bool? HighlyVisible { get; set; } = false;
+
     public IList<CompetitorFieldValue> Values { get; set; } = new List<CompetitorFieldValue>();
 
     public IList<SeriesResultsTemplateCustomField> TemplateFields { get; set; } = new List<SeriesResultsTemplateCustomField>();

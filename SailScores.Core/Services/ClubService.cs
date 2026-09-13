@@ -559,6 +559,7 @@ namespace SailScores.Core.Services
             dbClub.DefaultScoringSystemId = club.DefaultScoringSystemId;
             dbClub.ShowClubInResults = club.ShowClubInResults;
             dbClub.Locale = club.Locale;
+            dbClub.DefaultDateFormat = club.DefaultDateFormat;
             dbClub.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
             dbClub.LogoFileId = club.LogoFileId;
             dbClub.HomePageDescription = club.HomePageDescription;

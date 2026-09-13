@@ -13,6 +13,9 @@ namespace SailScores.Core.Scoring
         protected const string AVERAGE_FORMULANAME = "AVE";
         protected const string AVE_AFTER_DISCARDS_FORMULANAME = "AVE ND";
         protected const string AVE_PRIOR_RACES_FORMULANAME = "AVE P";
+        protected const string AVE_WHOLE_FORMULANAME = "AVE W";
+        protected const string AVE_WHOLE_ND_FORMULANAME = "AVE W ND";
+        protected const string AVE_WHOLE_P_FORMULANAME = "AVE W P";
         protected const string SERIESCOMPETITORS_FORMULANAME = "SER+";
         protected const string MANUAL_FORMULANAME = "MAN";
         protected const string FINISHERSPLUS_FORMULANAME = "FIN+";
@@ -50,10 +53,35 @@ namespace SailScores.Core.Scoring
 
         public SeriesResults CalculateResults(Series series)
         {
-            SeriesResults returnResults = GetResults(series);
-            AddCodesUsed(returnResults);
-            AddTrend(returnResults, series);
-            return returnResults;
+            var originalCodes = CaptureOriginalScoreCodes(series);
+            try
+            {
+                SeriesResults returnResults = GetResults(series);
+                AddCodesUsed(returnResults);
+                RestoreOriginalScoreCodes(originalCodes);
+                AddTrend(returnResults, series);
+                return returnResults;
+            }
+            finally
+            {
+                RestoreOriginalScoreCodes(originalCodes);
+            }
+        }
+
+        private static Dictionary<Score, string> CaptureOriginalScoreCodes(Series series)
+        {
+            return series.Races
+                .SelectMany(r => r.Scores)
+                .Distinct()
+                .ToDictionary(score => score, score => score.Code);
+        }
+
+        private static void RestoreOriginalScoreCodes(IReadOnlyDictionary<Score, string> originalCodes)
+        {
+            foreach (var originalCode in originalCodes)
+            {
+                originalCode.Key.Code = originalCode.Value;
+            }
         }
 
 
@@ -67,6 +95,11 @@ namespace SailScores.Core.Scoring
             {
                 // virtual and calls abstract GetBasicScore
                 SeriesCompetitorResults compResults = CalculateSimpleScores(comp, scores);
+
+                // Apply score code group limits early, before other score calculations.
+                // Use the expected number of discards (not actual), then recalculate scores.
+                var changes = ApplyScoreCodeGroupLimits(resultsWorkInProgress, compResults);
+
                 // the next three are private, so in BaseScoringCalculator
                 AddDefaultScores(resultsWorkInProgress, compResults);
                 CalculateRaceDependentScores(resultsWorkInProgress, compResults);
@@ -75,8 +108,11 @@ namespace SailScores.Core.Scoring
                 // these are virtual
                 CalculateOverrides(resultsWorkInProgress, compResults);
                 DiscardScores(resultsWorkInProgress, compResults);
+
                 resultsWorkInProgress.Results[comp] = compResults;
             }
+
+
             // Next two are virtual
             CalculateTotals(resultsWorkInProgress, scores);
             CalculateRanks(resultsWorkInProgress);
@@ -141,6 +177,251 @@ namespace SailScores.Core.Scoring
             {
                 score.Discard = true;
             }
+        }
+
+        /// <summary>
+        /// Apply score code group limitations. After this method runs, scores that exceed the group
+        /// limitation will have their Code changed to the overage code and will need re-scoring.
+        /// </summary>
+        protected virtual bool ApplyScoreCodeGroupLimits(
+            SeriesResults results,
+            SeriesCompetitorResults compResults)
+        {
+            if (ScoringSystem?.ScoreCodeGroups == null || ScoringSystem.ScoreCodeGroups.Count == 0)
+            {
+                return false;
+            }
+
+            var allScoreCodeGroups = new List<ScoreCodeGroup>(ScoringSystem.ScoreCodeGroups);
+            if (ScoringSystem.InheritedScoreCodeGroups != null)
+            {
+                allScoreCodeGroups.AddRange(ScoringSystem.InheritedScoreCodeGroups);
+            }
+
+            var returnValue = false;
+            int expectedNumberOfDiscards = GetNumberOfDiscards(results.SailedRaces.Count());
+
+            foreach (var group in allScoreCodeGroups)
+            {
+                var thisCompChanges = ApplyGroupLimitToCompetitor(
+                    compResults,
+                    group,
+                    results.SailedRaces.Count(),
+                    results,
+                    expectedNumberOfDiscards);
+                if (thisCompChanges)
+                {
+                    AddAppliedScoreCodeGroupSummary(results, group);
+                }
+                returnValue = returnValue || thisCompChanges;
+            }
+
+            return returnValue;
+        }
+
+        /// <summary>
+        /// Apply a single score code group limitation to a competitor's scores.
+        /// </summary>
+        private bool ApplyGroupLimitToCompetitor(
+            SeriesCompetitorResults compResults,
+            ScoreCodeGroup group,
+            int totalRaces,
+            SeriesResults results,
+            int expectedNumberOfDiscards)
+        {
+            // Get all scores for this competitor that are NOT already discarded
+            var groupScores = compResults.CalculatedScores.Values
+                .Where(cs => !cs.Discard && group.IncludedCodeNames.Contains(cs.RawScore.Code, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (groupScores.Count == 0)
+            {
+                return false;
+            }
+
+            // Calculate how many scores are allowed
+            var allowedCountInfo = CalculateAllowedCountForGroup(
+                group, compResults, totalRaces, results, expectedNumberOfDiscards);
+
+            // For date-based limitations, count distinct dates; otherwise count scores
+            int effectiveScoreCount;
+            if (allowedCountInfo.IsDateBased)
+            {
+                effectiveScoreCount = groupScores
+                    .Select(cs => cs.RawScore.Race?.Date)
+                    .Where(d => d.HasValue)
+                    .Distinct()
+                    .Count();
+            }
+            else
+            {
+                effectiveScoreCount = groupScores.Count;
+            }
+
+            if (effectiveScoreCount <= allowedCountInfo.AllowedCount)
+            {
+                return false; // No overage
+            }
+
+            // Identify which scores to mark as overage
+            var overageScores = SelectOverageScores(groupScores, group, allowedCountInfo);
+
+            // Mark overage scores with the overage code
+            foreach (var overageScore in overageScores)
+            {
+                overageScore.RawScore.Code = group.OverageCodeName ?? DEFAULT_CODE;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Calculate how many scores from a group are allowed for a competitor.
+        /// Returns an AllowedCountInfo object that distinguishes between race-based and
+        /// date-based limitations.
+        /// </summary>
+        private AllowedCountInfo CalculateAllowedCountForGroup(
+            ScoreCodeGroup group,
+            SeriesCompetitorResults compResults,
+            int totalRaces,
+            SeriesResults results,
+            int expectedNumberOfDiscards)
+        {
+            switch (group.LimitationType)
+            {
+                case ScoreCodeGroupLimitationType.NumberOfRaces:
+                    return AllowedCountInfo.RaceBased((int)group.LimitationValue);
+
+                case ScoreCodeGroupLimitationType.PercentOfRaces:
+                    {
+                        int denominator;
+                        if (group.UseNonDiscardedRaces)
+                        {
+                            // Use total races minus expected discards
+                            denominator = totalRaces - expectedNumberOfDiscards;
+                        }
+                        else
+                        {
+                            // Use total races
+                            denominator = totalRaces;
+                        }
+
+                        int allowedCount = (int)Math.Floor(
+                            group.LimitationValue / 100m * denominator);
+                        return AllowedCountInfo.RaceBased(allowedCount);
+                    }
+
+                case ScoreCodeGroupLimitationType.NumberOfDates:
+                    {
+                        // For date-based limitations, the allowed count is the number of
+                        // distinct dates allowed.
+                        return AllowedCountInfo.DateBased(
+                            (int)group.LimitationValue,
+                            group.OverageSelectionMethod);
+                    }
+
+                default:
+                    return AllowedCountInfo.RaceBased(int.MaxValue); // No limit
+            }
+        }
+
+        /// <summary>
+        /// Select which scores from the group should be marked as overage based on the
+        /// overage selection method and limitation type.
+        /// </summary>
+        private List<CalculatedScore> SelectOverageScores(
+            List<CalculatedScore> groupScores,
+            ScoreCodeGroup group,
+            AllowedCountInfo allowedCountInfo)
+        {
+            if (allowedCountInfo.IsDateBased)
+            {
+                return SelectOverageScoresByDate(
+                    groupScores,
+                    allowedCountInfo.AllowedCount,
+                    allowedCountInfo.OverageSelectionMethod);
+            }
+            else
+            {
+                return SelectOverageScoresByCount(groupScores, group, groupScores.Count - allowedCountInfo.AllowedCount);
+            }
+        }
+
+        /// <summary>
+        /// Select overage scores when limitation is based on number of races/scores.
+        /// </summary>
+        private List<CalculatedScore> SelectOverageScoresByCount(
+            List<CalculatedScore> groupScores,
+            ScoreCodeGroup group,
+            int overageCount)
+        {
+            switch (group.OverageSelectionMethod)
+            {
+                case ScoreCodeGroupOverageSelection.LatestFirst:
+                    // Latest first means we keep the earliest and mark latest as overage
+                    // Sort by date DESC, then by race order DESC
+                    var sortedByLatest = groupScores
+                        .OrderByDescending(cs => cs.RawScore.Race?.Date)
+                        .ThenByDescending(cs => cs.RawScore.Race?.Order)
+                        .Take(overageCount)
+                        .ToList();
+                    return sortedByLatest;
+
+                case ScoreCodeGroupOverageSelection.WorstFirst:
+                default:
+                    // Worst first means highest score values (worst in low-point scoring)
+                    var sortedByWorst = groupScores
+                        .OrderByDescending(cs => cs.ScoreValue ?? 0m)
+                        .Take(overageCount)
+                        .ToList();
+                    return sortedByWorst;
+            }
+        }
+
+        /// <summary>
+        /// Select overage scores when limitation is based on number of distinct dates.
+        /// First identifies which dates are overage based on the overage selection method,
+        /// then returns all scores from those overage dates.
+        /// </summary>
+        private List<CalculatedScore> SelectOverageScoresByDate(
+            List<CalculatedScore> groupScores,
+            int allowedDateCount,
+            ScoreCodeGroupOverageSelection overageSelectionMethod)
+        {
+            // Group scores by date
+            var scoresByDate = groupScores
+                .GroupBy(cs => cs.RawScore.Race?.Date ?? DateTime.MinValue)
+                .ToList();
+
+            // Select which dates are overage based on selection method
+            IEnumerable<IGrouping<DateTime, CalculatedScore>> overageDateGroups;
+
+            switch (overageSelectionMethod)
+            {
+                case ScoreCodeGroupOverageSelection.LatestFirst:
+                    // Latest first means we keep the earliest dates and discard the latest dates.
+                    // Sort by date DESC, take the ones beyond allowedDateCount (the most recent dates).
+                    overageDateGroups = scoresByDate
+                        .OrderByDescending(g => g.Key)
+                        .Take(scoresByDate.Count - allowedDateCount);
+                    break;
+
+                case ScoreCodeGroupOverageSelection.WorstFirst:
+                default:
+                    // Worst first means we prioritize marking fewer races as overage by
+                    // selecting dates with the fewest races. If multiple dates have the same
+                    // number of races, we select the most recent dates (which are often less
+                    // critical or more flexible to mark as overage).
+                    overageDateGroups = scoresByDate
+                        .OrderBy(g => g.Count())      // Fewest races first
+                        .ThenByDescending(g => g.Key) // Then most recent date
+                        .Take(scoresByDate.Count - allowedDateCount);
+                    break;
+            }
+
+            // Return all scores from overage dates
+            return overageDateGroups
+                .SelectMany(g => g)
+                .ToList();
         }
 
         protected virtual void CalculateTotals(
@@ -266,7 +547,10 @@ namespace SailScores.Core.Scoring
             var scoreCode = GetScoreCode(code);
             return scoreCode.Formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
                 || scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
-                || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
+                || scoreCode.Formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_ND_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_P_FORMULANAME, CASE_INSENSITIVE);
         }
 
         protected bool IsNonDiscardAverage(string code)
@@ -276,7 +560,8 @@ namespace SailScores.Core.Scoring
                 return false;
             }
             var scoreCode = GetScoreCode(code);
-            return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE);
+            return scoreCode.Formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
+                || scoreCode.Formula.Equals(AVE_WHOLE_ND_FORMULANAME, CASE_INSENSITIVE);
         }
 
         protected bool CountsAsFinished(Score s)
@@ -540,6 +825,19 @@ namespace SailScores.Core.Scoring
             results.ScoreCodesUsed = scoreCodes;
         }
 
+        private void AddAppliedScoreCodeGroupSummary(SeriesResults results, ScoreCodeGroup group)
+        {
+            results.AppliedScoreCodeGroupSummaries ??= new List<AppliedScoreCodeGroupSummary>();
+            var summary = AppliedScoreCodeGroupSummary.FromGroup(group);
+
+            if (results.AppliedScoreCodeGroupSummaries.Any(s => s.Description == summary.Description))
+            {
+                return;
+            }
+
+            results.AppliedScoreCodeGroupSummaries.Add(summary);
+        }
+
         protected virtual ScoreCodeSummary GetScoreCodeSummary(string code)
         {
             var codeDef = GetScoreCode(code);
@@ -581,6 +879,15 @@ namespace SailScores.Core.Scoring
                     break;
                 case "AVE P":
                     returnString.Append("Average of results in prior races");
+                    break;
+                case "AVE W":
+                    returnString.Append("Average of results rounded to a whole number");
+                    break;
+                case "AVE W ND":
+                    returnString.Append("Average of non-discarded results rounded to a whole number");
+                    break;
+                case "AVE W P":
+                    returnString.Append("Average of results in prior races rounded to a whole number");
                     break;
                 case "PLC%":
                     returnString.Append($"Place + penalty ({codeDef.FormulaValue?.ToString("0.###")}% of DNF score)");
@@ -847,6 +1154,9 @@ namespace SailScores.Core.Scoring
                 AVERAGE_FORMULANAME => CalculateAverage(compResults),
                 AVE_AFTER_DISCARDS_FORMULANAME => CalculateAverageNoDiscards(compResults),
                 AVE_PRIOR_RACES_FORMULANAME => CalculateAverageOfPrior(compResults, race),
+                AVE_WHOLE_FORMULANAME => CalculateAverage(compResults, decimals: 0),
+                AVE_WHOLE_ND_FORMULANAME => CalculateAverageNoDiscards(compResults, decimals: 0),
+                AVE_WHOLE_P_FORMULANAME => CalculateAverageOfPrior(compResults, race, decimals: 0),
                 SERIESCOMPETITORS_FORMULANAME => GetNumberOfCompetitors(resultsWorkInProgress) + (scoreCode.FormulaValue ?? 0m),
                 _ => null,
             };
@@ -858,7 +1168,10 @@ namespace SailScores.Core.Scoring
             string formula = scoreCode?.Formula ?? String.Empty;
             bool average = formula.Equals(AVERAGE_FORMULANAME, CASE_INSENSITIVE)
                 || formula.Equals(AVE_AFTER_DISCARDS_FORMULANAME, CASE_INSENSITIVE)
-                || formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE);
+                || formula.Equals(AVE_PRIOR_RACES_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_WHOLE_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_WHOLE_ND_FORMULANAME, CASE_INSENSITIVE)
+                || formula.Equals(AVE_WHOLE_P_FORMULANAME, CASE_INSENSITIVE);
             bool seriesCompPlus = scoreCode?.Formula?.Equals(SERIESCOMPETITORS_FORMULANAME, CASE_INSENSITIVE)
                 ?? false;
             return average || seriesCompPlus;
@@ -937,18 +1250,20 @@ namespace SailScores.Core.Scoring
 
 
         private decimal? CalculateAverage(
-            SeriesCompetitorResults compResults)
+            SeriesCompetitorResults compResults,
+            int decimals = 1)
         {
             var average = compResults.CalculatedScores.Values
                 .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                 .Average(s => s.ScoreValue) ?? 0m;
 
-            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+            return Math.Round(average, decimals, MidpointRounding.AwayFromZero);
 
         }
 
         private decimal? CalculateAverageNoDiscards(
-            SeriesCompetitorResults compResults)
+            SeriesCompetitorResults compResults,
+            int decimals = 1)
         {
             int numAverages = compResults.CalculatedScores
                     .Values.Count(s =>
@@ -974,13 +1289,14 @@ namespace SailScores.Core.Scoring
                    .Take(compResults.CalculatedScores.Count - numAverages - discards)
                    .Average(s => s.ScoreValue) ?? 0m;
             }
-            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+            return Math.Round(average, decimals, MidpointRounding.AwayFromZero);
 
         }
 
         private decimal? CalculateAverageOfPrior(
             SeriesCompetitorResults compResults,
-            Race race)
+            Race race,
+            int decimals = 1)
         {
             var beforeDate = race.Date;
             var beforeOrder = race.Order;
@@ -995,7 +1311,7 @@ namespace SailScores.Core.Scoring
                 .Where(s => (s.ScoreValue ?? 0m) != 0m && !IsAverage(s.RawScore.Code))
                 .Average(s => s.ScoreValue) ?? 0m;
 
-            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+            return Math.Round(average, decimals, MidpointRounding.AwayFromZero);
 
         }
     }

@@ -12,16 +12,27 @@ namespace SailScores.Web.Areas.Api.Controllers
     [ApiController]
     public class FleetsController : ControllerBase
     {
+        // IdentityConstants.ApplicationScheme's value ("Identity.Application") hardcoded here because
+        // attribute arguments must be compile-time constants and ApplicationScheme is a static readonly field.
+        private const string CookieOrJwtSchemes =
+            "Identity.Application," + JwtBearerDefaults.AuthenticationScheme;
+
         private readonly CoreServices.IClubService _clubService;
+        private readonly CoreServices.IFleetService _coreFleetService;
+        private readonly CoreServices.ICompetitorService _coreCompetitorService;
         private readonly IAuthorizationService _authService;
         private readonly IMapper _mapper;
 
         public FleetsController(
             CoreServices.IClubService clubService,
+            CoreServices.IFleetService coreFleetService,
+            CoreServices.ICompetitorService coreCompetitorService,
             IAuthorizationService authService,
             IMapper mapper)
         {
             _clubService = clubService;
+            _coreFleetService = coreFleetService;
+            _coreCompetitorService = coreCompetitorService;
             _authService = authService;
             _mapper = mapper;
         }
@@ -48,5 +59,52 @@ namespace SailScores.Web.Areas.Api.Controllers
             return Ok(savedFleet.Id);
         }
 
+        [HttpPost("{fleetId}/competitors/{competitorId}")]
+        [Authorize(AuthenticationSchemes = CookieOrJwtSchemes)]
+        public async Task<IActionResult> AddCompetitor(Guid fleetId, Guid competitorId)
+            => await ToggleMembership(fleetId, competitorId, add: true);
+
+        [HttpDelete("{fleetId}/competitors/{competitorId}")]
+        [Authorize(AuthenticationSchemes = CookieOrJwtSchemes)]
+        public async Task<IActionResult> RemoveCompetitor(Guid fleetId, Guid competitorId)
+            => await ToggleMembership(fleetId, competitorId, add: false);
+
+        private async Task<IActionResult> ToggleMembership(Guid fleetId, Guid competitorId, bool add)
+        {
+            var fleet = await _coreFleetService.Get(fleetId);
+            if (fleet == null)
+            {
+                return NotFound();
+            }
+
+            var isAdmin = await _authService.IsUserClubAdministrator(User, fleet.ClubId)
+                || await _authService.IsUserFullAdmin(User);
+            if (!isAdmin)
+            {
+                return Unauthorized();
+            }
+
+            if (fleet.FleetType != SailScores.Api.Enumerations.FleetType.SelectedBoats)
+            {
+                return BadRequest("Fleet membership can only be edited manually for fleets of type Selected Boats.");
+            }
+
+            var competitor = await _coreCompetitorService.GetCompetitorAsync(competitorId);
+            if (competitor == null || competitor.ClubId != fleet.ClubId)
+            {
+                return NotFound();
+            }
+
+            if (add)
+            {
+                await _coreFleetService.AddCompetitorToFleet(fleetId, competitorId);
+            }
+            else
+            {
+                await _coreFleetService.RemoveCompetitorFromFleet(fleetId, competitorId);
+            }
+
+            return Ok();
+        }
     }
 }

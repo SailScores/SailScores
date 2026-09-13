@@ -75,5 +75,8 @@ namespace SailScores.Api.Dtos.Public
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IList<PublicSeriesScoreCodeDto> ScoreCodesUsed { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IList<PublicSeriesScoreCodeGroupDto> AppliedScoreCodeGroups { get; set; }
     }
 }

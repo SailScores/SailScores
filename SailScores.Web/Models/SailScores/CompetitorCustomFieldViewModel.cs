@@ -24,6 +24,14 @@ public class CompetitorCustomFieldViewModel
 
     [Display(Name = "Show Dates")]
     public bool ShowDates { get; set; }
+
+    public bool IsHighlyVisible { get; set; }
+}
+
+public class CompetitorCustomFieldEditorRowViewModel
+{
+    public int FieldIndex { get; set; }
+    public CompetitorCustomFieldViewModel Field { get; set; }
 }
 
 public class CompetitorCustomFieldValueViewModel

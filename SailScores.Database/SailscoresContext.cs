@@ -33,6 +33,10 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     public DbSet<ScoringSystem> ScoringSystems { get; set; }
 
+    public DbSet<ScoreCodeGroup> ScoreCodeGroups { get; set; }
+
+    public DbSet<ScoreCodeGroupCode> ScoreCodeGroupCodes { get; set; }
+
     public DbSet<UserClubPermission> UserPermissions { get; set; }
 
     public DbSet<File> Files { get; set; }
@@ -625,6 +629,22 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasFilter("[EffectiveTo] IS NULL")
             .IsUnique()
             .HasDatabaseName("IX_ClassHandicap_NullEnd");
+
+        // ScoreCodeGroup relationships
+        modelBuilder.Entity<ScoreCodeGroup>()
+            .HasOne(scg => scg.ScoringSystem)
+            .WithMany(ss => ss.ScoreCodeGroups)
+            .HasForeignKey(scg => scg.ScoringSystemId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ScoreCodeGroupCode>()
+            .HasKey(scgc => new { scgc.ScoreCodeGroupId, scgc.CodeName });
+
+        modelBuilder.Entity<ScoreCodeGroupCode>()
+            .HasOne(scgc => scgc.ScoreCodeGroup)
+            .WithMany(scg => scg.Codes)
+            .HasForeignKey(scgc => scgc.ScoreCodeGroupId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<HandicapSystem>().HasData(
             new HandicapSystem

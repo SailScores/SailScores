@@ -9,17 +9,20 @@ public class CompetitorService : ICompetitorService
     private readonly Core.Services.IClubService _coreClubService;
     private readonly Core.Services.ICompetitorService _coreCompetitorService;
     private readonly Core.Services.IFleetService _coreFleetService;
+    private readonly Core.Services.Interfaces.ICompetitorFieldService _coreCompetitorFieldService;
     private readonly IMapper _mapper;
 
     public CompetitorService(
         Core.Services.IClubService clubService,
         Core.Services.ICompetitorService competitorService,
         Core.Services.IFleetService fleetService,
+        Core.Services.Interfaces.ICompetitorFieldService competitorFieldService,
         IMapper mapper)
     {
         _coreClubService = clubService;
         _coreCompetitorService = competitorService;
         _coreFleetService = fleetService;
+        _coreCompetitorFieldService = competitorFieldService;
         _mapper = mapper;
     }
 
@@ -91,7 +94,7 @@ public class CompetitorService : ICompetitorService
         Guid clubId,
         String userName = "")
     {
-        var coreCompetitors = new List<Core.Model.Competitor>();
+        var competitorsToSave = new List<(Core.Model.Competitor Competitor, CompetitorViewModel Source)>();
         var fleets = (await _coreClubService.GetMinimalForSelectedBoatsFleets(clubId))
             .OrderBy(f => f.Name);
         foreach (var comp in vm.Competitors)
@@ -115,12 +118,41 @@ public class CompetitorService : ICompetitorService
                     currentComp.Fleets.Add(fleets.Single(f => f.Id == fleetId));
                 }
             }
-            coreCompetitors.Add(currentComp);
+
+            competitorsToSave.Add((currentComp, comp));
         }
 
-        foreach (var comp in coreCompetitors)
+        foreach (var item in competitorsToSave)
         {
-            await _coreCompetitorService.SaveAsync(comp, userName);
+            await _coreCompetitorService.SaveAsync(item.Competitor, userName);
+            await SaveCreateMultipleCustomFieldValuesAsync(item.Competitor.Id, item.Source.CustomFieldValues);
+        }
+    }
+
+    private async Task SaveCreateMultipleCustomFieldValuesAsync(
+        Guid competitorId,
+        IList<CompetitorCustomFieldInputViewModel> customFieldValues)
+    {
+        if (customFieldValues == null)
+        {
+            return;
+        }
+
+        foreach (var fieldValue in customFieldValues.Where(v => v != null))
+        {
+            if (fieldValue.FieldDefinitionId == Guid.Empty || string.IsNullOrWhiteSpace(fieldValue.Value))
+            {
+                continue;
+            }
+
+            await _coreCompetitorFieldService.SaveValueAsync(new CompetitorFieldValue
+            {
+                CompetitorId = competitorId,
+                FieldDefinitionId = fieldValue.FieldDefinitionId,
+                Value = fieldValue.Value,
+                EffectiveFrom = null,
+                EffectiveTo = null
+            });
         }
     }
 

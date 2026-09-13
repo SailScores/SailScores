@@ -105,7 +105,8 @@
                     PreferAlternativeSailNumbers = Model.PreferAlternativeSailNumbers ?? false,
                     TrendLegend = trendLegend,
                     HideDncDiscards = Model.HideDncDiscards,
-                    UpdatedDate = Model.UpdatedDate
+                    UpdatedDate = Model.UpdatedDate,
+                    DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
                 };
 
                 }
@@ -130,5 +131,4 @@
     </div>
 </body>
 </html>
-
 

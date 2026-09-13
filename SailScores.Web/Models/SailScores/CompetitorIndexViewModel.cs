@@ -42,9 +42,17 @@ public class CompetitorIndexViewModel
     public DateTime? EarliestRacedDate { get; internal set; }
     public DateTime? LatestRacedDate { get; internal set; }
 
+    public IList<CompetitorIndexCustomFieldValueViewModel> HighlyVisibleCustomFieldValues { get; set; } =
+        new List<CompetitorIndexCustomFieldValueViewModel>();
+
     public override string ToString()
     {
         return BoatName + " : " + Name + " : " + SailNumber + " : " + Id;
     }
+}
 
+public class CompetitorIndexCustomFieldValueViewModel
+{
+    public string Label { get; set; }
+    public string Value { get; set; }
 }

@@ -19,6 +19,11 @@ public class ScoreCodeViewModel
     // SER+ - competitors in this series + FormulaValue
     // CTS+ - competitors who came to start + FormulaValue
     // AVE - average of all non-discarded races
+    // AVE P - average of prior races only
+    // AVE ND - average excluding discards
+    // AVE W - average of all non-discarded races, rounded to whole number
+    // AVE W P - average of prior races only, rounded to whole number
+    // AVE W ND - average excluding discards, rounded to whole number
     // PLC% - Place + xx% of DNF score (xx is stored FormulaValue)
     // MAN - allow scorer to enter score manually
     // TIE - Tied with previous finisher

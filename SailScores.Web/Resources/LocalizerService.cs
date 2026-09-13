@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+using SailScores.Core.Utility;
 using SailScores.Api.Enumerations;
 using SailScores.Core.Extensions;
 using SailScores.Core.FlatModel;
 using SailScores.Database;
 using SailScores.Web.Models.SailScores;
+using Microsoft.AspNetCore.Http;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -17,6 +19,7 @@ public class LocalizerService : ILocalizerService
     private readonly IStringLocalizer _localizer;
     private readonly ISailScoresContext _dbContext;
     private readonly IMemoryCache _cache;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     private readonly string cacheKeyName = "ClubLocaleCache";
 
@@ -25,13 +28,15 @@ public class LocalizerService : ILocalizerService
     public LocalizerService(
         IStringLocalizerFactory factory,
         ISailScoresContext dbContext,
-        IMemoryCache memoryCache)
+        IMemoryCache memoryCache,
+        IHttpContextAccessor httpContextAccessor)
     {
         var type = typeof(SharedResource);
         var assemblyName = new AssemblyName(type.GetTypeInfo().Assembly.FullName);
         _localizer = factory.Create("SharedResource", assemblyName.Name);
         _dbContext = dbContext;
         _cache = memoryCache;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public string this[string key] => _localizer[key];
@@ -80,26 +85,106 @@ public class LocalizerService : ILocalizerService
 
     public string GetShortName(FlatRace race)
     {
+        return GetShortName(race, null);
+    }
+
+    public string GetShortName(FlatRace race, string defaultDateFormat)
+    {
+        var effectiveDateFormat = ResolveEffectiveDateFormat(defaultDateFormat);
         if (string.IsNullOrEmpty(race.Name))
         {
             var firstLetter = GetRaceLetter();
-            return $"{race.Date.ToSuperShortString()} {firstLetter}{race.Order}";
+            return $"{FormatRaceDate(race.Date, effectiveDateFormat)} {firstLetter}{race.Order}";
         }
         else if ((race.IsSeries ?? false) && race.StartDate != null && race.EndDate != null)
         {
             if (race.StartDate == race.EndDate)
             {
-                return $"{race.Name} ({race.StartDate.ToSuperShortString()})";
+                return $"{race.Name} ({FormatRaceDate(race.StartDate, effectiveDateFormat)})";
             }
             else
             {
-                return $"{race.Name} ({race.StartDate.ToSuperShortString()} - {race.EndDate.ToSuperShortString()})";
+                var startDate = FormatRaceDate(race.StartDate, effectiveDateFormat);
+                var endDate = FormatRaceDate(race.EndDate, effectiveDateFormat);
+                return $"{race.Name} ({startDate} - {endDate})";
             }
         }
         else
         {
-            return $"{race.Name} ({race.Date.ToSuperShortString()})";
+            return $"{race.Name} ({FormatRaceDate(race.Date, effectiveDateFormat)})";
         }
+    }
+
+    private string ResolveEffectiveDateFormat(string defaultDateFormat)
+    {
+        if (ClubDateFormatUtility.TryNormalize(defaultDateFormat, out var normalizedFormat, out _)
+            && !string.IsNullOrWhiteSpace(normalizedFormat))
+        {
+            return normalizedFormat;
+        }
+
+        var path = _httpContextAccessor.HttpContext?.Request.Path ?? PathString.Empty;
+        if (path == PathString.Empty)
+        {
+            return null;
+        }
+
+        var clubInitials = GetClubInitialsFromPath(path);
+        if (string.IsNullOrWhiteSpace(clubInitials))
+        {
+            return null;
+        }
+
+        return GetClubDateFormat(clubInitials);
+    }
+
+    private string GetClubDateFormat(string clubInitials)
+    {
+        var dbFormat = _dbContext.Clubs
+            .Where(c => c.Initials == clubInitials)
+            .Select(c => c.DefaultDateFormat)
+            .FirstOrDefault();
+
+        return ClubDateFormatUtility.TryNormalize(dbFormat, out var normalizedFormat, out _)
+            ? normalizedFormat
+            : null;
+    }
+
+    private static string GetClubInitialsFromPath(PathString path)
+    {
+        var value = path.Value;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var parts = value.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+        {
+            return null;
+        }
+
+        return parts[0];
+    }
+
+    private static string FormatRaceDate(DateTime? date, string dateFormat)
+    {
+        if (!string.IsNullOrWhiteSpace(dateFormat))
+        {
+            return date?.ToString(dateFormat, CultureInfo.CurrentCulture);
+        }
+
+        return date.ToSuperShortString();
+    }
+
+    private static string FormatRaceDate(DateOnly? date, string dateFormat)
+    {
+        if (!string.IsNullOrWhiteSpace(dateFormat))
+        {
+            return date?.ToString(dateFormat, CultureInfo.CurrentCulture);
+        }
+
+        return date.ToSuperShortString();
     }
 
     public string GetRaceLetter()

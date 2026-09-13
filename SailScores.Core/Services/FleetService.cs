@@ -268,6 +268,72 @@ namespace SailScores.Core.Services
             });
         }
 
+        public async Task AddCompetitorToFleet(Guid fleetId, Guid competitorId)
+        {
+            var fleet = await _dbContext.Fleets
+                .Include(f => f.CompetitorFleets)
+                .SingleOrDefaultAsync(f => f.Id == fleetId)
+                .ConfigureAwait(false);
+
+            if (fleet == null)
+            {
+                throw new KeyNotFoundException($"Fleet {fleetId} not found.");
+            }
+            if (fleet.FleetType != Api.Enumerations.FleetType.SelectedBoats)
+            {
+                throw new InvalidOperationException(
+                    "Competitors can only be manually added to fleets with FleetType SelectedBoats.");
+            }
+
+            if (!fleet.CompetitorFleets.Any(cf => cf.CompetitorId == competitorId))
+            {
+                fleet.CompetitorFleets.Add(new Db.CompetitorFleet
+                {
+                    CompetitorId = competitorId,
+                    FleetId = fleetId
+                });
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+        }
+
+        public async Task RemoveCompetitorFromFleet(Guid fleetId, Guid competitorId)
+        {
+            var fleet = await _dbContext.Fleets
+                .Include(f => f.CompetitorFleets)
+                .SingleOrDefaultAsync(f => f.Id == fleetId)
+                .ConfigureAwait(false);
+
+            if (fleet == null)
+            {
+                throw new KeyNotFoundException($"Fleet {fleetId} not found.");
+            }
+            if (fleet.FleetType != Api.Enumerations.FleetType.SelectedBoats)
+            {
+                throw new InvalidOperationException(
+                    "Competitors can only be manually removed from fleets with FleetType SelectedBoats.");
+            }
+
+            var link = fleet.CompetitorFleets.SingleOrDefault(cf => cf.CompetitorId == competitorId);
+            if (link != null)
+            {
+                fleet.CompetitorFleets.Remove(link);
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+        }
+
+        public async Task<IDictionary<Guid, IList<Guid>>> GetCompetitorFleetMembership(Guid clubId)
+        {
+            var rows = await _dbContext.CompetitorFleets
+                .Where(cf => cf.Fleet.ClubId == clubId)
+                .Select(cf => new { cf.CompetitorId, cf.FleetId })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return rows
+                .GroupBy(r => r.CompetitorId)
+                .ToDictionary(g => g.Key, g => (IList<Guid>)g.Select(r => r.FleetId).ToList());
+        }
+
         public async Task<IDictionary<Guid, IEnumerable<Guid>>> GetClubRegattaFleets(Guid clubId)
         {
             // build a dictionary of fleet Ids to regatta Ids

@@ -16,6 +16,7 @@ namespace SailScores.Test.Unit.Web.Controllers
         [InlineData(typeof(BoatClassController), nameof(BoatClassController.Edit), AuthorizationPolicies.ClubAdmin)]
         [InlineData(typeof(BoatClassController), nameof(BoatClassController.Delete), AuthorizationPolicies.ClubAdmin)]
         [InlineData(typeof(CompetitorController), nameof(CompetitorController.Create), AuthorizationPolicies.RaceScorekeeper)]
+        [InlineData(typeof(FleetController), nameof(FleetController.Manage), AuthorizationPolicies.ClubAdmin)]
         public void Action_HasCorrectAuthorizationPolicy(Type controllerType, string methodName, string expectedPolicy)
         {
             // Arrange

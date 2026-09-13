@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace SailScores.Web.Models.SailScores;
@@ -14,6 +14,8 @@ public class MultipleCompetitorsWithOptionsViewModel
 
     public IList<Guid> FleetIds { get; set; }
 
-    public IList<CompetitorViewModel> Competitors { get; set; }
+    public IList<CompetitorFieldDefinition> HighlyVisibleFieldDefinitions { get; set; } = new List<CompetitorFieldDefinition>();
+
+    public IList<CompetitorViewModel> Competitors { get; set; } = new List<CompetitorViewModel>();
 
 }

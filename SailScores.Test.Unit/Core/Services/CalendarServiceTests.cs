@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Services;
 using SailScores.Core.Models;
 using SailScores.Test.Unit.Utilities;
@@ -20,14 +21,14 @@ namespace SailScores.Test.Unit.Core.Services
         {
             _context = InMemoryContextBuilder.GetContext();
             _service = new CalendarService(_context);
-            _clubInitials = _context.Clubs.First().Initials;
+            _clubInitials = _context.Clubs.FirstAsync(System.Threading.CancellationToken.None).GetAwaiter().GetResult().Initials;
         }
 
         [Fact]
         public async Task GetEventsAsync_IncludesRegattaAndSeries_WhenRangeCoversThem()
         {
-            var race = _context.Races.First();
-            var regatta = _context.Regattas.First();
+            var race = await _context.Races.FirstAsync(TestContext.Current.CancellationToken);
+            var regatta = await _context.Regattas.FirstAsync(TestContext.Current.CancellationToken);
 
             var raceDate = race.Date ?? DateTime.Now;
             var regattaStart = regatta.StartDate ?? DateTime.Now;

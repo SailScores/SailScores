@@ -160,6 +160,7 @@ public class PublicApiServiceTests
         Assert.Single(result.Competitors);
         Assert.Single(result.Races);
         Assert.Single(result.ScoreCodesUsed);
+        Assert.Single(result.AppliedScoreCodeGroups);
         Assert.Single(result.Races[0].CompetitorResults);
         Assert.Equal(TimeSpan.FromMinutes(42), result.Races[0].CompetitorResults[0].ElapsedTime);
         Assert.Equal(2, result.Competitors[0].Trend);
@@ -173,6 +174,7 @@ public class PublicApiServiceTests
         Assert.Equal("DNC", result.ScoreCodesUsed[0].Code);
         Assert.Equal("Did not come", result.ScoreCodesUsed[0].Description);
         Assert.Equal("N+1", result.ScoreCodesUsed[0].Formula);
+        Assert.Equal("RC, SB score codes are only allowed for 2 races", result.AppliedScoreCodeGroups[0].Description);
         _coreSeriesServiceMock.Verify(s => s.GetOneSeriesAsync(seriesId), Times.Once);
         _coreSeriesServiceMock.Verify(
             s => s.GetSeriesDetailsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
@@ -201,6 +203,7 @@ public class PublicApiServiceTests
         Assert.Single(result.Competitors);
         Assert.Null(result.Races);
         Assert.Null(result.ScoreCodesUsed);
+        Assert.Null(result.AppliedScoreCodeGroups);
     }
 
     [Fact]
@@ -226,6 +229,7 @@ public class PublicApiServiceTests
         Assert.Single(result.Races);
         Assert.Null(result.Races[0].CompetitorResults);
         Assert.Single(result.ScoreCodesUsed);
+        Assert.Single(result.AppliedScoreCodeGroups);
     }
 
     [Fact]
@@ -412,6 +416,7 @@ public class PublicApiServiceTests
         Assert.Null(result.Competitors);
         Assert.Null(result.Races);
         Assert.Null(result.ScoreCodesUsed);
+        Assert.Null(result.AppliedScoreCodeGroups);
         _coreSeriesServiceMock.Verify(s => s.GetSeriesDetailsAsync("MYC", "2025", "fall"), Times.Once);
         _coreSeriesServiceMock.Verify(s => s.GetOneSeriesAsync(It.IsAny<Guid>()), Times.Never);
     }
@@ -593,7 +598,14 @@ public class PublicApiServiceTests
                         Description = "Did not come",
                         Formula = "N+1"
                     }
-                }
+                },
+                AppliedScoreCodeGroupSummaries =
+                [
+                    new SailScores.Core.Scoring.AppliedScoreCodeGroupSummary
+                    {
+                        Description = "RC, SB score codes are only allowed for 2 races"
+                    }
+                ]
             }
         };
     }

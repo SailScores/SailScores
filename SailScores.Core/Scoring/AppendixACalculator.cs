@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,43 @@ public class AppendixACalculator : BaseScoringCalculator
     public AppendixACalculator(ScoringSystem scoringSystem) : base(scoringSystem)
     {
         CompetitorComparer = new LowPointSeriesCompComparer();
+    }
+
+    protected override void CalculateTotals(SeriesResults results, IEnumerable<Score> scores)
+    {
+        base.CalculateTotals(results, scores);
+
+        if (!(ScoringSystem.ParticipationPercent > 0))
+        {
+            return;
+        }
+
+        results.PercentRequired = ScoringSystem.ParticipationPercent;
+
+        var totalRaceCount = results.Races.Count(r =>
+            (r.State ?? RaceState.Raced) == RaceState.Raced
+            || r.State == RaceState.Preliminary);
+
+        if (totalRaceCount == 0)
+        {
+            return;
+        }
+
+        var requiredRaces = totalRaceCount * ((ScoringSystem.ParticipationPercent ?? 0) / 100m);
+
+        foreach (var comp in results.Competitors)
+        {
+            var compResults = results.Results[comp];
+            var racesParticipated = compResults.CalculatedScores
+                .Count(s => CountsAsStarted(s.Value.RawScore) || CountsAsParticipation(s.Value.RawScore));
+
+            compResults.ParticipationPercent = racesParticipated * 100m / totalRaceCount;
+
+            if (racesParticipated < requiredRaces)
+            {
+                compResults.TotalScore = null;
+            }
+        }
     }
 
     protected override decimal? GetBasicScore(

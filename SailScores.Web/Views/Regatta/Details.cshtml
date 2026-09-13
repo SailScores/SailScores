@@ -323,6 +323,7 @@
                             TrendLegend = trendLegend,
                             HideDncDiscards = currentSeries.HideDncDiscards,
                             UpdatedDate = currentSeries.UpdatedDate,
+                            DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
                         };
 
                     @await Html.PartialAsync("_ResultsTable", tableModel)

@@ -14,4 +14,5 @@ public interface IFleetService
     Task<FleetWithOptionsViewModel> GetBlankFleetWithOptionsAsync(
         string clubInitials,
         Guid? regattaId);
+    Task<FleetManagementViewModel> GetFleetManagementViewModel(string clubInitials);
 }

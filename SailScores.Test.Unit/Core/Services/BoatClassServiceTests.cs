@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Core.Mapping;
 using SailScores.Core.Model;
@@ -64,7 +64,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             await _service.Update(changedClass);
 
-            Assert.Equal("New", _context.BoatClasses.First().Name);
+            Assert.Equal("New", (await _context.BoatClasses.FirstAsync(TestContext.Current.CancellationToken)).Name);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace SailScores.Test.Unit.Core.Services
 
             await _service.SaveNew(changedClass);
 
-            Assert.Equal(2, _context.BoatClasses.Count());
+            Assert.Equal(2, await _context.BoatClasses.CountAsync(TestContext.Current.CancellationToken));
         }
 
         [Fact]

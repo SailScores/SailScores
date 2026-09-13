@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using SailScores.Core.Services;
 using SailScores.Database;
@@ -22,7 +23,7 @@ namespace SailScores.Test.Unit.Core.Services
         public UserServiceTests()
         {
             _context = InMemoryContextBuilder.GetContext();
-            _clubId = _context.Clubs.First().Id;
+            _clubId = _context.Clubs.FirstAsync(System.Threading.CancellationToken.None).GetAwaiter().GetResult().Id;
             _cache = new MemoryCache(new MemoryCacheOptions());
             
             _service = new UserService(_context, _cache);

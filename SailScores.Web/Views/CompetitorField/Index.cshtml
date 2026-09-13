@@ -15,34 +15,39 @@
     <table class="table table-sm table-striped">
         <thead>
             <tr>
+                <th></th>
                 <th>Field name</th>
                 <th>Display label</th>
                 <th>Value type</th>
                 <th>Display order</th>
-                <th></th>
+                <th>Active?</th>
+                <th>Highly visible</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var field in Model)
             {
                 <tr>
-                    <td>@field.Name</td>
-                    <td>@field.DisplayHeader</td>
-                    <td>@field.DataType</td>
-                    <td>@field.DisplayOrder</td>
-                    <td>
+                     <td>
                         <a asp-action="Edit" asp-route-clubInitials="@ViewData["ClubInitials"]" asp-route-id="@field.Id" class="btn btn-sm btn-outline-primary me-2" title="Edit">
                             <span class="fas fa-pen"></span>
                         </a>
-                        <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Delete this field?');">
+                        <form asp-action="DeletePermanent" method="post" style="display:inline;" onsubmit="return confirm('Permanently delete this field and all values? This cannot be undone.');">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="clubInitials" value="@ViewData["ClubInitials"]" />
                             <input type="hidden" name="id" value="@field.Id" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" title="Delete permanently">
                                 <span class="fas fa-trash"></span>
                             </button>
                         </form>
                     </td>
+                    <td>@field.Name</td>
+                    <td>@field.DisplayHeader</td>
+                    <td>@field.DataType</td>
+                    <td>@field.DisplayOrder</td>
+                    <td>@(field.IsActive ? "Yes" : "No")</td>
+                    <td>@(field.HighlyVisible == true ? "Yes" : "No")</td>
+
                 </tr>
             }
         </tbody>

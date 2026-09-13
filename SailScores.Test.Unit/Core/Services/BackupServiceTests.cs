@@ -24,7 +24,7 @@ public class BackupServiceTests
     public BackupServiceTests()
     {
         _context = InMemoryContextBuilder.GetContext();
-        _clubId = _context.Clubs.First().Id;
+        _clubId = _context.Clubs.FirstAsync(TestContext.Current.CancellationToken).GetAwaiter().GetResult().Id;
         _service = new BackupService(_context, NullLogger<BackupService>.Instance);
     }
 
@@ -305,7 +305,7 @@ public class BackupServiceTests
             ClubId = _clubId,
             Name = "Extra Competitor",
             SailNumber = "999",
-            BoatClassId = _context.BoatClasses.First(bc => bc.ClubId == _clubId).Id
+            BoatClassId = (await _context.BoatClasses.FirstAsync(bc => bc.ClubId == _clubId, TestContext.Current.CancellationToken)).Id
         });
         await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 

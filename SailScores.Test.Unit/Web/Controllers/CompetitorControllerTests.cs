@@ -14,7 +14,6 @@ using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService
 using SailScores.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using SailScores.Identity.Entities;
-using SailScores.Core.Model;
 
 namespace SailScores.Test.Unit.Web.Controllers
 {
@@ -25,6 +24,7 @@ namespace SailScores.Test.Unit.Web.Controllers
         private readonly IMapper _mapper;
         private readonly Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
         private readonly Mock<IAuthorizationService> _authServiceMock;
+        private readonly Mock<IRedirectHelper> _redirectHelperMock;
         private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
         private readonly Mock<ICsvService> _csvServiceMock;
         private readonly Mock<ICompetitorService> _competitorServiceMock;
@@ -50,6 +50,7 @@ namespace SailScores.Test.Unit.Web.Controllers
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
             _csvServiceMock = new Mock<ICsvService>();
             _authServiceMock = ControllerTestUtilities.MakeAuthServiceMock();
+            _redirectHelperMock = new Mock<IRedirectHelper>();
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
             _userManagerMock = new Mock<UserManager<ApplicationUser>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
             _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>()))
@@ -64,6 +65,7 @@ namespace SailScores.Test.Unit.Web.Controllers
                 _authServiceMock.Object,
                 _csvServiceMock.Object,
                 _adminTipServiceMock.Object,
+                _redirectHelperMock.Object,
                 _userManagerMock.Object,
                 _mapper);
         }

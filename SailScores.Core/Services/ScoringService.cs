@@ -102,6 +102,9 @@ namespace SailScores.Core.Services
             var requestedDbSystem = await _dbContext
                 .ScoringSystems
                 .Include(s => s.ScoreCodes)
+                .Include(s => s.ScoreCodeGroups)
+                    .ThenInclude(g => g.Codes)
+                .AsSplitQuery()
                 .SingleAsync(s => s.Id == scoringSystemId)
                 .ConfigureAwait(false);
 
@@ -114,6 +117,11 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
             requestedSystem.InheritedScoreCodes = allInheritedCodes
                 .Where(c => !requestedSystem.ScoreCodes.Any(ec => ec.Name == c.Name));
+
+            // Populate inherited score code groups
+            var allInheritedGroups = await GetAllCodeGroupsAsync(requestedSystem.ParentSystemId)
+                .ConfigureAwait(false);
+            requestedSystem.InheritedScoreCodeGroups = allInheritedGroups;
 
             _cache.Set(cacheKey, requestedSystem, TimeSpan.FromMinutes(2));
 
@@ -405,6 +413,113 @@ namespace SailScores.Core.Services
         {
             var cacheKey = $"ScoringSystem-{scoringSystemId}";
             _cache.Remove(cacheKey);
+        }
+
+        public async Task<ScoreCodeGroup> GetScoreCodeGroupAsync(Guid id)
+        {
+            var dbGroup = await _dbContext.ScoreCodeGroups
+                .Include(g => g.Codes)
+                .FirstOrDefaultAsync(g => g.Id == id)
+                .ConfigureAwait(false);
+
+            if (dbGroup == null)
+            {
+                return null;
+            }
+
+            var includedCodeNames = dbGroup.Codes.Select(c => c.CodeName).ToList();
+            return new ScoreCodeGroup(
+                dbGroup.Id,
+                dbGroup.ScoringSystemId,
+                dbGroup.Name,
+                (ScoreCodeGroupLimitationType)dbGroup.LimitationType,
+                dbGroup.LimitationValue,
+                dbGroup.UseNonDiscardedRaces,
+                dbGroup.OverageCodeName,
+                (ScoreCodeGroupOverageSelection)dbGroup.OverageSelectionMethod,
+                includedCodeNames);
+        }
+
+        public async Task SaveScoreCodeGroupAsync(ScoreCodeGroup group)
+        {
+            if (group.Id == Guid.Empty)
+            {
+                group.Id = Guid.NewGuid();
+            }
+
+            var dbGroup = await _dbContext.ScoreCodeGroups
+                .Include(g => g.Codes)
+                .FirstOrDefaultAsync(g => g.Id == group.Id)
+                .ConfigureAwait(false);
+
+            if (dbGroup == null)
+            {
+                // Create new group
+                dbGroup = new Db.ScoreCodeGroup(
+                    group.Id,
+                    group.ScoringSystemId,
+                    group.Name,
+                    (int)group.LimitationType,
+                    group.LimitationValue,
+                    group.UseNonDiscardedRaces,
+                    group.OverageCodeName,
+                    (int)group.OverageSelectionMethod);
+
+                _dbContext.ScoreCodeGroups.Add(dbGroup);
+            }
+            else
+            {
+                // Update existing group
+                dbGroup.Name = group.Name;
+                dbGroup.LimitationType = (int)group.LimitationType;
+                dbGroup.LimitationValue = group.LimitationValue;
+                dbGroup.UseNonDiscardedRaces = group.UseNonDiscardedRaces;
+                dbGroup.OverageCodeName = group.OverageCodeName;
+                dbGroup.OverageSelectionMethod = (int)group.OverageSelectionMethod;
+            }
+
+            // Update codes
+            _dbContext.ScoreCodeGroupCodes.RemoveRange(dbGroup.Codes);
+            dbGroup.Codes = (group.IncludedCodeNames ?? new List<string>())
+                .Select(codeName => new Db.ScoreCodeGroupCode { CodeName = codeName })
+                .ToList();
+
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            InvalidateScoringSystemCache(group.ScoringSystemId);
+        }
+
+        public async Task DeleteScoreCodeGroupAsync(Guid id)
+        {
+            var dbGroup = await _dbContext.ScoreCodeGroups
+                .FirstOrDefaultAsync(g => g.Id == id)
+                .ConfigureAwait(false);
+
+            if (dbGroup != null)
+            {
+                var scoringSystemId = dbGroup.ScoringSystemId;
+                _dbContext.ScoreCodeGroups.Remove(dbGroup);
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+                InvalidateScoringSystemCache(scoringSystemId);
+            }
+        }
+
+        private async Task<IEnumerable<ScoreCodeGroup>> GetAllCodeGroupsAsync(Guid? parentSystemId)
+        {
+            if (!parentSystemId.HasValue)
+            {
+                return Enumerable.Empty<ScoreCodeGroup>();
+            }
+
+            var parentSystem = await GetScoringSystemAsync(parentSystemId.Value).ConfigureAwait(false);
+            if (parentSystem == null)
+            {
+                return Enumerable.Empty<ScoreCodeGroup>();
+            }
+
+            var groups = parentSystem.ScoreCodeGroups ?? new List<ScoreCodeGroup>();
+            var inheritedGroups = parentSystem.InheritedScoreCodeGroups ?? Enumerable.Empty<ScoreCodeGroup>();
+
+            return groups.Concat(inheritedGroups);
         }
     }
 }

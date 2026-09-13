@@ -1,0 +1,60 @@
+@model SailScores.Web.Models.SailScores.CompetitorCustomFieldEditorRowViewModel
+
+@{
+    var field = Model.Field;
+    var fieldIndex = Model.FieldIndex;
+    var inputType = field.DataType == SailScores.Core.Model.CustomFieldDataType.Number ? "number" : "text";
+}
+
+<div class="border rounded p-3 mb-3">
+    <div class="fw-bold mb-2">@(string.IsNullOrWhiteSpace(field.DisplayHeader) ? field.Name : field.DisplayHeader)</div>
+    <input type="hidden" name="CustomFieldValues[@fieldIndex].FieldDefinitionId" value="@field.FieldDefinitionId" />
+    <input type="hidden" name="CustomFieldValues[@fieldIndex].Name" value="@field.Name" />
+    <input type="hidden" name="CustomFieldValues[@fieldIndex].DisplayHeader" value="@field.DisplayHeader" />
+    <input type="hidden" name="CustomFieldValues[@fieldIndex].DataType" value="@field.DataType" />
+
+    <div class="custom-field-value-rows">
+        @for (var valueIndex = 0; valueIndex < field.Values.Count; valueIndex++)
+        {
+            var valueRow = field.Values[valueIndex];
+            <div class="row g-2 align-items-end mb-2 custom-field-value-row">
+                <input type="hidden" name="CustomFieldValues[@fieldIndex].Values[@valueIndex].Id"
+                       value="@valueRow.Id" />
+                <div class="col-12 col-lg-5">
+                    <label class="form-label">Value</label>
+                    <input name="CustomFieldValues[@fieldIndex].Values[@valueIndex].Value"
+                           value="@valueRow.Value"
+                           class="form-control"
+                           type="@inputType" />
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label">Effective From</label>
+                    <input name="CustomFieldValues[@fieldIndex].Values[@valueIndex].EffectiveFrom"
+                           value="@valueRow.EffectiveFrom?.ToString("yyyy-MM-dd")"
+                           class="form-control"
+                           type="date" />
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label">Effective To</label>
+                    <input name="CustomFieldValues[@fieldIndex].Values[@valueIndex].EffectiveTo"
+                           value="@valueRow.EffectiveTo?.ToString("yyyy-MM-dd")"
+                           class="form-control"
+                           type="date" />
+                </div>
+                <div class="col-12 col-lg-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm w-100"
+                            onclick="this.parentElement.parentElement.remove()" title="Remove">
+                        <span class="fas fa-trash"></span>
+                        <span class="visually-hidden">Remove</span>
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <button type="button"
+            class="btn btn-outline-secondary btn-sm"
+            onclick="addCustomFieldValueRow(this, '@fieldIndex', '@inputType')">
+        Add Value
+    </button>
+</div>

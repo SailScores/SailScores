@@ -1,7 +1,7 @@
 @model IEnumerable<SailScores.Web.Models.SailScores.FleetDeleteViewModel>
 <div id="fleetsdiv">
     <div class="row">
-        <div class="col-2 col-sm-4 col-md-3">
+        <div class="col-12 col-md-6">
             <a class="btn btn-primary"
                 asp-action="Create"
                 asp-controller="Fleet">
@@ -10,8 +10,16 @@
                     New Fleet
                 </span>
             </a>
+            <a class="btn btn-outline-primary ms-2"
+                asp-action="Manage"
+                asp-controller="Fleet">
+                <span class="fas fa-users"></span>
+                <span class="d-none d-sm-inline">
+                    Manage Membership
+                </span>
+            </a>
         </div>
-        <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end mt-2 mt-md-0">
+        <div class="col-12 col-md-6 d-flex align-items-center justify-content-md-end mt-2 mt-md-0">
           <div class="form-check d-flex align-items-center">
             <input id="admin-show-inactive" class="form-check-input" type="checkbox" /> <label for="admin-show-inactive" class="form-check-label ms-2 mb-0">Show Inactive</label>
           </div>

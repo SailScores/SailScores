@@ -23,6 +23,8 @@ public class Club
 
     [StringLength(30)]
     public String Locale { get; set; }
+    [StringLength(30)]
+    public String DefaultDateFormat { get; set; }
 
     public bool? UseAdvancedFeatures { get; set; }
     public bool? UseExperimentalFeatures { get; set; }

@@ -108,7 +108,8 @@
                                 PreferAlternativeSailNumbers = series.PreferAlternativeSailNumbers ?? false,
                                 TrendLegend = trendLegend,
                                 HideDncDiscards = series.HideDncDiscards,
-                                UpdatedDate = series.UpdatedDate
+                                UpdatedDate = series.UpdatedDate,
+                                DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
                             };
                         <div class="row mt-4">
                             <div class="col-12">

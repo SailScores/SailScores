@@ -32,9 +32,9 @@ public class RegattaServiceTests
     {
 
         _context = Utilities.InMemoryContextBuilder.GetContext();
-        _clubInitials = _context.Clubs.First().Initials;
-        _clubId = _context.Clubs.First().Id;
-        _regatta = _context.Regattas.First();
+        _clubInitials = _context.Clubs.FirstAsync(System.Threading.CancellationToken.None).GetAwaiter().GetResult().Initials;
+        _clubId = _context.Clubs.FirstAsync(System.Threading.CancellationToken.None).GetAwaiter().GetResult().Id;
+        _regatta = _context.Regattas.FirstAsync(System.Threading.CancellationToken.None).GetAwaiter().GetResult();
 
 
         _mockSeriesService = new Mock<ISeriesService>();
@@ -54,7 +54,8 @@ public class RegattaServiceTests
             .Returns((Guid clubId, Guid fleetId, bool includeInactive) =>
             {
                 // find fleet or fall back to first
-                var fleet = _context.Fleets.FirstOrDefault(f => f.Id == fleetId) ?? _context.Fleets.First();
+                var fleet = _context.Fleets.FirstOrDefaultAsync(f => f.Id == fleetId, TestContext.Current.CancellationToken).GetAwaiter().GetResult()
+                    ?? _context.Fleets.FirstAsync(TestContext.Current.CancellationToken).GetAwaiter().GetResult();
                 var comps = fleet.CompetitorFleets?.Select(cf => cf.Competitor).ToList() ?? new List<SailScores.Database.Entities.Competitor>();
                 var mapped = comps.Select(c => _mapper.Map<SailScores.Core.Model.Competitor>(c));
                 var dict = new Dictionary<string, IEnumerable<SailScores.Core.Model.Competitor>>() { { string.Empty, mapped } };
@@ -69,7 +70,8 @@ public class RegattaServiceTests
                 IEnumerable<SailScores.Database.Entities.Competitor> comps;
                 if (fleetId.HasValue)
                 {
-                    var fleet = _context.Fleets.FirstOrDefault(f => f.Id == fleetId.Value) ?? _context.Fleets.First();
+                    var fleet = _context.Fleets.FirstOrDefaultAsync(f => f.Id == fleetId.Value, TestContext.Current.CancellationToken).GetAwaiter().GetResult()
+                        ?? _context.Fleets.FirstAsync(TestContext.Current.CancellationToken).GetAwaiter().GetResult();
                     comps = fleet.CompetitorFleets?.Select(cf => cf.Competitor) ?? Enumerable.Empty<SailScores.Database.Entities.Competitor>();
                 }
                 else
@@ -133,7 +135,7 @@ public class RegattaServiceTests
         var result = await _service.SaveNewRegattaAsync(
             _mapper.Map<SailScores.Core.Model.Regatta>(newRegatta));
 
-        Assert.Equal(2, _context.Regattas.Count());
+        Assert.Equal(2, await _context.Regattas.CountAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -169,14 +171,15 @@ public class RegattaServiceTests
         var race = new Race
         {
             Id = Guid.NewGuid(),
-            Fleet = _mapper.Map<Fleet>(_context.Fleets.First())
+            Fleet = _mapper.Map<Fleet>(await _context.Fleets.FirstAsync(TestContext.Current.CancellationToken))
         };
     
         await _service.AddRaceToRegattaAsync(
             _mapper.Map<SailScores.Core.Model.Race>(race),
             _regatta.Id);
 
-        Assert.Contains(_context.Regattas.First().RegattaSeries, rs =>
+        var savedRegatta = await _context.Regattas.FirstAsync(TestContext.Current.CancellationToken);
+        Assert.Contains(savedRegatta.RegattaSeries, rs =>
                 rs.Series.RaceSeries != null
                 && rs.Series.RaceSeries.Any(r => r.RaceId == race.Id));
     }
@@ -198,9 +201,9 @@ public class RegattaServiceTests
     [Fact]
     public async Task GetRegattaAsync_ForSelectedBoatsFleet_IncludesInactiveCompetitors()
     {
-        var club = _context.Clubs.First();
-        var season = _context.Seasons.First();
-        var inactiveCompetitor = _context.Competitors.First(c => c.IsActive == false);
+        var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+        var season = await _context.Seasons.FirstAsync(TestContext.Current.CancellationToken);
+        var inactiveCompetitor = await _context.Competitors.FirstAsync(c => c.IsActive == false, TestContext.Current.CancellationToken);
         var selectedBoatsFleet = new Fleet
         {
             Id = Guid.NewGuid(),
@@ -244,8 +247,8 @@ public class RegattaServiceTests
     [Fact]
     public async Task UpdateAsync_WhenScoringSystemChanges_ClearsAssociatedSeriesScoringOverridesAndRecalculatesResults()
     {
-        var club = _context.Clubs.First();
-        var season = _context.Seasons.First();
+        var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+        var season = await _context.Seasons.FirstAsync(TestContext.Current.CancellationToken);
         var originalScoringSystemId = Guid.NewGuid();
         var newScoringSystemId = Guid.NewGuid();
 

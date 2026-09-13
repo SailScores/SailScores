@@ -17,6 +17,8 @@ public class ScoringSystem
 
     public IList<ScoreCode> ScoreCodes { get; set; }
 
+    public IList<ScoreCodeGroup> ScoreCodeGroups { get; set; }
+
     [ForeignKey("ParentSystemId")]
     public ScoringSystem ParentSystem { get; set; }
 

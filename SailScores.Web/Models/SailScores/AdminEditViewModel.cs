@@ -68,6 +68,10 @@ public class AdminEditViewModel
     public int? DefaultRaceDateOffset { get; set; }
 
     public string Locale { get; set; }
+    [Display(Name = "Default Date Format")]
+    [StringLength(30)]
+    [ClubDateFormat]
+    public string DefaultDateFormat { get; set; }
     public IList<string> LocaleOptions { get; set; }
 
     public int RaceCount { get; set; }

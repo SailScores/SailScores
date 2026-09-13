@@ -17,7 +17,7 @@ namespace SailScores.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -242,6 +242,10 @@ namespace SailScores.Database.Migrations
 
                     b.Property<DateTime?>("AdvancedFeaturesEnabledDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DefaultDateFormat")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<Guid?>("DefaultHandicapSystemId")
                         .HasColumnType("uniqueidentifier");
@@ -602,6 +606,9 @@ namespace SailScores.Database.Migrations
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("HighlyVisible")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1308,6 +1315,57 @@ namespace SailScores.Database.Migrations
                     b.HasIndex("ScoringSystemId");
 
                     b.ToTable("ScoreCodes");
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.ScoreCodeGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("LimitationType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("LimitationValue")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("LimitationValue");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OverageCodeName")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("OverageSelectionMethod")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ScoringSystemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("UseNonDiscardedRaces")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScoringSystemId");
+
+                    b.ToTable("ScoreCodeGroups");
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.ScoreCodeGroupCode", b =>
+                {
+                    b.Property<Guid>("ScoreCodeGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodeName")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("ScoreCodeGroupId", "CodeName");
+
+                    b.ToTable("ScoreCodeGroupCodes");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.ScoringSystem", b =>
@@ -2282,6 +2340,28 @@ namespace SailScores.Database.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.ScoreCodeGroup", b =>
+                {
+                    b.HasOne("SailScores.Database.Entities.ScoringSystem", "ScoringSystem")
+                        .WithMany("ScoreCodeGroups")
+                        .HasForeignKey("ScoringSystemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ScoringSystem");
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.ScoreCodeGroupCode", b =>
+                {
+                    b.HasOne("SailScores.Database.Entities.ScoreCodeGroup", "ScoreCodeGroup")
+                        .WithMany("Codes")
+                        .HasForeignKey("ScoreCodeGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ScoreCodeGroup");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.ScoringSystem", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Club", null)
@@ -2522,9 +2602,16 @@ namespace SailScores.Database.Migrations
                     b.Navigation("RegattaSeries");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.ScoreCodeGroup", b =>
+                {
+                    b.Navigation("Codes");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.ScoringSystem", b =>
                 {
                     b.Navigation("DefaultForClubs");
+
+                    b.Navigation("ScoreCodeGroups");
 
                     b.Navigation("ScoreCodes");
                 });
