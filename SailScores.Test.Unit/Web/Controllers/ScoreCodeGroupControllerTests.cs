@@ -8,6 +8,7 @@ using SailScores.Core.Services;
 using SailScores.Web.Controllers;
 using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services.Interfaces;
 using Xunit;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
@@ -15,20 +16,23 @@ namespace SailScores.Test.Unit.Web.Controllers;
 
 public class ScoreCodeGroupControllerTests
 {
-    private readonly Mock<IClubService> _clubServiceMock;
-    private readonly Mock<IScoringService> _scoringServiceMock;
+    private readonly Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
+    private readonly Mock<SailScores.Core.Services.IScoringService> _scoringServiceMock;
     private readonly Mock<IAuthorizationService> _authServiceMock;
+    private readonly Mock<IRedirectHelper> _redirectHelperMock;
     private readonly ScoreCodeGroupController _controller;
 
     public ScoreCodeGroupControllerTests()
     {
-        _clubServiceMock = new Mock<IClubService>();
-        _scoringServiceMock = new Mock<IScoringService>();
+        _clubServiceMock = new Mock<SailScores.Core.Services.IClubService>();
+        _scoringServiceMock = new Mock<SailScores.Core.Services.IScoringService>();
         _authServiceMock = new Mock<IAuthorizationService>();
+        _redirectHelperMock = new Mock<IRedirectHelper>();
         _controller = new ScoreCodeGroupController(
             _clubServiceMock.Object,
             _scoringServiceMock.Object,
-            _authServiceMock.Object);
+            _authServiceMock.Object,
+            _redirectHelperMock.Object);
     }
 
     [Fact]

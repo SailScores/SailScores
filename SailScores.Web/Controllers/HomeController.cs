@@ -84,4 +84,10 @@ public class HomeController : Controller
     {
         return View();
     }
+
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, NoStore = false)]
+    public IActionResult TermsOfService()
+    {
+        return View();
+    }
 }
