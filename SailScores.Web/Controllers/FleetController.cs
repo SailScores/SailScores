@@ -111,6 +111,8 @@ public class FleetController : Controller
                 clubInitials,
                 model.RegattaId);
             model.BoatClassOptions = vm.BoatClassOptions;
+            model.CompetitorOptions = vm.CompetitorOptions;
+            model.CompetitorBoatClassOptions = vm.CompetitorBoatClassOptions;
             return View(model);
         }
     }
@@ -176,6 +178,12 @@ public class FleetController : Controller
         }
         catch
         {
+            var vmOptions = await _fleetService.GetBlankFleetWithOptionsAsync(
+                clubInitials,
+                model.RegattaId);
+            model.BoatClassOptions = vmOptions.BoatClassOptions;
+            model.CompetitorOptions = vmOptions.CompetitorOptions;
+            model.CompetitorBoatClassOptions = vmOptions.CompetitorBoatClassOptions;
             return View(model);
         }
     }
