@@ -184,21 +184,7 @@ public class SeriesController : Controller
             customFieldDefinitions = definitions?.ToDictionary(d => d.Id, d => d) ?? new Dictionary<Guid, CompetitorFieldDefinition>();
         }
 
-        Stream csv;
-        if (template != null)
-        {
-            // Use template-aware CSV export with custom fields
-            var competitors = new Dictionary<string, IEnumerable<Competitor>>
-            {
-                { "Series", series.FlatResults?.Competitors?.Cast<Competitor>().ToList() ?? new List<Competitor>() }
-            };
-            csv = _csvService.GetCsv(competitors, template, customFieldDefinitions);
-        }
-        else
-        {
-            // Fall back to basic CSV export (uses default localized headers)
-            csv = _csvService.GetCsv(series);
-        }
+        Stream csv = _csvService.GetCsv(series);
 
         return File(csv, "text/csv", filename);
     }
