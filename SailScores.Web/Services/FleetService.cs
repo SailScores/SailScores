@@ -1,4 +1,4 @@
-﻿using SailScores.Core.Model;
+using SailScores.Core.Model;
 using SailScores.Core.Utility;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
@@ -67,7 +67,7 @@ public class FleetService : IFleetService
     {
         if (String.IsNullOrWhiteSpace(fleet.ShortName))
         {
-            fleet.ShortName = UrlUtility.GetUrlName(fleet.Name).Left(30);
+            fleet.ShortName = UrlUtility.GetUrlName(fleet.Name).Left(40);
         }
         var coreModel = _mapper.Map<Fleet>(fleet);
         if (fleet.FleetType == Api.Enumerations.FleetType.SelectedClasses

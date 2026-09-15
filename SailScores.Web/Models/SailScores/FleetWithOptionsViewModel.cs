@@ -1,4 +1,4 @@
-﻿using SailScores.Api.Enumerations;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using System.ComponentModel.DataAnnotations;
 
@@ -12,7 +12,7 @@ public class FleetWithOptionsViewModel
 
     // Short Name, unique to the fleet in this club. Can be used in Urls.
     // Example: 2019DieHardMCs
-    [StringLength(30)]
+    [StringLength(40)]
     [Display(Name = "Short Name")]
     public String ShortName { get; set; }
 
@@ -24,7 +24,7 @@ public class FleetWithOptionsViewModel
 
     // Short Alias Name, does not need to be unique: used for display in regattas
     // Example: MC Scows
-    [StringLength(30)]
+    [StringLength(40)]
     [Display(Name = "Nickname")]
     public String NickName { get; set; }
 
