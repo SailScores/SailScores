@@ -17,19 +17,22 @@ public class RegattaController : Controller
     private readonly IAuthorizationService _authService;
     private readonly IMapper _mapper;
     private readonly IForwarderService _forwarderService;
+    private readonly ICustomViewService _customViewService;
 
     public RegattaController(
         IRegattaService regattaService,
         Core.Services.IClubService clubService,
         Core.Services.IForwarderService forwarderService,
         IAuthorizationService authService,
-        IMapper mapper)
+        IMapper mapper,
+        ICustomViewService customViewService)
     {
         _regattaService = regattaService;
         _clubService = clubService;
         _forwarderService = forwarderService;
         _authService = authService;
         _mapper = mapper;
+        _customViewService = customViewService;
     }
 
     [ResponseCache(Duration = 900)]
@@ -76,9 +79,15 @@ public class RegattaController : Controller
             canEdit = await _authService.CanUserEdit(User, clubInitials);
         }
 
+        var regattaVm = _mapper.Map<RegattaViewModel>(regatta);
+
+        // Load the regatta's default view template for displaying custom fields
+        var template = await _customViewService.GetRegattaResultsViewTemplateAsync(regatta.ClubId);
+        regattaVm.RegattaResultsTemplate = template;
+
         return View(new ClubItemViewModel<RegattaViewModel>
         {
-            Item = _mapper.Map<RegattaViewModel>(regatta),
+            Item = regattaVm,
             ClubInitials = clubInitials,
             CanEdit = canEdit
         });

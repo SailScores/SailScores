@@ -137,7 +137,17 @@ namespace SailScores.Core.Services
                         .FirstOrDefaultAsync(c => c.Id == seriesDb.ClubId)
                         .ConfigureAwait(false);
 
-                    Guid? defaultTemplateId = seriesDb.Type.HasValue && seriesDb.Type.Value == dbObj.SeriesType.Regatta
+                    // Determine if this series is part of a regatta
+                    bool isRegattaSeries = seriesDb.Type.HasValue && seriesDb.Type.Value == dbObj.SeriesType.Regatta;
+                    if (!isRegattaSeries)
+                    {
+                        // Also check if series is linked to a regatta via RegattaSeries
+                        isRegattaSeries = await _dbContext.RegattaSeries
+                            .AnyAsync(rs => rs.SeriesId == seriesDb.Id)
+                            .ConfigureAwait(false);
+                    }
+
+                    Guid? defaultTemplateId = isRegattaSeries
                         ? club?.DefaultRegattaSeriesResultsTemplateId
                         : club?.DefaultSeriesResultsTemplateId;
 

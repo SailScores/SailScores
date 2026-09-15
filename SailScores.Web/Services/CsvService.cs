@@ -16,15 +16,18 @@ public class CsvService : ICsvService, IDisposable
     private StreamWriter streamWriter;
     private IStringLocalizer<SharedResource> _stringLocalizer;
     private readonly ILocalizerService _sailscoresLocalizer;
+    private readonly ICustomViewService _customViewService;
     private const string _separator = ",";
     private const string _quote = "\"";
 
     public CsvService(
         IStringLocalizer<SharedResource> localizer,
-        ILocalizerService sailscoresLocalizer)
+        ILocalizerService sailscoresLocalizer,
+        ICustomViewService customViewService)
     {
         _stringLocalizer = localizer;
         _sailscoresLocalizer = sailscoresLocalizer;
+        _customViewService = customViewService;
     }
 
     public Stream GetCsv(Series series)
@@ -184,6 +187,44 @@ public class CsvService : ICsvService, IDisposable
         return stream;
     }
 
+    public Stream GetCsv(
+        IDictionary<string, IEnumerable<Competitor>> competitors,
+        SeriesResultsTemplate template,
+        IDictionary<Guid, CompetitorFieldDefinition> customFieldDefinitions)
+    {
+        if (stream != null)
+        {
+            stream.Dispose();
+        }
+        stream = new MemoryStream();
+        if (streamWriter != null)
+        {
+            streamWriter.Dispose();
+        }
+        streamWriter = new StreamWriter(stream, System.Text.Encoding.UTF8);
+
+        var customFieldsToShow = (template?.CustomFields ?? new List<SeriesResultsTemplateCustomField>())
+            .Where(c => c.Visibility != ColumnVisibility.Hidden)
+            .OrderBy(c => c.DisplayOrder)
+            .ThenBy(c => c.FieldDefinitionId)
+            .ToList();
+
+        streamWriter.WriteLine(GetCompetitorHeaders(customFieldsToShow, customFieldDefinitions));
+
+        foreach (var fleet in competitors)
+        {
+            foreach (var comp in fleet.Value)
+            {
+                streamWriter.WriteLine(GetScratchSheetInfo(fleet.Key, comp, customFieldsToShow, customFieldDefinitions));
+            }
+        }
+
+        streamWriter.Flush();
+        stream.Position = 0;
+
+        return stream;
+    }
+
 
 
     private string GetCompetitorHeaders()
@@ -206,6 +247,42 @@ public class CsvService : ICsvService, IDisposable
         return sb.ToString();
     }
 
+    private string GetCompetitorHeaders(
+        IList<SeriesResultsTemplateCustomField> customFields,
+        IDictionary<Guid, CompetitorFieldDefinition> customFieldDefinitions)
+    {
+        var sb = new StringBuilder();
+        sb.Append(GetEscapedLocalizedValue("Fleet"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Sail"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Alt Sail"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Sailor(s)"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Boat"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Club"));
+        sb.Append(_separator);
+        sb.Append(GetEscapedLocalizedValue("Class"));
+
+        foreach (var customField in customFields)
+        {
+            sb.Append(_separator);
+            if (customFieldDefinitions.TryGetValue(customField.FieldDefinitionId, out var definition))
+            {
+                var header = _customViewService.GetCustomFieldHeader(customField, definition);
+                sb.Append(GetEscapedValue(header));
+            }
+            else
+            {
+                sb.Append(GetEscapedValue("Unknown Field"));
+            }
+        }
+
+        return sb.ToString();
+    }
+
     private string GetScratchSheetInfo(String group, Competitor comp)
     {
         var sb = new StringBuilder();
@@ -222,6 +299,37 @@ public class CsvService : ICsvService, IDisposable
         sb.Append(GetEscapedValue(comp.HomeClubName));
         sb.Append(_separator);
         sb.Append(GetEscapedValue(comp.BoatClass?.Name));
+
+        return sb.ToString();
+    }
+
+    private string GetScratchSheetInfo(
+        String group,
+        Competitor comp,
+        IList<SeriesResultsTemplateCustomField> customFields,
+        IDictionary<Guid, CompetitorFieldDefinition> customFieldDefinitions)
+    {
+        var sb = new StringBuilder();
+        sb.Append(GetEscapedValue(group));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.SailNumber));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.AlternativeSailNumber));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.Name));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.BoatName));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.HomeClubName));
+        sb.Append(_separator);
+        sb.Append(GetEscapedValue(comp.BoatClass?.Name));
+
+        foreach (var customField in customFields)
+        {
+            sb.Append(_separator);
+            var fieldValue = _customViewService.GetCustomFieldValue(comp, customField.FieldDefinitionId);
+            sb.Append(GetEscapedValue(fieldValue));
+        }
 
         return sb.ToString();
     }

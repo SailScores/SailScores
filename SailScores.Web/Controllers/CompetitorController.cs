@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Identity.Entities;
@@ -17,7 +18,10 @@ using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationS
 using IClubService = SailScores.Core.Services.IClubService;
 using ICompetitorFieldService = SailScores.Core.Services.Interfaces.ICompetitorFieldService;
 using ICompetitorService = SailScores.Web.Services.Interfaces.ICompetitorService;
+using IRegattaService = SailScores.Web.Services.Interfaces.IRegattaService;
+using ICustomViewService = SailScores.Web.Services.Interfaces.ICustomViewService;
 using IForwarderService = SailScores.Core.Services.IForwarderService;
+using System.IO;
 
 namespace SailScores.Web.Controllers;
 
@@ -35,6 +39,8 @@ public class CompetitorController : Controller
     private readonly IForwarderService _forwarderService;
     private readonly IRedirectHelper _redirectHelper;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IRegattaService _regattaService;
+    private readonly ICustomViewService _customViewService;
 
     public CompetitorController(
         IClubService clubService,
@@ -47,7 +53,9 @@ public class CompetitorController : Controller
         IAdminTipService adminTipService,
         IRedirectHelper redirectHelper,
         UserManager<ApplicationUser> userManager,
-        IMapper mapper)
+        IMapper mapper,
+        IRegattaService regattaService,
+        ICustomViewService customViewService)
     {
         _clubService = clubService;
         _competitorService = competitorService;
@@ -60,6 +68,8 @@ public class CompetitorController : Controller
         _redirectHelper = redirectHelper;
         _userManager = userManager;
         _mapper = mapper;
+        _regattaService = regattaService;
+        _customViewService = customViewService;
     }
 
     [AllowAnonymous]
@@ -771,6 +781,9 @@ public class CompetitorController : Controller
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         IDictionary<string, IEnumerable<Competitor>> competitors = null;
+        SeriesResultsTemplate template = null;
+        Dictionary<Guid, CompetitorFieldDefinition> customFieldDefinitions = new();
+
         try
         {
             if (fleetId != default)
@@ -780,6 +793,12 @@ public class CompetitorController : Controller
             else if (regattaId != default)
             {
                 competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId), includeInactive);
+                // Load the regatta's template if available
+                var regatta = await _regattaService.GetRegattaAsync(new Guid(regattaId));
+                if (regatta?.Series.FirstOrDefault() is { } firstSeries)
+                {
+                    template = firstSeries.SeriesResultsTemplate;
+                }
             }
             else
             {
@@ -799,8 +818,25 @@ public class CompetitorController : Controller
             return new NotFoundResult();
         }
 
+        // Load custom field definitions if template specifies them
+        if (template?.CustomFields?.Any() == true)
+        {
+            var definitions = await _competitorFieldService.GetFieldDefinitionsAsync(clubId);
+            customFieldDefinitions = definitions.ToDictionary(d => d.Id, d => d);
+        }
+
         var filename = competitors.Count != 1 ? "competitors.csv" : $"{competitors.First().Key}.csv";
-        var csv = _csvService.GetCsv(competitors);
+
+        Stream csv;
+        if (customFieldDefinitions.Any())
+        {
+            var customFields = _customViewService.GetVisibleCustomFields(template);
+            csv = _csvService.GetCsv(competitors, template, customFieldDefinitions);
+        }
+        else
+        {
+            csv = _csvService.GetCsv(competitors);
+        }
 
         return File(csv, "text/csv", filename);
     }
@@ -813,6 +849,9 @@ public class CompetitorController : Controller
     {
         var clubId = await _clubService.GetClubId(clubInitials);
         IDictionary<string, IEnumerable<Competitor>> competitors = null;
+        SeriesResultsTemplate template = null;
+        Dictionary<Guid, CompetitorFieldDefinition> customFieldDefinitions = new();
+
         try
         {
             if (fleetId != default)
@@ -822,6 +861,12 @@ public class CompetitorController : Controller
             else if (regattaId != default)
             {
                 competitors = await _competitorService.GetCompetitorsForRegattaAsync(clubId, new Guid(regattaId), includeInactive);
+                // Load the regatta's template if available
+                var regatta = await _regattaService.GetRegattaAsync(new Guid(regattaId));
+                if (regatta?.Series.FirstOrDefault() is { } firstSeries)
+                {
+                    template = firstSeries.SeriesResultsTemplate;
+                }
             }
             else
             {
@@ -841,11 +886,25 @@ public class CompetitorController : Controller
             return new NotFoundResult();
         }
 
+        // Load custom field definitions if template specifies them
+        if (template?.CustomFields?.Any() == true)
+        {
+            var definitions = await _competitorFieldService.GetFieldDefinitionsAsync(clubId);
+            customFieldDefinitions = definitions.ToDictionary(d => d.Id, d => d);
+        }
+
         var filename = competitors.Count != 1 ? "competitors.html" : $"{competitors.First().Key}.html";
         var disposition = $"attachment; filename=\"{filename}\"; filename*=UTF-8''{filename}";
         Response.Headers.Append("content-disposition", disposition);
 
-        return View(competitors);
+        var vm = new CompetitorExportViewModel
+        {
+            Competitors = competitors,
+            Template = template,
+            CustomFieldDefinitions = customFieldDefinitions
+        };
+
+        return View(vm);
     }
 
     [HttpGet]

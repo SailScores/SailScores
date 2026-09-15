@@ -5,11 +5,15 @@
 @using SailScores.Web.Resources;
 @using SailScores.Web.Services;
 @using SailScores.Core.Services
+@using SailScores.Core.Services.Interfaces
+@using SailScores.Web.Services.Interfaces
 
 @using SailScores.Web.Models.SailScores
 
 @inject IStringLocalizer<SharedResource> localizer
 @inject AppSettingsService settingsService
+@inject ICompetitorFieldService competitorFieldService
+@inject ICustomViewService customViewService
 
 @model ClubItemViewModel<RegattaViewModel>
 @{
@@ -262,14 +266,49 @@
                    class="btn btn-outline-primary">Edit Fleet</a>
                     </div>
                 }
+                @{
+                    // Load custom field definitions and determine which fields to show
+                    // Use the regatta's default template for competitor list visibility
+                    var customFieldDefs = new Dictionary<Guid, CompetitorFieldDefinition>();
+                    var customFieldsForList = new List<SeriesResultsTemplateCustomField>();
+
+                    if (Model.Item?.ClubId != Guid.Empty)
+                    {
+                        var definitions = await competitorFieldService.GetFieldDefinitionsAsync(Model.Item.ClubId);
+                        customFieldDefs = definitions.ToDictionary(d => d.Id, d => d);
+
+                        // Use the regatta's default template for the competitor list
+                        var customFields = customViewService.GetVisibleCustomFields(Model.Item.RegattaResultsTemplate);
+                        customFieldsForList = customFields?.ToList() ?? new List<SeriesResultsTemplateCustomField>();
+                    }
+                }
                 <table class="table table-hover table-sm">
                     <thead>
                         <tr>
-                            <th></th>
-                            <th scope="col">@localizer["Sail Number"]</th>
-                            <th scope="col">@localizer["Name"]</th>
-                            <th scope="col">@localizer["Boat"]</th>
-                            <th scope="col">@localizer["Club"]</th>
+                            <th class="col-1"></th>
+                            @if (Model.Item.RegattaResultsTemplate?.SailNumberVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                            {
+                                <th scope="col" class="col-1 @(Model.Item.RegattaResultsTemplate?.SailNumberVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@localizer["Sail Number"]</th>
+                            }
+                            @if (Model.Item.RegattaResultsTemplate?.CompetitorNameVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                            {
+                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.CompetitorNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(Model.Item.RegattaResultsTemplate?.CompetitorNameHeader ?? localizer["Name"])</th>
+                            }
+                            @if (Model.Item.RegattaResultsTemplate?.BoatNameVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                            {
+                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.BoatNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(Model.Item.RegattaResultsTemplate?.BoatNameHeader ?? localizer["Boat"])</th>
+                            }
+                            @if (Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                            {
+                                <th scope="col" class="col-2@(Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@localizer["Club"]</th>
+                            }
+                            @foreach (var customField in customFieldsForList)
+                            {
+                                if (customFieldDefs.TryGetValue(customField.FieldDefinitionId, out var definition))
+                                {
+                                    <th scope="col" class="@(customField.Visibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@customViewService.GetCustomFieldHeader(customField, definition)</th>
+                                }
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -277,10 +316,31 @@
                         {
                             <tr>
                                 <td><small>@(counter++)</small></td>
-                                <td>@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
-                                <td>@comp.Name</td>
-                                <td>@comp.BoatName</td>
-                                <td>@(comp.HomeClubName ?? Model.ClubInitials)</td>
+                                @if (Model.Item.RegattaResultsTemplate?.SailNumberVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                                {
+                                    <td class="@(Model.Item.RegattaResultsTemplate?.SailNumberVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
+                                }
+                                @if (Model.Item.RegattaResultsTemplate?.CompetitorNameVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                                {
+                                    <td class="@(Model.Item.RegattaResultsTemplate?.CompetitorNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@comp.Name</td>
+                                }
+                                @if (Model.Item.RegattaResultsTemplate?.BoatNameVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                                {
+                                    <td class="@(Model.Item.RegattaResultsTemplate?.BoatNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@comp.BoatName</td>
+                                }
+                                @if (Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
+                                {
+                                    <td class="@(Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(comp.HomeClubName ?? Model.ClubInitials)</td>
+                                }
+                                @foreach (var customField in customFieldsForList)
+                                {
+                                    <td class="@(customField.Visibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">
+                                        @{
+                                            var fieldValue = customViewService.GetCustomFieldValue(comp, customField.FieldDefinitionId);
+                                            @(fieldValue ?? "—")
+                                        }
+                                    </td>
+                                }
                             </tr>
                         }
                     </tbody>
@@ -304,6 +364,19 @@
                     var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
                         currentSeries.SeriesResultsTemplate, isRegatta: true);
 
+                    var customFieldDefinitions = new Dictionary<Guid, CompetitorFieldDefinition>();
+                    var customFieldColumns = new List<SeriesResultsTemplateCustomField>();
+                    if (Model.Item?.ClubId != Guid.Empty)
+                    {
+                        var definitions = await competitorFieldService.GetFieldDefinitionsAsync(Model.Item.ClubId);
+                        customFieldDefinitions = definitions.ToDictionary(d => d.Id, d => d);
+                        customFieldColumns = (currentSeries.SeriesResultsTemplate?.CustomFields ?? new List<SeriesResultsTemplateCustomField>())
+                            .Where(c => c.Visibility != ColumnVisibility.Hidden)
+                            .OrderBy(c => c.DisplayOrder)
+                            .ThenBy(c => c.FieldDefinitionId)
+                            .ToList();
+                    }
+
                     var tableModel = new ResultsTableViewModel
                         {
                             SeriesId = currentSeries.Id,
@@ -316,6 +389,8 @@
                             BoatNameHeader = resolvedTemplate.BoatNameHeader,
                             CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
                             ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
+                            CustomFieldColumns = customFieldColumns,
+                            CustomFieldDefinitions = customFieldDefinitions,
                             IsExport = false,
                             ShowExportButtons = true,
                             ExcludeCompetitorLinks = true,

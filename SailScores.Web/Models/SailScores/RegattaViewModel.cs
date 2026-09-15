@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SailScores.Core.Model;
 using System.Text;
 
 namespace SailScores.Web.Models.SailScores;
@@ -21,6 +22,12 @@ public class RegattaViewModel : Core.Model.Regatta
             _seasonId = value;
         }
     }
+
+    /// <summary>
+    /// The regatta's default view template for displaying custom fields in competitor lists.
+    /// Determined by the club's DefaultRegattaSeriesResultsTemplate.
+    /// </summary>
+    public SeriesResultsTemplate RegattaResultsTemplate { get; set; }
 
     public string LongDescription
     {

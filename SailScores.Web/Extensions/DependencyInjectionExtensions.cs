@@ -24,6 +24,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IRegattaService, RegattaService>();
         services.AddScoped<IAdminTipService, AdminTipService>();
         services.AddScoped<ICsvService, CsvService>();
+        services.AddScoped<ICustomViewService, CustomViewService>();
         services.AddScoped<IMergeService, MergeService>();
         services.AddScoped<IWhatIfService, WhatIfService>();
         services.AddScoped<IClubRequestService, ClubRequestService>();

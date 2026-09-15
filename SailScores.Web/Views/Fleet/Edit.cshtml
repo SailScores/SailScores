@@ -47,7 +47,10 @@
                    data-bs-content="Used to create URLs; avoid spaces. Should be unique for this club, e.g. 2019DieHardMCs">
                     <span class="far fa-question-circle"></span>
                 </a>
-                <input asp-for="ShortName" class="form-control" />
+                <input asp-for="ShortName" class="form-control" maxlength="40" />
+                <small class="form-text text-body-secondary">
+                    <span id="shortNameCounter">0</span>/40 characters
+                </small>
                 <span asp-validation-for="ShortName" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -60,7 +63,10 @@
                    data-bs-content="Used as a display name, this does not need to be unique, e.g. MC Scows">
                     <span class="far fa-question-circle"></span>
                 </a>
-                <input asp-for="NickName" class="form-control" />
+                <input asp-for="NickName" class="form-control" maxlength="40" />
+                <small class="form-text text-body-secondary">
+                    <span id="nickNameCounter">0</span>/40 characters
+                </small>
                 <span asp-validation-for="NickName" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -163,6 +169,30 @@
                 // $('#competitors').selectpicker('refresh');
         }
         document.getElementById("inactiveCompButton").onclick = removeInactiveComps;
+
+        // Character counter for ShortName
+        const shortNameInput = document.querySelector('input[id*="ShortName"]');
+        if (shortNameInput) {
+            shortNameInput.addEventListener('input', function() {
+                const counter = document.getElementById('shortNameCounter');
+                if (counter) counter.textContent = this.value.length;
+            });
+            // Initialize counter on page load
+            const counter = document.getElementById('shortNameCounter');
+            if (counter) counter.textContent = shortNameInput.value.length;
+        }
+
+        // Character counter for NickName
+        const nickNameInput = document.querySelector('input[id*="NickName"]');
+        if (nickNameInput) {
+            nickNameInput.addEventListener('input', function() {
+                const counter = document.getElementById('nickNameCounter');
+                if (counter) counter.textContent = this.value.length;
+            });
+            // Initialize counter on page load
+            const counter = document.getElementById('nickNameCounter');
+            if (counter) counter.textContent = nickNameInput.value.length;
+        }
     </script>
     
     <script src="~/js/fleetEditor.min.js" asp-append-version="true"></script>

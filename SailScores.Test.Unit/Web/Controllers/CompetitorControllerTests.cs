@@ -67,7 +67,9 @@ namespace SailScores.Test.Unit.Web.Controllers
                 _adminTipServiceMock.Object,
                 _redirectHelperMock.Object,
                 _userManagerMock.Object,
-                _mapper);
+                _mapper,
+                new Mock<SailScores.Web.Services.Interfaces.IRegattaService>().Object,
+                new Mock<ICustomViewService>().Object);
         }
 
         [Fact]

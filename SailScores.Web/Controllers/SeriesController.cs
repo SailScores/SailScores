@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Identity.Entities;
 using SailScores.Web.Authorization;
@@ -31,6 +32,7 @@ public class SeriesController : Controller
     private readonly IForwarderService _forwarderService;
     private readonly Core.Services.IFleetService _fleetService;
     private readonly Core.Services.Interfaces.ISeriesResultsTemplateService _templateService;
+    private readonly Core.Services.Interfaces.ICompetitorFieldService _competitorFieldService;
     private readonly IRedirectHelper _redirectHelper;
 
     public SeriesController(
@@ -42,6 +44,7 @@ public class SeriesController : Controller
         IForwarderService forwarderService,
         Core.Services.IFleetService fleetService,
         Core.Services.Interfaces.ISeriesResultsTemplateService templateService,
+        Core.Services.Interfaces.ICompetitorFieldService competitorFieldService,
         UserManager<ApplicationUser> userManager,
         IMapper mapper,
         IRedirectHelper redirectHelper)
@@ -54,6 +57,7 @@ public class SeriesController : Controller
         _forwarderService = forwarderService;
         _fleetService = fleetService;
         _templateService = templateService;
+        _competitorFieldService = competitorFieldService;
         _userManager = userManager;
         _mapper = mapper;
         _redirectHelper = redirectHelper;
@@ -149,7 +153,52 @@ public class SeriesController : Controller
         }
 
         var filename = series.Name.Contains(series.Season.Name) ? $"{series.Name}.csv" : $"{series.Season.Name} {series.Name}.csv";
-        var csv = _csvService.GetCsv(series);
+
+        // Resolve template: use series template if set, otherwise fall back to club defaults
+        SeriesResultsTemplate template = series.SeriesResultsTemplate;
+        if (template == null)
+        {
+            // Load minimal club to get template defaults
+            var club = await _clubService.GetMinimalClub(series.ClubId);
+            if (club != null)
+            {
+                // Determine if this series is a regatta
+                bool isRegatta = series.Type == SeriesType.Regatta;
+
+                if (isRegatta && club.DefaultRegattaSeriesResultsTemplateId.HasValue)
+                {
+                    template = await _templateService.GetTemplateAsync(club.DefaultRegattaSeriesResultsTemplateId.Value);
+                }
+                else if (club.DefaultSeriesResultsTemplateId.HasValue)
+                {
+                    template = await _templateService.GetTemplateAsync(club.DefaultSeriesResultsTemplateId.Value);
+                }
+            }
+        }
+
+        // Get custom field definitions if template exists
+        var customFieldDefinitions = new Dictionary<Guid, CompetitorFieldDefinition>();
+        if (template != null)
+        {
+            var definitions = await _competitorFieldService.GetFieldDefinitionsAsync(series.ClubId);
+            customFieldDefinitions = definitions?.ToDictionary(d => d.Id, d => d) ?? new Dictionary<Guid, CompetitorFieldDefinition>();
+        }
+
+        Stream csv;
+        if (template != null)
+        {
+            // Use template-aware CSV export with custom fields
+            var competitors = new Dictionary<string, IEnumerable<Competitor>>
+            {
+                { "Series", series.FlatResults?.Competitors?.Cast<Competitor>().ToList() ?? new List<Competitor>() }
+            };
+            csv = _csvService.GetCsv(competitors, template, customFieldDefinitions);
+        }
+        else
+        {
+            // Fall back to basic CSV export (uses default localized headers)
+            csv = _csvService.GetCsv(series);
+        }
 
         return File(csv, "text/csv", filename);
     }
