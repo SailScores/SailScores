@@ -5,10 +5,10 @@ using SailScores.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load Application Insights configuration to enable adaptive sampling
+// Load OpenTelemetry configuration
 builder.Host.ConfigureAppConfiguration((ctx, config) =>
 {
-    config.AddJsonFile("appsettings.ApplicationInsights.json", optional: true, reloadOnChange: true);
+    config.AddJsonFile("appsettings.OpenTelemetry.json", optional: true);
 });
 
 var startup = new Startup(builder.Configuration, builder.Environment);

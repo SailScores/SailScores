@@ -43,7 +43,6 @@ using WebMarkupMin.AspNetCoreLatest;
 using Microsoft.Extensions.Hosting;
 using MailChimp.Net.Interfaces;
 using MailChimp.Net;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using SailScores.Web.Resources;
 using SailScores.Web.Authorization;
 
@@ -353,11 +352,11 @@ public class Startup
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
 #if !DEBUG
-        services.AddApplicationInsightsTelemetry(options =>
-        {
-            options.ConnectionString = Configuration["ApplicationInsights:ConnectionString"];
-            options.EnableRequestTrackingTelemetryModule = true;
-        });
+        // OpenTelemetry with Azure Monitor exporter is automatically configured
+        // when Azure.Monitor.OpenTelemetry.AspNetCore is installed.
+        // The connection string is read from the APPLICATIONINSIGHTS__CONNECTIONSTRING environment variable
+        // or the ApplicationInsights:ConnectionString configuration.
+        services.AddOpenTelemetry();
 #endif
 
         services.AddHttpContextAccessor();
@@ -367,6 +366,7 @@ public class Startup
     {
         services.AddHostedService<QueuedHostedService>();
         services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        services.AddSingleton<OpenTelemetryJavaScriptService>();
     }
 
     private void RegisterSailScoresServices(IServiceCollection services)
