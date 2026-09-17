@@ -45,6 +45,7 @@ using MailChimp.Net.Interfaces;
 using MailChimp.Net;
 using SailScores.Web.Resources;
 using SailScores.Web.Authorization;
+using OpenTelemetry.Trace;
 
 namespace SailScores.Web;
 
@@ -351,13 +352,19 @@ public class Startup
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
-#if !DEBUG
-        // OpenTelemetry with Azure Monitor exporter is automatically configured
-        // when Azure.Monitor.OpenTelemetry.AspNetCore is installed.
-        // The connection string is read from the APPLICATIONINSIGHTS__CONNECTIONSTRING environment variable
-        // or the ApplicationInsights:ConnectionString configuration.
-        services.AddOpenTelemetry();
-#endif
+        // Configure OpenTelemetry with adaptive error-preserving sampler
+        // The Azure Monitor package auto-initializes OpenTelemetry with default settings.
+        // We configure adaptive sampling to maintain a target trace rate while preserving errors.
+
+        var targetTracesPerMinute = Configuration.GetValue("OpenTelemetry:TargetTracesPerMinute", 3000);
+        var windowSeconds = Configuration.GetValue("OpenTelemetry:WindowSeconds", 60);
+
+        services.AddOpenTelemetry()
+            .WithTracing(builder =>
+            {
+                // Apply our adaptive sampler that preserves errors while maintaining target rate
+                builder.SetSampler(new AdaptiveErrorPreservingSampler(targetTracesPerMinute, windowSeconds));
+            });
 
         services.AddHttpContextAccessor();
     }
