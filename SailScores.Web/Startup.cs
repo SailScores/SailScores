@@ -46,6 +46,7 @@ using MailChimp.Net;
 using SailScores.Web.Resources;
 using SailScores.Web.Authorization;
 using OpenTelemetry.Trace;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 
 namespace SailScores.Web;
 
@@ -352,14 +353,30 @@ public class Startup
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
-        // Configure OpenTelemetry with adaptive error-preserving sampler
-        // The Azure Monitor package auto-initializes OpenTelemetry with default settings.
-        // We configure adaptive sampling to maintain a target trace rate while preserving errors.
+        // Configure OpenTelemetry with Azure Monitor exporter and adaptive error-preserving sampler
+        // The Azure Monitor extension sends telemetry to Application Insights.
+        // The connection string is read from APPLICATIONINSIGHTS__CONNECTIONSTRING environment variable.
 
+        // Get sampling configuration
         var targetTracesPerMinute = Configuration.GetValue("OpenTelemetry:TargetTracesPerMinute", 3000);
         var windowSeconds = Configuration.GetValue("OpenTelemetry:WindowSeconds", 60);
 
-        services.AddOpenTelemetry()
+        // Get connection string from environment variable
+        var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS__CONNECTIONSTRING")
+            ?? Configuration.GetConnectionString("ApplicationInsights")
+            ?? Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
+
+        // Add OpenTelemetry with Azure Monitor exporter
+        services
+            .AddOpenTelemetry()
+            .UseAzureMonitor(options =>
+            {
+                // Explicitly set connection string if available
+                if (!string.IsNullOrEmpty(connectionString))
+                {
+                    options.ConnectionString = connectionString;
+                }
+            })
             .WithTracing(builder =>
             {
                 // Apply our adaptive sampler that preserves errors while maintaining target rate
