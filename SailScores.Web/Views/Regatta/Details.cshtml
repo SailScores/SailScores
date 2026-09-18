@@ -300,7 +300,7 @@
                             }
                             @if (Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                             {
-                                <th scope="col" class="col-2@(Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@localizer["Club"]</th>
+                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@localizer["Club"]</th>
                             }
                             @foreach (var customField in customFieldsForList)
                             {
