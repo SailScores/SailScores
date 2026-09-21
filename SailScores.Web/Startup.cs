@@ -366,24 +366,29 @@ public class Startup
             ?? Configuration.GetConnectionString("ApplicationInsights")
             ?? Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
 
-        // Add OpenTelemetry with Azure Monitor exporter
-        services
-            .AddOpenTelemetry()
-            .UseAzureMonitor(options =>
-            {
-                // Explicitly set connection string if available
-                if (!string.IsNullOrEmpty(connectionString))
-                {
-                    options.ConnectionString = connectionString;
-                }
-            })
-            .WithTracing(builder =>
-            {
-                // Apply our adaptive sampler that preserves errors while maintaining target rate
-                builder.SetSampler(new AdaptiveErrorPreservingSampler(targetTracesPerMinute, windowSeconds));
-            });
+        if (!string.IsNullOrEmpty(connectionString))
+        {
 
-        services.AddHttpContextAccessor();
+            // Add OpenTelemetry with Azure Monitor exporter
+            services
+                .AddOpenTelemetry()
+                .UseAzureMonitor(options =>
+                {
+                    // Explicitly set connection string if available
+                    if (!string.IsNullOrEmpty(connectionString))
+                    {
+                        options.ConnectionString = connectionString;
+                    }
+                })
+                .WithTracing(builder =>
+                {
+                    // Apply our adaptive sampler that preserves errors while maintaining target rate
+                    builder.SetSampler(new AdaptiveErrorPreservingSampler(targetTracesPerMinute, windowSeconds));
+                });
+
+
+            services.AddHttpContextAccessor();
+        }
     }
 
     private void RegisterBackgroundQueueServices(IServiceCollection services)
