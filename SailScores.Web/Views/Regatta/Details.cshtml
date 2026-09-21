@@ -315,7 +315,21 @@
                         @foreach (var comp in fleet.Competitors)
                         {
                             <tr>
-                                <td><small>@(counter++)</small></td>
+                                <td>
+                                    <small>@(counter++)</small>
+                                    @if (Model.CanEdit)
+                                    {
+                                        @:&nbsp;
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-action="Edit"
+                                           asp-controller="Competitor"
+                                           asp-route-id="@comp.Id"
+                                           asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                                           title="Edit">
+                                            <span class="fas fa-pen"></span>
+                                        </a>
+                                    }
+                                </td>
                                 @if (Model.Item.RegattaResultsTemplate?.SailNumberVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                                 {
                                     <td class="@(Model.Item.RegattaResultsTemplate?.SailNumberVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(Model.Item.PreferAlternateSailNumbers ? (comp.AlternativeSailNumber ?? comp.SailNumber) : comp.SailNumber)</td>
