@@ -375,9 +375,18 @@
                     string trendLegend = localizer["Rank change from"] + " " +
                         localizer[EnumHelper<TrendOption>.GetDisplayValue(currentSeries.TrendOption.Value)];
 
-                    // Resolve template settings, passing isRegatta: true so the default shows competitor club column
+                    // Prefer the active series template, but fall back to the regatta default when the
+                    // series template is null or has no custom field configuration loaded for display.
+                    var effectiveTemplate = currentSeries.SeriesResultsTemplate != null &&
+                        (currentSeries.SeriesResultsTemplate.CustomFields != null &&
+                         currentSeries.SeriesResultsTemplate.CustomFields.Any())
+                        ? currentSeries.SeriesResultsTemplate
+                        : Model.Item.RegattaResultsTemplate;
+
                     var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
-                        currentSeries.SeriesResultsTemplate, isRegatta: true);
+                        currentSeries.SeriesResultsTemplate,
+                        isRegatta: true,
+                        fallbackTemplate: effectiveTemplate);
 
                     var customFieldDefinitions = new Dictionary<Guid, CompetitorFieldDefinition>();
                     var customFieldColumns = new List<SeriesResultsTemplateCustomField>();
@@ -385,7 +394,7 @@
                     {
                         var definitions = await competitorFieldService.GetFieldDefinitionsAsync(Model.Item.ClubId);
                         customFieldDefinitions = definitions.ToDictionary(d => d.Id, d => d);
-                        customFieldColumns = (currentSeries.SeriesResultsTemplate?.CustomFields ?? new List<SeriesResultsTemplateCustomField>())
+                        customFieldColumns = (effectiveTemplate?.CustomFields ?? new List<SeriesResultsTemplateCustomField>())
                             .Where(c => c.Visibility != ColumnVisibility.Hidden)
                             .OrderBy(c => c.DisplayOrder)
                             .ThenBy(c => c.FieldDefinitionId)

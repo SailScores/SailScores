@@ -90,6 +90,7 @@ namespace SailScores.Core.Services
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
                 .ThenInclude(s => s.SeriesResultsTemplate)
+                .ThenInclude(t => t.CustomFields)
                 .Include(r => r.Season)
                 .Include(r => r.Announcements)
                 .AsSplitQuery()

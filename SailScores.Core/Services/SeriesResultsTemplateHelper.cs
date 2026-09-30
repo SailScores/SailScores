@@ -7,21 +7,30 @@ public static class SeriesResultsTemplateHelper
 {
     public static ResolvedTemplate GetResolvedTemplate(SeriesResultsTemplate template, bool isRegatta = false)
     {
-        if (template == null)
+        return GetResolvedTemplate(template, isRegatta, fallbackTemplate: null);
+    }
+
+    public static ResolvedTemplate GetResolvedTemplate(
+        SeriesResultsTemplate template,
+        bool isRegatta,
+        SeriesResultsTemplate fallbackTemplate)
+    {
+        var effectiveTemplate = template ?? fallbackTemplate;
+        if (effectiveTemplate == null)
         {
             return GetDefaultTemplate(isRegatta);
         }
 
         return new ResolvedTemplate
         {
-            SailNumberVisibility = template.SailNumberVisibility,
-            CompetitorNameVisibility = template.CompetitorNameVisibility,
-            CompetitorNameHeader = template.CompetitorNameHeader ?? "Helm",
-            BoatNameVisibility = template.BoatNameVisibility,
-            BoatNameHeader = template.BoatNameHeader ?? "Boat",
-            CompetitorClubVisibility = template.CompetitorClubVisibility,
-            ShowPreDiscardTotal = template.ShowPreDiscardTotal,
-            ShowClubLogo = template.ShowClubLogo,
+            SailNumberVisibility = effectiveTemplate.SailNumberVisibility,
+            CompetitorNameVisibility = effectiveTemplate.CompetitorNameVisibility,
+            CompetitorNameHeader = effectiveTemplate.CompetitorNameHeader ?? "Helm",
+            BoatNameVisibility = effectiveTemplate.BoatNameVisibility,
+            BoatNameHeader = effectiveTemplate.BoatNameHeader ?? "Boat",
+            CompetitorClubVisibility = effectiveTemplate.CompetitorClubVisibility,
+            ShowPreDiscardTotal = effectiveTemplate.ShowPreDiscardTotal,
+            ShowClubLogo = effectiveTemplate.ShowClubLogo,
         };
     }
 
