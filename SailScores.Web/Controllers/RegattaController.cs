@@ -5,6 +5,7 @@ using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
+using ICompetitorFieldService = SailScores.Core.Services.Interfaces.ICompetitorFieldService;
 using IForwarderService = SailScores.Core.Services.IForwarderService;
 
 namespace SailScores.Web.Controllers;
@@ -18,6 +19,7 @@ public class RegattaController : Controller
     private readonly IMapper _mapper;
     private readonly IForwarderService _forwarderService;
     private readonly ICustomViewService _customViewService;
+    private readonly ICompetitorFieldService _competitorFieldService;
 
     public RegattaController(
         IRegattaService regattaService,
@@ -25,7 +27,8 @@ public class RegattaController : Controller
         Core.Services.IForwarderService forwarderService,
         IAuthorizationService authService,
         IMapper mapper,
-        ICustomViewService customViewService)
+        ICustomViewService customViewService,
+        ICompetitorFieldService competitorFieldService)
     {
         _regattaService = regattaService;
         _clubService = clubService;
@@ -33,6 +36,7 @@ public class RegattaController : Controller
         _authService = authService;
         _mapper = mapper;
         _customViewService = customViewService;
+        _competitorFieldService = competitorFieldService;
     }
 
     [ResponseCache(Duration = 900)]
@@ -79,6 +83,8 @@ public class RegattaController : Controller
             canEdit = await _authService.CanUserEdit(User, clubInitials);
         }
 
+        await PopulateCompetitorCustomFieldValuesAsync(regatta);
+
         var regattaVm = _mapper.Map<RegattaViewModel>(regatta);
 
         // Load the regatta's default view template for displaying custom fields
@@ -91,6 +97,34 @@ public class RegattaController : Controller
             ClubInitials = clubInitials,
             CanEdit = canEdit
         });
+    }
+
+    private async Task PopulateCompetitorCustomFieldValuesAsync(Regatta regatta)
+    {
+        if (regatta?.Fleets == null)
+        {
+            return;
+        }
+
+        foreach (var fleet in regatta.Fleets)
+        {
+            if (fleet?.Competitors == null)
+            {
+                continue;
+            }
+
+            foreach (var competitor in fleet.Competitors)
+            {
+                if (competitor == null)
+                {
+                    continue;
+                }
+
+                competitor.CustomFieldValues = await _competitorFieldService
+                    .GetValuesForCompetitorAsync(competitor.Id)
+                    ?? new List<CompetitorFieldValue>();
+            }
+        }
     }
 
     [Authorize]

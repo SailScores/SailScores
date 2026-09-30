@@ -43,11 +43,13 @@ public class CustomViewService : ICustomViewService
 
     /// <summary>
     /// Gets the current or most recent value for a custom field on a competitor,
-    /// respecting effective date ranges.
+    /// respecting effective date ranges. When no effective date is supplied,
+    /// the current UTC date is used.
     /// </summary>
     public string GetCustomFieldValue(
         Competitor competitor,
-        Guid fieldDefinitionId)
+        Guid fieldDefinitionId,
+        DateTime? effectiveDate = null)
     {
         if (competitor?.CustomFieldValues == null)
         {
@@ -64,12 +66,12 @@ public class CustomViewService : ICustomViewService
             return null;
         }
 
-        var today = DateTime.UtcNow.Date;
+        var targetDate = effectiveDate?.Date ?? DateTime.UtcNow.Date;
 
-        // Try to find a value that is currently effective
+        // Try to find a value that is effective on the requested date.
         var currentValue = fieldValues
-            .Where(v => (!v.EffectiveFrom.HasValue || v.EffectiveFrom.Value.Date <= today)
-                && (!v.EffectiveTo.HasValue || v.EffectiveTo.Value.Date >= today))
+            .Where(v => (!v.EffectiveFrom.HasValue || v.EffectiveFrom.Value.Date <= targetDate)
+                && (!v.EffectiveTo.HasValue || v.EffectiveTo.Value.Date >= targetDate))
             .FirstOrDefault();
 
         if (currentValue != null)

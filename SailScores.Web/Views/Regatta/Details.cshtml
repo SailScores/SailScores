@@ -350,7 +350,8 @@
                                 {
                                     <td class="@(customField.Visibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">
                                         @{
-                                            var fieldValue = customViewService.GetCustomFieldValue(comp, customField.FieldDefinitionId);
+                                            var regattaDate = Model.Item.StartDate ?? Model.Item.EndDate ?? DateTime.UtcNow;
+                                            var fieldValue = customViewService.GetCustomFieldValue(comp, customField.FieldDefinitionId, regattaDate);
                                             @(fieldValue ?? "—")
                                         }
                                     </td>
