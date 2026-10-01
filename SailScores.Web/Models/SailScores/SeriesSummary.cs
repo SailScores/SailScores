@@ -17,6 +17,7 @@ public class SeriesSummary
     public int? RaceCount { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
+
     public Season Season { get; set; }
 
     public String FleetName { get; set; }
