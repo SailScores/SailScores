@@ -45,6 +45,27 @@ public class SeriesResultsTemplateHelperTests
     }
 
     [Fact]
+    public void GetResolvedTemplate_FallbackTemplateUsedWhenPrimaryTemplateMissing_ReturnsFallbackValues()
+    {
+        var fallback = new SeriesResultsTemplate
+        {
+            CompetitorNameHeader = "Skipper",
+            BoatNameHeader = "Hull",
+            CompetitorClubVisibility = ColumnVisibility.Hidden,
+            ShowPreDiscardTotal = true,
+            ShowClubLogo = true
+        };
+
+        var result = SeriesResultsTemplateHelper.GetResolvedTemplate(null, isRegatta: true, fallbackTemplate: fallback);
+
+        Assert.Equal("Skipper", result.CompetitorNameHeader);
+        Assert.Equal("Hull", result.BoatNameHeader);
+        Assert.Equal(ColumnVisibility.Hidden, result.CompetitorClubVisibility);
+        Assert.True(result.ShowPreDiscardTotal);
+        Assert.True(result.ShowClubLogo);
+    }
+
+    [Fact]
     public void GetResolvedTemplate_TemplateWithShowClubLogoTrue_ReturnsShowClubLogoTrue()
     {
         var template = new SeriesResultsTemplate

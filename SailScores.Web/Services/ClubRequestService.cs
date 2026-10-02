@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
+using SailScores.Core.Services.Interfaces;
 using SailScores.Web.Models.SailScores;
 using Microsoft.Extensions.Caching.Memory;
 using SailScores.Web.Services.Interfaces;
@@ -18,8 +19,7 @@ public class ClubRequestService : IClubRequestService
     private readonly IConfiguration _configuration;
     private readonly IMemoryCache _memoryCache;
     private readonly IMapper _mapper;
-
-
+    private readonly ISeriesResultsTemplateService _coreSeriesResultTemplateService;
     private const string clubCacheKeyName = "CachedClubList";
 
     public ClubRequestService(
@@ -27,6 +27,7 @@ public class ClubRequestService : IClubRequestService
         Core.Services.IClubRequestService clubRequestService,
         Core.Services.IScoringService scoringService,
         Core.Services.IUserService userService,
+        ISeriesResultsTemplateService templateService,
         IEmailSender emailSender,
         IConfiguration configuration,
         IMemoryCache memoryCache,
@@ -36,6 +37,7 @@ public class ClubRequestService : IClubRequestService
         _coreClubRequestService = clubRequestService;
         _coreScoringService = scoringService;
         _coreUserService = userService;
+        _coreSeriesResultTemplateService = templateService;
         _emailSender = emailSender;
         _configuration = configuration;
         _memoryCache = memoryCache;
@@ -220,6 +222,9 @@ public class ClubRequestService : IClubRequestService
                 club.DefaultScoringSystemId = createdSystems[0].Id;
                 await _coreClubService.UpdateClub(club);
             }
+
+            // create default regatta and club views. Save them as the defaults for this club.
+            await _coreSeriesResultTemplateService.SeedDefaultTemplatesAsync(newClubId);
 
             if (club.IsHidden)
             {

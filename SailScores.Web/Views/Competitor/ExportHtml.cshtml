@@ -3,16 +3,21 @@
 @using Microsoft.Extensions.Localization
 @using SailScores.Web.Extensions
 @using SailScores.Web.Resources
+@using SailScores.Web.Services.Interfaces
 
 @inject IStringLocalizer<SharedResource> localizer
+@inject ICustomViewService customViewService
 
-@model IDictionary<string, IEnumerable<Competitor>>
+@model CompetitorExportViewModel
 
 @{
     ViewBag.Title = 
-        (Model.Count == 1 ? 
-        Model.First().Key + " " : "") + "Competitor List - SailScores";
+        (Model.Competitors.Count == 1 ? 
+        Model.Competitors.First().Key + " " : "") + "Competitor List - SailScores";
     Layout = null;
+
+    // Resolve template settings for determining which custom fields to show
+    var customFieldsToShow = customViewService.GetVisibleCustomFields(Model.Template);
 }
 
 <!DOCTYPE html>
@@ -38,15 +43,22 @@
                             <th scope="col">@localizer["Boat"]</th>
                             <th scope="col">@localizer["Club"]</th>
                             <th scope="col">@localizer["Class"]</th>
+                            @foreach (var customField in customFieldsToShow)
+                            {
+                                if (Model.CustomFieldDefinitions.TryGetValue(customField.FieldDefinitionId, out var definition))
+                                {
+                                    <th scope="col">@customViewService.GetCustomFieldHeader(customField, definition)</th>
+                                }
+                            }
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(var boatGroup in Model)
+                        @foreach(var boatGroup in Model.Competitors)
                         {
-                            @if (Model.Count > 1)
+                            @if (Model.Competitors.Count > 1)
                             {
                                 <tr>
-                                    <th colspan="6" class="text-center">@boatGroup.Key</th>
+                                    <th colspan="@(6 + customFieldsToShow.Count)" class="text-center">@boatGroup.Key</th>
                                 </tr>
                             }
 
@@ -59,13 +71,22 @@
                                     <td>@comp.BoatName</td>
                                     <td>@comp.HomeClubName</td>
                                     <td>@comp.BoatClass?.Name</td>
-                            </tr>
+                                    @foreach (var customField in customFieldsToShow)
+                                    {
+                                        <td>
+                                            @{
+                                                var fieldValue = customViewService.GetCustomFieldValue(comp, customField.FieldDefinitionId);
+                                                @(fieldValue ?? "—")
+                                            }
+                                        </td>
+                                    }
+                                </tr>
                             }
                         }
                     </tbody>
                 </table>
             </div>
-            
+
         </main>
     </div>
 </body>

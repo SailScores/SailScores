@@ -14,7 +14,7 @@ namespace SailScores.Core.Model
         // Short Name, unique to the fleet in this club. Can be used in Urls.
         // Example: 2019DieHardMCs
         [Required]
-        [StringLength(30)]
+        [StringLength(40)]
         [Display(Name = "Short Name")]
         public String ShortName { get; set; }
 
@@ -26,7 +26,7 @@ namespace SailScores.Core.Model
 
         // Short Alias Name, does not need to be unique: used for display in regattas
         // Example: MC Scows
-        [StringLength(30)]
+        [StringLength(40)]
         [Display(Name = "Nickname")]
         public String NickName { get; set; }
 

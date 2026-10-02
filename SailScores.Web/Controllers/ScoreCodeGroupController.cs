@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
-using SailScores.Core.Services;
 using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
@@ -11,18 +11,21 @@ namespace SailScores.Web.Controllers;
 [Authorize]
 public class ScoreCodeGroupController : Controller
 {
-    private readonly IClubService _clubService;
-    private readonly IScoringService _scoringService;
+    private readonly Core.Services.IClubService _clubService;
+    private readonly Core.Services.IScoringService _scoringService;
     private readonly IAuthorizationService _authService;
+    private readonly IRedirectHelper _redirectHelper;
 
     public ScoreCodeGroupController(
-        IClubService clubService,
-        IScoringService scoringService,
-        IAuthorizationService authService)
+        Core.Services.IClubService clubService,
+        Core.Services.IScoringService scoringService,
+        IAuthorizationService authService,
+        IRedirectHelper redirectHelper)
     {
         _clubService = clubService;
         _scoringService = scoringService;
         _authService = authService;
+        _redirectHelper = redirectHelper;
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -94,7 +97,12 @@ public class ScoreCodeGroupController : Controller
 
         await _scoringService.SaveScoreCodeGroupAsync(coreGroup);
 
-        return Redirect(returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{model.ScoringSystemId}");
+        return _redirectHelper.SafeRedirect(
+            Url,
+            Request,
+            returnUrl,
+            "Edit",
+            "ScoringSystem");
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -163,7 +171,12 @@ public class ScoreCodeGroupController : Controller
 
         await _scoringService.SaveScoreCodeGroupAsync(coreGroup);
 
-        return Redirect(returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{model.ScoringSystemId}");
+        return _redirectHelper.SafeRedirect(
+            Url,
+            Request,
+            returnUrl,
+            "Edit",
+            "ScoringSystem");
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -290,6 +303,11 @@ public class ScoreCodeGroupController : Controller
         var scoringSystemId = group.ScoringSystemId;
         await _scoringService.DeleteScoreCodeGroupAsync(id);
 
-        return Redirect(returnUrl ?? $"/{clubInitials}/ScoringSystem/Edit/{scoringSystemId}");
+        return _redirectHelper.SafeRedirect(
+            Url,
+            Request,
+            returnUrl,
+            "Edit",
+            "ScoringSystem");
     }
 }

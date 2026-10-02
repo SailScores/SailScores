@@ -4,6 +4,7 @@ using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
 using SailScores.Web.Resources;
 using SailScores.Web.Services;
+using SailScores.Web.Services.Interfaces;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -18,12 +19,14 @@ namespace SailScores.Test.Unit.Web.Services
     {
         private readonly Mock<IStringLocalizer<SharedResource>> _stringLocalizerMock;
         private readonly Mock<ILocalizerService> _sailscoresLocalizerMock;
+        private readonly Mock<ICustomViewService> _customViewServiceMock;
         private readonly CsvService _service;
 
         public CsvServiceTests()
         {
             _stringLocalizerMock = new Mock<IStringLocalizer<SharedResource>>();
             _sailscoresLocalizerMock = new Mock<ILocalizerService>();
+            _customViewServiceMock = new Mock<ICustomViewService>();
 
             // Setup default localizer behavior
             _stringLocalizerMock.Setup(l => l[It.IsAny<string>()])
@@ -34,7 +37,8 @@ namespace SailScores.Test.Unit.Web.Services
 
             _service = new CsvService(
                 _stringLocalizerMock.Object,
-                _sailscoresLocalizerMock.Object);
+                _sailscoresLocalizerMock.Object,
+                _customViewServiceMock.Object);
         }
 
         #region Helper Methods

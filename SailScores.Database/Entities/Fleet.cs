@@ -8,12 +8,12 @@ public class Fleet
     public Guid Id { get; set; }
     public Guid ClubId { get; set; }
 
-    [StringLength(30)]
+    [StringLength(40)]
     public String ShortName { get; set; }
     [StringLength(200)]
     public String Name { get; set; }
 
-    [StringLength(30)]
+    [StringLength(40)]
     public String NickName { get; set; }
 
     [StringLength(2000)]

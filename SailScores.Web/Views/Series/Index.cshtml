@@ -15,18 +15,9 @@
 }
 
 @section Sidebar {
-    <nav class="col-md-2 d-none d-md-block bg-almost sidebar">
+    <nav class="col-md-2 d-none d-lg-block bg-almost sidebar">
         <div class="sidebar-sticky sticky-top">
-            <ul class="nav flex-column">
-                @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
-                {
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#@item.FirstOrDefault()?.Season?.UrlName">
-                            @item.Key
-                        </a>
-                    </li>
-                }
-            </ul>
+            <div id="group-sidebar" class="nav flex-column gap-1 pt-3"></div>
         </div>
     </nav>
 }
@@ -38,9 +29,9 @@
             <div class="col-sm-3 my-2">
                 <div class="btn-group">
                     <a asp-controller="Series"
-                       asp-action="Create"
-                       asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
-                       class="btn btn-outline-primary">
+                        asp-action="Create"
+                        asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)"
+                        class="btn btn-outline-primary">
                         <span class="fas fa-plus"></span>
                         <span>@localizer["New Series"]</span>
                     </a>
@@ -50,9 +41,9 @@
                     <ul class="dropdown-menu">
                         <li>
                             <a class="dropdown-item"
-                               asp-action="CreateMultiple"
-                               asp-controller="Series"
-                               asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">
+                                asp-action="CreateMultiple"
+                                asp-controller="Series"
+                                asp-route-returnUrl="@settingsService.GetPreferredUri(Context.Request)">
                                 Create Multiple...
                             </a>
                         </li>
@@ -62,92 +53,115 @@
         </div>
         <br />
     }
-    @{
-        var firstSeason = true;
-    }
-    @foreach (var item in Model.List.GroupBy(s => s.Season?.Name ?? String.Empty, s => s))
-    {
-        <div class="row align-items-center">
-            <div class="col-6 col-md-8 mx-n2" id="@item.FirstOrDefault()?.Season?.UrlName">
-                <h2 class="h1">@item.Key<small> season</small></h2>
-            </div>
-            @if (firstSeason)
-            {
-                <div class="col-6 col-md-4 d-flex justify-content-end">
-                    <select id="sort-order" class="form-select form-select-sm" onchange="sortSeries()">
-                        <option selected disabled>Sort by</option>
-                        <option value="name">Name</option>
-                        <option value="startdate">Start Date</option>
-                        <option value="enddate">End Date</option>
-                    </select>
-                </div>
-                firstSeason = false;
-            }
-        </div>
-        var fleetList = item.GroupBy(s => s.FleetName, s => s);
-        @foreach (var fleetGroup in fleetList)
-        {
-            <div class="row">
-                <div class="col-12">
-                    <h3>@fleetGroup.Key</h3>
-                </div>
-            </div>
-            <div class="series-list">
-            @foreach (var series in fleetGroup)
-            {
-                var startDate = series.Races?.Where(r => r.Date.HasValue).Min(r => r.Date);
-                var endDate = series.Races?.Where(r => r.Date.HasValue).Max(r => r.Date);
-                <div class="row border-bottom mb-1 pb-1 ms-2 series-row" 
-                     data-name="@series.Name" 
-                     data-startdate="@(startDate?.ToString("yyyy-MM-dd") ?? "")" 
-                     data-enddate="@(endDate?.ToString("yyyy-MM-dd") ?? "")">
-                    <div class="col-md-5 col-lg-7">
-                        <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
-                        @if(series.RaceCount.HasValue) {
-                            <span class="avoidwrap">(@series.RaceCount @(series.RaceCount == 1 ? localizer["Race"] : localizer["Races"]))</span>
-                        }
-                        @if (!string.IsNullOrEmpty(series.Description))
-                        {
-                            <div><em>@Html.DisplayFor(modelItem => series.Description)</em></div>
-                        }
-                    </div>
 
-                    <div class="col-md-4 col-lg-3">
-                        <span class="small-on-small"><span class="avoidwrap">@series.StartDateString</span>
-                                @{
-                                    var endDateString = series.EndDateString;
-                                }
-                                @if (!String.IsNullOrWhiteSpace(endDateString))
-                                {
-                                   @: -
-                                   <span class="avoidwrap">@endDateString</span>
-                                }
-                      </span>
-                    </div>
-                        <div class="d-none d-md-flex col-md-3 col-lg-2 align-items-center">
-                        @if (series.UpdatedDate.HasValue)
-                        {
-                            <span class="updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
-                        }
-                        @if (series.Type == SeriesType.Summary)
-                        {
-                            <span class="badge bg-almost text-muted small ms-auto" title="@localizer["Summary"]">
-                              Σ<span class="visually-hidden">@localizer["Summary"]</span>
-                            </span>
-                        }
-                    </div>
-                </div>
+    @{
+        var seriesCount = Model.List?.Count() ?? 0;
+        var seasonCount = Model.List?.Select(s => s.Season?.Name ?? String.Empty).Where(n => !String.IsNullOrEmpty(n)).Distinct().Count() ?? 0;
+        var fleetCount = Model.List?.Select(s => s.FleetName ?? String.Empty).Where(n => !String.IsNullOrEmpty(n)).Distinct().Count() ?? 0;
+        var availableGroupingOptions = new List<string>();
+        if (seasonCount > 1) { availableGroupingOptions.Add("season"); }
+        if (fleetCount > 1) { availableGroupingOptions.Add("fleet"); }
+        var showGroupingControls = seriesCount > 10 && availableGroupingOptions.Count > 0;
+    }
+    <div class="row align-items-center mb-3 g-2">
+        <div class="col-md-4">
+            <h2 class="h1 mb-0">@localizer["Series"]</h2>
+        </div>
+        <div class="col-md-8 d-flex justify-content-md-end align-items-center flex-wrap gap-2">
+            @if (showGroupingControls)
+            {
+                <span class="text-muted small">Group by</span>
+                <div id="group-order" class="d-flex flex-wrap align-items-center gap-2"></div>
             }
+
+            <div class="d-flex align-items-center flex-nowrap gap-2">
+                <label class="form-label mb-0" for="sort-order">Sort</label>
+                <select id="sort-order" class="form-select form-select-sm" style="max-width: 170px;" onchange="updateSeriesView()">
+                    <option value="name">Name</option>
+                    <option value="startdate">Start Date</option>
+                    <option value="enddate">End Date</option>
+                    <option value="mostrecent">Most Recent</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="series-groups">
+        @foreach (var series in Model.List)
+        {
+            var startDateValue = series.StartDate ?? series.Races?
+                .Where(r => r.Date.HasValue)
+                .Select(r => DateOnly.FromDateTime(r.Date.Value))
+                .DefaultIfEmpty()
+                .Min();
+            var endDateValue = series.EndDate ?? series.Races?
+                .Where(r => r.Date.HasValue)
+                .Select(r => DateOnly.FromDateTime(r.Date.Value))
+                .DefaultIfEmpty()
+                .Max();
+            var raceDateCsv = string.Join(",", (series.Races ?? new List<Race>())
+                .Where(r => r.Date.HasValue)
+                .Select(r => DateOnly.FromDateTime(r.Date.Value).ToString("yyyy-MM-dd"))
+                .Distinct()
+                .OrderBy(date => date));
+
+            <div class="row border-bottom mb-1 pb-1 ms-2 series-row"
+                  data-name="@series.Name"
+                  data-season="@(series.Season?.Name ?? String.Empty)"
+                  data-season-startdate="@(series.Season?.Start.ToString("yyyy-MM-dd") ?? String.Empty)"
+                  data-season-url="@(series.Season?.UrlName ?? String.Empty)"
+                  data-fleet="@(series.FleetName ?? String.Empty)"
+                  data-startdate="@(startDateValue?.ToString("yyyy-MM-dd") ?? String.Empty)"
+                  data-enddate="@(endDateValue?.ToString("yyyy-MM-dd") ?? String.Empty)"
+                  data-race-dates="@raceDateCsv">
+                <div class="col-md-5 col-lg-7">
+                    <a href="~/@Model.ClubInitials/@series.Season.UrlName/@series.UrlName">@Html.DisplayFor(modelItem => series.Name)</a>
+                    @if (series.RaceCount.HasValue)
+                    {
+                        <span class="avoidwrap">(@series.RaceCount @(series.RaceCount == 1 ? localizer["Race"] : localizer["Races"]))</span>
+                    }
+                    @if (!string.IsNullOrEmpty(series.Description))
+                    {
+                        <div><em>@Html.DisplayFor(modelItem => series.Description)</em></div>
+                    }
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <span class="small-on-small"><span class="avoidwrap">@series.StartDateString</span>
+                        @{
+                            var endDateString = series.EndDateString;
+                        }
+                        @if (!String.IsNullOrWhiteSpace(endDateString))
+                        {
+                            @: -
+                            <span class="avoidwrap">@endDateString</span>
+                        }
+                    </span>
+                </div>
+                <div class="d-none d-md-flex col-md-3 col-lg-2 align-items-center">
+                    @if (series.UpdatedDate.HasValue)
+                    {
+                        <span class="updated-date">@localizer["Updated"] @(series.UpdatedDate.Value.ToString("d"))</span>
+                    }
+                    @if (series.Type == SeriesType.Summary)
+                    {
+                        <span class="badge bg-almost text-muted small ms-auto" title="@localizer["Summary"]">
+                            Σ<span class="visually-hidden">@localizer["Summary"]</span>
+                        </span>
+                    }
+                </div>
             </div>
         }
-
-        <br />
-    }
+    </div>
 </div>
 
-@section Scripts {
+    @section Scripts {
 <script>
-    // Cookie helper functions
+    window.seriesGroupingOptions = {
+        season: @((seasonCount > 1).ToString().ToLowerInvariant()),
+        fleet: @((fleetCount > 1).ToString().ToLowerInvariant())
+    };
+
     function setCookie(name, value, days) {
         var expires = "";
         if (days) {
@@ -157,66 +171,463 @@
         }
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
-    
+
     function getCookie(name) {
         var nameEQ = name + "=";
         var ca = document.cookie.split(';');
         for (var i = 0; i < ca.length; i++) {
             var c = ca[i];
-            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            while (c.charAt(0) === ' ') { c = c.substring(1, c.length); }
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
         }
         return null;
     }
-    
-    function sortSeries() {
+
+    function getAvailableGroupKeys() {
+        var keys = [];
+        if (window.seriesGroupingOptions.season) {
+            keys.push('season');
+        }
+        if (window.seriesGroupingOptions.fleet) {
+            keys.push('fleet');
+        }
+        return keys;
+    }
+
+    function getSelectedGroups() {
+        var saved = getCookie('seriesGroupOrder');
+        var keys = getAvailableGroupKeys();
+
+        if (saved === 'none') {
+            return [];
+        }
+
+        if (saved === null || saved === '') {
+            if (keys.length === 0) {
+                return [];
+            }
+            return [keys[0]];
+        }
+
+        var parsed = saved.split(',').map(function (value) {
+            return value.trim();
+        }).filter(function (value) {
+            return !!value && keys.indexOf(value) >= 0;
+        });
+
+        if (parsed.length === 0 && keys.length > 0) {
+            return [keys[0]];
+        }
+
+        return parsed;
+    }
+
+    function persistSelectedGroups(selectedGroups) {
+        var groupOrder = selectedGroups.join(',');
+        if (groupOrder) {
+            setCookie('seriesGroupOrder', groupOrder, 365);
+        } else {
+            setCookie('seriesGroupOrder', 'none', 365);
+        }
+    }
+
+    function getGroupLabel(groupKey) {
+        if (groupKey === 'season') return 'Season';
+        if (groupKey === 'fleet') return 'Fleet';
+        return 'None';
+    }
+
+    function getGroupValue(row, groupKey) {
+        if (groupKey === 'season') {
+            return $(row).data('season') || 'No Season';
+        }
+
+        if (groupKey === 'fleet') {
+            return $(row).data('fleet') || 'No Fleet';
+        }
+
+        return 'All';
+    }
+
+    function sanitizeGroupId(value) {
+        return String(value || '')
+            .normalize('NFKD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9\s-]/g, '')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '') || 'group';
+    }
+
+    function getGroupAnchorId(groupKey, groupLabel) {
+        return 'series-group-' + groupKey + '-' + sanitizeGroupId(groupLabel);
+    }
+
+    function getDateValue(value) {
+        if (!value) return null;
+        var date = new Date(value + 'T00:00:00');
+        if (isNaN(date.getTime())) return null;
+        return date;
+    }
+
+    function getMostRecentSortValue(row) {
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        var candidateDates = ($(row).data('race-dates') || '')
+            .split(',')
+            .map(function (value) { return value.trim(); })
+            .filter(function (value) { return !!value; })
+            .concat([$(row).data('enddate'), $(row).data('startdate')])
+            .filter(function (value) { return !!value; })
+            .map(getDateValue)
+            .filter(function (value) { return !!value; });
+
+        if (candidateDates.length === 0) {
+            return { bucket: 2, difference: Number.MAX_SAFE_INTEGER };
+        }
+
+        var pastDates = candidateDates.filter(function (date) {
+            return date <= today;
+        });
+
+        if (pastDates.length > 0) {
+            var closestPastDate = pastDates.reduce(function (closest, current) {
+                return current > closest ? current : closest;
+            }, pastDates[0]);
+
+            return {
+                bucket: 0,
+                difference: Math.floor((today - closestPastDate) / 86400000)
+            };
+        }
+
+        var futureDates = candidateDates.filter(function (date) {
+            return date > today;
+        });
+        var closestFutureDate = futureDates.reduce(function (closest, current) {
+            return current < closest ? current : closest;
+        }, futureDates[0]);
+
+        return {
+            bucket: 1,
+            difference: Math.ceil((closestFutureDate - today) / 86400000)
+        };
+    }
+
+    function compareSeriesRows(a, b, selectedSort) {
+        if (selectedSort === 'startdate' || selectedSort === 'enddate') {
+            var contentA = $(a).data(selectedSort);
+            var contentB = $(b).data(selectedSort);
+
+            if (!contentA && !contentB) return 0;
+            if (!contentA) return 1;
+            if (!contentB) return -1;
+
+            return contentA.localeCompare(contentB);
+        }
+
+        if (selectedSort === 'mostrecent') {
+            var sortA = getMostRecentSortValue(a);
+            var sortB = getMostRecentSortValue(b);
+
+            if (sortA.bucket !== sortB.bucket) {
+                return sortA.bucket - sortB.bucket;
+            }
+
+            if (sortA.difference !== sortB.difference) {
+                return sortA.difference - sortB.difference;
+            }
+        }
+
+        var contentA = $(a).data('name');
+        var contentB = $(b).data('name');
+        return String(contentA).localeCompare(String(contentB));
+    }
+
+    function sortRows(rows, selectedSort) {
+        var sortedRows = rows.slice().sort(function (a, b) {
+            return compareSeriesRows(a, b, selectedSort);
+        });
+
+        var pastRows = [];
+        var futureRows = [];
+
+        sortedRows.forEach(function (row) {
+            var isFutureRow = selectedSort === 'mostrecent'
+                ? getMostRecentSortValue(row).bucket > 0
+                : (!$(row).data('startdate') && !$(row).data('enddate') && !$(row).data('mostrecent'));
+
+            if (isFutureRow) {
+                futureRows.push(row);
+            } else {
+                pastRows.push(row);
+            }
+        });
+
+        return pastRows.concat(futureRows);
+    }
+
+    function renderGroupingControls() {
+        var container = $('#group-order');
+        if (!container.length) {
+            return;
+        }
+
+        var selectedGroups = getSelectedGroups();
+        var availableGroups = getAvailableGroupKeys();
+
+        container.empty();
+
+        var noneButton = $('<button type="button" class="btn btn-sm btn-outline-secondary" aria-label="No grouping"></button>')
+            .text('None')
+            .toggleClass('active', selectedGroups.length === 0)
+            .addClass(selectedGroups.length === 0 ? 'btn-primary' : 'btn-outline-secondary');
+
+        noneButton.on('click', function () {
+            persistSelectedGroups([]);
+            renderGroupingControls();
+            renderSeriesGroups($('.series-row').get());
+        });
+        container.append(noneButton);
+
+        selectedGroups.forEach(function (groupKey, index) {
+            var chip = $('<div class="btn-group btn-group-sm" role="group"></div>');
+            var labelButton = $('<button type="button" class="btn btn-primary"></button>')
+                .text(getGroupLabel(groupKey));
+            labelButton.on('click', function () {
+                var nextGroups = selectedGroups.filter(function (value) {
+                    return value !== groupKey;
+                });
+                persistSelectedGroups(nextGroups);
+                renderGroupingControls();
+                renderSeriesGroups($('.series-row').get());
+            });
+
+            chip.append(labelButton);
+
+            if (selectedGroups.length > 1) {
+                var moveUpButton = $('<button type="button" class="btn btn-outline-secondary" aria-label="Move group up">↑</button>');
+                moveUpButton.prop('disabled', index === 0);
+                moveUpButton.on('click', function () {
+                    if (index === 0) return;
+                    var reordered = selectedGroups.slice();
+                    var previous = reordered[index - 1];
+                    reordered[index - 1] = groupKey;
+                    reordered[index] = previous;
+                    persistSelectedGroups(reordered);
+                    renderGroupingControls();
+                    renderSeriesGroups($('.series-row').get());
+                });
+                chip.append(moveUpButton);
+
+                var moveDownButton = $('<button type="button" class="btn btn-outline-secondary" aria-label="Move group down">↓</button>');
+                moveDownButton.prop('disabled', index === selectedGroups.length - 1);
+                moveDownButton.on('click', function () {
+                    if (index === selectedGroups.length - 1) return;
+                    var reordered = selectedGroups.slice();
+                    var next = reordered[index + 1];
+                    reordered[index + 1] = groupKey;
+                    reordered[index] = next;
+                    persistSelectedGroups(reordered);
+                    renderGroupingControls();
+                    renderSeriesGroups($('.series-row').get());
+                });
+                chip.append(moveDownButton);
+            }
+
+            container.append(chip);
+        });
+
+        availableGroups.filter(function (groupKey) {
+            return selectedGroups.indexOf(groupKey) === -1;
+        }).forEach(function (groupKey) {
+            var addButton = $('<button type="button" class="btn btn-sm btn-outline-secondary"></button>')
+                .text('+ ' + getGroupLabel(groupKey));
+            addButton.on('click', function () {
+                var nextGroups = selectedGroups.slice();
+                nextGroups.push(groupKey);
+                persistSelectedGroups(nextGroups);
+                renderGroupingControls();
+                renderSeriesGroups($('.series-row').get());
+            });
+            container.append(addButton);
+        });
+    }
+
+    function getGroupSortValue(groupKey, groupRows) {
+        if (groupKey !== 'season') {
+            return null;
+        }
+
+        var values = [];
+        groupRows.forEach(function (row) {
+            var value = $(row).data('season-startdate');
+            if (value) {
+                values.push(new Date(value + 'T00:00:00').getTime());
+            }
+        });
+
+        if (values.length === 0) {
+            return 0;
+        }
+
+        return Math.max.apply(null, values);
+    }
+
+    function renderGroupSidebar(rows) {
+        var sidebar = $('#group-sidebar');
+        if (!sidebar.length) {
+            return;
+        }
+
+        var selectedGroups = getSelectedGroups();
+        var primaryGroupKey = selectedGroups.length > 0 ? selectedGroups[0] : null;
+        if (!primaryGroupKey) {
+            sidebar.empty();
+            sidebar.addClass('d-none');
+            return;
+        }
+
+        var primaryGroups = new Map();
+        rows.forEach(function (row) {
+            var key = getGroupValue(row, primaryGroupKey);
+            if (!primaryGroups.has(key)) {
+                primaryGroups.set(key, []);
+            }
+            primaryGroups.get(key).push(row);
+        });
+
+        var orderedGroups = Array.from(primaryGroups.entries())
+            .sort(function (a, b) {
+                if (primaryGroupKey === 'season') {
+                    return getGroupSortValue(primaryGroupKey, b[1]) - getGroupSortValue(primaryGroupKey, a[1]);
+                }
+                return String(a[0]).localeCompare(String(b[0]));
+            });
+
+        sidebar.empty();
+        sidebar.removeClass('d-none');
+
+        orderedGroups.forEach(function (entry) {
+            var label = entry[0];
+            var anchorId = getGroupAnchorId(primaryGroupKey, label);
+            var link = $('<a></a>')
+                .addClass('nav-link rounded px-2 py-1 small fw-semibold')
+                .attr('href', '#' + anchorId)
+                .text(label);
+            sidebar.append(link);
+        });
+    }
+
+    function renderSeriesGroups(rows) {
+        var container = $('#series-groups');
+        container.empty();
+
         var selectedSort = $('#sort-order').val();
-        
-        // Save sort preference to cookie (only if not 'name')
+        var selectedGroups = getSelectedGroups();
+        var primaryGroupKey = selectedGroups.length > 0 ? selectedGroups[0] : null;
+        var secondaryGroupKey = selectedGroups.length > 1 ? selectedGroups[1] : null;
+
+        if (!primaryGroupKey) {
+            sortRows(rows, selectedSort).forEach(function (row) {
+                container.append(row);
+            });
+            renderGroupSidebar(rows);
+            return;
+        }
+
+        var primaryGroups = new Map();
+        rows.forEach(function (row) {
+            var key = getGroupValue(row, primaryGroupKey);
+            if (!primaryGroups.has(key)) {
+                primaryGroups.set(key, []);
+            }
+            primaryGroups.get(key).push(row);
+        });
+
+        Array.from(primaryGroups.entries())
+            .sort(function (a, b) {
+                if (primaryGroupKey === 'season') {
+                    return getGroupSortValue(primaryGroupKey, b[1]) - getGroupSortValue(primaryGroupKey, a[1]);
+                }
+                return String(a[0]).localeCompare(String(b[0]));
+            })
+            .forEach(function (entry) {
+                var groupLabel = entry[0];
+                var groupRows = entry[1];
+                var orderedGroupRows = sortRows(groupRows, selectedSort);
+                var groupAnchorId = getGroupAnchorId(primaryGroupKey, groupLabel);
+
+                var groupHeader = $('<div class="row align-items-center mt-3"></div>');
+                groupHeader.append($('<div class="col-12"><h3 id="' + groupAnchorId + '" class="mb-1">' + groupLabel + '</h3></div>'));
+                container.append(groupHeader);
+
+                if (!secondaryGroupKey) {
+                    orderedGroupRows.forEach(function (row) {
+                        container.append(row);
+                    });
+                    return;
+                }
+
+                var secondaryGroups = new Map();
+                orderedGroupRows.forEach(function (row) {
+                    var key = getGroupValue(row, secondaryGroupKey);
+                    if (!secondaryGroups.has(key)) {
+                        secondaryGroups.set(key, []);
+                    }
+                    secondaryGroups.get(key).push(row);
+                });
+
+                Array.from(secondaryGroups.entries())
+                    .sort(function (a, b) {
+                        if (secondaryGroupKey === 'season') {
+                            return getGroupSortValue(secondaryGroupKey, b[1]) - getGroupSortValue(secondaryGroupKey, a[1]);
+                        }
+                        return String(a[0]).localeCompare(String(b[0]));
+                    })
+                    .forEach(function (secondaryEntry) {
+                        var secondaryLabel = secondaryEntry[0];
+                        var secondaryRows = secondaryEntry[1];
+                        var secondaryAnchorId = getGroupAnchorId(secondaryGroupKey, secondaryLabel);
+                        var secondaryHeader = $('<div class="row ms-2 mt-2"></div>');
+                        secondaryHeader.append($('<div class="col-12"><h4 id="' + secondaryAnchorId + '" class="h5 mb-1">' + secondaryLabel + '</h4></div>'));
+                        container.append(secondaryHeader);
+                        secondaryRows.forEach(function (row) {
+                            container.append(row);
+                        });
+                    });
+            });
+
+        renderGroupSidebar(rows);
+    }
+
+    function updateSeriesView() {
+        var selectedSort = $('#sort-order').val();
+
         if (selectedSort !== 'name') {
             setCookie('seriesSortPreference', selectedSort, 365);
         } else {
-            // Remove cookie if sorting by name (default)
             setCookie('seriesSortPreference', '', -1);
         }
-        
-        // Sort each series-list container independently
-        $('.series-list').each(function() {
-            var container = $(this);
-            var result = container.find('.series-row').sort(function (a, b) {
-                var contentA, contentB;
-                
-                if (selectedSort === 'startdate' || selectedSort === 'enddate') {
-                    contentA = $(a).data(selectedSort);
-                    contentB = $(b).data(selectedSort);
-                    
-                    // Handle empty dates (series with no races)
-                    if (!contentA && !contentB) return 0;
-                    if (!contentA) return 1;
-                    if (!contentB) return -1;
-                    
-                    // Compare dates as strings in yyyy-MM-dd format
-                    return contentA.localeCompare(contentB);
-                } else {
-                    // Sort by name
-                    contentA = $(a).data('name');
-                    contentB = $(b).data('name');
-                    return String(contentA).localeCompare(contentB);
-                }
-            });
-            
-            container.empty();
-            container.append(result);
-        });
+
+        renderGroupingControls();
+        renderSeriesGroups($('.series-row').get());
     }
-    
-    // Load sort preference from cookie
-    var savedSort = getCookie('seriesSortPreference');
-    if (savedSort) {
-        $('#sort-order').val(savedSort);
-    }
-    
-    // Initial sort
-    sortSeries();
+
+    $(function () {
+        var savedSort = getCookie('seriesSortPreference');
+        if (savedSort) {
+            $('#sort-order').val(savedSort);
+        }
+
+        if (window.seriesGroupingOptions.season || window.seriesGroupingOptions.fleet) {
+            renderGroupingControls();
+        }
+
+        updateSeriesView();
+    });
 </script>
 }

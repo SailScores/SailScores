@@ -52,16 +52,14 @@
     </environment>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 
-
+    @inject OpenTelemetryJavaScriptService OpenTelemetryService
     @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
-        var aiSnippet = Context.RequestServices.GetService(
-            typeof(Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet))
-            as Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet;
-        @if ((user?.EnableAppInsights ?? false) && aiSnippet is not null)
+        @if (user?.EnableAppInsights == true)
         {
-            @Html.Raw(aiSnippet.FullScript)
+            <!-- OpenTelemetry client-side telemetry for opt-in users -->
+            @Html.Raw(OpenTelemetryService.GetInitializationScript())
         }
     }
 </head>
@@ -122,7 +120,8 @@
                 <div class="col-12 col-sm-6">
                     <small>
                         &copy; 2018&ndash;2026 &ndash; J. Fraser &ndash;
-                        <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                        <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a> &ndash;
+                        <a asp-area="" asp-controller="Home" asp-action="TermsOfService">Terms of Service</a>
                     </small>
                 </div>
                 <div class="col-12 col-sm-6 text-sm-end">

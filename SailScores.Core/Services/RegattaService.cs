@@ -89,6 +89,8 @@ namespace SailScores.Core.Services
                 //.ThenInclude(cf => cf.Competitor)
                 .Include(r => r.RegattaSeries)
                 .ThenInclude(rs => rs.Series)
+                .ThenInclude(s => s.SeriesResultsTemplate)
+                .ThenInclude(t => t.CustomFields)
                 .Include(r => r.Season)
                 .Include(r => r.Announcements)
                 .AsSplitQuery()
@@ -96,6 +98,25 @@ namespace SailScores.Core.Services
                 .ConfigureAwait(false);
 
             var fullRegatta = _mapper.Map<Regatta>(regattaDb);
+
+            // Load club defaults for template fallback
+            var club = await _dbContext
+                .Clubs
+                .Where(c => c.Id == regattaDb.ClubId)
+                .Select(c => new
+                {
+                    DefaultSeriesResultsTemplateId = c.DefaultSeriesResultsTemplateId,
+                    DefaultRegattaSeriesResultsTemplateId = c.DefaultRegattaSeriesResultsTemplateId
+                })
+                .SingleAsync()
+                .ConfigureAwait(false);
+
+            var defaultRegattaTemplate = club.DefaultRegattaSeriesResultsTemplateId.HasValue
+                ? await _dbContext.SeriesResultsTemplates
+                    .Where(t => t.Id == club.DefaultRegattaSeriesResultsTemplateId)
+                    .SingleOrDefaultAsync()
+                    .ConfigureAwait(false)
+                : null;
 
             fullRegatta.Documents = await _dbContext.Documents.Where(
                 d => d.RegattaId == regattaId)
@@ -131,6 +152,12 @@ namespace SailScores.Core.Services
                 series.FlatResults = await _seriesService.GetHistoricalResults(series)
                     .ConfigureAwait(false);
                 series.PreferAlternativeSailNumbers = fullRegatta.PreferAlternateSailNumbers;
+
+                // Apply default regatta template if series template is not set
+                if (series.SeriesResultsTemplate == null && defaultRegattaTemplate != null)
+                {
+                    series.SeriesResultsTemplate = _mapper.Map<SeriesResultsTemplate>(defaultRegattaTemplate);
+                }
             }
             return fullRegatta;
         }

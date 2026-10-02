@@ -43,9 +43,10 @@ using WebMarkupMin.AspNetCoreLatest;
 using Microsoft.Extensions.Hosting;
 using MailChimp.Net.Interfaces;
 using MailChimp.Net;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using SailScores.Web.Resources;
 using SailScores.Web.Authorization;
+using OpenTelemetry.Trace;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 
 namespace SailScores.Web;
 
@@ -352,21 +353,49 @@ public class Startup
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
-#if !DEBUG
-        services.AddApplicationInsightsTelemetry(options =>
-        {
-            options.ConnectionString = Configuration["ApplicationInsights:ConnectionString"];
-            options.EnableRequestTrackingTelemetryModule = true;
-        });
-#endif
+        // Configure OpenTelemetry with Azure Monitor exporter and adaptive error-preserving sampler
+        // The Azure Monitor extension sends telemetry to Application Insights.
+        // The connection string is read from APPLICATIONINSIGHTS__CONNECTIONSTRING environment variable.
 
-        services.AddHttpContextAccessor();
+        // Get sampling configuration
+        var targetTracesPerMinute = Configuration.GetValue("OpenTelemetry:TargetTracesPerMinute", 3000);
+        var windowSeconds = Configuration.GetValue("OpenTelemetry:WindowSeconds", 60);
+
+        // Get connection string from environment variable
+        var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS__CONNECTIONSTRING")
+            ?? Configuration.GetConnectionString("ApplicationInsights")
+            ?? Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
+
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+
+            // Add OpenTelemetry with Azure Monitor exporter
+            services
+                .AddOpenTelemetry()
+                .UseAzureMonitor(options =>
+                {
+                    // Explicitly set connection string if available
+                    if (!string.IsNullOrEmpty(connectionString))
+                    {
+                        options.ConnectionString = connectionString;
+                    }
+                })
+                .WithTracing(builder =>
+                {
+                    // Apply our adaptive sampler that preserves errors while maintaining target rate
+                    builder.SetSampler(new AdaptiveErrorPreservingSampler(targetTracesPerMinute, windowSeconds));
+                });
+
+
+            services.AddHttpContextAccessor();
+        }
     }
 
     private void RegisterBackgroundQueueServices(IServiceCollection services)
     {
         services.AddHostedService<QueuedHostedService>();
         services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        services.AddSingleton<OpenTelemetryJavaScriptService>();
     }
 
     private void RegisterSailScoresServices(IServiceCollection services)
