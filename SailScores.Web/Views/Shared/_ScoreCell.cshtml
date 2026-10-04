@@ -78,7 +78,7 @@
                 
                     <span data-bs-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
                 } else {
-                    @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))
+                    @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("0.##"))
                 }
                 @if (Model.Result.Discard)
                 {
