@@ -76,7 +76,7 @@
                         Model.Result.Place.Value.Ordinalize() :
                     $"of {Model.Result.PerfectScoreValue.Value}&#010;{Model.Result.Place.Value.Ordinalize()}";
                 
-                    <span data-bs-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("N1"))</span>
+                    <span data-bs-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("0.##"))</span>
                 } else {
                     @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("0.##"))
                 }
