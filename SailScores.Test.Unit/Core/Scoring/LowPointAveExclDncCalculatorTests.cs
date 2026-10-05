@@ -168,6 +168,84 @@ namespace SailScores.Test.Unit.Core.Scoring
         }
 
         [Fact]
+        public void DiscardScores_DiscardHighestScores_NotLowestScores()
+        {
+            // Arrange - 2 races with 1 discard allowed; the worst result should be discarded.
+            var system = MakeScoringSystem();
+            system.DiscardPattern = "0,1";
+            var competitor1 = new Competitor { Id = Guid.NewGuid(), Name = "Competitor 1" };
+            var competitor2 = new Competitor { Id = Guid.NewGuid(), Name = "Competitor 2" };
+            var race1 = new Race { Id = Guid.NewGuid(), Name = "Race 1", Order = 1, Date = DateTime.UtcNow.AddDays(1), Scores = new List<Score>() };
+            var race2 = new Race { Id = Guid.NewGuid(), Name = "Race 2", Order = 2, Date = DateTime.UtcNow.AddDays(2), Scores = new List<Score>() };
+
+            race1.Scores.Add(new Score { Competitor = competitor1, Race = race1, Place = 1, Code = null });
+            race1.Scores.Add(new Score { Competitor = competitor2, Race = race1, Place = 2, Code = null });
+            race2.Scores.Add(new Score { Competitor = competitor1, Race = race2, Place = 3, Code = null });
+            race2.Scores.Add(new Score { Competitor = competitor2, Race = race2, Place = 1, Code = null });
+
+            var series = new Series
+            {
+                Id = Guid.NewGuid(),
+                Name = "Discard Test Series",
+                Races = new List<Race> { race1, race2 },
+                Competitors = new List<Competitor> { competitor1, competitor2 },
+                ScoringSystem = system,
+                Results = null
+            };
+
+            _calculator = new LowPointAveExclDncCalculator(system);
+
+            // Act
+            var results = _calculator.CalculateResults(series);
+
+            // Assert - worst score (3rd) is discarded for competitor 1; worst score (2nd) is discarded for competitor 2.
+            Assert.True(results.Results[competitor1].CalculatedScores[race2].Discard);
+            Assert.False(results.Results[competitor1].CalculatedScores[race1].Discard);
+            Assert.True(results.Results[competitor2].CalculatedScores[race1].Discard);
+            Assert.False(results.Results[competitor2].CalculatedScores[race2].Discard);
+        }
+
+        [Fact]
+        public void LowPointAverageInclDnc_DiscardHighestScores()
+        {
+            // Arrange - standard low-point average follows the same Appendix A discard behavior.
+            var system = MakeScoringSystem();
+            system.Name = "Low Point Average";
+            system.DiscardPattern = "0,1";
+
+            var competitor1 = new Competitor { Id = Guid.NewGuid(), Name = "Competitor 1" };
+            var competitor2 = new Competitor { Id = Guid.NewGuid(), Name = "Competitor 2" };
+            var race1 = new Race { Id = Guid.NewGuid(), Name = "Race 1", Order = 1, Date = DateTime.UtcNow.AddDays(1), Scores = new List<Score>() };
+            var race2 = new Race { Id = Guid.NewGuid(), Name = "Race 2", Order = 2, Date = DateTime.UtcNow.AddDays(2), Scores = new List<Score>() };
+
+            race1.Scores.Add(new Score { Competitor = competitor1, Race = race1, Place = 1, Code = null });
+            race1.Scores.Add(new Score { Competitor = competitor2, Race = race1, Place = 2, Code = null });
+            race2.Scores.Add(new Score { Competitor = competitor1, Race = race2, Place = 3, Code = null });
+            race2.Scores.Add(new Score { Competitor = competitor2, Race = race2, Place = 1, Code = null });
+
+            var series = new Series
+            {
+                Id = Guid.NewGuid(),
+                Name = "Low Point Average Discard Test",
+                Races = new List<Race> { race1, race2 },
+                Competitors = new List<Competitor> { competitor1, competitor2 },
+                ScoringSystem = system,
+                Results = null
+            };
+
+            var calculator = new LowPointAveInclDncCalculator(system);
+
+            // Act
+            var results = calculator.CalculateResults(series);
+
+            // Assert
+            Assert.True(results.Results[competitor1].CalculatedScores[race2].Discard);
+            Assert.False(results.Results[competitor1].CalculatedScores[race1].Discard);
+            Assert.True(results.Results[competitor2].CalculatedScores[race1].Discard);
+            Assert.False(results.Results[competitor2].CalculatedScores[race2].Discard);
+        }
+
+        [Fact]
         public void CalculateResults_SameAverage_BreaksTiesCorrectly()
         {
             // Arrange: 4 races, 4 competitors

@@ -124,7 +124,8 @@ namespace SailScores.Core.Scoring
         {
             int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress, compResults);
 
-            var compResultsOrdered = compResults.CalculatedScores.Values.OrderBy(s => s.ScoreValue / s.PerfectScoreValue)
+            var compResultsOrdered = compResults.CalculatedScores.Values
+                .OrderByDescending(s => s.ScoreValue / s.PerfectScoreValue)
                 .ThenBy(s => s.RawScore.Race.Date)
                 .ThenBy(s => s.RawScore.Race.Order)
                 .Where(s => CameToStart(s.RawScore) && (GetScoreCode(s.RawScore)?.Discardable ?? true));
