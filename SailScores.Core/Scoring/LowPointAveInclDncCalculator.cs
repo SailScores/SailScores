@@ -59,7 +59,7 @@ namespace SailScores.Core.Scoring
 
                 var racesParticipated = compResults.CalculatedScores
                     .Where(s => CountsAsStarted(s.Value.RawScore) ||
-                           CountsAsParticipation(s.Value.RawScore)).Count();
+                            CountsAsParticipation(s.Value.RawScore)).Count();
                 compResults.ParticipationPercent = racesParticipated * 100.0m / totalRaceCount;
                 var raceCount = compResults
                     .CalculatedScores.Values
@@ -82,6 +82,8 @@ namespace SailScores.Core.Scoring
 
                 }
             }
+
+            ApplyParticipationRequirement(results);
         }
 
         // There are two scenarios to handle for ties:

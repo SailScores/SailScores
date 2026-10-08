@@ -58,7 +58,7 @@ namespace SailScores.Core.Scoring
                 var compResults = results.Results[comp];
                 var racesParticipated = compResults.CalculatedScores
                     .Where(s => CountsAsStarted(s.Value.RawScore) ||
-                           CountsAsParticipation(s.Value.RawScore)).Count();
+                            CountsAsParticipation(s.Value.RawScore)).Count();
                 compResults.ParticipationPercent = racesParticipated * 100.0m / totalRaceCount;
                 var raceCount = compResults
                     .CalculatedScores.Values
@@ -81,6 +81,8 @@ namespace SailScores.Core.Scoring
                     }
                 }
             }
+
+            ApplyParticipationRequirement(results);
         }
 
         protected override void CalculateOverrides(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
