@@ -184,6 +184,7 @@ public class ReportService : Interfaces.IReportService
                     RacesParticipated = s.RacesParticipated,
                     TotalBoatClassRaces = s.TotalBoatClassRaces,
                     BoatsBeat = s.BoatsBeat,
+                    AveragePlace = s.AveragePlace,
                     ParticipationPercentage = s.ParticipationPercentage,
                     FirstRaceDate = s.FirstRaceDate,
                     LastRaceDate = s.LastRaceDate

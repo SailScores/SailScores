@@ -395,6 +395,13 @@ public class ReportService : IReportService
                     .Distinct()
                     .Count();
 
+                // Matches the competitor details page: average over finishing places only (coded scores excluded)
+                var places = g
+                    .Where(x => x.Score.Place.HasValue && x.Score.Place.Value > 0)
+                    .Select(x => (decimal)x.Score.Place.Value)
+                    .ToList();
+                decimal? averagePlace = places.Count > 0 ? places.Average() : null;
+
                 var raceDates = g.Where(x => x.Race.Date.HasValue)
                     .Select(x => x.Race.Date.Value)
                     .OrderBy(d => d)
@@ -410,6 +417,7 @@ public class ReportService : IReportService
                     RacesParticipated = racesParticipated,
                     TotalBoatClassRaces = totalBoatClassRaces,
                     BoatsBeat = boatsBeat,
+                    AveragePlace = averagePlace,
                     ParticipationPercentage = totalBoatClassRaces > 0
                         ? (decimal)racesParticipated / totalBoatClassRaces * 100
                         : 0,
