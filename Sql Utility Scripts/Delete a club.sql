@@ -111,6 +111,11 @@ FROM ScoringSystems
 WHERE ClubId = @ClubId
 
 
+PRINT N'Deleting Custom Views'
+DELETE
+FROM SeriesResultsTemplates
+WHERE ClubId = @ClubId
+
 
 PRINT N'Deleting Seasons'
 DELETE
