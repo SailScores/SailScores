@@ -66,6 +66,60 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
+        public async Task GetSkipperStatisticsAsync_WithFinishesAndCodedScore_AveragesFinishPlacesOnly()
+        {
+            // Arrange: seeded race has Comp1 in 1st; add a 4th place and a coded (no place) result
+            var competitor = _context.Competitors.First(c => c.Name == "Comp1");
+            var series = _context.Series.First(s => s.UrlName == "SeriesOne");
+            AddRace(competitor.Id, series, place: 4, code: null);
+            AddRace(competitor.Id, series, place: null, code: "DNF");
+            await _context.SaveChangesAsync();
+
+            // Act
+            var result = await _service.GetSkipperStatisticsAsync(_clubId);
+
+            // Assert
+            var stat = Assert.Single(result, s => s.CompetitorId == competitor.Id);
+            Assert.Equal(3, stat.RacesParticipated);
+            Assert.Equal(2.5m, stat.AveragePlace);
+        }
+
+        [Fact]
+        public async Task GetSkipperStatisticsAsync_WithOnlyCodedScores_ReturnsNullAveragePlace()
+        {
+            // Arrange
+            var competitor = _context.Competitors.First(c => c.Name == "Comp12");
+            var series = _context.Series.First(s => s.UrlName == "SeriesOne");
+            AddRace(competitor.Id, series, place: null, code: "DNC");
+            await _context.SaveChangesAsync();
+
+            // Act
+            var result = await _service.GetSkipperStatisticsAsync(_clubId);
+
+            // Assert
+            var stat = Assert.Single(result, s => s.CompetitorId == competitor.Id);
+            Assert.Null(stat.AveragePlace);
+        }
+
+        private void AddRace(Guid competitorId, Database.Entities.Series series, int? place, string code)
+        {
+            _context.Races.Add(new Database.Entities.Race
+            {
+                Id = Guid.NewGuid(),
+                Date = DateTime.Now,
+                ClubId = _clubId,
+                Scores = new System.Collections.Generic.List<Database.Entities.Score>
+                {
+                    new Database.Entities.Score { CompetitorId = competitorId, Place = place, Code = code }
+                },
+                SeriesRaces = new System.Collections.Generic.List<Database.Entities.SeriesRace>
+                {
+                    new Database.Entities.SeriesRace { Series = series }
+                }
+            });
+        }
+
+        [Fact]
         public async Task GetParticipationMetricsAsync_WithMonthGrouping_ReturnsData()
         {
             // Act

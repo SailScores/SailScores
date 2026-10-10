@@ -143,6 +143,8 @@ namespace SailScores.Core.Scoring
                     currentCompResults.TotalScore = currentCompResults.Average;
                 }
             }
+
+            ApplyParticipationRequirement(results);
         }
 
         protected override void DiscardScores(

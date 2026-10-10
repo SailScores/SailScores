@@ -69,6 +69,7 @@
                                 <th class="text-end">Races Participated</th>
                                 <th class="text-end">Total Class Races</th>
                                 <th class="text-end">Boats Beat</th>
+                                <th class="text-end">Average Place</th>
                                 <th class="text-end">Participation %</th>
                             </tr>
                         </thead>
@@ -83,6 +84,7 @@
                                     <td class="text-end">@stat.RacesParticipated</td>
                                     <td class="text-end">@stat.TotalBoatClassRaces</td>
                                     <td class="text-end">@stat.BoatsBeat</td>
+                                    <td class="text-end">@(stat.AveragePlace?.ToString("F3") ?? "")</td>
                                     <td class="text-end">@stat.ParticipationPercentage.ToString("F1")%</td>
                                 </tr>
                             }
@@ -122,7 +124,7 @@
                 pageLength: 25,
                 order: [[3, 'desc'],[0, 'asc']], // Sort by Races Participated descending
                 columnDefs: [
-                    { targets: [4, 5, 6, 7], className: 'text-end' }
+                    { targets: [4, 5, 6, 7, 8], className: 'text-end' }
                 ]
             });
         });

@@ -43,6 +43,7 @@ namespace SailScores.Test.Unit.Web.Services
                 _coreClubRequestServiceMock.Object,
                 _coreScoringServiceMock.Object,
                 _coreUserServiceMock.Object,
+                new Mock<SailScores.Core.Services.Interfaces.ISeriesResultsTemplateService>().Object,
                 _emailSenderMock.Object,
                 _configurationMock.Object,
                 _memoryCacheMock.Object,

@@ -48,6 +48,7 @@ public class SkipperStatistics
     public int RacesParticipated { get; set; }
     public int TotalBoatClassRaces { get; set; }
     public int BoatsBeat { get; set; }
+    public decimal? AveragePlace { get; set; }
     public decimal ParticipationPercentage { get; set; }
     public DateTime? FirstRaceDate { get; set; }
     public DateTime? LastRaceDate { get; set; }

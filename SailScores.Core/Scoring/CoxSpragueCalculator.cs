@@ -103,9 +103,9 @@ public class CoxSpragueCalculator : BaseScoringCalculator
             var currentCompResults = results.Results[comp];
             var racesParticipated = currentCompResults.CalculatedScores
                 .Where(s => CountsAsStarted(s.Value.RawScore) ||
-                       CountsAsParticipation(s.Value.RawScore)).Count();
+                    CountsAsParticipation(s.Value.RawScore)).Count();
             currentCompResults.ParticipationPercent = racesParticipated * 100.0m / raceCount;
-            
+
 
             // racesToExclude should include discards and DNCs
             var racesToExclude = currentCompResults
@@ -147,6 +147,8 @@ public class CoxSpragueCalculator : BaseScoringCalculator
                 currentCompResults.TotalScore = currentCompResults.Average;
             }
         }
+
+        ApplyParticipationRequirement(results);
     }
 
     // Discards for Cox-Sprague are not straight forward.

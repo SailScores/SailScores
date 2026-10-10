@@ -172,11 +172,11 @@ public class ReportsController : Controller
         var model = await _reportService.GetSkipperStatsAsync(clubInitials, startDate, endDate);
         
         var csv = new System.Text.StringBuilder();
-        csv.AppendLine("Competitor,Sail Number,Boat Class,Season,Races Participated,Total Boat Class Races,Boats Beat,Participation %");
-        
+        csv.AppendLine("Competitor,Sail Number,Boat Class,Season,Races Participated,Total Boat Class Races,Boats Beat,Average Place,Participation %");
+
         foreach (var item in model.SkipperStats)
         {
-            csv.AppendLine($"\"{item.CompetitorName}\",{item.SailNumber},{item.BoatClassName},{item.SeasonName},{item.RacesParticipated},{item.TotalBoatClassRaces},{item.BoatsBeat},{item.ParticipationPercentage:F1}");
+            csv.AppendLine($"\"{item.CompetitorName}\",{item.SailNumber},{item.BoatClassName},{item.SeasonName},{item.RacesParticipated},{item.TotalBoatClassRaces},{item.BoatsBeat},{item.AveragePlace:F3},{item.ParticipationPercentage:F1}");
         }
         
         var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());

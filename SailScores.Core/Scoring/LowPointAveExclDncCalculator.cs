@@ -58,7 +58,7 @@ namespace SailScores.Core.Scoring
                 var compResults = results.Results[comp];
                 var racesParticipated = compResults.CalculatedScores
                     .Where(s => CountsAsStarted(s.Value.RawScore) ||
-                           CountsAsParticipation(s.Value.RawScore)).Count();
+                            CountsAsParticipation(s.Value.RawScore)).Count();
                 compResults.ParticipationPercent = racesParticipated * 100.0m / totalRaceCount;
                 var raceCount = compResults
                     .CalculatedScores.Values
@@ -81,6 +81,8 @@ namespace SailScores.Core.Scoring
                     }
                 }
             }
+
+            ApplyParticipationRequirement(results);
         }
 
         protected override void CalculateOverrides(SeriesResults resultsWorkInProgress, SeriesCompetitorResults compResults)
@@ -124,7 +126,8 @@ namespace SailScores.Core.Scoring
         {
             int numOfDiscards = GetNumberOfDiscards(resultsWorkInProgress, compResults);
 
-            var compResultsOrdered = compResults.CalculatedScores.Values.OrderBy(s => s.ScoreValue / s.PerfectScoreValue)
+            var compResultsOrdered = compResults.CalculatedScores.Values
+                .OrderByDescending(s => s.ScoreValue / s.PerfectScoreValue)
                 .ThenBy(s => s.RawScore.Race.Date)
                 .ThenBy(s => s.RawScore.Race.Order)
                 .Where(s => CameToStart(s.RawScore) && (GetScoreCode(s.RawScore)?.Discardable ?? true));
