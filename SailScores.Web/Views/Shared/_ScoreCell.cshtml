@@ -13,19 +13,24 @@
     {
         classSb.Append("finish-first ");
     }
-    else if ((place == 2 || place == 3) && isTie && (scoreValue == 1.5m || scoreValue == 2.0m))
+    else if ((place == 2 || place == 3)
+        && isTie && (scoreValue == 1.5m || scoreValue == 2.0m))
     {
         classSb.Append("finish-first ");
     }
-    else if ((place == 2 || (scoreValue == 2m && !Model.IsPercentSystem)) && !hasCode && (scoreValue == 2m || scoreValue == 2.5m || scoreValue == 3.0m || Model.IsPercentSystem))
+    else if ((place == 2 || (scoreValue == 2m && !Model.IsPercentSystem))
+        && !hasCode && (scoreValue == 2m || scoreValue == 2.5m || scoreValue == 3.0m || Model.IsPercentSystem))
     {
         classSb.Append("finish-second ");
     }
-    else if ((place == 3 || place == 4) && isTie && (scoreValue == 2.5m || scoreValue == 3.0m))
+    else if ((place == 3 || place == 4)
+        && isTie && (scoreValue == 2.5m || scoreValue == 3.0m))
     {
         classSb.Append("finish-second ");
     }
-    else if ((place == 3 || (scoreValue == 3m && !Model.IsPercentSystem)) && !hasCode && (scoreValue == 3m || scoreValue == 3.5m || scoreValue == 4.0m || Model.IsPercentSystem))
+    else if ((place == 3 || (scoreValue == 3m && !Model.IsPercentSystem))
+        && !hasCode
+        && (scoreValue == 3m || scoreValue == 3.5m || scoreValue == 4.0m || Model.IsPercentSystem))
     {
         classSb.Append("finish-third ");
     }
