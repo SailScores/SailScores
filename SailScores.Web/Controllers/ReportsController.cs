@@ -176,7 +176,7 @@ public class ReportsController : Controller
 
         foreach (var item in model.SkipperStats)
         {
-            csv.AppendLine($"\"{item.CompetitorName}\",{item.SailNumber},{item.BoatClassName},{item.SeasonName},{item.RacesParticipated},{item.TotalBoatClassRaces},{item.BoatsBeat},{item.AveragePlace:F1},{item.ParticipationPercentage:F1}");
+            csv.AppendLine($"\"{item.CompetitorName}\",{item.SailNumber},{item.BoatClassName},{item.SeasonName},{item.RacesParticipated},{item.TotalBoatClassRaces},{item.BoatsBeat},{item.AveragePlace:F3},{item.ParticipationPercentage:F1}");
         }
         
         var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
