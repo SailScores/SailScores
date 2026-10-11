@@ -120,12 +120,28 @@
     
     <script>
         $(document).ready(function() {
+            // Remember the user's "Show N entries" choice across page reloads (e.g. date range changes).
+            var pageLengthKey = 'sailscores.reports.competitorStats.pageLength';
+            var lengthOptions = [10, 25, 50, 100, -1];
+            var pageLength = 25;
+            try {
+                var saved = parseInt(localStorage.getItem(pageLengthKey), 10);
+                if (lengthOptions.indexOf(saved) !== -1) {
+                    pageLength = saved;
+                }
+            } catch (e) { }
+
             $('#competitorTable').DataTable({
-                pageLength: 25,
+                pageLength: pageLength,
+                lengthMenu: [lengthOptions, [10, 25, 50, 100, 'All']],
                 order: [[3, 'desc'],[0, 'asc']], // Sort by Races Participated descending
                 columnDefs: [
                     { targets: [4, 5, 6, 7, 8], className: 'text-end' }
                 ]
+            }).on('length.dt', function (e, settings, len) {
+                try {
+                    localStorage.setItem(pageLengthKey, len);
+                } catch (e) { }
             });
         });
     </script>
