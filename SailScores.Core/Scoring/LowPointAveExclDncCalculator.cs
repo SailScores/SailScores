@@ -109,6 +109,11 @@ namespace SailScores.Core.Scoring
             );
         }
 
+        protected override bool IsExcludedFromSeries(ScoreCode scoreCode)
+        {
+            return ShouldExcludeScore(scoreCode);
+        }
+
         private bool ShouldExcludeScore(Score rawScore)
         {
             if (GetScoreCode(rawScore) is ScoreCode scoreCode)

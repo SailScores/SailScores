@@ -280,19 +280,7 @@ public class CoxSpragueCalculator : BaseScoringCalculator
     {
         var codeDef = GetScoreCode(code);
 
-        string possibleFormula;
-
-        if (CountsAsParticipation(codeDef) && !CameToStart(codeDef))
-        {
-            possibleFormula = "Participation but not scored.";
-        }
-        else if (!CameToStart(codeDef))
-        {
-            possibleFormula = "No participation, no score."; 
-        } else
-        {
-            possibleFormula = base.GetScoreCodeSummary(code).Formula;
-        }
+        var possibleFormula = base.GetScoreCodeSummary(code).Formula;
         if (possibleFormula.Contains("Fixed") && possibleFormula.Contains("0"))
         {
             possibleFormula = "One greater than # came to start.";
@@ -305,6 +293,12 @@ public class CoxSpragueCalculator : BaseScoringCalculator
             Formula = possibleFormula
         };
 
+    }
+
+    // Races with a code that didn't come to start are dropped from the perfect score.
+    protected override bool IsExcludedFromSeries(ScoreCode scoreCode)
+    {
+        return !CameToStart(scoreCode);
     }
 
     protected override bool IsSeriesBasedScore(ScoreCode scoreCode)

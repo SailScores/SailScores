@@ -329,5 +329,29 @@ namespace SailScores.Test.Unit.Core.Scoring
             // Competitor 2 should have a lower (worse) rank than Competitor 3
             Assert.True(comp2Results.Rank > comp3Results.Rank);
         }
+
+        [Fact]
+        public void CalculateResults_WithDnc_ScoreCodesUsedShowsExcluded()
+        {
+            var series = GetSeriesWithParticipation(3, 3, 2);
+            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+
+            var results = _calculator.CalculateResults(series);
+
+            Assert.Equal("Excluded", results.ScoreCodesUsed["DNC"].Formula);
+            Assert.Equal("Did not come to starting area", results.ScoreCodesUsed["DNC"].Description);
+        }
+
+        [Fact]
+        public void CalculateResults_WithDncCountingAsParticipation_ScoreCodesUsedNotesParticipation()
+        {
+            var series = GetSeriesWithParticipation(3, 3, 2);
+            series.ScoringSystem.ScoreCodes.First(c => c.Name == "DNC").CountAsParticipation = true;
+            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+
+            var results = _calculator.CalculateResults(series);
+
+            Assert.Equal("Excluded; counts toward participation", results.ScoreCodesUsed["DNC"].Formula);
+        }
     }
 }

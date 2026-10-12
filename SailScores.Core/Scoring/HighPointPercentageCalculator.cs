@@ -147,6 +147,12 @@ namespace SailScores.Core.Scoring
             ApplyParticipationRequirement(results);
         }
 
+        // Races with a code that didn't come to start are dropped from the perfect score.
+        protected override bool IsExcludedFromSeries(ScoreCode scoreCode)
+        {
+            return !CameToStart(scoreCode);
+        }
+
         protected override void DiscardScores(
             SeriesResults resultsWorkInProgress,
             SeriesCompetitorResults compResults)

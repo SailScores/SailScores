@@ -881,9 +881,25 @@ namespace SailScores.Core.Scoring
             {
                 Name = codeDef.Name,
                 Description = codeDef.Description,
-                Formula = GetFormulaString(codeDef)
+                Formula = IsExcludedFromSeries(codeDef)
+                    ? GetExcludedString(codeDef)
+                    : GetFormulaString(codeDef)
             };
 
+        }
+
+        // Systems that drop some coded results (e.g. DNC) from the series calculation
+        // entirely override this, so the code glossary doesn't show a misleading formula.
+        protected virtual bool IsExcludedFromSeries(ScoreCode scoreCode)
+        {
+            return false;
+        }
+
+        private string GetExcludedString(ScoreCode codeDef)
+        {
+            return CountsAsParticipation(codeDef)
+                ? "Excluded; counts toward participation"
+                : "Excluded";
         }
 
         private string GetFormulaString(ScoreCode codeDef)
