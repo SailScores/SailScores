@@ -41,3 +41,7 @@ $finish-third-light: #f3cf9b;
 $finish-first-dark: #473F24;
 $finish-second-dark: #393939;
 $finish-third-dark: #473829;
+
+/* Scoring system edit pages: accent for settings that belong to the parent's scoring method */
+$method-accent: #88B3DE; /* the bar, and the text in dark mode */
+$method-accent-text-light: #3D6E9E; /* text in light mode: #88B3DE is too pale on white */

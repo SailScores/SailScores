@@ -1,0 +1,106 @@
+{
+  "ScoringSystemName": "Top X High Point",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 0,
+  "NumberOfSailedRaces": 3,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": false,
+  "PercentRequired": "0",
+  "Columns": [
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2026-01-04 Winter 1",
+    "1. 2026-01-18 Winter 2",
+    "1. 2026-02-01 Winter 3 [Abandoned]",
+    "1. 2026-02-15 Winter 4 - Livett Cup",
+    "1. 2026-03-01 Winter 5 [Scheduled]",
+    "1. 2026-03-15 Spring 1 [Scheduled]",
+    "1. 2026-03-22 Spring 2 [Scheduled]",
+    "1. 2026-03-29 Spring 3 - The Baker Cup [Scheduled]",
+    "1. 2026-04-18 Spring 4 [Scheduled]",
+    "1. 2026-05-17 Spring 5 - Windas Cup [Scheduled]"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompJB2",
+      "SailNumber": "JB",
+      "Total": "298",
+      "PointsEarned": "298",
+      "Scores": "RCD 99/100 | 1:100/100 | - | 1:99/100 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompDB",
+      "SailNumber": "DB",
+      "Total": "292",
+      "PointsEarned": "292",
+      "Scores": "1:98/100 | 5:96/100 | - | 2:98/100 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompAF",
+      "SailNumber": "AF",
+      "Total": "198",
+      "PointsEarned": "198",
+      "Scores": "2:97/100 | RCD 101/100 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompAN",
+      "SailNumber": "AN",
+      "Total": "189",
+      "PointsEarned": "189",
+      "Scores": "3:96/100 | DNF 93/100 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompSC",
+      "SailNumber": "SC",
+      "Total": "189",
+      "PointsEarned": "189",
+      "Scores": "DNC null | RET 93/100 | - | 4:96/100 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompMM",
+      "SailNumber": "MM",
+      "Total": "99",
+      "PointsEarned": "99",
+      "Scores": "DNC null | 2:99/100 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompLF",
+      "SailNumber": "LF",
+      "Total": "98",
+      "PointsEarned": "98",
+      "Scores": "DNC null | 3:98/100 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompJG",
+      "SailNumber": "JG",
+      "Total": "97",
+      "PointsEarned": "97",
+      "Scores": "DNC null | 4:97/100 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompTL",
+      "SailNumber": "TL",
+      "Total": "97",
+      "PointsEarned": "97",
+      "Scores": "DNC null | DNC null | - | 3:97/100 | - | - | - | - | - | -"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "No participation, no score.: Did not come to starting area",
+    "DNF": "One greater than # came to start.: Started but did not finish",
+    "RCD": "No participation, no score.: Did not come to starting area",
+    "RET": "Number of boats that came to starting area + 1: Retired"
+  }
+}

@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using System;
@@ -11,11 +12,11 @@ namespace SailScores.Test.Unit.Core.Scoring
     public class AppendixAPre2025CalculatorTests
     {
 
-        private AppendixAPre2025Calculator _defaultCalculator;
+        private IScoringCalculator _defaultCalculator;
 
         public AppendixAPre2025CalculatorTests()
         {
-            _defaultCalculator = new AppendixAPre2025Calculator(MakeDefaultScoringSystem());
+            _defaultCalculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixAPre2025, MakeDefaultScoringSystem());
         }
 
         private ScoringSystem MakeDefaultScoringSystem()

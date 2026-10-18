@@ -1,5 +1,5 @@
 using Microsoft.Playwright;
-using Microsoft.Playwright.Xunit;
+using Microsoft.Playwright.Xunit.v3;
 using SailScores.Test.Playwright.Utilities;
 using System;
 using System.Threading.Tasks;

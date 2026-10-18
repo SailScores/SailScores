@@ -1,0 +1,1439 @@
+{
+  "metadata": {
+    "schema": "sailscores-club-backup",
+    "version": 1,
+    "createdDateUtc": "2026-02-22T18:38:13.6543269Z",
+    "sourceClubInitials": "LHYC",
+    "sourceClubName": "Lake Harriet Yacht Club",
+    "sourceClubId": "23cc00a0-ba27-4fe2-8c1c-e448b1f68eba",
+    "boatClassCount": 2,
+    "competitorCount": 25,
+    "fleetCount": 2,
+    "raceCount": 8,
+    "scoreCount": 40,
+    "seasonCount": 1,
+    "seriesCount": 1,
+    "regattaCount": 1,
+    "scoringSystemCount": 4
+  },
+  "name": "Lake Harriet Yacht Club",
+  "initials": "LHYC",
+  "isHidden": false,
+  "showClubInResults": false,
+  "showCalendarInNav": false,
+  "locale": "en-US",
+  "defaultRaceDateOffset": 0,
+  "boatClasses": [
+    {
+      "id": "e00433f2-0f79-4a7f-9a36-7854e2b9fb14",
+      "name": "M Scow"
+    },
+    {
+      "id": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "name": "MC Scow"
+    }
+  ],
+  "seasons": [
+    {
+      "id": "a3dbaece-27dd-45e6-8064-f5ac22852a7a",
+      "name": "2019",
+      "urlName": "2019",
+      "start": "2019-01-01T00:00:00",
+      "end": "2019-12-31T00:00:00"
+    }
+  ],
+  "fleets": [
+    {
+      "id": "644eecab-470a-4986-98e2-80f35154968b",
+      "name": "2019 Die Hard M Scows",
+      "shortName": "2019DieHardM",
+      "nickName": "M Scows",
+      "isActive": false,
+      "fleetType": "SelectedBoats",
+      "boatClassIds": []
+    },
+    {
+      "id": "d4852438-a1d4-4029-804c-9a87b275bae0",
+      "name": "2019 Die Hard MC Scows",
+      "shortName": "2019DieHardMC",
+      "nickName": "MC Scows",
+      "isActive": false,
+      "fleetType": "SelectedBoats",
+      "boatClassIds": []
+    }
+  ],
+  "competitors": [
+    {
+      "id": "4121f189-b96d-4492-8fcc-028caca5b076",
+      "name": "CompOLB",
+      "sailNumber": "2182",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id46",
+      "urlId": "id46",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+      "name": "CompJT",
+      "sailNumber": "LH9",
+      "boatName": "Commodore 9",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "e00433f2-0f79-4a7f-9a36-7854e2b9fb14",
+      "urlName": "id91",
+      "urlId": "id91",
+      "fleetIds": [
+        "644eecab-470a-4986-98e2-80f35154968b"
+      ]
+    },
+    {
+      "id": "530b29b6-943a-48cd-84a8-18c35f528f39",
+      "name": "CompSN",
+      "sailNumber": "2040",
+      "boatName": "Deadly Sinn",
+      "homeClubName": "Lake HArriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id34",
+      "urlId": "id34",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+      "name": "CompOC",
+      "sailNumber": "2322",
+      "boatName": "Sea Otter",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2322",
+      "urlId": "id49",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+      "name": "CompSC",
+      "sailNumber": "M12",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "e00433f2-0f79-4a7f-9a36-7854e2b9fb14",
+      "urlName": "m12",
+      "urlId": "id94",
+      "fleetIds": [
+        "644eecab-470a-4986-98e2-80f35154968b"
+      ]
+    },
+    {
+      "id": "888b2fa8-05d6-4248-a64e-532910d3abce",
+      "name": "CompAM",
+      "sailNumber": "1935",
+      "boatName": "Mde Oma",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1935",
+      "urlId": "id28",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "dfff9d53-f440-4948-af72-596d0542b232",
+      "name": "CompAK",
+      "sailNumber": "2669",
+      "boatName": "Honu One",
+      "homeClubName": "Gull Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2669",
+      "urlId": "id69",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "a889b992-d223-4462-90fa-5c3eef80116f",
+      "name": "CompWM",
+      "sailNumber": "2091",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id37",
+      "urlId": "id37",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "ff604b31-3791-418d-a5d6-5f91abb2799e",
+      "name": "CompNB",
+      "sailNumber": "2599",
+      "homeClubName": "Okoboji YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2599",
+      "urlId": "id58",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "e53bd38e-339b-46e4-b364-6d09e26f475c",
+      "name": "CompCB",
+      "sailNumber": "2644",
+      "boatName": "Mango",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id64",
+      "urlId": "id64",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "969620f0-9575-4f8e-bd47-76af510280ea",
+      "name": "CompBK",
+      "sailNumber": "TC36",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc36",
+      "urlId": "id121",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+      "name": "CompMJ",
+      "sailNumber": "2161",
+      "alternativeSailNumber": "1765",
+      "boatName": "Scuppers",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2161",
+      "urlId": "id43",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "d08d49f4-dc1d-4f61-8863-7ba1ec2b3421",
+      "name": "CompWJ",
+      "sailNumber": "1916",
+      "boatName": "Rapido",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1916",
+      "urlId": "id26",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "631d8371-6e7a-4da8-94a4-88e72c3e70b4",
+      "name": "CompPR",
+      "sailNumber": "2517",
+      "homeClubName": "Cedar Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2517",
+      "urlId": "id55",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+      "name": "CompGR",
+      "sailNumber": "2169",
+      "boatName": "Black Cat",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2169",
+      "urlId": "id45",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "84a06346-794b-4f41-a828-b10e2e9cae5a",
+      "name": "CompNN",
+      "sailNumber": "2717",
+      "homeClubName": "Upper Minnetonka YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2717",
+      "urlId": "id73",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "f78cd36e-82a6-48b2-84fd-beee478a3466",
+      "name": "CompDJ",
+      "sailNumber": "1687",
+      "homeClubName": "-",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id14",
+      "urlId": "id14",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "22ac20ef-82ce-4ba2-a64f-cf46527976a5",
+      "name": "CompRJ",
+      "sailNumber": "TC10",
+      "boatName": "-various-",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc10",
+      "urlId": "id105",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "4e7204cf-459e-4aab-89b6-d9f4abdcd5ff",
+      "name": "CompWE",
+      "sailNumber": "2652",
+      "boatName": " Zut alors",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2652",
+      "urlId": "id66",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+      "name": "CompFJ",
+      "sailNumber": "2144",
+      "boatName": "Don't Panic",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2144",
+      "urlId": "id42",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+      "name": "CompBJ",
+      "sailNumber": "LH700",
+      "boatName": "Attack",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "e00433f2-0f79-4a7f-9a36-7854e2b9fb14",
+      "urlName": "lh700",
+      "urlId": "id90",
+      "fleetIds": [
+        "644eecab-470a-4986-98e2-80f35154968b"
+      ]
+    },
+    {
+      "id": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+      "name": "CompFJ2",
+      "sailNumber": "TC62m",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "e00433f2-0f79-4a7f-9a36-7854e2b9fb14",
+      "urlName": "tc62m",
+      "urlId": "id143",
+      "fleetIds": [
+        "644eecab-470a-4986-98e2-80f35154968b"
+      ]
+    },
+    {
+      "id": "3ee3f69b-a049-4b4c-bee0-f2bb70a2acb1",
+      "name": "CompGJ",
+      "sailNumber": "2824",
+      "homeClubName": "Upper Minnetonka YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2824",
+      "urlId": "id38",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "2c30f99e-6531-4864-be89-fc485e413e97",
+      "name": "CompBP",
+      "sailNumber": "2624",
+      "homeClubName": "Cedar Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2624",
+      "urlId": "id62",
+      "fleetIds": [
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    },
+    {
+      "id": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+      "name": "CompPB",
+      "sailNumber": "M10",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "e00433f2-0f79-4a7f-9a36-7854e2b9fb14",
+      "urlName": "m10",
+      "urlId": "id93",
+      "fleetIds": [
+        "644eecab-470a-4986-98e2-80f35154968b"
+      ]
+    }
+  ],
+  "scoringSystems": [
+    {
+      "id": "651a3372-9c45-4d07-884f-1320a9554267",
+      "name": "Appendix A For Series - Rule 5.3",
+      "discardPattern": "0,1",
+      "isSiteDefault": true,
+      "calculatorType": 1,
+      "scoreCodes": [
+        {
+          "id": "5468746b-1a3d-41c8-9524-5a1348f530db",
+          "name": "BFD",
+          "description": "Disqualification under rule 30.4",
+          "preserveResult": false,
+          "discardable": false,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "bae7b19f-bd7a-4b34-bf61-a923074d0d6a",
+          "name": "DNC",
+          "description": "Did not come to starting area",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "97199c0b-ba85-4991-90de-78313daa5206",
+          "name": "DNE",
+          "description": "Disqualification that is not excludable",
+          "preserveResult": false,
+          "discardable": false,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "23924b2a-589e-449b-8ee1-4aace21887ee",
+          "name": "DNF",
+          "description": "Started but did not finish",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "0bdf9646-9fe7-41af-8cd5-d35c24ec08e7",
+          "name": "DNS",
+          "description": "Came to start area but did not start",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "fbb44a91-79c1-45bc-a1f1-b7e438f0bd13",
+          "name": "DPI",
+          "description": "Discretionary penalty",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "a5e1e95b-b485-4ef2-9fbb-ed9e2f5ea8ef",
+          "name": "DSQ",
+          "description": "Disqualification",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "3cde0694-404d-49e9-aa40-56481b1622d6",
+          "name": "NSC",
+          "description": "Did not sail the course (other than DNC, DNS, OCS and DNF)",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "570b7975-3033-426c-89d9-dea990494b17",
+          "name": "OCS",
+          "description": "On course side at start or broke rule 30.1",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "509de5cd-590d-49fc-92da-538539ba52ad",
+          "name": "RDG",
+          "description": "Redress: points set by protest hearing",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "MAN",
+          "countAsParticipation": true
+        },
+        {
+          "id": "3d648097-19ed-4075-aeea-5fb45e6d57fa",
+          "name": "RDGAve",
+          "description": "Redress: average of other races",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "AVE",
+          "countAsParticipation": true
+        },
+        {
+          "id": "aa3615ab-1dbf-4b0f-8874-6aeff614c5c8",
+          "name": "RET",
+          "description": "Retired",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "178e3235-dddd-4271-89fa-6d441d7635b0",
+          "name": "SCP",
+          "description": "Scoring Penalty imposed",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "caa61bf8-9eb5-4c90-8c5e-1333c19a8e4a",
+          "name": "TIE",
+          "description": "Tied with previous",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "TIE",
+          "countAsParticipation": true
+        },
+        {
+          "id": "48a704dd-f812-4ed3-ab0a-60a4c722fe0f",
+          "name": "UFD",
+          "description": "Disqualification under rule 30.3",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "82fabaa8-a390-4c58-a3ea-91af00c4c96d",
+          "name": "ZFP",
+          "description": "20% Penalty under rule 30.2",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        }
+      ],
+      "scoreCodeGroups": []
+    },
+    {
+      "id": "68b5c6dc-f1d4-4af3-944d-9b2eeabb50bd",
+      "name": "Appendix A Regatta pre-2025",
+      "discardPattern": "0,1",
+      "isSiteDefault": false,
+      "calculatorType": 2,
+      "scoreCodes": [
+        {
+          "id": "405c98bb-0e4b-4d72-9bf5-5afed3e0aabf",
+          "name": "BFD",
+          "description": "Disqualification under rule 30.4",
+          "preserveResult": false,
+          "discardable": false,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "e53ec7a2-234a-4ccc-9fd8-07a10db519aa",
+          "name": "DNC",
+          "description": "Did not come to starting area",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "fdc1e0f7-ffcf-4fe2-a66d-7cb4d6062ab4",
+          "name": "DNE",
+          "description": "Disqualification that is not excludable",
+          "preserveResult": false,
+          "discardable": false,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "86b06ab6-a6f9-471e-8494-6659211a458b",
+          "name": "DNF",
+          "description": "Started but did not finish",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "5dfc6a1b-de96-450d-8f6c-c52ade9e599c",
+          "name": "DNS",
+          "description": "Came to start area but did not start",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "933fdc2a-1d5f-46a7-8dd0-15f293e9f1ac",
+          "name": "DPI",
+          "description": "Discretionary penalty",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "672c40ae-0826-48e6-9653-7ec7dfca74bc",
+          "name": "DSQ",
+          "description": "Disqualification",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "b412a95d-edab-4263-8fba-f8f259ccae2f",
+          "name": "NSC",
+          "description": "Did not sail the course (other than DNC, DNS, OCS and DNF)",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "89d55676-1f37-48d4-83b4-286efe478f17",
+          "name": "OCS",
+          "description": "On course side at start or broke rule 30.1",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "60ceaa6d-837f-4b33-be71-2e321af0376a",
+          "name": "RDG",
+          "description": "Redress: points set by protest hearing",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "MAN"
+        },
+        {
+          "id": "90fc7c9b-75fb-4a90-b068-0ccd258be3e6",
+          "name": "RDGAve",
+          "description": "Redress: average of other races",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "AVE"
+        },
+        {
+          "id": "e96b709c-6ea5-494c-8550-b8f7b1cc10ba",
+          "name": "RET",
+          "description": "Retired",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "43c8b5aa-f8e1-424d-984b-b744bb982897",
+          "name": "SCP",
+          "description": "Scoring Penalty imposed",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "382b4fea-5e73-47da-a02e-0cb4e27677d8",
+          "name": "TIE",
+          "description": "Tied with previous",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "TIE"
+        },
+        {
+          "id": "ffb578bd-9dbf-41a3-91ff-ff155867c5ca",
+          "name": "UFD",
+          "description": "Disqualification under rule 30.3",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "c37e5031-56a2-46a8-b0ed-0eca47d52e38",
+          "name": "ZFP",
+          "description": "20% Penalty under rule 30.2",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "formulaValueDecimal": 20.000
+        }
+      ],
+      "scoreCodeGroups": []
+    },
+    {
+      "id": "0551a25e-bd0c-4431-9b9d-590597d2d008",
+      "name": "LHYC Standard Scoring",
+      "discardPattern": "0,0,0,0,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18,19,19,19,20,20,20,21,21,21,22,22,22,23,23,23,24,24,24,25,25,25,26,26,26,27,27,27,28,28,28,29,29,29,30,30,30,31,31,31,32,32,32",
+      "parentSystemId": "651a3372-9c45-4d07-884f-1320a9554267",
+      "scoreCodes": [
+        {
+          "id": "0396d40d-b5db-40fc-a46c-ee8724588781",
+          "name": "SB",
+          "description": "Safety boat duty",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false
+        },
+        {
+          "id": "981bb2d2-2a8f-4fb0-8235-f27a7c6307cd",
+          "name": "GST",
+          "description": "Unknown, unregistered or guest skipper",
+          "formula": "CTS+",
+          "formulaValue": 2,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": true,
+          "adjustOtherScores": true
+        },
+        {
+          "id": "f57e7cdf-20bf-4f0c-bea8-f7a3e0466442",
+          "name": "TLE",
+          "description": "Time Limit Elapsed: Finished After Time Limit",
+          "formula": "FIN+",
+          "formulaValue": 1,
+          "discardable": true,
+          "cameToStart": true,
+          "started": true,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": true
+        },
+        {
+          "id": "4178970b-2f07-4518-a69d-8d202e032620",
+          "name": "RDG Ave",
+          "description": "Redress: average of other races",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": true,
+          "started": true,
+          "finished": true,
+          "preserveResult": true,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "b906af00-a67f-4f04-93aa-ae894eec56e4",
+          "name": "RC",
+          "description": "Race Committee duty",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false
+        },
+        {
+          "id": "b0afc8ba-bcd4-433a-95f3-a7dbdc524894",
+          "name": "DNP",
+          "description": "Fees are not paid",
+          "formula": "CTS+",
+          "formulaValue": 2,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": true
+        },
+        {
+          "id": "6c27f859-e129-48ca-bff3-4c68ebad2981",
+          "name": "SBP",
+          "description": "Safety boat penalty",
+          "formula": "CTS+",
+          "formulaValue": 3,
+          "discardable": false,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "edede392-b8aa-475b-b17b-16aeef501d68",
+          "name": "DNC",
+          "description": "Did not come to starting area",
+          "formula": "CTS+",
+          "formulaValue": 2,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "ff23e296-6de3-4ea8-804e-1454c5715613",
+          "name": "DGM",
+          "description": "DSQ No Exclusion 69.1(b)(2)",
+          "formula": "CTS+",
+          "formulaValue": 1,
+          "discardable": false,
+          "cameToStart": true,
+          "started": true,
+          "finished": true,
+          "preserveResult": false,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "8006d055-3db1-4331-ae78-0e1cdb742ff2",
+          "name": "ORA",
+          "description": "Off-lake regatta, take average",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false
+        },
+        {
+          "id": "c739d186-e79f-4842-9b55-2dcd37c77667",
+          "name": "SBM",
+          "description": "Safety Boat Minimum",
+          "formula": "CTS+",
+          "formulaValue": 1,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": true
+        }
+      ]
+    },
+    {
+      "id": "e8753237-6f94-420d-82b9-f3f26483fcb9",
+      "name": "Appx A Low Point Regatta, 1 discard after 5 races",
+      "discardPattern": "0,0,0,0,1",
+      "parentSystemId": "68b5c6dc-f1d4-4af3-944d-9b2eeabb50bd",
+      "scoreCodes": []
+    }
+  ],
+  "series": [
+    {
+      "id": "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e",
+      "name": "2019 Die Hard M Scows",
+      "urlName": "2019 Die Hard M Scows",
+      "isImportantSeries": false,
+      "resultsLocked": false,
+      "updatedDate": "2019-09-22T22:00:22.7341102Z",
+      "scoringSystemId": "e8753237-6f94-420d-82b9-f3f26483fcb9",
+      "trendOption": "PreviousDay",
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "raceCount": 8,
+      "startDate": "2019-09-21",
+      "endDate": "2019-09-22",
+      "seasonId": "a3dbaece-27dd-45e6-8064-f5ac22852a7a",
+      "childrenSeriesIds": [],
+      "parentSeriesIds": []
+    }
+  ],
+  "races": [
+    {
+      "id": "b8246b56-3bf9-4ae8-b45e-0c78a1a14950",
+      "date": "2019-09-22T00:00:00",
+      "state": "Raced",
+      "order": 8,
+      "updatedDate": "2019-09-22T22:00:22.3270636",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "22462111-ca24-4cfb-815a-23af4f2ecdef",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "b8246b56-3bf9-4ae8-b45e-0c78a1a14950",
+          "place": 4
+        },
+        {
+          "id": "755c5faf-8c57-48bc-ac23-3a437f8674a7",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "b8246b56-3bf9-4ae8-b45e-0c78a1a14950",
+          "place": 3
+        },
+        {
+          "id": "06b2e03b-2837-4c7f-86fa-62ff042e610c",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "b8246b56-3bf9-4ae8-b45e-0c78a1a14950",
+          "code": "DNC"
+        },
+        {
+          "id": "dff3b388-374e-4e3a-8df1-e0c18d2ce5b5",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "b8246b56-3bf9-4ae8-b45e-0c78a1a14950",
+          "place": 1
+        },
+        {
+          "id": "d8ce71e5-5fb4-482c-98d5-f21384568a73",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "b8246b56-3bf9-4ae8-b45e-0c78a1a14950",
+          "place": 2
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    },
+    {
+      "id": "4ebd1ec7-e04a-4b54-92a5-4072e9579211",
+      "date": "2019-09-21T00:00:00",
+      "state": "Raced",
+      "order": 2,
+      "updatedDate": "2019-09-22T21:52:15.8965818",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "f3175695-ad02-4f4c-864c-0005a7426a26",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "4ebd1ec7-e04a-4b54-92a5-4072e9579211",
+          "place": 3
+        },
+        {
+          "id": "62f59414-3ab4-4276-9452-096aa93372f7",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "4ebd1ec7-e04a-4b54-92a5-4072e9579211",
+          "place": 1
+        },
+        {
+          "id": "96f6f77e-389f-4564-b013-2ec69e73f52c",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "4ebd1ec7-e04a-4b54-92a5-4072e9579211",
+          "code": "DNC"
+        },
+        {
+          "id": "5b845b09-c81b-40b4-b4ce-866d3a8cc7d7",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "4ebd1ec7-e04a-4b54-92a5-4072e9579211",
+          "place": 4
+        },
+        {
+          "id": "1f92e99c-c664-483e-a2f3-a6ca7661812b",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "4ebd1ec7-e04a-4b54-92a5-4072e9579211",
+          "place": 2
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    },
+    {
+      "id": "d895c9e7-0f5d-47a2-8d8d-5cbb0c119540",
+      "date": "2019-09-21T00:00:00",
+      "state": "Raced",
+      "order": 5,
+      "updatedDate": "2019-09-22T21:55:52.9643241",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "c0dcadfb-81b8-4205-8072-0b11461ce77e",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "d895c9e7-0f5d-47a2-8d8d-5cbb0c119540",
+          "code": "DNC"
+        },
+        {
+          "id": "97669fbd-b672-41b7-9cc9-7d62e94e6333",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "d895c9e7-0f5d-47a2-8d8d-5cbb0c119540",
+          "code": "DNC"
+        },
+        {
+          "id": "95a68a01-5268-4784-aa80-c940fa702fbf",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "d895c9e7-0f5d-47a2-8d8d-5cbb0c119540",
+          "code": "DNC"
+        },
+        {
+          "id": "bedeb490-a451-4a9c-b298-d71f21798c6b",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "d895c9e7-0f5d-47a2-8d8d-5cbb0c119540",
+          "place": 1
+        },
+        {
+          "id": "ab38d695-d91d-4d84-9d4b-e4b0cd014608",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "d895c9e7-0f5d-47a2-8d8d-5cbb0c119540",
+          "place": 2
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    },
+    {
+      "id": "159dec35-bc8c-4daf-bd85-8f31de230924",
+      "date": "2019-09-21T00:00:00",
+      "state": "Raced",
+      "order": 4,
+      "updatedDate": "2019-09-22T21:55:18.5151736",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "bff1c960-37ac-45ab-b88c-1cd1d09be5b7",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "159dec35-bc8c-4daf-bd85-8f31de230924",
+          "place": 2
+        },
+        {
+          "id": "39b073df-209a-437b-a70a-212918494da7",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "159dec35-bc8c-4daf-bd85-8f31de230924",
+          "code": "DNC"
+        },
+        {
+          "id": "26f8f094-91b7-434a-9eee-3a645116981f",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "159dec35-bc8c-4daf-bd85-8f31de230924",
+          "code": "DNC"
+        },
+        {
+          "id": "e2d37000-5fb4-47ed-86c9-69cde1052585",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "159dec35-bc8c-4daf-bd85-8f31de230924",
+          "place": 1
+        },
+        {
+          "id": "a16942ae-0ff9-4054-8d85-761d8133de6b",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "159dec35-bc8c-4daf-bd85-8f31de230924",
+          "code": "DNC"
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    },
+    {
+      "id": "a9edd793-6063-4636-b5cd-b9dad2fa77e4",
+      "date": "2019-09-21T00:00:00",
+      "state": "Raced",
+      "order": 3,
+      "updatedDate": "2019-09-22T21:53:12.6686777",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "ca9219a6-3d6e-41ee-82ac-375eb4699bbd",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "a9edd793-6063-4636-b5cd-b9dad2fa77e4",
+          "place": 1
+        },
+        {
+          "id": "7263a3b5-e240-4866-85c8-594d28928113",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "a9edd793-6063-4636-b5cd-b9dad2fa77e4",
+          "place": 2
+        },
+        {
+          "id": "e6b0aa3e-3197-4315-afdd-87beb8153b09",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "a9edd793-6063-4636-b5cd-b9dad2fa77e4",
+          "code": "DNC"
+        },
+        {
+          "id": "d5cf6732-3747-4959-bb6a-acba5bcebab7",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "a9edd793-6063-4636-b5cd-b9dad2fa77e4",
+          "place": 3
+        },
+        {
+          "id": "6e470ebe-4ca5-4a4c-adb8-e62b5c7ddf53",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "a9edd793-6063-4636-b5cd-b9dad2fa77e4",
+          "place": 4
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    },
+    {
+      "id": "8b4a04ba-5c15-4688-b49d-e5aa7dca9367",
+      "date": "2019-09-21T00:00:00",
+      "state": "Raced",
+      "order": 1,
+      "updatedDate": "2019-09-22T21:50:06.9635582",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "db3d2ea5-5572-4c1b-b58f-0255017d74ef",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "8b4a04ba-5c15-4688-b49d-e5aa7dca9367",
+          "place": 2
+        },
+        {
+          "id": "b14cb9c4-3b65-4970-bb37-123c3e7a4b4e",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "8b4a04ba-5c15-4688-b49d-e5aa7dca9367",
+          "place": 4
+        },
+        {
+          "id": "186eae6c-20c2-477b-9118-40eb379cfcdb",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "8b4a04ba-5c15-4688-b49d-e5aa7dca9367",
+          "code": "DNF"
+        },
+        {
+          "id": "dfbfcb1c-60f8-424e-a270-9a40963ec09f",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "8b4a04ba-5c15-4688-b49d-e5aa7dca9367",
+          "place": 1
+        },
+        {
+          "id": "780051ec-25f1-4ea0-87eb-ef5363fba3ac",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "8b4a04ba-5c15-4688-b49d-e5aa7dca9367",
+          "place": 3
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    },
+    {
+      "id": "c2d16e52-e047-4c26-a303-cf176a0ac934",
+      "date": "2019-09-22T00:00:00",
+      "state": "Raced",
+      "order": 6,
+      "updatedDate": "2019-09-22T21:48:48.0207782",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "332ba6ee-b1a7-4cce-9214-27879d86313b",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "c2d16e52-e047-4c26-a303-cf176a0ac934",
+          "place": 3
+        },
+        {
+          "id": "7781ba6c-0bc2-4894-849e-46c5cbd05fb5",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "c2d16e52-e047-4c26-a303-cf176a0ac934",
+          "code": "DNC"
+        },
+        {
+          "id": "4e76acf0-591a-4e2e-ab74-5bcfd91aab92",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "c2d16e52-e047-4c26-a303-cf176a0ac934",
+          "code": "DNF"
+        },
+        {
+          "id": "36834a88-6b08-44d0-8fcd-a11a9959340e",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "c2d16e52-e047-4c26-a303-cf176a0ac934",
+          "place": 1
+        },
+        {
+          "id": "f47bfd0c-25ca-4b75-b120-aaa01871519f",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "c2d16e52-e047-4c26-a303-cf176a0ac934",
+          "place": 2
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    },
+    {
+      "id": "58253174-4627-4bc5-a4e1-f5443c267e44",
+      "date": "2019-09-22T00:00:00",
+      "state": "Raced",
+      "order": 7,
+      "updatedDate": "2019-09-22T17:57:15.9789292",
+      "trackTimes": false,
+      "fleetId": "644eecab-470a-4986-98e2-80f35154968b",
+      "scores": [
+        {
+          "id": "42331212-aeaa-42b3-ba1f-2dfa187eb52f",
+          "competitorId": "c2f2b0e2-e101-45a7-8497-de2f74b0ad5a",
+          "raceId": "58253174-4627-4bc5-a4e1-f5443c267e44",
+          "place": 3
+        },
+        {
+          "id": "e08c4860-6625-435c-9534-4162302b9957",
+          "competitorId": "a0f56edc-7a3a-4cec-a090-4c426089a587",
+          "raceId": "58253174-4627-4bc5-a4e1-f5443c267e44",
+          "code": "DNC"
+        },
+        {
+          "id": "cc64b9bd-e4b7-4efa-bb5f-64386c6eebf4",
+          "competitorId": "dfb7ae5b-3e0d-401a-ad17-dd2142082e32",
+          "raceId": "58253174-4627-4bc5-a4e1-f5443c267e44",
+          "place": 2
+        },
+        {
+          "id": "b3b5834e-b787-40f1-843e-87a6607c30f2",
+          "competitorId": "ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1",
+          "raceId": "58253174-4627-4bc5-a4e1-f5443c267e44",
+          "place": 4
+        },
+        {
+          "id": "3c894f0a-6367-4246-a4d2-a2bbfdfba050",
+          "competitorId": "fd30e310-4ae7-4366-a674-0b8c5d5a76db",
+          "raceId": "58253174-4627-4bc5-a4e1-f5443c267e44",
+          "place": 1
+        }
+      ],
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ]
+    }
+  ],
+  "regattas": [
+    {
+      "id": "6f2e4bfe-8d0d-41b5-485e-08d732752bb6",
+      "name": "Die Hard",
+      "urlName": "DieHard",
+      "startDate": "2019-09-21T00:00:00",
+      "endDate": "2019-09-22T00:00:00",
+      "updatedDate": "2019-09-22T21:58:13.0837454Z",
+      "scoringSystemId": "e8753237-6f94-420d-82b9-f3f26483fcb9",
+      "preferAlternateSailNumbers": true,
+      "seasonId": "a3dbaece-27dd-45e6-8064-f5ac22852a7a",
+      "seriesIds": [
+        "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e"
+      ],
+      "fleetIds": [
+        "644eecab-470a-4986-98e2-80f35154968b",
+        "d4852438-a1d4-4029-804c-9a87b275bae0"
+      ]
+    }
+  ],
+  "historicalResults": [
+    {
+      "id": "7622d79c-0b60-4c1a-ed9d-08d73ebcd4ec",
+      "seriesId": "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e\",\"Competitors\":[{\"Id\":\"fd30e310-4ae7-4366-a674-0b8c5d5a76db\",\"Name\":\"CompJT\",\"SailNumber\":\"LH9\",\"AlternativeSailNumber\":null,\"BoatName\":\"Commodore 9\",\"HomeClubName\":null},{\"Id\":\"dfb7ae5b-3e0d-401a-ad17-dd2142082e32\",\"Name\":\"CompBJ\",\"SailNumber\":\"LH700\",\"AlternativeSailNumber\":null,\"BoatName\":\"Attack\",\"HomeClubName\":null},{\"Id\":\"c2f2b0e2-e101-45a7-8497-de2f74b0ad5a\",\"Name\":\"CompFJ2\",\"SailNumber\":\"TC62\",\"AlternativeSailNumber\":\"LH11\",\"BoatName\":null,\"HomeClubName\":null},{\"Id\":\"a0f56edc-7a3a-4cec-a090-4c426089a587\",\"Name\":\"CompSC\",\"SailNumber\":\"M12\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null},{\"Id\":\"ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1\",\"Name\":\"CompPB\",\"SailNumber\":\"M10\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null}],\"Races\":[{\"Id\":\"8b4a04ba-5c15-4688-b49d-e5aa7dca9367\",\"Name\":null,\"Date\":\"2019-09-21T00:00:00\",\"Order\":1,\"State\":1,\"UpdatedDate\":null},{\"Id\":\"4ebd1ec7-e04a-4b54-92a5-4072e9579211\",\"Name\":null,\"Date\":\"2019-09-21T00:00:00\",\"Order\":2,\"State\":1,\"UpdatedDate\":null},{\"Id\":\"a9edd793-6063-4636-b5cd-b9dad2fa77e4\",\"Name\":null,\"Date\":\"2019-09-21T00:00:00\",\"Order\":3,\"State\":1,\"UpdatedDate\":null},{\"Id\":\"159dec35-bc8c-4daf-bd85-8f31de230924\",\"Name\":null,\"Date\":\"2019-09-21T00:00:00\",\"Order\":4,\"State\":1,\"UpdatedDate\":null},{\"Id\":\"d895c9e7-0f5d-47a2-8d8d-5cbb0c119540\",\"Name\":null,\"Date\":\"2019-09-21T00:00:00\",\"Order\":5,\"State\":1,\"UpdatedDate\":null},{\"Id\":\"c2d16e52-e047-4c26-a303-cf176a0ac934\",\"Name\":null,\"Date\":\"2019-09-22T00:00:00\",\"Order\":6,\"State\":1,\"UpdatedDate\":null},{\"Id\":\"58253174-4627-4bc5-a4e1-f5443c267e44\",\"Name\":null,\"Date\":\"2019-09-22T00:00:00\",\"Order\":7,\"State\":1,\"UpdatedDate\":null},{\"Id\":\"b8246b56-3bf9-4ae8-b45e-0c78a1a14950\",\"Name\":null,\"Date\":\"2019-09-22T00:00:00\",\"Order\":8,\"State\":1,\"UpdatedDate\":null}],\"CalculatedScores\":[{\"CompetitorId\":\"ede750e5-6c0c-4f20-b25e-ffb3ae90aaf1\",\"Rank\":5,\"Trend\":0,\"TotalScore\":38.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"4ebd1ec7-e04a-4b54-92a5-4072e9579211\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"d895c9e7-0f5d-47a2-8d8d-5cbb0c119540\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"159dec35-bc8c-4daf-bd85-8f31de230924\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"a9edd793-6063-4636-b5cd-b9dad2fa77e4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"c2d16e52-e047-4c26-a303-cf176a0ac934\",\"Place\":null,\"Code\":\"DNF\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"8b4a04ba-5c15-4688-b49d-e5aa7dca9367\",\"Place\":null,\"Code\":\"DNF\",\"ScoreValue\":6.0,\"Discard\":true},{\"RaceId\":\"58253174-4627-4bc5-a4e1-f5443c267e44\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"b8246b56-3bf9-4ae8-b45e-0c78a1a14950\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false}]},{\"CompetitorId\":\"c2f2b0e2-e101-45a7-8497-de2f74b0ad5a\",\"Rank\":3,\"Trend\":0,\"TotalScore\":24.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"4ebd1ec7-e04a-4b54-92a5-4072e9579211\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"d895c9e7-0f5d-47a2-8d8d-5cbb0c119540\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"159dec35-bc8c-4daf-bd85-8f31de230924\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":true},{\"RaceId\":\"a9edd793-6063-4636-b5cd-b9dad2fa77e4\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"c2d16e52-e047-4c26-a303-cf176a0ac934\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"8b4a04ba-5c15-4688-b49d-e5aa7dca9367\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"58253174-4627-4bc5-a4e1-f5443c267e44\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"b8246b56-3bf9-4ae8-b45e-0c78a1a14950\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false}]},{\"CompetitorId\":\"fd30e310-4ae7-4366-a674-0b8c5d5a76db\",\"Rank\":1,\"Trend\":0,\"TotalScore\":7.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"4ebd1ec7-e04a-4b54-92a5-4072e9579211\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"d895c9e7-0f5d-47a2-8d8d-5cbb0c119540\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"159dec35-bc8c-4daf-bd85-8f31de230924\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"a9edd793-6063-4636-b5cd-b9dad2fa77e4\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"c2d16e52-e047-4c26-a303-cf176a0ac934\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"8b4a04ba-5c15-4688-b49d-e5aa7dca9367\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"58253174-4627-4bc5-a4e1-f5443c267e44\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"b8246b56-3bf9-4ae8-b45e-0c78a1a14950\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":true}]},{\"CompetitorId\":\"a0f56edc-7a3a-4cec-a090-4c426089a587\",\"Rank\":4,\"Trend\":0,\"TotalScore\":34.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"4ebd1ec7-e04a-4b54-92a5-4072e9579211\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"d895c9e7-0f5d-47a2-8d8d-5cbb0c119540\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"159dec35-bc8c-4daf-bd85-8f31de230924\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":true},{\"RaceId\":\"a9edd793-6063-4636-b5cd-b9dad2fa77e4\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"c2d16e52-e047-4c26-a303-cf176a0ac934\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"8b4a04ba-5c15-4688-b49d-e5aa7dca9367\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"58253174-4627-4bc5-a4e1-f5443c267e44\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"b8246b56-3bf9-4ae8-b45e-0c78a1a14950\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":6.0,\"Discard\":false}]},{\"CompetitorId\":\"dfb7ae5b-3e0d-401a-ad17-dd2142082e32\",\"Rank\":2,\"Trend\":0,\"TotalScore\":13.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"4ebd1ec7-e04a-4b54-92a5-4072e9579211\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"d895c9e7-0f5d-47a2-8d8d-5cbb0c119540\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"159dec35-bc8c-4daf-bd85-8f31de230924\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"a9edd793-6063-4636-b5cd-b9dad2fa77e4\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"c2d16e52-e047-4c26-a303-cf176a0ac934\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"8b4a04ba-5c15-4688-b49d-e5aa7dca9367\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":true},{\"RaceId\":\"58253174-4627-4bc5-a4e1-f5443c267e44\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"b8246b56-3bf9-4ae8-b45e-0c78a1a14950\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false}]}],\"NumberOfDiscards\":1,\"NumberOfSailedRaces\":8,\"IsPercentSystem\":false,\"PercentRequired\":null,\"ScoringSystemName\":\"Appx A Low Point Regatta, 1 discard after 5 races\"}",
+      "created": "2019-09-22T15:00:22.7561045"
+    }
+  ],
+  "defaultScoringSystemName": "LHYC Standard Scoring",
+  "fixtureInfo": {
+    "seriesId": "c3e1bc3e-b375-4a27-dbd7-08d73ebcd46e",
+    "seriesName": "2019 Die Hard M Scows",
+    "seasonUrlName": "2019",
+    "seriesUrlName": "2019 Die Hard M Scows",
+    "sourceBackupCreatedUtc": "2026-02-22T18:38:13.6543269Z",
+    "extractedUtc": "2026-10-16T03:20:58.3393423Z",
+    "userFieldsRemoved": 1,
+    "warnings": []
+  }
+}

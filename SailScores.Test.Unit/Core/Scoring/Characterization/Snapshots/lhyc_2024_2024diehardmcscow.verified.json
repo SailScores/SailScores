@@ -1,0 +1,327 @@
+{
+  "ScoringSystemName": "Appendix A, one discard after six races",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 6,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2024-09-21",
+    "2. 2024-09-21 [Abandoned]",
+    "3. 2024-09-22",
+    "4. 2024-09-22",
+    "5. 2024-09-22",
+    "6. 2024-09-22",
+    "7. 2024-09-22"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompGR",
+      "SailNumber": "2169",
+      "Total": "8",
+      "TotalIncludingDiscards": "11",
+      "Columns": {
+        "preDiscardTotal": "11"
+      },
+      "Scores": "(3) | - | 3 | 2 | 1 | 1 | 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompWM",
+      "SailNumber": "2674",
+      "Total": "12",
+      "TotalIncludingDiscards": "24",
+      "Columns": {
+        "preDiscardTotal": "24"
+      },
+      "Scores": "1 | - | 4 | 1 | (12) | 4 | 2"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompWE",
+      "SailNumber": "2652",
+      "Total": "16.8",
+      "TotalIncludingDiscards": "28.8",
+      "Columns": {
+        "preDiscardTotal": "28.8"
+      },
+      "Scores": "RDGAve 4.8 | - | 1 | 4 | 4 | (12) | 3"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompCS",
+      "SailNumber": "2823",
+      "Total": "17",
+      "TotalIncludingDiscards": "24",
+      "Columns": {
+        "preDiscardTotal": "24"
+      },
+      "Scores": "2 | - | 2 | 6 | 3 | (7) | 4"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompNN",
+      "SailNumber": "2717",
+      "Total": "31",
+      "TotalIncludingDiscards": "45",
+      "Columns": {
+        "preDiscardTotal": "45"
+      },
+      "Scores": "(14) | - | 5 | 3 | 2 | 11 | 10"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompAD",
+      "SailNumber": "2707",
+      "Total": "36",
+      "TotalIncludingDiscards": "51",
+      "Columns": {
+        "preDiscardTotal": "51"
+      },
+      "Scores": "7 | - | (15) | 5 | 6 | 9 | 9"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompMK",
+      "SailNumber": "2711",
+      "Total": "40.6",
+      "TotalIncludingDiscards": "57.6",
+      "Columns": {
+        "preDiscardTotal": "57.6"
+      },
+      "Scores": "RDGAve 9.6 | - | 7 | 13 | 5 | (17) | 6"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompFT",
+      "SailNumber": "2722",
+      "Total": "44",
+      "TotalIncludingDiscards": "60",
+      "Columns": {
+        "preDiscardTotal": "60"
+      },
+      "Scores": "RDGAve 10 | - | 8 | 8 | (16) | 5 | 13"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompSC",
+      "SailNumber": "2091",
+      "Total": "46",
+      "TotalIncludingDiscards": "68",
+      "Columns": {
+        "preDiscardTotal": "68"
+      },
+      "Scores": "5 | - | 6 | 16 | 8 | (22) | 11"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompLJ2",
+      "SailNumber": "TC79",
+      "Total": "46",
+      "TotalIncludingDiscards": "64",
+      "Columns": {
+        "preDiscardTotal": "64"
+      },
+      "Scores": "13 | - | (18) | 11 | 9 | 8 | 5"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompLJ",
+      "SailNumber": "1578",
+      "Total": "49.6",
+      "TotalIncludingDiscards": "63.6",
+      "Columns": {
+        "preDiscardTotal": "63.6"
+      },
+      "Scores": "RDGAve 10.6 | - | 12 | 7 | 10 | 10 | (14)"
+    },
+    {
+      "Rank": 12,
+      "Name": "CompMM",
+      "SailNumber": "2644",
+      "Total": "52.8",
+      "TotalIncludingDiscards": "76.8",
+      "Columns": {
+        "preDiscardTotal": "76.8"
+      },
+      "Scores": "RDGAve 12.8 | - | 10 | 15 | 7 | (24) | 8"
+    },
+    {
+      "Rank": 13,
+      "Name": "CompAJ",
+      "SailNumber": "2887",
+      "Total": "56.6",
+      "TotalIncludingDiscards": "75.6",
+      "Columns": {
+        "preDiscardTotal": "75.6"
+      },
+      "Scores": "RDGAve 12.6 | - | 14 | 12 | 15 | 3 | (19)"
+    },
+    {
+      "Rank": 14,
+      "Name": "CompGJ",
+      "SailNumber": "2824",
+      "Total": "58.4",
+      "TotalIncludingDiscards": "74.4",
+      "Columns": {
+        "preDiscardTotal": "74.4"
+      },
+      "Scores": "RDGAve 12.4 | - | 13 | 14 | 13 | 6 | (16)"
+    },
+    {
+      "Rank": 15,
+      "Name": "CompKA",
+      "SailNumber": "TC67",
+      "Total": "61",
+      "TotalIncludingDiscards": "89",
+      "Columns": {
+        "preDiscardTotal": "89"
+      },
+      "Scores": "6 | - | 11 | (DNF 28) | 14 | 2 | DNF 28"
+    },
+    {
+      "Rank": 16,
+      "Name": "CompKJ",
+      "SailNumber": "1847",
+      "Total": "61",
+      "TotalIncludingDiscards": "80",
+      "Columns": {
+        "preDiscardTotal": "80"
+      },
+      "Scores": "4 | - | (19) | 17 | 11 | 14 | 15"
+    },
+    {
+      "Rank": 17,
+      "Name": "CompFA",
+      "SailNumber": "TC77",
+      "Total": "62.8",
+      "TotalIncludingDiscards": "82.8",
+      "Columns": {
+        "preDiscardTotal": "82.8"
+      },
+      "Scores": "RDGAve 13.8 | - | (20) | 9 | 18 | 15 | 7"
+    },
+    {
+      "Rank": 18,
+      "Name": "CompJT",
+      "SailNumber": "2253",
+      "Total": "67",
+      "TotalIncludingDiscards": "87",
+      "Columns": {
+        "preDiscardTotal": "87"
+      },
+      "Scores": "10 | - | 17 | 10 | 17 | 13 | (20)"
+    },
+    {
+      "Rank": 19,
+      "Name": "CompNB",
+      "SailNumber": "2599",
+      "Total": "70",
+      "TotalIncludingDiscards": "90",
+      "Columns": {
+        "preDiscardTotal": "90"
+      },
+      "Scores": "RDGAve 15 | - | 9 | 18 | (20) | 16 | 12"
+    },
+    {
+      "Rank": 20,
+      "Name": "CompBJCC",
+      "SailNumber": "1850",
+      "Total": "90",
+      "TotalIncludingDiscards": "111",
+      "Columns": {
+        "preDiscardTotal": "111"
+      },
+      "Scores": "18 | - | 16 | 20 | 19 | (21) | 17"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "99.2",
+      "TotalIncludingDiscards": "121.2",
+      "Columns": {
+        "preDiscardTotal": "121.2"
+      },
+      "Scores": "RDGAve 20.2 | - | 21 | (22) | 22 | 18 | 18"
+    },
+    {
+      "Rank": 22,
+      "Name": "CompMJ",
+      "SailNumber": "2161",
+      "Total": "101",
+      "TotalIncludingDiscards": "124",
+      "Columns": {
+        "preDiscardTotal": "124"
+      },
+      "Scores": "17 | - | 22 | (23) | 21 | 20 | 21"
+    },
+    {
+      "Rank": 23,
+      "Name": "CompASL",
+      "SailNumber": "TC83",
+      "Total": "104",
+      "TotalIncludingDiscards": "128",
+      "Columns": {
+        "preDiscardTotal": "128"
+      },
+      "Scores": "19 | - | 23 | 21 | (24) | 19 | 22"
+    },
+    {
+      "Rank": 24,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "115",
+      "TotalIncludingDiscards": "143",
+      "Columns": {
+        "preDiscardTotal": "143"
+      },
+      "Scores": "21 | - | 24 | 19 | 23 | (DNC 28) | DNC 28"
+    },
+    {
+      "Rank": 25,
+      "Name": "CompHS",
+      "SailNumber": "TC44",
+      "Total": "117",
+      "TotalIncludingDiscards": "142",
+      "Columns": {
+        "preDiscardTotal": "142"
+      },
+      "Scores": "22 | - | (25) | 24 | 25 | 23 | 23"
+    },
+    {
+      "Rank": 26,
+      "Name": "CompAAC",
+      "SailNumber": "1664",
+      "Total": "140",
+      "TotalIncludingDiscards": "168",
+      "Columns": {
+        "preDiscardTotal": "168"
+      },
+      "Scores": "(DNC 28) | - | DNC 28 | DNC 28 | DNC 28 | DNC 28 | DNC 28"
+    },
+    {
+      "Rank": 26,
+      "Name": "CompHT",
+      "SailNumber": "2516",
+      "Total": "140",
+      "TotalIncludingDiscards": "168",
+      "Columns": {
+        "preDiscardTotal": "168"
+      },
+      "Scores": "(DNC 28) | - | DNC 28 | DNC 28 | DNC 28 | DNC 28 | DNC 28"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area",
+    "DNF": "Number of boats entered in series + 1: Started but did not finish",
+    "RDGAve": "Average of results: Redress: average of other races"
+  }
+}

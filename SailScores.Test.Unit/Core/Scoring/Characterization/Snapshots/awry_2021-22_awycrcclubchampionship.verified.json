@@ -1,0 +1,147 @@
+{
+  "ScoringSystemName": "AWRY scoring based on App. A Low Point",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 8,
+  "NumberOfSailedRaces": 35,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2021-11-21",
+    "2. 2021-11-21",
+    "3. 2021-11-21",
+    "4. 2021-11-21",
+    "5. 2021-11-21",
+    "6. 2021-11-21",
+    "7. 2021-11-21",
+    "8. 2021-11-21",
+    "9. 2021-11-21",
+    "10. 2021-11-21",
+    "1. 2021-12-05",
+    "2. 2021-12-05",
+    "3. 2021-12-05",
+    "4. 2021-12-05",
+    "5. 2021-12-05",
+    "6. 2021-12-05",
+    "7. 2021-12-05",
+    "8. 2021-12-05",
+    "9. 2021-12-05",
+    "10. 2021-12-05",
+    "11. 2021-12-05",
+    "1. 2022-02-20",
+    "2. 2022-02-20",
+    "3. 2022-02-20",
+    "4. 2022-02-20",
+    "5. 2022-02-20",
+    "6. 2022-02-20",
+    "7. 2022-02-20",
+    "8. 2022-02-20",
+    "9. 2022-02-20",
+    "10. 2022-02-20",
+    "11. 2022-02-20",
+    "12. 2022-02-20",
+    "13. 2022-02-20",
+    "14. 2022-02-20"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompJD",
+      "SailNumber": "746",
+      "Total": "37",
+      "TotalIncludingDiscards": "64",
+      "Columns": {
+        "preDiscardTotal": "64"
+      },
+      "Scores": "1 | (2) | 1 | (2) | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | (4) | (3) | (DSQ 5) | (4) | 2 | (4) | 1 | 1 | 1 | 2 | 2 | 1 | 2 | 1 | 2 | 2 | 1 | 2 | 1 | 1 | (3)"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompHV",
+      "SailNumber": "871",
+      "Total": "56",
+      "TotalIncludingDiscards": "96",
+      "Columns": {
+        "preDiscardTotal": "96"
+      },
+      "Scores": "3 | 3 | (4) | (4) | (5) | (6) | (4) | 1 | 2 | 2 | 3 | 3 | (4) | 1 | 2 | (4) | 1 | 1 | 4 | 2 | 4 | 3 | 3 | 1 | 1 | (DNC 9) | 3 | 2 | 1 | 1 | 3 | 1 | 2 | 2 | 1"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompJH",
+      "SailNumber": "837",
+      "Total": "68",
+      "TotalIncludingDiscards": "105",
+      "Columns": {
+        "preDiscardTotal": "105"
+      },
+      "Scores": "(4) | (4) | 3 | 3 | 3 | (4) | 3 | (4) | 3 | 3 | 2 | 2 | 2 | (4) | 1 | 1 | 3 | 2 | 3 | 3 | 2 | (DNC 9) | (4) | (4) | 4 | 2 | 1 | 3 | 3 | 3 | 2 | 3 | 3 | 3 | 2"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompDW",
+      "SailNumber": "440",
+      "Total": "173",
+      "TotalIncludingDiscards": "245",
+      "Columns": {
+        "preDiscardTotal": "245"
+      },
+      "Scores": "(DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | DNC 9 | DNC 9 | 4 | 4 | 3 | 3 | 3 | 2 | 2 | 3 | 1 | 1 | 3 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompKT",
+      "SailNumber": "946",
+      "Total": "175",
+      "TotalIncludingDiscards": "247",
+      "Columns": {
+        "preDiscardTotal": "247"
+      },
+      "Scores": "2 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 4 | 4 | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompPR",
+      "SailNumber": "XXXX",
+      "Total": "214",
+      "TotalIncludingDiscards": "286",
+      "Columns": {
+        "preDiscardTotal": "286"
+      },
+      "Scores": "(DNC 9) | (DNC 9) | 5 | 5 | 4 | 3 | 5 | DNF 7 | DNS 7 | DNS 7 | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompJL",
+      "SailNumber": "033",
+      "Total": "216",
+      "TotalIncludingDiscards": "288",
+      "Columns": {
+        "preDiscardTotal": "288"
+      },
+      "Scores": "5 | 5 | 6 | (DNC 9) | 6 | 5 | 6 | DNF 7 | DNS 7 | DNS 7 | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompPN",
+      "SailNumber": "743",
+      "Total": "217",
+      "TotalIncludingDiscards": "289",
+      "Columns": {
+        "preDiscardTotal": "289"
+      },
+      "Scores": "(DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | (DNC 9) | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | 2 | 2 | 3 | 3 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9 | DNC 9"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area",
+    "DNF": "Number of boats that came to starting area + 1: Started but did not finish",
+    "DNS": "Number of boats that came to starting area + 1: Came to start area but did not start",
+    "DSQ": "Number of boats that came to starting area + 1: Disqualification"
+  }
+}

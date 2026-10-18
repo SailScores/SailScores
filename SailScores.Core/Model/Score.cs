@@ -21,5 +21,12 @@ namespace SailScores.Core.Model
         public TimeSpan? CorrectedTime { get; set; }
         // Snapshot of the handicap rating applied; may be manually set to override the lookup
         public decimal? HandicapValue { get; set; }
+
+        // Summary series scoring only (not stored): a score taken as-is from a child
+        // series' results. Calculators use it instead of scoring the place, and codes don't apply.
+        public decimal? PresetScoreValue { get; set; }
+
+        // A copy to score with: scoring changes its place and code, not this score's.
+        public Score ShallowCopy() => (Score)MemberwiseClone();
     }
 }

@@ -21,4 +21,5 @@ public class ScoreCodeBackup
     public bool? PreserveResult { get; set; }
     public bool? AdjustOtherScores { get; set; }
     public bool? CountAsParticipation { get; set; }
+    public bool? IncludeInAverage { get; set; }
 }

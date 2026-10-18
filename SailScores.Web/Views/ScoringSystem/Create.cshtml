@@ -17,7 +17,28 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="ParentSystemId">Parent Scoring System</label>
+                <select id="parentSystemId" asp-for="ParentSystemId" class="form-select">
+                    @foreach (var scoringSystem in Model.ParentSystemOptions)
+                    {
+                        <option value="@scoringSystem.Id"
+                                data-calculator-type="@(scoringSystem.CalculatorType.HasValue ? ((int)scoringSystem.CalculatorType.Value).ToString() : string.Empty)"
+                                data-discard-method="@((int)scoringSystem.EffectiveDiscardMethod)"
+                                data-discard-pattern="@scoringSystem.EffectiveDiscardPattern"
+                                data-participation-percent="@(scoringSystem.EffectiveParticipationPercent?.ToString("0.##") ?? string.Empty)"
+                                data-settings="@(SailScores.Core.Model.ScoringSystemSettings.ToJson(scoringSystem.EffectiveSettings) ?? "{}")">
+                            @scoringSystem.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="ParentSystemId" class="text-danger"></span>
+            </div>
+            <partial name="_DiscardMethodSelect" model="Model" />
+            <div class="mb-3" data-discard-methods="0,1,3,4">
                 <label asp-for="DiscardPattern" class="control-label"></label>
+                <span class="small scoring-method-note" data-discard-methods="1">&ensp;<span class="fas fa-info-circle" aria-hidden="true"></span> Applied to each day's races separately.</span>
+                <span class="small scoring-method-note" data-discard-methods="3">&ensp;<span class="fas fa-info-circle" aria-hidden="true"></span> Applied to each child series' races separately, in summary series. Other series use it for all their races.</span>
+                <span class="small scoring-method-note" data-discard-methods="4">&ensp;<span class="fas fa-info-circle" aria-hidden="true"></span> Not used by a summary series that uses its child series' races: it keeps each child series' discards instead.</span>
                 <div class="input-group">
                     <input asp-for="DiscardPattern" class="form-control" />
                     <button type="button" class="btn btn-outline-secondary"
@@ -27,7 +48,7 @@
                     </button>
                 </div>
                 <span asp-validation-for="DiscardPattern" class="text-danger"></span>
-                <p class="small mx-3">A series of numbers indicating how many races should be discarded.
+                <p class="small mx-3">Leave blank to use the parent system's pattern. A series of numbers indicating how many races should be discarded.
                     The place of the number represents the number of races. The
                     number itself represents the number of discards. For example:
                 </p>
@@ -46,20 +67,8 @@
                 </dl>
             </div>
             <div class="mb-3">
-                <label asp-for="ParentSystemId">Parent Scoring System</label>
-                <select id="parentSystemId" asp-for="ParentSystemId" class="form-select">
-                    @foreach (var scoringSystem in Model.ParentSystemOptions)
-                    {
-                        <option value="@scoringSystem.Id">
-                            @scoringSystem.Name
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="ParentSystemId" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
                 <label asp-for="ParticipationPercent" class="control-label"></label>
-                <span class="small"><em>&ensp;Optional: Required participation for a rank.</em></span>
+                <span class="small"><em>&ensp;Optional: Required participation for a rank. Leave blank to use the parent system's value.</em></span>
                 <div class="input-group">
                     <input asp-for="ParticipationPercent" class="form-control" type="number"
                            min="0" max="99" />
@@ -67,6 +76,7 @@
                 </div>
                 <span asp-validation-for="ParticipationPercent" class="text-danger"></span>
             </div>
+            <partial name="_ScoringSystemSettings" model="Model" />
             <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
                 <a asp-controller="Admin"
@@ -82,4 +92,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/scoringSystemSettings.js" asp-append-version="true"></script>
 }

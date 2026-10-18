@@ -6,9 +6,10 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring
 {
-    // Decorator that applies time-correction (Phase 0) before delegating to the inner
-    // (place-based) series calculator. Works with any IScoringCalculator as its inner,
-    // so clubs can combine handicap time correction with any series scoring system.
+    // Decorator that scores a series on corrected times with any (place-based) scoring
+    // system, so clubs can combine handicap time correction with any series scoring system.
+    // The correction is an input step of the inner pipeline: it changes each run's copies of
+    // the scores, never the series' own.
     //
     // IRC/ORC support: use HandicapSystemType.TimeOnTime with a TCC stored as Value and
     // set EffectiveTo to the certificate expiry date.
@@ -18,39 +19,53 @@ namespace SailScores.Core.Scoring
         public const string NhcCode = "NHC";
 
         private readonly IScoringCalculator _innerCalculator;
-        private readonly HandicapSystem _handicapSystem;
-        private readonly IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal> _handicapLookup;
 
         public HandicapScoringCalculator(
             IScoringCalculator innerCalculator,
             HandicapSystem handicapSystem,
             IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal> handicapLookup)
         {
-            _innerCalculator = innerCalculator;
-            _handicapSystem = handicapSystem;
-            _handicapLookup = handicapLookup;
-        }
-
-        public SeriesResults CalculateResults(Series series)
-        {
-            ApplyTimeCorrection(series);
-            return _innerCalculator.CalculateResults(series);
-        }
-
-        // Phase 0: for each raced race, compute corrected times, then re-rank by corrected time.
-        // Modifies score.Place, score.CorrectedTime, score.HandicapValue, and score.Code in place.
-        private void ApplyTimeCorrection(Series series)
-        {
-            var racedStates = new[] { RaceState.Raced, RaceState.Preliminary };
-            foreach (var race in series.Races ?? Enumerable.Empty<Race>())
+            if (innerCalculator is not ScoringPipeline pipeline)
             {
-                if (race.Scores == null) continue;
+                throw new ArgumentException(
+                    "Handicap scoring needs a ScoringPipeline to correct times in.", nameof(innerCalculator));
+            }
+            _innerCalculator = pipeline.WithInputStep(new TimeCorrection(handicapSystem, handicapLookup));
+        }
+
+        public SeriesResults CalculateResults(Series series) =>
+            _innerCalculator.CalculateResults(series);
+
+        // An absent competitor has no times to correct; only the other competitors' counts matter.
+        public decimal? CalculateAbsentCompetitorScore(Series series) =>
+            _innerCalculator.CalculateAbsentCompetitorScore(series);
+
+        // For each raced race, compute corrected times, then re-rank by corrected time.
+        // Sets the place, corrected time, handicap value and (no handicap: NHC) code of the
+        // run's score copies.
+        private sealed class TimeCorrection(
+            HandicapSystem handicapSystem,
+            IReadOnlyDictionary<(Guid competitorId, DateTime raceDate), decimal> handicapLookup)
+            : IScoreInputStep
+        {
+            public void Apply(ScoringWorkspace workspace, IEnumerable<Race> races)
+            {
+                foreach (var race in races ?? Enumerable.Empty<Race>())
+                {
+                    CorrectRace(race, workspace.ScoresIn(race));
+                }
+            }
+
+            private void CorrectRace(Race race, IReadOnlyList<Score> scores)
+            {
+                var racedStates = new[] { RaceState.Raced, RaceState.Preliminary };
+                if (race.Scores == null) return;
                 var state = race.State ?? RaceState.Raced;
-                if (!racedStates.Contains(state)) continue;
+                if (!racedStates.Contains(state)) return;
 
                 var raceDate = race.Date ?? DateTime.MinValue;
 
-                foreach (var score in race.Scores)
+                foreach (var score in scores)
                 {
                     // Skip scores that already carry a finish code (DNS, DNC, etc.)
                     if (!string.IsNullOrEmpty(score.Code)) continue;
@@ -61,7 +76,7 @@ namespace SailScores.Core.Scoring
                     {
                         // Use the bool return of TryGetValue — do NOT compare the value to default(decimal)
                         // because 0 is a valid PHRF scratch-boat rating.
-                        if (_handicapLookup.TryGetValue((score.CompetitorId, raceDate.Date), out var looked))
+                        if (handicapLookup.TryGetValue((score.CompetitorId, raceDate.Date), out var looked))
                             handicap = looked;
                     }
 
@@ -75,11 +90,11 @@ namespace SailScores.Core.Scoring
 
                     score.HandicapValue = handicap;
                     score.CorrectedTime = ComputeCorrectedTime(
-                        score.ElapsedTime.Value, handicap.Value, race.CourseDistance);
+                        score.ElapsedTime.Value, handicap.Value, handicapSystem.SystemType, race.CourseDistance);
                 }
 
                 // Re-rank by corrected time; boats without a corrected time keep Place = null
-                var ranked = race.Scores
+                var ranked = scores
                     .Where(s => s.CorrectedTime.HasValue && string.IsNullOrEmpty(s.Code))
                     .OrderBy(s => s.CorrectedTime!.Value)
                     .ToList();
@@ -90,7 +105,7 @@ namespace SailScores.Core.Scoring
                 }
 
                 // Nullify place for scores that have a code or no corrected time
-                foreach (var score in race.Scores.Where(s => !s.CorrectedTime.HasValue || !string.IsNullOrEmpty(s.Code)))
+                foreach (var score in scores.Where(s => !s.CorrectedTime.HasValue || !string.IsNullOrEmpty(s.Code)))
                 {
                     if (string.IsNullOrEmpty(score.Code))
                         score.Place = null;
@@ -114,11 +129,6 @@ namespace SailScores.Core.Scoring
                 _ => throw new InvalidOperationException(
                     $"Unsupported handicap system type: {systemType}")
             };
-        }
-
-        private TimeSpan ComputeCorrectedTime(TimeSpan elapsed, decimal handicapValue, decimal? courseDistance)
-        {
-            return ComputeCorrectedTime(elapsed, handicapValue, _handicapSystem.SystemType, courseDistance);
         }
 
         // corrected = elapsed_sec - (rating × distance_nm)

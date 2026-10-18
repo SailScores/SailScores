@@ -125,6 +125,7 @@ public class InMemoryContextBuilder
             Name = "Appendix A Low Point For Series",
             ClubId = null,
             IsSiteDefault = true,
+            CalculatorType = SailScores.Api.Enumerations.ScoringCalculatorType.AppendixA,
             ScoreCodes = new List<ScoreCode>
             {
                 new Database.Entities.ScoreCode

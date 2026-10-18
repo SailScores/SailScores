@@ -35,6 +35,8 @@ public class SailScoresContext : DbContext, ISailScoresContext
 
     public DbSet<ScoreCodeGroup> ScoreCodeGroups { get; set; }
 
+    public DbSet<ScoringSystemClubAccess> ScoringSystemClubAccess { get; set; }
+
     public DbSet<ScoreCodeGroupCode> ScoreCodeGroupCodes { get; set; }
 
     public DbSet<UserClubPermission> UserPermissions { get; set; }
@@ -629,6 +631,22 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasFilter("[EffectiveTo] IS NULL")
             .IsUnique()
             .HasDatabaseName("IX_ClassHandicap_NullEnd");
+
+        modelBuilder.Entity<ScoringSystemClubAccess>()
+            .ToTable("ScoringSystemClubAccess")
+            .HasKey(x => new { x.ScoringSystemId, x.ClubId });
+
+        modelBuilder.Entity<ScoringSystemClubAccess>()
+            .HasOne(a => a.ScoringSystem)
+            .WithMany(s => s.ClubAccess)
+            .HasForeignKey(a => a.ScoringSystemId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ScoringSystemClubAccess>()
+            .HasOne(a => a.Club)
+            .WithMany()
+            .HasForeignKey(a => a.ClubId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // ScoreCodeGroup relationships
         modelBuilder.Entity<ScoreCodeGroup>()

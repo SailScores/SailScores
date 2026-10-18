@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using System;
@@ -11,11 +12,11 @@ namespace SailScores.Test.Unit.Core.Scoring
     public class AppendixACalculatorTests
     {
 
-        private AppendixACalculator _defaultCalculator;
+        private IScoringCalculator _defaultCalculator;
 
         public AppendixACalculatorTests()
         {
-            _defaultCalculator = new AppendixACalculator(MakeDefaultScoringSystem());
+            _defaultCalculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, MakeDefaultScoringSystem());
         }
 
         private ScoringSystem MakeDefaultScoringSystem()
@@ -921,7 +922,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         {
             // Arrange: Only first competitor participates in all races, others are DNC
             var series = GetSeriesWithParticipation(3, 5, 1);
-            var calculator = new AppendixACalculator(series.ScoringSystem);
+            var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, series.ScoringSystem);
 
             // Act
             var results = calculator.CalculateResults(series);
@@ -937,7 +938,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         {
             // Arrange: All competitors participate in all races
             var series = GetSeriesWithParticipation(3, 5, 3);
-            var calculator = new AppendixACalculator(series.ScoringSystem);
+            var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, series.ScoringSystem);
 
             // Act
             var results = calculator.CalculateResults(series);
@@ -952,7 +953,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         {
             // Arrange
             var series = GetSeriesWithParticipation(2, 5, 2);
-            var calculator = new AppendixACalculator(series.ScoringSystem);
+            var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, series.ScoringSystem);
 
             // Act
             var results = calculator.CalculateResults(series);
@@ -967,7 +968,7 @@ namespace SailScores.Test.Unit.Core.Scoring
             // Arrange: no participation percent set; one competitor DNCs all races
             var series = GetSeriesWithParticipation(3, 5, 1);
             series.ScoringSystem.ParticipationPercent = null;
-            var calculator = new AppendixACalculator(series.ScoringSystem);
+            var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, series.ScoringSystem);
 
             // Act
             var results = calculator.CalculateResults(series);
@@ -978,7 +979,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         }
 
         [Fact]
-        public void CalculateResults_WithScoreCodeGroupLimit_RestoresOriginalCodesAfterCalculation()
+        public void CalculateResults_WithScoreCodeGroupLimit_LeavesInputCodesUnchanged()
         {
             var series = GetBasicSeries(2, 4);
             series.ScoringSystem = MakeDefaultScoringSystem();
@@ -1004,7 +1005,7 @@ namespace SailScores.Test.Unit.Core.Scoring
             lastRaceScore.Code = "RC";
             lastRaceScore.Place = null;
 
-            var calculator = new AppendixACalculator(series.ScoringSystem);
+            var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, series.ScoringSystem);
 
             calculator.CalculateResults(series);
 

@@ -106,6 +106,7 @@ a full restore.
 | `urlName` | string | URL-safe name. |
 | `start` | datetime | Season start date. |
 | `end` | datetime | Season end date. |
+| `defaultScoringSystemId` | guid? | Scoring system for series in this season that set none. May point to a site-wide system not included in this backup; restore keeps it only if that system exists. |
 
 ### Fleet
 
@@ -148,7 +149,11 @@ a full restore.
 | `participationPercent` | decimal? | Minimum participation percentage for ranking. |
 | `parentSystemId` | guid? | Reference to a parent scoring system. May point to a site-wide system not included in this backup. |
 | `isSiteDefault` | bool? | Whether this is a site-level default system. |
+| `calculatorType` | int? | Base calculator (`ScoringCalculatorType`). Set on root systems; children inherit it. |
+| `settings` | string? | JSON of calculator-specific settings (`ScoringSystemSettings`). Null values inherit from the parent. |
+| `discardMethod` | int? | `DiscardMethod`: 0 race-count pattern, 1 pattern per day, 2 keep child series discards, 3 pattern per child series. Null inherits. |
 | `scoreCodes` | ScoreCode[] | Custom score codes for this system. |
+| `scoreCodeGroups` | ScoreCodeGroup[] | Limits on how often sets of codes may be used. |
 
 ### ScoreCode
 
@@ -167,6 +172,20 @@ a full restore.
 | `preserveResult` | bool? | Keep the original numeric result. |
 | `adjustOtherScores` | bool? | Whether this adjusts other competitors' scores. |
 | `countAsParticipation` | bool? | Whether this counts toward participation percentage. |
+| `includeInAverage` | bool? | Average-based systems: whether this score counts in the average. Null uses the calculator's rule. |
+
+### ScoreCodeGroup
+
+| Property | Type | Description |
+|---|---|---|
+| `id` | guid | Unique identifier. |
+| `name` | string | Group name. |
+| `limitationType` | string | `NumberOfRaces`, `PercentOfRaces` or `NumberOfDates`. |
+| `limitationValue` | decimal | The limit, in the units of `limitationType`. |
+| `useNonDiscardedRaces` | bool | Whether the limit counts only races that aren't discarded. |
+| `overageCodeName` | string? | Code that replaces uses beyond the limit. |
+| `overageSelectionMethod` | string | Which uses are replaced: `LatestFirst` or `WorstFirst`. |
+| `codes` | string[] | Names of the codes in the group. Matched by name, so they may be inherited from a parent system. |
 
 ### Series
 
@@ -187,7 +206,9 @@ a full restore.
 | `preferAlternativeSailNumbers` | bool? | Use alternative sail numbers. |
 | `excludeFromCompetitorStats` | bool? | Exclude from competitor statistics. |
 | `hideDncDiscards` | bool? | Hide DNC discards in display. |
-| `childrenSeriesAsSingleRace` | bool? | Treat child series as single race in summary. |
+| `childrenSeriesAsSingleRace` | bool? | Legacy: true when `summaryRollupMode` is 1. Read only when `summaryRollupMode` is missing (older backups). |
+| `summaryRollupMode` | int? | `SummaryRollupMode`: 0 child races, 1 each child series is a race scored by rank, 2 each child series is a race scored by its series score. |
+| `includeUnrankedChildScores` | bool? | Mode 2: also use the child scores of competitors the child series didn't rank. |
 | `raceCount` | int? | Number of races in the series. |
 | `dateRestricted` | bool? | Whether dates are restricted. |
 | `enforcedStartDate` | date? | Start of allowed date range. |

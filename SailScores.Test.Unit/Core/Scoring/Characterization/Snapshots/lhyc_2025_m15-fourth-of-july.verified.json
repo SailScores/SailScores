@@ -1,0 +1,108 @@
+{
+  "ScoringSystemName": "LHYC Standard Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 2,
+  "NumberOfSailedRaces": 7,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2025-07-04",
+    "2. 2025-07-04",
+    "1. 2025-07-05",
+    "2. 2025-07-05",
+    "3. 2025-07-05",
+    "1. 2025-07-06",
+    "2. 2025-07-06"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompC",
+      "SailNumber": "USA 327",
+      "Total": "5",
+      "TotalIncludingDiscards": "10",
+      "Columns": {
+        "preDiscardTotal": "10"
+      },
+      "Scores": "1 | (3) | (2) | 1 | 1 | 1 | 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompN",
+      "SailNumber": "USA 44",
+      "Total": "6.6",
+      "TotalIncludingDiscards": "11.6",
+      "Columns": {
+        "preDiscardTotal": "11.6"
+      },
+      "Scores": "(2) | 1 | 1 | (3) | 2 | SB 1.3 | SB 1.3"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompSJ",
+      "SailNumber": "USA 334",
+      "Total": "13",
+      "TotalIncludingDiscards": "21",
+      "Columns": {
+        "preDiscardTotal": "21"
+      },
+      "Scores": "(4) | 2 | 3 | (4) | 4 | 2 | 2"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompMB2",
+      "SailNumber": "USA 342",
+      "Total": "18",
+      "TotalIncludingDiscards": "30",
+      "Columns": {
+        "preDiscardTotal": "30"
+      },
+      "Scores": "3 | (DNS 6) | 4 | 2 | 3 | (DNC 6) | DNC 6"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompJT",
+      "SailNumber": "USA 341",
+      "Total": "23",
+      "TotalIncludingDiscards": "34",
+      "Columns": {
+        "preDiscardTotal": "34"
+      },
+      "Scores": "(5) | (DNS 6) | 5 | 5 | 5 | 4 | 4"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompMB",
+      "SailNumber": "USA 337",
+      "Total": "27",
+      "TotalIncludingDiscards": "41",
+      "Columns": {
+        "preDiscardTotal": "41"
+      },
+      "Scores": "(DNC 7) | (DNC 7) | DNC 7 | DNC 7 | DNC 7 | 3 | 3"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompOBBB",
+      "SailNumber": "USA 336",
+      "Total": "33",
+      "TotalIncludingDiscards": "47",
+      "Columns": {
+        "preDiscardTotal": "47"
+      },
+      "Scores": "(DNC 7) | (DNC 7) | DNC 7 | DNC 7 | DNC 7 | DNP 6 | DNP 6"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats that came to starting area + 2: Did not come to starting area",
+    "DNP": "Number of boats that came to starting area + 2: Fees are not paid",
+    "DNS": "Number of boats that came to starting area + 1: Came to start area but did not start",
+    "SB": "Average of non-discarded results: Safety boat duty"
+  }
+}

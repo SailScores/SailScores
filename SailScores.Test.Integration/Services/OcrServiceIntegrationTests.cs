@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using SailScores.Core.Model;
-using Xunit.Abstractions;
 
 namespace SailScores.Test.Integration.Services;
 

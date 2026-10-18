@@ -1,0 +1,134 @@
+@model SailScores.Web.Models.SailScores.SiteAdminScoringSystemAccessViewModel
+
+@{
+    ViewData["Title"] = "Scoring System Access";
+    Layout = "_Layout";
+    var selected = Model.SelectedClubIds.ToHashSet();
+}
+
+<h1>Scoring System Access</h1>
+
+<p>
+    <a asp-action="ScoringSystems">&larr; Shared Scoring Systems</a>
+</p>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h2>@Model.Name</h2>
+<p class="text-muted">
+    @if (Model.ParentSystemName != null)
+    {
+        <span>Child of @Model.ParentSystemName</span>
+    }
+    else if (Model.CalculatorName != null)
+    {
+        <span>@Model.CalculatorName</span>
+    }
+</p>
+
+@if (Model.IsUsedForNewClubs)
+{
+    <div class="alert alert-info">
+        New clubs are set up with systems based on this one, so it stays available to all clubs.
+    </div>
+}
+else
+{
+    <form asp-action="ScoringSystemAccess" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="IsRestrictedToClubs" id="accessAll" value="false"
+                       checked="@(!Model.IsRestrictedToClubs)" />
+                <label class="form-check-label" for="accessAll">All clubs</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="IsRestrictedToClubs" id="accessRestricted" value="true"
+                       checked="@Model.IsRestrictedToClubs" />
+                <label class="form-check-label" for="accessRestricted">Only the selected clubs</label>
+            </div>
+            <div class="form-text">
+                Clubs that already use this system as a parent keep it either way.
+            </div>
+        </div>
+
+        <fieldset id="clubSelection" class="mb-3">
+            <legend class="fs-5">Clubs <span class="badge bg-secondary" id="selectedCount"></span></legend>
+            <div class="row g-2 mb-2">
+                <div class="col-sm-8">
+                    <input type="search" id="clubFilter" class="form-control" placeholder="Filter by name or initials" aria-label="Filter clubs" />
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="selectedOnly" />
+                        <label class="form-check-label" for="selectedOnly">Selected only</label>
+                    </div>
+                </div>
+            </div>
+            <div class="border rounded p-2" style="max-height: 24rem; overflow-y: auto;">
+                @foreach (var club in Model.ClubOptions)
+                {
+                    <div class="form-check" data-club-filter="@($"{club.Name} {club.Initials}".ToLowerInvariant())">
+                        <input class="form-check-input" type="checkbox" name="SelectedClubIds" value="@club.Id"
+                               id="club-@club.Id" checked="@selected.Contains(club.Id)" />
+                        <label class="form-check-label" for="club-@club.Id">
+                            @club.Name (@club.Initials)
+                            @if (club.IsHidden)
+                            {
+                                <span class="badge bg-secondary">Hidden</span>
+                            }
+                        </label>
+                    </div>
+                }
+            </div>
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="ScoringSystems" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const selection = document.getElementById('clubSelection');
+            if (!selection) {
+                return;
+            }
+            const restricted = document.getElementById('accessRestricted');
+            const all = document.getElementById('accessAll');
+            const filter = document.getElementById('clubFilter');
+            const selectedOnly = document.getElementById('selectedOnly');
+            const count = document.getElementById('selectedCount');
+            const rows = [...selection.querySelectorAll('[data-club-filter]')];
+
+            function update() {
+                selection.disabled = !restricted.checked;
+                const text = filter.value.trim().toLowerCase();
+                let checked = 0;
+                rows.forEach(row => {
+                    const box = row.querySelector('input');
+                    if (box.checked) {
+                        checked++;
+                    }
+                    const visible = row.dataset.clubFilter.includes(text)
+                        && (!selectedOnly.checked || box.checked);
+                    row.classList.toggle('d-none', !visible);
+                });
+                count.textContent = checked + ' selected';
+            }
+
+            [restricted, all, selectedOnly].forEach(el => el.addEventListener('change', update));
+            filter.addEventListener('input', update);
+            rows.forEach(row => row.querySelector('input').addEventListener('change', update));
+            update();
+        })();
+    </script>
+}

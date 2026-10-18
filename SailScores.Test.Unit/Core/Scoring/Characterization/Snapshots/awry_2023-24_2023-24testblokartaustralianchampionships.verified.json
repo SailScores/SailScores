@@ -1,0 +1,89 @@
+{
+  "ScoringSystemName": "AWRY scoring based on App. A Low Point",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 0,
+  "NumberOfSailedRaces": 2,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "2. 2024-03-21",
+    "4. 2024-03-21"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompGG",
+      "SailNumber": "10",
+      "Total": "4",
+      "TotalIncludingDiscards": "4",
+      "Columns": {
+        "preDiscardTotal": "4"
+      },
+      "Scores": "3 | 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompHH",
+      "SailNumber": "11",
+      "Total": "5",
+      "TotalIncludingDiscards": "5",
+      "Columns": {
+        "preDiscardTotal": "5"
+      },
+      "Scores": "2 | 3"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompKK",
+      "SailNumber": "12",
+      "Total": "6",
+      "TotalIncludingDiscards": "6",
+      "Columns": {
+        "preDiscardTotal": "6"
+      },
+      "Scores": "1 | 5"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompEE",
+      "SailNumber": "9",
+      "Total": "7",
+      "TotalIncludingDiscards": "7",
+      "Columns": {
+        "preDiscardTotal": "7"
+      },
+      "Scores": "5 | 2"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompNN",
+      "SailNumber": "13",
+      "Total": "10",
+      "TotalIncludingDiscards": "10",
+      "Columns": {
+        "preDiscardTotal": "10"
+      },
+      "Scores": "6 | 4"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompBB",
+      "SailNumber": "8",
+      "Total": "11",
+      "TotalIncludingDiscards": "11",
+      "Columns": {
+        "preDiscardTotal": "11"
+      },
+      "Scores": "4 | DNC 7"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area"
+  }
+}

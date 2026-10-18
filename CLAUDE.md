@@ -9,8 +9,8 @@ The primary agent reference is **`.github/copilot-instructions.md`**. Read it fi
 | Step | Command |
 |------|---------|
 | Build | `dotnet build SailScores.sln --configuration Release` |
-| Unit tests | `dotnet test SailScores.Test.Unit/SailScores.Test.Unit.csproj` |
-| Import/export tests | `dotnet test SailScores.ImportExport.Test/SailScores.ImportExport.Test.csproj` |
+| Unit tests | `dotnet test --project SailScores.Test.Unit/SailScores.Test.Unit.csproj` |
+| Import/export tests | `dotnet test --project SailScores.ImportExport.Test/SailScores.ImportExport.Test.csproj` |
 | Add EF migration | `dotnet ef migrations add <Name> --project SailScores.Database --startup-project SailScores.Web --context SailScoresContext` |
 | Remove last migration | `dotnet ef migrations remove --project SailScores.Database --startup-project SailScores.Web --context SailScoresContext` |
 
@@ -22,6 +22,10 @@ The primary agent reference is **`.github/copilot-instructions.md`**. Read it fi
 
 See **`docs/SailingGlossary.md`** for a glossary of sailing terms as they apply to SailScores.
 
+## Scoring calculators
+
+To add a scoring calculator or base scoring system, follow **`docs/Scoring-AddingACalculator.md`**. Never change how an existing calculator scores: saved results are recalculated.
+
 ---
 
 ## Testing: which project to use
@@ -30,7 +34,8 @@ See **`docs/SailingGlossary.md`** for a glossary of sailing terms as they apply 
 |----------|---------|---------|
 | Core service logic (SeriesService, RaceService, etc.) | `SailScores.Test.Unit` | `InMemoryContextBuilder.GetContext()` for the DB context + `Moq` for non-DB dependencies (IScoringService, IMemoryCache, etc.) |
 | Web controller behavior | `SailScores.Test.Unit` | Moq **all** dependencies (web services, auth service, UserManager). Use `ControllerTestUtilities` helpers for common mocks. |
-| Scoring calculations | `SailScores.Test.Unit` | Pure unit tests — no DB or mocks needed; construct model objects directly. |
+| Scoring calculations | `SailScores.Test.Unit/Core/Scoring` | Pure unit tests, no DB or mocks. Build series with the scenario builder (`Scenarios/Scenario.cs`: `Scenario.With(...).Race("A:1 B:2 C:DNC").Score()`) and check with `ScenarioAssert`. |
+| Scoring regressions on real data | `SailScores.Test.Unit/Core/Scoring/Characterization` | Snapshot tests over series from club backups. A snapshot change means scoring output changed; see its `README.md`. |
 | Import/export (CSV/Excel parsing) | `SailScores.ImportExport.Test` | Use real file fixtures from the test project. |
 | Scenarios that genuinely require a real SQL Server (e.g., backup/restore, raw SQL) | `SailScores.Test.Integration` | Requires a running database configured in `appsettings.IntegrationTests.json`. |
 | End-to-end browser flows | `SailScores.Test.Playwright` | Requires a running application instance. |

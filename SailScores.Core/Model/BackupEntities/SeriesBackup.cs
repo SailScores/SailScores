@@ -27,7 +27,11 @@ public class SeriesBackup
     public Guid? SeriesResultsTemplateId { get; set; }
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }
+    // Still written so older versions can restore new backups; read only when
+    // SummaryRollupMode is missing (backups from before it existed).
     public bool? ChildrenSeriesAsSingleRace { get; set; }
+    public SummaryRollupMode? SummaryRollupMode { get; set; }
+    public bool? IncludeUnrankedChildScores { get; set; }
     public int? RaceCount { get; set; }
     public bool? DateRestricted { get; set; }
     public DateOnly? EnforcedStartDate { get; set; }

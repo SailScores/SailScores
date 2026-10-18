@@ -1,0 +1,112 @@
+{
+  "ScoringSystemName": "Cox-Sprague Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 0,
+  "NumberOfSailedRaces": 5,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": false,
+  "PercentRequired": "0",
+  "Columns": [
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2025-09-20",
+    "2. 2025-09-20",
+    "3. 2025-09-20",
+    "1. 2025-09-21",
+    "2. 2025-09-21"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "96.9543147208",
+      "Average": "96.9543147208",
+      "PointsEarned": "191",
+      "PointsPossible": "197",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "participation": "100"
+      },
+      "Scores": "1:31/31 | 2:46/52 | 1:52/52 | 1:31/31 | 1:31/31"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "94.2307692308",
+      "Average": "94.2307692308",
+      "PointsEarned": "98",
+      "PointsPossible": "104",
+      "ParticipationPercent": "40",
+      "Columns": {
+        "participation": "40"
+      },
+      "Scores": "DNC null | 1:52/52 | 2:46/52 | SB 0/31 | SB 0/31"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "80.6451612903",
+      "Average": "80.6451612903",
+      "PointsEarned": "50",
+      "PointsPossible": "62",
+      "ParticipationPercent": "40",
+      "Columns": {
+        "participation": "40"
+      },
+      "Scores": "DNC null | DNC null | DNC null | 2:25/31 | TIE 25/31"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "76.9230769231",
+      "Average": "76.9230769231",
+      "PointsEarned": "80",
+      "PointsPossible": "104",
+      "ParticipationPercent": "40",
+      "Columns": {
+        "participation": "40"
+      },
+      "Scores": "DNC null | 4:38/52 | 3:42/52 | DNC null | DNC null"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "72.5888324873",
+      "Average": "72.5888324873",
+      "PointsEarned": "143",
+      "PointsPossible": "197",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "participation": "100"
+      },
+      "Scores": "3:21/31 | 3:42/52 | 4:38/52 | 3:21/31 | 3:21/31"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "70.3703703704",
+      "Average": "70.3703703704",
+      "PointsEarned": "95",
+      "PointsPossible": "135",
+      "ParticipationPercent": "60",
+      "Columns": {
+        "participation": "60"
+      },
+      "Scores": "2:25/31 | 5:35/52 | 5:35/52 | DNC null | DNC null"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Excluded: Did not come to starting area",
+    "SB": "Excluded: Did not come to starting area",
+    "TIE": "Average of tied places: Tied with previous"
+  }
+}

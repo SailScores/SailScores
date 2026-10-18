@@ -1,0 +1,182 @@
+{
+  "ScoringSystemName": "Wawasee 2026",
+  "TotalHeader": "Points (with Penalties)",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 3,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": true,
+  "PercentRequired": "51",
+  "Columns": [
+    "participation: Participation (Percent, Hidden)",
+    "penalties: Penalties (Decimal, Always)",
+    "averageFinish: Average (Decimal, Always)",
+    "averageWithPenalties: Average (with Penalties) (Decimal, Hidden)"
+  ],
+  "Races": [
+    "1. 2026-01-04 Winter 1",
+    "1. 2026-01-18 Winter 2",
+    "1. 2026-02-01 Winter 3 [Abandoned]",
+    "1. 2026-02-15 Winter 4 - Livett Cup",
+    "1. 2026-03-01 Winter 5 [Scheduled]",
+    "1. 2026-03-15 Spring 1 [Scheduled]",
+    "1. 2026-03-22 Spring 2 [Scheduled]",
+    "1. 2026-03-29 Spring 3 - The Baker Cup [Scheduled]",
+    "1. 2026-04-18 Spring 4 [Scheduled]",
+    "1. 2026-05-17 Spring 5 - Windas Cup [Scheduled]"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompJB2",
+      "SailNumber": "JB",
+      "Total": "2",
+      "TotalIncludingDiscards": "3",
+      "Average": "1",
+      "PointsEarned": "2",
+      "PointsPossible": "2",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "averageFinish": "1",
+        "averageWithPenalties": "1",
+        "participation": "100"
+      },
+      "Scores": "(RCD 1/1) | 1/1 | - | 1/1 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompDB",
+      "SailNumber": "DB",
+      "Total": "7",
+      "TotalIncludingDiscards": "8",
+      "Average": "3.5",
+      "PointsEarned": "7",
+      "PointsPossible": "2",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "averageFinish": "3.5",
+        "averageWithPenalties": "3.5",
+        "participation": "100"
+      },
+      "Scores": "(1/1) | 5/1 | - | 2/1 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompSC",
+      "SailNumber": "SC",
+      "Total": "13",
+      "TotalIncludingDiscards": "19.5",
+      "Average": "6.5",
+      "PointsEarned": "13",
+      "PointsPossible": "2",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "averageFinish": "6.5",
+        "averageWithPenalties": "6.5",
+        "participation": "100"
+      },
+      "Scores": "(DNC 6.5) | RET 9/1 | - | 4/1 | - | - | - | - | - | -"
+    },
+    {
+      "Name": "CompAF",
+      "SailNumber": "AF",
+      "TotalIncludingDiscards": "18",
+      "PointsEarned": "16",
+      "PointsPossible": "2",
+      "ParticipationPercent": "0",
+      "Columns": {
+        "averageWithPenalties": "8",
+        "participation": "0",
+        "penalties": "2 x 8"
+      },
+      "Scores": "(2/1) | RCD null/1 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Name": "CompAN",
+      "SailNumber": "AN",
+      "TotalIncludingDiscards": "29",
+      "Average": "9",
+      "PointsEarned": "26",
+      "PointsPossible": "2",
+      "ParticipationPercent": "50",
+      "Columns": {
+        "averageFinish": "9",
+        "averageWithPenalties": "13",
+        "participation": "50",
+        "penalties": "1 x 8"
+      },
+      "Scores": "(3/1) | DNF 9/1 | - | DNC 9 | - | - | - | - | - | -"
+    },
+    {
+      "Name": "CompJG",
+      "SailNumber": "JG",
+      "TotalIncludingDiscards": "20",
+      "Average": "4",
+      "PointsEarned": "16",
+      "PointsPossible": "2",
+      "ParticipationPercent": "50",
+      "Columns": {
+        "averageFinish": "4",
+        "averageWithPenalties": "8",
+        "participation": "50",
+        "penalties": "1 x 8"
+      },
+      "Scores": "(DNC 4) | 4/1 | - | DNC 4 | - | - | - | - | - | -"
+    },
+    {
+      "Name": "CompLF",
+      "SailNumber": "LF",
+      "TotalIncludingDiscards": "17",
+      "Average": "3",
+      "PointsEarned": "14",
+      "PointsPossible": "2",
+      "ParticipationPercent": "50",
+      "Columns": {
+        "averageFinish": "3",
+        "averageWithPenalties": "7",
+        "participation": "50",
+        "penalties": "1 x 8"
+      },
+      "Scores": "(DNC 3) | 3/1 | - | DNC 3 | - | - | - | - | - | -"
+    },
+    {
+      "Name": "CompMM",
+      "SailNumber": "MM",
+      "TotalIncludingDiscards": "14",
+      "Average": "2",
+      "PointsEarned": "12",
+      "PointsPossible": "2",
+      "ParticipationPercent": "50",
+      "Columns": {
+        "averageFinish": "2",
+        "averageWithPenalties": "6",
+        "participation": "50",
+        "penalties": "1 x 8"
+      },
+      "Scores": "(DNC 2) | 2/1 | - | DNC 2 | - | - | - | - | - | -"
+    },
+    {
+      "Name": "CompTL",
+      "SailNumber": "TL",
+      "TotalIncludingDiscards": "17",
+      "Average": "3",
+      "PointsEarned": "14",
+      "PointsPossible": "2",
+      "ParticipationPercent": "50",
+      "Columns": {
+        "averageFinish": "3",
+        "averageWithPenalties": "7",
+        "participation": "50",
+        "penalties": "1 x 8"
+      },
+      "Scores": "(DNC 3) | DNC 3 | - | 3/1 | - | - | - | - | - | -"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Average of results: Did not come to the starting area: scored the average finish",
+    "DNF": "Number of boats entered in series + 1: Started but did not finish",
+    "RCD": "Average of results: Did not come to the starting area: scored the average finish",
+    "RET": "Number of boats entered in series + 1: Retired"
+  }
+}

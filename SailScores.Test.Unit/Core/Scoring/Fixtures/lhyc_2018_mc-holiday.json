@@ -1,0 +1,3634 @@
+{
+  "metadata": {
+    "schema": "sailscores-club-backup",
+    "version": 1,
+    "createdDateUtc": "2026-02-22T18:38:13.6543269Z",
+    "sourceClubInitials": "LHYC",
+    "sourceClubName": "Lake Harriet Yacht Club",
+    "sourceClubId": "23cc00a0-ba27-4fe2-8c1c-e448b1f68eba",
+    "boatClassCount": 1,
+    "competitorCount": 158,
+    "fleetCount": 1,
+    "raceCount": 9,
+    "scoreCount": 152,
+    "seasonCount": 1,
+    "seriesCount": 1,
+    "regattaCount": 0,
+    "scoringSystemCount": 2
+  },
+  "name": "Lake Harriet Yacht Club",
+  "initials": "LHYC",
+  "isHidden": false,
+  "showClubInResults": false,
+  "showCalendarInNav": false,
+  "locale": "en-US",
+  "defaultRaceDateOffset": 0,
+  "boatClasses": [
+    {
+      "id": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "name": "MC Scow"
+    }
+  ],
+  "seasons": [
+    {
+      "id": "213dcccb-099b-48a1-74e8-08d699dd649d",
+      "name": "2018",
+      "urlName": "2018",
+      "start": "2018-01-01T00:00:00",
+      "end": "2018-12-31T00:00:00"
+    }
+  ],
+  "fleets": [
+    {
+      "id": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "name": "MC Scows",
+      "shortName": "MC",
+      "isActive": true,
+      "fleetType": "SelectedClasses",
+      "boatClassIds": [
+        "7867bd2c-b6a5-4266-8621-8fe510b1b0fb"
+      ]
+    }
+  ],
+  "competitors": [
+    {
+      "id": "a959330e-807e-470b-a0e8-00e1719091d0",
+      "name": "CompWD",
+      "sailNumber": "TC07",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc07",
+      "urlId": "id102",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "c94eadd9-cffe-41a8-95ef-0171bf4e3413",
+      "name": "CompAD",
+      "sailNumber": "1262",
+      "boatName": "Water Wings",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1262",
+      "urlId": "id2",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4bc70b7e-74f6-4af4-9aef-028b67023265",
+      "name": "CompPS",
+      "sailNumber": "1667",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1667",
+      "urlId": "id12",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4121f189-b96d-4492-8fcc-028caca5b076",
+      "name": "CompOLB",
+      "sailNumber": "2182",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id46",
+      "urlId": "id46",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "27bcd73b-b5da-4abc-af69-0507aa90315b",
+      "name": "CompSC",
+      "sailNumber": "2091",
+      "alternativeSailNumber": "2556",
+      "boatName": "Prima III",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2091",
+      "urlId": "id36",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "6299012b-127c-4a53-9536-0ce79678f4ed",
+      "name": "CompMK",
+      "sailNumber": "TC66",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc66",
+      "urlId": "id147",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "18542973-7b35-43d3-8a77-0f22fe95575c",
+      "name": "CompRC",
+      "sailNumber": "TC46",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc46",
+      "urlId": "id130",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4802ec54-3a1c-4688-a255-1002a15ddd2b",
+      "name": "CompRJ",
+      "sailNumber": "1859",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1859",
+      "urlId": "id23",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "f83fd5ef-99f4-4107-9241-116efb272387",
+      "name": "CompFP",
+      "sailNumber": "TC87",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc87",
+      "urlId": "id167",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "171a23c7-3a58-4a4a-906e-12c6b9fe46a4",
+      "name": "CompCH",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id198",
+      "urlId": "id198",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1255b1e5-b052-405d-a01c-142b1e32ebae",
+      "name": "CompBB",
+      "sailNumber": "TC27",
+      "homeClubName": "TCSC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc27",
+      "urlId": "id114",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "12011a0c-ee33-42bb-aa0a-15bb32b2dd88",
+      "name": "CompRJ2",
+      "sailNumber": "TC34",
+      "homeClubName": "TCSC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id206",
+      "urlId": "id206",
+      "created": "2025-05-22T15:29:48.67545",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "d8e2e7b9-86a1-41b6-8cc8-1653178c5552",
+      "name": "CompES",
+      "sailNumber": "TC31",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc31",
+      "urlId": "id118",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "52145bc6-9fad-4c5a-9cf3-17225e8edf20",
+      "name": "CompPM",
+      "sailNumber": "TC26",
+      "homeClubName": "TCSC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc26",
+      "urlId": "id204",
+      "created": "2025-05-17T22:03:18.4752691",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "530b29b6-943a-48cd-84a8-18c35f528f39",
+      "name": "CompSN",
+      "sailNumber": "2040",
+      "boatName": "Deadly Sinn",
+      "homeClubName": "Lake HArriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id34",
+      "urlId": "id34",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1d082b9e-bce8-4378-b889-1ba9ef67e026",
+      "name": "CompHC",
+      "sailNumber": "2640",
+      "homeClubName": "Gull Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2640",
+      "urlId": "id63",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "232b1be7-a6f3-4e64-be43-1bddd439d6e0",
+      "name": "CompLMSJ",
+      "sailNumber": "1765",
+      "boatName": "Spastic",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1765",
+      "urlId": "id16",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "eea46cfc-c8ef-4740-9bcd-1c871d3fa575",
+      "name": "CompPK",
+      "sailNumber": "TC39",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc39",
+      "urlId": "id124",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "56a2267b-9f9d-4c1f-a398-1ce702d54c71",
+      "name": "CompKJ",
+      "sailNumber": "2608",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2608",
+      "urlId": "id61",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "60e99954-381d-4d7c-b7ba-1d87300fc5e7",
+      "name": "CompBJCC",
+      "sailNumber": "1850",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id21",
+      "urlId": "id21",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "33b51c7b-4666-48e0-b2a6-1e694b31bf21",
+      "name": "CompRN",
+      "sailNumber": "TC50",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc50",
+      "urlId": "id133",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "935c0c04-be52-4b76-a138-2194477d6938",
+      "name": "CompAJ",
+      "sailNumber": "2887",
+      "homeClubName": "Royal Dinghy YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2887",
+      "urlId": "id79",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4db6deb0-de02-4ed9-abf9-21d3ed157216",
+      "name": "CompCA",
+      "sailNumber": "TC81",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc81",
+      "urlId": "id161",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4fdddfc6-d047-4173-8a3c-24cf5bc7c8d2",
+      "name": "CompKA",
+      "sailNumber": "TC67",
+      "alternativeSailNumber": "264",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc67",
+      "urlId": "id148",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "9955f606-8ea6-4296-bae9-27a0213dc902",
+      "name": "CompMAJD",
+      "sailNumber": "2161",
+      "boatName": "Scuppers",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id44",
+      "urlId": "id44",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "db793a01-b3f0-4430-aeb1-287c04edcb06",
+      "name": "CompMB",
+      "sailNumber": "1894",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1894",
+      "urlId": "id24",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "2d2e4c53-7979-4eae-a73c-29dc3cc14f48",
+      "name": "CompJT",
+      "sailNumber": "LH9",
+      "boatName": "Commodore 9",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id92",
+      "urlId": "id92",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4baf30ff-9972-4152-b0b8-2db1dec80347",
+      "name": "CompLJ",
+      "sailNumber": "1578",
+      "homeClubName": "Gull Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1578",
+      "urlId": "id8",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "ad129df8-c052-4067-86c0-31aab6454551",
+      "name": "CompJT2",
+      "sailNumber": "2253",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2253",
+      "urlId": "id48",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "65b71032-9baf-414a-822f-329df0879466",
+      "name": "CompCJ",
+      "sailNumber": "TC65",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc65",
+      "urlId": "id146",
+      "fleetIds": []
+    },
+    {
+      "id": "e37ff859-2d23-4fe0-a209-364180a09016",
+      "sailNumber": "TC19",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc19",
+      "urlId": "id111",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "59d8a698-1015-4a24-aa30-37e1a1374182",
+      "name": "CompEJ",
+      "sailNumber": "TC63",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc63",
+      "urlId": "id144",
+      "fleetIds": []
+    },
+    {
+      "id": "02be4145-f5f7-4c08-915d-39f8953762df",
+      "name": "CompGC",
+      "sailNumber": "2539",
+      "homeClubName": "Lake Harriet YC",
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2539",
+      "urlId": "id56",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "a4431e75-2234-444c-b551-3c62257ed694",
+      "name": "CompBJ",
+      "sailNumber": "TC08",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc08",
+      "urlId": "id103",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4cfbe8ca-14e0-475f-a4b4-3d93f5f82a14",
+      "name": "CompTJ",
+      "sailNumber": "TC12",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc12",
+      "urlId": "id107",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "68b74191-499d-4079-b023-3e82b54c0a6e",
+      "name": "CompSC2",
+      "sailNumber": "TC56",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc56",
+      "urlId": "id138",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+      "name": "CompOC",
+      "sailNumber": "2322",
+      "boatName": "Sea Otter",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2322",
+      "urlId": "id49",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "16f6c88a-02a4-4246-bc99-43352e08e6c1",
+      "name": "CompLJ2",
+      "sailNumber": "TC79",
+      "alternativeSailNumber": "1",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc79",
+      "urlId": "id159",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "61586653-83f4-4d90-8559-46f4c2f30b77",
+      "name": "CompCJ2",
+      "sailNumber": "TC29",
+      "homeClubName": "TCSC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc29",
+      "urlId": "id116",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "8dfba50f-a9bd-4ae2-a72b-4c09c2e85940",
+      "name": "CompMKDB",
+      "sailNumber": "2121",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2121",
+      "urlId": "id39",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "298e1aae-47ea-4fe6-99a7-4da304b4c793",
+      "name": "CompCH2",
+      "sailNumber": "2040",
+      "boatName": "Flying Lotus",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id33",
+      "urlId": "id33",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "6c1b1770-079d-4b66-abaa-4e4f4a9f39d2",
+      "name": "CompMK2",
+      "sailNumber": "2711",
+      "homeClubName": "Upper Minnetonka YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2711",
+      "urlId": "id72",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "61cc4ac1-6383-4c76-bead-5092814c7c18",
+      "name": "CompGD",
+      "sailNumber": "2653",
+      "homeClubName": "White Bear YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2653",
+      "urlId": "id68",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "e6eb42c7-680d-4ee4-9ab3-51b538f2655f",
+      "name": "CompNM",
+      "sailNumber": "1337",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1337",
+      "urlId": "id4",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "7af0bf65-7f22-4752-8c77-52325f427682",
+      "name": "CompSJ",
+      "sailNumber": "2504",
+      "boatName": "Pathfinder",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2504",
+      "urlId": "id52",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "888b2fa8-05d6-4248-a64e-532910d3abce",
+      "name": "CompAM",
+      "sailNumber": "1935",
+      "boatName": "Mde Oma",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1935",
+      "urlId": "id28",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "8517a34c-b767-400b-a07b-56460c582378",
+      "name": "CompPL",
+      "sailNumber": "TC17",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc17",
+      "urlId": "id109",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "0d4e0951-01fb-469c-992b-574ed746ab95",
+      "name": "CompSM",
+      "sailNumber": "209",
+      "boatName": "Blu Ur",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "209",
+      "urlId": "id35",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "dfff9d53-f440-4948-af72-596d0542b232",
+      "name": "CompAK",
+      "sailNumber": "2669",
+      "boatName": "Honu One",
+      "homeClubName": "Gull Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2669",
+      "urlId": "id69",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "99677fda-6ec7-4626-b061-5b360c3d30da",
+      "name": "CompKJ2",
+      "sailNumber": "1847",
+      "boatName": "Beautiful Obsession",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id18",
+      "urlId": "id18",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "a889b992-d223-4462-90fa-5c3eef80116f",
+      "name": "CompWM",
+      "sailNumber": "2091",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id37",
+      "urlId": "id37",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "35b745f7-4798-440d-9a80-5c518088085e",
+      "name": "CompGJ",
+      "sailNumber": "TC76",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc76",
+      "urlId": "id156",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "5759b70b-bd62-4e9e-933d-5d0f7b0151cc",
+      "name": "CompAAC",
+      "sailNumber": "1664",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1664",
+      "urlId": "id10",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "8f4e935b-6e52-499b-8794-5d121085fd03",
+      "name": "CompHJ",
+      "sailNumber": "TC48",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc48",
+      "urlId": "id131",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1ce3d23f-5ccc-41a9-a0e0-5dce758eb8c7",
+      "name": "CompAB",
+      "sailNumber": "TC51",
+      "boatName": "- various -",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc51",
+      "urlId": "id134",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4b9ad3b4-5b9e-4e41-b46f-5ee0df807920",
+      "sailNumber": "2035",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2035",
+      "urlId": "id32",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "ff604b31-3791-418d-a5d6-5f91abb2799e",
+      "name": "CompNB",
+      "sailNumber": "2599",
+      "homeClubName": "Okoboji YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2599",
+      "urlId": "id58",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "a0663585-2196-40db-b250-620af0070f32",
+      "name": "CompAD2",
+      "sailNumber": "2811",
+      "homeClubName": "Clear Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2811",
+      "urlId": "id76",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "28b97b72-267b-4450-9f86-623f111882cf",
+      "name": "CompPJ",
+      "sailNumber": "TC85",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc85",
+      "urlId": "id165",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "404bd5ae-8e13-42f4-8b3e-633a8de8b4b2",
+      "name": "CompBJ2",
+      "sailNumber": "1687",
+      "boatName": "Hott Yott",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id13",
+      "urlId": "id13",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "8ea36199-d361-468f-9af7-64bc004e122f",
+      "name": "CompKE",
+      "sailNumber": "TC84",
+      "homeClubName": "Twin Cities SC ",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc84",
+      "urlId": "id164",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "7b8299dc-c91f-4655-84e1-6b2604359ca7",
+      "name": "CompSY",
+      "sailNumber": "TC?2",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc2",
+      "urlId": "id96",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "e53bd38e-339b-46e4-b364-6d09e26f475c",
+      "name": "CompCB",
+      "sailNumber": "2644",
+      "boatName": "Mango",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id64",
+      "urlId": "id64",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4b5ab819-3a31-4574-b79f-6d715be468b1",
+      "name": "CompLM",
+      "sailNumber": "TC30",
+      "homeClubName": "TCSC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc30",
+      "urlId": "id117",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "581bef2f-d016-4841-ab82-6dee3dcae841",
+      "sailNumber": "2140",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2140",
+      "urlId": "id41",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "da754adb-40a1-4770-ba30-6e1ccd6da719",
+      "name": "CompBB2",
+      "sailNumber": "TC28",
+      "homeClubName": "TCSC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc28",
+      "urlId": "id115",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "2b33de24-04b1-4cc7-a27e-6e3b7251d8c0",
+      "name": "CompMM",
+      "sailNumber": "2644",
+      "homeClubName": "Minnetonka YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id65",
+      "urlId": "id65",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "56c81c4b-ad49-404d-ad3f-6eb9c888899f",
+      "name": "CompLT",
+      "sailNumber": "TC52",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc52",
+      "urlId": "id135",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "9b5f9fd0-c0ff-47a5-8a72-704c0072b02b",
+      "name": "CompNB2",
+      "sailNumber": "1646",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1646",
+      "urlId": "id9",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "de1ee203-4142-4858-be97-7185cf893a3c",
+      "name": "CompHA",
+      "sailNumber": "TC38",
+      "alternativeSailNumber": "2338",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id211",
+      "urlId": "id211",
+      "created": "2025-08-07T02:34:33.5803068",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "e679c389-4935-424e-9cca-72be52ea6e65",
+      "name": "CompTN",
+      "sailNumber": "TC24",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc24",
+      "urlId": "id112",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1f3e12f9-f6a9-40de-9032-765718a1be15",
+      "name": "CompPI",
+      "sailNumber": "TC11",
+      "alternativeSailNumber": "16",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc11",
+      "urlId": "id106",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "969620f0-9575-4f8e-bd47-76af510280ea",
+      "name": "CompBK",
+      "sailNumber": "TC36",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc36",
+      "urlId": "id121",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4fbe4c80-8d24-4cde-bffb-784b3d20de1d",
+      "name": "CompSR",
+      "sailNumber": "453",
+      "boatName": "Shadow",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "453",
+      "urlId": "id82",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+      "name": "CompMJ",
+      "sailNumber": "2161",
+      "alternativeSailNumber": "1765",
+      "boatName": "Scuppers",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2161",
+      "urlId": "id43",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "d08d49f4-dc1d-4f61-8863-7ba1ec2b3421",
+      "name": "CompWJ",
+      "sailNumber": "1916",
+      "boatName": "Rapido",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1916",
+      "urlId": "id26",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "7eac01e3-60a0-468f-95b7-7c3cc3a139bd",
+      "sailNumber": "2033",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2033",
+      "urlId": "id31",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "d79f5448-0a7b-4bab-a799-7d4de0a1cf0d",
+      "name": "CompCB2",
+      "sailNumber": "1746",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1746",
+      "urlId": "id15",
+      "fleetIds": []
+    },
+    {
+      "id": "368b697d-6d3b-427f-96bc-7d5f210be23f",
+      "name": "CompMS",
+      "sailNumber": "1280",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1280",
+      "urlId": "id3",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "80b3516d-ee39-40b0-a8f2-7fc9b7e3438f",
+      "name": "CompGG",
+      "sailNumber": "TC16",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc16",
+      "urlId": "id108",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "5b30071e-e04d-44e8-a139-7fec574d3c17",
+      "name": "CompLT2",
+      "sailNumber": "TC82",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc82",
+      "urlId": "id162",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "47a85c55-9c31-4177-b0b6-806e62bfa452",
+      "name": "CompFT",
+      "sailNumber": "2722",
+      "homeClubName": "Powers Lake, WI",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2722",
+      "urlId": "id74",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "23f5da17-84d7-4feb-92c8-807a9603abc3",
+      "name": "CompSN2",
+      "sailNumber": "TC44",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id127",
+      "urlId": "id127",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "61ffe7ef-09d5-404c-99a9-831f1f33698e",
+      "name": "CompJP",
+      "sailNumber": "TC49",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc49",
+      "urlId": "id132",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "cec8647f-394c-46c1-8f24-847c4fc3f9a0",
+      "name": "CompWM2",
+      "sailNumber": "2674",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2674",
+      "urlId": "id70",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "b64f3b65-19c5-4da6-a3ed-84db0f4227a2",
+      "name": "CompFD",
+      "sailNumber": "TC75",
+      "boatName": "-various-",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id154",
+      "urlId": "id154",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "631d8371-6e7a-4da8-94a4-88e72c3e70b4",
+      "name": "CompPR",
+      "sailNumber": "2517",
+      "homeClubName": "Cedar Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2517",
+      "urlId": "id55",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "e7e433fe-02f4-4a22-a3c1-8990aa73d8ab",
+      "name": "CompSI",
+      "sailNumber": "2182",
+      "homeClubName": "Lake Minnetonka SS",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id47",
+      "urlId": "id47",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1ca5082f-7b07-419a-bc92-8a5eb1df5ba3",
+      "name": "CompFA",
+      "sailNumber": "TC77",
+      "alternativeSailNumber": "214",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc77",
+      "urlId": "id157",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+      "name": "CompGR",
+      "sailNumber": "2169",
+      "boatName": "Black Cat",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2169",
+      "urlId": "id45",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "ea334ad8-cffa-4f05-aeb0-90172b4cbe17",
+      "name": "CompTL",
+      "sailNumber": "TC18",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc18",
+      "urlId": "id110",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "aa42b65d-f1fd-4978-9c45-9785adb48559",
+      "name": "CompVE",
+      "sailNumber": "TC45",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc45",
+      "urlId": "id129",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "30c4d09d-64e5-4a6c-bbbe-988e471032ac",
+      "sailNumber": "121",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "121",
+      "urlId": "id1",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "298f1f3c-ec20-4c01-b475-98caa3499efc",
+      "name": "CompHD",
+      "sailNumber": "TC86",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc86",
+      "urlId": "id166",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "eb98d712-b202-4712-b222-99525e34b885",
+      "name": "CompCS",
+      "sailNumber": "2823",
+      "homeClubName": "Upper Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2823",
+      "urlId": "id78",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "f477f96b-e20a-4536-8bba-9bc689718c02",
+      "name": "CompFJ",
+      "sailNumber": "2511",
+      "boatName": "Minnehaha",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2511",
+      "urlId": "id53",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "6ae9f5dd-5f71-414e-893a-9f7c1508eada",
+      "sailNumber": "8",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "8",
+      "urlId": "id84",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "ddfd33ec-7849-4964-b08b-9fe5789aa56d",
+      "name": "CompEJ2",
+      "sailNumber": "TC73",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc73",
+      "urlId": "id152",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "0df58d3c-6961-403d-b019-a0b49e2104ce",
+      "name": "CompSL",
+      "sailNumber": "TC05",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc05",
+      "urlId": "id101",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "184e54e9-78c9-4f8c-bd59-a0cc5aecbc40",
+      "name": "CompWR",
+      "sailNumber": "TC70",
+      "boatName": "- various -",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc70",
+      "urlId": "id149",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4f9d887a-42b7-47cd-a1d1-a1f80dde3ccc",
+      "name": "CompAJ2",
+      "sailNumber": "2125",
+      "homeClubName": "Duluth YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2125",
+      "urlId": "id40",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "cd2beaf3-f35a-418a-b3fe-a383eeeb66da",
+      "name": "CompJK",
+      "sailNumber": "2338",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2338",
+      "urlId": "id51",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "e9b300e1-d04b-4c90-8fd5-a53d23c0460a",
+      "name": "CompHT",
+      "sailNumber": "2516",
+      "homeClubName": "-",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2516",
+      "urlId": "id54",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "510b5f58-9e9f-477b-9330-a5fd02937727",
+      "name": "CompRB",
+      "sailNumber": "TC88",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc88",
+      "urlId": "id168",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "47fd9f67-4cd2-48a4-99ae-a6cec65a5204",
+      "name": "CompDV",
+      "sailNumber": "2810",
+      "homeClubName": "Gull Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2810",
+      "urlId": "id75",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "717e4152-cdab-4cd1-b4df-ac772765b405",
+      "name": "CompDM",
+      "sailNumber": "2564",
+      "homeClubName": "MCSA",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2564",
+      "urlId": "id57",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "d46a07fd-4b15-46f6-b3cf-ad086fcfa620",
+      "name": "CompDR",
+      "sailNumber": "TC61",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc61",
+      "urlId": "id141",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "3704a30b-099b-423e-bd43-ad639d748a5e",
+      "name": "CompCA2",
+      "sailNumber": "1850",
+      "boatName": "American Flyer",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id22",
+      "urlId": "id22",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+      "name": "CompNCRA",
+      "sailNumber": "2604",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id60",
+      "urlId": "id60",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "84a06346-794b-4f41-a828-b10e2e9cae5a",
+      "name": "CompNN",
+      "sailNumber": "2717",
+      "homeClubName": "Upper Minnetonka YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2717",
+      "urlId": "id73",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "8fe8c76b-de51-4bc9-818f-b28c9d6e2ee7",
+      "name": "CompPJ2",
+      "sailNumber": "TC38",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc38",
+      "urlId": "id123",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "8da11853-88be-4455-820d-b537954fcb16",
+      "name": "CompKGJJ",
+      "sailNumber": "1847",
+      "boatName": "Beautiful Obsession",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1847",
+      "urlId": "id19",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "41911f57-f548-42dc-831e-b64af9c5fab7",
+      "name": "CompHE",
+      "sailNumber": "1010",
+      "boatName": "Naiad",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1010",
+      "urlId": "id208",
+      "created": "2025-07-10T22:31:47.156948",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "a20c70b2-81ab-4d28-abe8-b8855e3516f0",
+      "name": "CompBP",
+      "sailNumber": "1474",
+      "boatName": "True Blue",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1474",
+      "urlId": "id6",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "81f47ad6-3726-4c2a-bf45-b8c4eff340af",
+      "name": "CompP",
+      "sailNumber": "2009",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2009",
+      "urlId": "id30",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "fe8e1466-c913-4f52-b7bd-b9f1efffdc58",
+      "name": "CompSJ2",
+      "sailNumber": "TC37",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc37",
+      "urlId": "id122",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "9b727723-02b6-4018-bf9c-bd8993ce0151",
+      "name": "CompFT2",
+      "sailNumber": "18",
+      "homeClubName": "Lake Harriet YC",
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "18",
+      "urlId": "id17",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "f78cd36e-82a6-48b2-84fd-beee478a3466",
+      "name": "CompDJ",
+      "sailNumber": "1687",
+      "homeClubName": "-",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id14",
+      "urlId": "id14",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "0b1ffcef-8be8-4496-956e-bf49d54865b7",
+      "name": "CompGA",
+      "sailNumber": "TC64",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc64",
+      "urlId": "id145",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "c039fc4a-fb1b-4de5-8cdb-bf5f15c9d374",
+      "sailNumber": "1445",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1445",
+      "urlId": "id5",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "8db1f0df-86e1-4c39-a5a4-c066c265e8b8",
+      "name": "CompCC",
+      "sailNumber": "TC55",
+      "homeClubName": "Twin Cities SC",
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc55",
+      "urlId": "id137",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "39a3da69-00aa-4272-b78a-c0d0ecfa8e68",
+      "name": "CompDE",
+      "sailNumber": "TC34",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc34",
+      "urlId": "id120",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "75f82a59-4ed5-43e6-bf92-c3ba3d3ecb9a",
+      "name": "CompASL",
+      "sailNumber": "TC83",
+      "alternativeSailNumber": "987",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc83",
+      "urlId": "id163",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "3520dbda-f7dc-4975-bd67-c7079d51f592",
+      "name": "CompHS",
+      "sailNumber": "TC44",
+      "alternativeSailNumber": "264",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc44",
+      "urlId": "id126",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "03497a61-ecc7-41a2-ad1f-c8f51c88d225",
+      "name": "CompFJ2",
+      "sailNumber": "TC62",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc62",
+      "urlId": "id142",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "414fdc92-4bb4-493f-9a60-c8fe80a6a76d",
+      "name": "CompLS",
+      "sailNumber": "1664",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id11",
+      "urlId": "id11",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "f9bd2f2b-363e-48e3-b12d-cedb2d49e57b",
+      "name": "CompWS",
+      "sailNumber": "TC35",
+      "homeClubName": "TCSC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc35",
+      "urlId": "id209",
+      "created": "2025-07-17T22:27:59.632158",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "22ac20ef-82ce-4ba2-a64f-cf46527976a5",
+      "name": "CompRJ3",
+      "sailNumber": "TC10",
+      "boatName": "-various-",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc10",
+      "urlId": "id105",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "5041d936-bf11-4aa0-8ad6-cfffda914dc5",
+      "name": "CompTB",
+      "sailNumber": "1229",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1229",
+      "urlId": "id205",
+      "created": "2025-05-19T04:00:58.2484935",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "7e1f13ec-56bd-4edf-98be-d41269ebd6d2",
+      "name": "CompOTP",
+      "sailNumber": "TC42",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc42",
+      "urlId": "id125",
+      "fleetIds": []
+    },
+    {
+      "id": "a7f4d19d-6855-46ef-a8b4-d7101efffcc1",
+      "name": "CompSB",
+      "sailNumber": "TC?5",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc5",
+      "urlId": "id99",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "c1f46d7b-9c27-4c03-a776-d84951930a90",
+      "name": "CompBJ3",
+      "sailNumber": "1850",
+      "boatName": "Andy",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id20",
+      "urlId": "id20",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "2bf12382-b105-4637-910d-d9970b8c6a28",
+      "name": "CompND",
+      "sailNumber": "TC25",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc25",
+      "urlId": "id113",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "4e7204cf-459e-4aab-89b6-d9f4abdcd5ff",
+      "name": "CompWE",
+      "sailNumber": "2652",
+      "boatName": " Zut alors",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2652",
+      "urlId": "id66",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "b2fad1aa-79e2-42ed-9922-da76d8b6155b",
+      "name": "CompED",
+      "sailNumber": "TC03",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc03",
+      "urlId": "id100",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+      "name": "CompFJ3",
+      "sailNumber": "2144",
+      "boatName": "Don't Panic",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2144",
+      "urlId": "id42",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "bdb9f628-4233-4efc-a64d-e32d1563c21e",
+      "name": "CompHK",
+      "sailNumber": "TC59",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc59",
+      "urlId": "id139",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1ab7a095-2638-4aaf-b262-e33ff8b1582d",
+      "name": "CompOBJ",
+      "sailNumber": "TC37",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id225",
+      "urlId": "id225",
+      "created": "2025-09-20T22:29:55.266227",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "97c02cf5-0077-4971-9d6f-e5090ba05356",
+      "name": "CompMR",
+      "sailNumber": "TC75",
+      "boatName": "- various -",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id155",
+      "urlId": "id155",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "5877b295-e57d-4167-9982-e73cff7a975c",
+      "name": "CompPH",
+      "sailNumber": "TC78",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc78",
+      "urlId": "id158",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "9d4d026e-7847-4ca5-b69c-e81399cd9322",
+      "name": "CompGN",
+      "sailNumber": "1687",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1687",
+      "urlId": "id207",
+      "created": "2025-06-01T00:53:37.737778",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "55a28490-4c6c-41db-bc9a-ea05d1399f5e",
+      "name": "CompFW",
+      "sailNumber": "TC74",
+      "boatName": "-various-",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc74",
+      "urlId": "id153",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "2fa20205-74cf-4abd-b24e-eb6e47fc5543",
+      "name": "CompAD3",
+      "sailNumber": "2707",
+      "homeClubName": "Gull Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2707",
+      "urlId": "id71",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "011dbd1b-c116-4ebc-be16-ec07cd734e50",
+      "name": "CompGR2",
+      "sailNumber": "TC60",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc60",
+      "urlId": "id140",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "93bf6d30-100f-4eaf-94f9-eccc5193c2da",
+      "name": "CompPD",
+      "sailNumber": "TC80",
+      "boatName": "-various-",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc80",
+      "urlId": "id160",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1fb0c1ce-c3ec-459c-a1f6-eeef84f07131",
+      "sailNumber": "698",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "698",
+      "urlId": "id83",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "bada729c-f708-4ce3-ae5c-ef2230c85d92",
+      "name": "CompSZ",
+      "sailNumber": "TC?3",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc3",
+      "urlId": "id97",
+      "fleetIds": []
+    },
+    {
+      "id": "1f308eea-ebd8-41b4-a92b-f0dee04dbfd4",
+      "name": "CompCHM",
+      "sailNumber": "TC71",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc71",
+      "urlId": "id150",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "36ce18e8-ef1a-4bbc-8f6c-f24d824833d4",
+      "name": "CompCD",
+      "sailNumber": "TC32",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc32",
+      "urlId": "id119",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "d0463a4b-58ad-4fce-8e9d-f267effd86bf",
+      "name": "CompSA",
+      "sailNumber": "TC?4",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc4",
+      "urlId": "id98",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "3ee3f69b-a049-4b4c-bee0-f2bb70a2acb1",
+      "name": "CompGJ2",
+      "sailNumber": "2824",
+      "homeClubName": "Upper Minnetonka YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2824",
+      "urlId": "id38",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1d8f5bc7-5202-4975-a82f-f6d012561fb4",
+      "name": "CompFG",
+      "sailNumber": "TC72",
+      "boatName": "-various-",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc72",
+      "urlId": "id151",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "86b21cd6-628f-4006-8170-f729bfcf9d03",
+      "name": "CompRA",
+      "sailNumber": "TC09",
+      "boatName": "-various-",
+      "homeClubName": "Twin Cities SC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc09",
+      "urlId": "id104",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "1321bef4-5158-4cd1-a22f-f80619126952",
+      "name": "CompSX",
+      "sailNumber": "TC??",
+      "homeClubName": "Twin Cities SC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "tc",
+      "urlId": "id95",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "830fb963-6838-4e1d-811b-fbf6f2164ebd",
+      "name": "CompDB",
+      "sailNumber": "2604",
+      "boatName": "Windgate",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "id59",
+      "urlId": "id59",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "0f8825ba-e6b9-4e22-8593-fc39acaafa46",
+      "name": "CompCJ3",
+      "sailNumber": "1933",
+      "boatName": "Humdinger",
+      "homeClubName": "Lake Harriet YC",
+      "isActive": true,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "1933",
+      "urlId": "id27",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "2c30f99e-6531-4864-be89-fc485e413e97",
+      "name": "CompBP2",
+      "sailNumber": "2624",
+      "homeClubName": "Cedar Lake YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2624",
+      "urlId": "id62",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    },
+    {
+      "id": "06eae57a-8c94-4156-885c-fc6e21f0a791",
+      "name": "CompHD2",
+      "sailNumber": "2813",
+      "homeClubName": "Minnetonka YC",
+      "isActive": false,
+      "boatClassId": "7867bd2c-b6a5-4266-8621-8fe510b1b0fb",
+      "urlName": "2813",
+      "urlId": "id77",
+      "fleetIds": [
+        "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4"
+      ]
+    }
+  ],
+  "scoringSystems": [
+    {
+      "id": "651a3372-9c45-4d07-884f-1320a9554267",
+      "name": "Appendix A For Series - Rule 5.3",
+      "discardPattern": "0,1",
+      "isSiteDefault": true,
+      "calculatorType": 1,
+      "scoreCodes": [
+        {
+          "id": "5468746b-1a3d-41c8-9524-5a1348f530db",
+          "name": "BFD",
+          "description": "Disqualification under rule 30.4",
+          "preserveResult": false,
+          "discardable": false,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "bae7b19f-bd7a-4b34-bf61-a923074d0d6a",
+          "name": "DNC",
+          "description": "Did not come to starting area",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "97199c0b-ba85-4991-90de-78313daa5206",
+          "name": "DNE",
+          "description": "Disqualification that is not excludable",
+          "preserveResult": false,
+          "discardable": false,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "23924b2a-589e-449b-8ee1-4aace21887ee",
+          "name": "DNF",
+          "description": "Started but did not finish",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "0bdf9646-9fe7-41af-8cd5-d35c24ec08e7",
+          "name": "DNS",
+          "description": "Came to start area but did not start",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "fbb44a91-79c1-45bc-a1f1-b7e438f0bd13",
+          "name": "DPI",
+          "description": "Discretionary penalty",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "a5e1e95b-b485-4ef2-9fbb-ed9e2f5ea8ef",
+          "name": "DSQ",
+          "description": "Disqualification",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "3cde0694-404d-49e9-aa40-56481b1622d6",
+          "name": "NSC",
+          "description": "Did not sail the course (other than DNC, DNS, OCS and DNF)",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "570b7975-3033-426c-89d9-dea990494b17",
+          "name": "OCS",
+          "description": "On course side at start or broke rule 30.1",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "509de5cd-590d-49fc-92da-538539ba52ad",
+          "name": "RDG",
+          "description": "Redress: points set by protest hearing",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "MAN",
+          "countAsParticipation": true
+        },
+        {
+          "id": "3d648097-19ed-4075-aeea-5fb45e6d57fa",
+          "name": "RDGAve",
+          "description": "Redress: average of other races",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "AVE",
+          "countAsParticipation": true
+        },
+        {
+          "id": "aa3615ab-1dbf-4b0f-8874-6aeff614c5c8",
+          "name": "RET",
+          "description": "Retired",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "178e3235-dddd-4271-89fa-6d441d7635b0",
+          "name": "SCP",
+          "description": "Scoring Penalty imposed",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "caa61bf8-9eb5-4c90-8c5e-1333c19a8e4a",
+          "name": "TIE",
+          "description": "Tied with previous",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "TIE",
+          "countAsParticipation": true
+        },
+        {
+          "id": "48a704dd-f812-4ed3-ab0a-60a4c722fe0f",
+          "name": "UFD",
+          "description": "Disqualification under rule 30.3",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "82fabaa8-a390-4c58-a3ea-91af00c4c96d",
+          "name": "ZFP",
+          "description": "20% Penalty under rule 30.2",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        }
+      ],
+      "scoreCodeGroups": []
+    },
+    {
+      "id": "0551a25e-bd0c-4431-9b9d-590597d2d008",
+      "name": "LHYC Standard Scoring",
+      "discardPattern": "0,0,0,0,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18,19,19,19,20,20,20,21,21,21,22,22,22,23,23,23,24,24,24,25,25,25,26,26,26,27,27,27,28,28,28,29,29,29,30,30,30,31,31,31,32,32,32",
+      "parentSystemId": "651a3372-9c45-4d07-884f-1320a9554267",
+      "scoreCodes": [
+        {
+          "id": "0396d40d-b5db-40fc-a46c-ee8724588781",
+          "name": "SB",
+          "description": "Safety boat duty",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false
+        },
+        {
+          "id": "981bb2d2-2a8f-4fb0-8235-f27a7c6307cd",
+          "name": "GST",
+          "description": "Unknown, unregistered or guest skipper",
+          "formula": "CTS+",
+          "formulaValue": 2,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": true,
+          "adjustOtherScores": true
+        },
+        {
+          "id": "f57e7cdf-20bf-4f0c-bea8-f7a3e0466442",
+          "name": "TLE",
+          "description": "Time Limit Elapsed: Finished After Time Limit",
+          "formula": "FIN+",
+          "formulaValue": 1,
+          "discardable": true,
+          "cameToStart": true,
+          "started": true,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": true
+        },
+        {
+          "id": "4178970b-2f07-4518-a69d-8d202e032620",
+          "name": "RDG Ave",
+          "description": "Redress: average of other races",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": true,
+          "started": true,
+          "finished": true,
+          "preserveResult": true,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "b906af00-a67f-4f04-93aa-ae894eec56e4",
+          "name": "RC",
+          "description": "Race Committee duty",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false
+        },
+        {
+          "id": "b0afc8ba-bcd4-433a-95f3-a7dbdc524894",
+          "name": "DNP",
+          "description": "Fees are not paid",
+          "formula": "CTS+",
+          "formulaValue": 2,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": true
+        },
+        {
+          "id": "6c27f859-e129-48ca-bff3-4c68ebad2981",
+          "name": "SBP",
+          "description": "Safety boat penalty",
+          "formula": "CTS+",
+          "formulaValue": 3,
+          "discardable": false,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "edede392-b8aa-475b-b17b-16aeef501d68",
+          "name": "DNC",
+          "description": "Did not come to starting area",
+          "formula": "CTS+",
+          "formulaValue": 2,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "ff23e296-6de3-4ea8-804e-1454c5715613",
+          "name": "DGM",
+          "description": "DSQ No Exclusion 69.1(b)(2)",
+          "formula": "CTS+",
+          "formulaValue": 1,
+          "discardable": false,
+          "cameToStart": true,
+          "started": true,
+          "finished": true,
+          "preserveResult": false,
+          "adjustOtherScores": false
+        },
+        {
+          "id": "8006d055-3db1-4331-ae78-0e1cdb742ff2",
+          "name": "ORA",
+          "description": "Off-lake regatta, take average",
+          "formula": "AVE ND",
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false
+        },
+        {
+          "id": "c739d186-e79f-4842-9b55-2dcd37c77667",
+          "name": "SBM",
+          "description": "Safety Boat Minimum",
+          "formula": "CTS+",
+          "formulaValue": 1,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": true
+        }
+      ]
+    }
+  ],
+  "series": [
+    {
+      "id": "55dbe220-3562-4c65-31b5-08d699de72bf",
+      "name": "MC Holiday",
+      "urlName": "MC Holiday",
+      "updatedDate": "2022-07-15T01:13:14.7241506Z",
+      "raceCount": 9,
+      "startDate": "2018-05-26",
+      "endDate": "2018-09-03",
+      "seasonId": "213dcccb-099b-48a1-74e8-08d699dd649d",
+      "childrenSeriesIds": [],
+      "parentSeriesIds": []
+    }
+  ],
+  "races": [
+    {
+      "id": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+      "name": "5-26 R2",
+      "date": "2018-05-26T00:00:00",
+      "order": 2,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "8111c367-0935-4a22-8d91-113e8391c4ab",
+          "competitorId": "4e7204cf-459e-4aab-89b6-d9f4abdcd5ff",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 9
+        },
+        {
+          "id": "a697fbe4-5329-4296-886f-1b32c4c2268a",
+          "competitorId": "02be4145-f5f7-4c08-915d-39f8953762df",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 8
+        },
+        {
+          "id": "3731e01c-d80d-4d50-8e31-28ac791ec89b",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 4
+        },
+        {
+          "id": "40523265-60a0-4a7c-8b02-631e1e0461d4",
+          "competitorId": "e53bd38e-339b-46e4-b364-6d09e26f475c",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 0,
+          "code": "RC"
+        },
+        {
+          "id": "1e2f3c61-c2c4-47a6-88fb-6ae282d72a42",
+          "competitorId": "db793a01-b3f0-4430-aeb1-287c04edcb06",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 3
+        },
+        {
+          "id": "1ec291eb-0d76-4e2b-8978-764e99227246",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 14
+        },
+        {
+          "id": "84e07609-fe3f-4838-b2f8-7fb5d80ff3d2",
+          "competitorId": "ff604b31-3791-418d-a5d6-5f91abb2799e",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 11
+        },
+        {
+          "id": "100253a0-788f-46ce-9af2-8cfdb1d7e6ab",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 15
+        },
+        {
+          "id": "68f26a14-80ef-4080-bf9f-a16946e63190",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 5
+        },
+        {
+          "id": "8348872e-109f-41ec-8b42-bb9c6006bc2d",
+          "competitorId": "f477f96b-e20a-4536-8bba-9bc689718c02",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 10
+        },
+        {
+          "id": "d388ece6-dc2a-481b-841b-c7fa6eb81242",
+          "competitorId": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 7
+        },
+        {
+          "id": "47a90b8b-ee54-4fc7-b6f4-cc86ad8612aa",
+          "competitorId": "a20c70b2-81ab-4d28-abe8-b8855e3516f0",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 12
+        },
+        {
+          "id": "785a498f-d968-4083-aaa1-dde5f8a3e85f",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 1
+        },
+        {
+          "id": "7a51db64-0efb-47d7-bddd-e67447968c5f",
+          "competitorId": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 13
+        },
+        {
+          "id": "d7631663-2ade-4fc8-a3e6-ee92b27a51d4",
+          "competitorId": "61ffe7ef-09d5-404c-99a9-831f1f33698e",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 16
+        },
+        {
+          "id": "17069635-764c-4f89-8c96-ef1cf7123597",
+          "competitorId": "2bf12382-b105-4637-910d-d9970b8c6a28",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 2
+        },
+        {
+          "id": "a7808c05-3fdc-4092-bcfa-fe29df9357ee",
+          "competitorId": "3704a30b-099b-423e-bd43-ad639d748a5e",
+          "raceId": "477b9773-bf90-43c3-9edb-49d31e56c0f2",
+          "place": 6,
+          "code": "GST"
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "8925e17a-de29-4245-85ad-87397793208b",
+      "name": "5-28",
+      "date": "2018-05-28T00:00:00",
+      "order": 1,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "4b7a2549-ba75-4230-ba3e-01594273f8f7",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 6
+        },
+        {
+          "id": "744740c1-348b-4fe8-a706-0af4d6b1568f",
+          "competitorId": "02be4145-f5f7-4c08-915d-39f8953762df",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 9
+        },
+        {
+          "id": "db98d082-39c1-4284-9c3f-3c623d3c081b",
+          "competitorId": "db793a01-b3f0-4430-aeb1-287c04edcb06",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 7
+        },
+        {
+          "id": "0513306f-a9d2-438e-97ae-6016bce8beb9",
+          "competitorId": "e53bd38e-339b-46e4-b364-6d09e26f475c",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 1
+        },
+        {
+          "id": "5e8b9218-9055-41f5-b64d-6c93af14c5a9",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 5
+        },
+        {
+          "id": "b64f185a-1df6-436f-869b-75499e56648e",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 4
+        },
+        {
+          "id": "2be75b8a-d3cf-4a99-9efd-a115ecb2d335",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 2
+        },
+        {
+          "id": "bd00181d-8409-44eb-9728-b60a70a3d580",
+          "competitorId": "a4431e75-2234-444c-b551-3c62257ed694",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 11
+        },
+        {
+          "id": "faa24cb3-674b-41b8-a7a8-be3da08673b4",
+          "competitorId": "1321bef4-5158-4cd1-a22f-f80619126952",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 10
+        },
+        {
+          "id": "b571a13e-f556-4edd-8562-cdf41d7f3ee5",
+          "competitorId": "2bf12382-b105-4637-910d-d9970b8c6a28",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 3
+        },
+        {
+          "id": "4dd35398-d472-4d49-9258-f2a518da4d19",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "8925e17a-de29-4245-85ad-87397793208b",
+          "place": 8
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+      "name": "5-26 R1",
+      "date": "2018-05-26T00:00:00",
+      "order": 1,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "12478b73-fa3a-4388-8372-2d87f413fae3",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 1
+        },
+        {
+          "id": "f83bce52-dd73-4fd0-b332-47ef5f87bd45",
+          "competitorId": "61ffe7ef-09d5-404c-99a9-831f1f33698e",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 16
+        },
+        {
+          "id": "43cd4aa4-125c-4304-8432-554a6c724093",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 2
+        },
+        {
+          "id": "119c3c57-bf6c-43ee-8ceb-5bf8edf47eba",
+          "competitorId": "db793a01-b3f0-4430-aeb1-287c04edcb06",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 5
+        },
+        {
+          "id": "29e1cdcb-16d7-4209-803d-6fc28aea8d69",
+          "competitorId": "e53bd38e-339b-46e4-b364-6d09e26f475c",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 0,
+          "code": "RC"
+        },
+        {
+          "id": "a424c25a-69fe-4055-8aa2-6fc798d536f5",
+          "competitorId": "ff604b31-3791-418d-a5d6-5f91abb2799e",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 14
+        },
+        {
+          "id": "064b1ceb-337e-438f-abe7-7094e89ce111",
+          "competitorId": "4e7204cf-459e-4aab-89b6-d9f4abdcd5ff",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 15
+        },
+        {
+          "id": "14f24a46-27ed-43cd-965b-7bf342e70caf",
+          "competitorId": "a20c70b2-81ab-4d28-abe8-b8855e3516f0",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 10
+        },
+        {
+          "id": "c0f913e0-32f4-4df5-95b1-91ac52937970",
+          "competitorId": "2bf12382-b105-4637-910d-d9970b8c6a28",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 8
+        },
+        {
+          "id": "aeea4091-f264-454b-a4c1-a3b996502b23",
+          "competitorId": "f477f96b-e20a-4536-8bba-9bc689718c02",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 4
+        },
+        {
+          "id": "ee253754-daff-48e9-9f6c-acc745143579",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 13
+        },
+        {
+          "id": "b159dcbd-453a-4dec-95b2-b44d495e2232",
+          "competitorId": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 6
+        },
+        {
+          "id": "1a4216fb-f9ab-47d2-95c5-b6fe4c8fd549",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 9
+        },
+        {
+          "id": "7eaae1d6-2ce5-4636-894b-cc6941ac4192",
+          "competitorId": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 12
+        },
+        {
+          "id": "e5fbb689-3946-44c5-9122-cee2a819fe67",
+          "competitorId": "02be4145-f5f7-4c08-915d-39f8953762df",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 7
+        },
+        {
+          "id": "8fb83e88-87fb-439e-9355-f80d6480d7fd",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 3
+        },
+        {
+          "id": "702c2da3-d142-4ccf-bef2-fe6d3dd84f22",
+          "competitorId": "3704a30b-099b-423e-bd43-ad639d748a5e",
+          "raceId": "dc66b0e7-3371-4314-9927-fcc1226eba24",
+          "place": 11,
+          "code": "GST"
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "6fb0a126-01e4-4584-826f-0502192beba9",
+      "name": "6-30 R2",
+      "date": "2018-06-30T00:00:00",
+      "order": 2,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "e01f7ebd-ae87-4383-b1c4-10f6c4167a48",
+          "competitorId": "8dfba50f-a9bd-4ae2-a72b-4c09c2e85940",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 8
+        },
+        {
+          "id": "a54c34d1-7ba5-4c5b-94c1-1a81e1859f59",
+          "competitorId": "5759b70b-bd62-4e9e-933d-5d0f7b0151cc",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 12
+        },
+        {
+          "id": "7dd14da7-0989-4bf3-9f3b-301a9ed38f93",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "0f1af56d-c9a3-4e5a-85bf-457fd6575e03",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 4
+        },
+        {
+          "id": "f1d6f2e6-87c9-4b4e-919a-4af06309622d",
+          "competitorId": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 6
+        },
+        {
+          "id": "cf880f35-c99b-4b29-9fbe-5552ba0181ff",
+          "competitorId": "02be4145-f5f7-4c08-915d-39f8953762df",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 2
+        },
+        {
+          "id": "6c2f9e5a-7a81-46f9-a522-59115f21ae90",
+          "competitorId": "404bd5ae-8e13-42f4-8b3e-633a8de8b4b2",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 0,
+          "code": "RC"
+        },
+        {
+          "id": "b97edcba-1b67-494f-8ef3-5ade7026ed07",
+          "competitorId": "f477f96b-e20a-4536-8bba-9bc689718c02",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 3
+        },
+        {
+          "id": "8ea41769-953e-4408-b0b6-626f820c271f",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 9
+        },
+        {
+          "id": "33b34f5a-cf9d-44a1-8ba3-65459e596a6b",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 1
+        },
+        {
+          "id": "99e89fc6-2262-4429-8109-6be35dffde1b",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 5
+        },
+        {
+          "id": "8b5c0ef8-0653-4d26-9555-8512187ac41c",
+          "competitorId": "a20c70b2-81ab-4d28-abe8-b8855e3516f0",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 10
+        },
+        {
+          "id": "4cd552ac-81ae-49fe-8b91-898730d82fc2",
+          "competitorId": "3704a30b-099b-423e-bd43-ad639d748a5e",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 1,
+          "code": "GST"
+        },
+        {
+          "id": "6a434c8c-7411-4b37-8534-9e98331dca5c",
+          "competitorId": "db793a01-b3f0-4430-aeb1-287c04edcb06",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "4729952c-4955-409c-94d1-a7b4bbc96f5b",
+          "competitorId": "8db1f0df-86e1-4c39-a5a4-c066c265e8b8",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 11
+        },
+        {
+          "id": "af3ba9b1-6299-4c03-a8cd-cca2f4d66532",
+          "competitorId": "e6eb42c7-680d-4ee4-9ab3-51b538f2655f",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 13
+        },
+        {
+          "id": "0c8c224f-9eb0-49d8-ad06-f09b6a8b7d41",
+          "competitorId": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+          "raceId": "6fb0a126-01e4-4584-826f-0502192beba9",
+          "place": 7
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+      "name": "6-30 R1�",
+      "date": "2018-06-30T00:00:00",
+      "order": 1,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "1b175a34-cc04-494d-95fc-054e7b4e5aec",
+          "competitorId": "c1f46d7b-9c27-4c03-a776-d84951930a90",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 5
+        },
+        {
+          "id": "c06e1138-8973-4e77-99c1-125cb1a0908a",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 9
+        },
+        {
+          "id": "bfc06b76-d17b-4af9-8ff7-17bc983dfd86",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 2
+        },
+        {
+          "id": "d039fb42-914b-43d3-bc15-269913188f7b",
+          "competitorId": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 6
+        },
+        {
+          "id": "7ac1f1a3-273f-45eb-a14f-2f08bb193610",
+          "competitorId": "a4431e75-2234-444c-b551-3c62257ed694",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 12
+        },
+        {
+          "id": "8dc4a484-fda8-4484-8237-34ee0d01ca75",
+          "competitorId": "404bd5ae-8e13-42f4-8b3e-633a8de8b4b2",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 0,
+          "code": "RC"
+        },
+        {
+          "id": "cbe32ad1-9afe-4a6e-9967-499cba20a990",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "d9598471-fea2-4c41-bccc-4ddd86a2fe8c",
+          "competitorId": "5759b70b-bd62-4e9e-933d-5d0f7b0151cc",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 16
+        },
+        {
+          "id": "180545c1-db9b-4c17-b3fa-59b55a500e17",
+          "competitorId": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 10
+        },
+        {
+          "id": "20a3f92e-1b6e-4092-b38f-6e938e6a748c",
+          "competitorId": "f477f96b-e20a-4536-8bba-9bc689718c02",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 3
+        },
+        {
+          "id": "89f4f4e7-1399-4668-9da7-7507c15c0d99",
+          "competitorId": "1ce3d23f-5ccc-41a9-a0e0-5dce758eb8c7",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 14
+        },
+        {
+          "id": "6bdcb82b-a3f1-401c-82e7-9ea9704c0910",
+          "competitorId": "02be4145-f5f7-4c08-915d-39f8953762df",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 4
+        },
+        {
+          "id": "262fe33f-b14b-4c1a-b43c-a5fe21a17ef0",
+          "competitorId": "8db1f0df-86e1-4c39-a5a4-c066c265e8b8",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 13
+        },
+        {
+          "id": "46da0e48-c0bc-448e-952a-b0a40041dfb4",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 1
+        },
+        {
+          "id": "473ae825-2b5c-4fcf-8196-bd854bda4f48",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 7
+        },
+        {
+          "id": "2f6cd84e-0291-4c16-a6c8-de2eb70332c0",
+          "competitorId": "3704a30b-099b-423e-bd43-ad639d748a5e",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 2,
+          "code": "GST"
+        },
+        {
+          "id": "cf2ea1f5-5c27-4fd3-a498-df88a95f746d",
+          "competitorId": "db793a01-b3f0-4430-aeb1-287c04edcb06",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "5efd033f-7607-4ee9-8bba-f4347cf898f8",
+          "competitorId": "969620f0-9575-4f8e-bd47-76af510280ea",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 11
+        },
+        {
+          "id": "b55a2f88-2b8a-4b73-9cf2-f5c84293de79",
+          "competitorId": "fe8e1466-c913-4f52-b7bd-b9f1efffdc58",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 8
+        },
+        {
+          "id": "5fcf3f96-04d9-4c05-b757-fc31c615de4e",
+          "competitorId": "e6eb42c7-680d-4ee4-9ab3-51b538f2655f",
+          "raceId": "232308b1-ab82-4485-86f0-e8ec44111f1a",
+          "place": 15
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+      "name": "7-4",
+      "date": "2018-07-04T00:00:00",
+      "order": 1,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "63431438-fe8c-4113-80c8-18ca6965a3c7",
+          "competitorId": "1f3e12f9-f6a9-40de-9032-765718a1be15",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 10
+        },
+        {
+          "id": "70d42b3f-467a-4a32-a4c2-4e480779c0a5",
+          "competitorId": "8db1f0df-86e1-4c39-a5a4-c066c265e8b8",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 4
+        },
+        {
+          "id": "12cb4e82-10b3-4424-9b01-6f557d5d5924",
+          "competitorId": "969620f0-9575-4f8e-bd47-76af510280ea",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 9
+        },
+        {
+          "id": "9e1515bd-9f7a-430d-8413-96f77718c835",
+          "competitorId": "02be4145-f5f7-4c08-915d-39f8953762df",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 2
+        },
+        {
+          "id": "35fcc545-17ff-4626-a382-a38473455b81",
+          "competitorId": "c1f46d7b-9c27-4c03-a776-d84951930a90",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 5
+        },
+        {
+          "id": "2551a28f-0882-492d-b55f-aa276f873a29",
+          "competitorId": "f477f96b-e20a-4536-8bba-9bc689718c02",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 3
+        },
+        {
+          "id": "ec57bfc8-558b-42f0-8372-afdcf2f23445",
+          "competitorId": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 7
+        },
+        {
+          "id": "9d210c20-d238-475c-9ec1-b677de18ec8c",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "af05476e-ca16-4dd9-9cbe-b9349c6378c2",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 1
+        },
+        {
+          "id": "b18f134c-f626-43cb-a655-c5345cbdde06",
+          "competitorId": "0f8825ba-e6b9-4e22-8593-fc39acaafa46",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 0,
+          "code": "RC"
+        },
+        {
+          "id": "ad48f447-5779-4357-bb00-dfe5d887c7a3",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "6c56e030-65e2-4e08-ad3a-f9728261dec8",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 6
+        },
+        {
+          "id": "55d4abb0-1736-424e-9692-fcf7f03a2650",
+          "competitorId": "ea334ad8-cffa-4f05-aeb0-90172b4cbe17",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 8
+        },
+        {
+          "id": "448dcf3b-5ba7-4740-9007-ff73c2772917",
+          "competitorId": "61ffe7ef-09d5-404c-99a9-831f1f33698e",
+          "raceId": "8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864",
+          "place": 11
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "5155679e-53d1-481f-9af8-029afa277347",
+      "name": "9-1 R1",
+      "date": "2018-09-01T00:00:00",
+      "order": 1,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "7af05f58-1e59-4d6e-ac86-057f4f97fe3e",
+          "competitorId": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 7
+        },
+        {
+          "id": "72c67be5-0ebc-488f-9344-1a2de7126686",
+          "competitorId": "c94eadd9-cffe-41a8-95ef-0171bf4e3413",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 16
+        },
+        {
+          "id": "40907c50-2b12-437a-848f-29d2b0aeaf92",
+          "competitorId": "5759b70b-bd62-4e9e-933d-5d0f7b0151cc",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "10a2395b-b6c8-4b22-98c4-2a38f10cfb3f",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 4
+        },
+        {
+          "id": "cd775093-eaa8-4dcf-857c-3c30a286b990",
+          "competitorId": "4e7204cf-459e-4aab-89b6-d9f4abdcd5ff",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 2
+        },
+        {
+          "id": "38be2c3c-ed8d-4076-9f6b-480b58621d3f",
+          "competitorId": "c1f46d7b-9c27-4c03-a776-d84951930a90",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 9
+        },
+        {
+          "id": "ad9b8cc9-d7ba-4d2a-b550-4a8e91b56b4f",
+          "competitorId": "0f8825ba-e6b9-4e22-8593-fc39acaafa46",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 5
+        },
+        {
+          "id": "f500260a-e1a9-4b04-826d-555eebe2b49b",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 11
+        },
+        {
+          "id": "c29205e2-3c82-48e5-84ac-5680876bc3dd",
+          "competitorId": "8db1f0df-86e1-4c39-a5a4-c066c265e8b8",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 12
+        },
+        {
+          "id": "949c2fa5-e9ba-495c-a6bf-5cebdb322a57",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 13
+        },
+        {
+          "id": "a1638b7d-077a-4f2a-b322-6c9bd686327e",
+          "competitorId": "61ffe7ef-09d5-404c-99a9-831f1f33698e",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 15
+        },
+        {
+          "id": "cc8af775-944e-46f7-8d16-7d8dc5b86a74",
+          "competitorId": "80b3516d-ee39-40b0-a8f2-7fc9b7e3438f",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "66967c05-27a9-4d9f-9fc8-8877cfef939a",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 1
+        },
+        {
+          "id": "527f9d03-ba3e-4740-b465-9bb35ce488ce",
+          "competitorId": "27bcd73b-b5da-4abc-af69-0507aa90315b",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 8
+        },
+        {
+          "id": "501272d9-35df-41a2-9cce-9c09819071de",
+          "competitorId": "a4431e75-2234-444c-b551-3c62257ed694",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 14
+        },
+        {
+          "id": "26f48e12-867c-4ff4-bd0e-9dfcb98c8875",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 10
+        },
+        {
+          "id": "81e68409-10a0-40a1-8db9-a69f45d5eb87",
+          "competitorId": "e53bd38e-339b-46e4-b364-6d09e26f475c",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 6
+        },
+        {
+          "id": "291aa158-9986-47c0-b0fc-bf6425939bf9",
+          "competitorId": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 3
+        },
+        {
+          "id": "4de5e92a-1a5a-4196-9faa-ee63a8ed0992",
+          "competitorId": "404bd5ae-8e13-42f4-8b3e-633a8de8b4b2",
+          "raceId": "5155679e-53d1-481f-9af8-029afa277347",
+          "place": 0,
+          "code": "RC"
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+      "name": "9-2",
+      "date": "2018-09-02T00:00:00",
+      "order": 1,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "4920ea43-4526-49b5-9c93-067821836f76",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 1
+        },
+        {
+          "id": "ac53de71-6cd0-4d12-a457-2a98c52ad975",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 0,
+          "code": "RC"
+        },
+        {
+          "id": "334a9e00-c6cc-483f-b645-3533772ab233",
+          "competitorId": "a20c70b2-81ab-4d28-abe8-b8855e3516f0",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 0,
+          "code": "DNE"
+        },
+        {
+          "id": "74520c8b-6c0c-4c94-8c98-385a48635392",
+          "competitorId": "61ffe7ef-09d5-404c-99a9-831f1f33698e",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 11
+        },
+        {
+          "id": "9d05a0f6-b811-480d-b834-4e94bfc4ce95",
+          "competitorId": "ea334ad8-cffa-4f05-aeb0-90172b4cbe17",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 12
+        },
+        {
+          "id": "ec225018-1ada-48a5-b832-66a47cc989f8",
+          "competitorId": "4e7204cf-459e-4aab-89b6-d9f4abdcd5ff",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 5
+        },
+        {
+          "id": "4d338232-a668-47cf-9416-684be2e757a4",
+          "competitorId": "0f8825ba-e6b9-4e22-8593-fc39acaafa46",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 2
+        },
+        {
+          "id": "1a122e67-6e71-4d04-8f64-a405d0a1fd6d",
+          "competitorId": "27bcd73b-b5da-4abc-af69-0507aa90315b",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 9
+        },
+        {
+          "id": "d6bed620-8557-47c4-a9f0-bb40576e09e7",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 3
+        },
+        {
+          "id": "5434d80b-e0f8-4f1c-8f87-d3d20001960b",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 8
+        },
+        {
+          "id": "5aa2b970-114a-40a4-a94c-d5dbefbb7b80",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 6
+        },
+        {
+          "id": "6eac3cf2-4ed4-4ea1-a480-d5f48bdb41eb",
+          "competitorId": "22ac20ef-82ce-4ba2-a64f-cf46527976a5",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 4
+        },
+        {
+          "id": "8395e379-a85e-428a-8f68-f4c54cd80179",
+          "competitorId": "184e54e9-78c9-4f8c-bd59-a0cc5aecbc40",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 10
+        },
+        {
+          "id": "6320f260-c789-4d89-b1f0-ffa3b6c41382",
+          "competitorId": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+          "raceId": "52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab",
+          "place": 7
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    },
+    {
+      "id": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+      "name": "9-3",
+      "date": "2018-09-03T00:00:00",
+      "order": 1,
+      "trackTimes": false,
+      "fleetId": "7a63e2b3-2645-4fef-b53c-5ff9fb8ad0d4",
+      "scores": [
+        {
+          "id": "059e4696-4421-41a4-bd33-0295d3330d57",
+          "competitorId": "52b7a018-dac3-4c28-9be5-3f004b8a7215",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 13
+        },
+        {
+          "id": "5b8f7249-5114-479c-8fe2-071166889149",
+          "competitorId": "4e7204cf-459e-4aab-89b6-d9f4abdcd5ff",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 11
+        },
+        {
+          "id": "be82d050-d474-4339-ae48-0b7574e4eaef",
+          "competitorId": "ea334ad8-cffa-4f05-aeb0-90172b4cbe17",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 0,
+          "code": "DNF"
+        },
+        {
+          "id": "79f1abb7-a475-487b-b233-0d290250f249",
+          "competitorId": "5759b70b-bd62-4e9e-933d-5d0f7b0151cc",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 20
+        },
+        {
+          "id": "1fc22159-5ccd-4495-b46a-1138eb22547f",
+          "competitorId": "6c8a861e-4cb7-469f-b420-79187d2e3dd7",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 12
+        },
+        {
+          "id": "02f439eb-f7f8-431e-9dbc-18a5963086fd",
+          "competitorId": "e53bd38e-339b-46e4-b364-6d09e26f475c",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 1
+        },
+        {
+          "id": "2830a651-df8b-459d-ace9-2fd689a1766c",
+          "competitorId": "1e2fd196-f825-42d8-bcd2-db9d1e2a5462",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 10
+        },
+        {
+          "id": "c6ff3d1f-5fd7-444c-afc8-2ff0dca726d9",
+          "competitorId": "232b1be7-a6f3-4e64-be43-1bddd439d6e0",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 16
+        },
+        {
+          "id": "ee5b1a92-6fba-4268-bd0b-54d87c154b14",
+          "competitorId": "ccbdff7a-3f63-42f3-8d74-b023e49b40b5",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 3
+        },
+        {
+          "id": "ec443782-c858-4617-8767-552b9910de5a",
+          "competitorId": "27bcd73b-b5da-4abc-af69-0507aa90315b",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 7
+        },
+        {
+          "id": "54a9b753-9bff-41c4-9faa-5a698d20cf55",
+          "competitorId": "99677fda-6ec7-4626-b061-5b360c3d30da",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 4
+        },
+        {
+          "id": "8bb8e355-d9df-4242-b09b-65bfbb459abb",
+          "competitorId": "2568bfe7-9292-415b-bf08-8dfd1838d16c",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 0,
+          "code": "SB"
+        },
+        {
+          "id": "f4176b62-de4d-4ed5-88bb-66b059fa9642",
+          "competitorId": "888b2fa8-05d6-4248-a64e-532910d3abce",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 14
+        },
+        {
+          "id": "63df33f7-7077-46e4-ae3a-8437ede45617",
+          "competitorId": "0f8825ba-e6b9-4e22-8593-fc39acaafa46",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 6
+        },
+        {
+          "id": "b64bd3d9-8454-4005-933a-946ce6f98db9",
+          "competitorId": "4fdddfc6-d047-4173-8a3c-24cf5bc7c8d2",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 5
+        },
+        {
+          "id": "e67ec9eb-34e2-4854-9e72-a830d94b5577",
+          "competitorId": "a20c70b2-81ab-4d28-abe8-b8855e3516f0",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 0,
+          "code": "RC"
+        },
+        {
+          "id": "5e35e1db-c0c0-4b81-858b-ac0c34049aae",
+          "competitorId": "8db1f0df-86e1-4c39-a5a4-c066c265e8b8",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 18
+        },
+        {
+          "id": "3157d74d-a321-496b-909a-b1d9d8bb261e",
+          "competitorId": "db793a01-b3f0-4430-aeb1-287c04edcb06",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 8
+        },
+        {
+          "id": "4470a8a7-c671-4b3d-a584-d6ef75be866a",
+          "competitorId": "a4431e75-2234-444c-b551-3c62257ed694",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 15
+        },
+        {
+          "id": "6d9d7c9d-653d-49cb-81b4-d960d389235a",
+          "competitorId": "c1f46d7b-9c27-4c03-a776-d84951930a90",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 9
+        },
+        {
+          "id": "5f6e3d42-adaa-461d-b028-ddc0b1d06e59",
+          "competitorId": "61ffe7ef-09d5-404c-99a9-831f1f33698e",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 19
+        },
+        {
+          "id": "0a865fe8-2f0b-42c8-88eb-e3441fa6d8ea",
+          "competitorId": "368b697d-6d3b-427f-96bc-7d5f210be23f",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 17
+        },
+        {
+          "id": "2ff5c103-d703-4ad1-9e36-fedba5fb5e52",
+          "competitorId": "404bd5ae-8e13-42f4-8b3e-633a8de8b4b2",
+          "raceId": "bf669239-77d1-4b42-b4f8-ef9f884a0501",
+          "place": 2
+        }
+      ],
+      "seriesIds": [
+        "55dbe220-3562-4c65-31b5-08d699de72bf"
+      ]
+    }
+  ],
+  "regattas": [],
+  "historicalResults": [
+    {
+      "id": "652ee75f-7adf-48b6-367a-08da65ff3197",
+      "seriesId": "55dbe220-3562-4c65-31b5-08d699de72bf",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"55dbe220-3562-4c65-31b5-08d699de72bf\",\"Competitors\":[{\"Id\":\"2568bfe7-9292-415b-bf08-8dfd1838d16c\",\"Name\":\"CompGR\",\"SailNumber\":\"2169\",\"AlternativeSailNumber\":null,\"BoatName\":\"Black Cat\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"ccbdff7a-3f63-42f3-8d74-b023e49b40b5\",\"Name\":\"CompNCRA\",\"SailNumber\":\"2604\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"99677fda-6ec7-4626-b061-5b360c3d30da\",\"Name\":\"CompKJ2\",\"SailNumber\":\"1847\",\"AlternativeSailNumber\":null,\"BoatName\":\"Beautiful Obsession\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"02be4145-f5f7-4c08-915d-39f8953762df\",\"Name\":\"CompGC\",\"SailNumber\":\"2539\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"e53bd38e-339b-46e4-b364-6d09e26f475c\",\"Name\":\"CompCB\",\"SailNumber\":\"2644\",\"AlternativeSailNumber\":null,\"BoatName\":\"Mango\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"1e2fd196-f825-42d8-bcd2-db9d1e2a5462\",\"Name\":\"CompFJ3\",\"SailNumber\":\"2144\",\"AlternativeSailNumber\":null,\"BoatName\":\"Don't Panic\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"db793a01-b3f0-4430-aeb1-287c04edcb06\",\"Name\":\"CompMB\",\"SailNumber\":\"1894\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"f477f96b-e20a-4536-8bba-9bc689718c02\",\"Name\":\"CompFJ\",\"SailNumber\":\"2511\",\"AlternativeSailNumber\":null,\"BoatName\":\"Minnehaha\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"6c8a861e-4cb7-469f-b420-79187d2e3dd7\",\"Name\":\"CompMJ\",\"SailNumber\":\"2161\",\"AlternativeSailNumber\":null,\"BoatName\":\"Scuppers\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"888b2fa8-05d6-4248-a64e-532910d3abce\",\"Name\":\"CompAM\",\"SailNumber\":\"1935\",\"AlternativeSailNumber\":null,\"BoatName\":\"Mde Oma\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"0f8825ba-e6b9-4e22-8593-fc39acaafa46\",\"Name\":\"CompCJ3\",\"SailNumber\":\"1933\",\"AlternativeSailNumber\":null,\"BoatName\":\"Humdinger\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"4e7204cf-459e-4aab-89b6-d9f4abdcd5ff\",\"Name\":\"CompWE\",\"SailNumber\":\"2652\",\"AlternativeSailNumber\":null,\"BoatName\":\"L'Étoile du Nord\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"52b7a018-dac3-4c28-9be5-3f004b8a7215\",\"Name\":\"CompOC\",\"SailNumber\":\"2322\",\"AlternativeSailNumber\":null,\"BoatName\":\"Sea Otter\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"404bd5ae-8e13-42f4-8b3e-633a8de8b4b2\",\"Name\":\"CompBJ2\",\"SailNumber\":\"1687\",\"AlternativeSailNumber\":null,\"BoatName\":\"Hott Yott\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"2bf12382-b105-4637-910d-d9970b8c6a28\",\"Name\":\"CompND\",\"SailNumber\":\"TC25\",\"AlternativeSailNumber\":\"2142\",\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"c1f46d7b-9c27-4c03-a776-d84951930a90\",\"Name\":\"CompBJ3\",\"SailNumber\":\"1850\",\"AlternativeSailNumber\":null,\"BoatName\":\"Andy\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"27bcd73b-b5da-4abc-af69-0507aa90315b\",\"Name\":\"CompSC\",\"SailNumber\":\"2091\",\"AlternativeSailNumber\":null,\"BoatName\":\"Prima III\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"8db1f0df-86e1-4c39-a5a4-c066c265e8b8\",\"Name\":\"CompCC\",\"SailNumber\":\"TC55\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"a20c70b2-81ab-4d28-abe8-b8855e3516f0\",\"Name\":\"CompBP\",\"SailNumber\":\"1474\",\"AlternativeSailNumber\":null,\"BoatName\":\"True Blue\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"4fdddfc6-d047-4173-8a3c-24cf5bc7c8d2\",\"Name\":\"CompKA\",\"SailNumber\":\"TC67\",\"AlternativeSailNumber\":\"1503\",\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"22ac20ef-82ce-4ba2-a64f-cf46527976a5\",\"Name\":\"CompRJ3\",\"SailNumber\":\"TC10\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"ff604b31-3791-418d-a5d6-5f91abb2799e\",\"Name\":\"CompNB\",\"SailNumber\":\"2419\",\"AlternativeSailNumber\":\"2578\",\"BoatName\":null,\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"969620f0-9575-4f8e-bd47-76af510280ea\",\"Name\":\"CompBK\",\"SailNumber\":\"TC36\",\"AlternativeSailNumber\":\"2457\",\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"61ffe7ef-09d5-404c-99a9-831f1f33698e\",\"Name\":\"CompJP\",\"SailNumber\":\"TC49\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"a4431e75-2234-444c-b551-3c62257ed694\",\"Name\":\"CompBJ\",\"SailNumber\":\"TC08\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"fe8e1466-c913-4f52-b7bd-b9f1efffdc58\",\"Name\":\"CompSJ2\",\"SailNumber\":\"TC37\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"ea334ad8-cffa-4f05-aeb0-90172b4cbe17\",\"Name\":\"CompTL\",\"SailNumber\":\"TC18\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"5759b70b-bd62-4e9e-933d-5d0f7b0151cc\",\"Name\":\"CompAAC\",\"SailNumber\":\"TC93\",\"AlternativeSailNumber\":\"223\",\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"8dfba50f-a9bd-4ae2-a72b-4c09c2e85940\",\"Name\":\"CompMKDB\",\"SailNumber\":\"2121\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"184e54e9-78c9-4f8c-bd59-a0cc5aecbc40\",\"Name\":\"CompWR\",\"SailNumber\":\"TC70\",\"AlternativeSailNumber\":null,\"BoatName\":\"- various -\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"e6eb42c7-680d-4ee4-9ab3-51b538f2655f\",\"Name\":\"CompNM\",\"SailNumber\":\"1337\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"1f3e12f9-f6a9-40de-9032-765718a1be15\",\"Name\":\"CompPI\",\"SailNumber\":\"TC11\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"1321bef4-5158-4cd1-a22f-f80619126952\",\"Name\":\"CompSX\",\"SailNumber\":\"TC??\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"1ce3d23f-5ccc-41a9-a0e0-5dce758eb8c7\",\"Name\":\"CompAB\",\"SailNumber\":\"TC51\",\"AlternativeSailNumber\":null,\"BoatName\":\"- various -\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"80b3516d-ee39-40b0-a8f2-7fc9b7e3438f\",\"Name\":\"CompGG\",\"SailNumber\":\"TC16\",\"AlternativeSailNumber\":null,\"BoatName\":\"-various-\",\"HomeClubName\":\"Twin Cities SC\",\"CurrentSailNumber\":null},{\"Id\":\"232b1be7-a6f3-4e64-be43-1bddd439d6e0\",\"Name\":\"CompLMSJ\",\"SailNumber\":\"1554\",\"AlternativeSailNumber\":null,\"BoatName\":\"Spastic\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"c94eadd9-cffe-41a8-95ef-0171bf4e3413\",\"Name\":\"CompAD\",\"SailNumber\":\"1262\",\"AlternativeSailNumber\":null,\"BoatName\":\"Water Wings\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"368b697d-6d3b-427f-96bc-7d5f210be23f\",\"Name\":\"CompMS\",\"SailNumber\":\"1280\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null},{\"Id\":\"3704a30b-099b-423e-bd43-ad639d748a5e\",\"Name\":\"CompCA2\",\"SailNumber\":\"1850\",\"AlternativeSailNumber\":null,\"BoatName\":\"American Flyer\",\"HomeClubName\":\"Lake Harriet YC\",\"CurrentSailNumber\":null}],\"Races\":[{\"Id\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Name\":\"5-26 R1\",\"Date\":\"2018-05-26T00:00:00\",\"Order\":1,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Sat, May 26 Race 1\",\"ShortName\":\"5/26 R1\"},{\"Id\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Name\":\"5-26 R2\",\"Date\":\"2018-05-26T00:00:00\",\"Order\":2,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Sat, May 26 Race 2\",\"ShortName\":\"5/26 R2\"},{\"Id\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Name\":\"5-28\",\"Date\":\"2018-05-28T00:00:00\",\"Order\":1,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Mon, May 28 Race 1\",\"ShortName\":\"5/28 R1\"},{\"Id\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Name\":\"6-30 R1�\",\"Date\":\"2018-06-30T00:00:00\",\"Order\":1,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Sat, June 30 Race 1\",\"ShortName\":\"6/30 R1\"},{\"Id\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Name\":\"6-30 R2\",\"Date\":\"2018-06-30T00:00:00\",\"Order\":2,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Sat, June 30 Race 2\",\"ShortName\":\"6/30 R2\"},{\"Id\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Name\":\"7-4\",\"Date\":\"2018-07-04T00:00:00\",\"Order\":1,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Wed, July 4 Race 1\",\"ShortName\":\"7/4 R1\"},{\"Id\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Name\":\"9-1 R1\",\"Date\":\"2018-09-01T00:00:00\",\"Order\":1,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Sat, September 1 Race 1\",\"ShortName\":\"9/1 R1\"},{\"Id\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Name\":\"9-2\",\"Date\":\"2018-09-02T00:00:00\",\"Order\":1,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Sun, September 2 Race 1\",\"ShortName\":\"9/2 R1\"},{\"Id\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Name\":\"9-3\",\"Date\":\"2018-09-03T00:00:00\",\"Order\":1,\"Description\":null,\"State\":null,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null,\"CalculatedName\":\"Mon, September 3 Race 1\",\"ShortName\":\"9/3 R1\"}],\"CalculatedScores\":[{\"CompetitorId\":\"52b7a018-dac3-4c28-9be5-3f004b8a7215\",\"Rank\":13,\"Trend\":null,\"TotalScore\":53.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":13,\"Code\":null,\"ScoreValue\":12.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":13,\"Code\":null,\"ScoreValue\":13.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":12,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true}]},{\"CompetitorId\":\"c94eadd9-cffe-41a8-95ef-0171bf4e3413\",\"Rank\":37,\"Trend\":null,\"TotalScore\":89.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":16,\"Code\":null,\"ScoreValue\":16.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"5759b70b-bd62-4e9e-933d-5d0f7b0151cc\",\"Rank\":28,\"Trend\":null,\"TotalScore\":82.8,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":13.8,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":12,\"Code\":null,\"ScoreValue\":12.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":16,\"Code\":null,\"ScoreValue\":16.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":20,\"Code\":null,\"ScoreValue\":20.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"99677fda-6ec7-4626-b061-5b360c3d30da\",\"Rank\":3,\"Trend\":null,\"TotalScore\":21.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":true},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":true},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":true}]},{\"CompetitorId\":\"4e7204cf-459e-4aab-89b6-d9f4abdcd5ff\",\"Rank\":12,\"Trend\":null,\"TotalScore\":52.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":9,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":11,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":15,\"Code\":null,\"ScoreValue\":14.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false}]},{\"CompetitorId\":\"c1f46d7b-9c27-4c03-a776-d84951930a90\",\"Rank\":16,\"Trend\":null,\"TotalScore\":56.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"404bd5ae-8e13-42f4-8b3e-633a8de8b4b2\",\"Rank\":14,\"Trend\":null,\"TotalScore\":55.9,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":9.3,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":9.3,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":9.3,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true}]},{\"CompetitorId\":\"2568bfe7-9292-415b-bf08-8dfd1838d16c\",\"Rank\":1,\"Trend\":null,\"TotalScore\":6.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":true},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":true}]},{\"CompetitorId\":\"27bcd73b-b5da-4abc-af69-0507aa90315b\",\"Rank\":17,\"Trend\":null,\"TotalScore\":65.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false}]},{\"CompetitorId\":\"a4431e75-2234-444c-b551-3c62257ed694\",\"Rank\":25,\"Trend\":null,\"TotalScore\":80.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":14,\"Code\":null,\"ScoreValue\":14.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":11,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":12,\"Code\":null,\"ScoreValue\":12.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":15,\"Code\":null,\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"ccbdff7a-3f63-42f3-8d74-b023e49b40b5\",\"Rank\":2,\"Trend\":null,\"TotalScore\":20.4,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":3.4,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":true}]},{\"CompetitorId\":\"e53bd38e-339b-46e4-b364-6d09e26f475c\",\"Rank\":5,\"Trend\":null,\"TotalScore\":31.6,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":5.3,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":5.3,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true}]},{\"CompetitorId\":\"6c8a861e-4cb7-469f-b420-79187d2e3dd7\",\"Rank\":9,\"Trend\":null,\"TotalScore\":35.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":7,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":12,\"Code\":null,\"ScoreValue\":12.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":true}]},{\"CompetitorId\":\"0f8825ba-e6b9-4e22-8593-fc39acaafa46\",\"Rank\":11,\"Trend\":null,\"TotalScore\":49.2,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":8.2,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"888b2fa8-05d6-4248-a64e-532910d3abce\",\"Rank\":10,\"Trend\":null,\"TotalScore\":43.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":11,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":15,\"Code\":null,\"ScoreValue\":14.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":14,\"Code\":null,\"ScoreValue\":14.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":13,\"Code\":null,\"ScoreValue\":12.0,\"Discard\":true}]},{\"CompetitorId\":\"8db1f0df-86e1-4c39-a5a4-c066c265e8b8\",\"Rank\":18,\"Trend\":null,\"TotalScore\":68.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":12,\"Code\":null,\"ScoreValue\":12.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":11,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":13,\"Code\":null,\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":18,\"Code\":null,\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"1e2fd196-f825-42d8-bcd2-db9d1e2a5462\",\"Rank\":6,\"Trend\":null,\"TotalScore\":31.9,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":13,\"Code\":null,\"ScoreValue\":13.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":5.3,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":6,\"Code\":null,\"ScoreValue\":6.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":14,\"Code\":null,\"ScoreValue\":13.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":5.3,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":5.3,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false}]},{\"CompetitorId\":\"61ffe7ef-09d5-404c-99a9-831f1f33698e\",\"Rank\":24,\"Trend\":null,\"TotalScore\":80.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":15,\"Code\":null,\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":11,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":16,\"Code\":null,\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":11,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":19,\"Code\":null,\"ScoreValue\":19.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":16,\"Code\":null,\"ScoreValue\":15.0,\"Discard\":true},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"80b3516d-ee39-40b0-a8f2-7fc9b7e3438f\",\"Rank\":35,\"Trend\":null,\"TotalScore\":87.6,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":14.6,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"8dfba50f-a9bd-4ae2-a72b-4c09c2e85940\",\"Rank\":29,\"Trend\":null,\"TotalScore\":83.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"02be4145-f5f7-4c08-915d-39f8953762df\",\"Rank\":4,\"Trend\":null,\"TotalScore\":31.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":8,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"3704a30b-099b-423e-bd43-ad639d748a5e\",\"Rank\":39,\"Trend\":null,\"TotalScore\":90.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":1,\"Code\":\"GST\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":6,\"Code\":\"GST\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":2,\"Code\":\"GST\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":11,\"Code\":\"GST\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"db793a01-b3f0-4430-aeb1-287c04edcb06\",\"Rank\":7,\"Trend\":null,\"TotalScore\":34.6,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":5.8,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":7,\"Code\":null,\"ScoreValue\":7.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"SB\",\"ScoreValue\":5.8,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":true},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true}]},{\"CompetitorId\":\"e6eb42c7-680d-4ee4-9ab3-51b538f2655f\",\"Rank\":31,\"Trend\":null,\"TotalScore\":86.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":13,\"Code\":null,\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":15,\"Code\":null,\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"f477f96b-e20a-4536-8bba-9bc689718c02\",\"Rank\":8,\"Trend\":null,\"TotalScore\":35.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":10,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":true},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"a20c70b2-81ab-4d28-abe8-b8855e3516f0\",\"Rank\":19,\"Trend\":null,\"TotalScore\":69.4,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":false},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNE\",\"ScoreValue\":14.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":12,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"RC\",\"ScoreValue\":11.4,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":true},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true}]},{\"CompetitorId\":\"22ac20ef-82ce-4ba2-a64f-cf46527976a5\",\"Rank\":21,\"Trend\":null,\"TotalScore\":79.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"ea334ad8-cffa-4f05-aeb0-90172b4cbe17\",\"Rank\":27,\"Trend\":null,\"TotalScore\":82.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":12,\"Code\":null,\"ScoreValue\":12.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNF\",\"ScoreValue\":22.0,\"Discard\":true},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true}]},{\"CompetitorId\":\"184e54e9-78c9-4f8c-bd59-a0cc5aecbc40\",\"Rank\":30,\"Trend\":null,\"TotalScore\":85.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"2bf12382-b105-4637-910d-d9970b8c6a28\",\"Rank\":15,\"Trend\":null,\"TotalScore\":56.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"ff604b31-3791-418d-a5d6-5f91abb2799e\",\"Rank\":22,\"Trend\":null,\"TotalScore\":79.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":11,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":14,\"Code\":null,\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"1f3e12f9-f6a9-40de-9032-765718a1be15\",\"Rank\":32,\"Trend\":null,\"TotalScore\":87.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"969620f0-9575-4f8e-bd47-76af510280ea\",\"Rank\":23,\"Trend\":null,\"TotalScore\":80.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":9,\"Code\":null,\"ScoreValue\":9.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":11,\"Code\":null,\"ScoreValue\":11.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"1321bef4-5158-4cd1-a22f-f80619126952\",\"Rank\":33,\"Trend\":null,\"TotalScore\":87.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":10,\"Code\":null,\"ScoreValue\":10.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"fe8e1466-c913-4f52-b7bd-b9f1efffdc58\",\"Rank\":26,\"Trend\":null,\"TotalScore\":81.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":8,\"Code\":null,\"ScoreValue\":8.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"1ce3d23f-5ccc-41a9-a0e0-5dce758eb8c7\",\"Rank\":34,\"Trend\":null,\"TotalScore\":87.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":14,\"Code\":null,\"ScoreValue\":14.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":23.0,\"Discard\":true}]},{\"CompetitorId\":\"368b697d-6d3b-427f-96bc-7d5f210be23f\",\"Rank\":38,\"Trend\":null,\"TotalScore\":90.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":17,\"Code\":null,\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"4fdddfc6-d047-4173-8a3c-24cf5bc7c8d2\",\"Rank\":20,\"Trend\":null,\"TotalScore\":78.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]},{\"CompetitorId\":\"232b1be7-a6f3-4e64-be43-1bddd439d6e0\",\"Rank\":36,\"Trend\":null,\"TotalScore\":89.0,\"PointsEarned\":null,\"PointsPossible\":null,\"Scores\":[{\"RaceId\":\"bf669239-77d1-4b42-b4f8-ef9f884a0501\",\"Place\":16,\"Code\":null,\"ScoreValue\":16.0,\"Discard\":false},{\"RaceId\":\"dc66b0e7-3371-4314-9927-fcc1226eba24\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":true},{\"RaceId\":\"477b9773-bf90-43c3-9edb-49d31e56c0f2\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":17.0,\"Discard\":false},{\"RaceId\":\"8925e17a-de29-4245-85ad-87397793208b\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"232308b1-ab82-4485-86f0-e8ec44111f1a\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"6fb0a126-01e4-4584-826f-0502192beba9\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false},{\"RaceId\":\"8e3d98c3-ca80-4cb0-a6c0-5acfe90b0864\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":13.0,\"Discard\":false},{\"RaceId\":\"5155679e-53d1-481f-9af8-029afa277347\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":18.0,\"Discard\":true},{\"RaceId\":\"52bbb9bc-9b4e-4d3f-a54d-0d2686dc0cab\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":15.0,\"Discard\":false}]}],\"NumberOfDiscards\":3,\"NumberOfSailedRaces\":9,\"IsPreliminary\":false,\"IsPercentSystem\":false,\"PercentRequired\":null,\"ScoringSystemName\":\"LHYC Standard Scoring\",\"ScoreCodesUsed\":{\"SB\":{\"Name\":\"SB\",\"Description\":\"Safety boat duty\",\"Formula\":\"Average of non-discarded results\"},\"DNC\":{\"Name\":\"DNC\",\"Description\":\"Did not come to starting area\",\"Formula\":\"Number of boats that came to starting area + 2\"},\"RC\":{\"Name\":\"RC\",\"Description\":\"Race Committee duty\",\"Formula\":\"Average of non-discarded results\"},\"DNE\":{\"Name\":\"DNE\",\"Description\":\"Disqualification that is not excludable\",\"Formula\":\"Number of boats that came to starting area + 1; not excludable\"},\"DNF\":{\"Name\":\"DNF\",\"Description\":\"Started but did not finish\",\"Formula\":\"Number of boats that came to starting area + 1\"},\"GST\":{\"Name\":\"GST\",\"Description\":\"Unknown, unregistered or guest skipper\",\"Formula\":\"Number of boats that came to starting area + 2\"}}}",
+      "created": "2022-07-15T01:13:14.930009"
+    }
+  ],
+  "defaultScoringSystemName": "LHYC Standard Scoring",
+  "fixtureInfo": {
+    "seriesId": "55dbe220-3562-4c65-31b5-08d699de72bf",
+    "seriesName": "MC Holiday",
+    "seasonUrlName": "2018",
+    "seriesUrlName": "MC Holiday",
+    "sourceBackupCreatedUtc": "2026-02-22T18:38:13.6543269Z",
+    "extractedUtc": "2026-10-16T03:21:01.1941803Z",
+    "userFieldsRemoved": 11,
+    "warnings": []
+  }
+}

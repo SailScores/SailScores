@@ -60,4 +60,8 @@ public class ScoreCodeViewModel
     [Display(Name = "Count as Participation (For codes not set as \"Came To Start\")")]
     public bool CountAsParticipation { get; set; }
 
+    // Only used by average-based scoring systems. Null uses the scoring system's rule.
+    [Display(Name = "Include in average")]
+    public bool? IncludeInAverage { get; set; }
+
 }

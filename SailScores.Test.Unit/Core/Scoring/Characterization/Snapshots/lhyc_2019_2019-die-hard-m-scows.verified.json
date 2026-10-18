@@ -1,0 +1,85 @@
+{
+  "ScoringSystemName": "Appx A Low Point Regatta, 1 discard after 5 races",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 8,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2019-09-21",
+    "2. 2019-09-21",
+    "3. 2019-09-21",
+    "4. 2019-09-21",
+    "5. 2019-09-21",
+    "6. 2019-09-22",
+    "7. 2019-09-22",
+    "8. 2019-09-22"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompJT",
+      "SailNumber": "LH9",
+      "Total": "7",
+      "TotalIncludingDiscards": "9",
+      "Columns": {
+        "preDiscardTotal": "9"
+      },
+      "Scores": "1 | 1 | 1 | 1 | 1 | 1 | 1 | (2)"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompBJ",
+      "SailNumber": "LH700",
+      "Total": "13",
+      "TotalIncludingDiscards": "17",
+      "Columns": {
+        "preDiscardTotal": "17"
+      },
+      "Scores": "(4) | 2 | 2 | 2 | 2 | 2 | 2 | 1"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompFJ2",
+      "SailNumber": "TC62m",
+      "Total": "24",
+      "TotalIncludingDiscards": "30",
+      "Columns": {
+        "preDiscardTotal": "30"
+      },
+      "Scores": "3 | 3 | 3 | (DNC 6) | DNC 6 | 3 | 3 | 3"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompSC",
+      "SailNumber": "M12",
+      "Total": "34",
+      "TotalIncludingDiscards": "40",
+      "Columns": {
+        "preDiscardTotal": "40"
+      },
+      "Scores": "2 | 4 | 4 | (DNC 6) | DNC 6 | DNC 6 | DNC 6 | DNC 6"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompPB",
+      "SailNumber": "M10",
+      "Total": "38",
+      "TotalIncludingDiscards": "44",
+      "Columns": {
+        "preDiscardTotal": "44"
+      },
+      "Scores": "(DNF 6) | DNC 6 | DNC 6 | DNC 6 | DNC 6 | DNF 6 | 4 | 4"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area",
+    "DNF": "Number of boats entered in series + 1: Started but did not finish"
+  }
+}

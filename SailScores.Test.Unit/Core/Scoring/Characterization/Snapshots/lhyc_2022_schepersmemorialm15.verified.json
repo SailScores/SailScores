@@ -1,0 +1,104 @@
+{
+  "ScoringSystemName": "LHYC Standard Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 0,
+  "NumberOfSailedRaces": 3,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2022-09-10",
+    "2. 2022-09-10",
+    "1. 2022-09-11"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompN",
+      "SailNumber": "USA 44",
+      "Total": "3",
+      "TotalIncludingDiscards": "3",
+      "Columns": {
+        "preDiscardTotal": "3"
+      },
+      "Scores": "1 | 1 | 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompSJ",
+      "SailNumber": "USA 334",
+      "Total": "8",
+      "TotalIncludingDiscards": "8",
+      "Columns": {
+        "preDiscardTotal": "8"
+      },
+      "Scores": "2 | 3 | 3"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompMB2",
+      "SailNumber": "USA 342",
+      "Total": "12",
+      "TotalIncludingDiscards": "12",
+      "Columns": {
+        "preDiscardTotal": "12"
+      },
+      "Scores": "3 | 2 | DNC 7"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompJT",
+      "SailNumber": "USA 341",
+      "Total": "12",
+      "TotalIncludingDiscards": "12",
+      "Columns": {
+        "preDiscardTotal": "12"
+      },
+      "Scores": "NSC 6 | 4 | 2"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompOBBB",
+      "SailNumber": "USA 336",
+      "Total": "13",
+      "TotalIncludingDiscards": "13",
+      "Columns": {
+        "preDiscardTotal": "13"
+      },
+      "Scores": "4 | 5 | 4"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompC",
+      "SailNumber": "USA 327",
+      "Total": "20",
+      "TotalIncludingDiscards": "20",
+      "Columns": {
+        "preDiscardTotal": "20"
+      },
+      "Scores": "DNC 7 | DNC 7 | DNF 6"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompF",
+      "SailNumber": "USA 51",
+      "Total": "0",
+      "TotalIncludingDiscards": "0",
+      "Columns": {
+        "preDiscardTotal": "0"
+      },
+      "Scores": "RC 0 | RC 0 | RC 0"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats that came to starting area + 2: Did not come to starting area",
+    "DNF": "Number of boats that came to starting area + 1: Started but did not finish",
+    "NSC": "Number of boats that came to starting area + 1: Did not sail the course (other than DNC, DNS, OCS and DNF)",
+    "RC": "Average of non-discarded results: Race Committee duty"
+  }
+}

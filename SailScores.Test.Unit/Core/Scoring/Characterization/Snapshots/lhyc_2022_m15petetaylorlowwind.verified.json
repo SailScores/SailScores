@@ -1,0 +1,155 @@
+{
+  "ScoringSystemName": "LHYC Standard Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 3,
+  "NumberOfSailedRaces": 9,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2022-06-05",
+    "1. 2022-06-11",
+    "2. 2022-07-02",
+    "1. 2022-07-09",
+    "1. 2022-07-16",
+    "1. 2022-08-07",
+    "1. 2022-08-14",
+    "1. 2022-08-21",
+    "1. 2022-08-28"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompC",
+      "SailNumber": "USA 327",
+      "Total": "6",
+      "TotalIncludingDiscards": "16",
+      "Columns": {
+        "preDiscardTotal": "16"
+      },
+      "Scores": "(2) | 1 | (DNC 5) | RC 1 | (3) | RC 1 | 1 | 1 | RC 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompN",
+      "SailNumber": "USA 44",
+      "Total": "10.6",
+      "TotalIncludingDiscards": "29.6",
+      "Columns": {
+        "preDiscardTotal": "29.6"
+      },
+      "Scores": "1 | 2 | (DNC 5) | (DNC 8) | 2 | ORA 1.8 | 2 | (DNC 6) | SB 1.8"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompF",
+      "SailNumber": "USA 51",
+      "Total": "12",
+      "TotalIncludingDiscards": "28",
+      "Columns": {
+        "preDiscardTotal": "28"
+      },
+      "Scores": "(4) | SB 2 | 1 | 2 | 4 | ORA 2 | (6) | (DNC 6) | 1"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompMB2",
+      "SailNumber": "USA 342",
+      "Total": "16",
+      "TotalIncludingDiscards": "38",
+      "Columns": {
+        "preDiscardTotal": "38"
+      },
+      "Scores": "(DNC 9) | (DNC 8) | (DNC 5) | 1 | 1 | DNC 5 | 3 | 3 | 3"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompFPS",
+      "SailNumber": "USA 343",
+      "Total": "19.2",
+      "TotalIncludingDiscards": "44.2",
+      "Columns": {
+        "preDiscardTotal": "44.2"
+      },
+      "Scores": "3 | 5 | DNC 5 | SB 3.2 | (DNC 9) | 1 | (DNC 10) | (DNC 6) | 2"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompJT",
+      "SailNumber": "USA 341",
+      "Total": "20.4",
+      "TotalIncludingDiscards": "40.4",
+      "Columns": {
+        "preDiscardTotal": "40.4"
+      },
+      "Scores": "SB 3.4 | (DNC 8) | 2 | 3 | (6) | 3 | 4 | (DNC 6) | 5"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompMB",
+      "SailNumber": "USA 337",
+      "Total": "25",
+      "TotalIncludingDiscards": "47",
+      "Columns": {
+        "preDiscardTotal": "47"
+      },
+      "Scores": "5 | 3 | 3 | 6 | (7) | 2 | (7) | DNC 6 | (DNC 8)"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompFG",
+      "SailNumber": "USA 340",
+      "Total": "27",
+      "TotalIncludingDiscards": "47",
+      "Columns": {
+        "preDiscardTotal": "47"
+      },
+      "Scores": "(6) | 4 | SB 4.5 | 5 | 5 | SB 4.5 | (8) | 4 | (6)"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompB",
+      "SailNumber": "USA 339",
+      "Total": "28.8",
+      "TotalIncludingDiscards": "55.8",
+      "Columns": {
+        "preDiscardTotal": "55.8"
+      },
+      "Scores": "(DNC 9) | (DNC 8) | DNC 5 | DNC 8 | RC 4.8 | DNC 5 | (DNC 10) | 2 | 4"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompOBBB",
+      "SailNumber": "USA 336",
+      "Total": "33",
+      "TotalIncludingDiscards": "60",
+      "Columns": {
+        "preDiscardTotal": "60"
+      },
+      "Scores": "7 | TLE 6 | DNC 5 | 4 | (DNC 9) | DNC 5 | (DNC 10) | DNC 6 | (DNC 8)"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompSJ",
+      "SailNumber": "USA 334",
+      "Total": "37",
+      "TotalIncludingDiscards": "63",
+      "Columns": {
+        "preDiscardTotal": "63"
+      },
+      "Scores": "(DNC 9) | (DNC 8) | DNC 5 | DNC 8 | (DNC 9) | DNC 5 | 5 | SB 6 | DNC 8"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats that came to starting area + 2: Did not come to starting area",
+    "ORA": "Average of non-discarded results: Off-lake regatta, take average",
+    "RC": "Average of non-discarded results: Race Committee duty",
+    "SB": "Average of non-discarded results: Safety boat duty",
+    "TLE": "Number of boats that finished race + 1: Time Limit Elapsed: Finished After Time Limit"
+  }
+}

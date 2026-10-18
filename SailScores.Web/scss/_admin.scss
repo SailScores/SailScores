@@ -103,3 +103,30 @@
         border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
 }
+
+/* Scoring system edit pages: fields, columns and notes that belong to the parent system's
+ * scoring method (Views/ScoringSystem/_ScoringSystemSettings). Dark-mode text colour in _dark-mode.scss.
+ */
+:root {
+    --ss-method-accent: #{$method-accent};
+    --ss-method-accent-text: #{$method-accent-text-light};
+}
+
+.scoring-method-settings {
+    border-left: 3px solid var(--ss-method-accent);
+    padding-left: .75rem;
+    margin-bottom: 1rem;
+}
+
+.scoring-method-settings-heading {
+    color: var(--ss-method-accent-text);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+}
+
+.scoring-method-note {
+    color: var(--ss-method-accent-text);
+}

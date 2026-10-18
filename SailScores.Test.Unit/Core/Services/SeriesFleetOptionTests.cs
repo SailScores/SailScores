@@ -24,7 +24,7 @@ namespace SailScores.Test.Unit.Core.Services;
 /// 
 /// Phase 3 implementation will add:
 /// - PopulateCompetitorsAsync filtering by fleet
-/// - BaseScoringCalculator position recalculation
+/// - ScoringPipeline position recalculation
 /// </summary>
 public class SeriesFleetOptionTests
 {

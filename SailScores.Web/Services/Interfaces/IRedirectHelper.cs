@@ -16,11 +16,13 @@ public interface IRedirectHelper
     /// <param name="returnUrl">The user-supplied return URL to validate</param>
     /// <param name="defaultAction">The default action to redirect to if returnUrl is invalid</param>
     /// <param name="defaultController">The default controller to redirect to if returnUrl is invalid</param>
+    /// <param name="defaultRouteValues">Route values for the default action, such as its id</param>
     /// <returns>An ActionResult that redirects to a validated local URL</returns>
     ActionResult SafeRedirect(
         IUrlHelper urlHelper,
         HttpRequest request,
         string returnUrl,
         string defaultAction,
-        string defaultController);
+        string defaultController,
+        object defaultRouteValues = null);
 }

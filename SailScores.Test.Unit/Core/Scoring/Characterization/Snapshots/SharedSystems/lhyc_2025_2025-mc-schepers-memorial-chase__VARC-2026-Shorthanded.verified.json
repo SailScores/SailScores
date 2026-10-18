@@ -1,0 +1,81 @@
+{
+  "ScoringSystemName": "VARC 2026 Shorthanded",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 2,
+  "NumberOfSailedRaces": 5,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": false,
+  "Columns": [
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2025-09-20",
+    "2. 2025-09-20",
+    "3. 2025-09-20",
+    "1. 2025-09-21",
+    "2. 2025-09-21"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "297",
+      "TotalIncludingDiscards": "493",
+      "PointsEarned": "297",
+      "Scores": "1:98/100 | 2:99/100 | 1:100/100 | (1:98/100) | (1:98/100)"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "291",
+      "TotalIncludingDiscards": "483",
+      "PointsEarned": "291",
+      "Scores": "3:96/100 | 3:98/100 | 4:97/100 | (3:96/100) | (3:96/100)"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "289",
+      "TotalIncludingDiscards": "289",
+      "PointsEarned": "289",
+      "Scores": "2:97/100 | 5:96/100 | 5:96/100 | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "199",
+      "TotalIncludingDiscards": "199",
+      "PointsEarned": "199",
+      "Scores": "DNC 0 | 1:100/100 | 2:99/100 | (SB 0/100) | (SB 0/100)"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "195",
+      "TotalIncludingDiscards": "195",
+      "PointsEarned": "195",
+      "Scores": "DNC 0 | 4:97/100 | 3:98/100 | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "194",
+      "TotalIncludingDiscards": "194",
+      "PointsEarned": "194",
+      "Scores": "DNC 0 | (DNC 0) | (DNC 0) | 2:97/100 | TIE 97/100"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "No participation, no score.: Did not come to starting area",
+    "SB": "No participation, no score.: Did not come to starting area",
+    "TIE": "Average of tied places: Tied with previous"
+  }
+}

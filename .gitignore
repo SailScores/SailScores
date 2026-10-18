@@ -318,3 +318,6 @@ SailScores.Web/appsettings.Development.json
 *.lscache
 
 *.scmp
+
+# Snapshot test output awaiting review
+*.received.json

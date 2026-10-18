@@ -3,6 +3,7 @@ using Microsoft.Extensions.Localization;
 using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
+using SailScores.Web.Extensions;
 using SailScores.Web.Resources;
 using System.IO;
 using System.Text;
@@ -67,8 +68,13 @@ public class CsvService : ICsvService, IDisposable
         sb.Append(_separator);
         sb.Append(GetEscapedLocalizedValue("Boat"));
         sb.Append(_separator);
-        sb.Append(GetEscapedLocalizedValue("Total"));
+        sb.Append(GetEscapedLocalizedValue(series.FlatResults?.TotalHeader ?? "Total"));
         sb.Append(_separator);
+        foreach (var column in GetScoringColumns(series))
+        {
+            sb.Append(GetEscapedLocalizedValue(column.Header));
+            sb.Append(_separator);
+        }
         foreach (var race in series.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())
         {
             sb.Append(GetEscapedValue(_sailscoresLocalizer.GetShortName(race)));
@@ -83,6 +89,13 @@ public class CsvService : ICsvService, IDisposable
         }
 
         return sb.ToString();
+    }
+
+    // Scoring columns the scoring system doesn't hide.
+    private static IEnumerable<FlatResultColumn> GetScoringColumns(Series series)
+    {
+        return (series.FlatResults?.Columns ?? new List<FlatResultColumn>())
+            .Where(c => c.Visibility != ColumnVisibility.Hidden);
     }
 
     private string GetCompResults(Series series, FlatCompetitor comp)
@@ -109,6 +122,11 @@ public class CsvService : ICsvService, IDisposable
         var totalString = String.Format("{0:0.##}", score?.TotalScore ?? 0);
         sb.Append(GetEscapedValue(totalString.ToString()));
         sb.Append(_separator);
+        foreach (var column in GetScoringColumns(series))
+        {
+            sb.Append(GetEscapedValue(column.GetDisplayText(score)));
+            sb.Append(_separator);
+        }
         foreach (var race in series.FlatResults?.Races ?? Enumerable.Empty<FlatRace>())
         {
             if (race.State == RaceState.Scheduled)

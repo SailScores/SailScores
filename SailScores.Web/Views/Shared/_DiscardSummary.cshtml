@@ -1,0 +1,25 @@
+@using SailScores.Api.Enumerations
+@inject IStringLocalizer<SharedResource> localizer
+@model SailScores.Core.FlatModel.FlatResults
+@*
+    Discard count for a results header, e.g. "2 discards (set by day)".
+    Results saved before the discard method was recorded have no method: treat them as a pattern.
+*@
+@{
+    var discardLabel = Model.NumberOfDiscards == 1 ? localizer["discard"] : localizer["discards"];
+}
+@switch (Model.DiscardMethod ?? DiscardMethod.RaceCountPattern)
+{
+    case DiscardMethod.PerDay:
+        @:@Model.NumberOfDiscards @discardLabel (@localizer["set by day"])
+        break;
+    case DiscardMethod.PerChildSeries:
+        @:@Model.NumberOfDiscards @discardLabel (@localizer["set by child series"])
+        break;
+    case DiscardMethod.PreserveChildSeriesDiscards:
+        @:@localizer["up to"] @Model.NumberOfDiscards @discardLabel (@localizer["kept from child series"])
+        break;
+    default:
+        @:@Model.NumberOfDiscards @discardLabel
+        break;
+}

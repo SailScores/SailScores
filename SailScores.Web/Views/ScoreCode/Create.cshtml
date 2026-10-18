@@ -66,6 +66,18 @@
                 <input asp-for="CountAsParticipation" class="form-check-input" />
                 <label asp-for="CountAsParticipation" class="form-check-label"></label>
             </div>
+            <div class="mb-3 mt-3">
+                <label asp-for="IncludeInAverage" class="control-label"></label>
+                <select asp-for="IncludeInAverage" class="form-select">
+                    <option value="">Scoring system default</option>
+                    <option value="true">Include</option>
+                    <option value="false">Exclude</option>
+                </select>
+                <p class="small mx-3">
+                    Leave blank for scoring system default. Only used by average-based
+                    scoring systems, such as Low Point Average.
+                </p>
+            </div>
             <br />
             <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />

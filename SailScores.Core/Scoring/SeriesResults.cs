@@ -15,6 +15,8 @@ namespace SailScores.Core.Scoring
 
         public int NumberOfDiscards { get; set; }
 
+        public DiscardMethod DiscardMethod { get; set; } = DiscardMethod.RaceCountPattern;
+
         public bool IsPercentSystem { get; set; }
 
         public bool? LowerScoreWins { get; set; } = true;

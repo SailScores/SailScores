@@ -1,4 +1,4 @@
-using SailScores.Api.Enumerations;
+﻿using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
 using System;
 using System.Collections.Generic;
@@ -9,15 +9,21 @@ namespace SailScores.Core.Model
     public class SeriesAsRace : Race
     {
         private const string UrlSeparator = "/";
+        // Same as ScoringPipeline.DEFAULT_CODE.
+        public const string AbsentCode = "DNC";
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int TotalChildRaceCount { get; set; } = 0;
         public string SeriesUrl { get; set; }
 
+        // mode is ChildRankAsRace (each competitor's place is their child series rank) or
+        // ChildScoreAsRace (each competitor's score is their child series score, used as-is).
         public SeriesAsRace(
             Series childSeries,
-            FlatResults flatResults
+            FlatResults flatResults,
+            SummaryRollupMode mode = SummaryRollupMode.ChildRankAsRace,
+            bool includeUnrankedScores = false
             )
         {
             var minDate = childSeries.Races.Count > 0 ? childSeries.Races.Min(r => r.Date) : null;
@@ -100,7 +106,22 @@ namespace SailScores.Core.Model
 
             foreach (var result in flatResults?.CalculatedScores ?? [])
             {
-                if (result.Rank != null)
+                if (mode == SummaryRollupMode.ChildScoreAsRace)
+                {
+                    var childScore = result.TotalScore ?? result.Average ?? result.PointsEarned;
+                    if (childScore != null && (result.Rank != null || includeUnrankedScores))
+                    {
+                        this.Scores.Add(new Score
+                        {
+                            Place = result.Rank,
+                            PresetScoreValue = childScore,
+                            CompetitorId = result.CompetitorId,
+                            RaceId = childSeries.Id,
+                            Race = this
+                        });
+                    }
+                }
+                else if (result.Rank != null)
                 {
                     this.Scores.Add(new Score
                     {
@@ -113,6 +134,24 @@ namespace SailScores.Core.Model
             }
 
 
+        }
+
+        // ChildScoreAsRace: gives each of these competitors with no score in this race the
+        // child series score for missing every race, as a DNC. Codes don't change the value.
+        public void AddAbsentCompetitorScores(IEnumerable<Guid> competitorIds, decimal absentScore)
+        {
+            var scored = new HashSet<Guid>(this.Scores.Select(s => s.CompetitorId));
+            foreach (var competitorId in competitorIds.Where(id => !scored.Contains(id)))
+            {
+                this.Scores.Add(new Score
+                {
+                    Code = AbsentCode,
+                    PresetScoreValue = absentScore,
+                    CompetitorId = competitorId,
+                    RaceId = this.Id,
+                    Race = this
+                });
+            }
         }
     }
 }

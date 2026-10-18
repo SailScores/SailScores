@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using System;
@@ -116,7 +117,7 @@ public class FleetPositionRecalculationTests
         };
 
         // Act
-        var calculator = new AppendixACalculator(_scoringSystem);
+        var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, _scoringSystem);
         var results = calculator.CalculateResults(series);
 
         // Assert
@@ -183,7 +184,7 @@ public class FleetPositionRecalculationTests
         };
 
         // Act
-        var calculator = new AppendixACalculator(_scoringSystem);
+        var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, _scoringSystem);
         var results = calculator.CalculateResults(series);
 
         // Assert — original race positions should be used as-is
@@ -241,7 +242,7 @@ public class FleetPositionRecalculationTests
         };
 
         // Act
-        var calculator = new AppendixACalculator(_scoringSystem);
+        var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, _scoringSystem);
         var results = calculator.CalculateResults(series);
 
         // Assert — original positions used for all competitors (no filtering)
@@ -294,7 +295,7 @@ public class FleetPositionRecalculationTests
         };
 
         // Act
-        var calculator = new AppendixACalculator(_scoringSystem);
+        var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, _scoringSystem);
         var exception = Record.Exception(() => calculator.CalculateResults(series));
 
         // Assert — no crash; womanA should receive a DNC for this race
@@ -353,7 +354,7 @@ public class FleetPositionRecalculationTests
         };
 
         // Act
-        var calculator = new AppendixACalculator(_scoringSystem);
+        var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, _scoringSystem);
         var results = calculator.CalculateResults(series);
 
         // Assert — scored by fleet-only ranking, not overall race positions

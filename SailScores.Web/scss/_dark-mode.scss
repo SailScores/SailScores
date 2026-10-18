@@ -28,6 +28,9 @@
         --bs-table-active-bg: #{$ocr-table-active};
         --bs-table-hover-bg: #{$ocr-table-hover};
         --bs-table-color: #{$ocr-table-color};
+
+        /* Scoring system edit pages: scoring method text (see _admin.scss) */
+        --ss-method-accent-text: #{$method-accent};
     }
 
     /* Button variants */

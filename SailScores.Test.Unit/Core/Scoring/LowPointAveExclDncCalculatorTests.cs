@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using System;
@@ -9,7 +10,7 @@ namespace SailScores.Test.Unit.Core.Scoring
 {
     public class LowPointAveExclDncCalculatorTests
     {
-        private LowPointAveExclDncCalculator _calculator;
+        private IScoringCalculator _calculator;
 
         private ScoringSystem MakeScoringSystem()
         {
@@ -108,7 +109,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         {
             // Arrange: Only first competitor participates in all races, others are DNC
             var series = GetSeriesWithParticipation(3, 5, 1);
-            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+            _calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.LowPointAverageExclDnc, series.ScoringSystem);
 
             // Act
             var results = _calculator.CalculateResults(series);
@@ -156,7 +157,7 @@ namespace SailScores.Test.Unit.Core.Scoring
                     score.Place = 2;
                 }
             }
-            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+            _calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.LowPointAverageExclDnc, series.ScoringSystem);
 
             // Act
             var results = _calculator.CalculateResults(series);
@@ -193,7 +194,7 @@ namespace SailScores.Test.Unit.Core.Scoring
                 Results = null
             };
 
-            _calculator = new LowPointAveExclDncCalculator(system);
+            _calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.LowPointAverageExclDnc, system);
 
             // Act
             var results = _calculator.CalculateResults(series);
@@ -233,7 +234,7 @@ namespace SailScores.Test.Unit.Core.Scoring
                 Results = null
             };
 
-            var calculator = new LowPointAveInclDncCalculator(system);
+            var calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.LowPointAverageInclDnc, system);
 
             // Act
             var results = calculator.CalculateResults(series);
@@ -302,7 +303,7 @@ namespace SailScores.Test.Unit.Core.Scoring
                 ScoringSystem = MakeScoringSystem(),
                 Results = null
             };
-            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+            _calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.LowPointAverageExclDnc, series.ScoringSystem);
 
             // Act
             var results = _calculator.CalculateResults(series);
@@ -334,7 +335,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         public void CalculateResults_WithDnc_ScoreCodesUsedShowsExcluded()
         {
             var series = GetSeriesWithParticipation(3, 3, 2);
-            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+            _calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.LowPointAverageExclDnc, series.ScoringSystem);
 
             var results = _calculator.CalculateResults(series);
 
@@ -347,7 +348,7 @@ namespace SailScores.Test.Unit.Core.Scoring
         {
             var series = GetSeriesWithParticipation(3, 3, 2);
             series.ScoringSystem.ScoreCodes.First(c => c.Name == "DNC").CountAsParticipation = true;
-            _calculator = new LowPointAveExclDncCalculator(series.ScoringSystem);
+            _calculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.LowPointAverageExclDnc, series.ScoringSystem);
 
             var results = _calculator.CalculateResults(series);
 

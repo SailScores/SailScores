@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model.BackupEntities;
 using SailScores.Database;
 using System;
@@ -193,13 +194,17 @@ public class BackupService : IBackupService
             Name = s.Name,
             UrlName = s.UrlName,
             Start = s.Start,
-            End = s.End
+            End = s.End,
+            DefaultScoringSystemId = s.DefaultScoringSystemId
         }).ToList();
 
         // Scoring Systems (only those owned by this club)
         var scoringSystems = await _dbContext.ScoringSystems
             .Where(ss => ss.ClubId == clubId)
             .Include(ss => ss.ScoreCodes)
+            .Include(ss => ss.ScoreCodeGroups)
+                .ThenInclude(g => g.Codes)
+            .AsSplitQuery()
             .AsNoTracking()
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -211,6 +216,9 @@ public class BackupService : IBackupService
             ParticipationPercent = ss.ParticipationPercent,
             ParentSystemId = ss.ParentSystemId,
             IsSiteDefault = ss.IsSiteDefault,
+            CalculatorType = ss.CalculatorType,
+            Settings = ss.Settings,
+            DiscardMethod = ss.DiscardMethod,
             ScoreCodes = ss.ScoreCodes?.Select(sc => new ScoreCodeBackup
             {
                 Id = sc.Id,
@@ -227,8 +235,20 @@ public class BackupService : IBackupService
                 Finished = sc.Finished,
                 PreserveResult = sc.PreserveResult,
                 AdjustOtherScores = sc.AdjustOtherScores,
-                CountAsParticipation = sc.CountAsParticipation
-            }).ToList() ?? new List<ScoreCodeBackup>()
+                CountAsParticipation = sc.CountAsParticipation,
+                IncludeInAverage = sc.IncludeInAverage
+            }).ToList() ?? new List<ScoreCodeBackup>(),
+            ScoreCodeGroups = ss.ScoreCodeGroups?.Select(g => new ScoreCodeGroupBackup
+            {
+                Id = g.Id,
+                Name = g.Name,
+                LimitationType = (Model.ScoreCodeGroupLimitationType)g.LimitationType,
+                LimitationValue = g.LimitationValue,
+                UseNonDiscardedRaces = g.UseNonDiscardedRaces,
+                OverageCodeName = g.OverageCodeName,
+                OverageSelectionMethod = (Model.ScoreCodeGroupOverageSelection)g.OverageSelectionMethod,
+                Codes = g.Codes?.Select(c => c.CodeName).ToList() ?? new List<string>()
+            }).ToList() ?? new List<ScoreCodeGroupBackup>()
         }).ToList();
 
         // Get default scoring system name for reference
@@ -361,7 +381,9 @@ public class BackupService : IBackupService
             PreferAlternativeSailNumbers = s.PreferAlternativeSailNumbers,
             ExcludeFromCompetitorStats = s.ExcludeFromCompetitorStats,
             HideDncDiscards = s.HideDncDiscards,
-            ChildrenSeriesAsSingleRace = s.ChildrenSeriesAsSingleRace,
+            ChildrenSeriesAsSingleRace = s.SummaryRollupMode == SummaryRollupMode.ChildRankAsRace,
+            SummaryRollupMode = s.SummaryRollupMode,
+            IncludeUnrankedChildScores = s.IncludeUnrankedChildScores,
             RaceCount = s.RaceCount,
             DateRestricted = s.DateRestricted,
             EnforcedStartDate = s.EnforcedStartDate,
@@ -976,6 +998,7 @@ public class BackupService : IBackupService
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             await UpdateScoringSystemParentReferencesAsync(backup, cancellationToken).ConfigureAwait(false);
+            await UpdateSeasonDefaultScoringSystemsAsync(backup, cancellationToken).ConfigureAwait(false);
             await UpdateHandicapSystemParentReferencesAsync(backup, cancellationToken).ConfigureAwait(false);
             await UpdateHandicapDefaultReferencesAsync(targetClubId, backup, cancellationToken).ConfigureAwait(false);
 
@@ -1646,7 +1669,10 @@ public class BackupService : IBackupService
                 Name = ss.Name,
                 DiscardPattern = ss.DiscardPattern,
                 ParticipationPercent = ss.ParticipationPercent,
-                IsSiteDefault = ss.IsSiteDefault
+                IsSiteDefault = ss.IsSiteDefault,
+                CalculatorType = ss.CalculatorType,
+                Settings = ss.Settings,
+                DiscardMethod = ss.DiscardMethod
             };
 
             if (ss.Name == backup.DefaultScoringSystemName)
@@ -1656,6 +1682,7 @@ public class BackupService : IBackupService
 
             _dbContext.ScoringSystems.Add(dbSs);
             RestoreScoreCodes(ss, dbSs.Id);
+            RestoreScoreCodeGroups(ss, dbSs.Id);
         }
 
         return defaultScoringSystemId;
@@ -1709,9 +1736,64 @@ public class BackupService : IBackupService
                 Finished = sc.Finished,
                 PreserveResult = sc.PreserveResult,
                 AdjustOtherScores = sc.AdjustOtherScores,
-                CountAsParticipation = sc.CountAsParticipation
+                CountAsParticipation = sc.CountAsParticipation,
+                IncludeInAverage = sc.IncludeInAverage
             };
             _dbContext.ScoreCodes.Add(dbSc);
+        }
+    }
+
+    private void RestoreScoreCodeGroups(ScoringSystemBackup ss, Guid scoringSystemId)
+    {
+        foreach (var group in ss.ScoreCodeGroups ?? Enumerable.Empty<ScoreCodeGroupBackup>())
+        {
+            var dbGroup = new Db.ScoreCodeGroup(
+                GetNewGuid(group.Id),
+                scoringSystemId,
+                group.Name,
+                (int)group.LimitationType,
+                group.LimitationValue,
+                group.UseNonDiscardedRaces,
+                group.OverageCodeName,
+                (int)group.OverageSelectionMethod);
+            foreach (var codeName in (group.Codes ?? Enumerable.Empty<string>()).Distinct())
+            {
+                dbGroup.Codes.Add(new Db.ScoreCodeGroupCode
+                {
+                    ScoreCodeGroupId = dbGroup.Id,
+                    CodeName = codeName
+                });
+            }
+            _dbContext.ScoreCodeGroups.Add(dbGroup);
+        }
+    }
+
+    // Runs after scoring systems are saved. A default that is not one of the restored
+    // systems is kept only if it exists here as a site-wide system.
+    private async Task UpdateSeasonDefaultScoringSystemsAsync(ClubBackupData backup, CancellationToken cancellationToken = default)
+    {
+        foreach (var season in backup.Seasons ?? Enumerable.Empty<SeasonBackup>())
+        {
+            if (!season.DefaultScoringSystemId.HasValue) continue;
+
+            var newSeasonId = GetNewGuidIfExists(season.Id);
+            if (!newSeasonId.HasValue) continue;
+
+            var systemId = GetNewGuidIfExists(season.DefaultScoringSystemId.Value);
+            if (!systemId.HasValue
+                && await _dbContext.ScoringSystems
+                    .AnyAsync(s => s.Id == season.DefaultScoringSystemId.Value && s.ClubId == null, cancellationToken)
+                    .ConfigureAwait(false))
+            {
+                systemId = season.DefaultScoringSystemId.Value;
+            }
+            if (!systemId.HasValue) continue;
+
+            var dbSeason = await _dbContext.Seasons.FindAsync([newSeasonId.Value], cancellationToken).ConfigureAwait(false);
+            if (dbSeason != null)
+            {
+                dbSeason.DefaultScoringSystemId = systemId;
+            }
         }
     }
 
@@ -1870,7 +1952,11 @@ public class BackupService : IBackupService
                 PreferAlternativeSailNumbers = series.PreferAlternativeSailNumbers,
                 ExcludeFromCompetitorStats = series.ExcludeFromCompetitorStats,
                 HideDncDiscards = series.HideDncDiscards,
-                ChildrenSeriesAsSingleRace = series.ChildrenSeriesAsSingleRace,
+                SummaryRollupMode = series.SummaryRollupMode
+                    ?? (series.ChildrenSeriesAsSingleRace == true
+                        ? SummaryRollupMode.ChildRankAsRace
+                        : SummaryRollupMode.ChildRaces),
+                IncludeUnrankedChildScores = series.IncludeUnrankedChildScores,
                 RaceCount = series.RaceCount,
                 DateRestricted = series.DateRestricted,
                 EnforcedStartDate = series.EnforcedStartDate,
@@ -2668,9 +2754,28 @@ public class BackupService : IBackupService
             .ExecuteDeleteAsync(cancellationToken)
             .ConfigureAwait(false);
 
+        // ScoreCodeGroups and their codes (via scoring systems)
+        await _dbContext.ScoreCodeGroupCodes
+            .Where(c => _dbContext.ScoreCodeGroups
+                .Where(g => _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).Select(ss => ss.Id).Contains(g.ScoringSystemId))
+                .Select(g => g.Id)
+                .Contains(c.ScoreCodeGroupId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+        await _dbContext.ScoreCodeGroups
+            .Where(g => _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).Select(ss => ss.Id).Contains(g.ScoringSystemId))
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         // Clear default system references on the club before deleting ScoringSystems.
         // This prevents FK constraint violations when the club still references a scoring or handicap system.
         await ClearClubDefaultSystemReferencesAsync(clubId, cancellationToken).ConfigureAwait(false);
+
+        // Seasons reference scoring systems too, and are deleted after them.
+        await _dbContext.Seasons
+            .Where(s => s.ClubId == clubId && s.DefaultScoringSystemId != null)
+            .ExecuteUpdateAsync(s => s.SetProperty(x => x.DefaultScoringSystemId, (Guid?)null), cancellationToken)
+            .ConfigureAwait(false);
 
         // ScoringSystems
         await _dbContext.ScoringSystems
@@ -2915,6 +3020,13 @@ public class BackupService : IBackupService
         var scoringSystemIds = await _dbContext.ScoringSystems.Where(ss => ss.ClubId == clubId).Select(ss => ss.Id).ToListAsync(cancellationToken).ConfigureAwait(false);
         var scoreCodes = await _dbContext.ScoreCodes.Where(sc => scoringSystemIds.Contains(sc.ScoringSystemId)).ToListAsync(cancellationToken).ConfigureAwait(false);
         _dbContext.ScoreCodes.RemoveRange(scoreCodes);
+
+        // ScoreCodeGroups and their codes (via scoring systems)
+        var scoreCodeGroups = await _dbContext.ScoreCodeGroups.Where(g => scoringSystemIds.Contains(g.ScoringSystemId)).ToListAsync(cancellationToken).ConfigureAwait(false);
+        var scoreCodeGroupIds = scoreCodeGroups.Select(g => g.Id).ToList();
+        var scoreCodeGroupCodes = await _dbContext.ScoreCodeGroupCodes.Where(c => scoreCodeGroupIds.Contains(c.ScoreCodeGroupId)).ToListAsync(cancellationToken).ConfigureAwait(false);
+        _dbContext.ScoreCodeGroupCodes.RemoveRange(scoreCodeGroupCodes);
+        _dbContext.ScoreCodeGroups.RemoveRange(scoreCodeGroups);
 
         // Clear default system references on the club before deleting ScoringSystems
         await ClearClubDefaultSystemReferencesAsync(clubId, cancellationToken).ConfigureAwait(false);

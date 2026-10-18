@@ -208,8 +208,13 @@ Phase 0 (new): Time Correction
     Competitors with no elapsed time and no code → assign NHC code (see §6)
 
 Phase 1 (existing): Series scoring
-  BaseScoringCalculator uses Score.Place as normal
+  The scoring system's ScoringPipeline uses Score.Place as normal
 ```
+
+Phase 0 is an input step of the scoring pipeline (`IScoreInputStep`, added by
+`HandicapScoringCalculator`): it runs at the start of each scoring run on that run's copies of
+the scores, so the series' own `Score` objects are never changed. The scored values are on
+each result's `CalculatedScore.RawScore`.
 
 Phase 0 runs at series calculation time (not at race entry), so retroactive handicap corrections
 automatically flow into recalculated results. The `Score.HandicapValue` snapshot preserves what was

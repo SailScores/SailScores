@@ -1,0 +1,82 @@
+@model SailScores.Web.Models.SailScores.SiteAdminScoringSystemsViewModel
+
+@{
+    ViewData["Title"] = "Shared Scoring Systems";
+    Layout = "_Layout";
+}
+
+<h1>Shared Scoring Systems</h1>
+
+<p>
+    <a asp-action="Index">&larr; Site Administration</a>
+</p>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<p class="text-muted">
+    Clubs can choose a shared scoring system as the parent of their own systems.
+    A restricted system is only offered to the clubs listed. Clubs that already use it as a parent keep it.
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Parent / Calculator</th>
+                <th>Available To</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var system in Model.Systems)
+            {
+                <tr>
+                    <td>
+                        @system.Name
+                        @if (system.IsUsedForNewClubs)
+                        {
+                            <span class="badge bg-info text-dark">Used for new clubs</span>
+                        }
+                    </td>
+                    <td>
+                        @if (system.ParentSystemName != null)
+                        {
+                            <span>Child of @system.ParentSystemName</span>
+                        }
+                        else
+                        {
+                            @(system.CalculatorName ?? "")
+                        }
+                    </td>
+                    <td>
+                        @if (!system.IsRestrictedToClubs)
+                        {
+                            <span class="badge bg-success">All clubs</span>
+                        }
+                        else if (system.ClubNames.Count == 0)
+                        {
+                            <span class="badge bg-secondary">No clubs</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Restricted</span>
+                            <span class="small">@string.Join(", ", system.ClubNames)</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="ScoringSystemAccess" asp-route-id="@system.Id" class="btn btn-sm btn-primary">
+                            <i class="fas fa-users-cog"></i> Access
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

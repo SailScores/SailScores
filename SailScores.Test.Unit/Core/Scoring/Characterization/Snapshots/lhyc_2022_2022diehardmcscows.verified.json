@@ -1,0 +1,273 @@
+{
+  "ScoringSystemName": "Appendix A, one discard after six races",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 6,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2022-09-24",
+    "2. 2022-09-24",
+    "3. 2022-09-24",
+    "1. 2022-09-25",
+    "2. 2022-09-25",
+    "3. 2022-09-25"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompGR",
+      "SailNumber": "2169",
+      "Total": "6",
+      "TotalIncludingDiscards": "8",
+      "Columns": {
+        "preDiscardTotal": "8"
+      },
+      "Scores": "1 | (2) | 2 | 1 | 1 | 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompWE",
+      "SailNumber": "2652",
+      "Total": "13",
+      "TotalIncludingDiscards": "17",
+      "Columns": {
+        "preDiscardTotal": "17"
+      },
+      "Scores": "2 | (4) | 3 | 4 | 2 | 2"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompSI",
+      "SailNumber": "2182",
+      "Total": "20",
+      "TotalIncludingDiscards": "43",
+      "Columns": {
+        "preDiscardTotal": "43"
+      },
+      "Scores": "4 | 3 | 1 | 2 | 10 | (DNF 23)"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompMM",
+      "SailNumber": "2644",
+      "Total": "30",
+      "TotalIncludingDiscards": "42",
+      "Columns": {
+        "preDiscardTotal": "42"
+      },
+      "Scores": "5 | 11 | 8 | 3 | 3 | (12)"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompSC",
+      "SailNumber": "2091",
+      "Total": "30",
+      "TotalIncludingDiscards": "53",
+      "Columns": {
+        "preDiscardTotal": "53"
+      },
+      "Scores": "3 | 5 | 10 | (OCS 23) | 5 | 7"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompKA",
+      "SailNumber": "TC67",
+      "Total": "32",
+      "TotalIncludingDiscards": "44",
+      "Columns": {
+        "preDiscardTotal": "44"
+      },
+      "Scores": "10 | 1 | 4 | (ZFP 12) | 12 | 5"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompFA",
+      "SailNumber": "TC77",
+      "Total": "36",
+      "TotalIncludingDiscards": "46",
+      "Columns": {
+        "preDiscardTotal": "46"
+      },
+      "Scores": "9 | (10) | 6 | 5 | 8 | 8"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompNN",
+      "SailNumber": "2717",
+      "Total": "38",
+      "TotalIncludingDiscards": "61",
+      "Columns": {
+        "preDiscardTotal": "61"
+      },
+      "Scores": "12 | 9 | (DNS 23) | ZFP 10 | 4 | 3"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompAJ",
+      "SailNumber": "2887",
+      "Total": "38",
+      "TotalIncludingDiscards": "54",
+      "Columns": {
+        "preDiscardTotal": "54"
+      },
+      "Scores": "6 | (16) | 7 | 10 | 9 | 6"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompLJ2",
+      "SailNumber": "TC79",
+      "Total": "41",
+      "TotalIncludingDiscards": "64",
+      "Columns": {
+        "preDiscardTotal": "64"
+      },
+      "Scores": "7 | 7 | 5 | 8 | 14 | (DNF 23)"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompLJ",
+      "SailNumber": "1578",
+      "Total": "42",
+      "TotalIncludingDiscards": "56",
+      "Columns": {
+        "preDiscardTotal": "56"
+      },
+      "Scores": "8 | (14) | 12 | 12 | 6 | 4"
+    },
+    {
+      "Rank": 12,
+      "Name": "CompGJ2",
+      "SailNumber": "2824",
+      "Total": "53",
+      "TotalIncludingDiscards": "68",
+      "Columns": {
+        "preDiscardTotal": "68"
+      },
+      "Scores": "(15) | 13 | 14 | 6 | 11 | 9"
+    },
+    {
+      "Rank": 13,
+      "Name": "CompLT",
+      "SailNumber": "TC82",
+      "Total": "54",
+      "TotalIncludingDiscards": "71",
+      "Columns": {
+        "preDiscardTotal": "71"
+      },
+      "Scores": "(17) | 12 | 11 | 14 | 7 | 10"
+    },
+    {
+      "Rank": 14,
+      "Name": "CompPH",
+      "SailNumber": "TC78",
+      "Total": "68",
+      "TotalIncludingDiscards": "85",
+      "Columns": {
+        "preDiscardTotal": "85"
+      },
+      "Scores": "14 | 15 | 15 | 13 | (17) | 11"
+    },
+    {
+      "Rank": 15,
+      "Name": "CompBJ",
+      "SailNumber": "1850",
+      "Total": "74",
+      "TotalIncludingDiscards": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
+      "Scores": "11 | 8 | 9 | (DNC 23) | DNC 23 | DNC 23"
+    },
+    {
+      "Rank": 16,
+      "Name": "CompAAC",
+      "SailNumber": "1664",
+      "Total": "74",
+      "TotalIncludingDiscards": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
+      "Scores": "18 | 19 | (DNS 23) | 11 | 13 | 13"
+    },
+    {
+      "Rank": 17,
+      "Name": "CompCHM",
+      "SailNumber": "TC71",
+      "Total": "78",
+      "TotalIncludingDiscards": "101",
+      "Columns": {
+        "preDiscardTotal": "101"
+      },
+      "Scores": "(OCS 23) | 20 | 13 | 15 | 15 | 15"
+    },
+    {
+      "Rank": 18,
+      "Name": "CompGJ",
+      "SailNumber": "TC76",
+      "Total": "83",
+      "TotalIncludingDiscards": "106",
+      "Columns": {
+        "preDiscardTotal": "106"
+      },
+      "Scores": "19 | 18 | (DNC 23) | 16 | 16 | 14"
+    },
+    {
+      "Rank": 19,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "88",
+      "TotalIncludingDiscards": "111",
+      "Columns": {
+        "preDiscardTotal": "111"
+      },
+      "Scores": "13 | 6 | (DNC 23) | DNC 23 | DNC 23 | DNC 23"
+    },
+    {
+      "Rank": 20,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "102",
+      "TotalIncludingDiscards": "125",
+      "Columns": {
+        "preDiscardTotal": "125"
+      },
+      "Scores": "16 | 17 | (DNC 23) | DNC 23 | DNC 23 | DNC 23"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompCB",
+      "SailNumber": "1746",
+      "Total": "115",
+      "TotalIncludingDiscards": "138",
+      "Columns": {
+        "preDiscardTotal": "138"
+      },
+      "Scores": "(DNC 23) | DNC 23 | DNC 23 | DNC 23 | DNC 23 | DNC 23"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompHD",
+      "SailNumber": "2813",
+      "Total": "115",
+      "TotalIncludingDiscards": "138",
+      "Columns": {
+        "preDiscardTotal": "138"
+      },
+      "Scores": "(DNC 23) | DNC 23 | DNC 23 | DNC 23 | DNC 23 | DNC 23"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area",
+    "DNF": "Number of boats entered in series + 1: Started but did not finish",
+    "DNS": "Number of boats entered in series + 1: Came to start area but did not start",
+    "OCS": "Number of boats entered in series + 1: On course side at start or broke rule 30.1",
+    "ZFP": "Place + penalty (20% of DNF score): 20% Penalty under rule 30.2"
+  }
+}

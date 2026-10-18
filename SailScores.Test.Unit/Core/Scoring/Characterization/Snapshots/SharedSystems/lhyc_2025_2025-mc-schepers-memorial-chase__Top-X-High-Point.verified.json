@@ -1,0 +1,76 @@
+{
+  "ScoringSystemName": "Top X High Point",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 0,
+  "NumberOfSailedRaces": 5,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": false,
+  "PercentRequired": "0",
+  "Columns": [
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2025-09-20",
+    "2. 2025-09-20",
+    "3. 2025-09-20",
+    "1. 2025-09-21",
+    "2. 2025-09-21"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "493",
+      "PointsEarned": "493",
+      "Scores": "1:98/100 | 2:99/100 | 1:100/100 | 1:98/100 | 1:98/100"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "483",
+      "PointsEarned": "483",
+      "Scores": "3:96/100 | 3:98/100 | 4:97/100 | 3:96/100 | 3:96/100"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "397",
+      "PointsEarned": "397",
+      "Scores": "DNC null | 1:100/100 | 2:99/100 | SB 99/100 | SB 99/100"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "289",
+      "PointsEarned": "289",
+      "Scores": "2:97/100 | 5:96/100 | 5:96/100 | DNC null | DNC null"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "195",
+      "PointsEarned": "195",
+      "Scores": "DNC null | 4:97/100 | 3:98/100 | DNC null | DNC null"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "194",
+      "PointsEarned": "194",
+      "Scores": "DNC null | DNC null | DNC null | 2:97/100 | TIE 97/100"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "No participation, no score.: Did not come to starting area",
+    "SB": "No participation, no score.: Did not come to starting area",
+    "TIE": "Average of tied places: Tied with previous"
+  }
+}

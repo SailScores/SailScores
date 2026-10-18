@@ -1,0 +1,133 @@
+{
+  "ScoringSystemName": "PWA Standard",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 3,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2026-01-04 Winter 1",
+    "1. 2026-01-18 Winter 2",
+    "1. 2026-02-01 Winter 3 [Abandoned]",
+    "1. 2026-02-15 Winter 4 - Livett Cup",
+    "1. 2026-03-01 Winter 5 [Scheduled]",
+    "1. 2026-03-15 Spring 1 [Scheduled]",
+    "1. 2026-03-22 Spring 2 [Scheduled]",
+    "1. 2026-03-29 Spring 3 - The Baker Cup [Scheduled]",
+    "1. 2026-04-18 Spring 4 [Scheduled]",
+    "1. 2026-05-17 Spring 5 - Windas Cup [Scheduled]"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompJB2",
+      "SailNumber": "JB",
+      "Total": "1.4",
+      "TotalIncludingDiscards": "11.4",
+      "Columns": {
+        "preDiscardTotal": "11.4"
+      },
+      "Scores": "(RCD 10) | 1:0.7 | - | 1:0.7 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompDB",
+      "SailNumber": "DB",
+      "Total": "2.7",
+      "TotalIncludingDiscards": "7.7",
+      "Columns": {
+        "preDiscardTotal": "7.7"
+      },
+      "Scores": "1:0.7 | (5) | - | 2 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompMM",
+      "SailNumber": "MM",
+      "Total": "12",
+      "TotalIncludingDiscards": "22",
+      "Columns": {
+        "preDiscardTotal": "22"
+      },
+      "Scores": "(DNC 10) | 2 | - | DNC 10 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompAF",
+      "SailNumber": "AF",
+      "Total": "12",
+      "TotalIncludingDiscards": "22",
+      "Columns": {
+        "preDiscardTotal": "22"
+      },
+      "Scores": "2 | (RCD 10) | - | DNC 10 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompTL",
+      "SailNumber": "TL",
+      "Total": "13",
+      "TotalIncludingDiscards": "23",
+      "Columns": {
+        "preDiscardTotal": "23"
+      },
+      "Scores": "(DNC 10) | DNC 10 | - | 3 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompLF",
+      "SailNumber": "LF",
+      "Total": "13",
+      "TotalIncludingDiscards": "23",
+      "Columns": {
+        "preDiscardTotal": "23"
+      },
+      "Scores": "(DNC 10) | 3 | - | DNC 10 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompAN",
+      "SailNumber": "AN",
+      "Total": "13",
+      "TotalIncludingDiscards": "23",
+      "Columns": {
+        "preDiscardTotal": "23"
+      },
+      "Scores": "3 | (DNF 10) | - | DNC 10 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompSC",
+      "SailNumber": "SC",
+      "Total": "14",
+      "TotalIncludingDiscards": "24",
+      "Columns": {
+        "preDiscardTotal": "24"
+      },
+      "Scores": "(DNC 10) | RET 10 | - | 4 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompJG",
+      "SailNumber": "JG",
+      "Total": "14",
+      "TotalIncludingDiscards": "24",
+      "Columns": {
+        "preDiscardTotal": "24"
+      },
+      "Scores": "(DNC 10) | 4 | - | DNC 10 | - | - | - | - | - | -"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area",
+    "DNF": "Number of boats entered in series + 1: Started but did not finish",
+    "RCD": "Number of boats entered in series + 1: Did not come to starting area",
+    "RET": "Number of boats entered in series + 1: Retired"
+  }
+}

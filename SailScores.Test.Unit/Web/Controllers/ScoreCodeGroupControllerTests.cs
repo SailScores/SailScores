@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SailScores.Core.Model;
@@ -8,6 +9,7 @@ using SailScores.Core.Services;
 using SailScores.Web.Controllers;
 using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
+using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using Xunit;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -19,7 +21,6 @@ public class ScoreCodeGroupControllerTests
     private readonly Mock<SailScores.Core.Services.IClubService> _clubServiceMock;
     private readonly Mock<SailScores.Core.Services.IScoringService> _scoringServiceMock;
     private readonly Mock<IAuthorizationService> _authServiceMock;
-    private readonly Mock<IRedirectHelper> _redirectHelperMock;
     private readonly ScoreCodeGroupController _controller;
 
     public ScoreCodeGroupControllerTests()
@@ -27,12 +28,20 @@ public class ScoreCodeGroupControllerTests
         _clubServiceMock = new Mock<SailScores.Core.Services.IClubService>();
         _scoringServiceMock = new Mock<SailScores.Core.Services.IScoringService>();
         _authServiceMock = new Mock<IAuthorizationService>();
-        _redirectHelperMock = new Mock<IRedirectHelper>();
         _controller = new ScoreCodeGroupController(
             _clubServiceMock.Object,
             _scoringServiceMock.Object,
             _authServiceMock.Object,
-            _redirectHelperMock.Object);
+            new RedirectHelper());
+        var urlHelperMock = new Mock<IUrlHelper>();
+        urlHelperMock
+            .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
+            .Returns<string>(url => url != null && url.StartsWith("/") && !url.StartsWith("//"));
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        _controller.Url = urlHelperMock.Object;
     }
 
     [Fact]
@@ -279,9 +288,11 @@ public class ScoreCodeGroupControllerTests
         // Act
         var result = await _controller.Create(clubInitials, model);
 
-        // Assert
-        var redirectResult = Assert.IsType<RedirectResult>(result);
-        Assert.Contains(clubInitials, redirectResult.Url);
+        // Assert: without a return URL, back to the group's scoring system.
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Edit", redirectResult.ActionName);
+        Assert.Equal("ScoringSystem", redirectResult.ControllerName);
+        Assert.Equal(scoringSystemId, redirectResult.RouteValues["id"]);
         _scoringServiceMock.Verify(s => s.SaveScoreCodeGroupAsync(It.IsAny<ScoreCodeGroup>()), Times.Once);
     }
 
@@ -324,12 +335,42 @@ public class ScoreCodeGroupControllerTests
             OverageCodeName = "DNC"
         };
 
+        var returnUrl = $"/{clubInitials}/ScoringSystem/Edit/{scoringSystemId}";
+
         // Act
-        var result = await _controller.Edit(clubInitials, model);
+        var result = await _controller.Edit(clubInitials, model, returnUrl);
 
         // Assert
         var redirectResult = Assert.IsType<RedirectResult>(result);
-        Assert.Contains(clubInitials, redirectResult.Url);
+        Assert.Equal(returnUrl, redirectResult.Url);
         _scoringServiceMock.Verify(s => s.SaveScoreCodeGroupAsync(It.IsAny<ScoreCodeGroup>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteConfirmed_WithExternalReturnUrl_RedirectsToScoringSystem()
+    {
+        // Arrange
+        var clubId = Guid.NewGuid();
+        var scoringSystemId = Guid.NewGuid();
+        var groupId = Guid.NewGuid();
+        var clubInitials = "TST";
+
+        _clubServiceMock
+            .Setup(s => s.GetClubId(clubInitials))
+            .ReturnsAsync(clubId);
+        _scoringServiceMock
+            .Setup(s => s.GetScoreCodeGroupAsync(groupId))
+            .ReturnsAsync(new ScoreCodeGroup { Id = groupId, ScoringSystemId = scoringSystemId });
+        _scoringServiceMock
+            .Setup(s => s.GetScoringSystemAsync(scoringSystemId))
+            .ReturnsAsync(new ScoringSystem { Id = scoringSystemId, ClubId = clubId });
+
+        // Act
+        var result = await _controller.DeleteConfirmed(clubInitials, groupId, "https://evil.example.com/");
+
+        // Assert
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal(scoringSystemId, redirectResult.RouteValues["id"]);
+        _scoringServiceMock.Verify(s => s.DeleteScoreCodeGroupAsync(groupId), Times.Once);
     }
 }

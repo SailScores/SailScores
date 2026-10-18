@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using System;
@@ -11,11 +12,11 @@ namespace SailScores.Test.Unit.Core.Scoring
     public class HighPointPercCalculatorTests
     {
 
-        private HighPointPercentageCalculator _defaultCalculator;
+        private IScoringCalculator _defaultCalculator;
 
         public HighPointPercCalculatorTests()
         {
-            _defaultCalculator = new HighPointPercentageCalculator(MakeDefaultScoringSystem());
+            _defaultCalculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.HighPointPercentage, MakeDefaultScoringSystem());
         }
 
         private ScoringSystem MakeDefaultScoringSystem()

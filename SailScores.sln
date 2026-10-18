@@ -67,6 +67,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeaturePlans", "FeaturePlan
 		FeaturePlans\TRMNL-PublicApi-Phased-Implementation-Plan.md = FeaturePlans\TRMNL-PublicApi-Phased-Implementation-Plan.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.FixtureTool", "SailScores.FixtureTool\SailScores.FixtureTool.csproj", "{6C82D485-2765-4B4E-9DB3-52EC366CB266}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -342,6 +344,30 @@ Global
 		{4E90643D-B4DF-6085-2E94-B0A85F45AA9A}.Tests|x64.Build.0 = Tests|Any CPU
 		{4E90643D-B4DF-6085-2E94-B0A85F45AA9A}.Tests|x86.ActiveCfg = Tests|Any CPU
 		{4E90643D-B4DF-6085-2E94-B0A85F45AA9A}.Tests|x86.Build.0 = Tests|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|ARM.Build.0 = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|x64.Build.0 = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Debug|x86.Build.0 = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|ARM.ActiveCfg = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|ARM.Build.0 = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|x64.ActiveCfg = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|x64.Build.0 = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|x86.ActiveCfg = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Release|x86.Build.0 = Release|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|Any CPU.Build.0 = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|ARM.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|ARM.Build.0 = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|x64.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|x64.Build.0 = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|x86.ActiveCfg = Debug|Any CPU
+		{6C82D485-2765-4B4E-9DB3-52EC366CB266}.Tests|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

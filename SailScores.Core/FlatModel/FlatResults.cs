@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Scoring;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,14 @@ namespace SailScores.Core.FlatModel
         public IEnumerable<FlatCompetitor> Competitors { get; set; }
         public IEnumerable<FlatRace> Races { get; set; }
         public IEnumerable<FlatSeriesScore> CalculatedScores { get; set; }
+        // Extra columns after the total (see ScoringColumns); null for results saved
+        // before these existed until ScoringColumns.AddLegacyColumns fills them in.
+        public IList<FlatResultColumn> Columns { get; set; }
+        // Heading of the total column, from the calculator; null (older results) means "Total".
+        public string TotalHeader { get; set; }
         public int NumberOfDiscards { get; set; }
+        // Null for results saved before this was recorded; those used the race-count pattern.
+        public DiscardMethod? DiscardMethod { get; set; }
         public int NumberOfSailedRaces { get; set; }
         public bool? IsPreliminary { get; set; }
         public bool IsPercentSystem { get; set; }
