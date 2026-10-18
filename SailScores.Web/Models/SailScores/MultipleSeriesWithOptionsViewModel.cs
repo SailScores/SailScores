@@ -46,8 +46,11 @@ public class MultipleSeriesWithOptionsViewModel
 
     public IEnumerable<SeriesSummary> SummarySeriesOptions { get; set; } = new List<SeriesSummary>();
 
-    [Display(Name = "Children series each count as a single race")]
-    public bool SummaryChildrenSeriesAsSingleRace { get; set; }
+    [Display(Name = "Child series scoring")]
+    public SummaryRollupMode SummaryRollupMode { get; set; }
+
+    [Display(Name = "Include child series scores of unranked competitors")]
+    public bool SummaryIncludeUnrankedChildScores { get; set; }
 
     [Obsolete("Use SummarySummaryOption instead")]
     public bool CreateSummarySeries 

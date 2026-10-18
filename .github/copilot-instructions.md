@@ -94,20 +94,24 @@ dotnet build SailScores.sln --configuration Release
 
 ### Test
 
+The test projects use xUnit v3 on Microsoft.Testing.Platform; `global.json` opts `dotnet test` into that mode (required by the .NET 10 SDK), so pass the project with `--project`.
+
 Unit tests:
 ```bash
-dotnet test SailScores.Test.Unit/SailScores.Test.Unit.csproj
+dotnet test --project SailScores.Test.Unit/SailScores.Test.Unit.csproj
 ```
 
 Integration tests (requires database):
 ```bash
-dotnet test SailScores.Test.Integration/SailScores.Test.Integration.csproj
+dotnet test --project SailScores.Test.Integration/SailScores.Test.Integration.csproj
 ```
 
 Import/Export tests:
 ```bash
-dotnet test SailScores.ImportExport.Test/SailScores.ImportExport.Test.csproj
+dotnet test --project SailScores.ImportExport.Test/SailScores.ImportExport.Test.csproj
 ```
+
+Filter with xUnit's options, e.g. `--filter-class "*SeriesServiceTests"` or `--filter-method "*Fleet*"`. If the web app is running from Visual Studio and locks the Debug output, add `-c Release`.
 
 ### Note on libman Errors
 
@@ -195,8 +199,9 @@ The project uses libman for client-side libraries (Bootstrap, jQuery). Build err
 
 ### Working with Scores
 
-- Scoring calculations are in `SailScores.Core/Scoring/`
-- Supports Appendix A and High Point Percentage systems
+- Scoring calculations are in `SailScores.Core/Scoring/`, registered in `ScoringCalculatorRegistry`
+- To add a calculator or base scoring system, follow `docs/Scoring-AddingACalculator.md`. Never change how an existing calculator scores.
+- Supports Appendix A, low point average, High Point Percentage and other systems
 - Race results include proper rounding and tie-breaking
 
 ## API Development Guidelines

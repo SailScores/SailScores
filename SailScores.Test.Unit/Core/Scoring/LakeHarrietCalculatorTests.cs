@@ -1,3 +1,4 @@
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using System;
@@ -12,11 +13,11 @@ namespace SailScores.Test.Unit.Core.Scoring
     public class LakeHarrietCalculatorTests
     {
 
-        private readonly AppendixACalculator _defaultCalculator;
+        private readonly IScoringCalculator _defaultCalculator;
 
         public LakeHarrietCalculatorTests()
         {
-            _defaultCalculator = new AppendixACalculator(MakeDefaultScoringSystem());
+            _defaultCalculator = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, MakeDefaultScoringSystem());
         }
 
         private ScoringSystem MakeDefaultScoringSystem()

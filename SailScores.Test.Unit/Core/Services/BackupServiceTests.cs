@@ -390,6 +390,43 @@ public class BackupServiceTests
     }
 
     [Fact]
+    public async Task BackupAndRestore_RoundTrip_PreservesSummaryRollupMode()
+    {
+        // Arrange
+        var series = await _context.Series.FirstAsync(s => s.ClubId == _clubId, TestContext.Current.CancellationToken);
+        series.SummaryRollupMode = SailScores.Api.Enumerations.SummaryRollupMode.ChildScoreAsRace;
+        series.IncludeUnrankedChildScores = true;
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var name = series.Name;
+
+        // Act
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        var restored = await _context.Series.SingleAsync(s => s.ClubId == _clubId && s.Name == name, TestContext.Current.CancellationToken);
+        Assert.Equal(SailScores.Api.Enumerations.SummaryRollupMode.ChildScoreAsRace, restored.SummaryRollupMode);
+        Assert.True(restored.IncludeUnrankedChildScores);
+    }
+
+    [Fact]
+    public async Task RestoreBackupAsync_OlderBackupWithSingleRaceFlag_UsesChildRankAsRace()
+    {
+        // Arrange: a backup from before SummaryRollupMode existed.
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        var seriesBackup = backup.Series.First();
+        seriesBackup.SummaryRollupMode = null;
+        seriesBackup.ChildrenSeriesAsSingleRace = true;
+
+        // Act
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        var restored = await _context.Series.SingleAsync(s => s.ClubId == _clubId && s.Name == seriesBackup.Name, TestContext.Current.CancellationToken);
+        Assert.Equal(SailScores.Api.Enumerations.SummaryRollupMode.ChildRankAsRace, restored.SummaryRollupMode);
+    }
+
+    [Fact]
     public async Task BackupAndRestore_RoundTrip_PreservesSeasons()
     {
         // Arrange
@@ -456,6 +493,122 @@ public class BackupServiceTests
         Assert.NotNull(restoredParent);
         Assert.NotNull(restoredChild);
         Assert.Equal(restoredParent.Id, restoredChild.ParentSystemId);
+    }
+
+    [Fact]
+    public async Task BackupAndRestore_WithScoreCodeGroups_PreservesGroups()
+    {
+        // Arrange
+        var system = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "System With Groups",
+            DiscardPattern = "0"
+        };
+        _context.ScoringSystems.Add(system);
+        var group = new Db.ScoreCodeGroup(Guid.NewGuid(), system.Id, "Breakdowns", 1, 25m, true, "DNC", 1);
+        group.Codes.Add(new Db.ScoreCodeGroupCode { ScoreCodeGroupId = group.Id, CodeName = "BKD" });
+        group.Codes.Add(new Db.ScoreCodeGroupCode { ScoreCodeGroupId = group.Id, CodeName = "RDG" });
+        _context.ScoreCodeGroups.Add(group);
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        var restoredSystem = await _context.ScoringSystems
+            .SingleAsync(s => s.ClubId == _clubId && s.Name == "System With Groups", TestContext.Current.CancellationToken);
+        var restoredGroups = await _context.ScoreCodeGroups
+            .Include(g => g.Codes)
+            .Where(g => g.ScoringSystemId == restoredSystem.Id)
+            .ToListAsync(TestContext.Current.CancellationToken);
+        var restoredGroup = Assert.Single(restoredGroups);
+        Assert.Equal("Breakdowns", restoredGroup.Name);
+        Assert.Equal(1, restoredGroup.LimitationType);
+        Assert.Equal(25m, restoredGroup.LimitationValue);
+        Assert.True(restoredGroup.UseNonDiscardedRaces);
+        Assert.Equal("DNC", restoredGroup.OverageCodeName);
+        Assert.Equal(1, restoredGroup.OverageSelectionMethod);
+        Assert.Equal(new[] { "BKD", "RDG" }, restoredGroup.Codes.Select(c => c.CodeName).OrderBy(c => c));
+
+        // The group from before the restore is gone, not left alongside the restored one.
+        Assert.Equal(1, await _context.ScoreCodeGroups.CountAsync(g => g.Name == "Breakdowns", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task BackupAndRestore_WithSeasonDefaultClubSystem_RemapsDefault()
+    {
+        // Arrange
+        var system = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "Season Default System",
+            DiscardPattern = "0"
+        };
+        _context.ScoringSystems.Add(system);
+        var season = await _context.Seasons.FirstAsync(s => s.ClubId == _clubId, TestContext.Current.CancellationToken);
+        season.DefaultScoringSystemId = system.Id;
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var seasonName = season.Name;
+
+        // Act
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(system.Id, backup.Seasons.Single(s => s.Name == seasonName).DefaultScoringSystemId);
+        var restoredSystem = await _context.ScoringSystems
+            .SingleAsync(s => s.ClubId == _clubId && s.Name == "Season Default System", TestContext.Current.CancellationToken);
+        var restoredSeason = await _context.Seasons
+            .SingleAsync(s => s.ClubId == _clubId && s.Name == seasonName, TestContext.Current.CancellationToken);
+        Assert.Equal(restoredSystem.Id, restoredSeason.DefaultScoringSystemId);
+    }
+
+    [Fact]
+    public async Task BackupAndRestore_WithSeasonDefaultSiteWideSystem_KeepsDefault()
+    {
+        // Arrange
+        var siteWideSystem = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = null,
+            Name = "Site-wide Season Default",
+            DiscardPattern = "0"
+        };
+        _context.ScoringSystems.Add(siteWideSystem);
+        var season = await _context.Seasons.FirstAsync(s => s.ClubId == _clubId, TestContext.Current.CancellationToken);
+        season.DefaultScoringSystemId = siteWideSystem.Id;
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var seasonName = season.Name;
+
+        // Act
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        var restoredSeason = await _context.Seasons
+            .SingleAsync(s => s.ClubId == _clubId && s.Name == seasonName, TestContext.Current.CancellationToken);
+        Assert.Equal(siteWideSystem.Id, restoredSeason.DefaultScoringSystemId);
+    }
+
+    [Fact]
+    public async Task RestoreBackupAsync_SeasonDefaultNotFound_LeavesDefaultEmpty()
+    {
+        // Arrange
+        var backup = await _service.CreateBackupAsync(_clubId, "testuser", TestContext.Current.CancellationToken);
+        var seasonName = backup.Seasons[0].Name;
+        backup.Seasons[0].DefaultScoringSystemId = Guid.NewGuid();
+
+        // Act
+        await _service.RestoreBackupAsync(_clubId, backup, preserveClubName: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        var restoredSeason = await _context.Seasons
+            .SingleAsync(s => s.ClubId == _clubId && s.Name == seasonName, TestContext.Current.CancellationToken);
+        Assert.Null(restoredSeason.DefaultScoringSystemId);
     }
 
     [Fact]
@@ -661,6 +814,7 @@ public class BackupServiceTests
             (typeof(Db.HandicapSystem), typeof(HandicapSystemBackup), new[] { "ClubId", "ParentSystem" }),
             (typeof(Db.CompetitorHandicap), typeof(CompetitorHandicapBackup), new[] { "Competitor", "HandicapSystem" }),
             (typeof(Db.ScoreCode), typeof(ScoreCodeBackup), new[] { "ScoringSystemId" }),
+            (typeof(Db.ScoreCodeGroup), typeof(ScoreCodeGroupBackup), new[] { "ScoringSystemId", "ScoringSystem" }),
             (typeof(Db.Series), typeof(SeriesBackup), new[] { "ClubId", "RaceSeries", "ChildLinks", "ParentLinks", "Season", "ScoringSystem" }),
             (typeof(Db.Race), typeof(RaceBackup), new[] { "ClubId", "Fleet", "Scores", "SeriesRaces", "Weather" }),
             (typeof(Db.Score), typeof(ScoreBackup), new[] { "Competitor", "Race" }),
@@ -736,7 +890,8 @@ public class BackupServiceTests
             "NewRegattaId",     // RegattaForwarder: uses RegattaId in backup
             "NewSeriesId",      // SeriesForwarder: uses SeriesId in backup
             "DefaultHandicapSystemId", // Fleet/Club: restored via name-based backup references
-            "CourseDistance"    // Race: not currently included in backup payload
+            "CourseDistance",   // Race: not currently included in backup payload
+            "IsRestrictedToClubs" // ScoringSystem: only used on shared systems, which aren't backed up
         };
 
         return commonExclusions.Contains(propertyName) 

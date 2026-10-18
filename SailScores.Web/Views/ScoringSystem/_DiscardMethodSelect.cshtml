@@ -1,0 +1,11 @@
+@using SailScores.Api.Enumerations
+@model SailScores.Web.Models.SailScores.ScoringSystemWithOptionsViewModel
+@* Options not allowed for the parent's calculator are hidden by scoringSystemSettings.js. *@
+<div class="mb-3" id="discardMethodGroup">
+    <label asp-for="DiscardMethod" class="control-label"></label>
+    <select asp-for="DiscardMethod" class="form-select" id="discardMethod"
+            asp-items="Html.GetEnumSelectList<DiscardMethod>()">
+        <option value="">Same as parent</option>
+    </select>
+    <span asp-validation-for="DiscardMethod" class="text-danger"></span>
+</div>

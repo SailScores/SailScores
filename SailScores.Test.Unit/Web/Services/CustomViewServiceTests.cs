@@ -64,4 +64,38 @@ public class CustomViewServiceTests
 
         Assert.Null(value);
     }
+
+    [Fact]
+    public void GetCustomFieldValue_NoEffectiveDateAndNoneCurrent_ReturnsMostRecent()
+    {
+        var fieldDefinitionId = Guid.NewGuid();
+        var competitor = new Competitor
+        {
+            CustomFieldValues = new List<CompetitorFieldValue>
+            {
+                new()
+                {
+                    FieldDefinitionId = fieldDefinitionId,
+                    Value = "Older",
+                    EffectiveFrom = new DateTime(2020, 1, 1),
+                    EffectiveTo = new DateTime(2020, 12, 31)
+                },
+                new()
+                {
+                    FieldDefinitionId = fieldDefinitionId,
+                    Value = "Newer",
+                    EffectiveFrom = new DateTime(2021, 1, 1),
+                    EffectiveTo = new DateTime(2021, 12, 31)
+                }
+            }
+        };
+
+        var service = new CustomViewService(
+            Mock.Of<ISailScoresContext>(),
+            Mock.Of<ISeriesResultsTemplateService>());
+
+        var value = service.GetCustomFieldValue(competitor, fieldDefinitionId);
+
+        Assert.Equal("Newer", value);
+    }
 }

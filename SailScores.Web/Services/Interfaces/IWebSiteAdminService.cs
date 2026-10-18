@@ -11,4 +11,7 @@ public interface IWebSiteAdminService
     Task<(byte[] Data, string FileName)> BackupClubAsync(string clubInitials, string createdBy);
     Task ResetClubAsync(Guid clubId, ResetLevel resetLevel);
     Task RecalculateSeriesAsync(Guid seriesId, string updatedBy);
+    Task<SiteAdminScoringSystemsViewModel> GetScoringSystemsAsync();
+    Task<SiteAdminScoringSystemAccessViewModel> GetScoringSystemAccessAsync(Guid scoringSystemId);
+    Task SaveScoringSystemAccessAsync(SiteAdminScoringSystemAccessViewModel model);
 }

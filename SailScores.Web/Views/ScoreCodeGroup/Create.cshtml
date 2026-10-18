@@ -12,6 +12,7 @@
     <div class="col-md-8 col-lg-6">
         <form asp-action="Create">
             <input type="hidden" asp-for="ScoringSystemId" />
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">

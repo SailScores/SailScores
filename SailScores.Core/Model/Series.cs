@@ -28,7 +28,10 @@ public class Series
     public String Description { get; set; }
 
     public SeriesType Type { get; set; }
-    public bool ChildrenSeriesAsSingleRace { get; set; }
+    public SummaryRollupMode SummaryRollupMode { get; set; }
+    // SummaryRollupMode.ChildScoreAsRace: also use the child scores of competitors the
+    // child series didn't rank.
+    public bool IncludeUnrankedChildScores { get; set; }
 
     public IList<Guid> ChildrenSeriesIds { get; set; } = new List<Guid>();
 

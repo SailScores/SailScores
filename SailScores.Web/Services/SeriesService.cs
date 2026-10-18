@@ -816,7 +816,8 @@ public class SeriesService : ISeriesService
             IsImportantSeries = false,
             ParentSeriesIds = null,
 
-            ChildrenSeriesAsSingleRace = model.SummaryChildrenSeriesAsSingleRace,
+            SummaryRollupMode = model.SummaryRollupMode,
+            IncludeUnrankedChildScores = model.SummaryIncludeUnrankedChildScores,
             ChildrenSeriesIds = createdIds,
 
             DateRestricted = false,
@@ -861,7 +862,8 @@ public class SeriesService : ISeriesService
             ExcludeFromCompetitorStats = summarySeries.ExcludeFromCompetitorStats,
             IsImportantSeries = summarySeries.IsImportantSeries,
             ParentSeriesIds = null,
-            ChildrenSeriesAsSingleRace = summarySeries.ChildrenSeriesAsSingleRace,
+            SummaryRollupMode = summarySeries.SummaryRollupMode,
+            IncludeUnrankedChildScores = summarySeries.IncludeUnrankedChildScores,
             ChildrenSeriesIds = existingChildren,
             DateRestricted = false,
             EnforcedStartDate = null,

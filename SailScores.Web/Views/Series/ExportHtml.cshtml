@@ -61,16 +61,15 @@
                     }
                     @{
                         var raceLabel = results.NumberOfSailedRaces == 1 ? localizer["race sailed"] : localizer["races sailed"];
-                        var discardLabel = results.NumberOfDiscards == 1 ? localizer["discard"] : localizer["discards"];
-                        var competitorLabel = results.Competitors.Count() == 1 ? localizer["competitor"] : localizer["competitors"];
+                                                var competitorLabel = results.Competitors.Count() == 1 ? localizer["competitor"] : localizer["competitors"];
                     }
-                    @results.NumberOfSailedRaces @raceLabel with @results.NumberOfDiscards @discardLabel,
+                    @results.NumberOfSailedRaces @raceLabel with <partial name="_DiscardSummary" model="results" />,
                     @results.Competitors.Count() @competitorLabel
                     @if (!String.IsNullOrWhiteSpace(@results.ScoringSystemName))
                     {
                         @:&ndash; @results.ScoringSystemName
                     }
-                    @if (results.IsPercentSystem && results.PercentRequired.HasValue)
+                    @if (results.IsPercentSystem && results.PercentRequired > 0)
                     {
                         @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
                     }

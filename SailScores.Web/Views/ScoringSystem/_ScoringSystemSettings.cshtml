@@ -1,0 +1,115 @@
+@using SailScores.Api.Enumerations
+@using SailScores.Core.Scoring
+@model SailScores.Web.Models.SailScores.ScoringSystemWithOptionsViewModel
+@*
+    Calculator-specific settings fields (see _DiscardMethodSelect for the discard method).
+    Which fields show depends on the parent system's calculator and the discard method;
+    scoringSystemSettings.js toggles them when either changes.
+    Parent <option>s carry data-calculator-type, data-discard-method and data-settings.
+    Results column visibility works the same way: one select per column any calculator
+    produces, shown for the parent's calculator.
+    Fields and columns that only some calculators have sit in a .scoring-method-settings
+    panel headed with the calculator's name, so users can tell them from the common ones.
+*@
+@{
+    var calculatorNames = Html.GetEnumSelectList<ScoringCalculatorType>()
+        .ToDictionary(i => i.Value, i => i.Text);
+    var calculatorConfig = ScoringCalculatorRegistry.All.ToDictionary(
+        r => ((int)r.CalculatorType).ToString(),
+        r => new
+        {
+            name = calculatorNames.GetValueOrDefault(((int)r.CalculatorType).ToString()),
+            fields = r.Fields.Select(f => f.PropertyName).ToArray(),
+            columns = ScoringCalculatorRegistry.GetColumns(r.CalculatorType).Select(c => c.Key).ToArray(),
+            discardMethods = r.AllowedDiscardMethods.Select(m => (int)m).ToArray()
+        });
+    var configJson = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        defaultCalculatorType = ((int)ScoringCalculatorRegistry.DefaultCalculatorType).ToString(),
+        calculators = calculatorConfig
+    });
+    var standardColumnKeys = ScoringColumns.Standard.Select(c => c.Key).ToHashSet();
+
+    async Task RenderColumn(ScoringColumnDescriptor column)
+    {
+        var selectId = $"Settings_ColumnVisibilities_{column.Key}";
+        var selected = Model.Settings?.GetColumnVisibility(column.Key);
+        var defaultName = Html.GetEnumSelectList<ColumnVisibility>()
+            .FirstOrDefault(i => i.Value == ((int)column.DefaultVisibility).ToString())?.Text;
+        <div class="mb-3" data-settings-column="@column.Key" data-default-visibility="@((int)column.DefaultVisibility)">
+            <label for="@selectId" class="control-label">@column.Header</label>
+            <select id="@selectId" name="Settings.ColumnVisibilities[@column.Key]" class="form-select">
+                <option value="">Same as parent (@defaultName)</option>
+                @foreach (var item in Html.GetEnumSelectList<ColumnVisibility>())
+                {
+                    <option value="@item.Value" selected="@(selected.HasValue && item.Value == ((int)selected.Value).ToString())">@item.Text</option>
+                }
+            </select>
+            <p class="small mx-3">@column.HelpText</p>
+        </div>
+    }
+}
+<script type="application/json" id="scoringCalculatorConfig">@Html.Raw(configJson)</script>
+
+<div class="scoring-method-settings" data-method-panel>
+    <div class="scoring-method-settings-heading"><span data-method-name></span> settings</div>
+    @foreach (var field in ScoringCalculatorRegistry.AllFields)
+    {
+        var inputId = $"Settings_{field.PropertyName}";
+        var value = Model.Settings?.GetValue(field.PropertyName);
+        <div class="mb-3" data-settings-field="@field.PropertyName">
+            <label for="@inputId" class="control-label">@field.Label</label>
+            @if (field.Required)
+            {
+                <span class="small"><em>&ensp;Required here or in a parent system.</em></span>
+            }
+            @if (field.FieldType == ScoringFieldType.Boolean)
+            {
+                var selectedValue = value as bool?;
+                <select id="@inputId" name="Settings.@field.PropertyName" class="form-select">
+                    <option value="">Same as parent</option>
+                    <option value="true" selected="@(selectedValue == true)">Yes</option>
+                    <option value="false" selected="@(selectedValue == false)">No</option>
+                </select>
+            }
+            else
+            {
+                <div class="input-group">
+                    <input id="@inputId" name="Settings.@field.PropertyName" class="form-control" type="number"
+                           step="@(field.FieldType == ScoringFieldType.Integer ? "1" : "any")"
+                           min="0" max="@(field.FieldType == ScoringFieldType.Percent ? "100" : null)"
+                           value="@(value == null ? string.Empty : Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture))" />
+                    @if (field.FieldType == ScoringFieldType.Percent)
+                    {
+                        <span class="input-group-text">%</span>
+                    }
+                </div>
+            }
+            <span class="text-danger" data-valmsg-for="Settings.@field.PropertyName" data-valmsg-replace="true">
+                @(ViewData.ModelState.TryGetValue($"Settings.{field.PropertyName}", out var entry)
+                    ? string.Join(" ", entry.Errors.Select(e => e.ErrorMessage))
+                    : string.Empty)
+            </span>
+            <p class="small mx-3">@field.HelpText</p>
+        </div>
+    }
+</div>
+
+<h5 class="mt-4">Results Columns</h5>
+<p class="small">Extra columns shown after the total. Changes apply when the series results are next updated.</p>
+@foreach (var column in ScoringCalculatorRegistry.AllColumns.Where(c => standardColumnKeys.Contains(c.Key)))
+{
+    await RenderColumn(column);
+}
+<div class="scoring-method-settings" data-method-panel>
+    <div class="scoring-method-settings-heading"><span data-method-name></span> columns</div>
+    @foreach (var column in ScoringCalculatorRegistry.AllColumns.Where(c => !standardColumnKeys.Contains(c.Key)))
+    {
+        await RenderColumn(column);
+    }
+</div>
+<span class="text-danger">
+    @(ViewData.ModelState.TryGetValue("Settings.ColumnVisibilities", out var columnEntry)
+        ? string.Join(" ", columnEntry.Errors.Select(e => e.ErrorMessage))
+        : string.Empty)
+</span>

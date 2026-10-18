@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services.Interfaces;
@@ -13,14 +14,17 @@ public class WebSiteAdminService : IWebSiteAdminService
     private readonly CoreServices.ISiteAdminService _coreSiteAdminService;
     private readonly CoreServices.IClubService _coreClubService;
     private readonly IBackupService _backupService;
+    private readonly CoreServices.IScoringService _coreScoringService;
 
     public WebSiteAdminService(
         IMemoryCache cache,
         CoreServices.ISeriesService seriesService,
         CoreServices.ISiteAdminService coreSiteAdminService,
         CoreServices.IClubService coreClubService,
-        IBackupService backupService)
+        IBackupService backupService,
+        CoreServices.IScoringService coreScoringService)
     {
+        _coreScoringService = coreScoringService;
         _cache = cache;
         _seriesService = seriesService;
         _coreSiteAdminService = coreSiteAdminService;
@@ -131,5 +135,76 @@ public class WebSiteAdminService : IWebSiteAdminService
     public async Task RecalculateSeriesAsync(Guid seriesId, string updatedBy)
     {
         await _seriesService.UpdateSeriesResults(seriesId, updatedBy);
+    }
+
+    public async Task<SiteAdminScoringSystemsViewModel> GetScoringSystemsAsync()
+    {
+        var systems = await _coreScoringService.GetSharedScoringSystemAccessAsync();
+        var clubs = (await _coreClubService.GetClubs(true))
+            .ToDictionary(c => c.Id);
+
+        return new SiteAdminScoringSystemsViewModel
+        {
+            Systems = systems.Select(s => new SiteAdminScoringSystemSummary
+            {
+                Id = s.Id,
+                Name = s.Name,
+                ParentSystemName = s.ParentSystemName,
+                CalculatorName = GetCalculatorName(s.CalculatorType),
+                IsUsedForNewClubs = s.IsUsedForNewClubs,
+                IsRestrictedToClubs = s.IsRestrictedToClubs,
+                ClubNames = s.ClubIds
+                    .Where(clubs.ContainsKey)
+                    .Select(id => $"{clubs[id].Name} ({clubs[id].Initials})")
+                    .OrderBy(n => n)
+                    .ToList()
+            }).ToList()
+        };
+    }
+
+    public async Task<SiteAdminScoringSystemAccessViewModel> GetScoringSystemAccessAsync(Guid scoringSystemId)
+    {
+        var system = (await _coreScoringService.GetSharedScoringSystemAccessAsync())
+            .FirstOrDefault(s => s.Id == scoringSystemId);
+        if (system == null)
+        {
+            return null;
+        }
+
+        var clubs = await _coreClubService.GetClubs(true);
+        return new SiteAdminScoringSystemAccessViewModel
+        {
+            Id = system.Id,
+            Name = system.Name,
+            ParentSystemName = system.ParentSystemName,
+            CalculatorName = GetCalculatorName(system.CalculatorType),
+            IsUsedForNewClubs = system.IsUsedForNewClubs,
+            IsRestrictedToClubs = system.IsRestrictedToClubs,
+            SelectedClubIds = system.ClubIds.ToList(),
+            ClubOptions = clubs
+                .OrderBy(c => c.Name)
+                .Select(c => new SiteAdminClubOption
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Initials = c.Initials,
+                    IsHidden = c.IsHidden
+                }).ToList()
+        };
+    }
+
+    public Task SaveScoringSystemAccessAsync(SiteAdminScoringSystemAccessViewModel model)
+    {
+        return _coreScoringService.SaveSharedScoringSystemAccessAsync(
+            model.Id,
+            model.IsRestrictedToClubs,
+            model.SelectedClubIds ?? new List<Guid>());
+    }
+
+    private static string? GetCalculatorName(ScoringCalculatorType? calculatorType)
+    {
+        return calculatorType.HasValue
+            ? EnumHelper<ScoringCalculatorType>.GetDisplayValue(calculatorType.Value)
+            : null;
     }
 }

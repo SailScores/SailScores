@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
+using SailScores.Core.Scoring;
 using SailScores.Core.Services;
 using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
@@ -40,7 +42,6 @@ public class ScoringSystemController : Controller
         var vm = new ScoringSystemWithOptionsViewModel
         {
             ClubId = clubId,
-            DiscardPattern = "0",
             ParentSystemId = club.DefaultScoringSystemId
         };
         var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
@@ -59,15 +60,22 @@ public class ScoringSystemController : Controller
 
         model.ClubId = clubId;
         model.Id = Guid.NewGuid();
+        var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
+        var parent = potentialParents.FirstOrDefault(s => s.Id == model.ParentSystemId);
+        if (model.ParentSystemId.HasValue && parent == null)
+        {
+            ModelState.AddModelError(nameof(model.ParentSystemId),
+                "That parent scoring system isn't available to this club.");
+        }
+        AddSettingsValidationErrors(model, parent);
         if (!ModelState.IsValid)
         {
-            var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
             model.ParentSystemOptions = potentialParents.ToList();
             return View(model);
         }
 
         await _scoringService.SaveScoringSystemAsync(
-            _mapper.Map<ScoringSystem>(model));
+            ToScoringSystemForSave(model, parent));
 
         return RedirectToAction("Edit", "ScoringSystem", new { id = model.Id });
     }
@@ -84,8 +92,7 @@ public class ScoringSystemController : Controller
         }
 
         var vm = _mapper.Map<ScoringSystemWithOptionsViewModel>(scoringSystem);
-        var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
-        vm.ParentSystemOptions = potentialParents.Where(s => s.Id != id).ToList();
+        vm.ParentSystemOptions = await GetParentOptionsAsync(clubId, scoringSystem);
 
         return View(vm);
     }
@@ -102,18 +109,27 @@ public class ScoringSystemController : Controller
         {
             return Unauthorized();
         }
+        var scoringSystem = await _scoringService.GetScoringSystemAsync(model.Id);
+        var potentialParents = await GetParentOptionsAsync(clubId, scoringSystem);
+        var parent = potentialParents.FirstOrDefault(s => s.Id == model.ParentSystemId);
+        if (model.ParentSystemId.HasValue && parent == null)
+        {
+            ModelState.AddModelError(nameof(model.ParentSystemId),
+                "That parent scoring system isn't available to this club.");
+        }
+        AddSettingsValidationErrors(model, parent);
         if (!ModelState.IsValid)
         {
-            var potentialParents = await _scoringService.GetScoringSystemsAsync(clubId, true);
-            model.ParentSystemOptions = potentialParents.ToList();
+            model.ParentSystemOptions = potentialParents;
 
-            var scoringSystem = await _scoringService.GetScoringSystemAsync(model.Id);
             model.ScoreCodes = scoringSystem.ScoreCodes;
             model.InheritedScoreCodes = scoringSystem.InheritedScoreCodes;
+            model.ScoreCodeGroups = scoringSystem.ScoreCodeGroups;
+            model.InheritedScoreCodeGroups = scoringSystem.InheritedScoreCodeGroups;
             return View(model);
         }
-        var system = _mapper.Map<ScoringSystem>(model);
-        await _scoringService.SaveScoringSystemAsync(system);
+        await _scoringService.SaveScoringSystemAsync(
+            ToScoringSystemForSave(model, parent));
 
         return RedirectToAction("Index", "Admin");
 
@@ -157,5 +173,55 @@ public class ScoringSystemController : Controller
 
         await _scoringService.DeleteScoringSystemAsync(id);
         return RedirectToAction("Index", "Admin");
+    }
+
+    // Discard pattern and calculator settings are validated against what the
+    // system inherits from its (resolved) parent.
+    private void AddSettingsValidationErrors(
+        ScoringSystemWithOptionsViewModel model,
+        ScoringSystem parent)
+    {
+        foreach (var (propertyName, message) in
+            ScoringCalculatorRegistry.GetValidationErrors(model, parent))
+        {
+            var key = propertyName == nameof(ScoringSystem.DiscardPattern)
+                || propertyName == nameof(ScoringSystem.DiscardMethod)
+                ? propertyName
+                : $"{nameof(ScoringSystem.Settings)}.{propertyName}";
+            ModelState.AddModelError(key, message);
+        }
+    }
+
+    // The club's systems and the shared systems it can use. A system keeps its current
+    // parent as an option even if that shared system was later restricted to other clubs.
+    private async Task<IList<ScoringSystem>> GetParentOptionsAsync(
+        Guid clubId,
+        ScoringSystem system)
+    {
+        var options = (await _scoringService.GetScoringSystemsAsync(clubId, true))
+            .Where(s => s.Id != system?.Id)
+            .ToList();
+        var currentParentId = system?.ParentSystemId;
+        if (currentParentId.HasValue && options.All(s => s.Id != currentParentId.Value))
+        {
+            var currentParent = await _scoringService.GetScoringSystemAsync(currentParentId.Value);
+            if (currentParent != null)
+            {
+                options.Add(currentParent);
+                options = options.OrderBy(s => s.Name).ToList();
+            }
+        }
+        return options;
+    }
+
+    private ScoringSystem ToScoringSystemForSave(
+        ScoringSystemWithOptionsViewModel model,
+        ScoringSystem parent)
+    {
+        var system = _mapper.Map<ScoringSystem>(model);
+        system.Settings = ScoringCalculatorRegistry.RemoveUnusedSettings(
+            model.Settings,
+            parent?.CalculatorType ?? model.CalculatorType);
+        return system;
     }
 }

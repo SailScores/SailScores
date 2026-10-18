@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SailScores.Core.Scoring;
 
 namespace SailScores.Core.FlatModel
 {
@@ -15,6 +16,8 @@ namespace SailScores.Core.FlatModel
         public Decimal? PointsPossible { get; set; }
 
         public Decimal? ParticipationPercent { get; set; }
+        // Values for FlatResults.Columns, by column key. Competitors without a value are left out.
+        public Dictionary<string, ScoringColumnValue> ColumnValues { get; set; }
         public IEnumerable<FlatCalculatedScore> Scores { get; set; }
     }
 }

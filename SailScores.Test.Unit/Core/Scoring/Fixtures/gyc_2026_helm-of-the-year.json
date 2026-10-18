@@ -1,0 +1,1454 @@
+{
+  "metadata": {
+    "schema": "sailscores-club-backup",
+    "version": 1,
+    "createdDateUtc": "2026-02-22T18:51:42.1762664Z",
+    "sourceClubInitials": "GYC",
+    "sourceClubName": "Greenwich Yacht Club",
+    "sourceClubId": "6e2ae3f2-784b-4f65-8f17-5b7e6955b922",
+    "boatClassCount": 5,
+    "competitorCount": 53,
+    "fleetCount": 1,
+    "raceCount": 10,
+    "scoreCount": 16,
+    "seasonCount": 1,
+    "seriesCount": 6,
+    "regattaCount": 0,
+    "scoringSystemCount": 2
+  },
+  "name": "Greenwich Yacht Club",
+  "initials": "GYC",
+  "isHidden": false,
+  "showClubInResults": false,
+  "showCalendarInNav": false,
+  "locale": "en-US",
+  "defaultRaceDateOffset": 0,
+  "boatClasses": [
+    {
+      "id": "b4a15447-cb91-4cef-bac4-4e6d0bf13188",
+      "name": "Bosun"
+    },
+    {
+      "id": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "name": "Laser Stratos Keel"
+    },
+    {
+      "id": "c45341c2-19c8-4474-a7c8-7c2eeac77a20",
+      "name": "Laser"
+    },
+    {
+      "id": "96521d6f-b367-4bdb-8d73-a0aa72181997",
+      "name": "Laser Radial"
+    },
+    {
+      "id": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "name": "Laser 2000"
+    }
+  ],
+  "seasons": [
+    {
+      "id": "960aa699-1f9e-4fe0-84a5-3ce4232f475a",
+      "name": "2026",
+      "urlName": "2026",
+      "start": "2026-01-01T00:00:00",
+      "end": "2026-12-31T00:00:00"
+    }
+  ],
+  "fleets": [
+    {
+      "id": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "name": "Dinghy Fleet",
+      "shortName": "DinghyFleet",
+      "nickName": "D-fleet",
+      "isActive": true,
+      "fleetType": "SelectedClasses",
+      "boatClassIds": [
+        "b4a15447-cb91-4cef-bac4-4e6d0bf13188",
+        "5f0c38c6-b627-4232-9c58-53c6655749e7",
+        "c45341c2-19c8-4474-a7c8-7c2eeac77a20",
+        "96521d6f-b367-4bdb-8d73-a0aa72181997",
+        "269c8100-0f45-406d-aa94-d6a9d4d0368f"
+      ]
+    }
+  ],
+  "competitors": [
+    {
+      "id": "9dab48b3-8566-4ac4-85d9-0281e539af17",
+      "name": "CompLH",
+      "sailNumber": "LH",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "lh",
+      "urlId": "id20",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "22ae69cb-aaf5-428b-a3b1-03e42b508da1",
+      "name": "CompAS",
+      "sailNumber": "AS",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "as",
+      "urlId": "id23",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "d3e01357-8005-45df-bbe2-0b05a700bd49",
+      "name": "CompLH2",
+      "sailNumber": "LH",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "id53",
+      "urlId": "id53",
+      "created": "2026-01-04T17:03:05.4108308",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "5b542073-c0ca-47d8-9ada-0baf692374f3",
+      "name": "CompAC",
+      "sailNumber": "AC",
+      "isActive": true,
+      "boatClassId": "c45341c2-19c8-4474-a7c8-7c2eeac77a20",
+      "urlName": "ac",
+      "urlId": "id12",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "3919e2f1-8847-42bc-9608-16f1dcc06505",
+      "name": "CompDB",
+      "sailNumber": "DB",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "db",
+      "urlId": "id24",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "dfb7a67f-6c96-4b17-91b4-17bcd61cd601",
+      "name": "CompMT",
+      "sailNumber": "MT",
+      "isActive": true,
+      "boatClassId": "c45341c2-19c8-4474-a7c8-7c2eeac77a20",
+      "urlName": "mt",
+      "urlId": "id11",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "da868fe4-451b-4e95-b8e0-18eda8cd0c68",
+      "name": "CompJG",
+      "sailNumber": "JG",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "jg",
+      "urlId": "id10",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "8451d248-83ff-40a4-82aa-19adffd34b6d",
+      "name": "CompSC",
+      "sailNumber": "SC",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "sc",
+      "urlId": "id6",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "ae0ebbaf-d979-42c2-913d-1aa3a26e2c6f",
+      "name": "CompGW",
+      "sailNumber": "GW",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "gw",
+      "urlId": "id14",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "5c61d198-96b3-47ff-9a36-1c0ca7178ce5",
+      "name": "CompJC",
+      "sailNumber": "JC",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "jc",
+      "urlId": "id40",
+      "created": "2025-07-16T19:49:48.0793499",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "1d94f8dc-db21-46f8-bd89-1e432c865438",
+      "name": "CompVP",
+      "sailNumber": "VP",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "vp",
+      "urlId": "id39",
+      "created": "2025-06-07T16:55:48.6194944",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "784b956d-3d72-43bd-822d-1efd4713840d",
+      "name": "CompGS",
+      "sailNumber": "GS",
+      "isActive": true,
+      "boatClassId": "b4a15447-cb91-4cef-bac4-4e6d0bf13188",
+      "urlName": "gs",
+      "urlId": "id34",
+      "created": "2025-06-04T08:10:27.4465056",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "4a85a336-29e9-4714-9d59-21a92f23a9c9",
+      "name": "CompPB",
+      "sailNumber": "PB",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "pb",
+      "urlId": "id30",
+      "created": "2025-05-21T13:02:53.4673008",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "a822d036-66c6-4d9b-aca1-262df02c1366",
+      "name": "CompJB",
+      "sailNumber": "JB1",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "jb1",
+      "urlId": "id54",
+      "created": "2026-02-15T20:43:00.7720245",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "ecf5cec1-bd3e-4ea9-8c2c-26f923db9f76",
+      "name": "CompMN",
+      "sailNumber": "MN",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "mn",
+      "urlId": "id5",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "b018c596-e780-4eab-9fe2-29361cf140ab",
+      "name": "CompSB",
+      "sailNumber": "SB",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "sb",
+      "urlId": "id22",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "43bd6663-900c-473e-b773-2a6f5db99ece",
+      "name": "CompDB2",
+      "sailNumber": "DB",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "id51",
+      "urlId": "id51",
+      "created": "2025-11-08T21:13:33.395842",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "7ac58911-d55c-4b38-9225-316c12763102",
+      "name": "CompDM",
+      "sailNumber": "DM",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "dm",
+      "urlId": "id49",
+      "created": "2025-11-03T16:08:28.3939553",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "72e4bb62-0abd-4d4b-8d87-32f97abb2d61",
+      "name": "CompBR",
+      "sailNumber": "BR",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "br",
+      "urlId": "id41",
+      "created": "2025-07-16T20:38:40.4939877",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "7ab1047d-cd99-482d-8a83-33f78ef5340b",
+      "name": "CompBS",
+      "sailNumber": "BS",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "bs",
+      "urlId": "id15",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "7e9f6d7d-da06-4836-bffe-3585cecceb4f",
+      "name": "CompDHC",
+      "sailNumber": "DH",
+      "isActive": true,
+      "boatClassId": "c45341c2-19c8-4474-a7c8-7c2eeac77a20",
+      "urlName": "dh",
+      "urlId": "id46",
+      "created": "2025-10-05T19:08:51.7982474",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "8a7bff58-6de7-4732-a041-3e922f858fad",
+      "name": "CompYM",
+      "sailNumber": "YM",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "ym",
+      "urlId": "id16",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "0f0a67ea-7f17-4b7e-9e6d-3ebf4dfbc5d3",
+      "name": "CompAF",
+      "sailNumber": "AF",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "af",
+      "urlId": "id0",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "f842fe79-5e0d-4b5a-aebe-4590aaaeb6ee",
+      "name": "CompJC2",
+      "sailNumber": "JC",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "id50",
+      "urlId": "id50",
+      "created": "2025-11-03T16:09:34.0676502",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "bd428707-bb84-4e6c-b146-460070ed51ed",
+      "name": "CompAB",
+      "sailNumber": "AB",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "ab",
+      "urlId": "id38",
+      "created": "2025-06-07T16:55:03.3472483",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "528d24dd-168d-4c7a-b70d-526e78fd2eba",
+      "name": "CompSB2",
+      "sailNumber": "SB",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "id47",
+      "urlId": "id47",
+      "created": "2025-10-05T19:28:03.3268914",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "4510faf5-6401-43ec-a5f4-52dac9baafca",
+      "name": "CompMD",
+      "sailNumber": "MD",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "md",
+      "urlId": "id55",
+      "created": "2026-02-15T20:44:32.6482038",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "e0d9625b-1a9a-49df-bfc4-5c19c91d6f8f",
+      "name": "CompAS2",
+      "sailNumber": "AS1",
+      "isActive": true,
+      "boatClassId": "b4a15447-cb91-4cef-bac4-4e6d0bf13188",
+      "urlName": "as1",
+      "urlId": "id33",
+      "created": "2025-06-04T08:08:37.3128536",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "aeb4bcff-f1ed-4da1-9f91-5e44d5871bfe",
+      "name": "CompMS",
+      "sailNumber": "MS",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "ms",
+      "urlId": "id29",
+      "created": "2025-05-21T13:00:12.6386478",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "2296fb5d-ca9d-4edb-bc4d-6202626adc5c",
+      "name": "CompMF",
+      "sailNumber": "MF",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "mf",
+      "urlId": "id52",
+      "created": "2025-11-26T12:48:01.7305326",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "468e1726-ca71-422b-b54b-67e3562f07cc",
+      "name": "CompJM",
+      "sailNumber": "JM",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "id48",
+      "urlId": "id48",
+      "created": "2025-11-03T16:07:57.8411708",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "8cad9798-ed74-48d9-bcfa-6d1bd72f013e",
+      "name": "CompEL",
+      "sailNumber": "EL",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "el",
+      "urlId": "id2",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "50fdd8cf-67ce-4b26-99d1-71aaecea82b2",
+      "name": "CompLF",
+      "sailNumber": "LF",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "lf",
+      "urlId": "id17",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "726c4bb5-cad1-4b18-9cd4-7cae51ac4d02",
+      "name": "CompDB3",
+      "sailNumber": "DB",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "id42",
+      "urlId": "id42",
+      "created": "2025-07-16T20:51:03.4184723",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "35b1609e-f62c-4f3e-a199-8ad57ea1e3ac",
+      "name": "CompDP",
+      "sailNumber": "DP",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "dp",
+      "urlId": "id43",
+      "created": "2025-07-27T18:30:00.0754205",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "18baea72-99a1-4637-bd09-8e2a1d52a57b",
+      "name": "CompLR",
+      "sailNumber": "LR",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "lr",
+      "urlId": "id26",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "f05040b7-1483-48b9-9e1d-90226b9affa4",
+      "name": "CompGM",
+      "sailNumber": "GM",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "gm",
+      "urlId": "id37",
+      "created": "2025-06-07T16:53:58.6980376",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "9cc3d60d-8062-4a2b-9107-93a8f7308fa1",
+      "name": "CompJRH",
+      "sailNumber": "JR",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "jr",
+      "urlId": "id27",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "d0f1b8a6-fbe8-48da-a490-9a47f3c56f93",
+      "name": "CompTF",
+      "sailNumber": "TF",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "tf",
+      "urlId": "id31",
+      "created": "2025-05-21T13:04:11.3026702",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "7c2a9fb8-8e50-4012-a242-9be6a2fe162b",
+      "name": "CompMJ",
+      "sailNumber": "MJ",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "mj",
+      "urlId": "id3",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "af7ca24a-d58d-4533-99c3-a1a50c25964d",
+      "name": "CompMM",
+      "sailNumber": "MM",
+      "isActive": true,
+      "boatClassId": "c45341c2-19c8-4474-a7c8-7c2eeac77a20",
+      "urlName": "mm",
+      "urlId": "id4",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "70285c2d-bafc-45c6-b26a-a1e8981d1907",
+      "name": "CompAN",
+      "sailNumber": "AN",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "an",
+      "urlId": "id1",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "87385f23-1dd1-4ee6-b0b9-a2b26e6c214b",
+      "name": "CompTL",
+      "sailNumber": "TL",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "tl",
+      "urlId": "id8",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "ad3d2f94-9a89-48c5-a696-ae2c270e16e7",
+      "name": "CompSP",
+      "sailNumber": "SP",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "sp",
+      "urlId": "id7",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "e86bd02c-4247-4cb1-9985-aef5293e7643",
+      "name": "CompJM2",
+      "sailNumber": "JM",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "jm",
+      "urlId": "id45",
+      "created": "2025-07-31T19:07:32.9252359",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "0e8135a5-e860-45be-ae72-c349fd33a884",
+      "name": "CompCG",
+      "sailNumber": "CG",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "cg",
+      "urlId": "id44",
+      "created": "2025-07-27T18:31:18.9324912",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "62c3a47d-f4e4-4155-af62-c491c30eeebf",
+      "name": "CompTC",
+      "sailNumber": "TC",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "tc",
+      "urlId": "id35",
+      "created": "2025-06-07T06:26:06.3096802",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "fa46b563-261d-4281-9445-d7c79cfbf3a8",
+      "name": "CompNE",
+      "sailNumber": "NE",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "ne",
+      "urlId": "id25",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "e0ca124e-49bc-43d0-a476-e00685800adc",
+      "name": "CompJB2",
+      "sailNumber": "JB",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "jb",
+      "urlId": "id21",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "bdc35182-eaf9-4bcb-a9fe-e32ffeb77802",
+      "name": "CompTP",
+      "sailNumber": "TP",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "tp",
+      "urlId": "id13",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "acc0c3ec-5208-45b3-b46d-ea109946cf16",
+      "name": "CompNS",
+      "sailNumber": "NS",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "ns",
+      "urlId": "id32",
+      "created": "2025-05-21T13:04:43.1719138",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "4320dc3c-8273-4755-a47d-fa69219ac6c5",
+      "name": "CompBH",
+      "sailNumber": "BH",
+      "isActive": true,
+      "boatClassId": "269c8100-0f45-406d-aa94-d6a9d4d0368f",
+      "urlName": "bh",
+      "urlId": "id19",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    },
+    {
+      "id": "151781e7-ca99-4505-8e65-fb158f776e6d",
+      "name": "CompDL",
+      "sailNumber": "DL",
+      "isActive": true,
+      "boatClassId": "5f0c38c6-b627-4232-9c58-53c6655749e7",
+      "urlName": "dl",
+      "urlId": "id18",
+      "fleetIds": [
+        "b09d4b95-0338-41b6-9a46-0219e6e23852"
+      ]
+    }
+  ],
+  "scoringSystems": [
+    {
+      "id": "651a3372-9c45-4d07-884f-1320a9554267",
+      "name": "Appendix A For Series - Rule 5.3",
+      "discardPattern": "0,1",
+      "isSiteDefault": true,
+      "calculatorType": 1,
+      "scoreCodes": [
+        {
+          "id": "5468746b-1a3d-41c8-9524-5a1348f530db",
+          "name": "BFD",
+          "description": "Disqualification under rule 30.4",
+          "preserveResult": false,
+          "discardable": false,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "bae7b19f-bd7a-4b34-bf61-a923074d0d6a",
+          "name": "DNC",
+          "description": "Did not come to starting area",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "SER+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "97199c0b-ba85-4991-90de-78313daa5206",
+          "name": "DNE",
+          "description": "Disqualification that is not excludable",
+          "preserveResult": false,
+          "discardable": false,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "23924b2a-589e-449b-8ee1-4aace21887ee",
+          "name": "DNF",
+          "description": "Started but did not finish",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "0bdf9646-9fe7-41af-8cd5-d35c24ec08e7",
+          "name": "DNS",
+          "description": "Came to start area but did not start",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "fbb44a91-79c1-45bc-a1f1-b7e438f0bd13",
+          "name": "DPI",
+          "description": "Discretionary penalty",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "a5e1e95b-b485-4ef2-9fbb-ed9e2f5ea8ef",
+          "name": "DSQ",
+          "description": "Disqualification",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "3cde0694-404d-49e9-aa40-56481b1622d6",
+          "name": "NSC",
+          "description": "Did not sail the course (other than DNC, DNS, OCS and DNF)",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "570b7975-3033-426c-89d9-dea990494b17",
+          "name": "OCS",
+          "description": "On course side at start or broke rule 30.1",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "509de5cd-590d-49fc-92da-538539ba52ad",
+          "name": "RDG",
+          "description": "Redress: points set by protest hearing",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "MAN",
+          "countAsParticipation": true
+        },
+        {
+          "id": "3d648097-19ed-4075-aeea-5fb45e6d57fa",
+          "name": "RDGAve",
+          "description": "Redress: average of other races",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "AVE",
+          "countAsParticipation": true
+        },
+        {
+          "id": "aa3615ab-1dbf-4b0f-8874-6aeff614c5c8",
+          "name": "RET",
+          "description": "Retired",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "178e3235-dddd-4271-89fa-6d441d7635b0",
+          "name": "SCP",
+          "description": "Scoring Penalty imposed",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        },
+        {
+          "id": "caa61bf8-9eb5-4c90-8c5e-1333c19a8e4a",
+          "name": "TIE",
+          "description": "Tied with previous",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "TIE",
+          "countAsParticipation": true
+        },
+        {
+          "id": "48a704dd-f812-4ed3-ab0a-60a4c722fe0f",
+          "name": "UFD",
+          "description": "Disqualification under rule 30.3",
+          "preserveResult": false,
+          "discardable": true,
+          "started": false,
+          "formulaValue": 1.000,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "CTS+",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 1.000
+        },
+        {
+          "id": "82fabaa8-a390-4c58-a3ea-91af00c4c96d",
+          "name": "ZFP",
+          "description": "20% Penalty under rule 30.2",
+          "preserveResult": true,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 20.000,
+          "adjustOtherScores": false,
+          "cameToStart": true,
+          "finished": true,
+          "formula": "PLC%",
+          "countAsParticipation": true,
+          "formulaValueDecimal": 20.000
+        }
+      ],
+      "scoreCodeGroups": []
+    },
+    {
+      "id": "e567138e-bc9e-4e58-854a-d005f0431f46",
+      "name": "GYC scoring based on App A for Series - Rule 5.3",
+      "discardPattern": "0,0,1,1,2,2,3",
+      "parentSystemId": "651a3372-9c45-4d07-884f-1320a9554267",
+      "scoreCodes": [
+        {
+          "id": "ab7b2531-8544-4752-b143-7cbcc71fef0b",
+          "name": "RCD",
+          "description": "Race Committee Duty",
+          "formula": "AVE ND",
+          "formulaValue": 0,
+          "discardable": true,
+          "cameToStart": false,
+          "started": false,
+          "finished": false,
+          "preserveResult": false,
+          "adjustOtherScores": false,
+          "countAsParticipation": true
+        }
+      ]
+    }
+  ],
+  "series": [
+    {
+      "id": "68805db7-5fc9-4d4f-e07c-08de3ecdfde3",
+      "name": "Winter Series",
+      "urlName": "winter-series",
+      "type": "Standard",
+      "isImportantSeries": true,
+      "resultsLocked": false,
+      "updatedDate": "2026-02-15T21:02:50.5956844Z",
+      "scoringSystemId": "e567138e-bc9e-4e58-854a-d005f0431f46",
+      "trendOption": "None",
+      "excludeFromCompetitorStats": false,
+      "hideDncDiscards": false,
+      "childrenSeriesAsSingleRace": false,
+      "raceCount": 5,
+      "startDate": "2026-01-04",
+      "endDate": "2026-03-01",
+      "seasonId": "960aa699-1f9e-4fe0-84a5-3ce4232f475a",
+      "childrenSeriesIds": [],
+      "parentSeriesIds": [
+        "304d9126-18fd-4b26-e087-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3",
+      "name": "Spring Series",
+      "urlName": "spring-series",
+      "type": "Standard",
+      "isImportantSeries": false,
+      "resultsLocked": false,
+      "updatedDate": "2026-02-15T21:13:31.4412513Z",
+      "trendOption": "None",
+      "excludeFromCompetitorStats": false,
+      "hideDncDiscards": false,
+      "childrenSeriesAsSingleRace": false,
+      "raceCount": 5,
+      "startDate": "2026-03-15",
+      "endDate": "2026-05-17",
+      "seasonId": "960aa699-1f9e-4fe0-84a5-3ce4232f475a",
+      "childrenSeriesIds": [],
+      "parentSeriesIds": [
+        "304d9126-18fd-4b26-e087-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "ca224f26-dab9-4d1a-e080-08de3ecdfde3",
+      "name": "Summer Series",
+      "urlName": "summer-series",
+      "type": "Standard",
+      "isImportantSeries": false,
+      "resultsLocked": false,
+      "updatedDate": "2025-12-31T22:35:46.9982604Z",
+      "trendOption": "None",
+      "excludeFromCompetitorStats": false,
+      "hideDncDiscards": false,
+      "childrenSeriesAsSingleRace": false,
+      "raceCount": 0,
+      "seasonId": "960aa699-1f9e-4fe0-84a5-3ce4232f475a",
+      "childrenSeriesIds": [],
+      "parentSeriesIds": [
+        "304d9126-18fd-4b26-e087-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "ba9c8d57-9ece-4a55-e082-08de3ecdfde3",
+      "name": "Autumn Series",
+      "urlName": "autumn-series",
+      "type": "Standard",
+      "isImportantSeries": false,
+      "resultsLocked": false,
+      "updatedDate": "2025-12-31T22:36:40.3013273Z",
+      "trendOption": "None",
+      "excludeFromCompetitorStats": false,
+      "hideDncDiscards": false,
+      "childrenSeriesAsSingleRace": false,
+      "raceCount": 0,
+      "seasonId": "960aa699-1f9e-4fe0-84a5-3ce4232f475a",
+      "childrenSeriesIds": [],
+      "parentSeriesIds": [
+        "304d9126-18fd-4b26-e087-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "e437421e-fdcf-43e0-e084-08de3ecdfde3",
+      "name": "Evening Series",
+      "urlName": "evening-series",
+      "type": "Standard",
+      "isImportantSeries": false,
+      "resultsLocked": false,
+      "updatedDate": "2025-12-31T22:37:33.4422845Z",
+      "trendOption": "None",
+      "excludeFromCompetitorStats": false,
+      "hideDncDiscards": false,
+      "childrenSeriesAsSingleRace": false,
+      "raceCount": 0,
+      "seasonId": "960aa699-1f9e-4fe0-84a5-3ce4232f475a",
+      "childrenSeriesIds": [],
+      "parentSeriesIds": [
+        "304d9126-18fd-4b26-e087-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "304d9126-18fd-4b26-e087-08de3ecdfde3",
+      "name": "Helm Of The Year",
+      "urlName": "helm-of-the-year",
+      "type": "Summary",
+      "isImportantSeries": false,
+      "resultsLocked": false,
+      "updatedDate": "2026-02-15T21:13:31.4870495Z",
+      "trendOption": "None",
+      "excludeFromCompetitorStats": false,
+      "hideDncDiscards": false,
+      "childrenSeriesAsSingleRace": false,
+      "raceCount": 10,
+      "startDate": "2026-01-04",
+      "endDate": "2026-05-17",
+      "seasonId": "960aa699-1f9e-4fe0-84a5-3ce4232f475a",
+      "childrenSeriesIds": [
+        "68805db7-5fc9-4d4f-e07c-08de3ecdfde3",
+        "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3",
+        "ca224f26-dab9-4d1a-e080-08de3ecdfde3",
+        "ba9c8d57-9ece-4a55-e082-08de3ecdfde3",
+        "e437421e-fdcf-43e0-e084-08de3ecdfde3"
+      ],
+      "parentSeriesIds": []
+    }
+  ],
+  "races": [
+    {
+      "id": "4f8f7974-9dac-4c84-8fb9-1dacc2bbe593",
+      "name": "Spring 5 - Windas Cup",
+      "date": "2026-05-17T00:00:00",
+      "state": "Scheduled",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:13:31.4032262",
+      "trackTimes": false,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [],
+      "seriesIds": [
+        "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "276ddffc-13b3-4e1a-b2fc-42fb33efdb17",
+      "name": "Spring 1",
+      "date": "2026-03-15T00:00:00",
+      "state": "Scheduled",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:06:15.4217592",
+      "trackTimes": false,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [],
+      "seriesIds": [
+        "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "076706e3-e569-4a7d-b89a-4b5e510dafb9",
+      "name": "Spring 3 - The Baker Cup",
+      "date": "2026-03-29T00:00:00",
+      "state": "Scheduled",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:09:54.1606791",
+      "trackTimes": false,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [],
+      "seriesIds": [
+        "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "3e7c6289-7189-4dda-b9db-75caed058f0c",
+      "name": "Winter 5",
+      "date": "2026-03-01T00:00:00",
+      "state": "Scheduled",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:02:50.5725492",
+      "trackTimes": false,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [],
+      "seriesIds": [
+        "68805db7-5fc9-4d4f-e07c-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+      "name": "Winter 2",
+      "date": "2026-01-18T00:00:00",
+      "state": "Raced",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:01:38.7635741",
+      "startTime": "2026-01-18T12:30:00",
+      "trackTimes": true,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [
+        {
+          "id": "fca4046d-8cd6-4bbd-80b0-29d9c5f338fd",
+          "competitorId": "3919e2f1-8847-42bc-9608-16f1dcc06505",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "place": 5,
+          "finishTime": "2026-01-18T14:31:57",
+          "elapsedTime": "02:01:57"
+        },
+        {
+          "id": "8d124938-f4f4-4fda-aa76-30f4eb384283",
+          "competitorId": "da868fe4-451b-4e95-b8e0-18eda8cd0c68",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "place": 4,
+          "finishTime": "2026-01-18T14:24:15",
+          "elapsedTime": "01:54:15"
+        },
+        {
+          "id": "d501d4ae-8cd9-42c9-a210-31a6fed213c6",
+          "competitorId": "af7ca24a-d58d-4533-99c3-a1a50c25964d",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "place": 2,
+          "finishTime": "2026-01-18T14:22:13",
+          "elapsedTime": "01:52:13"
+        },
+        {
+          "id": "8cfacf40-9d1c-45b3-b8f0-379886f08e64",
+          "competitorId": "8451d248-83ff-40a4-82aa-19adffd34b6d",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "place": 6,
+          "code": "RET"
+        },
+        {
+          "id": "a2ea068b-a1e4-4461-97fd-4ef2bdf1d28c",
+          "competitorId": "0f0a67ea-7f17-4b7e-9e6d-3ebf4dfbc5d3",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "code": "RCD"
+        },
+        {
+          "id": "a6104c75-daef-4f21-8c7d-5ab0c7406b1a",
+          "competitorId": "70285c2d-bafc-45c6-b26a-a1e8981d1907",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "code": "DNF"
+        },
+        {
+          "id": "f81df768-02b9-4484-bc2e-70d3efba5752",
+          "competitorId": "50fdd8cf-67ce-4b26-99d1-71aaecea82b2",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "place": 3,
+          "finishTime": "2026-01-18T14:23:41",
+          "elapsedTime": "01:53:41"
+        },
+        {
+          "id": "7ccd48c5-1337-468e-a634-fe0f20af0b35",
+          "competitorId": "e0ca124e-49bc-43d0-a476-e00685800adc",
+          "raceId": "ccb33e50-c8b5-404a-b98c-95a9c8e3900c",
+          "place": 1,
+          "finishTime": "2026-01-18T14:16:23",
+          "elapsedTime": "01:46:23"
+        }
+      ],
+      "seriesIds": [
+        "68805db7-5fc9-4d4f-e07c-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "71655ca5-b856-4407-9832-a415a1febcba",
+      "name": "Winter 3",
+      "date": "2026-02-01T00:00:00",
+      "state": "Abandoned",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:01:55.5578635",
+      "trackTimes": false,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [],
+      "seriesIds": [
+        "68805db7-5fc9-4d4f-e07c-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "cc251438-e769-43c5-886e-a6917e6a18e8",
+      "name": "Spring 4",
+      "date": "2026-04-18T00:00:00",
+      "state": "Scheduled",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:11:36.5789703",
+      "trackTimes": false,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [],
+      "seriesIds": [
+        "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "732b30b9-e4b3-4500-a601-b467f50802b0",
+      "name": "Spring 2",
+      "date": "2026-03-22T00:00:00",
+      "state": "Scheduled",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:08:33.6693521",
+      "trackTimes": false,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [],
+      "seriesIds": [
+        "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "1c7283a5-3fe8-4c36-8689-c8d4b784e9d4",
+      "name": "Winter 1",
+      "date": "2026-01-04T00:00:00",
+      "state": "Raced",
+      "order": 1,
+      "updatedDate": "2026-01-04T17:00:15.5003597",
+      "startTime": "2026-01-04T13:00:00",
+      "trackTimes": true,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [
+        {
+          "id": "510f4e77-f09f-4e29-a7d0-065c3ab8c12b",
+          "competitorId": "70285c2d-bafc-45c6-b26a-a1e8981d1907",
+          "raceId": "1c7283a5-3fe8-4c36-8689-c8d4b784e9d4",
+          "place": 3,
+          "finishTime": "2026-01-04T13:34:22",
+          "elapsedTime": "00:34:22"
+        },
+        {
+          "id": "75017c12-d0a1-4159-b67b-abc78f82aaa4",
+          "competitorId": "0f0a67ea-7f17-4b7e-9e6d-3ebf4dfbc5d3",
+          "raceId": "1c7283a5-3fe8-4c36-8689-c8d4b784e9d4",
+          "place": 2,
+          "finishTime": "2026-01-04T13:36:56",
+          "elapsedTime": "00:36:56"
+        },
+        {
+          "id": "4b5c0ce0-3b93-4dde-bc4b-e51fd919d683",
+          "competitorId": "e0ca124e-49bc-43d0-a476-e00685800adc",
+          "raceId": "1c7283a5-3fe8-4c36-8689-c8d4b784e9d4",
+          "code": "RCD"
+        },
+        {
+          "id": "087fea57-64c5-4681-9e29-f70029278b98",
+          "competitorId": "3919e2f1-8847-42bc-9608-16f1dcc06505",
+          "raceId": "1c7283a5-3fe8-4c36-8689-c8d4b784e9d4",
+          "place": 1,
+          "finishTime": "2026-01-04T13:31:36",
+          "elapsedTime": "00:31:36"
+        }
+      ],
+      "seriesIds": [
+        "68805db7-5fc9-4d4f-e07c-08de3ecdfde3"
+      ]
+    },
+    {
+      "id": "813c52c6-157d-4788-b949-ed83cb992101",
+      "name": "Winter 4 - Livett Cup",
+      "date": "2026-02-15T00:00:00",
+      "state": "Raced",
+      "order": 1,
+      "updatedDate": "2026-02-15T21:02:34.5018494",
+      "startTime": "2026-02-15T11:40:00",
+      "trackTimes": true,
+      "fleetId": "b09d4b95-0338-41b6-9a46-0219e6e23852",
+      "scores": [
+        {
+          "id": "b8482161-cbcd-41d5-93d9-58ef35640efc",
+          "competitorId": "87385f23-1dd1-4ee6-b0b9-a2b26e6c214b",
+          "raceId": "813c52c6-157d-4788-b949-ed83cb992101",
+          "place": 3,
+          "finishTime": "2026-02-15T12:32:42",
+          "elapsedTime": "00:52:42"
+        },
+        {
+          "id": "506c805c-ac48-48db-8218-619361f124f9",
+          "competitorId": "e0ca124e-49bc-43d0-a476-e00685800adc",
+          "raceId": "813c52c6-157d-4788-b949-ed83cb992101",
+          "place": 1,
+          "finishTime": "2026-02-15T12:28:36",
+          "elapsedTime": "00:48:36"
+        },
+        {
+          "id": "1922b1de-7c9c-4bed-a6a5-84766103794d",
+          "competitorId": "3919e2f1-8847-42bc-9608-16f1dcc06505",
+          "raceId": "813c52c6-157d-4788-b949-ed83cb992101",
+          "place": 2,
+          "finishTime": "2026-02-15T12:30:36",
+          "elapsedTime": "00:50:36"
+        },
+        {
+          "id": "d8fa4f39-7980-47d9-80b7-f48798dd6cbc",
+          "competitorId": "8451d248-83ff-40a4-82aa-19adffd34b6d",
+          "raceId": "813c52c6-157d-4788-b949-ed83cb992101",
+          "place": 4,
+          "finishTime": "2026-02-15T12:33:18",
+          "elapsedTime": "00:53:18"
+        }
+      ],
+      "seriesIds": [
+        "68805db7-5fc9-4d4f-e07c-08de3ecdfde3"
+      ]
+    }
+  ],
+  "regattas": [],
+  "historicalResults": [
+    {
+      "id": "b8c58074-e1e7-46df-a1e6-08de6bdba6a5",
+      "seriesId": "68805db7-5fc9-4d4f-e07c-08de3ecdfde3",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"68805db7-5fc9-4d4f-e07c-08de3ecdfde3\",\"Competitors\":[{\"Id\":\"e0ca124e-49bc-43d0-a476-e00685800adc\",\"Name\":\"CompJB2\",\"SailNumber\":\"JB\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"3919e2f1-8847-42bc-9608-16f1dcc06505\",\"Name\":\"CompDB\",\"SailNumber\":\"DB\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"0f0a67ea-7f17-4b7e-9e6d-3ebf4dfbc5d3\",\"Name\":\"CompAF\",\"SailNumber\":\"AF\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"70285c2d-bafc-45c6-b26a-a1e8981d1907\",\"Name\":\"CompAN\",\"SailNumber\":\"AN\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"af7ca24a-d58d-4533-99c3-a1a50c25964d\",\"Name\":\"CompMM\",\"SailNumber\":\"MM\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"8451d248-83ff-40a4-82aa-19adffd34b6d\",\"Name\":\"CompSC\",\"SailNumber\":\"SC\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"87385f23-1dd1-4ee6-b0b9-a2b26e6c214b\",\"Name\":\"CompTL\",\"SailNumber\":\"TL\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"50fdd8cf-67ce-4b26-99d1-71aaecea82b2\",\"Name\":\"CompLF\",\"SailNumber\":\"LF\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"da868fe4-451b-4e95-b8e0-18eda8cd0c68\",\"Name\":\"CompJG\",\"SailNumber\":\"JG\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null}],\"Races\":[{\"Id\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Name\":\"Winter 1\",\"Date\":\"2026-01-04T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":1,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":3.60,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":240.0,\"WeatherIcon\":\"Cloudy\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Name\":\"Winter 2\",\"Date\":\"2026-01-18T00:00:00\",\"Order\":1,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":1,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":2.57,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":240.0,\"WeatherIcon\":\"Cloud\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"71655ca5-b856-4407-9832-a415a1febcba\",\"Name\":\"Winter 3\",\"Date\":\"2026-02-01T00:00:00\",\"Order\":1,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":3,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Name\":\"Winter 4 - Livett Cup\",\"Date\":\"2026-02-15T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":1,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":2.57,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":140.0,\"WeatherIcon\":\"Cloud\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"3e7c6289-7189-4dda-b9db-75caed058f0c\",\"Name\":\"Winter 5\",\"Date\":\"2026-03-01T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null}],\"CalculatedScores\":[{\"CompetitorId\":\"3919e2f1-8847-42bc-9608-16f1dcc06505\",\"Rank\":2,\"Trend\":null,\"TotalScore\":3.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"PerfectScoreValue\":1.0,\"Discard\":true},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false}]},{\"CompetitorId\":\"da868fe4-451b-4e95-b8e0-18eda8cd0c68\",\"Rank\":9,\"Trend\":null,\"TotalScore\":14.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]},{\"CompetitorId\":\"af7ca24a-d58d-4533-99c3-a1a50c25964d\",\"Rank\":5,\"Trend\":null,\"TotalScore\":12.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]},{\"CompetitorId\":\"8451d248-83ff-40a4-82aa-19adffd34b6d\",\"Rank\":6,\"Trend\":null,\"TotalScore\":12.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":6,\"Code\":\"RET\",\"ScoreValue\":8.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true}]},{\"CompetitorId\":\"0f0a67ea-7f17-4b7e-9e6d-3ebf4dfbc5d3\",\"Rank\":3,\"Trend\":null,\"TotalScore\":4.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":null,\"Code\":\"RCD\",\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true}]},{\"CompetitorId\":\"70285c2d-bafc-45c6-b26a-a1e8981d1907\",\"Rank\":4,\"Trend\":null,\"TotalScore\":11.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":null,\"Code\":\"DNF\",\"ScoreValue\":8.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true}]},{\"CompetitorId\":\"50fdd8cf-67ce-4b26-99d1-71aaecea82b2\",\"Rank\":8,\"Trend\":null,\"TotalScore\":13.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]},{\"CompetitorId\":\"e0ca124e-49bc-43d0-a476-e00685800adc\",\"Rank\":1,\"Trend\":null,\"TotalScore\":2.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"RCD\",\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":false}]},{\"CompetitorId\":\"87385f23-1dd1-4ee6-b0b9-a2b26e6c214b\",\"Rank\":7,\"Trend\":null,\"TotalScore\":13.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]}],\"NumberOfDiscards\":1,\"NumberOfSailedRaces\":3,\"IsPreliminary\":false,\"IsPercentSystem\":false,\"LowerScoreWins\":true,\"PercentRequired\":null,\"ScoringSystemName\":\"GYC scoring based on App A for Series - Rule 5.3\",\"ScoreCodesUsed\":{\"RCD\":{\"Name\":\"RCD\",\"Description\":\"Race Committee Duty\",\"Formula\":\"Average of non-discarded results\"},\"DNC\":{\"Name\":\"DNC\",\"Description\":\"Did not come to starting area\",\"Formula\":\"Number of boats entered in series + 1\"},\"DNF\":{\"Name\":\"DNF\",\"Description\":\"Started but did not finish\",\"Formula\":\"Number of boats that came to starting area + 1\"},\"RET\":{\"Name\":\"RET\",\"Description\":\"Retired\",\"Formula\":\"Number of boats that came to starting area + 1\"}}}",
+      "created": "2026-02-15T21:02:50.597354"
+    },
+    {
+      "id": "47215cf2-ab1b-4d24-a1fe-08de6bdba6a5",
+      "seriesId": "eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"eb23f01c-8f9f-4c0e-e07e-08de3ecdfde3\",\"Competitors\":[],\"Races\":[{\"Id\":\"276ddffc-13b3-4e1a-b2fc-42fb33efdb17\",\"Name\":\"Spring 1\",\"Date\":\"2026-03-15T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"732b30b9-e4b3-4500-a601-b467f50802b0\",\"Name\":\"Spring 2\",\"Date\":\"2026-03-22T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"076706e3-e569-4a7d-b89a-4b5e510dafb9\",\"Name\":\"Spring 3 - The Baker Cup\",\"Date\":\"2026-03-29T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"cc251438-e769-43c5-886e-a6917e6a18e8\",\"Name\":\"Spring 4\",\"Date\":\"2026-04-18T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"4f8f7974-9dac-4c84-8fb9-1dacc2bbe593\",\"Name\":\"Spring 5 - Windas Cup\",\"Date\":\"2026-05-17T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null}],\"CalculatedScores\":[],\"NumberOfDiscards\":0,\"NumberOfSailedRaces\":0,\"IsPreliminary\":false,\"IsPercentSystem\":false,\"LowerScoreWins\":true,\"PercentRequired\":null,\"ScoringSystemName\":\"GYC scoring based on App A for Series - Rule 5.3\",\"ScoreCodesUsed\":{}}",
+      "created": "2026-02-15T21:13:31.4427649"
+    },
+    {
+      "id": "a86e477e-855e-40a1-0659-08de3ecdfe25",
+      "seriesId": "ca224f26-dab9-4d1a-e080-08de3ecdfde3",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"ca224f26-dab9-4d1a-e080-08de3ecdfde3\",\"Competitors\":[],\"Races\":[],\"CalculatedScores\":[],\"NumberOfDiscards\":0,\"NumberOfSailedRaces\":0,\"IsPreliminary\":false,\"IsPercentSystem\":false,\"PercentRequired\":null,\"ScoringSystemName\":\"GYC scoring based on App A for Series - Rule 5.3\",\"ScoreCodesUsed\":{}}",
+      "created": "2025-12-31T22:35:46.9992859"
+    },
+    {
+      "id": "b401562e-148d-47aa-065b-08de3ecdfe25",
+      "seriesId": "ba9c8d57-9ece-4a55-e082-08de3ecdfde3",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"ba9c8d57-9ece-4a55-e082-08de3ecdfde3\",\"Competitors\":[],\"Races\":[],\"CalculatedScores\":[],\"NumberOfDiscards\":0,\"NumberOfSailedRaces\":0,\"IsPreliminary\":false,\"IsPercentSystem\":false,\"PercentRequired\":null,\"ScoringSystemName\":\"GYC scoring based on App A for Series - Rule 5.3\",\"ScoreCodesUsed\":{}}",
+      "created": "2025-12-31T22:36:40.3023518"
+    },
+    {
+      "id": "c82f97dd-dc8b-4355-065d-08de3ecdfe25",
+      "seriesId": "e437421e-fdcf-43e0-e084-08de3ecdfde3",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"e437421e-fdcf-43e0-e084-08de3ecdfde3\",\"Competitors\":[],\"Races\":[],\"CalculatedScores\":[],\"NumberOfDiscards\":0,\"NumberOfSailedRaces\":0,\"IsPreliminary\":false,\"IsPercentSystem\":false,\"PercentRequired\":null,\"ScoringSystemName\":\"GYC scoring based on App A for Series - Rule 5.3\",\"ScoreCodesUsed\":{}}",
+      "created": "2025-12-31T22:37:33.4433426"
+    },
+    {
+      "id": "eeda4c1b-6e9f-443f-a1ff-08de6bdba6a5",
+      "seriesId": "304d9126-18fd-4b26-e087-08de3ecdfde3",
+      "isCurrent": true,
+      "results": "{\"SeriesId\":\"304d9126-18fd-4b26-e087-08de3ecdfde3\",\"Competitors\":[{\"Id\":\"e0ca124e-49bc-43d0-a476-e00685800adc\",\"Name\":\"CompJB2\",\"SailNumber\":\"JB\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"3919e2f1-8847-42bc-9608-16f1dcc06505\",\"Name\":\"CompDB\",\"SailNumber\":\"DB\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"0f0a67ea-7f17-4b7e-9e6d-3ebf4dfbc5d3\",\"Name\":\"CompAF\",\"SailNumber\":\"AF\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"70285c2d-bafc-45c6-b26a-a1e8981d1907\",\"Name\":\"CompAN\",\"SailNumber\":\"AN\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"af7ca24a-d58d-4533-99c3-a1a50c25964d\",\"Name\":\"CompMM\",\"SailNumber\":\"MM\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"8451d248-83ff-40a4-82aa-19adffd34b6d\",\"Name\":\"CompSC\",\"SailNumber\":\"SC\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"87385f23-1dd1-4ee6-b0b9-a2b26e6c214b\",\"Name\":\"CompTL\",\"SailNumber\":\"TL\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"50fdd8cf-67ce-4b26-99d1-71aaecea82b2\",\"Name\":\"CompLF\",\"SailNumber\":\"LF\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null},{\"Id\":\"da868fe4-451b-4e95-b8e0-18eda8cd0c68\",\"Name\":\"CompJG\",\"SailNumber\":\"JG\",\"AlternativeSailNumber\":null,\"BoatName\":null,\"HomeClubName\":null,\"UrlName\":null}],\"Races\":[{\"Id\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Name\":\"Winter 1\",\"Date\":\"2026-01-04T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":1,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Name\":\"Winter 2\",\"Date\":\"2026-01-18T00:00:00\",\"Order\":1,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":1,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"71655ca5-b856-4407-9832-a415a1febcba\",\"Name\":\"Winter 3\",\"Date\":\"2026-02-01T00:00:00\",\"Order\":1,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":3,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Name\":\"Winter 4 - Livett Cup\",\"Date\":\"2026-02-15T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":1,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"3e7c6289-7189-4dda-b9db-75caed058f0c\",\"Name\":\"Winter 5\",\"Date\":\"2026-03-01T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":null,\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"276ddffc-13b3-4e1a-b2fc-42fb33efdb17\",\"Name\":\"Spring 1\",\"Date\":\"2026-03-15T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"732b30b9-e4b3-4500-a601-b467f50802b0\",\"Name\":\"Spring 2\",\"Date\":\"2026-03-22T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"076706e3-e569-4a7d-b89a-4b5e510dafb9\",\"Name\":\"Spring 3 - The Baker Cup\",\"Date\":\"2026-03-29T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"cc251438-e769-43c5-886e-a6917e6a18e8\",\"Name\":\"Spring 4\",\"Date\":\"2026-04-18T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null},{\"Id\":\"4f8f7974-9dac-4c84-8fb9-1dacc2bbe593\",\"Name\":\"Spring 5 - Windas Cup\",\"Date\":\"2026-05-17T00:00:00\",\"Order\":1,\"Description\":null,\"IsSeries\":false,\"StartDate\":null,\"EndDate\":null,\"TotalChildRaceCount\":0,\"seriesUrlName\":null,\"State\":2,\"UpdatedDate\":null,\"WindSpeedMeterPerSecond\":null,\"WindGustMeterPerSecond\":null,\"WindDirectionDegrees\":null,\"WeatherIcon\":\"\",\"WindSpeed\":null,\"WindGust\":null,\"WindSpeedUnits\":null}],\"CalculatedScores\":[{\"CompetitorId\":\"3919e2f1-8847-42bc-9608-16f1dcc06505\",\"Rank\":2,\"Trend\":null,\"TotalScore\":3.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":5,\"Code\":null,\"ScoreValue\":5.0,\"PerfectScoreValue\":1.0,\"Discard\":true},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false}]},{\"CompetitorId\":\"da868fe4-451b-4e95-b8e0-18eda8cd0c68\",\"Rank\":9,\"Trend\":null,\"TotalScore\":14.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]},{\"CompetitorId\":\"af7ca24a-d58d-4533-99c3-a1a50c25964d\",\"Rank\":5,\"Trend\":null,\"TotalScore\":12.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]},{\"CompetitorId\":\"8451d248-83ff-40a4-82aa-19adffd34b6d\",\"Rank\":6,\"Trend\":null,\"TotalScore\":12.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":6,\"Code\":\"RET\",\"ScoreValue\":8.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":4,\"Code\":null,\"ScoreValue\":4.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true}]},{\"CompetitorId\":\"0f0a67ea-7f17-4b7e-9e6d-3ebf4dfbc5d3\",\"Rank\":3,\"Trend\":null,\"TotalScore\":4.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":null,\"Code\":\"RCD\",\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":2,\"Code\":null,\"ScoreValue\":2.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true}]},{\"CompetitorId\":\"70285c2d-bafc-45c6-b26a-a1e8981d1907\",\"Rank\":4,\"Trend\":null,\"TotalScore\":11.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":null,\"Code\":\"DNF\",\"ScoreValue\":8.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true}]},{\"CompetitorId\":\"50fdd8cf-67ce-4b26-99d1-71aaecea82b2\",\"Rank\":8,\"Trend\":null,\"TotalScore\":13.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]},{\"CompetitorId\":\"e0ca124e-49bc-43d0-a476-e00685800adc\",\"Rank\":1,\"Trend\":null,\"TotalScore\":2.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"RCD\",\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":true},{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":1,\"Code\":null,\"ScoreValue\":1.0,\"PerfectScoreValue\":1.0,\"Discard\":false}]},{\"CompetitorId\":\"87385f23-1dd1-4ee6-b0b9-a2b26e6c214b\",\"Rank\":7,\"Trend\":null,\"TotalScore\":13.0,\"Average\":null,\"PointsEarned\":null,\"PointsPossible\":null,\"ParticipationPercent\":null,\"Scores\":[{\"RaceId\":\"813c52c6-157d-4788-b949-ed83cb992101\",\"Place\":3,\"Code\":null,\"ScoreValue\":3.0,\"PerfectScoreValue\":1.0,\"Discard\":false},{\"RaceId\":\"1c7283a5-3fe8-4c36-8689-c8d4b784e9d4\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":true},{\"RaceId\":\"ccb33e50-c8b5-404a-b98c-95a9c8e3900c\",\"Place\":null,\"Code\":\"DNC\",\"ScoreValue\":10.0,\"PerfectScoreValue\":null,\"Discard\":false}]}],\"NumberOfDiscards\":1,\"NumberOfSailedRaces\":3,\"IsPreliminary\":false,\"IsPercentSystem\":false,\"LowerScoreWins\":true,\"PercentRequired\":null,\"ScoringSystemName\":\"GYC scoring based on App A for Series - Rule 5.3\",\"ScoreCodesUsed\":{\"RCD\":{\"Name\":\"RCD\",\"Description\":\"Race Committee Duty\",\"Formula\":\"Average of non-discarded results\"},\"DNC\":{\"Name\":\"DNC\",\"Description\":\"Did not come to starting area\",\"Formula\":\"Number of boats entered in series + 1\"},\"DNF\":{\"Name\":\"DNF\",\"Description\":\"Started but did not finish\",\"Formula\":\"Number of boats that came to starting area + 1\"},\"RET\":{\"Name\":\"RET\",\"Description\":\"Retired\",\"Formula\":\"Number of boats that came to starting area + 1\"}}}",
+      "created": "2026-02-15T21:13:31.4885958"
+    }
+  ],
+  "defaultScoringSystemName": "GYC scoring based on App A for Series - Rule 5.3",
+  "fixtureInfo": {
+    "seriesId": "304d9126-18fd-4b26-e087-08de3ecdfde3",
+    "seriesName": "Helm Of The Year",
+    "seasonUrlName": "2026",
+    "seriesUrlName": "helm-of-the-year",
+    "sourceBackupCreatedUtc": "2026-02-22T18:51:42.1762664Z",
+    "extractedUtc": "2026-10-16T03:20:56.9539867Z",
+    "userFieldsRemoved": 43,
+    "warnings": []
+  }
+}

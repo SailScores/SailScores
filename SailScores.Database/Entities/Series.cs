@@ -61,7 +61,24 @@ public class Series
     public bool? ExcludeFromCompetitorStats { get; set; }
     public bool? HideDncDiscards { get; set; }
 
+    // Summary series: how child series are used. Setting it also sets
+    // ChildrenSeriesAsSingleRace so older code on the same database reads the same mode.
+    private SummaryRollupMode _summaryRollupMode;
+    public SummaryRollupMode SummaryRollupMode
+    {
+        get => _summaryRollupMode;
+        set
+        {
+            _summaryRollupMode = value;
+            ChildrenSeriesAsSingleRace = value == SummaryRollupMode.ChildRankAsRace;
+        }
+    }
+    // Replaced by SummaryRollupMode. Kept so the main branch can run against the same
+    // database; drop it in a separate migration once main is no longer deployed.
     public bool? ChildrenSeriesAsSingleRace { get; set; }
+    // SummaryRollupMode.ChildScoreAsRace: also use the child scores of competitors the
+    // child series didn't rank. Null means false.
+    public bool? IncludeUnrankedChildScores { get; set; }
     public int? RaceCount { get; set; }
 
     public bool? DateRestricted { get; set; }

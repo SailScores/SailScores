@@ -1,0 +1,577 @@
+{
+  "ScoringSystemName": "LHYC Standard Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 25,
+  "NumberOfSailedRaces": 77,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2019-06-05",
+    "2. 2019-06-05",
+    "3. 2019-06-05",
+    "4. 2019-06-05",
+    "5. 2019-06-05",
+    "6. 2019-06-05",
+    "7. 2019-06-05",
+    "8. 2019-06-05",
+    "9. 2019-06-05",
+    "1. 2019-06-12",
+    "2. 2019-06-12",
+    "3. 2019-06-12",
+    "4. 2019-06-12",
+    "5. 2019-06-12",
+    "6. 2019-06-12",
+    "7. 2019-06-12",
+    "8. 2019-06-12",
+    "1. 2019-06-19",
+    "2. 2019-06-19",
+    "3. 2019-06-19",
+    "4. 2019-06-19",
+    "5. 2019-06-19",
+    "6. 2019-06-19",
+    "7. 2019-06-19",
+    "1. 2019-06-26",
+    "2. 2019-06-26",
+    "1. 2019-07-03",
+    "2. 2019-07-03",
+    "3. 2019-07-03",
+    "4. 2019-07-03",
+    "5. 2019-07-03",
+    "1. 2019-07-10",
+    "2. 2019-07-10",
+    "3. 2019-07-10",
+    "4. 2019-07-10",
+    "5. 2019-07-10",
+    "6. 2019-07-10",
+    "7. 2019-07-10",
+    "8. 2019-07-10",
+    "9. 2019-07-10",
+    "1. 2019-07-24",
+    "2. 2019-07-24",
+    "3. 2019-07-24",
+    "4. 2019-07-24",
+    "5. 2019-07-24",
+    "6. 2019-07-24",
+    "1. 2019-07-31",
+    "2. 2019-07-31",
+    "3. 2019-07-31",
+    "4. 2019-07-31",
+    "5. 2019-07-31",
+    "6. 2019-07-31",
+    "7. 2019-07-31",
+    "8. 2019-07-31",
+    "1. 2019-08-07",
+    "2. 2019-08-07",
+    "3. 2019-08-07",
+    "4. 2019-08-07",
+    "5. 2019-08-07",
+    "6. 2019-08-07",
+    "7. 2019-08-07",
+    "1. 2019-08-14",
+    "2. 2019-08-14",
+    "3. 2019-08-14",
+    "4. 2019-08-14",
+    "5. 2019-08-14",
+    "1. 2019-08-21",
+    "2. 2019-08-21",
+    "3. 2019-08-21",
+    "4. 2019-08-21",
+    "5. 2019-08-21",
+    "6. 2019-08-21",
+    "1. 2019-08-28",
+    "2. 2019-08-28",
+    "3. 2019-08-28",
+    "4. 2019-08-28",
+    "5. 2019-08-28"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompGR",
+      "SailNumber": "2169",
+      "Total": "87.9",
+      "TotalIncludingDiscards": "321.9",
+      "Columns": {
+        "preDiscardTotal": "321.9"
+      },
+      "Scores": "2 | 1 | 1 | (3) | 2 | 1 | (5) | (4) | (3) | (4) | 2 | 3 | (7) | 2 | 2 | 1 | 2 | 1 | (4) | 2 | 2 | 2 | 3 | 3 | (5) | 3 | 1 | (5) | 2 | 1 | 1 | 1 | 3 | 2 | 3 | 1 | 3 | 1 | 1 | 2 | 2 | (7) | (4) | 1 | 3 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | (10) | 2 | RC 1.7 | RC 1.7 | RC 1.7 | RC 1.7 | RC 1.7 | RC 1.7 | RC 1.7 | (DNC 10) | (DNC 11) | (DNC 11) | (DNC 12) | (DNC 12) | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 17) | (DNC 17) | (4) | (8) | 2 | 1 | 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompCB",
+      "SailNumber": "2644",
+      "Total": "117.4",
+      "TotalIncludingDiscards": "549.4",
+      "Columns": {
+        "preDiscardTotal": "549.4"
+      },
+      "Scores": "5 | 3 | (DNC 19) | 2 | 1 | 2 | 1 | 1 | 1 | RC 2.3 | RC 2.3 | RC 2.3 | RC 2.3 | RC 2.3 | RC 2.3 | RC 2.3 | RC 2.3 | 3 | (6) | 4 | 1 | 1 | 1 | 2 | (9) | 2 | 2 | 2 | 1 | (8) | 4 | (8) | 1 | (DNC 17) | 1 | 2 | 2 | 2 | 2 | 1 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | 2 | 4 | 2 | 2 | 2 | 6 | 2 | 3 | 3 | 2 | (DNS 19) | 1 | 1 | 6 | 3 | 3 | 3 | (DNC 11) | 2 | 2 | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18)"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompCA2",
+      "SailNumber": "1850",
+      "Total": "213.5",
+      "TotalIncludingDiscards": "635.5",
+      "Columns": {
+        "preDiscardTotal": "635.5"
+      },
+      "Scores": "RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | 5 | 3 | 2 | 6 | 8 | (DNC 11) | DNC 10 | DNC 10 | SB 4.1 | SB 4.1 | SB 4.1 | SB 4.1 | SB 4.1 | SB 4.1 | SB 4.1 | 1 | 1 | 4 | 3 | 3 | 3 | 2 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | RC 4.1 | 3 | 1 | 5 | 4 | 1 | 4 | (DNC 16) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 16) | (DNC 16) | (DNC 16) | (DNC 16) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | (DNC 11) | DNC 11 | (DNC 12) | (DNC 12) | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 17) | (DNC 17) | 3 | 2 | 1 | 3 | 2"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompND",
+      "SailNumber": "TC25",
+      "Total": "220",
+      "TotalIncludingDiscards": "685",
+      "Columns": {
+        "preDiscardTotal": "685"
+      },
+      "Scores": "7 | 5 | 8 | 1 | 7 | 3 | 2 | 3 | 2 | 1 | 1 | 7 | 1 | 4 | DNC 11 | DNC 10 | 3 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 16) | DNC 15 | (DNC 16) | 3 | 5 | 3 | 4 | 4 | 6 | 3 | 2 | 2 | 3 | 6 | 3 | 6 | 4 | 3 | 5 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | (DNC 16) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 16) | (DNC 16) | (DNC 16) | (DNC 16) | 4 | 12 | 1 | 5 | 3 | 5 | 1 | 4 | 2 | 2 | 1 | 1 | 1 | 1 | 10 | 4 | 8 | 2 | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18)"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompRJ3",
+      "SailNumber": "TC10",
+      "Total": "326",
+      "TotalIncludingDiscards": "747",
+      "Columns": {
+        "preDiscardTotal": "747"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 13) | (DNC 14) | (DNC 14) | (DNC 12) | (DNC 13) | DNC 11 | DNC 10 | DNC 10 | 6 | 2 | 3 | 3 | 4 | 2 | 7 | (15) | 4 | 11 | 1 | 6 | 4 | 5 | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 17) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 16) | 7 | 6 | 9 | 7 | 5 | 3 | 5 | 10 | (14) | 12 | 9 | 8 | 11 | 7 | 10 | 4 | 6 | 3 | 4 | 3 | 5 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 3 | 6 | 3 | 7 | 2 | 4 | 1 | 9 | 5 | 2 | 5"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompFJ3",
+      "SailNumber": "2144",
+      "Total": "366",
+      "TotalIncludingDiscards": "808",
+      "Columns": {
+        "preDiscardTotal": "808"
+      },
+      "Scores": "1 | 6 | 3 | 8 | 11 | 5 | 3 | 7 | 6 | SB 7 | SB 7 | SB 7 | SB 7 | SB 7 | SB 7 | SB 7 | SB 7 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 16) | (DNC 15) | (DNC 16) | SB 7 | SB 7 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | 5 | 10 | 5 | 4 | 11 | 5 | 11 | 10 | 8 | (18) | (18) | (12) | (14) | (12) | 9 | 4 | 7 | 9 | 5 | 11 | 5 | 5 | 12 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | 1 | 4 | 7 | 4 | 5 | 11 | (14) | 12 | 8 | 7 | 11 | 7 | 3 | 11 | 9 | 10"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompNB",
+      "SailNumber": "2599",
+      "Total": "377",
+      "TotalIncludingDiscards": "802",
+      "Columns": {
+        "preDiscardTotal": "802"
+      },
+      "Scores": "6 | 4 | 6 | 10 | 4 | 12 | 6 | 5 | 4 | DNC 13 | (DNC 14) | (DNC 14) | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 7 | 3 | 6 | 4 | (DNC 16) | (DNC 15) | 5 | 7 | (DNC 19) | 10 | (OCS 18) | 5 | 2 | 10 | 6 | 4 | 1 | 8 | 6 | 4 | (16) | 7 | 4 | 13 | 3 | (DNF 23) | 6 | 6 | (DNC 22) | (DNC 16) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 16) | (DNC 16) | (DNC 16) | (DNC 16) | 7 | 3 | 9 | 6 | 5 | 7 | 10 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 17) | (DNC 17) | 6 | (DNC 17) | 3 | 12 | (15)"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompBJ3",
+      "SailNumber": "1850",
+      "Total": "379.8",
+      "TotalIncludingDiscards": "752.8",
+      "Columns": {
+        "preDiscardTotal": "752.8"
+      },
+      "Scores": "(10) | 9 | 4 | 4 | 9 | 9 | (12) | 8 | 7 | 8 | 6 | 10 | 9 | 7 | DNF 10 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 16) | (DNC 15) | (DNC 16) | (DNC 22) | (DNC 19) | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | (15) | (11) | (15) | (16) | 7 | (14) | 6 | (16) | (DNC 16) | (14) | 8 | 7 | (11) | 10 | 8 | 8 | 6 | 4 | 6 | 3 | 10 | 4 | 6 | (11) | 6 | (16) | 7 | (13) | 10 | (12) | DNC 10 | (DNC 11) | 8 | 5 | 4 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3 | RC 7.3"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompBK",
+      "SailNumber": "TC36",
+      "Total": "380.7",
+      "TotalIncludingDiscards": "739.7",
+      "Columns": {
+        "preDiscardTotal": "739.7"
+      },
+      "Scores": "SB 7.3 | SB 7.3 | SB 7.3 | SB 7.3 | SB 7.3 | SB 7.3 | SB 7.3 | SB 7.3 | SB 7.3 | (DNC 13) | (DNC 14) | (DNC 14) | (DNC 12) | (DNC 13) | 5 | 5 | 4 | 9 | 5 | (13) | (11) | (11) | 10 | 6 | (13) | 8 | 9 | 9 | 10 | 5 | 6 | 4 | 5 | 6 | 7 | 5 | 11 | 10 | 8 | 6 | (16) | (17) | (15) | 8 | (13) | (17) | 9 | 8 | 5 | 7 | (12) | 7 | 9 | 9 | 5 | 9 | 7 | 8 | (14) | (12) | 9 | 8 | 7 | 6 | 8 | 7 | 7 | 10 | 9 | (15) | (12) | (14) | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18)"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompCC",
+      "SailNumber": "TC55",
+      "Total": "414",
+      "TotalIncludingDiscards": "819",
+      "Columns": {
+        "preDiscardTotal": "819"
+      },
+      "Scores": "9 | 12 | 5 | 11 | 10 | 6 | 9 | (14) | 12 | (DNC 13) | (DNC 14) | (DNC 14) | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 16) | (DNC 15) | (DNC 16) | (DNC 22) | (DNC 19) | 7 | 12 | 13 | 7 | 12 | 7 | 8 | 4 | 2 | 9 | 7 | 8 | 5 | 10 | 5 | (15) | (16) | 9 | (14) | (14) | (DNC 16) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 16) | (DNC 16) | (DNC 16) | (DNC 16) | SB 8 | SB 8 | SB 8 | SB 8 | SB 8 | SB 8 | SB 8 | 7 | 5 | 4 | 6 | 6 | 2 | 3 | 4 | 6 | 11 | 9 | SB 8 | SB 8 | SB 8 | SB 8 | SB 8"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompKGJJ",
+      "SailNumber": "1847",
+      "Total": "472",
+      "TotalIncludingDiscards": "970",
+      "Columns": {
+        "preDiscardTotal": "970"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 2 | 1 | 1 | 6 | 5 | 4 | 1 | 2 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 17 | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | 3 | 5 | 3 | 3 | 6 | 3 | 3 | 1 | 9 | 7 | 8 | 2 | 7 | 4 | 2 | 2 | 1 | 1 | 3 | 3 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 12,
+      "Name": "CompJK",
+      "SailNumber": "2338",
+      "Total": "484",
+      "TotalIncludingDiscards": "930",
+      "Columns": {
+        "preDiscardTotal": "930"
+      },
+      "Scores": "11 | 10 | 10 | 5 | 16 | 8 | 7 | 9 | 11 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | 6 | 6 | 8 | 9 | (17) | 9 | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 17) | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | 9 | 9 | 6 | 3 | 7 | 6 | DNC 16 | 11 | 7 | 8 | 8 | 4 | 1 | 5 | 1 | 1 | 5 | 12 | 10 | 8 | 6 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18)"
+    },
+    {
+      "Rank": 13,
+      "Name": "CompCB2",
+      "SailNumber": "1746",
+      "Total": "486",
+      "TotalIncludingDiscards": "954",
+      "Columns": {
+        "preDiscardTotal": "954"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 17 | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | 1 | 2 | 2 | 2 | 2 | 5 | OCS 15 | 2 | 10 | 4 | 4 | 2 | 8 | 4 | 8 | 5 | 3 | 4 | 2 | 1 | 7 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | (DNC 18) | DNC 18 | DNC 18 | DNC 17 | DNC 17 | 2 | 5 | 4 | 8 | 3"
+    },
+    {
+      "Rank": 14,
+      "Name": "CompPI",
+      "SailNumber": "TC11",
+      "Total": "487",
+      "TotalIncludingDiscards": "897",
+      "Columns": {
+        "preDiscardTotal": "897"
+      },
+      "Scores": "(15) | 13 | 12 | 13 | (15) | (14) | (14) | 10 | 9 | 7 | 10 | (DNC 14) | DNC 12 | DNC 13 | 4 | 6 | 7 | 8 | 12 | 9 | 7 | 7 | 8 | 10 | (DNC 22) | (DNC 19) | 5 | (15) | (16) | (14) | (14) | 12 | 7 | 7 | 9 | 10 | 9 | 7 | (14) | 7 | (17) | 10 | 13 | (16) | (DSQ 23) | (16) | 12 | 9 | 8 | 11 | 5 | 13 | 12 | 8 | 6 | 13 | 14 | (15) | (16) | (16) | 11 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | (DNC 17) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 17) | (DNC 17) | 8 | 6 | 8 | 6 | 8"
+    },
+    {
+      "Rank": 15,
+      "Name": "CompSC",
+      "SailNumber": "2091",
+      "Total": "493",
+      "TotalIncludingDiscards": "986",
+      "Columns": {
+        "preDiscardTotal": "986"
+      },
+      "Scores": "4 | 8 | 9 | 14 | 8 | 7 | (DNC 18) | (DNC 18) | (DNC 18) | 9 | 7 | 8 | 8 | 9 | 7 | 7 | DNC 10 | 5 | 9 | 7 | 8 | (DNC 16) | DNC 15 | (DNC 16) | (DNC 22) | (DNC 19) | RC 9.5 | RC 9.5 | RC 9.5 | RC 9.5 | RC 9.5 | SB 9.5 | SB 9.5 | SB 9.5 | SB 9.5 | SB 9.5 | SB 9.5 | SB 9.5 | SB 9.5 | SB 9.5 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | (DNC 16) | (DNC 17) | (DNC 17) | (DNC 17) | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 12 | 11 | 13 | 9 | 14 | 7 | (DNC 17) | 1 | 6 | 4 | 4"
+    },
+    {
+      "Rank": 16,
+      "Name": "CompFT2",
+      "SailNumber": "18",
+      "Total": "558",
+      "TotalIncludingDiscards": "1026",
+      "Columns": {
+        "preDiscardTotal": "1026"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 12 | 8 | 11 | 15 | 10 | DNC 15 | (DNC 16) | 14 | 12 | 13 | 11 | 15 | 11 | 13 | 3 | 9 | 10 | 10 | (DNC 17) | 10 | 15 | 9 | DNC 16 | (22) | 14 | (18) | (18) | 16 | (18) | DNC 16 | (DNC 17) | (DNC 17) | (DNC 17) | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | 6 | 6 | 5 | 9 | 8 | 6 | 2 | 7 | 2 | 10 | 10 | 5 | 10 | 9 | 7 | 7"
+    },
+    {
+      "Rank": 17,
+      "Name": "CompWE2",
+      "SailNumber": "2652",
+      "Total": "568",
+      "TotalIncludingDiscards": "1048",
+      "Columns": {
+        "preDiscardTotal": "1048"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | 3 | 4 | 1 | 4 | 1 | 1 | 2 | 1 | (DNC 18) | (DNC 18) | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | 9 | 5 | 4 | 1 | 3 | 4 | 3 | 4 | 4 | 1 | 5 | 9 | 2 | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 18,
+      "Name": "CompBJ",
+      "SailNumber": "TC08",
+      "Total": "571",
+      "TotalIncludingDiscards": "1018",
+      "Columns": {
+        "preDiscardTotal": "1018"
+      },
+      "Scores": "12 | (15) | 13 | 12 | 6 | 10 | (16) | 13 | 10 | DNC 13 | (DNC 14) | (DNC 14) | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 11 | (16) | 8 | 9 | 13 | 11 | (14) | (16) | (14) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | 10 | 6 | 11 | (15) | 13 | (15) | 12 | (15) | 14 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | 7 | 12 | 12 | 13 | 13 | 11 | 13 | 13 | 13 | (16) | (15) | 13 | 9 | 13 | 13 | 5 | 8 | 3 | 10 | 9 | SB 11 | SB 11 | SB 11 | SB 11 | SB 11 | SB 11 | 13 | 13 | (15) | 14 | 12"
+    },
+    {
+      "Rank": 19,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "573",
+      "TotalIncludingDiscards": "960",
+      "Columns": {
+        "preDiscardTotal": "960"
+      },
+      "Scores": "(16) | (17) | (16) | (17) | (17) | (15) | 11 | 11 | (15) | DNC 13 | (DNC 14) | (DNC 14) | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (14) | (14) | (16) | (14) | 12 | 12 | 12 | 12 | 13 | (14) | (16) | (14) | (16) | (17) | 11 | 13 | 13 | 11 | (14) | 12 | (14) | 13 | 11 | 11 | 12 | 11 | (17) | 11 | 10 | 10 | 13 | 11 | 10 | 10 | 14 | 7 | 10 | (17) | 14 | 10 | (16) | (17) | 14 | (16) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 14 | 8 | 8 | 13 | 5 | 8 | 12 | 4 | 10 | 10 | 11"
+    },
+    {
+      "Rank": 20,
+      "Name": "CompGR2",
+      "SailNumber": "TC60",
+      "Total": "579.4",
+      "TotalIncludingDiscards": "1035.4",
+      "Columns": {
+        "preDiscardTotal": "1035.4"
+      },
+      "Scores": "(DNC 19) | (16) | 14 | 15 | 14 | 13 | 13 | 15 | 13 | DNC 13 | DNC 14 | 9 | 5 | 6 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 16) | DNC 15 | (DNC 16) | 11 | (DNC 19) | (16) | 14 | 12 | 15 | 15 | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 17) | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | 10 | 5 | 10 | 12 | 8 | 11 | 6 | 3 | 6 | 9 | 7 | 9 | 6 | 11 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | SB 10 | SB 11 | SB 11 | SB 11.2 | SB 11.2 | 10 | 16 | 16 | 14 | 13 | 13 | 11 | 14 | 13 | 13 | 6"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompFJ",
+      "SailNumber": "2511",
+      "Total": "606",
+      "TotalIncludingDiscards": "1111",
+      "Columns": {
+        "preDiscardTotal": "1111"
+      },
+      "Scores": "8 | 7 | 7 | 6 | 5 | 4 | 4 | 6 | 5 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 4 | 7 | 5 | 5 | 3 | 6 | 4 | 6 | 7 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 17 | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | (DNC 18) | (DNC 18) | (DNC 18) | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 22,
+      "Name": "CompCHM",
+      "SailNumber": "TC71",
+      "Total": "608",
+      "TotalIncludingDiscards": "1070",
+      "Columns": {
+        "preDiscardTotal": "1070"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | 13 | 12 | 8 | 12 | 8 | 13 | 13 | 6 | 9 | 8 | 11 | 8 | 13 | (17) | 13 | DNC 16 | (DNC 17) | (DNC 17) | (DNC 17) | DNC 16 | DNC 16 | DNC 16 | DNC 16 | 14 | 15 | 13 | (18) | 11 | 11 | 17 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 9 | 9 | 11 | 12 | 9 | 12 | 10 | 7 | 7 | 5 | 9"
+    },
+    {
+      "Rank": 23,
+      "Name": "CompDV",
+      "SailNumber": "2810",
+      "Total": "632.8",
+      "TotalIncludingDiscards": "1108.8",
+      "Columns": {
+        "preDiscardTotal": "1108.8"
+      },
+      "Scores": "3 | 2 | 2 | 7 | 3 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | 2 | 5 | 4 | 2 | 3 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | SB 12.2 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 24,
+      "Name": "CompKA",
+      "SailNumber": "TC67",
+      "Total": "638",
+      "TotalIncludingDiscards": "1149",
+      "Columns": {
+        "preDiscardTotal": "1149"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 18 | 10 | 8 | 5 | 3 | 10 | 6 | 3 | 6 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | 8 | 6 | 7 | 9 | 7 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 4 | 4 | 2 | 1 | 4 | 3 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 25,
+      "Name": "CompHS",
+      "SailNumber": "TC44",
+      "Total": "651",
+      "TotalIncludingDiscards": "1146",
+      "Columns": {
+        "preDiscardTotal": "1146"
+      },
+      "Scores": "14 | 14 | 11 | 16 | 13 | 11 | 10 | 12 | 16 | 11 | 11 | 11 | DNC 12 | 11 | 8 | 8 | 8 | 15 | 11 | 12 | 12 | 8 | 7 | 8 | (17) | 11 | 12 | 10 | 8 | 12 | 16 | (DNC 17) | (DNC 17) | (DNC 17) | (DNC 18) | (DNC 17) | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | (DNC 18) | (DNC 18) | (DNC 18) | DNC 17 | DNC 17 | 9 | 12 | 12 | 11 | 14"
+    },
+    {
+      "Rank": 26,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "654",
+      "TotalIncludingDiscards": "1126",
+      "Columns": {
+        "preDiscardTotal": "1126"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 16 | DNC 15 | DNC 16 | 8 | 9 | SB 12.6 | SB 12.6 | SB 12.6 | SB 12.6 | SB 12.6 | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 17 | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | 6 | 16 | 3 | 10 | 4 | 7 | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 8 | 7 | 6 | 10 | 6 | 6 | DNC 17 | DNC 17 | (DNC 18) | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 27,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "696",
+      "TotalIncludingDiscards": "1207",
+      "Columns": {
+        "preDiscardTotal": "1207"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | 8 | 2 | 8 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | 17 | 7 | 11 | 13 | 8 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | RC 10 | RC 11 | RC 11 | RC 12 | RC 12 | DNC 17 | 12 | 5 | 5 | 3 | 5 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 28,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "702",
+      "TotalIncludingDiscards": "1199",
+      "Columns": {
+        "preDiscardTotal": "1199"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 10 | 13 | 10 | 10 | 9 | 5 | 9 | RC 13.5 | RC 13.5 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 17 | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | 12 | 11 | 4 | 10 | 12 | 9 | 8 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | (DNC 18) | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 29,
+      "Name": "CompWD",
+      "SailNumber": "TC07",
+      "Total": "718",
+      "TotalIncludingDiscards": "1183",
+      "Columns": {
+        "preDiscardTotal": "1183"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 16 | 15 | 14 | 16 | 14 | 13 | 11 | 10 | 10 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | 9 | 14 | 12 | 13 | 15 | 16 | 5 | 12 | 13 | 15 | (19) | (19) | 15 | (19) | 15 | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (18) | (DNS 19) | 12 | 14 | (18) | (18) | 14 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | (DNC 18) | (DNC 18) | (DNC 18) | DNC 17 | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 30,
+      "Name": "CompMKDB",
+      "SailNumber": "2121",
+      "Total": "722",
+      "TotalIncludingDiscards": "1233",
+      "Columns": {
+        "preDiscardTotal": "1233"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | 4 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | DNC 19 | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 5 | 5 | 1 | 3 | 1 | 1 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 31,
+      "Name": "CompAAC",
+      "SailNumber": "1664",
+      "Total": "725",
+      "TotalIncludingDiscards": "1227",
+      "Columns": {
+        "preDiscardTotal": "1227"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | 11 | 15 | 13 | 14 | 14 | 12 | 14 | 14 | 16 | 10 | 11 | 11 | 8 | 17 | 15 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 13 | 13 | 14 | 11 | 15 | 15 | 14 | 15 | 14 | 16 | 16"
+    },
+    {
+      "Rank": 32,
+      "Name": "CompMK",
+      "SailNumber": "TC66",
+      "Total": "731",
+      "TotalIncludingDiscards": "1233",
+      "Columns": {
+        "preDiscardTotal": "1233"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | 2 | 8 | 2 | 9 | 6 | 2 | 4 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 33,
+      "Name": "CompSL",
+      "SailNumber": "TC05",
+      "Total": "733",
+      "TotalIncludingDiscards": "1238",
+      "Columns": {
+        "preDiscardTotal": "1238"
+      },
+      "Scores": "17 | (18) | 17 | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | 13 | 10 | 15 | 13 | 6 | 9 | 13 | 18 | 16 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | 14 | 15 | 14 | 14 | 12 | 8 | 9 | 11 | 12 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 34,
+      "Name": "CompDR",
+      "SailNumber": "TC61",
+      "Total": "756",
+      "TotalIncludingDiscards": "1242",
+      "Columns": {
+        "preDiscardTotal": "1242"
+      },
+      "Scores": "13 | 11 | 15 | 9 | 12 | 16 | 15 | 16 | 14 | DNC 13 | 12 | 12 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | (DNC 18) | DNC 17 | (DNC 19) | (DNC 19) | (DNC 18) | DNC 16 | 12 | 13 | 17 | (19) | (DNF 23) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | 9 | 9 | 7 | 10 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 35,
+      "Name": "CompCJ3",
+      "SailNumber": "1933",
+      "Total": "763.6",
+      "TotalIncludingDiscards": "1277.6",
+      "Columns": {
+        "preDiscardTotal": "1277.6"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 18 | DNC 18 | DNC 18 | DNC 18 | 6 | 9 | 6 | 10 | 5 | 3 | 4 | 5 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | DNC 19 | DNC 19 | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | RC 14.7 | RC 14.7 | RC 14.7 | RC 14.7 | RC 14.7 | RC 14.7 | RC 14.7 | RC 14.7 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 36,
+      "Name": "CompTL",
+      "SailNumber": "TC18",
+      "Total": "790",
+      "TotalIncludingDiscards": "1280",
+      "Columns": {
+        "preDiscardTotal": "1280"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (19) | (21) | (20) | (20) | 18 | 12 | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | 15 | 15 | 15 | 16 | DNC 17 | DNC 17 | 15 | 11 | 16 | 15 | 13"
+    },
+    {
+      "Rank": 37,
+      "Name": "CompTN",
+      "SailNumber": "TC24",
+      "Total": "800",
+      "TotalIncludingDiscards": "1311",
+      "Columns": {
+        "preDiscardTotal": "1311"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 18 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | 15 | 13 | 17 | 10 | 11 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompKJ2",
+      "SailNumber": "1847",
+      "Total": "809.6",
+      "TotalIncludingDiscards": "1291.6",
+      "Columns": {
+        "preDiscardTotal": "1291.6"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | RC 15.6 | RC 15.6 | RC 15.6 | RC 15.6 | RC 15.6 | RC 15.6 | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 39,
+      "Name": "CompSM",
+      "SailNumber": "209",
+      "Total": "812",
+      "TotalIncludingDiscards": "1326",
+      "Columns": {
+        "preDiscardTotal": "1326"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | 17 | 17 | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | 13 | 14 | 15 | 15 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 40,
+      "Name": "CompCJ",
+      "SailNumber": "TC65",
+      "Total": "812",
+      "TotalIncludingDiscards": "1314",
+      "Columns": {
+        "preDiscardTotal": "1314"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 18) | (DNC 18) | (DNC 18) | (DNC 18) | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | (DNC 18) | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | 15 | 17 | 17 | 17 | 15 | 15 | 18 | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 41,
+      "Name": "CompMAJD",
+      "SailNumber": "2161",
+      "Total": "817",
+      "TotalIncludingDiscards": "1309",
+      "Columns": {
+        "preDiscardTotal": "1309"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (DNC 22) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | (DNC 19) | DNC 18 | DNC 16 | (21) | (20) | 14 | (22) | 15 | (19) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 42,
+      "Name": "CompGA",
+      "SailNumber": "TC64",
+      "Total": "822",
+      "TotalIncludingDiscards": "1316",
+      "Columns": {
+        "preDiscardTotal": "1316"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (20) | 15 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | DNC 19 | DNC 18 | DNC 16 | (20) | (22) | (21) | (21) | (20) | (20) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    },
+    {
+      "Rank": 43,
+      "Name": "CompSX",
+      "SailNumber": "TC??",
+      "Total": "824",
+      "TotalIncludingDiscards": "1335",
+      "Columns": {
+        "preDiscardTotal": "1335"
+      },
+      "Scores": "(DNC 19) | (DNC 20) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 13 | DNC 14 | DNC 14 | DNC 12 | DNC 13 | DNC 11 | DNC 10 | DNC 10 | DNC 18 | DNC 18 | DNC 18 | DNC 18 | DNC 16 | DNC 15 | DNC 16 | (19) | 17 | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | (DNC 19) | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 17 | (DNC 19) | DNC 19 | DNC 18 | DNC 16 | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 24) | (DNC 22) | DNC 16 | DNC 17 | DNC 17 | DNC 17 | DNC 16 | DNC 16 | DNC 16 | DNC 16 | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | (DNC 20) | DNC 10 | DNC 11 | DNC 11 | DNC 12 | DNC 12 | DNC 17 | DNC 18 | DNC 18 | DNC 18 | DNC 17 | DNC 17 | DNC 17 | DNC 17 | DNC 18 | DNC 18 | DNC 18"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats that came to starting area + 2: Did not come to starting area",
+    "DNF": "Number of boats that came to starting area + 1: Started but did not finish",
+    "DNS": "Number of boats that came to starting area + 1: Came to start area but did not start",
+    "DSQ": "Number of boats that came to starting area + 1: Disqualification",
+    "OCS": "Number of boats that came to starting area + 1: On course side at start or broke rule 30.1",
+    "RC": "Average of non-discarded results: Race Committee duty",
+    "SB": "Average of non-discarded results: Safety boat duty"
+  }
+}

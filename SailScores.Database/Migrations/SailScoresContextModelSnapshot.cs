@@ -1294,6 +1294,9 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("decimal(6, 3)")
                         .HasColumnName("FormulaValue_Decimal");
 
+                    b.Property<bool?>("IncludeInAverage")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -1374,11 +1377,20 @@ namespace SailScores.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("CalculatorType")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("ClubId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("DiscardMethod")
+                        .HasColumnType("int");
+
                     b.Property<string>("DiscardPattern")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRestrictedToClubs")
+                        .HasColumnType("bit");
 
                     b.Property<bool?>("IsSiteDefault")
                         .HasColumnType("bit");
@@ -1393,6 +1405,9 @@ namespace SailScores.Database.Migrations
                     b.Property<decimal?>("ParticipationPercent")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<string>("Settings")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClubId");
@@ -1400,6 +1415,21 @@ namespace SailScores.Database.Migrations
                     b.HasIndex("ParentSystemId");
 
                     b.ToTable("ScoringSystems");
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.ScoringSystemClubAccess", b =>
+                {
+                    b.Property<Guid>("ScoringSystemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ScoringSystemId", "ClubId");
+
+                    b.HasIndex("ClubId");
+
+                    b.ToTable("ScoringSystemClubAccess", (string)null);
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.Season", b =>
@@ -1477,6 +1507,9 @@ namespace SailScores.Database.Migrations
                     b.Property<bool?>("HideDncDiscards")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("IncludeUnrankedChildScores")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsImportantSeries")
                         .HasColumnType("bit");
 
@@ -1505,6 +1538,9 @@ namespace SailScores.Database.Migrations
 
                     b.Property<DateOnly?>("StartDate")
                         .HasColumnType("date");
+
+                    b.Property<int>("SummaryRollupMode")
+                        .HasColumnType("int");
 
                     b.Property<string>("TrendOption")
                         .HasColumnType("nvarchar(max)");
@@ -2375,6 +2411,25 @@ namespace SailScores.Database.Migrations
                     b.Navigation("ParentSystem");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.ScoringSystemClubAccess", b =>
+                {
+                    b.HasOne("SailScores.Database.Entities.Club", "Club")
+                        .WithMany()
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SailScores.Database.Entities.ScoringSystem", "ScoringSystem")
+                        .WithMany("ClubAccess")
+                        .HasForeignKey("ScoringSystemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Club");
+
+                    b.Navigation("ScoringSystem");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.Season", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Club", null)
@@ -2609,6 +2664,8 @@ namespace SailScores.Database.Migrations
 
             modelBuilder.Entity("SailScores.Database.Entities.ScoringSystem", b =>
                 {
+                    b.Navigation("ClubAccess");
+
                     b.Navigation("DefaultForClubs");
 
                     b.Navigation("ScoreCodeGroups");

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Database;
 
@@ -25,52 +25,11 @@ namespace SailScores.Core.Scoring
         public async Task<IScoringCalculator> CreateScoringCalculatorAsync(
             Model.ScoringSystem scoringSystem)
         {
+            var calculatorType = await GetCalculatorTypeAsync(scoringSystem).ConfigureAwait(false);
+            // Keep the resolved type: flattening results reads it to pick the scoring columns.
+            scoringSystem.CalculatorType ??= calculatorType;
 
-            var baseSystemName = await GetBaseScoringSystemNameAsync(scoringSystem).ConfigureAwait(false);
-
-            if (baseSystemName.Contains("High Point Percentage"))
-            {
-                return new HighPointPercentageCalculator(scoringSystem);
-            } else if (baseSystemName.Contains("Cox-Sprague"))
-            {
-                return new CoxSpragueCalculator(scoringSystem);
-            } else if (baseSystemName.Contains("Low Point Average")
-                && baseSystemName.Contains("without DNCs"))
-            {
-                return new LowPointAveExclDncCalculator(scoringSystem);
-            } else if (baseSystemName.Contains("Low Point Average"))
-            {
-                return new LowPointAveInclDncCalculator(scoringSystem);
-            }
-            else if (baseSystemName.Contains("First = 0"))
-            {
-                return new AppAAltFirstIsZero(scoringSystem);
-            }
-            else if (baseSystemName.Contains("First = ")
-                && baseSystemName.Contains(".75"))
-            {
-                return new AppAAltFirstIsPoint75(scoringSystem);
-            }
-            else if (baseSystemName.Contains("First = ")
-                && baseSystemName.Contains(".7"))
-            {
-                return new AppAAltFirstIsPoint7(scoringSystem);
-            }
-            else if (baseSystemName.Contains("Top X High Point"))
-            {
-                return new TopXHighPointCalculator(scoringSystem);
-            }
-            else if (baseSystemName.Contains("Appendix A") && baseSystemName.Contains("pre-2025"))
-            {
-                return new AppendixAPre2025Calculator(scoringSystem);
-            } else if (baseSystemName.StartsWith("PWA Standard"))
-            {
-                return new PwaStandardCalculator(scoringSystem);
-            }
-            else
-            {
-                return new AppendixACalculator(scoringSystem);
-            }
+            return CreateScoringCalculator(calculatorType, scoringSystem);
         }
 
         public async Task<IScoringCalculator> CreateScoringCalculatorAsync(
@@ -82,29 +41,40 @@ namespace SailScores.Core.Scoring
             return new HandicapScoringCalculator(innerCalculator, handicapSystem, handicapLookup);
         }
 
-        private async Task<string> GetBaseScoringSystemNameAsync(ScoringSystem scoringSystem)
+        public static IScoringCalculator CreateScoringCalculator(
+            ScoringCalculatorType? calculatorType,
+            Model.ScoringSystem scoringSystem)
         {
-            string baseSystemName;
-            if (!_cache.TryGetValue($"ScoringSystemName_{scoringSystem.Id}", out baseSystemName))
-            {
+            return ScoringCalculatorRegistry.CreateCalculator(calculatorType, scoringSystem);
+        }
 
-                if (scoringSystem.ParentSystemId == null)
-                {
-                    return scoringSystem.Name;
-                }
-                Database.Entities.ScoringSystem currentSystem =
-                    await _dbContext.ScoringSystems.SingleAsync(s => s.Id == scoringSystem.ParentSystemId)
-                    .ConfigureAwait(false);
-                while (currentSystem.ParentSystemId != null)
-                {
-                    currentSystem = await _dbContext.ScoringSystems
-                        .SingleAsync(s => s.Id == currentSystem.ParentSystemId)
-                        .ConfigureAwait(false);
-                }
-                baseSystemName = currentSystem.Name;
-                _cache.Set($"ScoringSystemName_{scoringSystem.Id}", baseSystemName, TimeSpan.FromSeconds(15));
+        // ScoringService resolves CalculatorType from the root system. Models built
+        // elsewhere may not have it, so fall back to walking the parent chain.
+        private async Task<ScoringCalculatorType?> GetCalculatorTypeAsync(ScoringSystem scoringSystem)
+        {
+            if (scoringSystem.CalculatorType.HasValue || scoringSystem.ParentSystemId == null)
+            {
+                return scoringSystem.CalculatorType;
             }
-            return baseSystemName;
+
+            var cacheKey = $"ScoringCalculatorType_{scoringSystem.Id}";
+            if (_cache.TryGetValue(cacheKey, out ScoringCalculatorType? calculatorType))
+            {
+                return calculatorType;
+            }
+
+            Database.Entities.ScoringSystem currentSystem =
+                await _dbContext.ScoringSystems.SingleAsync(s => s.Id == scoringSystem.ParentSystemId)
+                .ConfigureAwait(false);
+            while (currentSystem.ParentSystemId != null)
+            {
+                currentSystem = await _dbContext.ScoringSystems
+                    .SingleAsync(s => s.Id == currentSystem.ParentSystemId)
+                    .ConfigureAwait(false);
+            }
+            calculatorType = currentSystem.CalculatorType;
+            _cache.Set(cacheKey, calculatorType, TimeSpan.FromSeconds(15));
+            return calculatorType;
         }
     }
 }

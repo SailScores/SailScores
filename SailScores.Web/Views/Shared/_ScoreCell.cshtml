@@ -39,8 +39,13 @@
         classSb.Append("finish-third ");
     }
 
-    if ((Model.Result != null && Model.Result.Discard)
-       || (Model.IsPercentSystem && Model.Result != null && Model.Result.Code == "DNC"))
+    // In percent systems a DNC is shown like a discard when it doesn't count toward
+    // the result. In high point percent systems that's every DNC; in Low Point Average
+    // systems an uncounted DNC is scored as zero, and a counted one is shown normally.
+    var isUncountedDnc = Model.IsPercentSystem && Model.Result?.Code == "DNC"
+        && (!Model.LowerScoreWins || (Model.Result.ScoreValue ?? 0m) == 0m);
+
+    if ((Model.Result != null && Model.Result.Discard) || isUncountedDnc)
     {
         classSb.Append("discardmuted ");
     }
@@ -55,7 +60,7 @@
         <span class="@(Model.Result.Discard ? "discardmuted" : "")">
             @* hide all cell contents if DNC, discarded, and series setting. *@
             @if (!(Model.HideDncDiscards && Model.Result.Code == "DNC" &&
-                (Model.Result.Discard || Model.IsPercentSystem )))
+                (Model.Result.Discard || isUncountedDnc)))
             {
                 @if (Model.Result.Discard)
                 {
@@ -65,7 +70,7 @@
                    && Model.ScoreCodesUsed != null
                    && Model.ScoreCodesUsed.ContainsKey(Model.Result.Code))
                 {
-                    var muteText = (Model.IsPercentSystem && Model.Result.Code == "DNC") ? "discardmuted" : "";
+                    var muteText = isUncountedDnc ? "discardmuted" : "";
                     @Html.Raw($"<span title=\"{Model.ScoreCodesUsed[Model.Result.Code].Description}\" class=\"{muteText}\">")
                 }
                 @Model.Result.Code 

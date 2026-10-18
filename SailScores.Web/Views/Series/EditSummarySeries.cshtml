@@ -44,11 +44,22 @@
                 <span asp-validation-for="SeasonId" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="SummaryRollupMode" class="control-label">Child series scoring</label>
+                <select asp-for="SummaryRollupMode" class="form-select"
+                        asp-items="Html.GetEnumSelectList<SummaryRollupMode>()"></select>
+                <p class="small mx-3">Use child series races: every race in the child series is a race in this series.
+                    One race, scored by rank: each child series is one race, with competitors placed by their rank in it.
+                    One race, scored by its series score: each child series is one race, with each competitor's
+                    series score (total or average) used as their score for it. Score codes don't apply to these
+                    races. A competitor with no score from a child series gets a DNC worth what they
+                    would have scored in that child series for missing every race.</p>
+            </div>
+            <div class="mb-3">
                 <div class="form-check">
-                    <input class="form-check-input" asp-for="ChildrenSeriesAsSingleRace" />
-                    <label class="form-check-label" asp-for="ChildrenSeriesAsSingleRace">
-                        Children series each count as a single race</label>
-                    <span class="small"><br />If not checked, all races will be counted in this series as individual races.</span>
+                    <input class="form-check-input" asp-for="IncludeUnrankedChildScores" />
+                    <label class="form-check-label" asp-for="IncludeUnrankedChildScores">
+                        Include child series scores of unranked competitors</label>
+                    <span class="small"><br />Only for "scored by its series score". If not checked, competitors not ranked in a child series get the missed-every-race DNC for it instead.</span>
                 </div>
             </div>
             <div class="mb-3">

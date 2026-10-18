@@ -36,6 +36,8 @@ namespace SailScores.Core.Model
         // Should scoring of other following competitors use this as a finisher ahead? 
         public bool? AdjustOtherScores { get; set; }
         public bool? CountAsParticipation { get; set; }
+        // Averaging calculators: include this score in the average? Null uses the calculator's rule.
+        public bool? IncludeInAverage { get; set; }
 
     }
 }

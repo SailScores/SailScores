@@ -255,5 +255,244 @@ namespace SailScores.Test.Unit.Core.Services
             Assert.True(result);
         }
 
+        [Fact]
+        public async Task GetScoringSystemAsync_ChildSystem_ResolvesCalculatorTypeFromRoot()
+        {
+            var (_, child) = await AddRootAndChildSystemsAsync();
+
+            var result = await _service.GetScoringSystemAsync(child.Id);
+
+            Assert.Equal(Api.Enumerations.ScoringCalculatorType.LowPointAverageExclDnc, result.CalculatorType);
+        }
+
+        // The Edit action loads every club and base system (tracked, with score codes)
+        // before saving, so the saved system's ParentSystem and ScoreCodes are populated.
+        [Fact]
+        public async Task SaveScoringSystemAsync_AfterLoadingAllSystems_KeepsParentAndScoreCodes()
+        {
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            var baseSystem = await _context.ScoringSystems
+                .FirstAsync(s => s.ClubId == null, TestContext.Current.CancellationToken);
+            var child = new Database.Entities.ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Child",
+                ClubId = club.Id,
+                ParentSystemId = baseSystem.Id,
+                DiscardPattern = "0",
+                ScoreCodes = new List<Database.Entities.ScoreCode>
+                {
+                    new Database.Entities.ScoreCode { Name = "DNC", CameToStart = false }
+                }
+            };
+            _context.ScoringSystems.Add(child);
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            await _service.GetScoringSystemsAsync(club.Id, true);
+
+            // Act
+            await _service.SaveScoringSystemAsync(new ScoringSystem
+            {
+                Id = child.Id,
+                Name = "Child renamed",
+                ClubId = club.Id,
+                ParentSystemId = baseSystem.Id,
+                DiscardPattern = "0,1"
+            });
+
+            // Assert
+            var saved = await _context.ScoringSystems.AsNoTracking()
+                .Include(s => s.ScoreCodes)
+                .SingleAsync(s => s.Id == child.Id, TestContext.Current.CancellationToken);
+            Assert.Equal("Child renamed", saved.Name);
+            Assert.Equal(baseSystem.Id, saved.ParentSystemId);
+            Assert.Single(saved.ScoreCodes);
+        }
+
+        [Fact]
+        public async Task SaveScoringSystemAsync_ChildWithResolvedType_DoesNotWriteCalculatorType()
+        {
+            var (_, child) = await AddRootAndChildSystemsAsync();
+            var model = await _service.GetScoringSystemAsync(child.Id);
+            model.Name = "Renamed child";
+
+            await _service.SaveScoringSystemAsync(model);
+
+            var dbChild = await _context.ScoringSystems.SingleAsync(s => s.Id == child.Id, TestContext.Current.CancellationToken);
+            Assert.Equal("Renamed child", dbChild.Name);
+            Assert.Null(dbChild.CalculatorType);
+        }
+
+        [Fact]
+        public async Task SaveScoringSystemAsync_WithSettings_StoresJsonAndChildInheritsValues()
+        {
+            var (root, child) = await AddRootAndChildSystemsAsync();
+            var rootModel = await _service.GetScoringSystemAsync(root.Id);
+            rootModel.Settings = new ScoringSystemSettings { PenaltyThresholdPercent = 70m };
+            rootModel.DiscardMethod = Api.Enumerations.DiscardMethod.PerDay;
+            await _service.SaveScoringSystemAsync(rootModel);
+
+            var childModel = await _service.GetScoringSystemAsync(child.Id);
+            childModel.Settings = new ScoringSystemSettings { PenaltyScoreValue = 8m };
+            await _service.SaveScoringSystemAsync(childModel);
+
+            var result = await _service.GetScoringSystemAsync(child.Id);
+            var dbChild = await _context.ScoringSystems.SingleAsync(s => s.Id == child.Id, TestContext.Current.CancellationToken);
+
+            Assert.Equal("{\"PenaltyScoreValue\":8}", dbChild.Settings);
+            Assert.Equal(8m, result.Settings.PenaltyScoreValue);
+            Assert.Null(result.Settings.PenaltyThresholdPercent);
+            Assert.Equal(70m, result.EffectiveSettings.PenaltyThresholdPercent);
+            Assert.Null(result.DiscardMethod);
+            Assert.Equal(Api.Enumerations.DiscardMethod.PerDay, result.EffectiveDiscardMethod);
+        }
+
+        [Fact]
+        public async Task GetScoringSystemsAsync_ChildSystem_ResolvesInheritedValues()
+        {
+            var (_, child) = await AddRootAndChildSystemsAsync();
+
+            var results = await _service.GetScoringSystemsAsync(child.ClubId.Value, true);
+
+            var childResult = results.Single(s => s.Id == child.Id);
+            Assert.Equal(Api.Enumerations.ScoringCalculatorType.LowPointAverageExclDnc, childResult.CalculatorType);
+        }
+
+        [Fact]
+        public async Task GetScoringSystemsAsync_RestrictedBaseSystem_OnlyOfferedToAllowedClubs()
+        {
+            var (root, _) = await AddRootAndChildSystemsAsync();
+            var allowedClub = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            var otherClubId = await AddClubAsync("OTHER");
+            await _service.SaveSharedScoringSystemAccessAsync(root.Id, true, new[] { allowedClub.Id });
+
+            var allowed = await _service.GetScoringSystemsAsync(allowedClub.Id, true);
+            var other = await _service.GetScoringSystemsAsync(otherClubId, true);
+
+            Assert.Contains(allowed, s => s.Id == root.Id);
+            Assert.DoesNotContain(other, s => s.Id == root.Id);
+            Assert.Contains(other, s => s.ClubId == null);
+        }
+
+        [Fact]
+        public async Task SaveSharedScoringSystemAccessAsync_Unrestricted_ClearsClubsAndOffersToAll()
+        {
+            var (root, _) = await AddRootAndChildSystemsAsync();
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            var otherClubId = await AddClubAsync("OTHER");
+            await _service.SaveSharedScoringSystemAccessAsync(root.Id, true, new[] { club.Id });
+
+            await _service.SaveSharedScoringSystemAccessAsync(root.Id, false, new[] { club.Id });
+
+            var access = (await _service.GetSharedScoringSystemAccessAsync()).Single(s => s.Id == root.Id);
+            Assert.False(access.IsRestrictedToClubs);
+            Assert.Empty(access.ClubIds);
+            var other = await _service.GetScoringSystemsAsync(otherClubId, true);
+            Assert.Contains(other, s => s.Id == root.Id);
+        }
+
+        [Fact]
+        public async Task SaveSharedScoringSystemAccessAsync_ChangedClubs_ReplacesAccessList()
+        {
+            var (root, _) = await AddRootAndChildSystemsAsync();
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            var otherClubId = await AddClubAsync("OTHER");
+            await _service.SaveSharedScoringSystemAccessAsync(root.Id, true, new[] { club.Id });
+
+            await _service.SaveSharedScoringSystemAccessAsync(root.Id, true, new[] { otherClubId, Guid.NewGuid() });
+
+            var access = (await _service.GetSharedScoringSystemAccessAsync()).Single(s => s.Id == root.Id);
+            Assert.True(access.IsRestrictedToClubs);
+            Assert.Equal(new[] { otherClubId }, access.ClubIds);
+            Assert.Equal(root.Name, access.Name);
+        }
+
+        [Fact]
+        public async Task SaveSharedScoringSystemAccessAsync_SiteDefaultSystem_Throws()
+        {
+            var siteDefault = await _context.ScoringSystems
+                .FirstAsync(s => s.IsSiteDefault == true, TestContext.Current.CancellationToken);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.SaveSharedScoringSystemAccessAsync(siteDefault.Id, true, Array.Empty<Guid>()));
+        }
+
+        [Fact]
+        public async Task SaveSharedScoringSystemAccessAsync_ClubSystem_Throws()
+        {
+            var (_, child) = await AddRootAndChildSystemsAsync();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.SaveSharedScoringSystemAccessAsync(child.Id, true, Array.Empty<Guid>()));
+        }
+
+        [Fact]
+        public async Task GetSharedScoringSystemAccessAsync_SiteDefault_IsUsedForNewClubs()
+        {
+            var (root, child) = await AddRootAndChildSystemsAsync();
+
+            var access = await _service.GetSharedScoringSystemAccessAsync();
+
+            Assert.Contains(access, s => s.IsUsedForNewClubs);
+            Assert.False(access.Single(s => s.Id == root.Id).IsUsedForNewClubs);
+            Assert.DoesNotContain(access, s => s.Id == child.Id);
+        }
+
+        [Fact]
+        public async Task GetScoringSystemAsync_ChildWithoutPatternOrParticipation_InheritsFromParent()
+        {
+            var (root, child) = await AddRootAndChildSystemsAsync();
+            root.DiscardPattern = "0,0,0,1";
+            root.ParticipationPercent = 50m;
+            child.DiscardPattern = null;
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var system = await _service.GetScoringSystemAsync(child.Id, true);
+
+            Assert.Null(system.DiscardPattern);
+            Assert.Null(system.ParticipationPercent);
+            Assert.Equal("0,0,0,1", system.EffectiveDiscardPattern);
+            Assert.Equal(50m, system.EffectiveParticipationPercent);
+        }
+
+        private async Task<Guid> AddClubAsync(string initials)
+        {
+            var club = new Database.Entities.Club
+            {
+                Id = Guid.NewGuid(),
+                Name = $"{initials} Club",
+                Initials = initials
+            };
+            _context.Clubs.Add(club);
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            return club.Id;
+        }
+
+        private async Task<(Database.Entities.ScoringSystem root, Database.Entities.ScoringSystem child)>
+            AddRootAndChildSystemsAsync()
+        {
+            var root = new Database.Entities.ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Base LPA",
+                DiscardPattern = "0",
+                CalculatorType = Api.Enumerations.ScoringCalculatorType.LowPointAverageExclDnc,
+                ScoreCodes = new List<Database.Entities.ScoreCode>()
+            };
+            var child = new Database.Entities.ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Club LPA",
+                DiscardPattern = "0",
+                ClubId = (await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken)).Id,
+                ParentSystemId = root.Id,
+                ScoreCodes = new List<Database.Entities.ScoreCode>()
+            };
+            _context.ScoringSystems.Add(root);
+            _context.ScoringSystems.Add(child);
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            return (root, child);
+        }
+
     }
 }

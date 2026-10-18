@@ -81,10 +81,16 @@ namespace SailScores.Test.Unit.Core.Scoring
             HandicapSystemType type,
             IReadOnlyDictionary<(Guid, DateTime), decimal> lookup = null)
         {
-            var inner = new AppendixACalculator(MakeScoringSystem());
+            var inner = ScoringCalculatorRegistry.CreateCalculator(ScoringCalculatorType.AppendixA, MakeScoringSystem());
             return new HandicapScoringCalculator(inner, MakeHandicapSystem(type),
                 lookup ?? new Dictionary<(Guid, DateTime), decimal>());
         }
+
+        // The score as the run scored it (its corrected time, place and code). The series'
+        // own scores are left as they were.
+        private static Score Scored(SeriesResults results, Score input) =>
+            results.Results.Single(r => r.Key.Id == input.CompetitorId).Value
+                .CalculatedScores[input.Race].RawScore;
 
         // --- PHRF Time-on-Distance formula tests ---
 
@@ -118,10 +124,10 @@ namespace SailScores.Test.Unit.Core.Scoring
             series.Races[0].Scores[1].Competitor = compB;
 
             var calculator = MakeCalculator(HandicapSystemType.PhrfToD, lookup);
-            calculator.CalculateResults(series);
+            var results = calculator.CalculateResults(series);
 
-            Assert.Equal(2, scoreA.Place); // 3150 s → 2nd
-            Assert.Equal(1, scoreB.Place); // 2900 s → 1st
+            Assert.Equal(2, Scored(results, scoreA).Place); // 3150 s → 2nd
+            Assert.Equal(1, Scored(results, scoreB).Place); // 2900 s → 1st
         }
 
         [Fact]
@@ -142,11 +148,11 @@ namespace SailScores.Test.Unit.Core.Scoring
             score.Competitor = comp;
 
             var calculator = MakeCalculator(HandicapSystemType.PhrfToD, lookup);
-            calculator.CalculateResults(series);
+            var scored = Scored(calculator.CalculateResults(series), score);
 
             // corrected = 3600 - 0×5 = 3600 s (unchanged for scratch)
-            Assert.Equal(TimeSpan.FromSeconds(3600), score.CorrectedTime);
-            Assert.Equal(1, score.Place);
+            Assert.Equal(TimeSpan.FromSeconds(3600), scored.CorrectedTime);
+            Assert.Equal(1, scored.Place);
         }
 
         // --- PHRF Time-on-Time formula tests ---
@@ -171,11 +177,11 @@ namespace SailScores.Test.Unit.Core.Scoring
             score.Competitor = comp;
 
             var calculator = MakeCalculator(HandicapSystemType.PhrfToT, lookup);
-            calculator.CalculateResults(series);
+            var scored = Scored(calculator.CalculateResults(series), score);
 
             var expected = 3600.0 * 600.0 / 690.0;
-            Assert.NotNull(score.CorrectedTime);
-            Assert.Equal(expected, score.CorrectedTime!.Value.TotalSeconds, precision: 1);
+            Assert.NotNull(scored.CorrectedTime);
+            Assert.Equal(expected, scored.CorrectedTime!.Value.TotalSeconds, precision: 1);
         }
 
         // --- Portsmouth Yardstick formula tests ---
@@ -200,11 +206,11 @@ namespace SailScores.Test.Unit.Core.Scoring
             score.Competitor = comp;
 
             var calculator = MakeCalculator(HandicapSystemType.Portsmouth, lookup);
-            calculator.CalculateResults(series);
+            var scored = Scored(calculator.CalculateResults(series), score);
 
             var expected = 3600.0 / 1050.0 * 1000.0;
-            Assert.NotNull(score.CorrectedTime);
-            Assert.Equal(expected, score.CorrectedTime!.Value.TotalSeconds, precision: 1);
+            Assert.NotNull(scored.CorrectedTime);
+            Assert.Equal(expected, scored.CorrectedTime!.Value.TotalSeconds, precision: 1);
         }
 
         [Fact]
@@ -225,8 +231,7 @@ namespace SailScores.Test.Unit.Core.Scoring
             score.Competitor = comp;
 
             var portsmouthCalculator = MakeCalculator(HandicapSystemType.Portsmouth, lookup);
-            portsmouthCalculator.CalculateResults(seriesPortsmouth);
-            var pyCorrected = score.CorrectedTime;
+            var pyCorrected = Scored(portsmouthCalculator.CalculateResults(seriesPortsmouth), score).CorrectedTime;
 
             var raceDpy = MakeRace(raceDate);
             var scoreDpy = MakeTimedScore(comp, raceDpy, TimeSpan.FromSeconds(3600));
@@ -235,11 +240,11 @@ namespace SailScores.Test.Unit.Core.Scoring
             scoreDpy.Competitor = comp;
 
             var dpyCalculator = MakeCalculator(HandicapSystemType.PortsmouthDpy, lookup);
-            dpyCalculator.CalculateResults(seriesDpy);
+            var dpyCorrected = Scored(dpyCalculator.CalculateResults(seriesDpy), scoreDpy).CorrectedTime;
 
             Assert.NotNull(pyCorrected);
-            Assert.NotNull(scoreDpy.CorrectedTime);
-            Assert.Equal(pyCorrected!.Value.TotalSeconds / 10.0, scoreDpy.CorrectedTime!.Value.TotalSeconds, precision: 1);
+            Assert.NotNull(dpyCorrected);
+            Assert.Equal(pyCorrected!.Value.TotalSeconds / 10.0, dpyCorrected!.Value.TotalSeconds, precision: 1);
         }
 
         [Fact]
@@ -265,7 +270,7 @@ namespace SailScores.Test.Unit.Core.Scoring
             scorePortsmouthB.Competitor = compB;
 
             var portsmouthCalculator = MakeCalculator(HandicapSystemType.Portsmouth, lookup);
-            portsmouthCalculator.CalculateResults(seriesPortsmouth);
+            var portsmouthResults = portsmouthCalculator.CalculateResults(seriesPortsmouth);
 
             var raceDpy = MakeRace(raceDate);
             var scoreDpyA = MakeTimedScore(compA, raceDpy, TimeSpan.FromSeconds(3500));
@@ -277,11 +282,11 @@ namespace SailScores.Test.Unit.Core.Scoring
             scoreDpyB.Competitor = compB;
 
             var dpyCalculator = MakeCalculator(HandicapSystemType.PortsmouthDpy, lookup);
-            dpyCalculator.CalculateResults(seriesDpy);
+            var dpyResults = dpyCalculator.CalculateResults(seriesDpy);
 
-            Assert.Equal(scorePortsmouthA.Place, scoreDpyA.Place);
-            Assert.Equal(scorePortsmouthB.Place, scoreDpyB.Place);
-            Assert.True(scoreDpyA.Place < scoreDpyB.Place);
+            Assert.Equal(Scored(portsmouthResults, scorePortsmouthA).Place, Scored(dpyResults, scoreDpyA).Place);
+            Assert.Equal(Scored(portsmouthResults, scorePortsmouthB).Place, Scored(dpyResults, scoreDpyB).Place);
+            Assert.True(Scored(dpyResults, scoreDpyA).Place < Scored(dpyResults, scoreDpyB).Place);
         }
 
         // --- NHC code assignment ---
@@ -300,9 +305,10 @@ namespace SailScores.Test.Unit.Core.Scoring
             score.Competitor = comp;
 
             var calculator = MakeCalculator(HandicapSystemType.PhrfToD);
-            calculator.CalculateResults(series);
+            var results = calculator.CalculateResults(series);
 
-            Assert.Equal(HandicapScoringCalculator.NhcCode, score.Code);
+            Assert.Equal(HandicapScoringCalculator.NhcCode, results.Results.Single().Value.CalculatedScores[race].Code);
+            Assert.Null(score.Code);
         }
 
         // --- Manual handicap override on score ---
@@ -326,12 +332,12 @@ namespace SailScores.Test.Unit.Core.Scoring
             score.Competitor = comp;
 
             var calculator = MakeCalculator(HandicapSystemType.PhrfToD, lookup);
-            calculator.CalculateResults(series);
+            var scored = Scored(calculator.CalculateResults(series), score);
 
             // corrected = 3600 - 60×5 = 3300 s (using override 60, not lookup 90)
-            Assert.NotNull(score.CorrectedTime);
-            Assert.Equal(3300.0, score.CorrectedTime!.Value.TotalSeconds, precision: 1);
-            Assert.Equal(60m, score.HandicapValue);
+            Assert.NotNull(scored.CorrectedTime);
+            Assert.Equal(3300.0, scored.CorrectedTime!.Value.TotalSeconds, precision: 1);
+            Assert.Equal(60m, scored.HandicapValue);
         }
 
         // --- Boats with finish codes are not time-corrected ---
@@ -354,10 +360,10 @@ namespace SailScores.Test.Unit.Core.Scoring
             score.Competitor = comp;
 
             var calculator = MakeCalculator(HandicapSystemType.PhrfToD, lookup);
-            calculator.CalculateResults(series);
+            var scored = Scored(calculator.CalculateResults(series), score);
 
-            Assert.Equal("DNS", score.Code);
-            Assert.Null(score.CorrectedTime);
+            Assert.Equal("DNS", scored.Code);
+            Assert.Null(scored.CorrectedTime);
         }
 
         // --- PHRF ToD throws without course distance ---
@@ -381,6 +387,101 @@ namespace SailScores.Test.Unit.Core.Scoring
 
             var calculator = MakeCalculator(HandicapSystemType.PhrfToD, lookup);
             Assert.Throws<InvalidOperationException>(() => calculator.CalculateResults(series));
+        }
+
+        // --- Formulas and edge cases ---
+
+        [Fact]
+        public void ComputeCorrectedTime_TimeOnTime_MultipliesByCoefficient()
+        {
+            var corrected = HandicapScoringCalculator.ComputeCorrectedTime(
+                TimeSpan.FromSeconds(3600), 0.9m, HandicapSystemType.TimeOnTime, null);
+
+            Assert.Equal(TimeSpan.FromSeconds(3240), corrected);
+        }
+
+        [Theory]
+        [InlineData(HandicapSystemType.Portsmouth)]
+        [InlineData(HandicapSystemType.PortsmouthDpy)]
+        public void ComputeCorrectedTime_PortsmouthRatingZero_Throws(HandicapSystemType type)
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                HandicapScoringCalculator.ComputeCorrectedTime(TimeSpan.FromSeconds(3600), 0m, type, null));
+        }
+
+        [Fact]
+        public void ComputeCorrectedTime_UnknownSystemType_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                HandicapScoringCalculator.ComputeCorrectedTime(
+                    TimeSpan.FromSeconds(3600), 1m, (HandicapSystemType)999, null));
+        }
+
+        [Fact]
+        public void CalculateResults_RatedBoatWithoutElapsedTime_HasNoPlace()
+        {
+            var raceDate = new DateTime(2025, 6, 1);
+            var timed = MakeCompetitor();
+            var untimed = MakeCompetitor();
+            var race = MakeRace(raceDate);
+            var timedScore = MakeTimedScore(timed, race, TimeSpan.FromSeconds(3600), handicapOverride: 100m);
+            var untimedScore = new Score
+            {
+                Id = Guid.NewGuid(), CompetitorId = untimed.Id, Competitor = untimed,
+                Race = race, RaceId = race.Id, Place = 1, HandicapValue = 100m
+            };
+            race.Scores = new List<Score> { timedScore, untimedScore };
+            var series = new Series { Races = new List<Race> { race }, ScoringSystem = MakeScoringSystem() };
+
+            var results = MakeCalculator(HandicapSystemType.Portsmouth).CalculateResults(series);
+
+            Assert.Equal(1, Scored(results, timedScore).Place);
+            Assert.Null(Scored(results, untimedScore).Place);
+        }
+
+        [Fact]
+        public void CalculateResults_TimedRace_LeavesSeriesScoresUnchanged()
+        {
+            var raceDate = new DateTime(2025, 6, 1);
+            var timed = MakeCompetitor();
+            var unrated = MakeCompetitor();
+            var race = MakeRace(raceDate);
+            var timedScore = MakeTimedScore(timed, race, TimeSpan.FromSeconds(3600));
+            var unratedScore = MakeTimedScore(unrated, race, TimeSpan.FromSeconds(3000));
+            unratedScore.Place = 1;
+            race.Scores = new List<Score> { timedScore, unratedScore };
+            var series = new Series { Races = new List<Race> { race }, ScoringSystem = MakeScoringSystem() };
+            var lookup = new Dictionary<(Guid, DateTime), decimal> { { (timed.Id, raceDate.Date), 100m } };
+
+            var results = MakeCalculator(HandicapSystemType.Portsmouth, lookup).CalculateResults(series);
+
+            Assert.Equal(1, Scored(results, timedScore).Place);
+            Assert.Equal(HandicapScoringCalculator.NhcCode, Scored(results, unratedScore).Code);
+            Assert.Null(timedScore.Place);
+            Assert.Null(timedScore.CorrectedTime);
+            Assert.Null(timedScore.HandicapValue);
+            Assert.Equal(1, unratedScore.Place);
+            Assert.Null(unratedScore.Code);
+        }
+
+        [Fact]
+        public void CalculateAbsentCompetitorScore_TimedRace_ScoresAsInnerCalculator()
+        {
+            var raceDate = new DateTime(2025, 6, 1);
+            var comp = MakeCompetitor();
+            var race = MakeRace(raceDate);
+            race.Scores = new List<Score> { MakeTimedScore(comp, race, TimeSpan.FromSeconds(3600), handicapOverride: 100m) };
+            var series = new Series
+            {
+                Races = new List<Race> { race },
+                Competitors = new List<Competitor> { comp },
+                ScoringSystem = MakeScoringSystem()
+            };
+
+            var absentScore = MakeCalculator(HandicapSystemType.Portsmouth).CalculateAbsentCompetitorScore(series);
+
+            // DNC: one series competitor + 1.
+            Assert.Equal(2m, absentScore);
         }
     }
 }

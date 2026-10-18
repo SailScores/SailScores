@@ -58,6 +58,7 @@
         <form asp-action="DeleteConfirmed" method="post">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ScoringSystemId" />
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
 
             <button type="submit" class="btn btn-danger">Delete</button>
             <a href="@ViewBag.ReturnUrl" class="btn btn-outline-secondary">Cancel</a>

@@ -19,6 +19,8 @@
         .OrderBy(c => c.DisplayOrder)
         .ThenBy(c => c.FieldDefinitionId)
         .ToList();
+    // Calculator-specific columns after the total, with visibility from the scoring system.
+    var scoringColumns = Model?.VisibleScoringColumns ?? new List<FlatResultColumn>();
 }
 
 @using System.Collections.Generic
@@ -65,10 +67,10 @@
                             : customField.FieldDefinitionId.ToString("D").Substring(0, 8);
                         <th scope="col" class="@customField.Visibility.ToCssClass()">@headerText</th>
                     }
-                    <th scope="col" class="text-center">@localizer["Total"]</th>
-                    @if (Model.ShowPreDiscardTotal && !(Model.Results.IsPercentSystem))
+                    <th scope="col" class="text-center">@localizer[Model?.Results?.TotalHeader ?? "Total"]</th>
+                    @foreach (var scoringColumn in scoringColumns)
                     {
-                        <th scope="col" class="text-center">@localizer["Pre-Discard Total"]</th>
+                        <th scope="col" class="text-center @scoringColumn.Visibility.ToCssClass()">@localizer[scoringColumn.Header]</th>
                     }
                     @{
                         var colCount = 0;
@@ -309,29 +311,9 @@
                             }
                         </strong>
                     </td>
-                    @if (Model.ShowPreDiscardTotal && !(Model.Results.IsPercentSystem))
+                    @foreach (var scoringColumn in scoringColumns)
                     {
-                        <td scope="row" class="text-center">
-                            <strong>
-                                @{
-                                    var preDiscardTotal = compScore?.TotalScoreIncludingDiscards;
-
-                                    // Fallback calculation if not available (for historical results before this feature)
-                                    if (!preDiscardTotal.HasValue && compScore?.Scores != null)
-                                    {
-                                        preDiscardTotal = compScore.Scores.Sum(s => s.ScoreValue ?? 0.0m);
-                                    }
-                                }
-                                @if (preDiscardTotal.HasValue)
-                                {
-                                    @String.Format("{0:0.###}", preDiscardTotal)
-                                }
-                                else
-                                {
-                                    @Html.Raw("&mdash;")
-                                }
-                            </strong>
-                        </td>
+                        <td class="text-center @scoringColumn.Visibility.ToCssClass()">@scoringColumn.GetDisplayText(compScore)</td>
                     }
                     @{
                         colCount = 0;
@@ -377,6 +359,7 @@
                                {
                                    Result = result,
                                     IsPercentSystem = Model.Results.IsPercentSystem,
+                                    LowerScoreWins = Model.Results.LowerScoreWins ?? false,
                                     ScoreCodesUsed = Model.Results.ScoreCodesUsed,
                                     HideDncDiscards = Model.HideDncDiscards
                                })

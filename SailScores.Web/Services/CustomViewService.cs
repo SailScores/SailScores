@@ -42,9 +42,9 @@ public class CustomViewService : ICustomViewService
     }
 
     /// <summary>
-    /// Gets the current or most recent value for a custom field on a competitor,
-    /// respecting effective date ranges. When no effective date is supplied,
-    /// the current UTC date is used.
+    /// Gets the value of a custom field on a competitor that is effective on a date,
+    /// falling back to an undated value. When no effective date is supplied, the current
+    /// UTC date is used, and if nothing is effective today the most recent value is returned.
     /// </summary>
     public string GetCustomFieldValue(
         Competitor competitor,
@@ -89,8 +89,17 @@ public class CustomViewService : ICustomViewService
             return undatedValue.Value;
         }
 
-        // Fall back to most recent by any criteria
-        return fieldValues.FirstOrDefault()?.Value;
+        // A specific date (e.g. a regatta's) shows nothing rather than a value from another time.
+        if (effectiveDate.HasValue)
+        {
+            return null;
+        }
+
+        // Otherwise fall back to the most recent value.
+        return fieldValues
+            .OrderByDescending(v => v.EffectiveFrom ?? v.EffectiveTo ?? DateTime.MinValue)
+            .First()
+            .Value;
     }
 
     /// <summary>

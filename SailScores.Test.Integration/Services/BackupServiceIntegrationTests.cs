@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Testcontainers.MsSql;
 using Xunit;
-using Xunit.Abstractions;
 using Db = SailScores.Database.Entities;
 
 namespace SailScores.Test.Integration.Services;
@@ -128,7 +127,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         Log("[INIT] Constructor complete");
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         LogDirect("========== TEST INITIALIZATION STARTING ==========");
         Log("[INIT] InitializeAsync starting...");
@@ -192,7 +191,7 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         LogDirect("========== TEST CLEANUP STARTING ==========");
         Log("[DISPOSE] Starting cleanup...");
@@ -819,6 +818,48 @@ public class BackupServiceIntegrationTests : IAsyncLifetime
             Assert.NotNull(restoredParent);
             _output.WriteLine($"Restored child system '{restoredChild.Name}' still has parent '{restoredParent.Name}'");
         }
+    }
+
+    [Fact]
+    [Trait("Category", "Integration")]
+    [Trait("Category", "Database")]
+    [Trait("Category", "Slow")]
+    public async Task BackupAndRestore_WithSeasonDefaultAndScoreCodeGroup_RestoresOverExistingData()
+    {
+        // Arrange: a club system with a score code group, used as a season default. Restore
+        // deletes the club's scoring systems before its seasons, so the season reference
+        // must be cleared first or SQL Server rejects the delete.
+        var system = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _testClubId,
+            Name = "Integration Season Default",
+            DiscardPattern = "0"
+        };
+        _context.ScoringSystems.Add(system);
+        var group = new Db.ScoreCodeGroup(Guid.NewGuid(), system.Id, "Integration Group", 0, 2m, false, "DNC", 0);
+        group.Codes.Add(new Db.ScoreCodeGroupCode { ScoreCodeGroupId = group.Id, CodeName = "BKD" });
+        _context.ScoreCodeGroups.Add(group);
+        var season = await _context.Seasons.FirstAsync(s => s.ClubId == _testClubId);
+        season.DefaultScoringSystemId = system.Id;
+        await _context.SaveChangesAsync();
+        var seasonName = season.Name;
+
+        // Act
+        var backup = await _backupService.CreateBackupAsync(_testClubId, "integration-test");
+        await _backupService.RestoreBackupAsync(_testClubId, backup, preserveClubName: true);
+
+        // Assert
+        _context.ChangeTracker.Clear();
+        var restoredSystem = await _context.ScoringSystems
+            .Include(s => s.ScoreCodeGroups)
+                .ThenInclude(g => g.Codes)
+            .AsSplitQuery()
+            .SingleAsync(s => s.ClubId == _testClubId && s.Name == "Integration Season Default");
+        var restoredGroup = Assert.Single(restoredSystem.ScoreCodeGroups);
+        Assert.Equal("BKD", Assert.Single(restoredGroup.Codes).CodeName);
+        var restoredSeason = await _context.Seasons.SingleAsync(s => s.ClubId == _testClubId && s.Name == seasonName);
+        Assert.Equal(restoredSystem.Id, restoredSeason.DefaultScoringSystemId);
     }
 
     [Fact]

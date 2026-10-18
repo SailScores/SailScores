@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SailScores.Core.Model;
 using SailScores.Identity.Entities;
+using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
@@ -159,6 +160,59 @@ public class SiteAdminController : Controller
         await _siteAdminService.RecalculateSeriesAsync(seriesId, userName);
         TempData["Message"] = "Series has been recalculated successfully.";
         return RedirectToAction(nameof(Details), new { clubInitials });
+    }
+
+    // GET: SiteAdmin/ScoringSystems
+    public async Task<ActionResult> ScoringSystems()
+    {
+        if (!await _authService.IsUserFullAdmin(User))
+        {
+            return Unauthorized();
+        }
+
+        var vm = await _siteAdminService.GetScoringSystemsAsync();
+        return View(vm);
+    }
+
+    // GET: SiteAdmin/ScoringSystemAccess/5
+    public async Task<ActionResult> ScoringSystemAccess(Guid id)
+    {
+        if (!await _authService.IsUserFullAdmin(User))
+        {
+            return Unauthorized();
+        }
+
+        var vm = await _siteAdminService.GetScoringSystemAccessAsync(id);
+        if (vm == null)
+        {
+            return NotFound();
+        }
+
+        return View(vm);
+    }
+
+    // POST: SiteAdmin/ScoringSystemAccess/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ScoringSystemAccess(SiteAdminScoringSystemAccessViewModel model)
+    {
+        if (!await _authService.IsUserFullAdmin(User))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await _siteAdminService.SaveScoringSystemAccessAsync(model);
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(ScoringSystemAccess), new { id = model.Id });
+        }
+
+        TempData["Message"] = "Scoring system access has been saved.";
+        return RedirectToAction(nameof(ScoringSystems));
     }
 
     // GET: SiteAdmin/StripeConfiguration

@@ -1,0 +1,580 @@
+{
+  "ScoringSystemName": "High Point Percentage For Series",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 9,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": false,
+  "Columns": [
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2018-05-26 5-26 R1",
+    "2. 2018-05-26 5-26 R2",
+    "1. 2018-05-28 5-28",
+    "1. 2018-06-30 6-30 R1�",
+    "2. 2018-06-30 6-30 R2",
+    "1. 2018-07-04 7-4",
+    "1. 2018-09-01 9-1 R1",
+    "1. 2018-09-02 9-2",
+    "1. 2018-09-03 9-3"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompGR",
+      "SailNumber": "2169",
+      "Total": "100",
+      "Average": "100",
+      "PointsEarned": "88",
+      "PointsPossible": "88",
+      "ParticipationPercent": "77.7777777778",
+      "Columns": {
+        "participation": "77.7777777778"
+      },
+      "Scores": "1:15/15 | 1:15/15 | (2:10/11) | 1:16/16 | 1:13/13 | SB 0/11 | 1:16/16 | 1:13/13 | SB 0/21"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompCB",
+      "SailNumber": "2644",
+      "Total": "100",
+      "Average": "100",
+      "PointsEarned": "32",
+      "PointsPossible": "32",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "RC 0/15 | RC 0/15 | 1:11/11 | DNC 0 | DNC 0 | DNC 0 | (6:11/16) | DNC 0 | 1:21/21"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompBJ2",
+      "SailNumber": "1687",
+      "Total": "95.2380952381",
+      "Average": "95.2380952381",
+      "PointsEarned": "20",
+      "PointsPossible": "21",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | RC 0/16 | RC 0/13 | DNC 0 | RC 0/16 | DNC 0 | 2:20/21"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompND",
+      "SailNumber": "TC25",
+      "Total": "88.4615384615",
+      "Average": "88.4615384615",
+      "PointsEarned": "23",
+      "PointsPossible": "26",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "(8/15) | 2:14/15 | 3:9/11 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompFJ",
+      "SailNumber": "2511",
+      "Total": "83.6363636364",
+      "Average": "83.6363636364",
+      "PointsEarned": "46",
+      "PointsPossible": "55",
+      "ParticipationPercent": "55.5555555556",
+      "Columns": {
+        "participation": "55.5555555556"
+      },
+      "Scores": "4:12/15 | (10:7/15) | DNC 0 | 3:14/16 | 3:11/13 | 3:9/11 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompCJ3",
+      "SailNumber": "1933",
+      "Total": "82.3529411765",
+      "Average": "82.3529411765",
+      "PointsEarned": "28",
+      "PointsPossible": "34",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | RC 0/11 | (5:12/16) | 2:12/13 | 6:16/21"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompKA",
+      "SailNumber": "TC67",
+      "Total": "80.9523809524",
+      "Average": "80.9523809524",
+      "PointsEarned": "17",
+      "PointsPossible": "21",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 5:17/21"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompNCRA",
+      "SailNumber": "2604",
+      "Total": "77.6595744681",
+      "Average": "77.6595744681",
+      "PointsEarned": "73",
+      "PointsPossible": "94",
+      "ParticipationPercent": "77.7777777778",
+      "Columns": {
+        "participation": "77.7777777778"
+      },
+      "Scores": "3:13/15 | 5:11/15 | 4:8/11 | 2:15/16 | (9:5/13) | DNC 0 | 10:7/16 | RC 0/13 | 3:19/21"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompKJ2",
+      "SailNumber": "1847",
+      "Total": "77.5862068966",
+      "Average": "77.5862068966",
+      "PointsEarned": "90",
+      "PointsPossible": "116",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "participation": "100"
+      },
+      "Scores": "(9:7/15) | 4:12/15 | 6/11 | 7:10/16 | 5:9/13 | 1:11/11 | 4:13/16 | 3:11/13 | 4:18/21"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompRJ3",
+      "SailNumber": "TC10",
+      "Total": "76.9230769231",
+      "Average": "76.9230769231",
+      "PointsEarned": "10",
+      "PointsPossible": "13",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 4:10/13 | DNC 0"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "75.7142857143",
+      "Average": "75.7142857143",
+      "PointsEarned": "53",
+      "PointsPossible": "70",
+      "ParticipationPercent": "66.6666666667",
+      "Columns": {
+        "participation": "66.6666666667"
+      },
+      "Scores": "7:9/15 | 8:9/15 | (9:3/11) | 4:13/16 | 2:12/13 | 2:10/11 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 12,
+      "Name": "CompMB",
+      "SailNumber": "1894",
+      "Total": "74.5098039216",
+      "Average": "74.5098039216",
+      "PointsEarned": "38",
+      "PointsPossible": "51",
+      "ParticipationPercent": "44.4444444444",
+      "Columns": {
+        "participation": "44.4444444444"
+      },
+      "Scores": "5:11/15 | 3:13/15 | (7:5/11) | SB 0/16 | SB 0/13 | DNC 0 | DNC 0 | DNC 0 | 8:14/21"
+    },
+    {
+      "Rank": 13,
+      "Name": "CompMJ",
+      "SailNumber": "2161",
+      "Total": "67.0454545455",
+      "Average": "67.0454545455",
+      "PointsEarned": "59",
+      "PointsPossible": "88",
+      "ParticipationPercent": "77.7777777778",
+      "Columns": {
+        "participation": "77.7777777778"
+      },
+      "Scores": "6:10/15 | 7:10/15 | DNC 0 | 6:11/16 | 7/13 | DNC 0 | 3:14/16 | 7/13 | (12:10/21)"
+    },
+    {
+      "Rank": 14,
+      "Name": "CompBJ3",
+      "SailNumber": "1850",
+      "Total": "66.6666666667",
+      "Average": "66.6666666667",
+      "PointsEarned": "32",
+      "PointsPossible": "48",
+      "ParticipationPercent": "44.4444444444",
+      "Columns": {
+        "participation": "44.4444444444"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | 5:12/16 | DNC 0 | 5:7/11 | (9:8/16) | DNC 0 | 9:13/21"
+    },
+    {
+      "Rank": 15,
+      "Name": "CompWE",
+      "SailNumber": "2652",
+      "Total": "66.1538461538",
+      "Average": "66.1538461538",
+      "PointsEarned": "43",
+      "PointsPossible": "65",
+      "ParticipationPercent": "55.5555555556",
+      "Columns": {
+        "participation": "55.5555555556"
+      },
+      "Scores": "(15:2/15) | 9:8/15 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 2:15/16 | 5:9/13 | 11/21"
+    },
+    {
+      "Rank": 16,
+      "Name": "CompSC",
+      "SailNumber": "2091",
+      "Total": "64.8648648649",
+      "Average": "64.8648648649",
+      "PointsEarned": "24",
+      "PointsPossible": "37",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 8:9/16 | (9:5/13) | 7:15/21"
+    },
+    {
+      "Rank": 17,
+      "Name": "CompSJ2",
+      "SailNumber": "TC37",
+      "Total": "56.25",
+      "Average": "56.25",
+      "PointsEarned": "9",
+      "PointsPossible": "16",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | 8:9/16 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 18,
+      "Name": "CompFJ3",
+      "SailNumber": "2144",
+      "Total": "55.2631578947",
+      "Average": "55.2631578947",
+      "PointsEarned": "42",
+      "PointsPossible": "76",
+      "ParticipationPercent": "66.6666666667",
+      "Columns": {
+        "participation": "66.6666666667"
+      },
+      "Scores": "2:14/15 | (14:3/15) | 8:4/11 | SB 0/16 | SB 0/13 | SB 0/11 | 13:4/16 | 6:8/13 | 10:12/21"
+    },
+    {
+      "Rank": 19,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "47.8260869565",
+      "Average": "47.8260869565",
+      "PointsEarned": "44",
+      "PointsPossible": "92",
+      "ParticipationPercent": "77.7777777778",
+      "Columns": {
+        "participation": "77.7777777778"
+      },
+      "Scores": "12:5/15 | (13:4/15) | DNC 0 | 10:7/16 | 6:8/13 | 7:5/11 | 7:10/16 | DNC 0 | 13:9/21"
+    },
+    {
+      "Rank": 20,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "47.4137931034",
+      "Average": "47.4137931034",
+      "PointsEarned": "55",
+      "PointsPossible": "116",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "participation": "100"
+      },
+      "Scores": "13:4/15 | (15:2/15) | 5:7/11 | 9:8/16 | 4:10/13 | 6/11 | 11:6/16 | 8:6/13 | 14:8/21"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompMKDB",
+      "SailNumber": "2121",
+      "Total": "46.1538461538",
+      "Average": "46.1538461538",
+      "PointsEarned": "6",
+      "PointsPossible": "13",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | 8:6/13 | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 22,
+      "Name": "CompNB",
+      "SailNumber": "2599",
+      "Total": "40",
+      "Average": "40",
+      "PointsEarned": "6",
+      "PointsPossible": "15",
+      "ParticipationPercent": "22.2222222222",
+      "Columns": {
+        "participation": "22.2222222222"
+      },
+      "Scores": "(14:3/15) | 11:6/15 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 23,
+      "Name": "CompBK",
+      "SailNumber": "TC36",
+      "Total": "37.5",
+      "Average": "37.5",
+      "PointsEarned": "6",
+      "PointsPossible": "16",
+      "ParticipationPercent": "22.2222222222",
+      "Columns": {
+        "participation": "22.2222222222"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | 11:6/16 | DNC 0 | (9:3/11) | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 24,
+      "Name": "CompCC",
+      "SailNumber": "TC55",
+      "Total": "35.7142857143",
+      "Average": "35.7142857143",
+      "PointsEarned": "20",
+      "PointsPossible": "56",
+      "ParticipationPercent": "55.5555555556",
+      "Columns": {
+        "participation": "55.5555555556"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | 13:4/16 | 11:3/13 | 4:8/11 | 12:5/16 | DNC 0 | (18:4/21)"
+    },
+    {
+      "Rank": 25,
+      "Name": "CompWR",
+      "SailNumber": "TC70",
+      "Total": "30.7692307692",
+      "Average": "30.7692307692",
+      "PointsEarned": "4",
+      "PointsPossible": "13",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 10:4/13 | DNC 0"
+    },
+    {
+      "Rank": 26,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "28.5714285714",
+      "Average": "28.5714285714",
+      "PointsEarned": "6",
+      "PointsPossible": "21",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 16:6/21"
+    },
+    {
+      "Rank": 27,
+      "Name": "CompBJ",
+      "SailNumber": "TC08",
+      "Total": "28.3018867925",
+      "Average": "28.3018867925",
+      "PointsEarned": "15",
+      "PointsPossible": "53",
+      "ParticipationPercent": "44.4444444444",
+      "Columns": {
+        "participation": "44.4444444444"
+      },
+      "Scores": "DNC 0 | DNC 0 | (11:1/11) | 12:5/16 | DNC 0 | DNC 0 | 14:3/16 | DNC 0 | 15:7/21"
+    },
+    {
+      "Rank": 28,
+      "Name": "CompBP",
+      "SailNumber": "1474",
+      "Total": "25.5813953488",
+      "Average": "25.5813953488",
+      "PointsEarned": "11",
+      "PointsPossible": "43",
+      "ParticipationPercent": "44.4444444444",
+      "Columns": {
+        "participation": "44.4444444444"
+      },
+      "Scores": "10:6/15 | 12:5/15 | DNC 0 | DNC 0 | (10:4/13) | DNC 0 | DNC 0 | DNE 0/13 | RC 0/21"
+    },
+    {
+      "Rank": 29,
+      "Name": "CompTL",
+      "SailNumber": "TC18",
+      "Total": "25",
+      "Average": "25",
+      "PointsEarned": "6",
+      "PointsPossible": "24",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 8:4/11 | DNC 0 | 12:2/13 | (DNF 0/21)"
+    },
+    {
+      "Rank": 30,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "23.8095238095",
+      "Average": "23.8095238095",
+      "PointsEarned": "5",
+      "PointsPossible": "21",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 17:5/21"
+    },
+    {
+      "Rank": 31,
+      "Name": "CompAB",
+      "SailNumber": "TC51",
+      "Total": "18.75",
+      "Average": "18.75",
+      "PointsEarned": "3",
+      "PointsPossible": "16",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | 14:3/16 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 32,
+      "Name": "CompPI",
+      "SailNumber": "TC11",
+      "Total": "18.1818181818",
+      "Average": "18.1818181818",
+      "PointsEarned": "2",
+      "PointsPossible": "11",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 10:2/11 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 33,
+      "Name": "CompSX",
+      "SailNumber": "TC??",
+      "Total": "18.1818181818",
+      "Average": "18.1818181818",
+      "PointsEarned": "2",
+      "PointsPossible": "11",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | 10:2/11 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 34,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "13.1578947368",
+      "Average": "13.1578947368",
+      "PointsEarned": "10",
+      "PointsPossible": "76",
+      "ParticipationPercent": "66.6666666667",
+      "Columns": {
+        "participation": "66.6666666667"
+      },
+      "Scores": "(16:1/15) | 16:1/15 | DNC 0 | DNC 0 | DNC 0 | 11:1/11 | 15:2/16 | 11:3/13 | 19:3/21"
+    },
+    {
+      "Rank": 35,
+      "Name": "CompNM",
+      "SailNumber": "1337",
+      "Total": "12.5",
+      "Average": "12.5",
+      "PointsEarned": "2",
+      "PointsPossible": "16",
+      "ParticipationPercent": "22.2222222222",
+      "Columns": {
+        "participation": "22.2222222222"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | 15:2/16 | (13:1/13) | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 36,
+      "Name": "CompAAC",
+      "SailNumber": "1664",
+      "Total": "11.7647058824",
+      "Average": "11.7647058824",
+      "PointsEarned": "4",
+      "PointsPossible": "34",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | (16:1/16) | 12:2/13 | DNC 0 | SB 0/16 | DNC 0 | 20:2/21"
+    },
+    {
+      "Rank": 37,
+      "Name": "CompAD",
+      "SailNumber": "1262",
+      "Total": "6.25",
+      "Average": "6.25",
+      "PointsEarned": "1",
+      "PointsPossible": "16",
+      "ParticipationPercent": "11.1111111111",
+      "Columns": {
+        "participation": "11.1111111111"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | 16:1/16 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompCA2",
+      "SailNumber": "1850",
+      "Total": "0",
+      "Average": "0",
+      "PointsEarned": "0",
+      "PointsPossible": "0",
+      "ParticipationPercent": "0",
+      "Columns": {
+        "participation": "0"
+      },
+      "Scores": "GST 0/15 | GST 0/15 | DNC 0 | GST 0/16 | GST 0/13 | DNC 0 | DNC 0 | DNC 0 | DNC 0"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompGG",
+      "SailNumber": "TC16",
+      "Total": "0",
+      "Average": "0",
+      "PointsEarned": "0",
+      "PointsPossible": "0",
+      "ParticipationPercent": "0",
+      "Columns": {
+        "participation": "0"
+      },
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | DNC 0 | SB 0/16 | DNC 0 | DNC 0"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Excluded: Did not come to starting area",
+    "DNE": "Fixed at 0; not excludable: Disqualification that is not excludable",
+    "DNF": "Fixed at 0: Started but did not finish",
+    "GST": "Excluded: Did not come to starting area",
+    "RC": "Excluded: Did not come to starting area",
+    "SB": "Excluded: Did not come to starting area"
+  }
+}

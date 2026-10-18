@@ -16,17 +16,19 @@ public class RedirectHelper : IRedirectHelper
     /// <param name="returnUrl">The user-supplied return URL to validate</param>
     /// <param name="defaultAction">The default action to redirect to if returnUrl is invalid</param>
     /// <param name="defaultController">The default controller to redirect to if returnUrl is invalid</param>
+    /// <param name="defaultRouteValues">Route values for the default action, such as its id</param>
     /// <returns>An ActionResult that redirects to a validated local URL</returns>
     public ActionResult SafeRedirect(
         IUrlHelper urlHelper,
         HttpRequest request,
         string returnUrl,
         string defaultAction,
-        string defaultController)
+        string defaultController,
+        object defaultRouteValues = null)
     {
         if (string.IsNullOrWhiteSpace(returnUrl))
         {
-            return new RedirectToActionResult(defaultAction, defaultController, null);
+            return new RedirectToActionResult(defaultAction, defaultController, defaultRouteValues);
         }
 
         // Check if it's a relative URL (most common case)
@@ -54,6 +56,6 @@ public class RedirectHelper : IRedirectHelper
         }
 
         // If validation fails, redirect to default
-        return new RedirectToActionResult(defaultAction, defaultController, null);
+        return new RedirectToActionResult(defaultAction, defaultController, defaultRouteValues);
     }
 }

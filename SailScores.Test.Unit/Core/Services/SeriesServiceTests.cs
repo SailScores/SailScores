@@ -389,5 +389,199 @@ public class SeriesServiceTests
         Assert.Contains(dbSummary.ChildLinks, l => l.ChildSeriesId == child2.Id);
     }
 
+    [Fact]
+    public async Task UpdateSeriesResults_SummaryKeepingChildDiscards_LoadsChildDiscardsOntoRaces()
+    {
+        // Arrange: a summary of two child series, each with one race; the first child
+        // discarded the competitor's score.
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+        var fleet = _context.Fleets.First();
+        var competitor = _context.Competitors.First();
+
+        Database.Entities.Series MakeChild(string name)
+        {
+            var race = new Database.Entities.Race
+            {
+                Id = Guid.NewGuid(), ClubId = clubId, Name = $"{name} race", Fleet = fleet,
+                Date = new DateTime(2026, 6, 6),
+                Scores = new List<Database.Entities.Score>()
+            };
+            race.Scores.Add(new Database.Entities.Score
+            {
+                Id = Guid.NewGuid(), CompetitorId = competitor.Id, RaceId = race.Id, Place = 1
+            });
+            var child = new Database.Entities.Series
+            {
+                Id = Guid.NewGuid(), ClubId = clubId, Name = name, UrlName = name, Season = season,
+                Type = Database.Entities.SeriesType.Standard,
+                RaceSeries = new List<Database.Entities.SeriesRace>(),
+                ChildLinks = new List<Database.Entities.SeriesToSeriesLink>(),
+                ParentLinks = new List<Database.Entities.SeriesToSeriesLink>()
+            };
+            child.RaceSeries.Add(new Database.Entities.SeriesRace { Race = race, Series = child });
+            return child;
+        }
+
+        var child1 = MakeChild("child-1");
+        var child2 = MakeChild("child-2");
+        var child1RaceId = child1.RaceSeries.Single().Race.Id;
+        var summary = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(), ClubId = clubId, Name = "Summary", UrlName = "summary", Season = season,
+            Type = Database.Entities.SeriesType.Summary,
+            RaceSeries = new List<Database.Entities.SeriesRace>(),
+            ChildLinks = new List<Database.Entities.SeriesToSeriesLink>(),
+            ParentLinks = new List<Database.Entities.SeriesToSeriesLink>()
+        };
+        _context.Series.AddRange(child1, child2, summary);
+        _context.SeriesToSeriesLinks.AddRange(
+            new Database.Entities.SeriesToSeriesLink { ParentSeriesId = summary.Id, ChildSeriesId = child1.Id },
+            new Database.Entities.SeriesToSeriesLink { ParentSeriesId = summary.Id, ChildSeriesId = child2.Id });
+        var child1Results = new FlatResults
+        {
+            CalculatedScores = new[]
+            {
+                new FlatSeriesScore
+                {
+                    CompetitorId = competitor.Id,
+                    Scores = new[] { new FlatCalculatedScore { RaceId = child1RaceId, Discard = true } }
+                }
+            }
+        };
+        _context.HistoricalResults.Add(new Database.Entities.HistoricalResults
+        {
+            Id = Guid.NewGuid(), SeriesId = child1.Id, IsCurrent = true, Created = DateTime.UtcNow,
+            Results = Newtonsoft.Json.JsonConvert.SerializeObject(child1Results)
+        });
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        _mockScoringService
+            .Setup(s => s.GetScoringSystemFromCacheAsync(It.IsAny<Series>()))
+            .ReturnsAsync(new ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                ScoreCodes = new List<ScoreCode>(),
+                EffectiveDiscardMethod = Api.Enumerations.DiscardMethod.PreserveChildSeriesDiscards
+            });
+        Series scoredSeries = null;
+        _mockCalculator
+            .Setup(c => c.CalculateResults(It.Is<Series>(s => s.Id == summary.Id)))
+            .Callback<Series>(s => scoredSeries = s)
+            .Returns(new SeriesResults { Results = new Dictionary<Competitor, SeriesCompetitorResults>() });
+
+        // Act
+        await _service.UpdateSeriesResults(summary.Id, "test", calculateParents: false);
+
+        // Assert
+        Assert.NotNull(scoredSeries);
+        var race1 = scoredSeries.Races.Single(r => r.Id == child1RaceId);
+        var race2 = scoredSeries.Races.Single(r => r.Id != child1RaceId);
+        Assert.Equal(child1.Id, race1.SourceChildSeriesId);
+        Assert.Equal(child2.Id, race2.SourceChildSeriesId);
+        Assert.Contains(competitor.Id, race1.CompetitorIdsDiscardedInChild);
+        Assert.Empty(race2.CompetitorIdsDiscardedInChild);
+    }
+
+    [Fact]
+    public async Task UpdateSeriesResults_SummaryUsingChildScores_AddsMissedEveryRaceScoreForAbsentCompetitors()
+    {
+        // Arrange: a summary of two child series; each child has a different competitor.
+        var clubId = _context.Clubs.First().Id;
+        var season = _context.Seasons.First();
+        var fleet = _context.Fleets.First();
+        var competitorA = _context.Competitors.First();
+        var competitorB = new Database.Entities.Competitor
+        {
+            Id = Guid.NewGuid(), ClubId = clubId, Name = "Second", SailNumber = "2", IsActive = true
+        };
+        _context.Competitors.Add(competitorB);
+
+        Database.Entities.Series MakeChild(string name, Guid competitorId)
+        {
+            var race = new Database.Entities.Race
+            {
+                Id = Guid.NewGuid(), ClubId = clubId, Name = $"{name} race", Fleet = fleet,
+                Date = new DateTime(2026, 6, 6),
+                Scores = new List<Database.Entities.Score>()
+            };
+            race.Scores.Add(new Database.Entities.Score
+            {
+                Id = Guid.NewGuid(), CompetitorId = competitorId, RaceId = race.Id, Place = 1
+            });
+            var child = new Database.Entities.Series
+            {
+                Id = Guid.NewGuid(), ClubId = clubId, Name = name, UrlName = name, Season = season,
+                Type = Database.Entities.SeriesType.Standard,
+                RaceSeries = new List<Database.Entities.SeriesRace>(),
+                ChildLinks = new List<Database.Entities.SeriesToSeriesLink>(),
+                ParentLinks = new List<Database.Entities.SeriesToSeriesLink>()
+            };
+            child.RaceSeries.Add(new Database.Entities.SeriesRace { Race = race, Series = child });
+            _context.HistoricalResults.Add(new Database.Entities.HistoricalResults
+            {
+                Id = Guid.NewGuid(), SeriesId = child.Id, IsCurrent = true, Created = DateTime.UtcNow,
+                Results = Newtonsoft.Json.JsonConvert.SerializeObject(new FlatResults
+                {
+                    CalculatedScores = new[]
+                    {
+                        new FlatSeriesScore { CompetitorId = competitorId, Rank = 1, TotalScore = 1m }
+                    }
+                })
+            });
+            return child;
+        }
+
+        var child1 = MakeChild("child-1", competitorA.Id);
+        var child2 = MakeChild("child-2", competitorB.Id);
+        var summary = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(), ClubId = clubId, Name = "Summary", UrlName = "summary", Season = season,
+            Type = Database.Entities.SeriesType.Summary,
+            SummaryRollupMode = Api.Enumerations.SummaryRollupMode.ChildScoreAsRace,
+            RaceSeries = new List<Database.Entities.SeriesRace>(),
+            ChildLinks = new List<Database.Entities.SeriesToSeriesLink>(),
+            ParentLinks = new List<Database.Entities.SeriesToSeriesLink>()
+        };
+        _context.Series.AddRange(child1, child2, summary);
+        _context.SeriesToSeriesLinks.AddRange(
+            new Database.Entities.SeriesToSeriesLink { ParentSeriesId = summary.Id, ChildSeriesId = child1.Id },
+            new Database.Entities.SeriesToSeriesLink { ParentSeriesId = summary.Id, ChildSeriesId = child2.Id });
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var system = new ScoringSystem { Id = Guid.NewGuid(), ScoreCodes = new List<ScoreCode>() };
+        _mockScoringService
+            .Setup(s => s.GetScoringSystemFromCacheAsync(It.IsAny<Series>()))
+            .ReturnsAsync(system);
+        _mockScoringService
+            .Setup(s => s.GetScoringSystemsFromCacheAsync(It.IsAny<IList<Series>>()))
+            .ReturnsAsync((IList<Series> list) => list.ToDictionary(s => s.Id, _ => system));
+        _mockCalculator
+            .Setup(c => c.CalculateAbsentCompetitorScore(It.IsAny<Series>()))
+            .Returns(5m);
+        Series scoredSeries = null;
+        _mockCalculator
+            .Setup(c => c.CalculateResults(It.Is<Series>(s => s.Id == summary.Id)))
+            .Callback<Series>(s => scoredSeries = s)
+            .Returns(new SeriesResults { Results = new Dictionary<Competitor, SeriesCompetitorResults>() });
+
+        // Act
+        await _service.UpdateSeriesResults(summary.Id, "test", calculateParents: false);
+
+        // Assert
+        Assert.NotNull(scoredSeries);
+        var race1 = scoredSeries.Races.Single(r => r.Id == child1.Id);
+        var race2 = scoredSeries.Races.Single(r => r.Id == child2.Id);
+        var absentInRace1 = race1.Scores.Single(s => s.CompetitorId == competitorB.Id);
+        var absentInRace2 = race2.Scores.Single(s => s.CompetitorId == competitorA.Id);
+        Assert.Equal("DNC", absentInRace1.Code);
+        Assert.Equal(5m, absentInRace1.PresetScoreValue);
+        Assert.Equal(5m, absentInRace2.PresetScoreValue);
+        Assert.Equal(1m, race1.Scores.Single(s => s.CompetitorId == competitorA.Id).PresetScoreValue);
+        _mockScoringService.Verify(
+            s => s.GetScoringSystemsFromCacheAsync(It.Is<IList<Series>>(l => l.Count == 2)),
+            Times.Once);
+    }
+
 
 }

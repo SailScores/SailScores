@@ -25,5 +25,7 @@ public class ScoreCode
     public bool? AdjustOtherScores { get; set; }
     // high point: count as participation even if not CameToStart
     public bool? CountAsParticipation { get; set; }
+    // Averaging calculators: include this score in the average? Null uses the calculator's rule.
+    public bool? IncludeInAverage { get; set; }
 
 }

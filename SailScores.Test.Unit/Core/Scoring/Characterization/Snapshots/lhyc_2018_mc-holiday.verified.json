@@ -1,0 +1,464 @@
+{
+  "ScoringSystemName": "LHYC Standard Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 3,
+  "NumberOfSailedRaces": 9,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2018-05-26 5-26 R1",
+    "2. 2018-05-26 5-26 R2",
+    "1. 2018-05-28 5-28",
+    "1. 2018-06-30 6-30 R1�",
+    "2. 2018-06-30 6-30 R2",
+    "1. 2018-07-04 7-4",
+    "1. 2018-09-01 9-1 R1",
+    "1. 2018-09-02 9-2",
+    "1. 2018-09-03 9-3"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompGR",
+      "SailNumber": "2169",
+      "Total": "6",
+      "TotalIncludingDiscards": "10",
+      "Columns": {
+        "preDiscardTotal": "10"
+      },
+      "Scores": "(1) | (1) | (2) | 1 | 1 | SB 1 | 1 | 1 | SB 1"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompNCRA",
+      "SailNumber": "2604",
+      "Total": "20.4",
+      "TotalIncludingDiscards": "52.4",
+      "Columns": {
+        "preDiscardTotal": "52.4"
+      },
+      "Scores": "3 | 5 | 4 | 2 | (9) | (DNC 13) | (10) | RC 3.4 | 3"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompKJ2",
+      "SailNumber": "1847",
+      "Total": "21",
+      "TotalIncludingDiscards": "43",
+      "Columns": {
+        "preDiscardTotal": "43"
+      },
+      "Scores": "(9) | 4 | (6) | (7) | 5 | 1 | 4 | 3 | 4"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompCB",
+      "SailNumber": "2644",
+      "Total": "31.6",
+      "TotalIncludingDiscards": "79.6",
+      "Columns": {
+        "preDiscardTotal": "79.6"
+      },
+      "Scores": "RC 5.3 | RC 5.3 | 1 | (DNC 18) | (DNC 15) | DNC 13 | 6 | (DNC 15) | 1"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompFJ3",
+      "SailNumber": "2144",
+      "Total": "31.9",
+      "TotalIncludingDiscards": "68.9",
+      "Columns": {
+        "preDiscardTotal": "68.9"
+      },
+      "Scores": "2 | (14) | 8 | SB 5.3 | SB 5.3 | SB 5.3 | (13) | 6 | (10)"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "32",
+      "TotalIncludingDiscards": "88",
+      "Columns": {
+        "preDiscardTotal": "88"
+      },
+      "Scores": "7 | 8 | 9 | 4 | 2 | 2 | (DNC 18) | (DNC 15) | (DNC 23)"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompMB",
+      "SailNumber": "1894",
+      "Total": "34.6",
+      "TotalIncludingDiscards": "80.6",
+      "Columns": {
+        "preDiscardTotal": "80.6"
+      },
+      "Scores": "5 | 3 | 7 | SB 5.8 | SB 5.8 | (DNC 13) | (DNC 18) | (DNC 15) | 8"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompFJ",
+      "SailNumber": "2511",
+      "Total": "36",
+      "TotalIncludingDiscards": "92",
+      "Columns": {
+        "preDiscardTotal": "92"
+      },
+      "Scores": "4 | 10 | DNC 13 | 3 | 3 | 3 | (DNC 18) | (DNC 15) | (DNC 23)"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompMJ",
+      "SailNumber": "2161",
+      "Total": "36",
+      "TotalIncludingDiscards": "74",
+      "Columns": {
+        "preDiscardTotal": "74"
+      },
+      "Scores": "6 | 7 | (DNC 13) | 6 | 7 | (DNC 13) | 3 | 7 | (12)"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "43",
+      "TotalIncludingDiscards": "85",
+      "Columns": {
+        "preDiscardTotal": "85"
+      },
+      "Scores": "(13) | (15) | 5 | 9 | 4 | 6 | 11 | 8 | (14)"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompCJ3",
+      "SailNumber": "1933",
+      "Total": "49.2",
+      "TotalIncludingDiscards": "101.2",
+      "Columns": {
+        "preDiscardTotal": "101.2"
+      },
+      "Scores": "(DNC 17) | (DNC 17) | DNC 13 | (DNC 18) | DNC 15 | RC 8.2 | 5 | 2 | 6"
+    },
+    {
+      "Rank": 12,
+      "Name": "CompWE",
+      "SailNumber": "2652",
+      "Total": "53",
+      "TotalIncludingDiscards": "101",
+      "Columns": {
+        "preDiscardTotal": "101"
+      },
+      "Scores": "(15) | 9 | DNC 13 | (DNC 18) | (DNC 15) | DNC 13 | 2 | 5 | 11"
+    },
+    {
+      "Rank": 13,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "55",
+      "TotalIncludingDiscards": "96",
+      "Columns": {
+        "preDiscardTotal": "96"
+      },
+      "Scores": "12 | (13) | (DNC 13) | 10 | 6 | 7 | 7 | (DNC 15) | 13"
+    },
+    {
+      "Rank": 14,
+      "Name": "CompBJ2",
+      "SailNumber": "1687",
+      "Total": "55.9",
+      "TotalIncludingDiscards": "104.9",
+      "Columns": {
+        "preDiscardTotal": "104.9"
+      },
+      "Scores": "(DNC 17) | (DNC 17) | DNC 13 | RC 9.3 | RC 9.3 | DNC 13 | RC 9.3 | (DNC 15) | 2"
+    },
+    {
+      "Rank": 15,
+      "Name": "CompND",
+      "SailNumber": "TC25",
+      "Total": "56",
+      "TotalIncludingDiscards": "115",
+      "Columns": {
+        "preDiscardTotal": "115"
+      },
+      "Scores": "8 | 2 | 3 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 16,
+      "Name": "CompBJ3",
+      "SailNumber": "1850",
+      "Total": "56",
+      "TotalIncludingDiscards": "105",
+      "Columns": {
+        "preDiscardTotal": "105"
+      },
+      "Scores": "(DNC 17) | (DNC 17) | DNC 13 | 5 | (DNC 15) | 5 | 9 | DNC 15 | 9"
+    },
+    {
+      "Rank": 17,
+      "Name": "CompSC",
+      "SailNumber": "2091",
+      "Total": "65",
+      "TotalIncludingDiscards": "117",
+      "Columns": {
+        "preDiscardTotal": "117"
+      },
+      "Scores": "(DNC 17) | (DNC 17) | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | 8 | 9 | 7"
+    },
+    {
+      "Rank": 18,
+      "Name": "CompCC",
+      "SailNumber": "TC55",
+      "Total": "68",
+      "TotalIncludingDiscards": "120",
+      "Columns": {
+        "preDiscardTotal": "120"
+      },
+      "Scores": "(DNC 17) | (DNC 17) | DNC 13 | 13 | 11 | 4 | 12 | DNC 15 | (18)"
+    },
+    {
+      "Rank": 19,
+      "Name": "CompBP",
+      "SailNumber": "1474",
+      "Total": "70.6",
+      "TotalIncludingDiscards": "119.6",
+      "Columns": {
+        "preDiscardTotal": "119.6"
+      },
+      "Scores": "10 | 12 | (DNC 13) | (DNC 18) | 10 | DNC 13 | (DNC 18) | DNE 14 | RC 11.6"
+    },
+    {
+      "Rank": 20,
+      "Name": "CompKA",
+      "SailNumber": "TC67",
+      "Total": "78",
+      "TotalIncludingDiscards": "131",
+      "Columns": {
+        "preDiscardTotal": "131"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | 5"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompRJ3",
+      "SailNumber": "TC10",
+      "Total": "79",
+      "TotalIncludingDiscards": "138",
+      "Columns": {
+        "preDiscardTotal": "138"
+      },
+      "Scores": "DNC 17 | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | 4 | (DNC 23)"
+    },
+    {
+      "Rank": 22,
+      "Name": "CompBK",
+      "SailNumber": "TC36",
+      "Total": "80",
+      "TotalIncludingDiscards": "138",
+      "Columns": {
+        "preDiscardTotal": "138"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | 11 | DNC 15 | 9 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 23,
+      "Name": "CompBJ",
+      "SailNumber": "TC08",
+      "Total": "80",
+      "TotalIncludingDiscards": "129",
+      "Columns": {
+        "preDiscardTotal": "129"
+      },
+      "Scores": "(DNC 17) | (DNC 17) | 11 | 12 | (DNC 15) | DNC 13 | 14 | DNC 15 | 15"
+    },
+    {
+      "Rank": 24,
+      "Name": "CompSJ2",
+      "SailNumber": "TC37",
+      "Total": "81",
+      "TotalIncludingDiscards": "139",
+      "Columns": {
+        "preDiscardTotal": "139"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | 8 | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 25,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "81",
+      "TotalIncludingDiscards": "134",
+      "Columns": {
+        "preDiscardTotal": "134"
+      },
+      "Scores": "(16) | 16 | DNC 13 | (DNC 18) | DNC 15 | 11 | 15 | 11 | (19)"
+    },
+    {
+      "Rank": 26,
+      "Name": "CompNB",
+      "SailNumber": "2599",
+      "Total": "81",
+      "TotalIncludingDiscards": "140",
+      "Columns": {
+        "preDiscardTotal": "140"
+      },
+      "Scores": "14 | 11 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 27,
+      "Name": "CompTL",
+      "SailNumber": "TC18",
+      "Total": "82",
+      "TotalIncludingDiscards": "140",
+      "Columns": {
+        "preDiscardTotal": "140"
+      },
+      "Scores": "DNC 17 | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | 8 | (DNC 18) | 12 | (DNF 22)"
+    },
+    {
+      "Rank": 28,
+      "Name": "CompAAC",
+      "SailNumber": "1664",
+      "Total": "82.8",
+      "TotalIncludingDiscards": "136.8",
+      "Columns": {
+        "preDiscardTotal": "136.8"
+      },
+      "Scores": "(DNC 17) | (DNC 17) | DNC 13 | 16 | 12 | DNC 13 | SB 13.8 | DNC 15 | (20)"
+    },
+    {
+      "Rank": 29,
+      "Name": "CompMKDB",
+      "SailNumber": "2121",
+      "Total": "83",
+      "TotalIncludingDiscards": "142",
+      "Columns": {
+        "preDiscardTotal": "142"
+      },
+      "Scores": "DNC 17 | DNC 17 | DNC 13 | (DNC 18) | 8 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 30,
+      "Name": "CompWR",
+      "SailNumber": "TC70",
+      "Total": "85",
+      "TotalIncludingDiscards": "144",
+      "Columns": {
+        "preDiscardTotal": "144"
+      },
+      "Scores": "DNC 17 | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | 10 | (DNC 23)"
+    },
+    {
+      "Rank": 31,
+      "Name": "CompNM",
+      "SailNumber": "1337",
+      "Total": "86",
+      "TotalIncludingDiscards": "144",
+      "Columns": {
+        "preDiscardTotal": "144"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | 15 | 13 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 32,
+      "Name": "CompPI",
+      "SailNumber": "TC11",
+      "Total": "87",
+      "TotalIncludingDiscards": "146",
+      "Columns": {
+        "preDiscardTotal": "146"
+      },
+      "Scores": "DNC 17 | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | 10 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 33,
+      "Name": "CompSX",
+      "SailNumber": "TC??",
+      "Total": "87",
+      "TotalIncludingDiscards": "146",
+      "Columns": {
+        "preDiscardTotal": "146"
+      },
+      "Scores": "DNC 17 | DNC 17 | 10 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 34,
+      "Name": "CompAB",
+      "SailNumber": "TC51",
+      "Total": "87",
+      "TotalIncludingDiscards": "145",
+      "Columns": {
+        "preDiscardTotal": "145"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | 14 | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 35,
+      "Name": "CompGG",
+      "SailNumber": "TC16",
+      "Total": "87.6",
+      "TotalIncludingDiscards": "145.6",
+      "Columns": {
+        "preDiscardTotal": "145.6"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | SB 14.6 | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 36,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "89",
+      "TotalIncludingDiscards": "142",
+      "Columns": {
+        "preDiscardTotal": "142"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | 16"
+    },
+    {
+      "Rank": 37,
+      "Name": "CompAD",
+      "SailNumber": "1262",
+      "Total": "89",
+      "TotalIncludingDiscards": "147",
+      "Columns": {
+        "preDiscardTotal": "147"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | 16 | DNC 15 | (DNC 23)"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "90",
+      "TotalIncludingDiscards": "143",
+      "Columns": {
+        "preDiscardTotal": "143"
+      },
+      "Scores": "(DNC 17) | DNC 17 | DNC 13 | (DNC 18) | DNC 15 | DNC 13 | (DNC 18) | DNC 15 | 17"
+    },
+    {
+      "Rank": 39,
+      "Name": "CompCA2",
+      "SailNumber": "1850",
+      "Total": "90",
+      "TotalIncludingDiscards": "149",
+      "Columns": {
+        "preDiscardTotal": "149"
+      },
+      "Scores": "GST 17 | GST 17 | DNC 13 | (GST 18) | GST 15 | DNC 13 | (DNC 18) | DNC 15 | (DNC 23)"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats that came to starting area + 2: Did not come to starting area",
+    "DNE": "Number of boats that came to starting area + 1; not excludable: Disqualification that is not excludable",
+    "DNF": "Number of boats that came to starting area + 1: Started but did not finish",
+    "GST": "Number of boats that came to starting area + 2: Unknown, unregistered or guest skipper",
+    "RC": "Average of non-discarded results: Race Committee duty",
+    "SB": "Average of non-discarded results: Safety boat duty"
+  }
+}

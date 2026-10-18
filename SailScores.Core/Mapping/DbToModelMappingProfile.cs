@@ -49,11 +49,15 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.Race, Model.Race>()
                 .ForMember(d => d.Series, o => o.MapFrom(s => s.SeriesRaces.Select(f => f.Series)))
                 .ForMember(d => d.Season, o => o.Ignore())
+                .ForMember(d => d.SourceChildSeriesId, o => o.Ignore())
+                .ForMember(d => d.CompetitorIdsDiscardedInChild, o => o.Ignore())
                 .ReverseMap()
                 .ForMember(d => d.SeriesRaces, o => o.Ignore());
             CreateMap<Db.Score, Model.Score>()
                 .ForMember(d => d.Competitor, o => o.Ignore())
+                .ForMember(d => d.PresetScoreValue, o => o.Ignore())
                 .ReverseMap()
+                .ForSourceMember(s => s.PresetScoreValue, opt => opt.DoNotValidate())
                 // CorrectedTime and HandicapValue are computed at scoring time; not persisted.
                 .ForSourceMember(s => s.CorrectedTime, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.HandicapValue, opt => opt.DoNotValidate());
@@ -79,7 +83,14 @@ namespace SailScores.Core.Mapping
 
             CreateMap<Db.ScoringSystem, Model.ScoringSystem>()
                 .ForMember(d => d.InheritedScoreCodes, o => o.Ignore())
-                .ReverseMap();
+                // Settings JSON and inherited values are converted by ScoringService, not AutoMapper.
+                .ForMember(d => d.Settings, o => o.Ignore())
+                .ForMember(d => d.EffectiveSettings, o => o.Ignore())
+                .ForMember(d => d.EffectiveDiscardMethod, o => o.Ignore())
+                .ReverseMap()
+                // Model value is resolved from the root system; only migrations/scripts set the column.
+                .ForMember(d => d.CalculatorType, o => o.Ignore())
+                .ForMember(d => d.Settings, o => o.Ignore());
             CreateMap<Db.ScoreCodeGroup, Model.ScoreCodeGroup>()
                 .ConstructUsing(s => new Model.ScoreCodeGroup(s))
                 .ReverseMap()

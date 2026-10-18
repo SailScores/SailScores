@@ -1,0 +1,94 @@
+{
+  "ScoringSystemName": "LHYC Standard Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 5,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2025-09-20",
+    "2. 2025-09-20",
+    "3. 2025-09-20",
+    "1. 2025-09-21",
+    "2. 2025-09-21"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "4.5",
+      "TotalIncludingDiscards": "6.5",
+      "Columns": {
+        "preDiscardTotal": "6.5"
+      },
+      "Scores": "1 | (2) | 1 | 1 | 1:1.5"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "6",
+      "TotalIncludingDiscards": "11",
+      "Columns": {
+        "preDiscardTotal": "11"
+      },
+      "Scores": "(DNC 5) | 1 | 2 | SB 1.5 | SB 1.5"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "12",
+      "TotalIncludingDiscards": "16",
+      "Columns": {
+        "preDiscardTotal": "16"
+      },
+      "Scores": "3 | 3 | (4) | 3 | 3"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "15.5",
+      "TotalIncludingDiscards": "22.5",
+      "Columns": {
+        "preDiscardTotal": "22.5"
+      },
+      "Scores": "DNC 5 | (DNC 7) | DNC 7 | 2 | TIE 1.5"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "17",
+      "TotalIncludingDiscards": "22",
+      "Columns": {
+        "preDiscardTotal": "22"
+      },
+      "Scores": "2 | (5) | 5 | DNC 5 | DNC 5"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "17",
+      "TotalIncludingDiscards": "22",
+      "Columns": {
+        "preDiscardTotal": "22"
+      },
+      "Scores": "(DNC 5) | 4 | 3 | DNC 5 | DNC 5"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats that came to starting area + 2: Did not come to starting area",
+    "SB": "Average of non-discarded results: Safety boat duty",
+    "TIE": "Average of tied places: Tied with previous"
+  }
+}

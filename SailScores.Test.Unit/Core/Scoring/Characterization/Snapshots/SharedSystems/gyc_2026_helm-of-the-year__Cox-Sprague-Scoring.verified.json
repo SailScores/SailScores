@@ -1,0 +1,160 @@
+{
+  "ScoringSystemName": "Cox-Sprague Scoring",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 0,
+  "NumberOfSailedRaces": 3,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": false,
+  "PercentRequired": "0",
+  "Columns": [
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2026-01-04 Winter 1",
+    "1. 2026-01-18 Winter 2",
+    "1. 2026-02-01 Winter 3 [Abandoned]",
+    "1. 2026-02-15 Winter 4 - Livett Cup",
+    "1. 2026-03-01 Winter 5 [Scheduled]",
+    "1. 2026-03-15 Spring 1 [Scheduled]",
+    "1. 2026-03-22 Spring 2 [Scheduled]",
+    "1. 2026-03-29 Spring 3 - The Baker Cup [Scheduled]",
+    "1. 2026-04-18 Spring 4 [Scheduled]",
+    "1. 2026-05-17 Spring 5 - Windas Cup [Scheduled]"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompJB2",
+      "SailNumber": "JB",
+      "Total": "100",
+      "Average": "100",
+      "PointsEarned": "109",
+      "PointsPossible": "109",
+      "ParticipationPercent": "66.6666666667",
+      "Columns": {
+        "participation": "66.6666666667"
+      },
+      "Scores": "RCD 0/31 | 1:66/66 | - | 1:43/43 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompMM",
+      "SailNumber": "MM",
+      "Total": "90.9090909091",
+      "Average": "90.9090909091",
+      "PointsEarned": "60",
+      "PointsPossible": "66",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC null | 2:60/66 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompLF",
+      "SailNumber": "LF",
+      "Total": "84.8484848485",
+      "Average": "84.8484848485",
+      "PointsEarned": "56",
+      "PointsPossible": "66",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC null | 3:56/66 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompDB",
+      "SailNumber": "DB",
+      "Total": "83.5714285714",
+      "Average": "83.5714285714",
+      "PointsEarned": "117",
+      "PointsPossible": "140",
+      "ParticipationPercent": "100",
+      "Columns": {
+        "participation": "100"
+      },
+      "Scores": "1:31/31 | 5:49/66 | - | 2:37/43 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompAF",
+      "SailNumber": "AF",
+      "Total": "80.6451612903",
+      "Average": "80.6451612903",
+      "PointsEarned": "25",
+      "PointsPossible": "31",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "2:25/31 | RCD 0/66 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompJG",
+      "SailNumber": "JG",
+      "Total": "78.7878787879",
+      "Average": "78.7878787879",
+      "PointsEarned": "52",
+      "PointsPossible": "66",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC null | 4:52/66 | - | DNC null | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompTL",
+      "SailNumber": "TL",
+      "Total": "76.7441860465",
+      "Average": "76.7441860465",
+      "PointsEarned": "33",
+      "PointsPossible": "43",
+      "ParticipationPercent": "33.3333333333",
+      "Columns": {
+        "participation": "33.3333333333"
+      },
+      "Scores": "DNC null | DNC null | - | 3:33/43 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompSC",
+      "SailNumber": "SC",
+      "Total": "65.1376146789",
+      "Average": "65.1376146789",
+      "PointsEarned": "71",
+      "PointsPossible": "109",
+      "ParticipationPercent": "66.6666666667",
+      "Columns": {
+        "participation": "66.6666666667"
+      },
+      "Scores": "DNC null | RET 42/66 | - | 4:29/43 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompAN",
+      "SailNumber": "AN",
+      "Total": "64.9484536082",
+      "Average": "64.9484536082",
+      "PointsEarned": "63",
+      "PointsPossible": "97",
+      "ParticipationPercent": "66.6666666667",
+      "Columns": {
+        "participation": "66.6666666667"
+      },
+      "Scores": "3:21/31 | DNF 42/66 | - | DNC null | - | - | - | - | - | -"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Excluded: Did not come to starting area",
+    "DNF": "One greater than # came to start.: Started but did not finish",
+    "RCD": "Excluded: Did not come to starting area",
+    "RET": "One greater than # came to start.: Retired"
+  }
+}

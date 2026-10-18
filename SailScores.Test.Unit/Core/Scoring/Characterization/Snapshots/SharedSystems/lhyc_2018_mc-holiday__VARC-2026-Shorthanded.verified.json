@@ -1,0 +1,385 @@
+{
+  "ScoringSystemName": "VARC 2026 Shorthanded",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 6,
+  "NumberOfSailedRaces": 9,
+  "IsPreliminary": false,
+  "IsPercentSystem": true,
+  "LowerScoreWins": false,
+  "Columns": [
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2018-05-26 5-26 R1",
+    "2. 2018-05-26 5-26 R2",
+    "1. 2018-05-28 5-28",
+    "1. 2018-06-30 6-30 R1�",
+    "2. 2018-06-30 6-30 R2",
+    "1. 2018-07-04 7-4",
+    "1. 2018-09-01 9-1 R1",
+    "1. 2018-09-02 9-2",
+    "1. 2018-09-03 9-3"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompGR",
+      "SailNumber": "2169",
+      "Total": "300",
+      "TotalIncludingDiscards": "699",
+      "PointsEarned": "300",
+      "Scores": "1:100/100 | 1:100/100 | (2:99/100) | 1:100/100 | (1:100/100) | (SB 0/100) | (1:100/100) | (1:100/100) | (SB 0/100)"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompCB",
+      "SailNumber": "2644",
+      "Total": "295",
+      "TotalIncludingDiscards": "295",
+      "PointsEarned": "295",
+      "Scores": "(RC 0/100) | (RC 0/100) | 1:100/100 | (DNC 0) | (DNC 0) | (DNC 0) | 6:95/100 | (DNC 0) | 1:100/100"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompKJ2",
+      "SailNumber": "1847",
+      "Total": "295",
+      "TotalIncludingDiscards": "866",
+      "PointsEarned": "295",
+      "Scores": "(9:92/100) | 4:97/100 | (6:95/100) | (7:94/100) | (5:96/100) | 1:100/100 | (4:97/100) | 3:98/100 | (4:97/100)"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "295",
+      "TotalIncludingDiscards": "575",
+      "PointsEarned": "295",
+      "Scores": "(7:94/100) | (8:94/100) | (9:92/100) | 4:97/100 | 2:99/100 | 2:99/100 | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompNCRA",
+      "SailNumber": "2604",
+      "Total": "295",
+      "TotalIncludingDiscards": "671",
+      "PointsEarned": "295",
+      "Scores": "3:98/100 | (5:96/100) | (4:97/100) | 2:99/100 | (9:92/100) | (DNC 0) | (10:91/100) | (RC 0/100) | 3:98/100"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompFJ",
+      "SailNumber": "2511",
+      "Total": "294",
+      "TotalIncludingDiscards": "483",
+      "PointsEarned": "294",
+      "Scores": "(4:97/100) | (10:92/100) | (DNC 0) | 3:98/100 | 3:98/100 | 3:98/100 | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompND",
+      "SailNumber": "TC25",
+      "Total": "290",
+      "TotalIncludingDiscards": "290",
+      "PointsEarned": "290",
+      "Scores": "8:93/100 | 2:99/100 | 3:98/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompCJ3",
+      "SailNumber": "1933",
+      "Total": "290",
+      "TotalIncludingDiscards": "290",
+      "PointsEarned": "290",
+      "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (RC 0/100) | 5:96/100 | 2:99/100 | 6:95/100"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompWE",
+      "SailNumber": "2652",
+      "Total": "288",
+      "TotalIncludingDiscards": "465",
+      "PointsEarned": "288",
+      "Scores": "(15:87/100) | 9:93/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 2:99/100 | 5:96/100 | (11:90/100)"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompMB",
+      "SailNumber": "1894",
+      "Total": "288",
+      "TotalIncludingDiscards": "381",
+      "PointsEarned": "288",
+      "Scores": "5:96/100 | 3:98/100 | 7:94/100 | (SB 0/100) | (SB 0/100) | (DNC 0) | (DNC 0) | (DNC 0) | (8:93/100)"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompMJ",
+      "SailNumber": "2161",
+      "Total": "288",
+      "TotalIncludingDiscards": "660",
+      "PointsEarned": "288",
+      "Scores": "6:95/100 | 7:95/100 | (DNC 0) | (6:95/100) | (7:94/100) | (DNC 0) | 3:98/100 | (7:94/100) | (12:89/100)"
+    },
+    {
+      "Rank": 12,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "288",
+      "TotalIncludingDiscards": "826",
+      "PointsEarned": "288",
+      "Scores": "(13:89/100) | (15:87/100) | 5:96/100 | (9:92/100) | 4:97/100 | 6:95/100 | (11:90/100) | (8:93/100) | (14:87/100)"
+    },
+    {
+      "Rank": 13,
+      "Name": "CompFJ3",
+      "SailNumber": "2144",
+      "Total": "287",
+      "TotalIncludingDiscards": "554",
+      "PointsEarned": "287",
+      "Scores": "2:99/100 | (14:88/100) | 8:93/100 | (SB 0/100) | (SB 0/100) | (SB 0/100) | (13:88/100) | 6:95/100 | (10:91/100)"
+    },
+    {
+      "Rank": 14,
+      "Name": "CompBJ3",
+      "SailNumber": "1850",
+      "Total": "284",
+      "TotalIncludingDiscards": "376",
+      "PointsEarned": "284",
+      "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | 5:96/100 | (DNC 0) | 5:96/100 | 9:92/100 | (DNC 0) | (9:92/100)"
+    },
+    {
+      "Rank": 15,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "283",
+      "TotalIncludingDiscards": "641",
+      "PointsEarned": "283",
+      "Scores": "(12:90/100) | (13:89/100) | (DNC 0) | (10:91/100) | 6:95/100 | 7:94/100 | 7:94/100 | (DNC 0) | (13:88/100)"
+    },
+    {
+      "Rank": 16,
+      "Name": "CompSC",
+      "SailNumber": "2091",
+      "Total": "279",
+      "TotalIncludingDiscards": "279",
+      "PointsEarned": "279",
+      "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 8:93/100 | 9:92/100 | 7:94/100"
+    },
+    {
+      "Rank": 17,
+      "Name": "CompCC",
+      "SailNumber": "TC55",
+      "Total": "276",
+      "TotalIncludingDiscards": "447",
+      "PointsEarned": "276",
+      "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (13:88/100) | 11:90/100 | 4:97/100 | 12:89/100 | (DNC 0) | (18:83/100)"
+    },
+    {
+      "Rank": 18,
+      "Name": "CompBP",
+      "SailNumber": "1474",
+      "Total": "269",
+      "TotalIncludingDiscards": "359",
+      "PointsEarned": "269",
+      "Scores": "10:91/100 | (12:90/100) | (DNC 0) | (DNC 0) | 10:91/100 | (DNC 0) | (DNC 0) | DNE 87/100 | (RC 0/100)"
+    },
+    {
+      "Rank": 19,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "266",
+      "TotalIncludingDiscards": "520",
+      "PointsEarned": "266",
+      "Scores": "16:86/100 | (16:86/100) | (DNC 0) | (DNC 0) | (DNC 0) | 11:90/100 | (15:86/100) | 11:90/100 | (19:82/100)"
+    },
+    {
+      "Rank": 20,
+      "Name": "CompBJ",
+      "SailNumber": "TC08",
+      "Total": "266",
+      "TotalIncludingDiscards": "352",
+      "PointsEarned": "266",
+      "Scores": "(DNC 0) | (DNC 0) | 11:90/100 | 12:89/100 | (DNC 0) | (DNC 0) | 14:87/100 | (DNC 0) | (15:86/100)"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompTL",
+      "SailNumber": "TC18",
+      "Total": "261",
+      "TotalIncludingDiscards": "261",
+      "PointsEarned": "261",
+      "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 8:93/100 | (DNC 0) | 12:89/100 | DNF 79/100"
+    },
+    {
+      "Rank": 22,
+      "Name": "CompAAC",
+      "SailNumber": "1664",
+      "Total": "255",
+      "TotalIncludingDiscards": "255",
+      "PointsEarned": "255",
+      "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | 16:85/100 | 12:89/100 | (DNC 0) | (SB 0/100) | (DNC 0) | 20:81/100"
+    },
+    {
+      "Rank": 23,
+      "Name": "CompBK",
+      "SailNumber": "TC36",
+      "Total": "182",
+      "TotalIncludingDiscards": "182",
+      "PointsEarned": "182",
+      "Scores": "DNC 0 | (DNC 0) | (DNC 0) | 11:90/100 | (DNC 0) | 9:92/100 | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 24,
+      "Name": "CompNB",
+      "SailNumber": "2599",
+      "Total": "179",
+      "TotalIncludingDiscards": "179",
+      "PointsEarned": "179",
+      "Scores": "14:88/100 | 11:91/100 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 25,
+      "Name": "CompNM",
+      "SailNumber": "1337",
+      "Total": "174",
+      "TotalIncludingDiscards": "174",
+      "PointsEarned": "174",
+      "Scores": "DNC 0 | (DNC 0) | (DNC 0) | 15:86/100 | 13:88/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 26,
+      "Name": "CompBJ2",
+      "SailNumber": "1687",
+      "Total": "99",
+      "TotalIncludingDiscards": "99",
+      "PointsEarned": "99",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (RC 0/100) | (RC 0/100) | (DNC 0) | (RC 0/100) | (DNC 0) | 2:99/100"
+    },
+    {
+      "Rank": 27,
+      "Name": "CompRJ3",
+      "SailNumber": "TC10",
+      "Total": "97",
+      "TotalIncludingDiscards": "97",
+      "PointsEarned": "97",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 4:97/100 | (DNC 0)"
+    },
+    {
+      "Rank": 28,
+      "Name": "CompKA",
+      "SailNumber": "TC67",
+      "Total": "96",
+      "TotalIncludingDiscards": "96",
+      "PointsEarned": "96",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 5:96/100"
+    },
+    {
+      "Rank": 29,
+      "Name": "CompMKDB",
+      "SailNumber": "2121",
+      "Total": "93",
+      "TotalIncludingDiscards": "93",
+      "PointsEarned": "93",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | 8:93/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 30,
+      "Name": "CompSJ2",
+      "SailNumber": "TC37",
+      "Total": "93",
+      "TotalIncludingDiscards": "93",
+      "PointsEarned": "93",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | 8:93/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 31,
+      "Name": "CompWR",
+      "SailNumber": "TC70",
+      "Total": "91",
+      "TotalIncludingDiscards": "91",
+      "PointsEarned": "91",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 10:91/100 | (DNC 0)"
+    },
+    {
+      "Rank": 32,
+      "Name": "CompPI",
+      "SailNumber": "TC11",
+      "Total": "91",
+      "TotalIncludingDiscards": "91",
+      "PointsEarned": "91",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | 10:91/100 | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 33,
+      "Name": "CompSX",
+      "SailNumber": "TC??",
+      "Total": "91",
+      "TotalIncludingDiscards": "91",
+      "PointsEarned": "91",
+      "Scores": "DNC 0 | DNC 0 | 10:91/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 34,
+      "Name": "CompAB",
+      "SailNumber": "TC51",
+      "Total": "87",
+      "TotalIncludingDiscards": "87",
+      "PointsEarned": "87",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | 14:87/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 35,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "85",
+      "TotalIncludingDiscards": "85",
+      "PointsEarned": "85",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 16:85/100"
+    },
+    {
+      "Rank": 36,
+      "Name": "CompAD",
+      "SailNumber": "1262",
+      "Total": "85",
+      "TotalIncludingDiscards": "85",
+      "PointsEarned": "85",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 16:85/100 | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 37,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "84",
+      "TotalIncludingDiscards": "84",
+      "PointsEarned": "84",
+      "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 17:84/100"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompCA2",
+      "SailNumber": "1850",
+      "Total": "0",
+      "TotalIncludingDiscards": "0",
+      "PointsEarned": "0",
+      "Scores": "GST 0/100 | GST 0/100 | DNC 0 | (GST 0/100) | (GST 0/100) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompGG",
+      "SailNumber": "TC16",
+      "Total": "0",
+      "TotalIncludingDiscards": "0",
+      "PointsEarned": "0",
+      "Scores": "DNC 0 | DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (SB 0/100) | (DNC 0) | (DNC 0)"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "No participation, no score.: Did not come to starting area",
+    "DNE": "One greater than # came to start.: Disqualification that is not excludable",
+    "DNF": "One greater than # came to start.: Started but did not finish",
+    "GST": "No participation, no score.: Did not come to starting area",
+    "RC": "No participation, no score.: Did not come to starting area",
+    "SB": "No participation, no score.: Did not come to starting area"
+  }
+}

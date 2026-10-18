@@ -23,5 +23,10 @@ namespace SailScores.Core.Scoring
         // unless a competitor isn't ranked (didn't meet participation requirements)
         // then this may have a value and TotalScore will be null.
         public Decimal? Average { get; set; }
+
+        // Calculator-specific scoring column values, by ScoringColumnDescriptor.Key.
+        // Columns built from the properties above are filled in when results are flattened.
+        public Dictionary<string, ScoringColumnValue> ColumnValues { get; set; }
+            = new Dictionary<string, ScoringColumnValue>();
     }
 }

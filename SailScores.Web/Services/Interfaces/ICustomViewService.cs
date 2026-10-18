@@ -15,8 +15,9 @@ public interface ICustomViewService
         CompetitorFieldDefinition fieldDefinition);
 
     /// <summary>
-    /// Gets the current or most recent value for a custom field on a competitor,
-    /// respecting effective date ranges. When no date is supplied, the current UTC date is used.
+    /// Gets the value of a custom field on a competitor that is effective on a date, falling
+    /// back to an undated value. When no date is supplied, the current UTC date is used, and
+    /// if nothing is effective today the most recent value is returned.
     /// </summary>
     string GetCustomFieldValue(Competitor competitor, Guid fieldDefinitionId, DateTime? effectiveDate = null);
 

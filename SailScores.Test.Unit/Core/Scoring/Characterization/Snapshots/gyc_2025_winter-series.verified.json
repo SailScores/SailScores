@@ -1,0 +1,128 @@
+{
+  "ScoringSystemName": "GYC scoring based on App A for Series - Rule 5.3(Winter)",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 5,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2025-01-11 Winter 1 [Abandoned]",
+    "2. 2025-01-26 Winter 2",
+    "3. 2025-02-02 Winter 3",
+    "1. 2025-02-09 Livett Centenary Cup",
+    "1. 2025-02-16 Winter 5",
+    "1. 2025-03-01 Winter 6"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompAF",
+      "SailNumber": "AF",
+      "Total": "10",
+      "TotalIncludingDiscards": "14",
+      "Columns": {
+        "preDiscardTotal": "14"
+      },
+      "Scores": "- | 2 | (RET 4) | 2 | 3 | 3"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompAN",
+      "SailNumber": "AN",
+      "Total": "12",
+      "TotalIncludingDiscards": "22",
+      "Columns": {
+        "preDiscardTotal": "22"
+      },
+      "Scores": "- | 3 | (DNC 10) | RET 5 | RCD 3 | 1"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompMN",
+      "SailNumber": "MN",
+      "Total": "16",
+      "TotalIncludingDiscards": "26",
+      "Columns": {
+        "preDiscardTotal": "26"
+      },
+      "Scores": "- | 1 | 2 | 3 | (DNC 10) | DNC 10"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompMM",
+      "SailNumber": "MM",
+      "Total": "22",
+      "TotalIncludingDiscards": "32",
+      "Columns": {
+        "preDiscardTotal": "32"
+      },
+      "Scores": "- | (DNC 10) | DNC 10 | 1 | 1 | DNC 10"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompSP",
+      "SailNumber": "SP",
+      "Total": "22",
+      "TotalIncludingDiscards": "32",
+      "Columns": {
+        "preDiscardTotal": "32"
+      },
+      "Scores": "- | RCD 5.5 | 1 | (DNC 10) | DNC 10 | RCD 5.5"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompTL",
+      "SailNumber": "TL",
+      "Total": "29.3",
+      "TotalIncludingDiscards": "39.3",
+      "Columns": {
+        "preDiscardTotal": "39.3"
+      },
+      "Scores": "- | (DNC 10) | RCD 7.3 | DNC 10 | 2 | DNC 10"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompMJ",
+      "SailNumber": "MJ",
+      "Total": "32",
+      "TotalIncludingDiscards": "42",
+      "Columns": {
+        "preDiscardTotal": "42"
+      },
+      "Scores": "- | (DNC 10) | DNC 10 | DNC 10 | DNC 10 | 2"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompEL",
+      "SailNumber": "EL",
+      "Total": "32",
+      "TotalIncludingDiscards": "42",
+      "Columns": {
+        "preDiscardTotal": "42"
+      },
+      "Scores": "- | (DNC 10) | DNC 10 | DNC 10 | 4 | RCD 8"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompSC",
+      "SailNumber": "SC",
+      "Total": "34",
+      "TotalIncludingDiscards": "44",
+      "Columns": {
+        "preDiscardTotal": "44"
+      },
+      "Scores": "- | (DNC 10) | DNC 10 | DNC 10 | DNC 10 | 4"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area",
+    "RCD": "Average of non-discarded results: Race Committee Duty",
+    "RET": "Number of boats that came to starting area + 1: Retired"
+  }
+}

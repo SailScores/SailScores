@@ -97,12 +97,7 @@ public class ScoreCodeGroupController : Controller
 
         await _scoringService.SaveScoreCodeGroupAsync(coreGroup);
 
-        return _redirectHelper.SafeRedirect(
-            Url,
-            Request,
-            returnUrl,
-            "Edit",
-            "ScoringSystem");
+        return RedirectToScoringSystem(model.ScoringSystemId, returnUrl);
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -171,12 +166,7 @@ public class ScoreCodeGroupController : Controller
 
         await _scoringService.SaveScoreCodeGroupAsync(coreGroup);
 
-        return _redirectHelper.SafeRedirect(
-            Url,
-            Request,
-            returnUrl,
-            "Edit",
-            "ScoringSystem");
+        return RedirectToScoringSystem(model.ScoringSystemId, returnUrl);
     }
 
     [Authorize(Policy = AuthorizationPolicies.ClubAdmin)]
@@ -303,11 +293,18 @@ public class ScoreCodeGroupController : Controller
         var scoringSystemId = group.ScoringSystemId;
         await _scoringService.DeleteScoreCodeGroupAsync(id);
 
+        return RedirectToScoringSystem(scoringSystemId, returnUrl);
+    }
+
+    // Back to returnUrl when it's local, otherwise to the group's scoring system.
+    private ActionResult RedirectToScoringSystem(Guid scoringSystemId, string returnUrl)
+    {
         return _redirectHelper.SafeRedirect(
             Url,
             Request,
             returnUrl,
             "Edit",
-            "ScoringSystem");
+            "ScoringSystem",
+            new { id = scoringSystemId });
     }
 }

@@ -14,7 +14,7 @@ public class PlaywrightFixture : IAsyncLifetime
     public SailScoresTestConfig Configuration { get; private set; }
     public IBrowserContext Context { get; private set; }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         Configuration = TestHelper.GetApplicationConfiguration(Environment.CurrentDirectory);
         Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
@@ -28,7 +28,7 @@ public class PlaywrightFixture : IAsyncLifetime
         Assertions.SetDefaultExpectTimeout(15000);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (Context != null)
             await Context.CloseAsync();

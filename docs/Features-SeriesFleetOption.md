@@ -267,9 +267,9 @@ When UseFullRaceScores is false and a fleet is selected, position-based scores n
      - Processes each competitor's individual race scores
      - Calls `CalculateSimpleScores()` to get basic scores per race
      - Calls `CalculateRaceDependentScores()` - processes Place-based scoring
-     - Calls `CalculateOverrides()` - applies score code rules
-     - Calls `DiscardScores()` - marks discardable scores
-     - Calls `CalculateTotals()` - sums non-discarded scores
+     - Applies the calculator's `Adjustments` (e.g. cap at the DNC score)
+     - Applies the calculator's `Discards` rules - marks discarded scores
+     - Applies the calculator's `Total` and `Eligibility` rules - series totals, participation
      - Calls `CalculateRanks()` - ranks competitors by total
 
 ### Key Files for Implementation

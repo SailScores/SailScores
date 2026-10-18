@@ -48,6 +48,11 @@ namespace SailScores.Core.Model
         // Course length in nautical miles; required for PHRF Time-on-Distance scoring
         public decimal? CourseDistance { get; set; }
 
+        // Summary series scoring only (not stored): the child series this race was loaded
+        // from, and the competitors whose score in it the child series discarded.
+        public Guid? SourceChildSeriesId { get; set; }
+        public ISet<Guid> CompetitorIdsDiscardedInChild { get; set; }
+
         public bool Equals(Race other)
         {
             return this.Id == other.Id

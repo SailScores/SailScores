@@ -11,6 +11,7 @@ namespace SailScores.Core.Services
         Task<IList<ScoringSystem>> GetScoringSystemsAsync(Guid clubId, bool includeBaseSystems);
         Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId);
         Task<ScoringSystem> GetScoringSystemFromCacheAsync(Series series);
+        Task<IDictionary<Guid, ScoringSystem>> GetScoringSystemsFromCacheAsync(IList<Series> seriesList);
         Task<ScoreCode> GetScoreCodeAsync(Guid id);
         Task SaveScoreCodeAsync(ScoreCode scoreCode);
         Task DeleteScoreCodeAsync(Guid id);
@@ -22,6 +23,10 @@ namespace SailScores.Core.Services
         Task<ScoringSystem> GetScoringSystemAsync(Guid scoringSystemId, bool skipCache);
         Task<Guid?> GetClubDefaultScoringSystemId(Guid clubId);
         Task<ScoringSystem> GetBaseRegattaSystemAsync();
+
+        // Shared (ClubId == null) systems and which clubs may use them as parents.
+        Task<IList<SharedScoringSystemAccess>> GetSharedScoringSystemAccessAsync();
+        Task SaveSharedScoringSystemAccessAsync(Guid scoringSystemId, bool restrictToClubs, IEnumerable<Guid> clubIds);
         
         /// <summary>
         /// Creates default scoring systems for a club based on site defaults.

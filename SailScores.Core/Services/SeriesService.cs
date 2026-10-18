@@ -408,7 +408,8 @@ namespace SailScores.Core.Services
             fullSeries.ScoringSystem = _mapper.Map<ScoringSystem>(dbScoringSystem);
 
             // For import-mode summary series, populate races BEFORE building handicap lookup
-            if (initial && fullSeries.Type == SeriesType.Summary && !fullSeries.ChildrenSeriesAsSingleRace)
+            if (initial && fullSeries.Type == SeriesType.Summary
+                && fullSeries.SummaryRollupMode == SummaryRollupMode.ChildRaces)
             {
                 await AddChildSeriesAsSeries(fullSeries).ConfigureAwait(false);
             }
@@ -440,7 +441,7 @@ namespace SailScores.Core.Services
 
                 if (fullSeries.Type == SeriesType.Summary)
                 {
-                    if (fullSeries.ChildrenSeriesAsSingleRace)
+                    if (fullSeries.SummaryRollupMode != SummaryRollupMode.ChildRaces)
                     {
                         await AddChildSeriesAsRaces(fullSeries).ConfigureAwait(false);
                     }
@@ -462,62 +463,165 @@ namespace SailScores.Core.Services
 
         private async Task AddChildSeriesAsSeries(Series fullSeries)
         {
+            // Child discards are only needed to keep them; they come from each child's saved
+            // results, so children must be scored before the summary (as they already are).
+            var discardMethod = fullSeries.ScoringSystem?.EffectiveDiscardMethod;
+            var keepChildDiscards = discardMethod == DiscardMethod.PreserveChildSeriesDiscards
+                || discardMethod == DiscardMethod.ChildSeriesDiscardsOrPattern;
+
+            var childIds = fullSeries.ChildrenSeriesIds.ToList();
+            var dbChildren = await LoadChildSeriesAsync(childIds).ConfigureAwait(false);
+            var childResults = keepChildDiscards
+                ? await GetHistoricalResultsAsync(fullSeries.ClubId, childIds).ConfigureAwait(false)
+                : null;
+
             // Get all the races in any child series
             var tempRaceList = new List<Race>();
-            foreach (var childLink in fullSeries.ChildrenSeriesIds)
+            foreach (var childSeries in dbChildren)
             {
-                var childSeries = await _dbContext
-                    .Series
-                    .Include(s => s.RaceSeries)
-                        .ThenInclude(rs => rs.Race)
-                            .ThenInclude(r => r.Scores)
-                    .Include(s => s.RaceSeries)
-                        .ThenInclude(rs => rs.Race)
-                            .ThenInclude(r => r.Weather)
-                    .AsSplitQuery()
-                    .SingleAsync(s => s.Id == childLink)
-                    .ConfigureAwait(false);
-
-                if (childSeries != null)
+                var childRaces = _mapper.Map<List<Race>>(
+                    childSeries.RaceSeries.Select(rs => rs.Race));
+                var childDiscards = keepChildDiscards
+                    ? GetDiscardedCompetitorIdsByRace(childResults.GetValueOrDefault(childSeries.Id))
+                    : null;
+                foreach (var race in childRaces)
                 {
-                    tempRaceList.AddRange(
-                        _mapper.Map<List<Race>>(
-                            childSeries.RaceSeries.Select(rs => rs.Race)));
+                    race.SourceChildSeriesId = childSeries.Id;
+                    if (childDiscards != null)
+                    {
+                        race.CompetitorIdsDiscardedInChild =
+                            childDiscards.TryGetValue(race.Id, out var competitorIds)
+                                ? competitorIds
+                                : new HashSet<Guid>();
+                    }
                 }
+                tempRaceList.AddRange(childRaces);
             }
 
             fullSeries.Races = tempRaceList;
         }
 
+        // Child series with their races, scores and weather, in childIds order, in one
+        // (split) query. Ids with no series are skipped.
+        private async Task<List<dbObj.Series>> LoadChildSeriesAsync(IList<Guid> childIds)
+        {
+            var children = await _dbContext
+                .Series
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Scores)
+                .Include(s => s.RaceSeries)
+                    .ThenInclude(rs => rs.Race)
+                        .ThenInclude(r => r.Weather)
+                .AsSplitQuery()
+                .Where(s => childIds.Contains(s.Id))
+                .ToListAsync()
+                .ConfigureAwait(false);
+            var byId = children.ToDictionary(s => s.Id);
+            return childIds
+                .Where(byId.ContainsKey)
+                .Select(id => byId[id])
+                .ToList();
+        }
+
+        // Race id => ids of competitors whose score in that race the series discarded.
+        private static Dictionary<Guid, ISet<Guid>> GetDiscardedCompetitorIdsByRace(
+            FlatResults results)
+        {
+            var returnValue = new Dictionary<Guid, ISet<Guid>>();
+            foreach (var competitorScores in results?.CalculatedScores ?? Enumerable.Empty<FlatSeriesScore>())
+            {
+                foreach (var score in competitorScores.Scores?.Where(s => s.Discard)
+                    ?? Enumerable.Empty<FlatCalculatedScore>())
+                {
+                    if (!returnValue.TryGetValue(score.RaceId, out var competitorIds))
+                    {
+                        competitorIds = new HashSet<Guid>();
+                        returnValue[score.RaceId] = competitorIds;
+                    }
+                    competitorIds.Add(competitorScores.CompetitorId);
+                }
+            }
+            return returnValue;
+        }
+
         private async Task AddChildSeriesAsRaces(Series fullSeries)
         {
             // Get the results of each child series as a race.
+            var childIds = fullSeries.ChildrenSeriesIds.ToList();
+            var dbChildren = await LoadChildSeriesAsync(childIds).ConfigureAwait(false);
+            var childResults = await GetHistoricalResultsAsync(fullSeries.ClubId, childIds)
+                .ConfigureAwait(false);
+
             var tempRaceList = new List<Race>();
-            foreach (var childLink in fullSeries.ChildrenSeriesIds)
+            var children = new List<(SeriesAsRace Race, Series Child)>();
+            foreach (var childSeries in dbChildren)
             {
+                var domainObject = _mapper.Map<Series>(childSeries);
+                var race = new SeriesAsRace(
+                    domainObject,
+                    childResults.GetValueOrDefault(childSeries.Id),
+                    fullSeries.SummaryRollupMode,
+                    fullSeries.IncludeUnrankedChildScores);
+                tempRaceList.Add(race);
+                children.Add((race, domainObject));
+            }
 
-                var childSeries = await _dbContext
-                    .Series
-                    .Include(s => s.RaceSeries)
-                        .ThenInclude(rs => rs.Race)
-                            .ThenInclude(r => r.Scores)
-                    .Include(s => s.RaceSeries)
-                        .ThenInclude(rs => rs.Race)
-                            .ThenInclude(r => r.Weather)
-                    .AsSplitQuery()
-                    .SingleAsync(s => s.Id == childLink)
-                    .ConfigureAwait(false);
-
-                if (childSeries != null)
-                {
-                    var results = await GetHistoricalResults(fullSeries.ClubId, childSeries.Id)
-                        .ConfigureAwait(false);
-                    var domainObject = _mapper.Map<Series>(childSeries);
-                    tempRaceList.Add(new SeriesAsRace(domainObject, results));
-                }
+            if (fullSeries.SummaryRollupMode == SummaryRollupMode.ChildScoreAsRace)
+            {
+                await AddAbsentCompetitorScoresAsync(children).ConfigureAwait(false);
             }
 
             fullSeries.Races = tempRaceList;
+        }
+
+        // Competitors with no score from a child series get the score they would have had
+        // there for missing every race, from the child's own scoring system and competitors.
+        // Without one, the summary's own default (DNC) applies. Recalculates the children
+        // without saving anything, loading their systems and competitors for all at once.
+        private async Task AddAbsentCompetitorScoresAsync(
+            IList<(SeriesAsRace Race, Series Child)> children)
+        {
+            var competitorIds = children
+                .SelectMany(c => c.Race.Scores)
+                .Select(s => s.CompetitorId)
+                .Distinct()
+                .ToList();
+
+            // A summary child's races aren't loaded here.
+            var regularChildren = children
+                .Where(c => c.Child.Type != SeriesType.Summary)
+                .ToList();
+            if (regularChildren.Count == 0)
+            {
+                return;
+            }
+            var systems = await _scoringService
+                .GetScoringSystemsFromCacheAsync(regularChildren.Select(c => c.Child).ToList())
+                .ConfigureAwait(false);
+            var scorable = regularChildren
+                .Where(c => systems.ContainsKey(c.Child.Id))
+                .ToList();
+            foreach (var (_, child) in scorable)
+            {
+                child.ScoringSystem = systems[child.Id];
+                child.Races = child.Races.Where(r => r != null).ToList();
+            }
+            await PopulateCompetitorsAsync(scorable.Select(c => c.Child).ToList())
+                .ConfigureAwait(false);
+
+            foreach (var (race, child) in scorable)
+            {
+                // Handicaps don't matter: the absent competitor has no times, and the other
+                // competitors' counts are the same either way.
+                var calculator = await _scoringCalculatorFactory
+                    .CreateScoringCalculatorAsync(child.ScoringSystem)
+                    .ConfigureAwait(false);
+                if (calculator.CalculateAbsentCompetitorScore(child) is decimal absentScore)
+                {
+                    race.AddAbsentCompetitorScores(competitorIds, absentScore);
+                }
+            }
         }
 
         public async Task<Series> CalculateWhatIfScoresAsync(
@@ -561,9 +665,11 @@ namespace SailScores.Core.Services
                 sb.Append(i);
                 sb.Append(",");
             }
-            fullSeries.ScoringSystem.DiscardPattern = sb.ToString();
-            fullSeries.ScoringSystem.ParticipationPercent = participationPercent ??
-                fullSeries.ScoringSystem.ParticipationPercent;
+            fullSeries.ScoringSystem.EffectiveDiscardPattern = sb.ToString();
+            // The chosen discard count is for the whole series.
+            fullSeries.ScoringSystem.EffectiveDiscardMethod = DiscardMethod.RaceCountPattern;
+            fullSeries.ScoringSystem.EffectiveParticipationPercent = participationPercent ??
+                fullSeries.ScoringSystem.EffectiveParticipationPercent;
             var calculator = await _scoringCalculatorFactory
                 .CreateScoringCalculatorAsync(fullSeries.ScoringSystem)
                 .ConfigureAwait(false);
@@ -623,11 +729,20 @@ namespace SailScores.Core.Services
 
         private async Task LocalizeFlatResults(FlatResults flatResults, Guid clubId)
         {
-            var settings = await _dbContext.Clubs
-                .Where(c =>
-                   c.Id == clubId
-                ).Select(c => c.WeatherSettings).SingleOrDefaultAsync()
-                .ConfigureAwait(false);
+            LocalizeFlatResults(flatResults, await GetWeatherSettingsAsync(clubId)
+                .ConfigureAwait(false));
+        }
+
+        private Task<dbObj.WeatherSettings> GetWeatherSettingsAsync(Guid clubId)
+        {
+            return _dbContext.Clubs
+                .Where(c => c.Id == clubId)
+                .Select(c => c.WeatherSettings)
+                .SingleOrDefaultAsync();
+        }
+
+        private void LocalizeFlatResults(FlatResults flatResults, dbObj.WeatherSettings settings)
+        {
             if (settings == null)
             {
                 return;
@@ -709,13 +824,21 @@ namespace SailScores.Core.Services
 
             }
             var races = FlattenRaces(series);
+            var scores = FlattenSeriesScores(series);
             var flatResults = new FlatResults
             {
                 SeriesId = series.Id,
                 Competitors = FlattenCompetitors(series),
                 Races = races,
-                CalculatedScores = FlattenSeriesScores(series),
+                CalculatedScores = scores,
+                Columns = ScoringColumns.Resolve(
+                    ScoringCalculatorRegistry.GetColumns(series.ScoringSystem?.CalculatorType),
+                    series.ScoringSystem?.EffectiveSettings,
+                    series.Results.IsPercentSystem,
+                    scores),
+                TotalHeader = ScoringCalculatorRegistry.Get(series.ScoringSystem?.CalculatorType).TotalHeader,
                 NumberOfDiscards = series.Results.NumberOfDiscards,
+                DiscardMethod = series.Results.DiscardMethod,
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),
                 IsPercentSystem = series.Results.IsPercentSystem,
                 LowerScoreWins = series.Results.LowerScoreWins,
@@ -729,7 +852,7 @@ namespace SailScores.Core.Services
             return flatResults;
         }
 
-        private IEnumerable<FlatSeriesScore> FlattenSeriesScores(Series series)
+        private List<FlatSeriesScore> FlattenSeriesScores(Series series)
         {
             if (series?.Results?.Results == null)
             {
@@ -746,9 +869,12 @@ namespace SailScores.Core.Services
                     PointsEarned = kvp.Value.PointsEarned,
                     PointsPossible = kvp.Value.PointsPossible,
                     ParticipationPercent = kvp.Value.ParticipationPercent,
+                    ColumnValues = kvp.Value.ColumnValues?.Count > 0
+                        ? new Dictionary<string, ScoringColumnValue>(kvp.Value.ColumnValues)
+                        : null,
                     Scores = FlattenScores(kvp.Value),
                     Trend = kvp.Value.Trend
-                });
+                }).ToList();
         }
 
         private IEnumerable<FlatCalculatedScore> FlattenScores(SeriesCompetitorResults results)
@@ -757,8 +883,8 @@ namespace SailScores.Core.Services
                 s => new FlatCalculatedScore
                 {
                     RaceId = s.Key.Id,
-                    Place = s.Value.RawScore.Place,
-                    Code = s.Value.RawScore.Code,
+                    Place = s.Value.Place,
+                    Code = s.Value.Code,
                     ScoreValue = s.Value.ScoreValue,
                     PerfectScoreValue = s.Value.PerfectScoreValue,
                     Discard = s.Value.Discard,
@@ -893,151 +1019,129 @@ namespace SailScores.Core.Services
             return true;
         }
 
+        // Competitors loaded for a series, and the competitor ids they were loaded for.
+        private sealed record CachedSeriesCompetitors(
+            ISet<Guid> CompetitorIds,
+            List<dbObj.Competitor> Competitors);
+
         private async Task PopulateCompetitorsAsync(Series series)
         {
-            var compIds = series.Races
-                .Where(r => r != null)
-                .SelectMany(r => r.Scores)
-                .Select(s => s.CompetitorId)
-                .Distinct();
+            var compIds = GetScoredCompetitorIds(series);
+            var cacheKey = $"SeriesCompetitors_{series.Id}";
 
-            if (!_cache.TryGetValue($"SeriesCompetitors_{series.Id}", out List<dbObj.Competitor> dbCompetitors) || dbCompetitors == null)
+            List<dbObj.Competitor> dbCompetitors;
+            if (_cache.TryGetValue(cacheKey, out CachedSeriesCompetitors cached)
+                && cached != null
+                && compIds.IsSubsetOf(cached.CompetitorIds))
             {
-                var query = _dbContext.Competitors
-                    .Include(c => c.CompetitorFleets)
-                    .Include(c => c.BoatClass)
-                    .Include(c => c.CustomFieldValues)
+                // this method is called with series that may be missing races (creating
+                // historical results for charts), so refilter the competitors.
+                dbCompetitors = cached.Competitors
                     .Where(c => compIds.Contains(c.Id))
-                    .AsSplitQuery();
-
-                // Filter by fleet if series has FleetId set
-                if (series.FleetId.HasValue)
-                {
-                    // Load the fleet to check its type
-                    var fleet = await _dbContext.Fleets
-                        .Include(f => f.FleetBoatClasses)
-                        .FirstOrDefaultAsync(f => f.Id == series.FleetId.Value)
-                        .ConfigureAwait(false);
-
-                    if (fleet != null)
-                    {
-                        query = ApplyFleetFilter(query, fleet);
-                    }
-                }
-
-                dbCompetitors = await query.ToListAsync()
-                    .ConfigureAwait(false);
-
-                // Only cache non-null results
-                if (dbCompetitors != null)
-                {
-                    _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
-                }
+                    .ToList();
             }
             else
             {
-                // this method is called with series that may be missing races (creating
-                // historical results for charts)
-                // so we need to refilter the competitors.
-                dbCompetitors = dbCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
-
-                // Also apply fleet filtering to cached results
-                if (series.FleetId.HasValue)
+                var fleet = series.FleetId.HasValue
+                    ? await LoadFleetsAsync(new[] { series.FleetId.Value }).ConfigureAwait(false)
+                    : new Dictionary<Guid, dbObj.Fleet>();
+                dbCompetitors = await LoadCompetitorsAsync(compIds).ConfigureAwait(false);
+                if (series.FleetId.HasValue && fleet.TryGetValue(series.FleetId.Value, out var seriesFleet))
                 {
-                    var fleet = await _dbContext.Fleets
-                        .Include(f => f.FleetBoatClasses)
-                        .FirstOrDefaultAsync(f => f.Id == series.FleetId.Value)
-                        .ConfigureAwait(false);
-
-                    if (fleet != null)
-                    {
-                        dbCompetitors = ApplyFleetFilterToList(dbCompetitors, fleet);
-                    }
+                    dbCompetitors = ApplyFleetFilterToList(dbCompetitors, seriesFleet);
                 }
+                _cache.Set(cacheKey, new CachedSeriesCompetitors(compIds, dbCompetitors),
+                    TimeSpan.FromSeconds(30));
             }
 
-            series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
+            AssignCompetitors(series, dbCompetitors);
+        }
 
+        // Several series at once: one competitor load and one fleet load for all of them.
+        private async Task PopulateCompetitorsAsync(IList<Series> seriesList)
+        {
+            var allIds = new HashSet<Guid>(seriesList.SelectMany(GetScoredCompetitorIds));
+            var allCompetitors = await LoadCompetitorsAsync(allIds).ConfigureAwait(false);
+            var fleets = await LoadFleetsAsync(seriesList
+                    .Where(s => s.FleetId.HasValue)
+                    .Select(s => s.FleetId.Value)
+                    .Distinct()
+                    .ToList())
+                .ConfigureAwait(false);
+
+            foreach (var series in seriesList)
+            {
+                var compIds = GetScoredCompetitorIds(series);
+                var dbCompetitors = allCompetitors.Where(c => compIds.Contains(c.Id)).ToList();
+                if (series.FleetId.HasValue && fleets.TryGetValue(series.FleetId.Value, out var fleet))
+                {
+                    dbCompetitors = ApplyFleetFilterToList(dbCompetitors, fleet);
+                }
+                AssignCompetitors(series, dbCompetitors);
+            }
+        }
+
+        private static HashSet<Guid> GetScoredCompetitorIds(Series series)
+        {
+            return series.Races
+                .Where(r => r != null)
+                .SelectMany(r => r.Scores)
+                .Select(s => s.CompetitorId)
+                .ToHashSet();
+        }
+
+        private async Task<List<dbObj.Competitor>> LoadCompetitorsAsync(ICollection<Guid> competitorIds)
+        {
+            if (competitorIds.Count == 0)
+            {
+                return new List<dbObj.Competitor>();
+            }
+            return await _dbContext.Competitors
+                .Include(c => c.CompetitorFleets)
+                .Include(c => c.BoatClass)
+                .Include(c => c.CustomFieldValues)
+                .Where(c => competitorIds.Contains(c.Id))
+                .AsSplitQuery()
+                .ToListAsync()
+                .ConfigureAwait(false);
+        }
+
+        private async Task<Dictionary<Guid, dbObj.Fleet>> LoadFleetsAsync(ICollection<Guid> fleetIds)
+        {
+            if (fleetIds.Count == 0)
+            {
+                return new Dictionary<Guid, dbObj.Fleet>();
+            }
+            return await _dbContext.Fleets
+                .Include(f => f.FleetBoatClasses)
+                .Where(f => fleetIds.Contains(f.Id))
+                .ToDictionaryAsync(f => f.Id)
+                .ConfigureAwait(false);
+        }
+
+        // Sets the series' competitors and each score's competitor. Scores for competitors
+        // not in the list (e.g. outside the series' fleet) are left without one.
+        private void AssignCompetitors(Series series, List<dbObj.Competitor> dbCompetitors)
+        {
+            series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
+            var dbById = dbCompetitors.ToDictionary(c => c.Id);
             foreach (var competitor in series.Competitors)
             {
-                var dbCompetitor = dbCompetitors.FirstOrDefault(c => c.Id == competitor.Id);
+                var dbCompetitor = dbById.GetValueOrDefault(competitor.Id);
                 if (dbCompetitor?.CustomFieldValues != null)
                 {
                     competitor.CustomFieldValues = _mapper.Map<IList<CompetitorFieldValue>>(dbCompetitor.CustomFieldValues);
                 }
             }
 
+            var byId = series.Competitors.ToDictionary(c => c.Id);
             foreach (var score in series.Races
                 .Where(r => r != null).SelectMany(r => r.Scores))
             {
-                var competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
-                if(competitor == null)
+                if (byId.TryGetValue(score.CompetitorId, out var competitor))
                 {
-                    var query = _dbContext.Competitors
-                        .Include(c => c.CompetitorFleets)
-                        .Include(c => c.BoatClass)
-                        .Include(c => c.CustomFieldValues)
-                        .Where(c => compIds.Contains(c.Id));
-
-                    // Filter by fleet if series has FleetId set
-                    if (series.FleetId.HasValue)
-                    {
-                        var fleet = await _dbContext.Fleets
-                            .Include(f => f.FleetBoatClasses)
-                            .FirstOrDefaultAsync(f => f.Id == series.FleetId.Value)
-                            .ConfigureAwait(false);
-
-                        if (fleet != null)
-                        {
-                            query = ApplyFleetFilter(query, fleet);
-                        }
-                    }
-
-                    dbCompetitors = await query
-                        .AsSplitQuery()
-                        .ToListAsync()
-                        .ConfigureAwait(false);
-                    competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
-                    if (competitor == null)
-                    {
-                        // Skip scores for competitors not in the fleet
-                        continue;
-                    }
-
-                    // seems we have a score for a competitor not in the series competitor list. Add them and the new list to the cache.
-                    if (dbCompetitors != null)
-                    {
-                        _cache.Set($"SeriesCompetitors_{series.Id}", dbCompetitors, TimeSpan.FromSeconds(30));
-                    }
-                    series.Competitors = _mapper.Map<IList<Competitor>>(dbCompetitors);
-                    competitor = series.Competitors.FirstOrDefault(c => c.Id == score.CompetitorId);
-
+                    score.Competitor = competitor;
                 }
-                score.Competitor = competitor;
-            }
-        }
-
-        private IQueryable<dbObj.Competitor> ApplyFleetFilter(IQueryable<dbObj.Competitor> query, dbObj.Fleet fleet)
-        {
-            switch (fleet.FleetType)
-            {
-                case Api.Enumerations.FleetType.AllBoatsInClub:
-                    // No filtering - include all competitors
-                    return query;
-
-                case Api.Enumerations.FleetType.SelectedClasses:
-                    // Filter by boat classes associated with the fleet
-                    if (fleet.FleetBoatClasses != null && fleet.FleetBoatClasses.Any())
-                    {
-                        var boatClassIds = fleet.FleetBoatClasses.Select(fbc => fbc.BoatClassId).ToList();
-                        return query.Where(c => boatClassIds.Contains(c.BoatClassId));
-                    }
-                    return query.Where(c => false); // No classes selected, so no competitors match
-
-                case Api.Enumerations.FleetType.SelectedBoats:
-                default:
-                    // Filter by explicit fleet membership (CompetitorFleets)
-                    return query.Where(c => c.CompetitorFleets.Any(cf => cf.FleetId == fleet.Id));
             }
         }
 
@@ -1235,7 +1339,8 @@ namespace SailScores.Core.Services
             existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
             existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
-            existingSeries.ChildrenSeriesAsSingleRace = model.ChildrenSeriesAsSingleRace;
+            existingSeries.SummaryRollupMode = model.SummaryRollupMode;
+            existingSeries.IncludeUnrankedChildScores = model.IncludeUnrankedChildScores;
             existingSeries.DateRestricted = model.DateRestricted;
             existingSeries.EnforcedStartDate = model.EnforcedStartDate;
             existingSeries.EnforcedEndDate = model.EnforcedEndDate;
@@ -1483,9 +1588,41 @@ namespace SailScores.Core.Services
             }
 
             var flatResults = Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(dbRow.Results);
+            ScoringColumns.AddLegacyColumns(flatResults);
             await LocalizeFlatResults(flatResults, clubId)
                 .ConfigureAwait(false);
             return flatResults;
+        }
+
+        // Current saved results by series id, for the series that have them.
+        private async Task<Dictionary<Guid, FlatResults>> GetHistoricalResultsAsync(
+            Guid clubId,
+            IList<Guid> seriesIds)
+        {
+            var rows = await _dbContext.HistoricalResults
+                .Where(r => seriesIds.Contains(r.SeriesId) && r.IsCurrent)
+                .Select(r => new { r.SeriesId, r.Results })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var results = new Dictionary<Guid, FlatResults>();
+            if (rows.Count == 0)
+            {
+                return results;
+            }
+            var weatherSettings = await GetWeatherSettingsAsync(clubId).ConfigureAwait(false);
+            foreach (var row in rows)
+            {
+                if (String.IsNullOrWhiteSpace(row.Results) || results.ContainsKey(row.SeriesId))
+                {
+                    continue;
+                }
+                var flatResults = Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(row.Results);
+                ScoringColumns.AddLegacyColumns(flatResults);
+                LocalizeFlatResults(flatResults, weatherSettings);
+                results[row.SeriesId] = flatResults;
+            }
+            return results;
         }
 
         public async Task<FlatChartData> GetChartData(Guid seriesId)
