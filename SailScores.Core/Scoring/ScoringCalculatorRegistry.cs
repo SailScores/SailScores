@@ -63,6 +63,7 @@ namespace SailScores.Core.Scoring
                 Simple(ScoringCalculatorType.TopXHighPoint, Pipeline(TopX.Create),
                     DiscardMethod.RaceCountPattern),
                 Simple(ScoringCalculatorType.PwaStandard, Pipeline(PwaStandard.Create)),
+                Simple(ScoringCalculatorType.AppendixBWindsurfing, Pipeline(AppendixB.Windsurfing)),
                 // Keeps child series discards in a summary series; uses the discard pattern
                 // in any other series.
                 new ScoringCalculatorRegistration
