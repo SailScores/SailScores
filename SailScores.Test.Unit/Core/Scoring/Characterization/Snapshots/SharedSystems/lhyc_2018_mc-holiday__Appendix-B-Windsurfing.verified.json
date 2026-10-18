@@ -1,0 +1,464 @@
+{
+  "ScoringSystemName": "Appendix B Windsurfing",
+  "TotalHeader": "Total",
+  "DiscardMethod": "RaceCountPattern",
+  "NumberOfDiscards": 1,
+  "NumberOfSailedRaces": 9,
+  "IsPreliminary": false,
+  "IsPercentSystem": false,
+  "LowerScoreWins": true,
+  "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
+    "participation: Participation (Percent, Hidden)"
+  ],
+  "Races": [
+    "1. 2018-05-26 5-26 R1",
+    "2. 2018-05-26 5-26 R2",
+    "1. 2018-05-28 5-28",
+    "1. 2018-06-30 6-30 R1�",
+    "2. 2018-06-30 6-30 R2",
+    "1. 2018-07-04 7-4",
+    "1. 2018-09-01 9-1 R1",
+    "1. 2018-09-02 9-2",
+    "1. 2018-09-03 9-3"
+  ],
+  "Competitors": [
+    {
+      "Rank": 1,
+      "Name": "CompKJ2",
+      "SailNumber": "1847",
+      "Total": "34",
+      "TotalIncludingDiscards": "43",
+      "Columns": {
+        "preDiscardTotal": "43"
+      },
+      "Scores": "(9) | 4 | 6 | 7 | 5 | 1 | 4 | 3 | 4"
+    },
+    {
+      "Rank": 2,
+      "Name": "CompGR",
+      "SailNumber": "2169",
+      "Total": "48",
+      "TotalIncludingDiscards": "88",
+      "Columns": {
+        "preDiscardTotal": "88"
+      },
+      "Scores": "1 | 1 | 2 | 1 | 1 | (SB 40) | 1 | 1 | SB 40"
+    },
+    {
+      "Rank": 3,
+      "Name": "CompAM",
+      "SailNumber": "1935",
+      "Total": "70",
+      "TotalIncludingDiscards": "85",
+      "Columns": {
+        "preDiscardTotal": "85"
+      },
+      "Scores": "13 | (15) | 5 | 9 | 4 | 6 | 11 | 8 | 14"
+    },
+    {
+      "Rank": 4,
+      "Name": "CompNCRA",
+      "SailNumber": "2604",
+      "Total": "76",
+      "TotalIncludingDiscards": "116",
+      "Columns": {
+        "preDiscardTotal": "116"
+      },
+      "Scores": "3 | 5 | 4 | 2 | 9 | (DNC 40) | 10 | RC 40 | 3"
+    },
+    {
+      "Rank": 5,
+      "Name": "CompMJ",
+      "SailNumber": "2161",
+      "Total": "88",
+      "TotalIncludingDiscards": "128",
+      "Columns": {
+        "preDiscardTotal": "128"
+      },
+      "Scores": "6 | 7 | (DNC 40) | 6 | 7 | DNC 40 | 3 | 7 | 12"
+    },
+    {
+      "Rank": 6,
+      "Name": "CompOC",
+      "SailNumber": "2322",
+      "Total": "108",
+      "TotalIncludingDiscards": "148",
+      "Columns": {
+        "preDiscardTotal": "148"
+      },
+      "Scores": "12 | 13 | (DNC 40) | 10 | 6 | 7 | 7 | DNC 40 | 13"
+    },
+    {
+      "Rank": 7,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "112",
+      "TotalIncludingDiscards": "152",
+      "Columns": {
+        "preDiscardTotal": "152"
+      },
+      "Scores": "7 | 8 | 9 | 4 | 2 | 2 | (DNC 40) | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 8,
+      "Name": "CompFJ3",
+      "SailNumber": "2144",
+      "Total": "133",
+      "TotalIncludingDiscards": "173",
+      "Columns": {
+        "preDiscardTotal": "173"
+      },
+      "Scores": "2 | 14 | 8 | (SB 40) | SB 40 | SB 40 | 13 | 6 | 10"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompFJ",
+      "SailNumber": "2511",
+      "Total": "143",
+      "TotalIncludingDiscards": "183",
+      "Columns": {
+        "preDiscardTotal": "183"
+      },
+      "Scores": "4 | 10 | (DNC 40) | 3 | 3 | 3 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 10,
+      "Name": "CompWE",
+      "SailNumber": "2652",
+      "Total": "162",
+      "TotalIncludingDiscards": "202",
+      "Columns": {
+        "preDiscardTotal": "202"
+      },
+      "Scores": "15 | 9 | (DNC 40) | DNC 40 | DNC 40 | DNC 40 | 2 | 5 | 11"
+    },
+    {
+      "Rank": 11,
+      "Name": "CompJP",
+      "SailNumber": "TC49",
+      "Total": "168",
+      "TotalIncludingDiscards": "208",
+      "Columns": {
+        "preDiscardTotal": "208"
+      },
+      "Scores": "16 | 16 | (DNC 40) | DNC 40 | DNC 40 | 11 | 15 | 11 | 19"
+    },
+    {
+      "Rank": 12,
+      "Name": "CompCC",
+      "SailNumber": "TC55",
+      "Total": "178",
+      "TotalIncludingDiscards": "218",
+      "Columns": {
+        "preDiscardTotal": "218"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | 13 | 11 | 4 | 12 | DNC 40 | 18"
+    },
+    {
+      "Rank": 13,
+      "Name": "CompMB",
+      "SailNumber": "1894",
+      "Total": "183",
+      "TotalIncludingDiscards": "223",
+      "Columns": {
+        "preDiscardTotal": "223"
+      },
+      "Scores": "5 | 3 | 7 | (SB 40) | SB 40 | DNC 40 | DNC 40 | DNC 40 | 8"
+    },
+    {
+      "Rank": 14,
+      "Name": "CompBJ3",
+      "SailNumber": "1850",
+      "Total": "188",
+      "TotalIncludingDiscards": "228",
+      "Columns": {
+        "preDiscardTotal": "228"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | 5 | DNC 40 | 5 | 9 | DNC 40 | 9"
+    },
+    {
+      "Rank": 15,
+      "Name": "CompCB",
+      "SailNumber": "2644",
+      "Total": "208",
+      "TotalIncludingDiscards": "248",
+      "Columns": {
+        "preDiscardTotal": "248"
+      },
+      "Scores": "(RC 40) | RC 40 | 1 | DNC 40 | DNC 40 | DNC 40 | 6 | DNC 40 | 1"
+    },
+    {
+      "Rank": 16,
+      "Name": "CompBJ",
+      "SailNumber": "TC08",
+      "Total": "212",
+      "TotalIncludingDiscards": "252",
+      "Columns": {
+        "preDiscardTotal": "252"
+      },
+      "Scores": "(DNC 40) | DNC 40 | 11 | 12 | DNC 40 | DNC 40 | 14 | DNC 40 | 15"
+    },
+    {
+      "Rank": 17,
+      "Name": "CompND",
+      "SailNumber": "TC25",
+      "Total": "213",
+      "TotalIncludingDiscards": "253",
+      "Columns": {
+        "preDiscardTotal": "253"
+      },
+      "Scores": "8 | 2 | 3 | (DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 18,
+      "Name": "CompCJ3",
+      "SailNumber": "1933",
+      "Total": "213",
+      "TotalIncludingDiscards": "253",
+      "Columns": {
+        "preDiscardTotal": "253"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | RC 40 | 5 | 2 | 6"
+    },
+    {
+      "Rank": 19,
+      "Name": "CompSC",
+      "SailNumber": "2091",
+      "Total": "224",
+      "TotalIncludingDiscards": "264",
+      "Columns": {
+        "preDiscardTotal": "264"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 8 | 9 | 7"
+    },
+    {
+      "Rank": 20,
+      "Name": "CompBP",
+      "SailNumber": "1474",
+      "Total": "232",
+      "TotalIncludingDiscards": "272",
+      "Columns": {
+        "preDiscardTotal": "272"
+      },
+      "Scores": "10 | 12 | (DNC 40) | DNC 40 | 10 | DNC 40 | DNC 40 | DNE 40 | RC 40"
+    },
+    {
+      "Rank": 21,
+      "Name": "CompAAC",
+      "SailNumber": "1664",
+      "Total": "248",
+      "TotalIncludingDiscards": "288",
+      "Columns": {
+        "preDiscardTotal": "288"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | 16 | 12 | DNC 40 | SB 40 | DNC 40 | 20"
+    },
+    {
+      "Rank": 22,
+      "Name": "CompTL",
+      "SailNumber": "TC18",
+      "Total": "260",
+      "TotalIncludingDiscards": "300",
+      "Columns": {
+        "preDiscardTotal": "300"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 8 | DNC 40 | 12 | DNF 40"
+    },
+    {
+      "Rank": 23,
+      "Name": "CompBK",
+      "SailNumber": "TC36",
+      "Total": "260",
+      "TotalIncludingDiscards": "300",
+      "Columns": {
+        "preDiscardTotal": "300"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | 11 | DNC 40 | 9 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 24,
+      "Name": "CompNB",
+      "SailNumber": "2599",
+      "Total": "265",
+      "TotalIncludingDiscards": "305",
+      "Columns": {
+        "preDiscardTotal": "305"
+      },
+      "Scores": "14 | 11 | (DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 25,
+      "Name": "CompNM",
+      "SailNumber": "1337",
+      "Total": "268",
+      "TotalIncludingDiscards": "308",
+      "Columns": {
+        "preDiscardTotal": "308"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | 15 | 13 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 26,
+      "Name": "CompBJ2",
+      "SailNumber": "1687",
+      "Total": "282",
+      "TotalIncludingDiscards": "322",
+      "Columns": {
+        "preDiscardTotal": "322"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | RC 40 | RC 40 | DNC 40 | RC 40 | DNC 40 | 2"
+    },
+    {
+      "Rank": 27,
+      "Name": "CompRJ3",
+      "SailNumber": "TC10",
+      "Total": "284",
+      "TotalIncludingDiscards": "324",
+      "Columns": {
+        "preDiscardTotal": "324"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 4 | DNC 40"
+    },
+    {
+      "Rank": 28,
+      "Name": "CompKA",
+      "SailNumber": "TC67",
+      "Total": "285",
+      "TotalIncludingDiscards": "325",
+      "Columns": {
+        "preDiscardTotal": "325"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 5"
+    },
+    {
+      "Rank": 29,
+      "Name": "CompMKDB",
+      "SailNumber": "2121",
+      "Total": "288",
+      "TotalIncludingDiscards": "328",
+      "Columns": {
+        "preDiscardTotal": "328"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | 8 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 30,
+      "Name": "CompSJ2",
+      "SailNumber": "TC37",
+      "Total": "288",
+      "TotalIncludingDiscards": "328",
+      "Columns": {
+        "preDiscardTotal": "328"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | 8 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 31,
+      "Name": "CompWR",
+      "SailNumber": "TC70",
+      "Total": "290",
+      "TotalIncludingDiscards": "330",
+      "Columns": {
+        "preDiscardTotal": "330"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 10 | DNC 40"
+    },
+    {
+      "Rank": 32,
+      "Name": "CompPI",
+      "SailNumber": "TC11",
+      "Total": "290",
+      "TotalIncludingDiscards": "330",
+      "Columns": {
+        "preDiscardTotal": "330"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 10 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 33,
+      "Name": "CompSX",
+      "SailNumber": "TC??",
+      "Total": "290",
+      "TotalIncludingDiscards": "330",
+      "Columns": {
+        "preDiscardTotal": "330"
+      },
+      "Scores": "(DNC 40) | DNC 40 | 10 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 34,
+      "Name": "CompAB",
+      "SailNumber": "TC51",
+      "Total": "294",
+      "TotalIncludingDiscards": "334",
+      "Columns": {
+        "preDiscardTotal": "334"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | 14 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 35,
+      "Name": "CompLMSJ",
+      "SailNumber": "1765",
+      "Total": "296",
+      "TotalIncludingDiscards": "336",
+      "Columns": {
+        "preDiscardTotal": "336"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 16"
+    },
+    {
+      "Rank": 36,
+      "Name": "CompAD",
+      "SailNumber": "1262",
+      "Total": "296",
+      "TotalIncludingDiscards": "336",
+      "Columns": {
+        "preDiscardTotal": "336"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 16 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 37,
+      "Name": "CompMS",
+      "SailNumber": "1280",
+      "Total": "297",
+      "TotalIncludingDiscards": "337",
+      "Columns": {
+        "preDiscardTotal": "337"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | 17"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompCA2",
+      "SailNumber": "1850",
+      "Total": "320",
+      "TotalIncludingDiscards": "360",
+      "Columns": {
+        "preDiscardTotal": "360"
+      },
+      "Scores": "(GST 40) | GST 40 | DNC 40 | GST 40 | GST 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40"
+    },
+    {
+      "Rank": 38,
+      "Name": "CompGG",
+      "SailNumber": "TC16",
+      "Total": "320",
+      "TotalIncludingDiscards": "360",
+      "Columns": {
+        "preDiscardTotal": "360"
+      },
+      "Scores": "(DNC 40) | DNC 40 | DNC 40 | DNC 40 | DNC 40 | DNC 40 | SB 40 | DNC 40 | DNC 40"
+    }
+  ],
+  "CodesUsed": {
+    "DNC": "Number of boats entered in series + 1: Did not come to starting area",
+    "DNE": "Number of boats entered in series + 1; not excludable: Disqualification that is not excludable",
+    "DNF": "Number of boats entered in series + 1: Started but did not finish",
+    "GST": "Number of boats entered in series + 1: Did not come to starting area",
+    "RC": "Number of boats entered in series + 1: Did not come to starting area",
+    "SB": "Number of boats entered in series + 1: Did not come to starting area"
+  }
+}

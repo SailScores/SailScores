@@ -39,6 +39,7 @@ public class ScoringCalculatorFactoryTests
     [InlineData(ScoringCalculatorType.TopXHighPoint, "Top X High Point")]
     [InlineData(ScoringCalculatorType.PwaStandard, "PWA Standard")]
     [InlineData(ScoringCalculatorType.Wawasee2026, "Wawasee 2026")]
+    [InlineData(ScoringCalculatorType.AppendixBWindsurfing, "Appendix B Windsurfing")]
     public async Task CreateScoringCalculatorAsync_WithCalculatorType_ReturnsMatchingCalculator(
         ScoringCalculatorType? calculatorType,
         string expected)

@@ -36,6 +36,8 @@ namespace SailScores.Api.Enumerations
         [Display(Name = "VARC 2026")]
         Varc2026 = 16,
         [Display(Name = "Wawasee 2026")]
-        Wawasee2026 = 17
+        Wawasee2026 = 17,
+        [Display(Name = "Appendix B Windsurfing")]
+        AppendixBWindsurfing = 18
     }
 }
