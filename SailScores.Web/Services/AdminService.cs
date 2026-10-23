@@ -83,7 +83,6 @@ public class AdminService : IAdminService
         vm.LocaleOptions = GetLocaleLongNames();
         vm.Locale = _localizerService.GetLocaleLongName(club.Locale);
         vm.HandicapSystemOptions = await _coreHandicapService.GetHandicapSystemsAsync(club.Id);
-        vm.TemplateOptions = (await _coreTemplateService.GetTemplatesForClubAsync(club.Id)).ToList();
         return vm;
     }
 

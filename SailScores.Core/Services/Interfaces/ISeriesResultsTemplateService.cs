@@ -11,6 +11,7 @@ public interface ISeriesResultsTemplateService
     Task<SeriesResultsTemplate> GetTemplateAsync(Guid templateId);
     Task<SeriesResultsTemplate> SaveTemplateAsync(SeriesResultsTemplate template);
     Task DeleteTemplateAsync(Guid templateId);
+    Task SetClubDefaultsAsync(Guid clubId, Guid? seriesTemplateId, Guid? regattaTemplateId);
     Task SeedDefaultTemplatesAsync(Guid clubId);
     Task EnsureDefaultTemplatesForAllClubsAsync();
 }

@@ -568,8 +568,6 @@ namespace SailScores.Core.Services
             dbClub.EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers;
             dbClub.EnableCustomCompetitorFields = club.EnableCustomCompetitorFields;
             dbClub.DefaultHandicapSystemId = club.DefaultHandicapSystemId;
-            dbClub.DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId;
-            dbClub.DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId;
 
 
             dbClub.WeatherSettings ??= new Database.Entities.WeatherSettings();

@@ -82,11 +82,16 @@ template whenever possible.
 
 ### Club admin
 
-Club admin pages expose both default template selectors:
-- Default series results template
-- Default regatta results template
+Templates are shown to club admins as "Results views". `SeriesResultsTemplate/Index` is the
+single management page, linked from the club settings page (`Admin/Edit`). It holds:
+- The club defaults (standard series and regatta), saved by the `SetDefaults` action through
+  `ISeriesResultsTemplateService.SetClubDefaultsAsync`, which rejects templates from another club.
+- The template list, with badges marking the defaults.
 
-Template options are loaded from the club's available templates.
+Opening the page seeds the default templates for a club that has none.
+
+`ClubService.UpdateClub` does not write the default template ids, so saving club settings
+leaves them alone.
 
 ### Series create/edit
 
@@ -97,7 +102,8 @@ If no template is selected for a series, fallback rules apply at read time.
 
 ### Template CRUD
 
-Club admins can manage templates in `SeriesResultsTemplateController`.
+Club admins can manage templates in `SeriesResultsTemplateController`. Edit and delete
+return Not Found for a template that belongs to a different club than the one in the route.
 
 Delete protection:
 - A template cannot be deleted if it is currently configured as a club default.

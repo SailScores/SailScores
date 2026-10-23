@@ -38,15 +38,47 @@ public class SeriesResultsTemplateController : Controller
     {
         ViewData["ClubInitials"] = clubInitials;
         var clubId = await _clubService.GetClubId(clubInitials);
+        var club = await _clubService.GetMinimalClub(clubId);
+
+        if (club.DefaultSeriesResultsTemplateId == null || club.DefaultRegattaSeriesResultsTemplateId == null)
+        {
+            await _templateService.SeedDefaultTemplatesAsync(clubId);
+            club = await _clubService.GetMinimalClub(clubId);
+        }
+
         var templates = await _templateService.GetTemplatesForClubAsync(clubId);
 
         var vm = new SeriesResultsTemplateListViewModel
         {
             ClubInitials = clubInitials,
-            Templates = templates.ToList()
+            Templates = templates.ToList(),
+            DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
+            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId
         };
 
         return View(vm);
+    }
+
+    // POST: SeriesResultsTemplate/SetDefaults
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> SetDefaults(string clubInitials, SeriesResultsTemplateListViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        try
+        {
+            await _templateService.SetClubDefaultsAsync(
+                clubId,
+                model.DefaultSeriesResultsTemplateId,
+                model.DefaultRegattaSeriesResultsTemplateId);
+            TempData["SuccessMessage"] = "Default views saved.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Index), new { clubInitials });
     }
 
     // GET: SeriesResultsTemplate/Create
@@ -109,7 +141,8 @@ public class SeriesResultsTemplateController : Controller
     public async Task<ActionResult> Edit(string clubInitials, Guid id)
     {
         ViewData["ClubInitials"] = clubInitials;
-        var template = await _templateService.GetTemplateAsync(id);
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var template = await GetClubTemplateAsync(clubId, id);
 
         if (template == null)
         {
@@ -118,7 +151,7 @@ public class SeriesResultsTemplateController : Controller
 
         var vm = _mapper.Map<SeriesResultsTemplateViewModel>(template);
         vm.ClubInitials = clubInitials;
-        vm.AvailableCustomFields = (await _competitorFieldService.GetFieldDefinitionsAsync(await _clubService.GetClubId(clubInitials))).ToList();
+        vm.AvailableCustomFields = (await _competitorFieldService.GetFieldDefinitionsAsync(clubId)).ToList();
         var selections = await _competitorFieldService.GetTemplateSelectionsAsync(template.Id);
         var selectionLookup = selections.ToDictionary(s => s.FieldDefinitionId, s => s);
         vm.CustomFieldSelections = vm.AvailableCustomFields
@@ -155,6 +188,10 @@ public class SeriesResultsTemplateController : Controller
 
             model.Id = id;
             var clubId = await _clubService.GetClubId(clubInitials);
+            if (await GetClubTemplateAsync(clubId, id) == null)
+            {
+                return NotFound();
+            }
             model.ClubId = clubId;
 
             var template = _mapper.Map<SeriesResultsTemplate>(model);
@@ -184,14 +221,14 @@ public class SeriesResultsTemplateController : Controller
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
         ViewData["ClubInitials"] = clubInitials;
-        var template = await _templateService.GetTemplateAsync(id);
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var template = await GetClubTemplateAsync(clubId, id);
 
         if (template == null)
         {
             return NotFound();
         }
 
-        var clubId = await _clubService.GetClubId(clubInitials);
         var club = await _clubService.GetMinimalClub(clubId);
 
         var vm = _mapper.Map<SeriesResultsTemplateViewModel>(template);
@@ -211,6 +248,10 @@ public class SeriesResultsTemplateController : Controller
         try
         {
             var clubId = await _clubService.GetClubId(clubInitials);
+            if (await GetClubTemplateAsync(clubId, id) == null)
+            {
+                return NotFound();
+            }
             var club = await _clubService.GetMinimalClub(clubId);
 
             // Check if template is a club default
@@ -235,5 +276,12 @@ public class SeriesResultsTemplateController : Controller
             TempData["ErrorMessage"] = $"Error deleting template: {ex.Message}";
             return RedirectToAction(nameof(Delete), new { clubInitials, id });
         }
+    }
+
+    // The template, or null when it doesn't exist or belongs to another club.
+    private async Task<SeriesResultsTemplate> GetClubTemplateAsync(Guid clubId, Guid templateId)
+    {
+        var template = await _templateService.GetTemplateAsync(templateId);
+        return template?.ClubId == clubId ? template : null;
     }
 }

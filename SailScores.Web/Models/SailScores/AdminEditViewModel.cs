@@ -78,13 +78,5 @@ public class AdminEditViewModel
 
     public bool CanSelfReset => RaceCount <= ResetClubViewModel.MaxSelfServiceRaceCount;
 
-    [Display(Name = "Default Template for Standard Series")]
-    public Guid? DefaultSeriesResultsTemplateId { get; set; }
-
-    [Display(Name = "Default Template for Regattas")]
-    public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
-
-    public IList<SeriesResultsTemplate> TemplateOptions { get; set; }
-
 #pragma warning restore CA2227 // Collection properties should be read only
 }

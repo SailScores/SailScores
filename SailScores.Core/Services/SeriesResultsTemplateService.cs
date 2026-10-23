@@ -65,7 +65,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
                 .FirstOrDefaultAsync(t => t.Id == template.Id)
                 .ConfigureAwait(false);
 
-            if (dbTemplate == null)
+            if (dbTemplate == null || dbTemplate.ClubId != template.ClubId)
             {
                 throw new InvalidOperationException("Template not found.");
             }
@@ -100,6 +100,36 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             _dbContext.SeriesResultsTemplates.Remove(dbTemplate);
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
+    }
+
+    public async Task SetClubDefaultsAsync(Guid clubId, Guid? seriesTemplateId, Guid? regattaTemplateId)
+    {
+        var club = await _dbContext.Clubs
+            .FirstOrDefaultAsync(c => c.Id == clubId)
+            .ConfigureAwait(false);
+
+        if (club == null)
+        {
+            throw new InvalidOperationException("Club not found.");
+        }
+
+        var requestedIds = new[] { seriesTemplateId, regattaTemplateId }
+            .Where(id => id.HasValue)
+            .Select(id => id.Value)
+            .Distinct()
+            .ToList();
+        var clubTemplateCount = await _dbContext.SeriesResultsTemplates
+            .CountAsync(t => t.ClubId == clubId && requestedIds.Contains(t.Id))
+            .ConfigureAwait(false);
+
+        if (clubTemplateCount != requestedIds.Count)
+        {
+            throw new InvalidOperationException("Template not found.");
+        }
+
+        club.DefaultSeriesResultsTemplateId = seriesTemplateId;
+        club.DefaultRegattaSeriesResultsTemplateId = regattaTemplateId;
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
     public async Task SeedDefaultTemplatesAsync(Guid clubId)
