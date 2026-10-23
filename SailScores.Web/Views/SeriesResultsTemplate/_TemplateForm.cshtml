@@ -123,6 +123,59 @@
 </div>
 
 <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+    <h2 class="h5 mb-3">Score codes</h2>
+    <p class="text-body-secondary small mb-3">
+        Choose how each score code appears in race cells. <strong>Code only</strong> leaves out the points,
+        <strong>Hidden</strong> leaves the cell blank so only places stand out, and <strong>Faded</strong>
+        mutes the code like a discard. Scoring is not changed.
+    </p>
+    @if (Model.ScoreCodes != null && Model.ScoreCodes.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">Code</th>
+                        <th scope="col">Show</th>
+                        <th scope="col" class="text-center">Faded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var index = 0; index < Model.ScoreCodes.Count; index++)
+                    {
+                        var scoreCode = Model.ScoreCodes[index];
+                        <tr>
+                            <td>
+                                <input type="hidden" asp-for="@Model.ScoreCodes[index].Code" />
+                                <input type="hidden" asp-for="@Model.ScoreCodes[index].Description" />
+                                <strong>@scoreCode.Code</strong>
+                                @if (!string.IsNullOrWhiteSpace(scoreCode.Description))
+                                {
+                                    <small class="text-body-secondary d-block">@scoreCode.Description</small>
+                                }
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm" asp-for="@Model.ScoreCodes[index].Display"
+                                        asp-items="Html.GetEnumSelectList<ScoreCodeDisplay>()"
+                                        aria-label="How @scoreCode.Code is shown"></select>
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" asp-for="@Model.ScoreCodes[index].Faded"
+                                       aria-label="Fade @scoreCode.Code" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-body-secondary mb-0">No score codes are available for this club.</p>
+    }
+</div>
+
+<div class="border rounded p-3 p-md-4 mb-4 bg-almost">
     <h2 class="h5 mb-3">Custom competitor fields</h2>
     <p class="text-body-secondary small mb-3">
         Select which custom competitor fields should appear in this results view.

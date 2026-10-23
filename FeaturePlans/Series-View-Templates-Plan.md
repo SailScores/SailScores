@@ -47,8 +47,10 @@ Per template, per score code:
 - Faded — muted like a discard.
 
 Stored in a child table (`SeriesResultsTemplateScoreCode`: template, code, display mode,
-faded). Edit UI lists the codes from the club's scoring systems. Rendering in `_ScoreCell`;
-the series `HideDncDiscards` option keeps working. Backup/restore, docs.
+faded), saved with the template; only non-default codes get a row. The edit page lists the
+codes from the club's and the shared scoring systems (`IScoringService.GetScoreCodesAsync`),
+plus any codes the template already has settings for. Rendering in `_ScoreCell`; the series
+`HideDncDiscards` option keeps working. Backup is phase 4.
 
 ## Phase 4 — Back up results views
 
@@ -92,4 +94,16 @@ HTML, and What If results. Check both light and dark mode.
       name column at the right. On Larger Screens: race columns disappear on a phone width.
 - [ ] Series HTML export and regatta "export all" now honor "Show Pre-Discard Total" (they
       ignored it before).
+
+### D. Score codes (phase 3)
+
+- [ ] Edit page lists the club's score codes with descriptions, each with "Show" (Code and
+      points / Code only / Hidden) and "Faded". Settings save and reload.
+- [ ] Hidden DNC: DNC cells are blank on the series page, regatta page and HTML exports; place
+      colors don't show in those cells. Points totals are unchanged.
+- [ ] Code only DNF: cells show "DNF" (with its tooltip) but no points; discarded ones still
+      struck through.
+- [ ] Faded DNC: DNC cells are gray like discards, in light and dark mode.
+- [ ] A series with "Hide discarded DNC scores" still hides them when the view shows DNC.
+- [ ] Deleting a view with score code settings works.
 

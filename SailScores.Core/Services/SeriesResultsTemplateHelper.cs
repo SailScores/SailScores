@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 
@@ -34,6 +37,10 @@ public static class SeriesResultsTemplateHelper
             HighlightTopThree = effectiveTemplate.HighlightTopThree,
             ColumnSeparators = effectiveTemplate.ColumnSeparators,
             RaceColumnsVisibility = effectiveTemplate.RaceColumnsVisibility,
+            ScoreCodes = (effectiveTemplate.ScoreCodes ?? new List<SeriesResultsTemplateScoreCode>())
+                .Where(c => !string.IsNullOrWhiteSpace(c.Code))
+                .GroupBy(c => c.Code, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase),
         };
     }
 
@@ -69,4 +76,8 @@ public class ResolvedTemplate
     public bool HighlightTopThree { get; set; } = true;
     public ResultsColumnSeparator ColumnSeparators { get; set; }
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
+
+    // Score code display settings keyed by code, ignoring case. Codes not listed show code and points.
+    public IDictionary<string, SeriesResultsTemplateScoreCode> ScoreCodes { get; set; } =
+        new Dictionary<string, SeriesResultsTemplateScoreCode>(StringComparer.OrdinalIgnoreCase);
 }

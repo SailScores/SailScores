@@ -1,4 +1,5 @@
 @using Humanizer
+@using SailScores.Api.Enumerations
 
 @model SailScores.Web.Models.SailScores.ScoreCellViewModel
 @{
@@ -8,6 +9,10 @@
     var scoreValue = Model.Result?.ScoreValue;
     var hasCode = !String.IsNullOrEmpty(Model.Result?.Code);
     var isTie = Model.Result?.Code == "TIE";
+    // Score code settings from the results template.
+    var hideForCode = Model.CodeDisplay?.Display == ScoreCodeDisplay.Hidden;
+    var showPoints = Model.CodeDisplay?.Display != ScoreCodeDisplay.CodeOnly;
+    var fadeForCode = Model.CodeDisplay?.Faded ?? false;
     if ((place == 1 || (scoreValue == 1m && !Model.IsPercentSystem)) && !hasCode &&
         (scoreValue < 1m || scoreValue == 1m || scoreValue == 1.5m || scoreValue == 2.0m || Model.IsPercentSystem))
     {
@@ -38,7 +43,7 @@
     {
         classSb.Append("finish-third ");
     }
-    if (!Model.HighlightTopThree)
+    if (!Model.HighlightTopThree || hideForCode)
     {
         classSb.Clear();
     }
@@ -61,9 +66,9 @@
 @if (Model != null && Model.Result != null )
 {
     <td class="text-center @cellFinishClasses @Model.CssClass">
-        <span class="@(Model.Result.Discard ? "discardmuted" : "")">
-            @* hide all cell contents if DNC, discarded, and series setting. *@
-            @if (!(Model.HideDncDiscards && Model.Result.Code == "DNC" &&
+        <span class="@(Model.Result.Discard || fadeForCode ? "discardmuted" : "")">
+            @* hide all cell contents if DNC, discarded, and series setting, or if the template hides the code. *@
+            @if (!hideForCode && !(Model.HideDncDiscards && Model.Result.Code == "DNC" &&
                 (Model.Result.Discard || isUncountedDnc)))
             {
                 @if (Model.Result.Discard)
@@ -84,14 +89,15 @@
                 {
                     @Html.Raw("</span> ")
                 }
-                @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
+                @* points are left out when the template shows only the code *@
+                @if (showPoints && Model.IsPercentSystem && Model.Result.Place.HasValue)
                 {
                     var tooltipText = Model.Result.PerfectScoreValue == null ?
                         Model.Result.Place.Value.Ordinalize() :
                     $"of {Model.Result.PerfectScoreValue.Value}&#010;{Model.Result.Place.Value.Ordinalize()}";
                 
                     <span data-bs-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("0.##"))</span>
-                } else {
+                } else if (showPoints) {
                     @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("0.##"))
                 }
                 @if (Model.Result.Discard)

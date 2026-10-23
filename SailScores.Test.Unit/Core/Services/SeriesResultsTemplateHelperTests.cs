@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
@@ -116,5 +117,27 @@ public class SeriesResultsTemplateHelperTests
         Assert.False(result.HighlightTopThree);
         Assert.Equal(ResultsColumnSeparator.EveryColumn, result.ColumnSeparators);
         Assert.Equal(ColumnVisibility.Hidden, result.RaceColumnsVisibility);
+    }
+
+    [Fact]
+    public void GetResolvedTemplate_WithScoreCodes_LooksUpCodesIgnoringCase()
+    {
+        var template = new SeriesResultsTemplate
+        {
+            ScoreCodes = new List<SeriesResultsTemplateScoreCode>
+            {
+                new() { Code = "DNC", Display = ScoreCodeDisplay.Hidden }
+            }
+        };
+
+        var result = SeriesResultsTemplateHelper.GetResolvedTemplate(template);
+
+        Assert.Equal(ScoreCodeDisplay.Hidden, result.ScoreCodes["dnc"].Display);
+    }
+
+    [Fact]
+    public void GetDefaultTemplate_HasNoScoreCodeSettings()
+    {
+        Assert.Empty(SeriesResultsTemplateHelper.GetDefaultTemplate().ScoreCodes);
     }
 }

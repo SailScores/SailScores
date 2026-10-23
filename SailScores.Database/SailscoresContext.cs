@@ -57,6 +57,7 @@ public class SailScoresContext : DbContext, ISailScoresContext
     public DbSet<CompetitorFieldDefinition> CompetitorFieldDefinitions { get; set; }
     public DbSet<CompetitorFieldValue> CompetitorFieldValues { get; set; }
     public DbSet<SeriesResultsTemplateCustomField> SeriesResultsTemplateCustomFields { get; set; }
+    public DbSet<SeriesResultsTemplateScoreCode> SeriesResultsTemplateScoreCodes { get; set; }
 
     public DbSet<ClubRequest> ClubRequests { get; set; }
 
@@ -374,6 +375,16 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .WithMany(t => t.CustomFields)
             .HasForeignKey(f => f.SeriesResultsTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SeriesResultsTemplateScoreCode>()
+            .HasOne(c => c.SeriesResultsTemplate)
+            .WithMany(t => t.ScoreCodes)
+            .HasForeignKey(c => c.SeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SeriesResultsTemplateScoreCode>()
+            .HasIndex(c => new { c.SeriesResultsTemplateId, c.Code })
+            .IsUnique();
 
         modelBuilder.Entity<SeriesResultsTemplateCustomField>()
             .HasOne(f => f.FieldDefinition)

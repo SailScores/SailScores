@@ -1780,6 +1780,34 @@ namespace SailScores.Database.Migrations
                     b.ToTable("SeriesResultsTemplateCustomFields");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.SeriesResultsTemplateScoreCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Display")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Faded")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("SeriesResultsTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeriesResultsTemplateId", "Code")
+                        .IsUnique();
+
+                    b.ToTable("SeriesResultsTemplateScoreCodes");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.SeriesToSeriesLink", b =>
                 {
                     b.Property<Guid>("ParentSeriesId")
@@ -2568,6 +2596,17 @@ namespace SailScores.Database.Migrations
                     b.Navigation("SeriesResultsTemplate");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.SeriesResultsTemplateScoreCode", b =>
+                {
+                    b.HasOne("SailScores.Database.Entities.SeriesResultsTemplate", "SeriesResultsTemplate")
+                        .WithMany("ScoreCodes")
+                        .HasForeignKey("SeriesResultsTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SeriesResultsTemplate");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.SeriesToSeriesLink", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Series", "ChildSeries")
@@ -2699,6 +2738,8 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.SeriesResultsTemplate", b =>
                 {
                     b.Navigation("CustomFields");
+
+                    b.Navigation("ScoreCodes");
                 });
 #pragma warning restore 612, 618
         }

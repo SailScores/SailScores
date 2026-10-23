@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SailScores.Api.Enumerations;
+using SailScores.Core.Mapping;
 using SailScores.Core.Model;
 using SailScores.Core.Services.Interfaces;
 using SailScores.Database;
@@ -29,6 +30,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
     {
         var dbTemplates = await _dbContext.SeriesResultsTemplates
             .Include(t => t.CustomFields)
+            .Include(t => t.ScoreCodes)
             .Where(t => t.ClubId == clubId)
             .OrderBy(t => t.Name)
             .ToListAsync()
@@ -41,14 +43,15 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
     {
         var dbTemplate = await _dbContext.SeriesResultsTemplates
             .Include(t => t.CustomFields)
+            .Include(t => t.ScoreCodes)
             .FirstOrDefaultAsync(t => t.Id == templateId)
             .ConfigureAwait(false);
 
         return _mapper.Map<SeriesResultsTemplate>(dbTemplate);
     }
 
-    // Saves the template's own settings. Custom field selections are saved separately by
-    // ICompetitorFieldService.SaveTemplateSelectionsAsync.
+    // Saves the template's own settings and score code display settings. Custom field selections
+    // are saved separately by ICompetitorFieldService.SaveTemplateSelectionsAsync.
     public async Task<SeriesResultsTemplate> SaveTemplateAsync(SeriesResultsTemplate template)
     {
         Db.SeriesResultsTemplate dbTemplate;
@@ -64,6 +67,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         else
         {
             dbTemplate = await _dbContext.SeriesResultsTemplates
+                .Include(t => t.ScoreCodes)
                 .FirstOrDefaultAsync(t => t.Id == template.Id)
                 .ConfigureAwait(false);
 
@@ -74,8 +78,36 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         }
 
         CopySettings(template, dbTemplate);
+        ReplaceScoreCodes(template, dbTemplate);
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
         return _mapper.Map<SeriesResultsTemplate>(dbTemplate);
+    }
+
+    // Keeps one row per code that isn't shown the default way.
+    private void ReplaceScoreCodes(SeriesResultsTemplate source, Db.SeriesResultsTemplate target)
+    {
+        foreach (var existing in target.ScoreCodes.ToList())
+        {
+            _dbContext.SeriesResultsTemplateScoreCodes.Remove(existing);
+        }
+        target.ScoreCodes.Clear();
+
+        var codes = (source.ScoreCodes ?? new List<SeriesResultsTemplateScoreCode>())
+            .Where(c => !string.IsNullOrWhiteSpace(c?.Code) && !c.IsDefault)
+            .GroupBy(c => c.Code.Trim().ToUpperInvariant())
+            .Select(g => new SeriesResultsTemplateScoreCode
+            {
+                Code = g.Key,
+                Display = g.First().Display,
+                Faded = g.First().Faded
+            });
+        // Added through the DbSet (which also fills target.ScoreCodes): a child with its key
+        // already set, found through the navigation, would be treated as an existing row.
+        foreach (var code in codes)
+        {
+            _dbContext.SeriesResultsTemplateScoreCodes.Add(
+                SeriesResultsTemplateScoreCodeConversions.ToDb(code, target.Id));
+        }
     }
 
     private static void CopySettings(SeriesResultsTemplate source, Db.SeriesResultsTemplate target)

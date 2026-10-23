@@ -19,15 +19,18 @@ public class SeriesResultsTemplateController : Controller
     private readonly ISeriesResultsTemplateService _templateService;
     private readonly IClubService _clubService;
     private readonly ICompetitorFieldService _competitorFieldService;
+    private readonly IScoringService _scoringService;
 
     public SeriesResultsTemplateController(
         ISeriesResultsTemplateService templateService,
         IClubService clubService,
-        ICompetitorFieldService competitorFieldService)
+        ICompetitorFieldService competitorFieldService,
+        IScoringService scoringService)
     {
         _templateService = templateService;
         _clubService = clubService;
         _competitorFieldService = competitorFieldService;
+        _scoringService = scoringService;
     }
 
     // GET: SeriesResultsTemplate
@@ -90,6 +93,7 @@ public class SeriesResultsTemplateController : Controller
             ClubInitials = clubInitials
         };
         await LoadCustomFieldsAsync(vm, clubId, templateId: null);
+        await LoadScoreCodesAsync(vm, clubId);
 
         return View(vm);
     }
@@ -107,6 +111,7 @@ public class SeriesResultsTemplateController : Controller
             {
                 model.ClubInitials = clubInitials;
                 model.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+                await LoadScoreCodesAsync(model, clubId);
                 return View(model);
             }
 
@@ -143,6 +148,7 @@ public class SeriesResultsTemplateController : Controller
         var vm = new SeriesResultsTemplateViewModel(template);
         vm.ClubInitials = clubInitials;
         await LoadCustomFieldsAsync(vm, clubId, template.Id);
+        await LoadScoreCodesAsync(vm, clubId);
 
         return View(vm);
     }
@@ -165,6 +171,7 @@ public class SeriesResultsTemplateController : Controller
             {
                 model.ClubInitials = clubInitials;
                 model.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+                await LoadScoreCodesAsync(model, clubId);
                 return View(model);
             }
             model.ClubId = clubId;
@@ -274,6 +281,33 @@ public class SeriesResultsTemplateController : Controller
             })
             .OrderBy(s => s.DisplayOrder)
             .ThenBy(s => s.DisplayHeader)
+            .ToList();
+    }
+
+    // One row per score code the club's scoring systems use, plus any codes the template already
+    // has settings for, keeping the template's settings.
+    private async Task LoadScoreCodesAsync(SeriesResultsTemplateViewModel vm, Guid clubId)
+    {
+        var clubCodes = (await _scoringService.GetScoreCodesAsync(clubId))
+            .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().Description, StringComparer.OrdinalIgnoreCase);
+        var saved = (vm.ScoreCodes ?? new List<TemplateScoreCodeViewModel>())
+            .Where(c => !string.IsNullOrWhiteSpace(c.Code))
+            .GroupBy(c => c.Code, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        vm.ScoreCodes = clubCodes.Keys
+            .Union(saved.Keys, StringComparer.OrdinalIgnoreCase)
+            .Select(code =>
+            {
+                var row = saved.TryGetValue(code, out var existing)
+                    ? existing
+                    : new TemplateScoreCodeViewModel { Code = code };
+                row.Description = clubCodes.TryGetValue(code, out var description) ? description : null;
+                return row;
+            })
+            .OrderBy(c => c.Code, StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
 

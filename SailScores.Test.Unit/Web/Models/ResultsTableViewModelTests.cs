@@ -118,4 +118,22 @@ public class ResultsTableViewModelTests
         Assert.Equal(ResultsColumnSeparator.RaceDays, table.ColumnSeparators);
         Assert.Equal(ColumnVisibility.Hidden, table.RaceColumnsVisibility);
     }
+
+    [Fact]
+    public void GetScoreCodeDisplay_FromTemplate_FindsCodeAndReturnsNullOtherwise()
+    {
+        var template = SeriesResultsTemplateHelper.GetResolvedTemplate(new SailScores.Core.Model.SeriesResultsTemplate
+        {
+            ScoreCodes = new List<SailScores.Core.Model.SeriesResultsTemplateScoreCode>
+            {
+                new() { Code = "DNC", Display = ScoreCodeDisplay.CodeOnly }
+            }
+        });
+
+        var table = new ResultsTableViewModel().WithTemplate(template);
+
+        Assert.Equal(ScoreCodeDisplay.CodeOnly, table.GetScoreCodeDisplay("dnc").Display);
+        Assert.Null(table.GetScoreCodeDisplay("DNF"));
+        Assert.Null(table.GetScoreCodeDisplay(null));
+    }
 }

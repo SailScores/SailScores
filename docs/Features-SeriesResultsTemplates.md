@@ -29,6 +29,14 @@ Each template includes:
 - Column separators (`ResultsColumnSeparator`): `None`, `EveryColumn` (between every race or
   child series), or `RaceDays` (where the race date changes)
 
+- Score code display, per code (`SeriesResultsTemplateScoreCode`):
+  - `ScoreCodeDisplay`: `CodeAndPoints` (default), `CodeOnly` (no points), or `Hidden` (blank cell)
+  - Faded: muted like a discard
+
+  Only codes that differ from the default are stored. Codes match ignoring case. These settings
+  change display only, never scoring. The series-level "Hide discarded DNC scores" option still
+  applies on top of them.
+
 Visibility uses `ColumnVisibility`:
 - `Always`
 - `OnLargerScreens`
@@ -43,6 +51,9 @@ Visibility uses `ColumnVisibility`:
   - `ClubId`
   - `Name`
   - column visibility/header fields listed above
+
+- `SeriesResultsTemplateScoreCode` (child of a template, cascade delete)
+  - `SeriesResultsTemplateId`, `Code` (unique per template), `Display`, `Faded`
 
 - `Club`
   - `DefaultSeriesResultsTemplateId`

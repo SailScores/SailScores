@@ -123,6 +123,8 @@ namespace SailScores.Core.Services
                 .Include(s => s.ChildLinks)
                 .Include(s => s.SeriesResultsTemplate)
                     .ThenInclude(t => t.CustomFields)
+                .Include(s => s.SeriesResultsTemplate)
+                    .ThenInclude(t => t.ScoreCodes)
                 .AsSingleQuery()
                 .FirstOrDefaultAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
@@ -155,6 +157,7 @@ namespace SailScores.Core.Services
                     {
                         var defaultTemplate = await _dbContext.SeriesResultsTemplates
                             .Include(t => t.CustomFields)
+                            .Include(t => t.ScoreCodes)
                             .FirstOrDefaultAsync(t => t.Id == defaultTemplateId.Value)
                             .ConfigureAwait(false);
                         fullSeries.SeriesResultsTemplate = _mapper.Map<SeriesResultsTemplate>(defaultTemplate);

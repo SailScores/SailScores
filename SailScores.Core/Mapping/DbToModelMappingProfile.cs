@@ -123,7 +123,10 @@ namespace SailScores.Core.Mapping
             CreateMap<Db.CompetitorStatsSummary, Model.CompetitorSeasonStats>();
 
             CreateMap<Db.SeriesResultsTemplate, Model.SeriesResultsTemplate>()
-                .ReverseMap();
+                .ForMember(d => d.ScoreCodes, o => o.MapFrom(
+                    s => SeriesResultsTemplateScoreCodeConversions.ToModels(s.ScoreCodes)))
+                .ReverseMap()
+                .ForMember(d => d.ScoreCodes, o => o.Ignore());
 
             CreateMap<Db.CompetitorFieldDefinition, Model.CompetitorFieldDefinition>()
                 .ReverseMap();

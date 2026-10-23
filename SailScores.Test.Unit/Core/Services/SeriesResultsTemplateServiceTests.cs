@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SailScores.Api.Enumerations;
@@ -140,5 +141,60 @@ public class SeriesResultsTemplateServiceTests
         Assert.Equal("Renamed", dbTemplate.Name);
         Assert.Equal(ResultsColumnSeparator.EveryColumn, dbTemplate.ColumnSeparators);
         Assert.Single(_context.SeriesResultsTemplateCustomFields.Where(f => f.SeriesResultsTemplateId == created.Id));
+    }
+
+    [Fact]
+    public async Task SaveTemplateAsync_WithScoreCodes_KeepsOnlyNonDefaultCodes()
+    {
+        var saved = await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            ClubId = _clubId,
+            Name = "Sparse",
+            ScoreCodes = new List<SeriesResultsTemplateScoreCode>
+            {
+                new() { Code = "dnc", Display = ScoreCodeDisplay.Hidden },
+                new() { Code = "DNF", Display = ScoreCodeDisplay.CodeOnly, Faded = true },
+                new() { Code = "OCS", Display = ScoreCodeDisplay.CodeAndPoints }
+            }
+        });
+
+        var codes = _context.SeriesResultsTemplateScoreCodes
+            .Where(c => c.SeriesResultsTemplateId == saved.Id)
+            .OrderBy(c => c.Code)
+            .ToList();
+        Assert.Equal(new[] { "DNC", "DNF" }, codes.Select(c => c.Code));
+        Assert.Equal(ScoreCodeDisplay.Hidden, codes[0].Display);
+        Assert.True(codes[1].Faded);
+        Assert.Equal(2, saved.ScoreCodes.Count);
+    }
+
+    [Fact]
+    public async Task SaveTemplateAsync_ExistingScoreCodes_ReplacesThem()
+    {
+        var created = await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            ClubId = _clubId,
+            Name = "Sparse",
+            ScoreCodes = new List<SeriesResultsTemplateScoreCode>
+            {
+                new() { Code = "DNC", Display = ScoreCodeDisplay.Hidden }
+            }
+        });
+
+        await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            Id = created.Id,
+            ClubId = _clubId,
+            Name = "Sparse",
+            ScoreCodes = new List<SeriesResultsTemplateScoreCode>
+            {
+                new() { Code = "DNF", Faded = true }
+            }
+        });
+
+        var reloaded = await _service.GetTemplateAsync(created.Id);
+        var code = Assert.Single(reloaded.ScoreCodes);
+        Assert.Equal("DNF", code.Code);
+        Assert.True(code.Faded);
     }
 }

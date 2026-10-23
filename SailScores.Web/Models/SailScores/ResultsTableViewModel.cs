@@ -64,6 +64,13 @@ public class ResultsTableViewModel
 
     public bool ShowRaceColumns => RaceColumnsVisibility != ColumnVisibility.Hidden;
 
+    public IDictionary<string, SeriesResultsTemplateScoreCode> ScoreCodeDisplays { get; set; } =
+        new Dictionary<string, SeriesResultsTemplateScoreCode>(StringComparer.OrdinalIgnoreCase);
+
+    // The template's display setting for a score code, or null to show code and points.
+    public SeriesResultsTemplateScoreCode GetScoreCodeDisplay(string code) =>
+        !string.IsNullOrEmpty(code) && ScoreCodeDisplays.TryGetValue(code, out var display) ? display : null;
+
     // Copies the display settings of a results template into this table.
     public ResultsTableViewModel WithTemplate(ResolvedTemplate template)
     {
@@ -77,6 +84,7 @@ public class ResultsTableViewModel
         HighlightTopThree = template.HighlightTopThree;
         ColumnSeparators = template.ColumnSeparators;
         RaceColumnsVisibility = template.RaceColumnsVisibility;
+        ScoreCodeDisplays = template.ScoreCodes;
         return this;
     }
 

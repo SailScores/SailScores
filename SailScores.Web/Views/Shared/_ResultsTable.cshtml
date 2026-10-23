@@ -371,7 +371,8 @@
                                     ScoreCodesUsed = Model.Results.ScoreCodesUsed,
                                     HideDncDiscards = Model.HideDncDiscards,
                                     HighlightTopThree = Model.HighlightTopThree,
-                                    CssClass = raceColumnClass
+                                    CssClass = raceColumnClass,
+                                    CodeDisplay = Model.GetScoreCodeDisplay(result?.Code)
                                })
                         }
                         prevRaceDate = race.Date;

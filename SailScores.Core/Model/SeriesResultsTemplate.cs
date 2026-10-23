@@ -23,4 +23,5 @@ public class SeriesResultsTemplate
     public ResultsColumnSeparator ColumnSeparators { get; set; }
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
     public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
+    public IList<SeriesResultsTemplateScoreCode> ScoreCodes { get; set; } = new List<SeriesResultsTemplateScoreCode>();
 }

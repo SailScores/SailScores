@@ -26,6 +26,9 @@ public class SeriesResultsTemplateViewModel
         HighlightTopThree = template.HighlightTopThree;
         ColumnSeparators = template.ColumnSeparators;
         RaceColumnsVisibility = template.RaceColumnsVisibility;
+        ScoreCodes = (template.ScoreCodes ?? new List<SeriesResultsTemplateScoreCode>())
+            .Select(c => new TemplateScoreCodeViewModel(c))
+            .ToList();
     }
 
     // The template's own settings; custom field selections are saved separately.
@@ -45,6 +48,9 @@ public class SeriesResultsTemplateViewModel
         HighlightTopThree = HighlightTopThree,
         ColumnSeparators = ColumnSeparators,
         RaceColumnsVisibility = RaceColumnsVisibility,
+        ScoreCodes = (ScoreCodes ?? new List<TemplateScoreCodeViewModel>())
+            .Select(c => c.ToModel())
+            .ToList(),
     };
 
     public Guid Id { get; set; }
@@ -91,6 +97,8 @@ public class SeriesResultsTemplateViewModel
 
     [Display(Name = "Race columns")]
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
+
+    public IList<TemplateScoreCodeViewModel> ScoreCodes { get; set; } = new List<TemplateScoreCodeViewModel>();
 
     public IList<TemplateCustomFieldSelectionViewModel> CustomFieldSelections { get; set; } = new List<TemplateCustomFieldSelectionViewModel>();
 

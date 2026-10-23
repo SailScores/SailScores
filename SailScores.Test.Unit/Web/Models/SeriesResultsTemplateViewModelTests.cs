@@ -26,7 +26,11 @@ public class SeriesResultsTemplateViewModelTests
             ShowClubLogo = true,
             HighlightTopThree = false,
             ColumnSeparators = ResultsColumnSeparator.RaceDays,
-            RaceColumnsVisibility = ColumnVisibility.Hidden
+            RaceColumnsVisibility = ColumnVisibility.Hidden,
+            ScoreCodes = new System.Collections.Generic.List<SeriesResultsTemplateScoreCode>
+            {
+                new() { Code = "DNC", Display = ScoreCodeDisplay.Hidden, Faded = true }
+            }
         };
 
         var result = new SeriesResultsTemplateViewModel(template).ToModel();
