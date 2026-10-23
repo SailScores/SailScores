@@ -157,13 +157,6 @@
         SeriesId = Model.Item.Id,
         Results = Model.Item.FlatResults,
         ShowTrend = showTrend,
-        SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-        CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-        CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-        BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-        BoatNameHeader = resolvedTemplate.BoatNameHeader,
-        CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
-        ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
         CustomFieldColumns = customFieldColumns,
         CustomFieldDefinitions = customFieldDefinitions,
         IsExport = false,
@@ -174,7 +167,7 @@
         HideDncDiscards = Model.Item.HideDncDiscards,
         UpdatedDate = Model.Item.UpdatedDate,
         DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-    };
+    }.WithTemplate(resolvedTemplate);
 }
 
 @await Html.PartialAsync("_ResultsTable", tableModel)

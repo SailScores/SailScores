@@ -176,11 +176,6 @@ namespace SailScores.Web.Mapping
                 .ForMember( d => d.TimeOffset, o => o.Ignore())
                 .ForMember( d => d.File, o => o.Ignore());
 
-            CreateMap<Core.Model.SeriesResultsTemplate, SeriesResultsTemplateViewModel>()
-                .ForMember(d => d.ClubInitials, o => o.Ignore())
-                .ForMember(d => d.IsClubDefault, o => o.Ignore())
-                .ReverseMap();
-
             MapRegattaObjects();
         }
 

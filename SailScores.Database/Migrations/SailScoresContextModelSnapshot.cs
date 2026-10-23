@@ -1712,6 +1712,9 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid>("ClubId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("ColumnSeparators")
+                        .HasColumnType("int");
+
                     b.Property<int>("CompetitorClubVisibility")
                         .HasColumnType("int");
 
@@ -1722,10 +1725,16 @@ namespace SailScores.Database.Migrations
                     b.Property<int>("CompetitorNameVisibility")
                         .HasColumnType("int");
 
+                    b.Property<bool>("HighlightTopThree")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("RaceColumnsVisibility")
+                        .HasColumnType("int");
 
                     b.Property<int>("SailNumberVisibility")
                         .HasColumnType("int");

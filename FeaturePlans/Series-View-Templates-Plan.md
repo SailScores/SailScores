@@ -22,19 +22,19 @@ set in the club settings form (`Admin/Edit`).
   previously open another club's template by id).
 - Seed default templates when the management page is opened, as `Admin/Edit` does.
 
-## Phase 2 — Display options (top 3, separators, hide race columns)
+## Phase 2 — Display options (top 3, separators, race columns)
 
-New template fields (one migration):
+New template fields (one migration; existing rows get place colors on and race columns shown):
 
 - `HighlightTopThree` (bool, default true) — gold/silver/bronze place colors.
 - `ColumnSeparators` (enum `ResultsColumnSeparator`: `None`, `EveryColumn`, `RaceDays`) —
   vertical lines between race columns, between race days, or between child series in a
   summary series (each child series is one column, so `EveryColumn`).
-- `HideRaceColumns` (bool) — hide race / child series columns, leaving competitor and scoring
-  columns.
+- `RaceColumnsVisibility` (`ColumnVisibility`, default `Always`) — `Hidden` leaves only the
+  competitor and scoring columns; `OnLargerScreens` gives a compact phone view.
 
 Work: entity + core model + explicit (non-AutoMapper) conversions, resolved template, edit UI,
-`_ResultsTable` / `_ScoreCell` rendering, backup/restore, docs. Collect the duplicated
+`_ResultsTable` / `_ScoreCell` rendering, docs (backup is phase 4). Collect the duplicated
 template-to-`ResultsTableViewModel` copying into one helper used by series, regatta, export
 and what-if views.
 
@@ -50,6 +50,13 @@ Stored in a child table (`SeriesResultsTemplateScoreCode`: template, code, displ
 faded). Edit UI lists the codes from the club's scoring systems. Rendering in `_ScoreCell`;
 the series `HideDncDiscards` option keeps working. Backup/restore, docs.
 
+## Phase 4 — Back up results views
+
+Found while planning: club backups don't include `SeriesResultsTemplates` or their custom
+field selections at all, though they do include the club default ids and each series'
+template id. Add templates (with the phase 2 and 3 settings) to `ClubBackupData`, and restore
+them before clubs and series so their references resolve.
+
 ## Manual testing checklist
 
 ### A. Template management (phase 1)
@@ -62,3 +69,27 @@ the series `HideDncDiscards` option keeps working. Backup/restore, docs.
 - [ ] Open `/{otherClub}/SeriesResultsTemplate/Edit/{id of a template from your club}` —
       returns Not Found.
 - [ ] A club with no templates gets Standard and Regatta seeded on opening the page.
+
+### B. Template edit page (phases 1–2)
+
+- [ ] Create a view: the custom competitor fields table now appears on Create (it was only on
+      Edit before) and the selections are saved.
+- [ ] Edit page has "Race columns", "Highlight top three places" and "Column separators";
+      values save and reload. Existing views open with place colors on, race columns Always,
+      separators None.
+- [ ] Submitting with an empty name re-shows the form with the custom fields table intact.
+
+### C. Results pages (phase 2)
+
+Check on a series page, a regatta page, the series HTML export, the regatta "export all"
+HTML, and What If results. Check both light and dark mode.
+
+- [ ] Highlight top three off: no gold/silver/bronze cells; discards still faded.
+- [ ] Separators "Between every race": a vertical line before every race column after the
+      first, including abandoned/scheduled columns. In a summary series, between child series.
+- [ ] Separators "Between race days": lines only where the date changes.
+- [ ] Race columns Hidden: only place, competitor columns, total and scoring columns; no repeated
+      name column at the right. On Larger Screens: race columns disappear on a phone width.
+- [ ] Series HTML export and regatta "export all" now honor "Show Pre-Discard Total" (they
+      ignored it before).
+

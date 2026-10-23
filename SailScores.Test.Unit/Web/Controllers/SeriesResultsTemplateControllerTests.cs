@@ -8,7 +8,6 @@ using Moq;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Core.Services.Interfaces;
-using SailScores.Test.Unit.Utilities;
 using SailScores.Web.Controllers;
 using SailScores.Web.Models.SailScores;
 using Xunit;
@@ -30,8 +29,7 @@ public class SeriesResultsTemplateControllerTests
         _controller = new SeriesResultsTemplateController(
             _templateServiceMock.Object,
             _clubServiceMock.Object,
-            _competitorFieldServiceMock.Object,
-            MapperBuilder.GetSailScoresMapper())
+            _competitorFieldServiceMock.Object)
         {
             TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>())
         };

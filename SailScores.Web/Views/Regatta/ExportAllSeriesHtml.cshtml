@@ -95,12 +95,6 @@
                                 SeriesId = series.Id,
                                 Results = series.FlatResults,
                                 ShowTrend = false,
-                                SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-                                CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-                                CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-                                BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-                                BoatNameHeader = resolvedTemplate.BoatNameHeader,
-                                CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
                                 IsExport = true,
                                 ShowExportButtons = false,
                                 ExcludeCompetitorLinks = true,
@@ -109,7 +103,7 @@
                                 HideDncDiscards = series.HideDncDiscards,
                                 UpdatedDate = series.UpdatedDate,
                                 DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-                            };
+                            }.WithTemplate(resolvedTemplate);
                         <div class="row mt-4">
                             <div class="col-12">
                                 <h2>@series.Name</h2>

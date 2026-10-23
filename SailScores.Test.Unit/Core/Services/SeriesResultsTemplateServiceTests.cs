@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Services;
 using SailScores.Database;
@@ -86,5 +87,58 @@ public class SeriesResultsTemplateServiceTests
         var saved = _context.SeriesResultsTemplates.Single(t => t.Id == _otherClubTemplateId);
         Assert.Equal(_otherClubId, saved.ClubId);
         Assert.Equal("Other", saved.Name);
+    }
+
+    [Fact]
+    public async Task SaveTemplateAsync_NewTemplate_SavesDisplayOptions()
+    {
+        var saved = await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            ClubId = _clubId,
+            Name = "Sparse",
+            HighlightTopThree = false,
+            ColumnSeparators = ResultsColumnSeparator.RaceDays,
+            RaceColumnsVisibility = ColumnVisibility.OnLargerScreens
+        });
+
+        var dbTemplate = _context.SeriesResultsTemplates.Single(t => t.Id == saved.Id);
+        Assert.Equal(_clubId, dbTemplate.ClubId);
+        Assert.False(dbTemplate.HighlightTopThree);
+        Assert.Equal(ResultsColumnSeparator.RaceDays, dbTemplate.ColumnSeparators);
+        Assert.Equal(ColumnVisibility.OnLargerScreens, dbTemplate.RaceColumnsVisibility);
+        Assert.False(saved.HighlightTopThree);
+    }
+
+    [Fact]
+    public async Task SaveTemplateAsync_ExistingTemplate_UpdatesSettingsAndKeepsCustomFields()
+    {
+        var created = await _service.SaveTemplateAsync(new SeriesResultsTemplate { ClubId = _clubId, Name = "View" });
+        var fieldDefinition = new Db.CompetitorFieldDefinition
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "Crew"
+        };
+        _context.CompetitorFieldDefinitions.Add(fieldDefinition);
+        _context.SeriesResultsTemplateCustomFields.Add(new Db.SeriesResultsTemplateCustomField
+        {
+            Id = Guid.NewGuid(),
+            SeriesResultsTemplateId = created.Id,
+            FieldDefinitionId = fieldDefinition.Id
+        });
+        await _context.SaveChangesAsync();
+
+        await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            Id = created.Id,
+            ClubId = _clubId,
+            Name = "Renamed",
+            ColumnSeparators = ResultsColumnSeparator.EveryColumn
+        });
+
+        var dbTemplate = _context.SeriesResultsTemplates.Single(t => t.Id == created.Id);
+        Assert.Equal("Renamed", dbTemplate.Name);
+        Assert.Equal(ResultsColumnSeparator.EveryColumn, dbTemplate.ColumnSeparators);
+        Assert.Single(_context.SeriesResultsTemplateCustomFields.Where(f => f.SeriesResultsTemplateId == created.Id));
     }
 }

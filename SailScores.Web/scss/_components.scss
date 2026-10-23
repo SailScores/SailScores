@@ -289,6 +289,11 @@ nav.bg-dark {
     background: #{$finish-third-light} !important;
 }
 
+/* Vertical line between race columns, set by the results template */
+.table > :not(caption) > * > .results-separator {
+    border-left: 2px solid var(--bs-secondary-color);
+}
+
 /* Race status */
 span.discardmuted {
     color: #6c757d !important;

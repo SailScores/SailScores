@@ -45,12 +45,6 @@
             Results = alternateResults,
             ShowTrend = true,
             ShowTrendOnAllDevices = true,
-            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-            BoatNameHeader = resolvedTemplate.BoatNameHeader,
-            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
             IsExport = false,
             ShowExportButtons = false,
             ExcludeCompetitorLinks = true,
@@ -58,7 +52,7 @@
             TrendLegend = "Rank change from existing scoring method.",
             UpdatedDate = null,
             DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-        };
+        }.WithTemplate(resolvedTemplate);
 }
 @await Html.PartialAsync("_ResultsTable", previewModel)
 
@@ -86,13 +80,6 @@
             SeriesId = Model.Series.Id,
             Results = Model.Series.FlatResults,
             ShowTrend = false,
-            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-            BoatNameHeader = resolvedTemplate.BoatNameHeader,
-            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
-            ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
             IsExport = false,
             ShowExportButtons = false,
             ExcludeCompetitorLinks = true,
@@ -100,7 +87,7 @@
             TrendLegend = String.Empty,
             UpdatedDate = null,
             DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-        };
+        }.WithTemplate(resolvedTemplate);
 }
 @await Html.PartialAsync("_ResultsTable", currentResults)
 

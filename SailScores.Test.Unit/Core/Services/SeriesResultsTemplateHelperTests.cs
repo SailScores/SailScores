@@ -90,4 +90,31 @@ public class SeriesResultsTemplateHelperTests
 
         Assert.False(result.ShowClubLogo);
     }
+
+    [Fact]
+    public void GetDefaultTemplate_HighlightsTopThreeAndShowsRaceColumns()
+    {
+        var result = SeriesResultsTemplateHelper.GetDefaultTemplate();
+
+        Assert.True(result.HighlightTopThree);
+        Assert.Equal(ResultsColumnSeparator.None, result.ColumnSeparators);
+        Assert.Equal(ColumnVisibility.Always, result.RaceColumnsVisibility);
+    }
+
+    [Fact]
+    public void GetResolvedTemplate_WithDisplayOptions_CopiesThem()
+    {
+        var template = new SeriesResultsTemplate
+        {
+            HighlightTopThree = false,
+            ColumnSeparators = ResultsColumnSeparator.EveryColumn,
+            RaceColumnsVisibility = ColumnVisibility.Hidden
+        };
+
+        var result = SeriesResultsTemplateHelper.GetResolvedTemplate(template);
+
+        Assert.False(result.HighlightTopThree);
+        Assert.Equal(ResultsColumnSeparator.EveryColumn, result.ColumnSeparators);
+        Assert.Equal(ColumnVisibility.Hidden, result.RaceColumnsVisibility);
+    }
 }

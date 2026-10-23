@@ -19,18 +19,15 @@ public class SeriesResultsTemplateController : Controller
     private readonly ISeriesResultsTemplateService _templateService;
     private readonly IClubService _clubService;
     private readonly ICompetitorFieldService _competitorFieldService;
-    private readonly IMapper _mapper;
 
     public SeriesResultsTemplateController(
         ISeriesResultsTemplateService templateService,
         IClubService clubService,
-        ICompetitorFieldService competitorFieldService,
-        IMapper mapper)
+        ICompetitorFieldService competitorFieldService)
     {
         _templateService = templateService;
         _clubService = clubService;
         _competitorFieldService = competitorFieldService;
-        _mapper = mapper;
     }
 
     // GET: SeriesResultsTemplate
@@ -90,9 +87,9 @@ public class SeriesResultsTemplateController : Controller
         var vm = new SeriesResultsTemplateViewModel
         {
             ClubId = clubId,
-            ClubInitials = clubInitials,
-            AvailableCustomFields = (await _competitorFieldService.GetFieldDefinitionsAsync(clubId)).ToList()
+            ClubInitials = clubInitials
         };
+        await LoadCustomFieldsAsync(vm, clubId, templateId: null);
 
         return View(vm);
     }
@@ -105,26 +102,20 @@ public class SeriesResultsTemplateController : Controller
         ViewData["ClubInitials"] = clubInitials;
         try
         {
+            var clubId = await _clubService.GetClubId(clubInitials);
             if (!ModelState.IsValid)
             {
                 model.ClubInitials = clubInitials;
+                model.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
                 return View(model);
             }
 
-            var clubId = await _clubService.GetClubId(clubInitials);
             model.ClubId = clubId;
 
-            var template = _mapper.Map<SeriesResultsTemplate>(model);
+            var template = model.ToModel();
             var savedTemplate = await _templateService.SaveTemplateAsync(template);
-            await _competitorFieldService.SaveTemplateSelectionsAsync(savedTemplate.Id, model.CustomFieldSelections
-                .Where(s => s.Selected)
-                .Select(s => new SeriesResultsTemplateCustomField
-                {
-                    FieldDefinitionId = s.FieldDefinitionId,
-                    Visibility = s.Visibility,
-                    DisplayOrder = s.DisplayOrder
-                })
-                .ToList());
+            await _competitorFieldService.SaveTemplateSelectionsAsync(
+                savedTemplate.Id, GetSelectedCustomFields(model));
 
             TempData["SuccessMessage"] = $"Template '{model.Name}' created successfully.";
             return RedirectToAction(nameof(Index), new { clubInitials });
@@ -149,25 +140,9 @@ public class SeriesResultsTemplateController : Controller
             return NotFound();
         }
 
-        var vm = _mapper.Map<SeriesResultsTemplateViewModel>(template);
+        var vm = new SeriesResultsTemplateViewModel(template);
         vm.ClubInitials = clubInitials;
-        vm.AvailableCustomFields = (await _competitorFieldService.GetFieldDefinitionsAsync(clubId)).ToList();
-        var selections = await _competitorFieldService.GetTemplateSelectionsAsync(template.Id);
-        var selectionLookup = selections.ToDictionary(s => s.FieldDefinitionId, s => s);
-        vm.CustomFieldSelections = vm.AvailableCustomFields
-            .Select(field => new TemplateCustomFieldSelectionViewModel
-            {
-                FieldDefinitionId = field.Id,
-                Name = field.Name,
-                DisplayHeader = field.DisplayHeader,
-                DataType = field.DataType,
-                Selected = selectionLookup.ContainsKey(field.Id),
-                Visibility = selectionLookup.TryGetValue(field.Id, out var value) ? value.Visibility : ColumnVisibility.Hidden,
-                DisplayOrder = selectionLookup.TryGetValue(field.Id, out var value2) ? value2.DisplayOrder : 0
-            })
-            .OrderBy(s => s.DisplayOrder)
-            .ThenBy(s => s.DisplayHeader)
-            .ToList();
+        await LoadCustomFieldsAsync(vm, clubId, template.Id);
 
         return View(vm);
     }
@@ -180,31 +155,24 @@ public class SeriesResultsTemplateController : Controller
         ViewData["ClubInitials"] = clubInitials;
         try
         {
-            if (!ModelState.IsValid)
-            {
-                model.ClubInitials = clubInitials;
-                return View(model);
-            }
-
             model.Id = id;
             var clubId = await _clubService.GetClubId(clubInitials);
             if (await GetClubTemplateAsync(clubId, id) == null)
             {
                 return NotFound();
             }
+            if (!ModelState.IsValid)
+            {
+                model.ClubInitials = clubInitials;
+                model.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+                return View(model);
+            }
             model.ClubId = clubId;
 
-            var template = _mapper.Map<SeriesResultsTemplate>(model);
+            var template = model.ToModel();
             var savedTemplate = await _templateService.SaveTemplateAsync(template);
-            await _competitorFieldService.SaveTemplateSelectionsAsync(savedTemplate.Id, model.CustomFieldSelections
-                .Where(s => s.Selected)
-                .Select(s => new SeriesResultsTemplateCustomField
-                {
-                    FieldDefinitionId = s.FieldDefinitionId,
-                    Visibility = s.Visibility,
-                    DisplayOrder = s.DisplayOrder
-                })
-                .ToList());
+            await _competitorFieldService.SaveTemplateSelectionsAsync(
+                savedTemplate.Id, GetSelectedCustomFields(model));
 
             TempData["SuccessMessage"] = $"Template '{model.Name}' updated successfully.";
             return RedirectToAction(nameof(Index), new { clubInitials });
@@ -231,7 +199,7 @@ public class SeriesResultsTemplateController : Controller
 
         var club = await _clubService.GetMinimalClub(clubId);
 
-        var vm = _mapper.Map<SeriesResultsTemplateViewModel>(template);
+        var vm = new SeriesResultsTemplateViewModel(template);
         vm.ClubInitials = clubInitials;
         vm.IsClubDefault = template.Id == club.DefaultSeriesResultsTemplateId 
                         || template.Id == club.DefaultRegattaSeriesResultsTemplateId;
@@ -277,6 +245,49 @@ public class SeriesResultsTemplateController : Controller
             return RedirectToAction(nameof(Delete), new { clubInitials, id });
         }
     }
+
+    private async Task<IList<CompetitorFieldDefinition>> GetFieldDefinitionsAsync(Guid clubId) =>
+        (await _competitorFieldService.GetFieldDefinitionsAsync(clubId)).ToList();
+
+    // Fills the custom field choices: every club field, marked with the template's selections.
+    private async Task LoadCustomFieldsAsync(SeriesResultsTemplateViewModel vm, Guid clubId, Guid? templateId)
+    {
+        vm.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+        var selections = templateId.HasValue
+            ? await _competitorFieldService.GetTemplateSelectionsAsync(templateId.Value)
+            : new List<SeriesResultsTemplateCustomField>();
+        var selectionLookup = selections.ToDictionary(s => s.FieldDefinitionId, s => s);
+        vm.CustomFieldSelections = vm.AvailableCustomFields
+            .Select(field =>
+            {
+                var isSelected = selectionLookup.TryGetValue(field.Id, out var selection);
+                return new TemplateCustomFieldSelectionViewModel
+                {
+                    FieldDefinitionId = field.Id,
+                    Name = field.Name,
+                    DisplayHeader = field.DisplayHeader,
+                    DataType = field.DataType,
+                    Selected = isSelected,
+                    Visibility = isSelected ? selection.Visibility : ColumnVisibility.Hidden,
+                    DisplayOrder = isSelected ? selection.DisplayOrder : 0
+                };
+            })
+            .OrderBy(s => s.DisplayOrder)
+            .ThenBy(s => s.DisplayHeader)
+            .ToList();
+    }
+
+    private static IList<SeriesResultsTemplateCustomField> GetSelectedCustomFields(
+        SeriesResultsTemplateViewModel model) =>
+        (model.CustomFieldSelections ?? new List<TemplateCustomFieldSelectionViewModel>())
+            .Where(s => s.Selected)
+            .Select(s => new SeriesResultsTemplateCustomField
+            {
+                FieldDefinitionId = s.FieldDefinitionId,
+                Visibility = s.Visibility,
+                DisplayOrder = s.DisplayOrder
+            })
+            .ToList();
 
     // The template, or null when it doesn't exist or belongs to another club.
     private async Task<SeriesResultsTemplate> GetClubTemplateAsync(Guid clubId, Guid templateId)

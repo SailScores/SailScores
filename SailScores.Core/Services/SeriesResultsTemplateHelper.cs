@@ -31,6 +31,9 @@ public static class SeriesResultsTemplateHelper
             CompetitorClubVisibility = effectiveTemplate.CompetitorClubVisibility,
             ShowPreDiscardTotal = effectiveTemplate.ShowPreDiscardTotal,
             ShowClubLogo = effectiveTemplate.ShowClubLogo,
+            HighlightTopThree = effectiveTemplate.HighlightTopThree,
+            ColumnSeparators = effectiveTemplate.ColumnSeparators,
+            RaceColumnsVisibility = effectiveTemplate.RaceColumnsVisibility,
         };
     }
 
@@ -46,6 +49,9 @@ public static class SeriesResultsTemplateHelper
             CompetitorClubVisibility = isRegatta ? ColumnVisibility.OnLargerScreens : ColumnVisibility.Hidden,
             ShowPreDiscardTotal = false,
             ShowClubLogo = false,
+            HighlightTopThree = true,
+            ColumnSeparators = ResultsColumnSeparator.None,
+            RaceColumnsVisibility = ColumnVisibility.Always,
         };
     }
 }
@@ -60,4 +66,7 @@ public class ResolvedTemplate
     public ColumnVisibility CompetitorClubVisibility { get; set; }
     public bool ShowPreDiscardTotal { get; set; }
     public bool ShowClubLogo { get; set; }
+    public bool HighlightTopThree { get; set; } = true;
+    public ResultsColumnSeparator ColumnSeparators { get; set; }
+    public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
 }

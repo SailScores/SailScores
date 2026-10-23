@@ -19,5 +19,8 @@ public class SeriesResultsTemplate
     public ColumnVisibility CompetitorClubVisibility { get; set; }
     public bool ShowPreDiscardTotal { get; set; }
     public bool ShowClubLogo { get; set; }
+    public bool HighlightTopThree { get; set; } = true;
+    public ResultsColumnSeparator ColumnSeparators { get; set; }
+    public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
     public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 }

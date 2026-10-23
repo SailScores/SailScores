@@ -21,6 +21,14 @@ Each template includes:
 - Boat Name header text (for example, `Boat`)
 - Competitor Club visibility
 
+- Race columns visibility (the race columns, or child series columns in a summary series).
+  When hidden, only competitor and scoring columns (totals, participation) are shown.
+- Show Pre-Discard Total
+- Show Club Logo
+- Highlight top three places (gold, silver and bronze cell colors; on by default)
+- Column separators (`ResultsColumnSeparator`): `None`, `EveryColumn` (between every race or
+  child series), or `RaceDays` (where the race date changes)
+
 Visibility uses `ColumnVisibility`:
 - `Always`
 - `OnLargerScreens`
@@ -110,6 +118,10 @@ Delete protection:
 - The club default must be changed first.
 
 ## Results table rendering
+
+Views build a `ResultsTableViewModel` and call `WithTemplate(resolvedTemplate)` to copy all of the
+template's display settings, so a new template setting only needs adding there. The race column
+CSS (visibility and the `results-separator` line) comes from `RaceColumnCssClass`.
 
 The results table view model contains explicit template-driven visibility fields.
 The legacy `ShowCompetitorClub` behavior is now derived from

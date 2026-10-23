@@ -38,6 +38,10 @@
     {
         classSb.Append("finish-third ");
     }
+    if (!Model.HighlightTopThree)
+    {
+        classSb.Clear();
+    }
 
     // In percent systems a DNC is shown like a discard when it doesn't count toward
     // the result. In high point percent systems that's every DNC; in Low Point Average
@@ -56,7 +60,7 @@
 
 @if (Model != null && Model.Result != null )
 {
-    <td class="text-center @cellFinishClasses ">
+    <td class="text-center @cellFinishClasses @Model.CssClass">
         <span class="@(Model.Result.Discard ? "discardmuted" : "")">
             @* hide all cell contents if DNC, discarded, and series setting. *@
             @if (!(Model.HideDncDiscards && Model.Result.Code == "DNC" &&
@@ -100,5 +104,5 @@
 }
 else
 {
-    <td></td>
+    <td class="@Model?.CssClass"></td>
 }

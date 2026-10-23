@@ -33,5 +33,10 @@ public class SeriesResultsTemplate
     public bool ShowPreDiscardTotal { get; set; } = false;
     public bool ShowClubLogo { get; set; }
 
+    // Score display settings
+    public bool HighlightTopThree { get; set; } = true;
+    public ResultsColumnSeparator ColumnSeparators { get; set; }
+    public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
+
     public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 }

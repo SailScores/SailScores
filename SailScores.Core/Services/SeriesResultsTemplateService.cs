@@ -47,21 +47,23 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         return _mapper.Map<SeriesResultsTemplate>(dbTemplate);
     }
 
+    // Saves the template's own settings. Custom field selections are saved separately by
+    // ICompetitorFieldService.SaveTemplateSelectionsAsync.
     public async Task<SeriesResultsTemplate> SaveTemplateAsync(SeriesResultsTemplate template)
     {
+        Db.SeriesResultsTemplate dbTemplate;
         if (template.Id == Guid.Empty)
         {
-            // Create new template
-            var dbTemplate = _mapper.Map<Db.SeriesResultsTemplate>(template);
-            dbTemplate.Id = Guid.NewGuid();
+            dbTemplate = new Db.SeriesResultsTemplate
+            {
+                Id = Guid.NewGuid(),
+                ClubId = template.ClubId
+            };
             _dbContext.SeriesResultsTemplates.Add(dbTemplate);
-            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-            return _mapper.Map<SeriesResultsTemplate>(dbTemplate);
         }
         else
         {
-            // Update existing template
-            var dbTemplate = await _dbContext.SeriesResultsTemplates
+            dbTemplate = await _dbContext.SeriesResultsTemplates
                 .FirstOrDefaultAsync(t => t.Id == template.Id)
                 .ConfigureAwait(false);
 
@@ -69,11 +71,27 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             {
                 throw new InvalidOperationException("Template not found.");
             }
-
-            _mapper.Map(template, dbTemplate);
-            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-            return _mapper.Map<SeriesResultsTemplate>(dbTemplate);
         }
+
+        CopySettings(template, dbTemplate);
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        return _mapper.Map<SeriesResultsTemplate>(dbTemplate);
+    }
+
+    private static void CopySettings(SeriesResultsTemplate source, Db.SeriesResultsTemplate target)
+    {
+        target.Name = source.Name;
+        target.SailNumberVisibility = source.SailNumberVisibility;
+        target.CompetitorNameVisibility = source.CompetitorNameVisibility;
+        target.CompetitorNameHeader = source.CompetitorNameHeader;
+        target.BoatNameVisibility = source.BoatNameVisibility;
+        target.BoatNameHeader = source.BoatNameHeader;
+        target.CompetitorClubVisibility = source.CompetitorClubVisibility;
+        target.ShowPreDiscardTotal = source.ShowPreDiscardTotal;
+        target.ShowClubLogo = source.ShowClubLogo;
+        target.HighlightTopThree = source.HighlightTopThree;
+        target.ColumnSeparators = source.ColumnSeparators;
+        target.RaceColumnsVisibility = source.RaceColumnsVisibility;
     }
 
     public async Task DeleteTemplateAsync(Guid templateId)

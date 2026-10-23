@@ -1,0 +1,36 @@
+using System;
+using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
+using SailScores.Web.Models.SailScores;
+using Xunit;
+
+namespace SailScores.Test.Unit.Web.Models;
+
+public class SeriesResultsTemplateViewModelTests
+{
+    [Fact]
+    public void ToModel_FromTemplate_RoundTripsSettings()
+    {
+        var template = new SeriesResultsTemplate
+        {
+            Id = Guid.NewGuid(),
+            ClubId = Guid.NewGuid(),
+            Name = "Sparse",
+            SailNumberVisibility = ColumnVisibility.OnLargerScreens,
+            CompetitorNameVisibility = ColumnVisibility.Always,
+            CompetitorNameHeader = "Skipper",
+            BoatNameVisibility = ColumnVisibility.Hidden,
+            BoatNameHeader = "Yacht",
+            CompetitorClubVisibility = ColumnVisibility.Always,
+            ShowPreDiscardTotal = true,
+            ShowClubLogo = true,
+            HighlightTopThree = false,
+            ColumnSeparators = ResultsColumnSeparator.RaceDays,
+            RaceColumnsVisibility = ColumnVisibility.Hidden
+        };
+
+        var result = new SeriesResultsTemplateViewModel(template).ToModel();
+
+        Assert.Equivalent(template, result);
+    }
+}

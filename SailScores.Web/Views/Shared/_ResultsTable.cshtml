@@ -77,9 +77,12 @@
                         var needCompNameColumn = false;
                         DateTime? prevRaceDate = null;
                     }
-                    @foreach (var race in Model.Results?.Races ?? Enumerable.Empty<FlatRace>())
+                    @foreach (var race in Model.ShowRaceColumns
+                        ? Model.Results?.Races ?? Enumerable.Empty<FlatRace>()
+                        : Enumerable.Empty<FlatRace>())
                     {
                         ++colCount;
+                        var raceColumnClass = Model.RaceColumnCssClass(colCount - 1);
                         if (!needCompNameColumn)
                         {
                             needCompNameColumn = colCount % 23 == 20 && (Model.Results.NumberOfSailedRaces - colCount) > 10;
@@ -91,7 +94,7 @@
                         }
                         if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                         {
-                            <th class="text-center d-none d-sm-table-cell" scope="col">
+                            <th class="text-center d-none d-sm-table-cell @raceColumnClass" scope="col">
                                 @if (Model.IsExport)
                                 {
                                     @localizer.GetShortName(race, Model.DefaultDateFormat)
@@ -128,7 +131,7 @@
                         }
                         else
                         {
-                            <th class="text-center" scope="col">
+                            <th class="text-center @raceColumnClass" scope="col">
                                 @if (Model.IsExport)
                                 {
                     @localizer.GetShortName(race, Model.DefaultDateFormat)
@@ -163,7 +166,7 @@
                         }
                         prevRaceDate = race.Date;
                     }
-                    @if ((Model.Results.NumberOfSailedRaces) > 4)
+                    @if (Model.ShowRaceColumns && (Model.Results.NumberOfSailedRaces) > 4)
                     {
                         <th scope="col" class="d-table-cell @((Model.Results.NumberOfSailedRaces < 25)?"d-md-none":"")">
                             @Model.CompetitorNameHeader
@@ -324,9 +327,10 @@
                         needCompNameColumn = false;
                         prevRaceDate = null;
                     }
-                        @foreach (var race in Model.Results.Races)
+                        @foreach (var race in Model.ShowRaceColumns ? Model.Results.Races : Enumerable.Empty<FlatRace>())
                     {
                         ++colCount;
+                        var raceColumnClass = Model.RaceColumnCssClass(colCount - 1);
                         if (!needCompNameColumn)
                         {
                                 needCompNameColumn = colCount % 23 == 20 && (Model.Results.NumberOfSailedRaces - colCount) > 10;
@@ -341,7 +345,7 @@
                         {
                             if (firstRow)
                             {
-                                    <td rowspan="@(Model.Results?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell">
+                                    <td rowspan="@(Model.Results?.Competitors?.Count() ?? 1)" class="abandoned d-none d-sm-table-cell @raceColumnClass">
                                     <span>@localizer["Abandoned"].ToUpper()</span>
                                 </td>
                             }
@@ -350,7 +354,7 @@
                         {
                             if (firstRow)
                             {
-                                    <td rowspan="@(Model.Results?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell">
+                                    <td rowspan="@(Model.Results?.Competitors?.Count() ?? 1)" class="scheduled d-none d-sm-table-cell @raceColumnClass">
                                         <span>@localizer["Scheduled"].ToUpper()</span>
                                 </td>
                             }
@@ -365,12 +369,14 @@
                                     IsPercentSystem = Model.Results.IsPercentSystem,
                                     LowerScoreWins = Model.Results.LowerScoreWins ?? false,
                                     ScoreCodesUsed = Model.Results.ScoreCodesUsed,
-                                    HideDncDiscards = Model.HideDncDiscards
+                                    HideDncDiscards = Model.HideDncDiscards,
+                                    HighlightTopThree = Model.HighlightTopThree,
+                                    CssClass = raceColumnClass
                                })
                         }
                         prevRaceDate = race.Date;
                     }
-                    @if ((Model.Results.NumberOfSailedRaces) > 4)
+                    @if (Model.ShowRaceColumns && (Model.Results.NumberOfSailedRaces) > 4)
                     {
                         <th class="d-table-cell @(( Model.Results.NumberOfSailedRaces < 25)?"d-md-none":"")"
                         scope="row">@comp.Name</th>

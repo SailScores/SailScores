@@ -6,6 +6,47 @@ namespace SailScores.Web.Models.SailScores;
 
 public class SeriesResultsTemplateViewModel
 {
+    public SeriesResultsTemplateViewModel()
+    {
+    }
+
+    public SeriesResultsTemplateViewModel(SeriesResultsTemplate template)
+    {
+        Id = template.Id;
+        ClubId = template.ClubId;
+        Name = template.Name;
+        SailNumberVisibility = template.SailNumberVisibility;
+        CompetitorNameVisibility = template.CompetitorNameVisibility;
+        CompetitorNameHeader = template.CompetitorNameHeader;
+        BoatNameVisibility = template.BoatNameVisibility;
+        BoatNameHeader = template.BoatNameHeader;
+        CompetitorClubVisibility = template.CompetitorClubVisibility;
+        ShowPreDiscardTotal = template.ShowPreDiscardTotal;
+        ShowClubLogo = template.ShowClubLogo;
+        HighlightTopThree = template.HighlightTopThree;
+        ColumnSeparators = template.ColumnSeparators;
+        RaceColumnsVisibility = template.RaceColumnsVisibility;
+    }
+
+    // The template's own settings; custom field selections are saved separately.
+    public SeriesResultsTemplate ToModel() => new()
+    {
+        Id = Id,
+        ClubId = ClubId,
+        Name = Name,
+        SailNumberVisibility = SailNumberVisibility,
+        CompetitorNameVisibility = CompetitorNameVisibility,
+        CompetitorNameHeader = CompetitorNameHeader,
+        BoatNameVisibility = BoatNameVisibility,
+        BoatNameHeader = BoatNameHeader,
+        CompetitorClubVisibility = CompetitorClubVisibility,
+        ShowPreDiscardTotal = ShowPreDiscardTotal,
+        ShowClubLogo = ShowClubLogo,
+        HighlightTopThree = HighlightTopThree,
+        ColumnSeparators = ColumnSeparators,
+        RaceColumnsVisibility = RaceColumnsVisibility,
+    };
+
     public Guid Id { get; set; }
 
     public Guid ClubId { get; set; }
@@ -41,6 +82,15 @@ public class SeriesResultsTemplateViewModel
 
     [Display(Name = "Show Club Logo")]
     public bool ShowClubLogo { get; set; }
+
+    [Display(Name = "Highlight top three places")]
+    public bool HighlightTopThree { get; set; } = true;
+
+    [Display(Name = "Column separators")]
+    public ResultsColumnSeparator ColumnSeparators { get; set; } = ResultsColumnSeparator.None;
+
+    [Display(Name = "Race columns")]
+    public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
 
     public IList<TemplateCustomFieldSelectionViewModel> CustomFieldSelections { get; set; } = new List<TemplateCustomFieldSelectionViewModel>();
 
