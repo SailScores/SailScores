@@ -5,11 +5,8 @@ namespace SailScores.Core.Scoring.Discards;
 // Cox-Sprague: the discard pattern is applied to the races the competitor sailed (started
 // or counting as participation). Each discard is the race whose removal raises the
 // competitor's percentage most: the race scoring furthest below the competitor's percentage
-// of its perfect score. Only races they came to the start in can go. Child series discards
-// and discard groups aren't used.
-//
-// Quirk: a code that can't be discarded isn't protected; the code built a discardable-only
-// list but never used it (docs/Scoring-Quirks.md).
+// of its perfect score. Only races they came to the start in, with a score that can be
+// discarded, can go. Child series discards and discard groups aren't used.
 public sealed class CoxSpragueDiscards : IDiscardRule
 {
     public void Apply(ScoringWorkspace workspace, SeriesResults results, SeriesCompetitorResults competitor)
@@ -40,7 +37,7 @@ public sealed class CoxSpragueDiscards : IDiscardRule
             .Where(s => !s.Discard && host.CameToStart(s.RawScore)).Sum(s => s.ScoreValue ?? 0);
 
         var candidateRaceIds = competitor.CalculatedScores.Values
-            .Where(s => !s.Discard && host.CameToStart(s.RawScore))
+            .Where(s => !s.Discard && host.CameToStart(s.RawScore) && (host.GetScoreCode(s.RawScore)?.Discardable ?? true))
             .Select(s => s.RawScore.RaceId);
         var candidateRaces = results.Races.Where(r => candidateRaceIds.Any(id => id == r.Id));
 

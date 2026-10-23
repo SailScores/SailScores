@@ -19,6 +19,8 @@ namespace SailScores.Core.FlatModel
         public IList<FlatResultColumn> Columns { get; set; }
         // Heading of the total column, from the calculator; null (older results) means "Total".
         public string TotalHeader { get; set; }
+        // From the calculator: an unranked competitor's total column shows PointsEarned, not Average.
+        public bool UnrankedShowsPoints { get; set; }
         public int NumberOfDiscards { get; set; }
         // Null for results saved before this was recorded; those used the race-count pattern.
         public DiscardMethod? DiscardMethod { get; set; }

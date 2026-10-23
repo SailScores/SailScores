@@ -2,7 +2,7 @@ using SailScores.Core.Model;
 
 namespace SailScores.Core.Scoring.Formulas;
 
-// A count of boats plus the code's Formula Value: FIN+, CTS+ and SER+.
+// A count of boats plus the code's Formula Value: FIN+, CTS+, STR+ and SER+.
 public abstract class CompetitorCountFormula : IScoreCodeFormula
 {
     public abstract string Name { get; }

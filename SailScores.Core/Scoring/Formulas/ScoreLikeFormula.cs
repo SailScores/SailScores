@@ -2,8 +2,8 @@ using SailScores.Core.Model;
 
 namespace SailScores.Core.Scoring.Formulas;
 
-// COD: meant to score like the code named in ScoreLike. Unfinished: never evaluated, so the
-// code keeps its place-based score (docs/Scoring-Quirks.md).
+// COD: scores like the code named in ScoreLike. Not evaluated itself: the pipeline scores the
+// code with that code's formula and formula value (ScoringPipeline.FormulaCode).
 public sealed class ScoreLikeFormula : IScoreCodeFormula
 {
     public const string FormulaName = "COD";

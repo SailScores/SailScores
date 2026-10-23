@@ -2,10 +2,11 @@
 -- Score codes are copied from the sitewide "Low Point Average without DNCs" base system
 -- (CalculatorType 7). Safe to run more than once: skipped when it exists.
 --
--- Low point average without DNCs; 50% participation to rank, counting only races that
--- weren't discarded. A summary series using its child series' races keeps their discards;
--- any other series uses the discard pattern (inherited from this base system unless the
--- club's system sets one).
+-- Low point average without DNCs; 50% participation to rank, discarded races included.
+-- A summary series using its child series' races keeps their discards; any other series
+-- (a daily series) uses the discard pattern: a boat that sailed 6 or more races discards
+-- its worst (0,0,0,0,0,1, inherited from this base system unless the club's system sets
+-- one). Rules: docs/ScoringSystems/Pbg.md.
 --
 -- The new system starts restricted: only the club named in @AccessClubInitials can use it.
 -- Set it before running (for example the test club). To open the system to more clubs
@@ -40,7 +41,7 @@ DECLARE @Systems TABLE (
     [Settings] NVARCHAR(MAX));
 
 INSERT INTO @Systems VALUES
-    ('b7f3c2d4-6a1e-4f8b-9c05-3e2d8a71f4b6', 'PBG', '0', 14, 4, NULL);
+    ('b7f3c2d4-6a1e-4f8b-9c05-3e2d8a71f4b6', 'PBG', '0,0,0,0,0,1', 14, 4, NULL);
 
 DELETE s FROM @Systems s
 WHERE EXISTS (

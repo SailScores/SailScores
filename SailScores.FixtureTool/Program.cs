@@ -5,9 +5,11 @@ const string Usage = """
     SailScores fixture tool: turns club backups into scoring test fixtures.
 
     Commands:
-      shared-systems --connection <connection string> --out <file.json>
+      shared-systems --connection <connection string> --out <file.json> [--only <system id> ...]
           Exports the shared (site-wide) scoring and handicap systems. Club backups
           leave these out, but extraction needs them to make fixtures that score.
+          With --only, updates just those scoring systems in an existing <file.json>
+          and leaves the rest of it alone.
 
       list <backup.json.gz> [--shared <file.json>] [--out <file.csv>]
           Writes one CSV row per series: calculator, discard method, codes used,
@@ -50,8 +52,19 @@ static int ShowUsage()
 
 static int SharedSystems(Options options)
 {
-    var shared = SharedSystemsExporter.Export(options.Required("--connection"));
     var outPath = options.Required("--out");
+    var only = options.All("--only")
+        .Select(id => Guid.TryParse(id, out var g) ? g : throw new ArgumentException($"--only needs a system id, not '{id}'."))
+        .ToList();
+    var exported = SharedSystemsExporter.Export(options.Required("--connection"));
+    var shared = exported;
+    if (only.Count > 0)
+    {
+        shared = File.Exists(outPath)
+            ? Json.ReadFile(outPath)
+            : throw new ArgumentException($"--only updates an earlier export, and {outPath} doesn't exist.");
+        SharedSystemsExporter.Merge(shared, exported, only);
+    }
     Json.WriteFile(outPath, shared, gzip: false);
     Console.WriteLine($"Wrote {Json.Count(shared, "scoringSystems")} scoring systems and "
         + $"{Json.Count(shared, "handicapSystems")} handicap systems to {outPath}.");

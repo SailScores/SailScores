@@ -23,12 +23,12 @@
       "Rank": 1,
       "Name": "CompMS",
       "SailNumber": "1280",
-      "Total": "3.6",
-      "TotalIncludingDiscards": "5.6",
+      "Total": "3.625",
+      "TotalIncludingDiscards": "5.625",
       "Columns": {
-        "preDiscardTotal": "5.6"
+        "preDiscardTotal": "5.625"
       },
-      "Scores": "1:0.75 | (2) | 1:0.75 | 1:0.75 | 1:1.35"
+      "Scores": "1:0.75 | (2) | 1:0.75 | 1:0.75 | 1:1.375"
     },
     {
       "Rank": 2,
@@ -56,12 +56,12 @@
       "Rank": 4,
       "Name": "CompGC",
       "SailNumber": "2539",
-      "Total": "17.35",
-      "TotalIncludingDiscards": "24.35",
+      "Total": "17.375",
+      "TotalIncludingDiscards": "24.375",
       "Columns": {
-        "preDiscardTotal": "24.35"
+        "preDiscardTotal": "24.375"
       },
-      "Scores": "(DNC 7) | DNC 7 | DNC 7 | 2 | TIE 1.35"
+      "Scores": "(DNC 7) | DNC 7 | DNC 7 | 2 | TIE 1.375"
     },
     {
       "Rank": 5,

@@ -1,13 +1,15 @@
+using System;
+using System.Linq;
 using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
+using SailScores.Core.Scoring;
+using SailScores.Core.Scoring.Tiebreaks;
 using SailScores.Test.Unit.Core.Scoring.Scenarios;
 using Xunit;
 
 namespace SailScores.Test.Unit.Core.Scoring;
 
-// PWA Standard tiebreaks (Rankings.Pwa), as ranked today. PWA scores a win 0.7.
-//
-// Quirk (bug): tiebreak (C), the better discarded result, compares a boat's discards with
-// its own, so it never breaks a tie. See docs/Scoring-Quirks.md.
+// PWA Standard tiebreaks (Rankings.Pwa). PWA scores a win 0.7.
 public class PwaScenarioTests
 {
     [Fact]
@@ -40,5 +42,36 @@ public class PwaScenarioTests
 
         ScenarioAssert.Totals(results, ("A", 5.7m), ("B", 5.7m));
         ScenarioAssert.Ranks(results, "C", "A", "B", "D");
+    }
+
+    private static SeriesCompetitorResults Discarding(params decimal[] discarded) => new()
+    {
+        CalculatedScores = discarded
+            .Select(s => new CalculatedScore { ScoreValue = s, Discard = true })
+            .Append(new CalculatedScore { ScoreValue = 1, Discard = false })
+            .ToDictionary(_ => new Race { Id = Guid.NewGuid() }, s => s)
+    };
+
+    // Tiebreak (C) on its own: in a series it's reached only when two boats have the same
+    // scores, discards included, and the same total, which takes non-discardable codes.
+    [Fact]
+    public void BetterDiscard_BetterDiscardedScore_RanksAhead()
+    {
+        // Best first: 2, 6 against 3, 5.
+        Assert.Equal(-1, new PwaBetterDiscard().Compare(null, Discarding(2, 6), Discarding(3, 5)));
+        Assert.Equal(1, new PwaBetterDiscard().Compare(null, Discarding(3, 5), Discarding(2, 6)));
+    }
+
+    [Fact]
+    public void BetterDiscard_SameAsFarAsShorterList_MoreDiscardsRanksAhead()
+    {
+        Assert.Equal(-1, new PwaBetterDiscard().Compare(null, Discarding(3, 6), Discarding(3)));
+        Assert.Equal(1, new PwaBetterDiscard().Compare(null, Discarding(3), Discarding(3, 6)));
+    }
+
+    [Fact]
+    public void BetterDiscard_SameDiscards_Ties()
+    {
+        Assert.Equal(0, new PwaBetterDiscard().Compare(null, Discarding(3, 5), Discarding(5, 3)));
     }
 }

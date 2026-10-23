@@ -22,7 +22,8 @@ public interface IScoreCodeFormula
 
 public enum FormulaStep
 {
-    // Not evaluated (TIE is handled by each calculator's place scoring; COD is unfinished).
+    // Not evaluated (TIE is handled by each calculator's place scoring; COD scores with the
+    // formula of the code it names).
     None,
     // From the race alone: fixed and manual values, boat counts in the race, penalties.
     Race,

@@ -10,6 +10,7 @@ public class ScoreCodeWithOptionsViewModel : ScoreCodeViewModel
         new SelectListItem("FIN+ - Competitors who finished this race + Formula Value", "FIN+"),
         new SelectListItem("SER+ - Competitors in this series + Formula Value", "SER+"),
         new SelectListItem("CTS+ - Competitors who came to start + Formula Value", "CTS+"),
+        new SelectListItem("STR+ - Competitors who started + Formula Value", "STR+"),
         new SelectListItem("AVE - Average of other results", "AVE"),
         new SelectListItem("AVE P - Average of previous results", "AVE P" ),
         new SelectListItem("AVE ND - Average of all non-discarded races", "AVE ND"),

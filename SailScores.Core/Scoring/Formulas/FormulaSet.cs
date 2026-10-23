@@ -14,6 +14,7 @@ public sealed class FormulaSet
         new ManualFormula(),
         new FinishersPlusFormula(),
         new CameToStartPlusFormula(),
+        new StartersPlusFormula(),
         new SeriesCompetitorsPlusFormula(),
         new PlacePlusPercentFormula(PlacePlusPercentFormula.Rounding2025),
         new AverageFormula(AverageFormula.Ave, decimals: 1),

@@ -107,8 +107,10 @@ export function initialize() {
     document.querySelector('form')?.addEventListener('keypress', checkEnter);
     document.getElementById('startNowButton')?.addEventListener('click', startNow);
     document.getElementById('fleetId')?.addEventListener('change', loadFleet);
-    if ($("#defaultRaceDateOffset").val() == "") {
+    // Only adjust a club default date; keep a date the server took from the series or regatta.
+    if ($('#needsLocalDate').val() === "True" && $("#defaultRaceDateOffset").val() == "") {
         $('#date').val('');
+        $('#needsLocalDate').val('');
     } else if ($('#needsLocalDate').val() === "True") {
         let now = new Date();
         const selectedDate: Date | null = new Date( $('#date').val() as string );

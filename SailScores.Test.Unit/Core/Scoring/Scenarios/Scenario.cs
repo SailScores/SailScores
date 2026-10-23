@@ -157,7 +157,8 @@ public sealed class Scenario
     }
 
     // Marks boats as discarded in the last race's child series, as a summary series sees
-    // child series races (DiscardMethod.ChildSeriesDiscardsOrPattern and similar).
+    // child series races (DiscardMethod.ChildSeriesDiscardsOrPattern and similar). Each day's
+    // races are then one child series.
     public Scenario DiscardedInChild(params string[] names)
     {
         foreach (var race in _races)
@@ -183,9 +184,16 @@ public sealed class Scenario
     {
         if (_races.Any(r => r.CompetitorIdsDiscardedInChild != null))
         {
+            var childSeriesIds = new Dictionary<DateTime?, Guid>();
             foreach (var race in _races)
             {
                 race.CompetitorIdsDiscardedInChild ??= new HashSet<Guid>();
+                if (!childSeriesIds.TryGetValue(race.Date, out var childSeriesId))
+                {
+                    childSeriesId = Guid.NewGuid();
+                    childSeriesIds[race.Date] = childSeriesId;
+                }
+                race.SourceChildSeriesId = childSeriesId;
             }
         }
         var series = new Series

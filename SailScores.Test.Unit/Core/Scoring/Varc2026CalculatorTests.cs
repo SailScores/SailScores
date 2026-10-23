@@ -1,6 +1,7 @@
 using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
+using SailScores.Test.Unit.Core.Scoring.Scenarios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -285,5 +286,146 @@ public class Varc2026CalculatorTests
 
         Assert.Equal(1, results.Results[c[0]].Rank);
         Assert.Equal(2, results.Results[c[1]].Rank);
+    }
+
+    // The club's answers (2026-10-22), scored with the VARC 2026 base system's codes.
+    private static Scenario Varc() => Scenario.With(ScoringCalculatorType.Varc2026);
+
+    private static decimal? Points(ScenarioResults results, string name, int raceIndex = 0) =>
+        results.For(name).CalculatedScores
+            .OrderBy(kv => kv.Key.Order)
+            .ElementAt(raceIndex).Value.ScoreValue;
+
+    [Fact]
+    public void CalculateResults_Dns_CountsAsBoatRacing()
+    {
+        var results = Varc().Race("A:1 B:2 C:3 D:4 E:DNF F:DNS").Score();
+
+        // Six boats racing: the DNF and DNS score 100 - 6.
+        Assert.Equal(100m, Points(results, "A"));
+        Assert.Equal(94m, Points(results, "E"));
+        Assert.Equal(94m, Points(results, "F"));
+    }
+
+    [Fact]
+    public void CalculateResults_UnderFiveRacingWithDns_ReducesForEveryBoatRacing()
+    {
+        var results = Varc().Race("A:1 B:2 C:DNS").Score();
+
+        // Three boats racing: (100 - 5) + 3 = 98 for first; the DNS is one behind second.
+        Assert.Equal(98m, Points(results, "A"));
+        Assert.Equal(97m, Points(results, "B"));
+        Assert.Equal(95m, Points(results, "C"));
+    }
+
+    [Fact]
+    public void CalculateResults_TiedPlaces_BothScoreTheBetterPlace()
+    {
+        var results = Varc().Race("A:1 B:2 C:2 D:4 E:5").Score();
+
+        Assert.Equal(99m, Points(results, "B"));
+        Assert.Equal(99m, Points(results, "C"));
+        Assert.Equal(97m, Points(results, "D"));
+        Assert.Equal(96m, Points(results, "E"));
+    }
+
+    [Fact]
+    public void CalculateResults_TieCode_ScoresThePlaceOfTheBoatAhead()
+    {
+        var results = Varc().Race("A:1 B:2 C:TIE@3 D:4 E:5").Score();
+
+        Assert.Equal(99m, Points(results, "B"));
+        Assert.Equal(99m, Points(results, "C"));
+        Assert.Equal(97m, Points(results, "D"));
+    }
+
+    [Fact]
+    public void CalculateResults_Penalty_ScoresAsDncAndIsNotABoatRacing()
+    {
+        var results = Varc().Race("A:1 B:2 C:3 D:4 E:DNF F:SCP@5").Score();
+
+        // Five boats racing: the DNF scores 100 - 5; the SCP scores 0.
+        Assert.Equal(95m, Points(results, "E"));
+        Assert.Equal(0m, Points(results, "F"));
+    }
+
+    [Fact]
+    public void CalculateResults_BfdAndDne_AreDiscardedLikeDnf()
+    {
+        var results = Varc()
+            .Race("A:BFD B:1 C:2 D:DNE").Race("A:1 B:2 D:3").Race("A:1 B:2 D:3").Race("A:1 B:2 D:3")
+            .Score();
+
+        Assert.True(results.For("A").CalculatedScores.OrderBy(kv => kv.Key.Order).First().Value.Discard);
+        Assert.True(results.For("D").CalculatedScores.OrderBy(kv => kv.Key.Order).First().Value.Discard);
+    }
+
+    [Fact]
+    public void CalculateResults_EventWithAWinnerAndADns_Counts()
+    {
+        var results = Varc().Race("A:1 B:DNS").Score();
+
+        Assert.Equal(0, results.Results.NumberOfDiscards);
+        Assert.False(results.For("A").CalculatedScores.Single().Value.Discard);
+    }
+
+    [Fact]
+    public void CalculateResults_EventWithAWinnerAndAPenalty_DoesNotCount()
+    {
+        var results = Varc().Race("A:1 B:SCP@2").Score();
+
+        Assert.True(results.For("A").CalculatedScores.Single().Value.Discard);
+    }
+
+    [Fact]
+    public void CalculateResults_RdgWithPointsEntered_ScoresThePoints()
+    {
+        var results = Varc().Race("A:1 B:2 C:3 D:4 E:RDG=97.5").Score();
+
+        Assert.Equal(97.5m, Points(results, "E"));
+    }
+
+    [Fact]
+    public void CalculateResults_RdgWithoutPoints_ScoresLikeDnf()
+    {
+        var results = Varc().Race("A:1 B:2 C:3 D:4 E:RDG").Score();
+
+        // Five boats racing: 100 - 5.
+        Assert.Equal(95m, Points(results, "E"));
+    }
+
+    // Boat of the Year: a summary series where each season series is one race scored by its
+    // series score (preset), best 2 of 3 counting, and ties standing after A8.1.
+    private static Scenario BoatOfTheYear() =>
+        Varc().Settings(s =>
+        {
+            s.ScoresToCount = 2;
+            s.TiesStandAfterA81 = true;
+        });
+
+    [Fact]
+    public void CalculateResults_BoatOfTheYearTie_A81ComparesCountedSeasonScoresBestFirst()
+    {
+        // Tied on 594: A's best season (300, 1st) beats B's (297, 2nd), though B's other
+        // counted season is better (297 against 294).
+        var results = BoatOfTheYear()
+            .Race("A:=300 B:=297").Race("A:=294 B:=297").Race("A:=200 B:=200")
+            .Score();
+
+        ScenarioAssert.Totals(results, ("A", 594m), ("B", 594m));
+        ScenarioAssert.Ranks(results, "A", "B");
+    }
+
+    [Fact]
+    public void CalculateResults_BoatOfTheYearTie_DiscardedSeasonDoesNotBreakIt()
+    {
+        // Both count 300 + 290. A's discarded season is better, but only counted scores
+        // are compared, so the tie stands.
+        var results = BoatOfTheYear()
+            .Race("A:=300 B:=300").Race("A:=290 B:=290").Race("A:=289 B:=100")
+            .Score();
+
+        ScenarioAssert.Rank(results, "A", 1);
+        ScenarioAssert.Rank(results, "B", 1);
     }
 }

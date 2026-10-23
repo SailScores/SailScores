@@ -80,11 +80,11 @@
       "Name": "CompKA",
       "SailNumber": "TC67",
       "Total": "32",
-      "TotalIncludingDiscards": "44",
+      "TotalIncludingDiscards": "46",
       "Columns": {
-        "preDiscardTotal": "44"
+        "preDiscardTotal": "46"
       },
-      "Scores": "10 | 1 | 4 | (ZFP 12) | 12 | 5"
+      "Scores": "10 | 1 | 4 | (ZFP 14) | 12 | 5"
     },
     {
       "Rank": 7,
@@ -99,17 +99,6 @@
     },
     {
       "Rank": 8,
-      "Name": "CompNN",
-      "SailNumber": "2717",
-      "Total": "38",
-      "TotalIncludingDiscards": "61",
-      "Columns": {
-        "preDiscardTotal": "61"
-      },
-      "Scores": "12 | 9 | (DNS 23) | ZFP 10 | 4 | 3"
-    },
-    {
-      "Rank": 9,
       "Name": "CompAJ",
       "SailNumber": "2887",
       "Total": "38",
@@ -118,6 +107,17 @@
         "preDiscardTotal": "54"
       },
       "Scores": "6 | (16) | 7 | 10 | 9 | 6"
+    },
+    {
+      "Rank": 9,
+      "Name": "CompNN",
+      "SailNumber": "2717",
+      "Total": "40",
+      "TotalIncludingDiscards": "63",
+      "Columns": {
+        "preDiscardTotal": "63"
+      },
+      "Scores": "12 | 9 | (DNS 23) | ZFP 12 | 4 | 3"
     },
     {
       "Rank": 10,

@@ -26,6 +26,17 @@
   "Competitors": [
     {
       "Rank": 1,
+      "Name": "CompJB2",
+      "SailNumber": "JB",
+      "Total": "0",
+      "TotalIncludingDiscards": "10",
+      "Columns": {
+        "preDiscardTotal": "10"
+      },
+      "Scores": "(RCD 10) | 1:0 | - | 1:0 | - | - | - | - | - | -"
+    },
+    {
+      "Rank": 2,
       "Name": "CompDB",
       "SailNumber": "DB",
       "Total": "2",
@@ -36,7 +47,7 @@
       "Scores": "1:0 | (5) | - | 2 | - | - | - | - | - | -"
     },
     {
-      "Rank": 2,
+      "Rank": 3,
       "Name": "CompMM",
       "SailNumber": "MM",
       "Total": "12",
@@ -47,7 +58,7 @@
       "Scores": "(DNC 10) | 2 | - | DNC 10 | - | - | - | - | - | -"
     },
     {
-      "Rank": 3,
+      "Rank": 4,
       "Name": "CompAF",
       "SailNumber": "AF",
       "Total": "12",
@@ -58,7 +69,7 @@
       "Scores": "2 | (RCD 10) | - | DNC 10 | - | - | - | - | - | -"
     },
     {
-      "Rank": 4,
+      "Rank": 5,
       "Name": "CompTL",
       "SailNumber": "TL",
       "Total": "13",
@@ -69,7 +80,7 @@
       "Scores": "(DNC 10) | DNC 10 | - | 3 | - | - | - | - | - | -"
     },
     {
-      "Rank": 5,
+      "Rank": 6,
       "Name": "CompLF",
       "SailNumber": "LF",
       "Total": "13",
@@ -80,7 +91,7 @@
       "Scores": "(DNC 10) | 3 | - | DNC 10 | - | - | - | - | - | -"
     },
     {
-      "Rank": 6,
+      "Rank": 7,
       "Name": "CompAN",
       "SailNumber": "AN",
       "Total": "13",
@@ -91,7 +102,7 @@
       "Scores": "3 | (DNF 10) | - | DNC 10 | - | - | - | - | - | -"
     },
     {
-      "Rank": 7,
+      "Rank": 8,
       "Name": "CompSC",
       "SailNumber": "SC",
       "Total": "14",
@@ -102,7 +113,7 @@
       "Scores": "(DNC 10) | RET 10 | - | 4 | - | - | - | - | - | -"
     },
     {
-      "Rank": 8,
+      "Rank": 9,
       "Name": "CompJG",
       "SailNumber": "JG",
       "Total": "14",
@@ -111,17 +122,6 @@
         "preDiscardTotal": "24"
       },
       "Scores": "(DNC 10) | 4 | - | DNC 10 | - | - | - | - | - | -"
-    },
-    {
-      "Rank": 9,
-      "Name": "CompJB2",
-      "SailNumber": "JB",
-      "Total": "0",
-      "TotalIncludingDiscards": "10",
-      "Columns": {
-        "preDiscardTotal": "10"
-      },
-      "Scores": "(RCD 10) | 1:0 | - | 1:0 | - | - | - | - | - | -"
     }
   ],
   "CodesUsed": {

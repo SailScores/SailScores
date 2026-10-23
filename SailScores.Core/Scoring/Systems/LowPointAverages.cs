@@ -49,8 +49,9 @@ public static class LowPointAverages
 
     // PBG: low point average without DNCs. A summary series using its child series' races
     // keeps the discards each child series made; any other series uses the discard pattern
-    // (the system's discard method, ChildSeriesDiscardsOrPattern). Participation leaves out
-    // discarded races: races sailed and not discarded, over the races not discarded.
+    // (the system's discard method, ChildSeriesDiscardsOrPattern). Participation is after
+    // discards: races not discarded over the races less the maximum discards (what a boat
+    // sailing every race would discard). The club's rules: docs/ScoringSystems/Pbg.md.
     public static ScoringRecipe Pbg(ScoringSystem system) => new()
     {
         Name = "PBG",
@@ -58,8 +59,8 @@ public static class LowPointAverages
         AveragedScores = AveragedScores.ExceptCountsNotAtStart,
         Adjustments = [new CapAtDefaultScore(), new ZeroWhenNotAveraged()],
         Discards = [new WorstPercentagesByPattern(lowerScoreWins: true, countAveragedRaces: true)],
-        Total = new LowPointAverage(),
-        Eligibility = [new ParticipationPercent(), new ParticipationOfRacesNotDiscarded()],
+        Total = new LowPointAverage(participationAfterDiscards: true),
+        Eligibility = [new ParticipationPercent(afterDiscards: true)],
         Ranking = Rankings.LowPoint,
         Glossary = new NotAveragedExcludedGlossary(AveragedScores.ExceptCountsNotAtStart)
     };

@@ -25,6 +25,9 @@ public sealed class ScoringWorkspace
     // race scores. False when places are recalculated among the fleet's boats.
     public bool UseOriginalPlace { get; init; }
 
+    // True when a fleet series uses full race scores: the boats' places in the whole race.
+    public bool UseFullRaceScores { get; init; }
+
     // Races whose scores don't count (Wawasee 2026 and VARC 2026 minimum-boat rules).
     // Filled in by those rules as competitors are scored.
     public ISet<Race> RacesNotCounted { get; } = new HashSet<Race>();

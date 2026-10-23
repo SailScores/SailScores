@@ -4,12 +4,17 @@ namespace SailScores.Core.Scoring.Tiebreaks;
 
 // RRS A8.1, low point: compare the scores that weren't discarded, best first; at the first
 // difference the better score ranks ahead. If one boat runs out of scores first, the other
-// ranks ahead.
-//
-// Quirk: scores of 0 are left out, so under First = 0 wins don't count here
-// (docs/Scoring-Quirks.md).
+// ranks ahead. Scores of 0 are left out unless countZeroScores (First = 0, where a win
+// scores 0); scores without a value always are.
 public sealed class AppendixA81LowPoint : ITieBreak
 {
+    private readonly bool _countZeroScores;
+
+    public AppendixA81LowPoint(bool countZeroScores = false)
+    {
+        _countZeroScores = countZeroScores;
+    }
+
     public int Compare(ScoringWorkspace workspace, SeriesCompetitorResults x, SeriesCompetitorResults y)
     {
         var xScores = CountedScoresBestFirst(x);
@@ -29,9 +34,9 @@ public sealed class AppendixA81LowPoint : ITieBreak
         return xScores.Length < yScores.Length ? 1 : 0;
     }
 
-    private static decimal[] CountedScoresBestFirst(SeriesCompetitorResults results) =>
+    private decimal[] CountedScoresBestFirst(SeriesCompetitorResults results) =>
         results.CalculatedScores.Values
-            .Where(s => !s.Discard && (s.ScoreValue ?? 0.0m) != 0.0m)
+            .Where(s => !s.Discard && (_countZeroScores ? s.ScoreValue.HasValue : (s.ScoreValue ?? 0.0m) != 0.0m))
             .Select(s => s.ScoreValue ?? decimal.MaxValue)
             .OrderBy(s => s)
             .ToArray();

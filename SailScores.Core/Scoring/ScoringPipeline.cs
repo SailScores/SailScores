@@ -17,8 +17,8 @@ namespace SailScores.Core.Scoring
     // For each competitor (ScoreCompetitor):
     //   1. Race points        recipe.RacePoints, for every finish
     //   2. Code limits        score code group overages become the overage code
-    //   3. Missing results    a race with no score is scored as DNC
-    //   4. Race formulas      FIX, MAN, FIN+, CTS+, PLC% (or recipe.CodedResults instead)
+    //   3. Missing results    a race with no score is scored as recipe.DefaultCode (DNC)
+    //   4. Race formulas      FIX, MAN, FIN+, CTS+, STR+, PLC% (or recipe.CodedResults instead)
     //   5. Series formulas    SER+, then the averages (unless recipe.SeriesFormulas is off)
     //   6. Child scores       a summary series' preset scores are used as they are
     //   7. Adjustments        recipe.Adjustments, in order
@@ -40,8 +40,8 @@ namespace SailScores.Core.Scoring
 
         // Code to use if no result is found or if scorecode is not found in the system.
         //  This will be used if code defined in a child scoring system is used but the
-        // series is scored with the ancestor
-        private const string DEFAULT_CODE = "DNC";
+        // series is scored with the ancestor. DNC unless the recipe says otherwise.
+        private string DEFAULT_CODE => Recipe.DefaultCode;
 
         private const StringComparison CASE_INSENSITIVE = StringComparison.InvariantCultureIgnoreCase;
 
@@ -232,6 +232,7 @@ namespace SailScores.Core.Scoring
                 // Original race places when there is no fleet filter (standard scoring), or
                 // when the series keeps full-race positions.
                 UseOriginalPlace = series.FleetId == null || series.UseFullRaceScores == true,
+                UseFullRaceScores = series.FleetId != null && series.UseFullRaceScores == true,
                 RaceScores = CopyScores(series.Races)
             };
             foreach (var step in _inputSteps)
@@ -297,15 +298,11 @@ namespace SailScores.Core.Scoring
             SeriesResults results,
             SeriesCompetitorResults compResults)
         {
-            if (ScoringSystem?.ScoreCodeGroups == null || ScoringSystem.ScoreCodeGroups.Count == 0)
+            var allScoreCodeGroups = new List<ScoreCodeGroup>(ScoringSystem?.ScoreCodeGroups ?? []);
+            allScoreCodeGroups.AddRange(ScoringSystem?.InheritedScoreCodeGroups ?? []);
+            if (allScoreCodeGroups.Count == 0)
             {
                 return false;
-            }
-
-            var allScoreCodeGroups = new List<ScoreCodeGroup>(ScoringSystem.ScoreCodeGroups);
-            if (ScoringSystem.InheritedScoreCodeGroups != null)
-            {
-                allScoreCodeGroups.AddRange(ScoringSystem.InheritedScoreCodeGroups);
             }
 
             var returnValue = false;
@@ -580,19 +577,23 @@ namespace SailScores.Core.Scoring
             return seriesResults.Competitors.Count;
         }
 
-        // Quirk: a DNF formula that isn't worked out from the race alone (SER+, for one) is
-        // taken as boats that started + its Formula Value (docs/Scoring-Quirks.md).
+        // The DNF score in a race, from the DNF code's formula. Other formulas (an average)
+        // are taken as boats that started + its Formula Value.
         private decimal? GetDnfScore(Race race, SeriesResults seriesResults = null)
         {
-            var dnfCode = GetScoreCode(DNF_SCORENAME);
+            var dnfCode = FormulaCode(GetScoreCode(DNF_SCORENAME));
             var formula = Formulas.Find(dnfCode);
-            if (formula?.Step == FormulaStep.Race)
+            // A race or series formula (SER+: boats in the series) gives the DNF score directly
+            // (RRS 44.3(c)). An average formula would depend on the scores being worked out, so
+            // it falls back to the boats that started + 1.
+            if (formula?.Step == FormulaStep.Race
+                || (formula?.Step == FormulaStep.Series && seriesResults != null))
             {
                 return EvaluateFormula(formula, CodeOnlyScore(dnfCode), dnfCode, race, seriesResults);
             }
 
             return GetRaceScoresForCounts(race, seriesResults).Count(s => CountsAsStarted(s))
-                + (dnfCode.FormulaValue ?? 0m);
+                + (dnfCode?.FormulaValue ?? 0m);
         }
 
         private decimal? GetDefaultScore(Race race, SeriesResults resultsWorkInProgress)
@@ -601,7 +602,7 @@ namespace SailScores.Core.Scoring
             {
                 return fixedScore;
             }
-            var defaultCode = GetScoreCode(DEFAULT_CODE);
+            var defaultCode = FormulaCode(GetScoreCode(DEFAULT_CODE));
             var formula = Formulas.Find(defaultCode);
             if (formula?.Step == FormulaStep.Race)
             {
@@ -611,11 +612,11 @@ namespace SailScores.Core.Scoring
             {
                 //Assume it's competitors plus for now. I suppose the default could be
                 // the competitors average, but that would create all sort of problems, I think.
-                return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode.FormulaValue ?? 0m);
+                return GetNumberOfCompetitors(resultsWorkInProgress) + (defaultCode?.FormulaValue ?? 0m);
             }
 
             return GetRaceScoresForCounts(race, resultsWorkInProgress).Count(s => CountsAsStarted(s))
-                + (defaultCode.FormulaValue ?? 0m);
+                + (defaultCode?.FormulaValue ?? 0m);
         }
 
         private bool IsAverage(string code)
@@ -627,6 +628,7 @@ namespace SailScores.Core.Scoring
         // any other formula.
         private decimal? GetFixedOrManualValue(CalculatedScore score, ScoreCode scoreCode)
         {
+            scoreCode = FormulaCode(scoreCode);
             var formula = Formulas.Find(scoreCode);
             return formula is FixedFormula or ManualFormula
                 ? EvaluateFormula(formula, score, scoreCode, score.RawScore?.Race, null)
@@ -725,7 +727,7 @@ namespace SailScores.Core.Scoring
         // scoreCode is null for a score without a code.
         private bool IsIncludedInAverageByDefault(ScoreCode scoreCode)
         {
-            return Recipe.AveragedScores.IncludesByDefault(scoreCode, Formulas);
+            return Recipe.AveragedScores.IncludesByDefault(scoreCode, Formulas.Find(FormulaCode(scoreCode)));
         }
 
 
@@ -1131,7 +1133,7 @@ namespace SailScores.Core.Scoring
             foreach (var race in resultsWorkInProgress.SailedRaces)
             {
                 var score = compResults.CalculatedScores[race];
-                var scoreCode = GetScoreCode(score.RawScore);
+                var scoreCode = FormulaCode(GetScoreCode(score.RawScore));
                 var formula = Formulas.Find(scoreCode);
                 if (formula?.Step == FormulaStep.Race)
                 {
@@ -1148,7 +1150,7 @@ namespace SailScores.Core.Scoring
             foreach (var race in resultsWorkInProgress.SailedRaces)
             {
                 var score = compResults.CalculatedScores[race];
-                var scoreCode = GetScoreCode(score.RawScore);
+                var scoreCode = FormulaCode(GetScoreCode(score.RawScore));
                 if (IsSeriesBasedScore(scoreCode) && !IsAverage(score.RawScore.Code))
                 {
                     score.ScoreValue = EvaluateFormula(Formulas.Find(scoreCode), score, scoreCode, race,
@@ -1159,7 +1161,7 @@ namespace SailScores.Core.Scoring
             foreach (var race in resultsWorkInProgress.SailedRaces)
             {
                 var score = compResults.CalculatedScores[race];
-                var scoreCode = GetScoreCode(score.RawScore);
+                var scoreCode = FormulaCode(GetScoreCode(score.RawScore));
                 if (IsSeriesBasedScore(scoreCode) && IsAverage(score.RawScore.Code))
                 {
                     score.ScoreValue = EvaluateFormula(Formulas.Find(scoreCode), score, scoreCode, race,
@@ -1172,7 +1174,24 @@ namespace SailScores.Core.Scoring
         private bool IsSeriesBasedScore(ScoreCode scoreCode)
         {
             return Recipe.SeriesFormulas
-                && Formulas.Find(scoreCode)?.Step is FormulaStep.Series or FormulaStep.Average;
+                && Formulas.Find(FormulaCode(scoreCode))?.Step is FormulaStep.Series or FormulaStep.Average;
+        }
+
+        // The code whose formula and formula value score this code. A COD code scores like the
+        // code named in its ScoreLike, followed through further COD codes; it keeps its own
+        // flags (came to start, discardable...). Null for a COD with no ScoreLike, or a loop.
+        private ScoreCode FormulaCode(ScoreCode scoreCode)
+        {
+            var seen = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            while (scoreCode != null && Formulas.Find(scoreCode) is ScoreLikeFormula)
+            {
+                if (!seen.Add(scoreCode.Name))
+                {
+                    return null;
+                }
+                scoreCode = GetScoreCode(scoreCode.ScoreLike);
+            }
+            return scoreCode;
         }
 
         private decimal? EvaluateFormula(
@@ -1208,7 +1227,7 @@ namespace SailScores.Core.Scoring
 
         IScoreCodeFormula IFormulaHost.FormulaFor(string codeName)
         {
-            return String.IsNullOrWhiteSpace(codeName) ? null : Formulas.Find(GetScoreCode(codeName));
+            return String.IsNullOrWhiteSpace(codeName) ? null : Formulas.Find(FormulaCode(GetScoreCode(codeName)));
         }
 
         bool IFormulaHost.CountsAsFinished(Score score) => CountsAsFinished(score);
@@ -1220,11 +1239,13 @@ namespace SailScores.Core.Scoring
 
         decimal? IFormulaHost.DnfScore(Race race, SeriesResults series) => GetDnfScore(race, series);
 
+        bool IFormulaHost.AveragesCountZeroScores => Recipe.ZeroIsAScore;
+
         ScoreCode IScoringHost.GetScoreCode(Score score) => GetScoreCode(score);
 
         ScoreCode IScoringHost.GetScoreCode(string codeName) => GetScoreCode(codeName);
 
-        bool IScoringHost.CountsAsStarted(Score score) => CountsAsStarted(score);
+        bool IFormulaHost.CountsAsStarted(Score score) => CountsAsStarted(score);
 
         bool IScoringHost.AdjustsOtherScores(Score score) => ShouldAdjustOtherScores(score);
 

@@ -837,6 +837,7 @@ namespace SailScores.Core.Services
                     series.Results.IsPercentSystem,
                     scores),
                 TotalHeader = ScoringCalculatorRegistry.Get(series.ScoringSystem?.CalculatorType).TotalHeader,
+                UnrankedShowsPoints = ScoringCalculatorRegistry.Get(series.ScoringSystem?.CalculatorType).UnrankedShowsPoints,
                 NumberOfDiscards = series.Results.NumberOfDiscards,
                 DiscardMethod = series.Results.DiscardMethod,
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),

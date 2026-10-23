@@ -162,10 +162,8 @@ public class ScoreCodeGroupScoringTests
         ScenarioAssert.Scores(results, "A", "2 RDGAve 3.5 RC 5");
     }
 
-    // Quirk: inherited groups apply only when the system also has a group of its own.
-    // See docs/Scoring-Quirks.md.
     [Fact]
-    public void InheritedGroupOnly_IsNotApplied()
+    public void InheritedGroupOnly_IsApplied()
     {
         var results = FourBoats(Group(ScoreCodeGroupLimitationType.NumberOfRaces, 1), inherited: true)
             .Race("A:2 B:1 C:3 D:4")
@@ -173,7 +171,7 @@ public class ScoreCodeGroupScoringTests
             .Race("A:RC B:1 C:2 D:3")
             .Score();
 
-        ScenarioAssert.Scores(results, "A", "2 RC 2 RC 2");
+        ScenarioAssert.Scores(results, "A", "2 RC 3.5 RC 5");
     }
 
     [Fact]

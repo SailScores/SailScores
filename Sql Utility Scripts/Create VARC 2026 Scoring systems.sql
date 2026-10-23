@@ -8,6 +8,10 @@
 --   (MinimumCompetitors) came to the start. For series where ties stand after A8.1,
 --   create a club child system with "Ties stand after A8.1" set to Yes.
 --
+-- The club's answers (2026-10-22) change some copied codes: BFD and DNE score and discard
+-- like a DNF, and the penalties SCP, DPI and ZFP score as DNC (0, not a boat racing). These
+-- updates also apply to VARC 2026 base systems that already exist.
+--
 -- The new systems start restricted: only the club named in @AccessClubInitials can use them.
 -- Set it before running (for example the test club). To open the systems to more clubs
 -- later, add them in Site Admin > Shared Scoring Systems.
@@ -66,5 +70,25 @@ SELECT NEWID(), sc.[Name], sc.[Description], sc.[PreserveResult], sc.[Discardabl
 FROM [ScoreCodes] sc
 CROSS JOIN @Systems s
 WHERE sc.[ScoringSystemId] = @SourceSystemId;
+
+-- The club's answers, on the new or existing VARC 2026 base systems.
+DECLARE @VarcSystemIds TABLE ([Id] UNIQUEIDENTIFIER);
+INSERT INTO @VarcSystemIds
+SELECT [Id] FROM [ScoringSystems]
+WHERE [ClubId] IS NULL AND [ParentSystemId] IS NULL AND [CalculatorType] IN (15, 16);
+
+-- Codes the NOR doesn't name count the same as a DNF.
+UPDATE [ScoreCodes]
+SET [Discardable] = 1
+WHERE [ScoringSystemId] IN (SELECT [Id] FROM @VarcSystemIds) AND [Name] IN ('BFD', 'DNE');
+
+-- Penalties score as DNC: 0, and the boat isn't racing or scored.
+UPDATE [ScoreCodes]
+SET [Description] = [Description] + ': scored as DNC',
+    [Formula] = 'FIX', [FormulaValue] = 0, [FormulaValue_Decimal] = 0,
+    [PreserveResult] = 0, [AdjustOtherScores] = 1,
+    [Started] = 0, [CameToStart] = 0, [Finished] = 0
+WHERE [ScoringSystemId] IN (SELECT [Id] FROM @VarcSystemIds) AND [Name] IN ('SCP', 'DPI', 'ZFP')
+    AND [Description] NOT LIKE '%: scored as DNC';
 
 COMMIT;

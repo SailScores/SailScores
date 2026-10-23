@@ -222,4 +222,104 @@ public class RaceServiceTests
         Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == inactiveFleet.Id);
         Assert.Contains(raceWithOptions.FleetOptions, f => f.Id == anotherInactiveFleet.Id);
     }
+
+    [Fact]
+    public async Task GetBlankRaceWithOptions_DateRestrictedSeriesWithRaces_DefaultsToLastRaceDate()
+    {
+        var lastRaceDate = DateTime.Today.AddDays(-3);
+        var series = MakeDateRestrictedSeries(
+            DateTime.Today.AddDays(-10),
+            DateTime.Today.AddDays(10),
+            DateTime.Today.AddDays(-5),
+            lastRaceDate);
+
+        var result = await GetBlankSeriesRace(series);
+
+        Assert.Equal(lastRaceDate, result.Date);
+        Assert.False(result.NeedsLocalDate);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(-1)]
+    public async Task GetBlankRaceWithOptions_DateRestrictedSeriesIncludesToday_UsesClubDefault(
+        int? defaultRaceDateOffset)
+    {
+        var series = MakeDateRestrictedSeries(
+            DateTime.Today.AddDays(-10),
+            DateTime.Today.AddDays(10));
+
+        var result = await GetBlankSeriesRace(series, defaultRaceDateOffset);
+
+        Assert.Equal(
+            defaultRaceDateOffset.HasValue ? DateTime.Today.AddDays(defaultRaceDateOffset.Value) : null,
+            result.Date);
+        Assert.Equal(defaultRaceDateOffset, result.DefaultRaceDateOffset);
+        Assert.True(result.NeedsLocalDate);
+    }
+
+    [Fact]
+    public async Task GetBlankRaceWithOptions_DateRestrictedSeriesInFuture_DefaultsToSeriesStart()
+    {
+        var start = DateTime.Today.AddDays(5);
+        var series = MakeDateRestrictedSeries(start, DateTime.Today.AddDays(10));
+
+        var result = await GetBlankSeriesRace(series);
+
+        Assert.Equal(start, result.Date);
+    }
+
+    [Fact]
+    public async Task GetBlankRaceWithOptions_DateRestrictedSeriesInPast_DefaultsToSeriesEnd()
+    {
+        var end = DateTime.Today.AddDays(-5);
+        var series = MakeDateRestrictedSeries(DateTime.Today.AddDays(-10), end);
+
+        var result = await GetBlankSeriesRace(series);
+
+        Assert.Equal(end, result.Date);
+    }
+
+    private static Series MakeDateRestrictedSeries(
+        DateTime start,
+        DateTime end,
+        params DateTime[] raceDates)
+    {
+        return new Series
+        {
+            Id = Guid.NewGuid(),
+            DateRestricted = true,
+            EnforcedStartDate = DateOnly.FromDateTime(start),
+            EnforcedEndDate = DateOnly.FromDateTime(end),
+            Season = new Season
+            {
+                Start = DateTime.Today.AddYears(-1),
+                End = DateTime.Today.AddYears(1)
+            },
+            Races = raceDates.Select(d => new Race { Id = Guid.NewGuid(), Date = d }).ToList()
+        };
+    }
+
+    // By default the club has no default race date, so any date comes from the series.
+    private async Task<RaceWithOptionsViewModel> GetBlankSeriesRace(
+        Series series,
+        int? defaultRaceDateOffset = null)
+    {
+        var clubId = Guid.NewGuid();
+        var club = new Club { Id = clubId, Initials = "TEST", DefaultRaceDateOffset = defaultRaceDateOffset };
+        series.ClubId = clubId;
+
+        _clubServiceMock.Setup(s => s.GetMinimalClub("TEST")).ReturnsAsync(club);
+        _clubServiceMock.Setup(s => s.GetAllFleets(clubId)).ReturnsAsync(new List<Fleet>());
+        _clubServiceMock.Setup(s => s.GetActiveFleets(clubId, false)).ReturnsAsync(new List<Fleet>());
+        _clubServiceMock.Setup(s => s.GetAllBoatClasses(clubId)).ReturnsAsync(new List<BoatClass>());
+        _coreSeriesServiceMock
+            .Setup(s => s.GetAllSeriesAsync(clubId, It.IsAny<DateTime>(), false, false))
+            .ReturnsAsync(new List<Series>());
+        _coreSeriesServiceMock.Setup(s => s.GetOneSeriesAsync(series.Id)).ReturnsAsync(series);
+        _coreScoringServiceMock.Setup(s => s.GetScoreCodesAsync(clubId)).ReturnsAsync(new List<ScoreCode>());
+        _weatherServiceMock.Setup(s => s.GetWeatherIconOptions()).Returns(new List<KeyValuePair<string, string>>());
+
+        return await _service.GetBlankRaceWithOptions("TEST", null, series.Id);
+    }
 }

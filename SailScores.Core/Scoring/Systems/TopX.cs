@@ -36,6 +36,9 @@ public static class TopX
 
     // VARC 2026 and VARC 2026 Shorthanded: Top X race scores (DNC 0), but the total is each
     // boat's best ScoresToCount scores; the others show as discards and are left out of A8.1.
+    //   - Boats racing are every boat with a score but DNC, so a DNS counts. Coded results
+    //     score one behind them, except RDG (MAN) with points entered; tied boats score the
+    //     better place.
     // VARC 2026 also registers MinimumCompetitors (a race with fewer boats that came to the
     // start doesn't count: its scores are discards and A8.2 skips it) and TiesStandAfterA81.
     //   - High total wins; ties go to A8.1 over the scores that count, then (unless ties
@@ -47,9 +50,10 @@ public static class TopX
         return new()
         {
             Name = "VARC 2026",
-            RacePoints = new TopXPoints(),
+            RacePoints = new VarcEventPoints(),
             Formulas = FormulaSet.HighPoint,
-            CodedResults = new CodedResultsOneBehindLast(TopXPoints.ForPlace),
+            CodedResults = new CodedResultsOneBehindLast(
+                TopXPoints.ForPlace, VarcEventPoints.IsRacing, keepManualPoints: true),
             FixedDefaultScore = 0m,
             Adjustments = [new RaiseToDefaultScore(), new NotAtStartScoresFixedOrZero()],
             Discards = [new RacesNeedBoatsAtStart(), new KeepBestScores()],

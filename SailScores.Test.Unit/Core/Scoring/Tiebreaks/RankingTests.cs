@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using SailScores.Api.Enumerations;
 using SailScores.Core.Scoring;
 using SailScores.Core.Scoring.Tiebreaks;
@@ -63,6 +64,31 @@ public class RankingTests
         Assert.Equal(expected, new LowestTotal(zeroTotalRanksLast).Compare(null, Total(0), Total(5)));
     }
 
+    private static SeriesCompetitorResults ZeroTotal(params decimal?[] scores) => new()
+    {
+        TotalScore = 0,
+        CalculatedScores = scores.ToDictionary(
+            _ => new SailScores.Core.Model.Race { Id = System.Guid.NewGuid() },
+            s => new CalculatedScore { ScoreValue = s })
+    };
+
+    [Fact]
+    public void LowestTotal_ZeroFromScoresCounts_ZeroTotalOfWinsRanksFirst()
+    {
+        var ranking = new LowestTotal(zeroTotalRanksLast: true, zeroFromScoresCounts: true);
+
+        Assert.Equal(-1, ranking.Compare(null, ZeroTotal(0, 0), Total(5)));
+    }
+
+    [Fact]
+    public void LowestTotal_ZeroFromScoresCounts_ZeroTotalWithoutScoresRanksLast()
+    {
+        var ranking = new LowestTotal(zeroTotalRanksLast: true, zeroFromScoresCounts: true);
+
+        Assert.Equal(1, ranking.Compare(null, ZeroTotal(null, null), Total(5)));
+        Assert.Equal(1, ranking.Compare(null, ZeroTotal(), Total(5)));
+    }
+
     [Fact]
     public void LowestTotal_NoTotal_RanksLast()
     {
@@ -79,17 +105,16 @@ public class RankingTests
     public void StandardRankings_ListTheirSteps()
     {
         Assert.Equal("LowestTotal, then AppendixA81LowPoint, then AppendixA82", Rankings.LowPoint.ToString());
+        Assert.Equal("LowestTotal, then AppendixA81LowPoint, then AppendixA82", Rankings.LowPointFirstIsZero.ToString());
         Assert.Equal("HighestTotal, then MoreRacesSailed, then AppendixA81HighPoint, then AppendixA82",
             Rankings.HighPoint.ToString());
         Assert.Equal("LowestTotal, then PwaBeatenMoreOften, then PwaBetterScoresIncludingDiscards, "
             + "then PwaBetterDiscard, then AppendixA82", Rankings.Pwa.ToString());
     }
 
-    // Quirk: A8.1 leaves out scores of 0, so under First = 0 a win doesn't count in the
-    // tiebreak (docs/Scoring-Quirks.md). A and B tie on 4. By RRS A8.1 A ranks ahead (0, 4
-    // against 2, 2); without the 0, A's 4 loses to B's 2.
+    // Under First = 0 A and B tie on 4. By RRS A8.1 A ranks ahead: 0, 4 against 2, 2.
     [Fact]
-    public void AppendixA81_FirstIsZero_LeavesOutWins()
+    public void AppendixA81_FirstIsZero_CountsWins()
     {
         var results = Scenario.With(ScoringCalculatorType.AppAAltFirstIsZero)
             .Discards("0")
@@ -98,6 +123,6 @@ public class RankingTests
             .Score();
 
         ScenarioAssert.Totals(results, ("A", 4), ("B", 4));
-        ScenarioAssert.Ranks(results, "C", "B", "A", "D", "E");
+        ScenarioAssert.Ranks(results, "C", "A", "B", "D", "E");
     }
 }

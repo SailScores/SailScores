@@ -8,9 +8,10 @@ club's document, and a page per system showing where each rule is implemented an
 
 | System | Club | Page | Recipe | Tests |
 |--------|------|------|--------|-------|
-| Wawasee 2026 | Wawasee | not written yet | `Scoring/Systems/Wawasee2026.cs` | `Wawasee2026CalculatorTests` |
-| VARC 2026, VARC 2026 Shorthanded | VARC | not written yet | `Scoring/Systems/TopX.cs` (`Varc2026`) | `Varc2026CalculatorTests` |
-| PBG | PBG | not written yet | `Scoring/Systems/LowPointAverages.cs` (`Pbg`) | `PbgCalculatorTests` |
+| Wawasee 2026 | Wawasee | [Wawasee2026.md](Wawasee2026.md) | `Scoring/Systems/Wawasee2026.cs` | `Wawasee2026CalculatorTests` |
+| VARC 2026, VARC 2026 Shorthanded | VARC | [Varc2026.md](Varc2026.md) | `Scoring/Systems/TopX.cs` (`Varc2026`) | `Varc2026CalculatorTests` |
+| PBG | PBGMYS | [Pbg.md](Pbg.md) | `Scoring/Systems/LowPointAverages.cs` (`Pbg`) | `PbgCalculatorTests` |
+| Appendix B Windsurfing | All clubs (shared base system, RRS 2025-2028) | [AppendixB-Windsurfing.md](AppendixB-Windsurfing.md) | `Scoring/Systems/AppendixB.cs` (`Windsurfing`) | `AppendixBWindsurfingCalculatorTests` |
 
 Recipe paths are under `SailScores.Core/`; tests are under `SailScores.Test.Unit/Core/Scoring/`.
 
@@ -52,7 +53,7 @@ Keep the old page: it records what the old calculator implements, and saved resu
 by it are recalculated with it. Don't edit an existing system to follow new rules; see
 [Scoring-AddingACalculator.md](../Scoring-AddingACalculator.md).
 
-The exception is a system that doesn't yet match the rules it was written for. Fixing that
+The exception is a system that doesn't yet follow the rules it was written for. Fixing that
 changes saved results when they're recalculated, so tell the club first, and record the
 change in the page's open questions and in [Scoring-Quirks.md](../Scoring-Quirks.md).
 

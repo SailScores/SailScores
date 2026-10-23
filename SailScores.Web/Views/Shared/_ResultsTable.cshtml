@@ -299,6 +299,10 @@
                                         {
                                             @(String.Format("{0:0.###}", compScore.TotalScore))
                                         }
+                                        else if (Model.Results.UnrankedShowsPoints && compScore?.PointsEarned != null)
+                                        {
+                                          <span class="text-muted">@(String.Format("{0:0.###}", compScore.PointsEarned))</span>
+                                        }
                                         else if (compScore?.Average != null)
                                         {
                                           <span class="text-muted">@(String.Format("{0:0.###}", compScore.Average))</span>

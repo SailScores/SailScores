@@ -56,21 +56,21 @@
     },
     {
       "Rank": 5,
+      "Name": "CompGC",
+      "SailNumber": "2539",
+      "Total": "195",
+      "TotalIncludingDiscards": "195",
+      "PointsEarned": "195",
+      "Scores": "DNC 0 | (DNC 0) | (DNC 0) | 2:97/100 | TIE 98/100"
+    },
+    {
+      "Rank": 6,
       "Name": "CompLMSJ",
       "SailNumber": "1765",
       "Total": "195",
       "TotalIncludingDiscards": "195",
       "PointsEarned": "195",
       "Scores": "DNC 0 | 4:97/100 | 3:98/100 | (DNC 0) | (DNC 0)"
-    },
-    {
-      "Rank": 6,
-      "Name": "CompGC",
-      "SailNumber": "2539",
-      "Total": "194",
-      "TotalIncludingDiscards": "194",
-      "PointsEarned": "194",
-      "Scores": "DNC 0 | (DNC 0) | (DNC 0) | 2:97/100 | TIE 97/100"
     }
   ],
   "CodesUsed": {

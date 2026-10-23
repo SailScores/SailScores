@@ -13,9 +13,7 @@ public sealed class ManualFormula : IScoreCodeFormula
 
     public decimal? Evaluate(FormulaContext context)
     {
-        // Quirk: found ignoring case, but only scored when written in upper case
-        // (docs/Scoring-Quirks.md).
-        if (context.Code.Formula != FormulaName)
+        if (!string.Equals(context.Code.Formula, FormulaName, StringComparison.OrdinalIgnoreCase))
         {
             return null;
         }
@@ -32,4 +30,7 @@ public sealed class ManualFormula : IScoreCodeFormula
     }
 
     public string Describe(ScoreCode code) => "Manually entered value";
+
+    public static bool IsManual(ScoreCode code) =>
+        string.Equals(code?.Formula, FormulaName, StringComparison.OrdinalIgnoreCase);
 }

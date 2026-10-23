@@ -105,9 +105,8 @@ public class FormulaScenarioTests
         ScenarioAssert.Scores(results, "A", "1 BFD 5 (2) AND 1.5");
     }
 
-    // Quirk (bug under First = 0): averages leave out scores of 0, so a win is left out.
     [Fact]
-    public void Average_FirstIsZero_LeavesOutWins()
+    public void Average_FirstIsZero_CountsWins()
     {
         var results = Scenario.With(ScoringCalculatorType.AppAAltFirstIsZero)
             .Discards("0")
@@ -116,9 +115,8 @@ public class FormulaScenarioTests
             .Race("A:RDGAve B:1 C:2 D:3")
             .Score();
 
-        // First = 0 scores a win 0 and other places as the place. The real average of 0 and 3
-        // is 1.5.
-        ScenarioAssert.Scores(results, "A", "1:0 3 RDGAve 3");
+        // First = 0 scores a win 0 and other places as the place: the average of 0 and 3.
+        ScenarioAssert.Scores(results, "A", "1:0 3 RDGAve 1.5");
     }
 
     [Fact]
@@ -129,26 +127,113 @@ public class FormulaScenarioTests
         ScenarioAssert.Scores(results, "A", "XF 3");
     }
 
-    // Quirk (bug): FIX is recognised in any case but only evaluated in upper case.
     [Fact]
-    public void Fix_LowerCase_ScoresNothing()
+    public void Fix_LowerCase_ScoresFormulaValue()
     {
         var results = AppendixA().Code(Code("XF", "fix", 3m)).Race("A:XF B:1 C:2 D:3").Score();
 
-        ScenarioAssert.Scores(results, "A", "XF null");
+        ScenarioAssert.Scores(results, "A", "XF 3");
     }
 
-    // Quirk (unfinished feature): COD isn't evaluated, so the code keeps the place-based score.
-    // Its place is cleared, so no boat counts as ahead of it and it scores 1, like a win.
     [Fact]
-    public void Cod_IsNotEvaluated()
+    public void Man_LowerCase_ScoresCodePoints()
     {
-        var cod = Code("CD", "COD");
-        cod.ScoreLike = "DNF";
-        var results = AppendixA().Code(cod).Race("A:CD@2 B:1 C:3 D:4").Score();
+        var results = AppendixA().Code(Code("XM", "man")).Race("A:XM=2.5 B:1 C:2 D:3").Score();
 
-        ScenarioAssert.Scores(results, "A", "CD 1");
+        ScenarioAssert.Scores(results, "A", "XM 2.5");
+    }
+
+    [Theory]
+    [InlineData("TIE")]
+    [InlineData("tie")]
+    public void Tie_AnyCase_TiesWithPreviousFinisher(string formula)
+    {
+        var tie = Code("XT", formula, preserveResult: true);
+        tie.Finished = true;
+        tie.AdjustOtherScores = false;
+        var results = AppendixA().Code(tie).Race("A:1 B:2 C:XT@3 D:4").Score();
+
+        ScenarioAssert.Scores(results, "C", "XT 2.5");
+    }
+
+    private static ScoreCode Cod(string name, string scoreLike)
+    {
+        var cod = Code(name, "COD");
+        cod.ScoreLike = scoreLike;
+        return cod;
+    }
+
+    [Fact]
+    public void Cod_ScoreLikeDnf_ScoresDnfScore()
+    {
+        var results = AppendixA().Code(Cod("CD", "DNF")).Race("A:CD@2 B:1 C:3 D:4").Score();
+
+        // DNF in Appendix A for regattas: boats in the series + 1.
+        ScenarioAssert.Scores(results, "A", "CD 5");
         Assert.Null(results.Score("A", 1).RawScore.Place);
+    }
+
+    [Fact]
+    public void Cod_ScoreLikeFixedCode_ScoresItsFormulaValue()
+    {
+        var results = AppendixA().Code(Code("XF", "FIX", 3m)).Code(Cod("CD", "XF"))
+            .Race("A:CD B:1 C:2 D:4").Score();
+
+        ScenarioAssert.Scores(results, "A", "CD 3");
+    }
+
+    [Fact]
+    public void Cod_ScoreLikeAnotherCod_FollowsTheChain()
+    {
+        var results = AppendixA().Code(Code("XF", "FIX", 3m)).Code(Cod("C1", "C2")).Code(Cod("C2", "XF"))
+            .Race("A:C1 B:1 C:2 D:4").Score();
+
+        ScenarioAssert.Scores(results, "A", "C1 3");
+    }
+
+    [Fact]
+    public void Cod_ScoreLikeAverage_ScoresTheAverage()
+    {
+        var results = AppendixA().Code(Cod("CD", "RDGAve"))
+            .Race("A:1 B:2 C:3 D:4")
+            .Race("A:3 B:1 C:2 D:4")
+            .Race("A:CD B:1 C:2 D:3")
+            .Score();
+
+        ScenarioAssert.Scores(results, "A", "1 3 CD 2");
+    }
+
+    // Low point average without DNCs leaves codes scored like DNC out of the average, as it
+    // does DNC itself.
+    [Theory]
+    [InlineData("DNC")]
+    [InlineData("CD")]
+    public void Cod_ScoreLikeDnc_LeftOutOfLowPointAverageWithoutDncs(string code)
+    {
+        var cod = Cod("CD", "DNC");
+        cod.CameToStart = false;
+        cod.Started = false;
+        var results = Scenario.With(ScoringCalculatorType.LowPointAverageExclDnc).Discards("0").Participation(0)
+            .Code(cod)
+            .Race("A:1 B:2 C:3")
+            .Race($"A:{code} B:1 C:2")
+            .Race("A:3 B:1 C:2")
+            .Score();
+
+        ScenarioAssert.Totals(results, ("A", 2));
+    }
+
+    // A loop, or no ScoreLike, gives no formula: the code keeps its place-based score (its
+    // place is cleared, so no boat is ahead of it and it scores 1).
+    [Theory]
+    [InlineData(null)]
+    [InlineData("C2")]
+    public void Cod_NoScoreLikeOrLoop_KeepsPlaceBasedScore(string scoreLike)
+    {
+        var results = AppendixA().Code(Cod("C1", scoreLike)).Code(Cod("C2", "C1"))
+            .Race("A:C1@2 B:1 C:3 D:4").Score();
+
+        ScenarioAssert.Scores(results, "A", "C1 1");
     }
 
     [Theory]
@@ -181,18 +266,18 @@ public class FormulaScenarioTests
         ScenarioAssert.Scores(results, "A", "ZFP 3 ZFP 2.8");
     }
 
-    // Quirk: when DNF is series-based (SER+, boats in the series + 1), the PLC% penalty uses
-    // boats that started + 1 instead. A boat missing the race lowers everyone's penalty.
+    // RRS 44.3(c): the penalty is a percentage of the DNF score, here series-based (SER+, boats
+    // in the series + 1), so a boat missing the race doesn't lower it.
     [Fact]
-    public void PlacePlusPercent_DnfSeriesCompetitorsPlusOne_PenaltyFromStartersPlusOne()
+    public void PlacePlusPercent_DnfSeriesCompetitorsPlusOne_PenaltyFromDnfScore()
     {
         var results = AppendixA()
             .Race("A:1 B:2 C:3 D:4")
             .Race("A:2 B:1 C:ZFP@3")
             .Score();
 
-        // DNF scores 5 (four boats in the series + 1) but the penalty is 20% of 4.
-        ScenarioAssert.Scores(results, "C", "3 ZFP 3.8");
+        // DNF scores 5 (four boats in the series + 1); the penalty is 20% of 5.
+        ScenarioAssert.Scores(results, "C", "3 ZFP 4");
         ScenarioAssert.Scores(results, "D", "4 DNC 5");
     }
 
@@ -207,10 +292,8 @@ public class FormulaScenarioTests
         ScenarioAssert.Scores(results, "A", "ZFP 4");
     }
 
-    // Quirk (bug): under First = .75 a tie for first counts first as 0.7, copied from
-    // First = .7 (docs/Scoring-Quirks.md). (0.75 + 2) / 2 would be 1.375.
     [Theory]
-    [InlineData(ScoringCalculatorType.AppAAltFirstIsPoint75, "1:1.35")]
+    [InlineData(ScoringCalculatorType.AppAAltFirstIsPoint75, "1:1.375")]
     [InlineData(ScoringCalculatorType.AppAAltFirstIsPoint7, "1:1.35")]
     [InlineData(ScoringCalculatorType.AppAAltFirstIsZero, "1")]
     [InlineData(ScoringCalculatorType.AppendixA, "1:1.5")]

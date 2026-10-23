@@ -65,118 +65,113 @@
       "Rank": 3,
       "Name": "CompSC",
       "SailNumber": "SC",
-      "Total": "13",
-      "TotalIncludingDiscards": "19.5",
-      "Average": "6.5",
-      "PointsEarned": "13",
+      "Total": "12",
+      "TotalIncludingDiscards": "18",
+      "Average": "6",
+      "PointsEarned": "12",
       "PointsPossible": "2",
       "ParticipationPercent": "100",
       "Columns": {
-        "averageFinish": "6.5",
-        "averageWithPenalties": "6.5",
+        "averageFinish": "6",
+        "averageWithPenalties": "6",
         "participation": "100"
       },
-      "Scores": "(DNC 6.5) | RET 9/1 | - | 4/1 | - | - | - | - | - | -"
+      "Scores": "(DNP 6) | RET 8/1 | - | 4/1 | - | - | - | - | - | -"
     },
     {
       "Name": "CompAF",
       "SailNumber": "AF",
-      "TotalIncludingDiscards": "18",
-      "PointsEarned": "16",
+      "TotalIncludingDiscards": "10",
+      "PointsEarned": "8",
       "PointsPossible": "2",
       "ParticipationPercent": "0",
       "Columns": {
-        "averageWithPenalties": "8",
+        "averageWithPenalties": "4",
         "participation": "0",
-        "penalties": "2 x 8"
+        "penalties": "1 x 8"
       },
-      "Scores": "(2/1) | RCD null/1 | - | DNC null | - | - | - | - | - | -"
+      "Scores": "(2/1) | RCD null/1 | - | DNP null | - | - | - | - | - | -"
     },
     {
       "Name": "CompAN",
       "SailNumber": "AN",
-      "TotalIncludingDiscards": "29",
-      "Average": "9",
-      "PointsEarned": "26",
-      "PointsPossible": "2",
-      "ParticipationPercent": "50",
-      "Columns": {
-        "averageFinish": "9",
-        "averageWithPenalties": "13",
-        "participation": "50",
-        "penalties": "1 x 8"
-      },
-      "Scores": "(3/1) | DNF 9/1 | - | DNC 9 | - | - | - | - | - | -"
-    },
-    {
-      "Name": "CompJG",
-      "SailNumber": "JG",
-      "TotalIncludingDiscards": "20",
-      "Average": "4",
+      "TotalIncludingDiscards": "19",
+      "Average": "8",
       "PointsEarned": "16",
       "PointsPossible": "2",
       "ParticipationPercent": "50",
       "Columns": {
-        "averageFinish": "4",
+        "averageFinish": "8",
         "averageWithPenalties": "8",
-        "participation": "50",
-        "penalties": "1 x 8"
+        "participation": "50"
       },
-      "Scores": "(DNC 4) | 4/1 | - | DNC 4 | - | - | - | - | - | -"
+      "Scores": "(3/1) | DNF 8/1 | - | DNP 8 | - | - | - | - | - | -"
+    },
+    {
+      "Name": "CompJG",
+      "SailNumber": "JG",
+      "TotalIncludingDiscards": "12",
+      "Average": "4",
+      "PointsEarned": "8",
+      "PointsPossible": "2",
+      "ParticipationPercent": "50",
+      "Columns": {
+        "averageFinish": "4",
+        "averageWithPenalties": "4",
+        "participation": "50"
+      },
+      "Scores": "(DNP 4) | 4/1 | - | DNP 4 | - | - | - | - | - | -"
     },
     {
       "Name": "CompLF",
       "SailNumber": "LF",
-      "TotalIncludingDiscards": "17",
+      "TotalIncludingDiscards": "9",
       "Average": "3",
-      "PointsEarned": "14",
+      "PointsEarned": "6",
       "PointsPossible": "2",
       "ParticipationPercent": "50",
       "Columns": {
         "averageFinish": "3",
-        "averageWithPenalties": "7",
-        "participation": "50",
-        "penalties": "1 x 8"
+        "averageWithPenalties": "3",
+        "participation": "50"
       },
-      "Scores": "(DNC 3) | 3/1 | - | DNC 3 | - | - | - | - | - | -"
+      "Scores": "(DNP 3) | 3/1 | - | DNP 3 | - | - | - | - | - | -"
     },
     {
       "Name": "CompMM",
       "SailNumber": "MM",
-      "TotalIncludingDiscards": "14",
+      "TotalIncludingDiscards": "6",
       "Average": "2",
-      "PointsEarned": "12",
+      "PointsEarned": "4",
       "PointsPossible": "2",
       "ParticipationPercent": "50",
       "Columns": {
         "averageFinish": "2",
-        "averageWithPenalties": "6",
-        "participation": "50",
-        "penalties": "1 x 8"
+        "averageWithPenalties": "2",
+        "participation": "50"
       },
-      "Scores": "(DNC 2) | 2/1 | - | DNC 2 | - | - | - | - | - | -"
+      "Scores": "(DNP 2) | 2/1 | - | DNP 2 | - | - | - | - | - | -"
     },
     {
       "Name": "CompTL",
       "SailNumber": "TL",
-      "TotalIncludingDiscards": "17",
+      "TotalIncludingDiscards": "9",
       "Average": "3",
-      "PointsEarned": "14",
+      "PointsEarned": "6",
       "PointsPossible": "2",
       "ParticipationPercent": "50",
       "Columns": {
         "averageFinish": "3",
-        "averageWithPenalties": "7",
-        "participation": "50",
-        "penalties": "1 x 8"
+        "averageWithPenalties": "3",
+        "participation": "50"
       },
-      "Scores": "(DNC 3) | DNC 3 | - | 3/1 | - | - | - | - | - | -"
+      "Scores": "(DNP 3) | DNP 3 | - | 3/1 | - | - | - | - | - | -"
     }
   ],
   "CodesUsed": {
-    "DNC": "Average of results: Did not come to the starting area: scored the average finish",
-    "DNF": "Number of boats entered in series + 1: Started but did not finish",
-    "RCD": "Average of results: Did not come to the starting area: scored the average finish",
-    "RET": "Number of boats entered in series + 1: Retired"
+    "DNF": "Number of boats that started + 1: Started but did not finish",
+    "DNP": "Average of results: Did not participate: scored the average finish",
+    "RCD": "Average of results: Did not participate: scored the average finish",
+    "RET": "Number of boats that started + 1: Retired"
   }
 }

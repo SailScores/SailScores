@@ -2,13 +2,14 @@ using SailScores.Api.Enumerations;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using SailScores.Test.Unit.Core.Scoring.Scenarios;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 namespace SailScores.Test.Unit.Core.Scoring;
 
 // The shared Wawasee 2026 base system: 51% to rank, 70% to avoid penalties, four boats a day
-// for races to count, and DNC, EXC and BKD scored as the boat's average finish.
+// for races to count, and DNP (no result), DNS, EXC and BKD scored as the boat's average finish.
 public class Wawasee2026CalculatorTests
 {
     // Each fleet's child system sets its penalty points.
@@ -51,6 +52,7 @@ public class Wawasee2026CalculatorTests
             },
             registration.Columns.Select(c => c.Key));
         Assert.Equal("Points (with Penalties)", registration.TotalHeader);
+        Assert.True(registration.UnrankedShowsPoints);
     }
 
     [Fact]
@@ -72,7 +74,7 @@ public class Wawasee2026CalculatorTests
         // Six 2nds, four misses at the average of 2, and one race short of 7: 12 + 8 + 8.
         var c1 = results.For("C1");
         Assert.Equal(2m, c1.Average);
-        ScenarioAssert.Scores(results, "C1", "2 2 2 2 2 2 DNC 2 DNC 2 DNC 2 DNC 2");
+        ScenarioAssert.Scores(results, "C1", "2 2 2 2 2 2 DNP 2 DNP 2 DNP 2 DNP 2");
         Assert.Equal(28m, c1.TotalScore);
         Assert.Equal(1m, c1.ColumnValues[ScoringColumns.PenaltiesKey].Value);
         Assert.Equal(8m, c1.ColumnValues[ScoringColumns.PenaltiesKey].Multiplier);
@@ -158,10 +160,10 @@ public class Wawasee2026CalculatorTests
     }
 
     [Fact]
-    public void CalculateResults_RequiredRacesBelowHalf_RoundUp()
+    public void CalculateResults_RequiredRacesBelowHalf_RoundDown()
     {
-        // Twelve races at 70% is 8.4 races. Eight would be under 70%, so 9 are needed:
-        // C1 sailed 8, so one penalty.
+        // The club's spreadsheet rounds to the nearest race: twelve races at 70% is 8.4
+        // races, so 8 are needed. C1 sailed 8, so no penalty.
         var scenario = Wawasee().Participation(0).Settings(s => s.MinimumCompetitors = null);
         for (var i = 0; i < 8; i++)
         {
@@ -174,7 +176,7 @@ public class Wawasee2026CalculatorTests
 
         var results = scenario.Score();
 
-        Assert.Equal(1m, results.For("C1").ColumnValues[ScoringColumns.PenaltiesKey].Value);
+        Assert.False(results.For("C1").ColumnValues.ContainsKey(ScoringColumns.PenaltiesKey));
     }
 
     [Fact]
@@ -205,5 +207,125 @@ public class Wawasee2026CalculatorTests
 
         ScenarioAssert.Totals(results, ("C0", 10), ("C1", 10));
         ScenarioAssert.Ranks(results, "C2", "C1", "C0");
+    }
+
+    // The base system's breakdown limit (one per series, later ones RET), as a club's
+    // system inherits it.
+    private static ScoreCodeGroup BreakdownLimit() => new()
+    {
+        Name = "Breakdown throw-outs",
+        LimitationType = ScoreCodeGroupLimitationType.NumberOfRaces,
+        LimitationValue = 1,
+        OverageCodeName = "RET",
+        IncludedCodeNames = new List<string> { "BKD" }
+    };
+
+    [Fact]
+    public void CalculateResults_TimeLimit_ScoresFinishersPlusTwo()
+    {
+        // SI 15.1: four finished within the limit, so C4 scores 6. Six boats in the series:
+        // the cap is 7.
+        var results = Wawasee().Participation(0)
+            .Race("C0:1 C1:2 C2:3 C3:4 C4:TLE")
+            .Race("C0:1 C1:2 C2:3 C3:4 C4:5 C5:6")
+            .Score();
+
+        Assert.Equal(6m, results.Score("C4", 1).ScoreValue);
+    }
+
+    [Theory]
+    [InlineData("DNF")]
+    [InlineData("RET")]
+    [InlineData("DSQ")]
+    public void CalculateResults_DnfRetDsq_ScoreStartersPlusOne(string code)
+    {
+        // The club's answer: the starters + 1. Four finished and C4 started, so 6; C5's DNS
+        // isn't a starter. Six boats in the series would give 7.
+        var results = Wawasee().Participation(0)
+            .Race($"C0:1 C1:2 C2:3 C3:4 C4:{code} C5:DNS")
+            .Score();
+
+        Assert.Equal(6m, results.Score("C4", 1).ScoreValue);
+    }
+
+    [Fact]
+    public void CalculateResults_NoResultOrDnc_ScoredAsDnp()
+    {
+        // The club uses DNP, not DNC: a missing result is DNP, and a DNC (not one of the
+        // system's codes) scores as DNP. Both score C1's average finish, 2.
+        var results = Wawasee().Participation(0)
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C2:2 C3:3 C4:4")
+            .Race("C0:1 C2:2 C3:3 C4:4 C1:DNC")
+            .Score();
+
+        Assert.Equal("DNP", results.Score("C1", 2).RawScore.Code);
+        Assert.Equal(2m, results.Score("C1", 2).ScoreValue);
+        Assert.Equal(2m, results.Score("C1", 3).ScoreValue);
+    }
+
+    [Fact]
+    public void CalculateResults_AverageFinish_NotRounded()
+    {
+        // C1: 1, 2, 2, then missed: average 5/3, not 1.7.
+        var results = Wawasee().Participation(0)
+            .Race("C1:1 C0:2 C2:3 C3:4")
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C2:2 C3:3 C4:4")
+            .Score();
+
+        Assert.Equal(5m / 3m, results.For("C1").Average);
+        Assert.Equal(5m / 3m, results.Score("C1", 4).ScoreValue);
+    }
+
+    [Fact]
+    public void CalculateResults_Dns_ScoredLikeDnp()
+    {
+        // The club's answer: a DNS is a DNP. C1: two finishes, a DNS and a race missed.
+        // The DNS scores C1's average finish, 2, and only 2 of 4 count toward 51% (50%),
+        // so C1 isn't ranked.
+        var results = Wawasee().Settings(s => s.PenaltyThresholdPercent = null)
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C2:2 C3:3 C4:4 C1:DNS")
+            .Race("C0:1 C2:2 C3:3 C4:4")
+            .Score();
+
+        Assert.Equal(2m, results.Score("C1", 3).ScoreValue);
+        Assert.Equal(50m, results.For("C1").ParticipationPercent);
+        Assert.Null(results.For("C1").TotalScore);
+    }
+
+    [Fact]
+    public void CalculateResults_Dns_DoesNotAvoidPenalty()
+    {
+        // 70% of 4 races is 3 sailed. C1 finished two and has a DNS: one race short.
+        var results = Wawasee().Participation(0)
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C2:2 C3:3 C4:4 C1:DNS")
+            .Race("C0:1 C2:2 C3:3 C4:4 C1:DNS")
+            .Score();
+
+        Assert.Equal(1m, results.For("C1").ColumnValues[ScoringColumns.PenaltiesKey].Value);
+    }
+
+    [Fact]
+    public void CalculateResults_SecondBreakdown_ScoresAsRet()
+    {
+        // One BKD per series: C1's second scores RET, the starters + 1 = 5. The first
+        // scores the average of C1's other scores, the RET included: (2 + 5) / 2.
+        var results = Wawasee().Participation(0)
+            .CodeGroup(BreakdownLimit(), inherited: true)
+            .Race("C0:1 C1:2 C2:3 C3:4")
+            .Race("C0:1 C2:2 C3:3 C1:BKD")
+            .Race("C0:1 C2:2 C3:3 C1:BKD")
+            .Score();
+
+        Assert.Equal("BKD", results.Score("C1", 2).RawScore.Code);
+        Assert.Equal(3.5m, results.Score("C1", 2).ScoreValue);
+        Assert.Equal("RET", results.Score("C1", 3).RawScore.Code);
+        Assert.Equal(5m, results.Score("C1", 3).ScoreValue);
     }
 }

@@ -290,29 +290,29 @@ public class RaceService : IRaceService
     {
         var model = await CreateClubRaceAsync(clubInitials, false, null, includeInactive);
         var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
-        // Season doesn't include now. so use last race date or season start.
-        if(series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)
-        {
-            if (series.Races.Any(r => r.Date.HasValue))
-            {
-                model.Date = series.Races.Where(r => r.Date.HasValue).Max(r => r.Date);
-            } else // no races, set to start of season.
-            {
-                model.Date = series.Season.Start;
-            }
-        }
+        var lastRaceDate = series.Races?.Where(r => r.Date.HasValue).Max(r => r.Date);
 
-        // Ensure default date falls within the series date range only when the series
-        // is explicitly date restricted. Series start/end values are not used as a
-        // default date limit because they commonly reflect the last race in the series.
-        DateTime candidateDate = model.Date ?? DateTime.Today;
-        if (series.DateRestricted == true)
+        // A date restricted series defaults to its last race date. Without races, it uses
+        // the club default if its range includes today, or else the nearest date in range.
+        // Series start/end values are not used as a default date limit because they
+        // commonly reflect the last race in the series.
+        var restrictedDate = series.DateRestricted == true
+            ? GetDateRestrictedSeriesRaceDate(series, lastRaceDate ?? DateTime.Today)
+            : null;
+        if (restrictedDate.HasValue)
         {
-            var restrictedDate = GetDateRestrictedSeriesRaceDate(series, candidateDate);
-            if (restrictedDate != null)
+            var rangeIncludesToday = restrictedDate == DateTime.Today;
+            if (lastRaceDate.HasValue || !rangeIncludesToday)
             {
                 model.Date = restrictedDate;
+                // The date comes from the series, not the club's default offset.
+                model.NeedsLocalDate = false;
             }
+        }
+        // Season doesn't include now. so use last race date or season start.
+        else if (series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)
+        {
+            model.Date = lastRaceDate ?? series.Season.Start;
         }
 
         if (model.Date.HasValue && model.Date.Value.Date != DateTime.Today.Date)
@@ -385,7 +385,7 @@ public class RaceService : IRaceService
         {
             return enforcedStart;
         }
-        return null;
+        return candidateDate.Date;
     }
 
     public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions, bool includeInactive = false)

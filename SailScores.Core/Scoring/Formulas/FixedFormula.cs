@@ -1,3 +1,4 @@
+using System;
 using SailScores.Core.Model;
 
 namespace SailScores.Core.Scoring.Formulas;
@@ -12,9 +13,7 @@ public sealed class FixedFormula : IScoreCodeFormula
 
     public decimal? Evaluate(FormulaContext context)
     {
-        // Quirk: found ignoring case, but only scored when written in upper case
-        // (docs/Scoring-Quirks.md).
-        if (context.Code.Formula != FormulaName)
+        if (!string.Equals(context.Code.Formula, FormulaName, StringComparison.OrdinalIgnoreCase))
         {
             return null;
         }
