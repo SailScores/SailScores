@@ -1,0 +1,34 @@
+@model SailScores.Web.Models.SailScores.SeriesResultsTemplateViewModel
+@*
+    Live preview of the results view, inside the template form so the form's settings are
+    posted with it. The page stays usable while the panel is open (no backdrop, scrolling on),
+    so settings can be changed and the preview follows. seriesResultsTemplatePreview.js
+    posts the form to the Preview action.
+*@
+
+<div class="offcanvas offcanvas-bottom results-view-preview" tabindex="-1" id="resultsViewPreview"
+     data-bs-backdrop="false" data-bs-scroll="true" aria-labelledby="resultsViewPreviewLabel"
+     data-preview-url="@Url.Action("Preview", new { clubInitials = Model.ClubInitials })">
+    <div class="offcanvas-header py-2 gap-3 flex-wrap">
+        <h2 class="offcanvas-title h5 mb-0" id="resultsViewPreviewLabel">Preview</h2>
+        @if (Model.PreviewSeries?.Any() == true)
+        {
+            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                <label for="previewSeriesId" class="form-label mb-0 text-nowrap small">Series</label>
+                <select id="previewSeriesId" name="previewSeriesId" class="form-select form-select-sm w-auto mw-100">
+                    @foreach (var series in Model.PreviewSeries)
+                    {
+                        <option value="@series.Id">@series.Season?.Name @series.Name</option>
+                    }
+                </select>
+            </div>
+        }
+        <small class="text-body-secondary">Updates as you change settings. Nothing is saved.</small>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body pt-0">
+        <div data-preview-content>
+            <p class="text-body-secondary mb-0">Loading…</p>
+        </div>
+    </div>
+</div>

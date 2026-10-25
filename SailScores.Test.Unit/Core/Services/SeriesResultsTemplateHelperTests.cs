@@ -53,7 +53,9 @@ public class SeriesResultsTemplateHelperTests
             CompetitorNameHeader = "Skipper",
             BoatNameHeader = "Hull",
             CompetitorClubVisibility = ColumnVisibility.Hidden,
-            ShowPreDiscardTotal = true,
+            PreDiscardTotalVisibility = ColumnVisibility.Always,
+            ParticipationVisibility = ColumnVisibility.OnLargerScreens,
+            TotalsSeparator = true,
             ShowClubLogo = true
         };
 
@@ -62,7 +64,9 @@ public class SeriesResultsTemplateHelperTests
         Assert.Equal("Skipper", result.CompetitorNameHeader);
         Assert.Equal("Hull", result.BoatNameHeader);
         Assert.Equal(ColumnVisibility.Hidden, result.CompetitorClubVisibility);
-        Assert.True(result.ShowPreDiscardTotal);
+        Assert.Equal(ColumnVisibility.Always, result.PreDiscardTotalVisibility);
+        Assert.Equal(ColumnVisibility.OnLargerScreens, result.ParticipationVisibility);
+        Assert.True(result.TotalsSeparator);
         Assert.True(result.ShowClubLogo);
     }
 

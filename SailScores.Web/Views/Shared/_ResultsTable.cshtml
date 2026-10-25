@@ -369,9 +369,11 @@
                                     IsPercentSystem = Model.Results.IsPercentSystem,
                                     LowerScoreWins = Model.Results.LowerScoreWins ?? false,
                                     ScoreCodesUsed = Model.Results.ScoreCodesUsed,
-                                    HideDncDiscards = Model.HideDncDiscards,
                                     HighlightTopThree = Model.HighlightTopThree,
                                     CssClass = raceColumnClass,
+                                    DiscardStrikethrough = Model.DiscardStrikethrough,
+                                    DiscardCssClass = Model.DiscardCssClass,
+                                    DiscardParentheses = Model.DiscardParentheses,
                                     CodeDisplay = Model.GetScoreCodeDisplay(result?.Code)
                                })
                         }

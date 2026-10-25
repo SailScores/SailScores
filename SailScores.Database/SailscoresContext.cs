@@ -422,6 +422,12 @@ public class SailScoresContext : DbContext, ISailScoresContext
             .HasForeignKey(c => c.DefaultRegattaSeriesResultsTemplateId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<Club>()
+            .HasOne<SeriesResultsTemplate>()
+            .WithMany()
+            .HasForeignKey(c => c.DefaultSummarySeriesResultsTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Regatta>()
             .Property(e => e.UpdatedDate)
             .HasConversion(v => v, v =>

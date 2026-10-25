@@ -163,7 +163,6 @@ public class SeriesService : ISeriesService
             ScoringSystemId = blankSingle.ScoringSystemId,
             ScoringSystemOptions = blankSingle.ScoringSystemOptions,
             TrendOption = blankSingle.TrendOption,
-            HideDncDiscards = blankSingle.HideDncDiscards,
             FleetOptions = blankSingle.FleetOptions,
             Series = new List<MultipleSeriesRowViewModel>
             {
@@ -773,7 +772,6 @@ public class SeriesService : ISeriesService
             FleetId = model.FleetId,
             UseFullRaceScores = model.UseFullRaceScores,
             TrendOption = model.TrendOption,
-            HideDncDiscards = model.HideDncDiscards,
 
             Type = SeriesType.Standard,
             ExcludeFromCompetitorStats = false,
@@ -808,7 +806,6 @@ public class SeriesService : ISeriesService
             Season = season,
             ScoringSystemId = model.ScoringSystemId == Guid.Empty ? null : model.ScoringSystemId,
             TrendOption = model.TrendOption,
-            HideDncDiscards = model.HideDncDiscards,
 
             Type = SeriesType.Summary,
             ExcludeFromCompetitorStats = false,
@@ -858,7 +855,6 @@ public class SeriesService : ISeriesService
             Type = SeriesType.Summary,
             ScoringSystemId = summarySeries.ScoringSystemId,
             TrendOption = summarySeries.TrendOption,
-            HideDncDiscards = summarySeries.HideDncDiscards,
             ExcludeFromCompetitorStats = summarySeries.ExcludeFromCompetitorStats,
             IsImportantSeries = summarySeries.IsImportantSeries,
             ParentSeriesIds = null,

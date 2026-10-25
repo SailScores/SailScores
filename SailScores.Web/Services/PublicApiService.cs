@@ -277,7 +277,12 @@ public class PublicApiService : IPublicApiService
                 : series.GetEffectiveFleetName(),
             TrendOption = series.TrendOption?.ToString(),
             PreferAlternativeSailNumbers = series.PreferAlternativeSailNumbers ?? false,
-            HideDncDiscards = series.HideDncDiscards,
+            // From the results view: discarded DNCs are blank when DNC is hidden, always or
+            // when discarded.
+            HideDncDiscards = series.SeriesResultsTemplate?.ScoreCodes?.Any(c =>
+                string.Equals(c.Code, "DNC", StringComparison.OrdinalIgnoreCase)
+                && c.Display is SailScores.Api.Enumerations.ScoreCodeDisplay.Hidden
+                    or SailScores.Api.Enumerations.ScoreCodeDisplay.HiddenWhenDiscarded) ?? false,
             IsPreliminary = series.FlatResults?.IsPreliminary,
             NumberOfSailedRaces = series.FlatResults?.NumberOfSailedRaces ?? 0,
             NumberOfDiscards = series.FlatResults?.NumberOfDiscards ?? 0,

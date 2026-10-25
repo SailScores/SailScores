@@ -70,7 +70,7 @@ public static ScoringRecipe Pbg(ScoringSystem system) => new()
 | 8 | The series average isn't rounded; results show it to three decimals (`0.###`). | `LowPointAverage` (no rounding); `_ResultsTable.cshtml` format | Snapshots | implemented. RDGAve still rounds to one decimal (decision 2). |
 | 9 | Ranked boats go lowest average first; unranked boats follow. | `Tiebreaks/Rankings.LowPoint` | Covered by the low point average tests | implemented |
 | (decision 3) | Ties: RRS A8.1, then A8.2. | `Tiebreaks/Rankings.LowPoint` (`AppendixA81LowPoint`, `AppendixA82.LowPoint`) | Covered by the Appendix A tests | implemented |
-| 10 | Daily results show columns for the Average, participation percent, races participated, and Net total. | Columns: the total (headed "Score"), Net Points, and Net Series Races. Participation exists but is hidden by default: turn it on in the system's Results Columns. | `CreateCalculator_Pbg_UsesPbgCalculatorWithNetColumnsAndScoreHeader` | **partly supported**: see below |
+| 10 | Daily results show columns for the Average, participation percent, races participated, and Net total. | Columns: the total (headed "Score"), Net Points, and Net Series Races. Participation exists but is hidden by default: turn it on in the club's results views. | `CreateCalculator_Pbg_UsesPbgCalculatorWithNetColumnsAndScoreHeader` | **partly supported**: see below |
 | 11 | A summary series can hide the individual race columns. | Nothing | Nothing | **not supported** |
 | 12 | Each series' heading shows the number of races needed to rank. | The heading shows "50% participation required for ranking" (`Series/Details.cshtml`), not a race count. | Nothing | **not supported** |
 
@@ -78,7 +78,7 @@ public static ScoringRecipe Pbg(ScoringSystem system) => new()
 
 - **Spec 10, columns.**
   - *Average:* shown as the total column, headed "Score" (`TotalHeader` in the registration). Keeping "Score" is fine (decision 5).
-  - *Participation percent:* the standard Participation column, hidden by default. Turn it on in the club's system (Results Columns), or make it visible by default for PBG.
+  - *Participation percent:* the standard Participation column, hidden by default. Turn it on in the club's results views.
   - *Races participated:* there's no column for it. Net Series Races is the races averaged after discards, which is one fewer than participated once a boat discards. Needs a new column (from the count the participation rule already makes).
   - *Net total:* Net Points, the points after discards. Implemented.
 - **Spec 11, hiding race columns in a summary.** Needs a series (or scoring system) option and a change to the results table and exports.

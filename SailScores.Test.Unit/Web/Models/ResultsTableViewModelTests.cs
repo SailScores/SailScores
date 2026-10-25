@@ -47,6 +47,17 @@ public class ResultsTableViewModelTests
     }
 
     [Fact]
+    public void HasSeparatorBefore_TotalsSeparator_SeparatesFirstColumnOnly()
+    {
+        var table = MakeTable(ResultsColumnSeparator.None);
+        table.TotalsSeparator = true;
+
+        Assert.True(table.HasSeparatorBefore(0));
+        Assert.False(table.HasSeparatorBefore(1));
+        Assert.Equal("results-separator", table.RaceColumnCssClass(0));
+    }
+
+    [Fact]
     public void HasSeparatorBefore_RaceDays_SeparatesOnlyWhenDateChanges()
     {
         var table = MakeTable(ResultsColumnSeparator.RaceDays);
@@ -54,6 +65,41 @@ public class ResultsTableViewModelTests
         Assert.False(table.HasSeparatorBefore(0));
         Assert.False(table.HasSeparatorBefore(1));
         Assert.True(table.HasSeparatorBefore(2));
+    }
+
+    [Fact]
+    public void HasSeparatorBefore_ChildSeries_SeparatesWhereChildSeriesChanges()
+    {
+        var first = Guid.NewGuid();
+        var second = Guid.NewGuid();
+        var table = new ResultsTableViewModel
+        {
+            Results = new FlatResults
+            {
+                Races = new List<FlatRace>
+                {
+                    new() { Id = Guid.NewGuid(), ChildSeriesId = first },
+                    new() { Id = Guid.NewGuid(), ChildSeriesId = first },
+                    new() { Id = Guid.NewGuid(), ChildSeriesId = second },
+                    // A child series shown as one column, saved before ChildSeriesId existed.
+                    new() { Id = Guid.NewGuid(), IsSeries = true },
+                }
+            },
+            ColumnSeparators = ResultsColumnSeparator.ChildSeries
+        };
+
+        Assert.False(table.HasSeparatorBefore(1));
+        Assert.True(table.HasSeparatorBefore(2));
+        Assert.True(table.HasSeparatorBefore(3));
+    }
+
+    [Fact]
+    public void HasSeparatorBefore_ChildSeriesWithoutChildSeries_NeverSeparates()
+    {
+        var table = MakeTable(ResultsColumnSeparator.ChildSeries);
+
+        Assert.False(table.HasSeparatorBefore(1));
+        Assert.False(table.HasSeparatorBefore(2));
     }
 
     [Fact]
@@ -99,7 +145,9 @@ public class ResultsTableViewModelTests
             BoatNameVisibility = ColumnVisibility.Always,
             BoatNameHeader = "Yacht",
             CompetitorClubVisibility = ColumnVisibility.Always,
-            ShowPreDiscardTotal = true,
+            PreDiscardTotalVisibility = ColumnVisibility.Always,
+            ParticipationVisibility = ColumnVisibility.OnLargerScreens,
+            TotalsSeparator = true,
             HighlightTopThree = false,
             ColumnSeparators = ResultsColumnSeparator.RaceDays,
             RaceColumnsVisibility = ColumnVisibility.Hidden,
@@ -113,7 +161,9 @@ public class ResultsTableViewModelTests
         Assert.Equal(ColumnVisibility.Always, table.BoatNameVisibility);
         Assert.Equal("Yacht", table.BoatNameHeader);
         Assert.Equal(ColumnVisibility.Always, table.CompetitorClubVisibility);
-        Assert.True(table.ShowPreDiscardTotal);
+        Assert.Equal(ColumnVisibility.Always, table.PreDiscardTotalVisibility);
+        Assert.Equal(ColumnVisibility.OnLargerScreens, table.ParticipationVisibility);
+        Assert.True(table.TotalsSeparator);
         Assert.False(table.HighlightTopThree);
         Assert.Equal(ResultsColumnSeparator.RaceDays, table.ColumnSeparators);
         Assert.Equal(ColumnVisibility.Hidden, table.RaceColumnsVisibility);
@@ -135,5 +185,53 @@ public class ResultsTableViewModelTests
         Assert.Equal(ScoreCodeDisplay.CodeOnly, table.GetScoreCodeDisplay("dnc").Display);
         Assert.Null(table.GetScoreCodeDisplay("DNF"));
         Assert.Null(table.GetScoreCodeDisplay(null));
+    }
+
+    [Theory]
+    [InlineData(true, ResultsTextColor.Default, "discardmuted")]
+    [InlineData(false, ResultsTextColor.Default, "")]
+    [InlineData(false, ResultsTextColor.Red, "discard-red")]
+    [InlineData(true, ResultsTextColor.Blue, "discard-blue discard-faded")]
+    public void DiscardCssClass_FromSettings_CombinesFadeAndColor(
+        bool faded, ResultsTextColor color, string expected)
+    {
+        var table = new ResultsTableViewModel { DiscardFaded = faded, DiscardColor = color };
+
+        Assert.Equal(expected, table.DiscardCssClass);
+    }
+
+    [Theory]
+    [InlineData(false, false, ResultsTextColor.Default, true)]
+    [InlineData(true, false, ResultsTextColor.Default, false)]
+    [InlineData(false, true, ResultsTextColor.Default, false)]
+    [InlineData(false, false, ResultsTextColor.Red, false)]
+    public void DiscardParentheses_FromSettings_OnlyWithNoOtherStyling(
+        bool strikethrough, bool faded, ResultsTextColor color, bool expected)
+    {
+        var table = new ResultsTableViewModel
+        {
+            DiscardStrikethrough = strikethrough,
+            DiscardFaded = faded,
+            DiscardColor = color
+        };
+
+        Assert.Equal(expected, table.DiscardParentheses);
+    }
+
+    [Fact]
+    public void WithTemplate_CopiesDiscardSettings()
+    {
+        var template = new ResolvedTemplate
+        {
+            DiscardStrikethrough = false,
+            DiscardFaded = false,
+            DiscardColor = ResultsTextColor.Green
+        };
+
+        var table = new ResultsTableViewModel().WithTemplate(template);
+
+        Assert.False(table.DiscardStrikethrough);
+        Assert.False(table.DiscardFaded);
+        Assert.Equal(ResultsTextColor.Green, table.DiscardColor);
     }
 }

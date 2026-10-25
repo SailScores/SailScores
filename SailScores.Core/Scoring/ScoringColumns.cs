@@ -18,7 +18,7 @@ namespace SailScores.Core.Scoring
         public static readonly ScoringColumnDescriptor PreDiscardTotal = new(
             PreDiscardTotalKey,
             "Pre-Discard Total",
-            "Total of all race scores, including discards. A results template can also show this column.",
+            "Total of all race scores, including discards.",
             ScoringColumnFormat.Decimal,
             ColumnVisibility.Hidden,
             includeForPercentSystems: false,
@@ -85,7 +85,8 @@ namespace SailScores.Core.Scoring
                 ? Value(s.PointsEarned / s.PointsPossible)
                 : null);
 
-        // Columns every calculator produces.
+        // Columns every calculator produces. Results views set whether they're shown; see
+        // GetVisibility.
         public static readonly IReadOnlyList<ScoringColumnDescriptor> Standard = new[]
         {
             PreDiscardTotal,
@@ -135,6 +136,18 @@ namespace SailScores.Core.Scoring
             }
             return columns;
         }
+
+        // The visibility of a scoring column on a results page: the standard columns use the
+        // results view's settings, other columns keep the visibility from the scoring system.
+        public static ColumnVisibility GetVisibility(
+            FlatResultColumn column,
+            ColumnVisibility preDiscardTotal,
+            ColumnVisibility participation) => column.Key switch
+        {
+            PreDiscardTotalKey => preDiscardTotal,
+            ParticipationKey => participation,
+            _ => column.Visibility
+        };
 
         // Results saved before scoring columns existed get the standard columns with
         // default visibility.

@@ -58,6 +58,8 @@ namespace SailScores.Core.Model
 
         public Guid? DefaultSeriesResultsTemplateId { get; set; }
         public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+        // Null uses the standard series default.
+        public Guid? DefaultSummarySeriesResultsTemplateId { get; set; }
         public bool EnableCustomCompetitorFields { get; set; }
 
         public String StatisticsDescription { get; set; }

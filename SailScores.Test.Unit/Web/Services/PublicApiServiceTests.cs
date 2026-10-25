@@ -511,7 +511,16 @@ public class PublicApiServiceTests
             Type = SeriesType.Summary,
             TrendOption = SailScores.Api.Enumerations.TrendOption.PreviousRace,
             PreferAlternativeSailNumbers = true,
-            HideDncDiscards = true,
+            // The view, not the old series flag, sets HideDncDiscards.
+            HideDncDiscards = false,
+            SeriesResultsTemplate = new SeriesResultsTemplate
+            {
+                CompetitorClubVisibility = SailScores.Api.Enumerations.ColumnVisibility.Always,
+                ScoreCodes = new List<SeriesResultsTemplateScoreCode>
+                {
+                    new() { Code = "DNC", Display = SailScores.Api.Enumerations.ScoreCodeDisplay.HiddenWhenDiscarded }
+                }
+            },
             UpdatedBy = "scorekeeper",
             Season = new Season
             {

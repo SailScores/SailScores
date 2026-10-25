@@ -20,17 +20,23 @@ public class SeriesResultsTemplateController : Controller
     private readonly IClubService _clubService;
     private readonly ICompetitorFieldService _competitorFieldService;
     private readonly IScoringService _scoringService;
+    private readonly ISeriesService _seriesService;
+
+    // How many recent series the preview offers.
+    private const int PreviewSeriesCount = 30;
 
     public SeriesResultsTemplateController(
         ISeriesResultsTemplateService templateService,
         IClubService clubService,
         ICompetitorFieldService competitorFieldService,
-        IScoringService scoringService)
+        IScoringService scoringService,
+        ISeriesService seriesService)
     {
         _templateService = templateService;
         _clubService = clubService;
         _competitorFieldService = competitorFieldService;
         _scoringService = scoringService;
+        _seriesService = seriesService;
     }
 
     // GET: SeriesResultsTemplate
@@ -53,7 +59,8 @@ public class SeriesResultsTemplateController : Controller
             ClubInitials = clubInitials,
             Templates = templates.ToList(),
             DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
-            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId
+            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId,
+            DefaultSummarySeriesResultsTemplateId = club.DefaultSummarySeriesResultsTemplateId
         };
 
         return View(vm);
@@ -70,7 +77,8 @@ public class SeriesResultsTemplateController : Controller
             await _templateService.SetClubDefaultsAsync(
                 clubId,
                 model.DefaultSeriesResultsTemplateId,
-                model.DefaultRegattaSeriesResultsTemplateId);
+                model.DefaultRegattaSeriesResultsTemplateId,
+                model.DefaultSummarySeriesResultsTemplateId);
             TempData["SuccessMessage"] = "Default views saved.";
         }
         catch (InvalidOperationException ex)
@@ -94,6 +102,7 @@ public class SeriesResultsTemplateController : Controller
         };
         await LoadCustomFieldsAsync(vm, clubId, templateId: null);
         await LoadScoreCodesAsync(vm, clubId);
+        await LoadPreviewSeriesAsync(vm, clubId);
 
         return View(vm);
     }
@@ -110,8 +119,9 @@ public class SeriesResultsTemplateController : Controller
             if (!ModelState.IsValid)
             {
                 model.ClubInitials = clubInitials;
-                model.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+                await LoadFieldDefinitionsAsync(model, clubId);
                 await LoadScoreCodesAsync(model, clubId);
+                await LoadPreviewSeriesAsync(model, clubId);
                 return View(model);
             }
 
@@ -134,7 +144,9 @@ public class SeriesResultsTemplateController : Controller
     }
 
     // GET: SeriesResultsTemplate/Edit/5
-    public async Task<ActionResult> Edit(string clubInitials, Guid id)
+    // With reset, the form shows the default settings, keeping the name; nothing is saved
+    // until the form is.
+    public async Task<ActionResult> Edit(string clubInitials, Guid id, bool reset = false)
     {
         ViewData["ClubInitials"] = clubInitials;
         var clubId = await _clubService.GetClubId(clubInitials);
@@ -145,10 +157,19 @@ public class SeriesResultsTemplateController : Controller
             return NotFound();
         }
 
-        var vm = new SeriesResultsTemplateViewModel(template);
+        var vm = reset
+            ? new SeriesResultsTemplateViewModel
+            {
+                Id = template.Id,
+                ClubId = template.ClubId,
+                Name = template.Name,
+                IsReset = true
+            }
+            : new SeriesResultsTemplateViewModel(template);
         vm.ClubInitials = clubInitials;
-        await LoadCustomFieldsAsync(vm, clubId, template.Id);
+        await LoadCustomFieldsAsync(vm, clubId, reset ? null : template.Id);
         await LoadScoreCodesAsync(vm, clubId);
+        await LoadPreviewSeriesAsync(vm, clubId);
 
         return View(vm);
     }
@@ -170,8 +191,9 @@ public class SeriesResultsTemplateController : Controller
             if (!ModelState.IsValid)
             {
                 model.ClubInitials = clubInitials;
-                model.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+                await LoadFieldDefinitionsAsync(model, clubId);
                 await LoadScoreCodesAsync(model, clubId);
+                await LoadPreviewSeriesAsync(model, clubId);
                 return View(model);
             }
             model.ClubId = clubId;
@@ -192,6 +214,45 @@ public class SeriesResultsTemplateController : Controller
         }
     }
 
+    // POST: SeriesResultsTemplate/Preview
+    // A club series' results table shown with the form's settings, which aren't saved.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Preview(
+        string clubInitials,
+        Guid? previewSeriesId,
+        SeriesResultsTemplateViewModel model)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        var seriesId = previewSeriesId
+            ?? (await _templateService.GetPreviewSeriesAsync(clubId, 1)).FirstOrDefault()?.Id;
+        var series = seriesId.HasValue ? await _seriesService.GetOneSeriesAsync(seriesId.Value) : null;
+        if (series == null || series.ClubId != clubId || series.FlatResults == null)
+        {
+            return PartialView("_Preview", null);
+        }
+
+        var template = model.ToModel();
+        template.ClubId = clubId;
+        template.CustomFields = GetSelectedCustomFields(model);
+        var club = await _clubService.GetMinimalClub(clubId);
+
+        var table = new ResultsTableViewModel
+        {
+            SeriesId = series.Id,
+            Results = series.FlatResults,
+            CustomFieldColumns = template.CustomFields,
+            CustomFieldDefinitions = (await GetFieldDefinitionsAsync(clubId)).ToDictionary(d => d.Id, d => d),
+            ShowExportButtons = false,
+            ExcludeCompetitorLinks = true,
+            PreferAlternativeSailNumbers = series.PreferAlternativeSailNumbers ?? false,
+            UpdatedDate = series.UpdatedDate,
+            DefaultDateFormat = club?.DefaultDateFormat
+        }.WithTemplate(SeriesResultsTemplateHelper.GetResolvedTemplate(template));
+
+        return PartialView("_Preview", table);
+    }
+
     // GET: SeriesResultsTemplate/Delete/5
     public async Task<ActionResult> Delete(string clubInitials, Guid id)
     {
@@ -208,8 +269,7 @@ public class SeriesResultsTemplateController : Controller
 
         var vm = new SeriesResultsTemplateViewModel(template);
         vm.ClubInitials = clubInitials;
-        vm.IsClubDefault = template.Id == club.DefaultSeriesResultsTemplateId 
-                        || template.Id == club.DefaultRegattaSeriesResultsTemplateId;
+        vm.IsClubDefault = IsClubDefault(club, template.Id);
 
         return View(vm);
     }
@@ -230,7 +290,7 @@ public class SeriesResultsTemplateController : Controller
             var club = await _clubService.GetMinimalClub(clubId);
 
             // Check if template is a club default
-            if (id == club.DefaultSeriesResultsTemplateId || id == club.DefaultRegattaSeriesResultsTemplateId)
+            if (IsClubDefault(club, id))
             {
                 TempData["ErrorMessage"] = "Cannot delete a template that is set as a club default. Please change the club defaults first.";
                 return RedirectToAction(nameof(Delete), new { clubInitials, id });
@@ -257,9 +317,16 @@ public class SeriesResultsTemplateController : Controller
         (await _competitorFieldService.GetFieldDefinitionsAsync(clubId)).ToList();
 
     // Fills the custom field choices: every club field, marked with the template's selections.
+    private async Task LoadFieldDefinitionsAsync(SeriesResultsTemplateViewModel vm, Guid clubId)
+    {
+        var club = await _clubService.GetMinimalClub(clubId);
+        vm.CustomFieldsEnabled = club?.EnableCustomCompetitorFields ?? false;
+        vm.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+    }
+
     private async Task LoadCustomFieldsAsync(SeriesResultsTemplateViewModel vm, Guid clubId, Guid? templateId)
     {
-        vm.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
+        await LoadFieldDefinitionsAsync(vm, clubId);
         var selections = templateId.HasValue
             ? await _competitorFieldService.GetTemplateSelectionsAsync(templateId.Value)
             : new List<SeriesResultsTemplateCustomField>();
@@ -311,6 +378,11 @@ public class SeriesResultsTemplateController : Controller
             .ToList();
     }
 
+    private async Task LoadPreviewSeriesAsync(SeriesResultsTemplateViewModel vm, Guid clubId)
+    {
+        vm.PreviewSeries = await _templateService.GetPreviewSeriesAsync(clubId, PreviewSeriesCount);
+    }
+
     private static IList<SeriesResultsTemplateCustomField> GetSelectedCustomFields(
         SeriesResultsTemplateViewModel model) =>
         (model.CustomFieldSelections ?? new List<TemplateCustomFieldSelectionViewModel>())
@@ -322,6 +394,11 @@ public class SeriesResultsTemplateController : Controller
                 DisplayOrder = s.DisplayOrder
             })
             .ToList();
+
+    private static bool IsClubDefault(Club club, Guid templateId) =>
+        templateId == club.DefaultSeriesResultsTemplateId
+        || templateId == club.DefaultRegattaSeriesResultsTemplateId
+        || templateId == club.DefaultSummarySeriesResultsTemplateId;
 
     // The template, or null when it doesn't exist or belongs to another club.
     private async Task<SeriesResultsTemplate> GetClubTemplateAsync(Guid clubId, Guid templateId)

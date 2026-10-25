@@ -289,14 +289,41 @@ nav.bg-dark {
     background: #{$finish-third-light} !important;
 }
 
-/* Vertical line between race columns, set by the results template */
+/* Vertical line between race columns, set by the results template. Kept subtle: a little
+ * stronger than the row lines. Dark mode in _dark-mode.scss. */
 .table > :not(caption) > * > .results-separator {
-    border-left: 2px solid var(--bs-secondary-color);
+    border-left: 2px solid rgba(0, 0, 0, 0.12);
 }
 
 /* Race status */
 span.discardmuted {
     color: #6c757d !important;
+}
+
+/* Results view edit page: the live preview panel */
+.results-view-preview {
+    --bs-offcanvas-height: 45vh;
+}
+
+/* Discard colors from the results template; dark mode in _dark-mode.scss */
+span.discard-red {
+    color: #c62828;
+}
+
+span.discard-blue {
+    color: #1565c0;
+}
+
+span.discard-green {
+    color: #2e7d32;
+}
+
+span.discard-orange {
+    color: #c25e00;
+}
+
+span.discard-faded {
+    opacity: 0.6;
 }
 
 .abandoned {

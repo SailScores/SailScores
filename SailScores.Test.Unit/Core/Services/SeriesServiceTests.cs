@@ -115,6 +115,21 @@ public class SeriesServiceTests
     }
 
     [Fact]
+    public async Task Update_HideDncDiscardsSetOnSeries_KeepsIt()
+    {
+        // Results views now hide discarded DNCs; the series flag is kept for the previous release.
+        _context.Series.Single(s => s.Id == _fakeSeries.Id).HideDncDiscards = true;
+        _context.SaveChanges();
+        var seriesToUpdate = _mapper.Map<Series>(_fakeSeries);
+        seriesToUpdate.ResultsLocked = true;
+        seriesToUpdate.HideDncDiscards = false;
+
+        await _service.Update(seriesToUpdate);
+
+        Assert.True(_context.Series.Single(s => s.Id == _fakeSeries.Id).HideDncDiscards);
+    }
+
+    [Fact]
     public async Task GetSeriesDetailAsync_ReturnsFromDb()
     {
         // Arrange
@@ -129,6 +144,43 @@ public class SeriesServiceTests
 
         // Assert
         Assert.NotNull(result);
+    }
+
+    [Theory]
+    [InlineData(true, "Summary")]
+    [InlineData(false, "Standard")]
+    public async Task GetOneSeriesAsync_SummaryWithoutTemplate_UsesSummaryDefaultOrElseStandard(
+        bool hasSummaryDefault, string expectedTemplate)
+    {
+        var club = _context.Clubs.First();
+        var standard = new Database.Entities.SeriesResultsTemplate
+        {
+            Id = Guid.NewGuid(), ClubId = club.Id, Name = "Standard"
+        };
+        var summaryTemplate = new Database.Entities.SeriesResultsTemplate
+        {
+            Id = Guid.NewGuid(), ClubId = club.Id, Name = "Summary"
+        };
+        _context.SeriesResultsTemplates.AddRange(standard, summaryTemplate);
+        club.DefaultSeriesResultsTemplateId = standard.Id;
+        club.DefaultSummarySeriesResultsTemplateId = hasSummaryDefault ? summaryTemplate.Id : null;
+        var series = new Database.Entities.Series
+        {
+            Id = Guid.NewGuid(), ClubId = club.Id, Name = "Season Summary", UrlName = "season-summary",
+            Season = _context.Seasons.First(), Type = Database.Entities.SeriesType.Summary,
+            RaceSeries = new List<Database.Entities.SeriesRace>()
+        };
+        _context.Series.Add(series);
+        _context.HistoricalResults.Add(new Database.Entities.HistoricalResults
+        {
+            Id = Guid.NewGuid(), SeriesId = series.Id, IsCurrent = true, Created = DateTime.UtcNow,
+            Results = Newtonsoft.Json.JsonConvert.SerializeObject(new FlatResults { Races = new List<FlatRace>() })
+        });
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var result = await _service.GetOneSeriesAsync(series.Id);
+
+        Assert.Equal(expectedTemplate, result.SeriesResultsTemplate.Name);
     }
 
     [Fact]
@@ -481,6 +533,12 @@ public class SeriesServiceTests
         Assert.Equal(child2.Id, race2.SourceChildSeriesId);
         Assert.Contains(competitor.Id, race1.CompetitorIdsDiscardedInChild);
         Assert.Empty(race2.CompetitorIdsDiscardedInChild);
+
+        // The saved results record each column's child series, for column separators.
+        var saved = Newtonsoft.Json.JsonConvert.DeserializeObject<FlatResults>(
+            _context.HistoricalResults.Single(r => r.SeriesId == summary.Id && r.IsCurrent).Results);
+        Assert.Equal(child1.Id, saved.Races.Single(r => r.Id == child1RaceId).ChildSeriesId);
+        Assert.Equal(child2.Id, saved.Races.Single(r => r.Id != child1RaceId).ChildSeriesId);
     }
 
     [Fact]

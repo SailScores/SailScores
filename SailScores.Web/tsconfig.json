@@ -34,7 +34,8 @@
     "./Scripts/fleetManagement.ts",
     "./Scripts/interfaces/CompetitorDto.cs.d.ts",
     "./Scripts/ocrRaceEntry.ts",
-    "./Scripts/scoringSystemSettings.ts"
+    "./Scripts/scoringSystemSettings.ts",
+    "./Scripts/seriesResultsTemplatePreview.ts"
   ],
   "compileOnSave": true
   }

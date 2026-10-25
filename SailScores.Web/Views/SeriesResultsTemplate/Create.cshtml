@@ -5,19 +5,34 @@
 }
 
 <div class="container-lg p-0 p-md-2">
-    <div class="mb-3">
-        <h1 class="h2 mb-1">@ViewData["Title"]</h1>
-        <p class="text-body-secondary mb-0">
-            Define how series results are displayed: which columns appear and how scores are shown.
-        </p>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2 mb-3">
+        <div>
+            <h1 class="h2 mb-1">@ViewData["Title"]</h1>
+            <p class="text-body-secondary mb-0">
+                Define how series results are displayed: which columns appear and how scores are shown.
+            </p>
+        </div>
+        <div>
+            <button type="button" class="btn btn-outline-secondary text-nowrap" data-bs-toggle="offcanvas"
+                    data-bs-target="#resultsViewPreview" aria-controls="resultsViewPreview">
+                <span class="fas fa-eye"></span>
+                Preview
+            </button>
+        </div>
     </div>
 
     <form asp-action="Create" method="post">
         <partial name="_TemplateForm" model="Model" />
+        <partial name="_PreviewPanel" model="Model" />
 
         <div class="d-flex flex-wrap gap-2 mb-3">
             <button type="submit" class="btn btn-primary">
                 Create
+            </button>
+            <button type="button" class="btn btn-outline-secondary text-nowrap" data-bs-toggle="offcanvas"
+                    data-bs-target="#resultsViewPreview" aria-controls="resultsViewPreview">
+                <span class="fas fa-eye"></span>
+                Preview
             </button>
             <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
                 Cancel
@@ -28,4 +43,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/seriesResultsTemplatePreview.js" asp-append-version="true"></script>
 }

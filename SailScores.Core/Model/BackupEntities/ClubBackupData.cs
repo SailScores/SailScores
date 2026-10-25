@@ -39,6 +39,7 @@ public class ClubBackupData
     public bool EnableCustomCompetitorFields { get; set; }
     public Guid? DefaultSeriesResultsTemplateId { get; set; }
     public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+    public Guid? DefaultSummarySeriesResultsTemplateId { get; set; }
 
     // Referenced data
     public IList<BoatClassBackup> BoatClasses { get; set; }

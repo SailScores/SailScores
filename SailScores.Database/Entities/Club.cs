@@ -60,6 +60,8 @@ public class Club
 
     public Guid? DefaultSeriesResultsTemplateId { get; set; }
     public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+    // Null uses the standard series default.
+    public Guid? DefaultSummarySeriesResultsTemplateId { get; set; }
 
     public IList<ClubSequence> ClubSequences { get; set; }
 

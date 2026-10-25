@@ -21,11 +21,16 @@ public class SeriesResultsTemplateViewModel
         BoatNameVisibility = template.BoatNameVisibility;
         BoatNameHeader = template.BoatNameHeader;
         CompetitorClubVisibility = template.CompetitorClubVisibility;
-        ShowPreDiscardTotal = template.ShowPreDiscardTotal;
+        PreDiscardTotalVisibility = template.PreDiscardTotalVisibility;
+        ParticipationVisibility = template.ParticipationVisibility;
         ShowClubLogo = template.ShowClubLogo;
         HighlightTopThree = template.HighlightTopThree;
         ColumnSeparators = template.ColumnSeparators;
         RaceColumnsVisibility = template.RaceColumnsVisibility;
+        TotalsSeparator = template.TotalsSeparator;
+        DiscardStrikethrough = template.DiscardStrikethrough;
+        DiscardFaded = template.DiscardFaded;
+        DiscardColor = template.DiscardColor;
         ScoreCodes = (template.ScoreCodes ?? new List<SeriesResultsTemplateScoreCode>())
             .Select(c => new TemplateScoreCodeViewModel(c))
             .ToList();
@@ -43,11 +48,16 @@ public class SeriesResultsTemplateViewModel
         BoatNameVisibility = BoatNameVisibility,
         BoatNameHeader = BoatNameHeader,
         CompetitorClubVisibility = CompetitorClubVisibility,
-        ShowPreDiscardTotal = ShowPreDiscardTotal,
+        PreDiscardTotalVisibility = PreDiscardTotalVisibility,
+        ParticipationVisibility = ParticipationVisibility,
         ShowClubLogo = ShowClubLogo,
         HighlightTopThree = HighlightTopThree,
         ColumnSeparators = ColumnSeparators,
         RaceColumnsVisibility = RaceColumnsVisibility,
+        TotalsSeparator = TotalsSeparator,
+        DiscardStrikethrough = DiscardStrikethrough,
+        DiscardFaded = DiscardFaded,
+        DiscardColor = DiscardColor,
         ScoreCodes = (ScoreCodes ?? new List<TemplateScoreCodeViewModel>())
             .Select(c => c.ToModel())
             .ToList(),
@@ -83,8 +93,11 @@ public class SeriesResultsTemplateViewModel
     [Display(Name = "Competitor Club")]
     public ColumnVisibility CompetitorClubVisibility { get; set; } = ColumnVisibility.Hidden;
 
-    [Display(Name = "Show Pre-Discard Total")]
-    public bool ShowPreDiscardTotal { get; set; } = false;
+    [Display(Name = "Pre-Discard Total")]
+    public ColumnVisibility PreDiscardTotalVisibility { get; set; } = ColumnVisibility.Hidden;
+
+    [Display(Name = "Participation")]
+    public ColumnVisibility ParticipationVisibility { get; set; } = ColumnVisibility.Hidden;
 
     [Display(Name = "Show Club Logo")]
     public bool ShowClubLogo { get; set; }
@@ -98,11 +111,32 @@ public class SeriesResultsTemplateViewModel
     [Display(Name = "Race columns")]
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
 
+    [Display(Name = "Line between totals and races")]
+    public bool TotalsSeparator { get; set; }
+
+    [Display(Name = "Strike through")]
+    public bool DiscardStrikethrough { get; set; } = true;
+
+    [Display(Name = "Faded")]
+    public bool DiscardFaded { get; set; } = true;
+
+    [Display(Name = "Color")]
+    public ResultsTextColor DiscardColor { get; set; } = ResultsTextColor.Default;
+
     public IList<TemplateScoreCodeViewModel> ScoreCodes { get; set; } = new List<TemplateScoreCodeViewModel>();
+
+    // The edit form is showing the default settings, not yet saved.
+    public bool IsReset { get; set; }
 
     public IList<TemplateCustomFieldSelectionViewModel> CustomFieldSelections { get; set; } = new List<TemplateCustomFieldSelectionViewModel>();
 
     public IList<CompetitorFieldDefinition> AvailableCustomFields { get; set; } = new List<CompetitorFieldDefinition>();
+
+    // The club has custom competitor fields turned on; otherwise the form hides that section.
+    public bool CustomFieldsEnabled { get; set; }
+
+    // Recent club series the preview can show.
+    public IList<Series> PreviewSeries { get; set; } = new List<Series>();
 
     // Used in delete view to show warning
     public bool IsClubDefault { get; set; }

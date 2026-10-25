@@ -22,11 +22,16 @@ public class SeriesResultsTemplateViewModelTests
             BoatNameVisibility = ColumnVisibility.Hidden,
             BoatNameHeader = "Yacht",
             CompetitorClubVisibility = ColumnVisibility.Always,
-            ShowPreDiscardTotal = true,
+            PreDiscardTotalVisibility = ColumnVisibility.OnLargerScreens,
+            ParticipationVisibility = ColumnVisibility.Always,
+            TotalsSeparator = true,
             ShowClubLogo = true,
             HighlightTopThree = false,
             ColumnSeparators = ResultsColumnSeparator.RaceDays,
             RaceColumnsVisibility = ColumnVisibility.Hidden,
+            DiscardStrikethrough = false,
+            DiscardFaded = false,
+            DiscardColor = ResultsTextColor.Orange,
             ScoreCodes = new System.Collections.Generic.List<SeriesResultsTemplateScoreCode>
             {
                 new() { Code = "DNC", Display = ScoreCodeDisplay.Hidden, Faded = true }

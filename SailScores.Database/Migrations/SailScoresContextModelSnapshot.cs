@@ -262,6 +262,9 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid?>("DefaultSeriesResultsTemplateId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("DefaultSummarySeriesResultsTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -331,6 +334,8 @@ namespace SailScores.Database.Migrations
                     b.HasIndex("DefaultScoringSystemId");
 
                     b.HasIndex("DefaultSeriesResultsTemplateId");
+
+                    b.HasIndex("DefaultSummarySeriesResultsTemplateId");
 
                     b.HasIndex("WeatherSettingsId");
 
@@ -1725,6 +1730,15 @@ namespace SailScores.Database.Migrations
                     b.Property<int>("CompetitorNameVisibility")
                         .HasColumnType("int");
 
+                    b.Property<int>("DiscardColor")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("DiscardFaded")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DiscardStrikethrough")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("HighlightTopThree")
                         .HasColumnType("bit");
 
@@ -1732,6 +1746,12 @@ namespace SailScores.Database.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ParticipationVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PreDiscardTotalVisibility")
+                        .HasColumnType("int");
 
                     b.Property<int>("RaceColumnsVisibility")
                         .HasColumnType("int");
@@ -1743,6 +1763,9 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("ShowPreDiscardTotal")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("TotalsSeparator")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -2100,6 +2123,11 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.SeriesResultsTemplate", null)
                         .WithMany()
                         .HasForeignKey("DefaultSeriesResultsTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SailScores.Database.Entities.SeriesResultsTemplate", null)
+                        .WithMany()
+                        .HasForeignKey("DefaultSummarySeriesResultsTemplateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SailScores.Database.Entities.WeatherSettings", "WeatherSettings")

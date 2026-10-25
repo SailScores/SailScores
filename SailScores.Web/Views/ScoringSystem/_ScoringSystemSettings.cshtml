@@ -6,8 +6,8 @@
     Which fields show depends on the parent system's calculator and the discard method;
     scoringSystemSettings.js toggles them when either changes.
     Parent <option>s carry data-calculator-type, data-discard-method and data-settings.
-    Results column visibility works the same way: one select per column any calculator
-    produces, shown for the parent's calculator.
+    Results column visibility works the same way: one select per calculator-specific column,
+    shown for the parent's calculator. The standard columns are set in results views.
     Fields and columns that only some calculators have sit in a .scoring-method-settings
     panel headed with the calculator's name, so users can tell them from the common ones.
 *@
@@ -96,11 +96,12 @@
 </div>
 
 <h5 class="mt-4">Results Columns</h5>
-<p class="small">Extra columns shown after the total. Changes apply when the series results are next updated.</p>
-@foreach (var column in ScoringCalculatorRegistry.AllColumns.Where(c => standardColumnKeys.Contains(c.Key)))
-{
-    await RenderColumn(column);
-}
+<p class="small">
+    Extra columns shown after the total. Changes apply when the series results are next updated.
+    Columns every scoring system has, such as @string.Join(" and ", ScoringColumns.Standard.Select(c => c.Header)),
+    are shown or hidden by each
+    <a asp-controller="SeriesResultsTemplate" asp-action="Index">results view</a>.
+</p>
 <div class="scoring-method-settings" data-method-panel>
     <div class="scoring-method-settings-heading"><span data-method-name></span> columns</div>
     @foreach (var column in ScoringCalculatorRegistry.AllColumns.Where(c => !standardColumnKeys.Contains(c.Key)))

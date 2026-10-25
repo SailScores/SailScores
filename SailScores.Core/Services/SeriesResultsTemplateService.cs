@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SailScores.Api.Enumerations;
 using SailScores.Core.Mapping;
 using SailScores.Core.Model;
+using SailScores.Core.Scoring;
 using SailScores.Core.Services.Interfaces;
 using SailScores.Database;
 using System;
@@ -31,6 +32,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         var dbTemplates = await _dbContext.SeriesResultsTemplates
             .Include(t => t.CustomFields)
             .Include(t => t.ScoreCodes)
+            .AsSplitQuery()
             .Where(t => t.ClubId == clubId)
             .OrderBy(t => t.Name)
             .ToListAsync()
@@ -44,6 +46,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         var dbTemplate = await _dbContext.SeriesResultsTemplates
             .Include(t => t.CustomFields)
             .Include(t => t.ScoreCodes)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(t => t.Id == templateId)
             .ConfigureAwait(false);
 
@@ -119,11 +122,48 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         target.BoatNameVisibility = source.BoatNameVisibility;
         target.BoatNameHeader = source.BoatNameHeader;
         target.CompetitorClubVisibility = source.CompetitorClubVisibility;
-        target.ShowPreDiscardTotal = source.ShowPreDiscardTotal;
+        target.PreDiscardTotalVisibility = source.PreDiscardTotalVisibility;
+        target.ParticipationVisibility = source.ParticipationVisibility;
+        target.ShowPreDiscardTotal = source.PreDiscardTotalVisibility != ColumnVisibility.Hidden;
         target.ShowClubLogo = source.ShowClubLogo;
         target.HighlightTopThree = source.HighlightTopThree;
         target.ColumnSeparators = source.ColumnSeparators;
         target.RaceColumnsVisibility = source.RaceColumnsVisibility;
+        target.TotalsSeparator = source.TotalsSeparator;
+        target.DiscardStrikethrough = source.DiscardStrikethrough;
+        target.DiscardFaded = source.DiscardFaded;
+        target.DiscardColor = source.DiscardColor;
+    }
+
+    public async Task<IList<Series>> GetPreviewSeriesAsync(Guid clubId, int count)
+    {
+        var series = await _dbContext.Series
+            .Where(s => s.ClubId == clubId
+                && _dbContext.HistoricalResults.Any(h => h.SeriesId == s.Id && h.IsCurrent))
+            .OrderByDescending(s => s.UpdatedDate)
+            .Take(count)
+            .Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.Type,
+                s.UpdatedDate,
+                SeasonName = s.Season.Name
+            })
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return series
+            .Select(s => new Series
+            {
+                Id = s.Id,
+                ClubId = clubId,
+                Name = s.Name,
+                Type = (SeriesType)(int)(s.Type ?? Db.SeriesType.Standard),
+                UpdatedDate = s.UpdatedDate,
+                Season = new Season { Name = s.SeasonName }
+            })
+            .ToList();
     }
 
     public async Task DeleteTemplateAsync(Guid templateId)
@@ -131,7 +171,8 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         // Check if template is set as a club default
         var isDefault = await _dbContext.Clubs
             .AnyAsync(c => c.DefaultSeriesResultsTemplateId == templateId
-                        || c.DefaultRegattaSeriesResultsTemplateId == templateId)
+                        || c.DefaultRegattaSeriesResultsTemplateId == templateId
+                        || c.DefaultSummarySeriesResultsTemplateId == templateId)
             .ConfigureAwait(false);
 
         if (isDefault)
@@ -152,7 +193,11 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         }
     }
 
-    public async Task SetClubDefaultsAsync(Guid clubId, Guid? seriesTemplateId, Guid? regattaTemplateId)
+    public async Task SetClubDefaultsAsync(
+        Guid clubId,
+        Guid? seriesTemplateId,
+        Guid? regattaTemplateId,
+        Guid? summaryTemplateId)
     {
         var club = await _dbContext.Clubs
             .FirstOrDefaultAsync(c => c.Id == clubId)
@@ -163,7 +208,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             throw new InvalidOperationException("Club not found.");
         }
 
-        var requestedIds = new[] { seriesTemplateId, regattaTemplateId }
+        var requestedIds = new[] { seriesTemplateId, regattaTemplateId, summaryTemplateId }
             .Where(id => id.HasValue)
             .Select(id => id.Value)
             .Distinct()
@@ -179,6 +224,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
 
         club.DefaultSeriesResultsTemplateId = seriesTemplateId;
         club.DefaultRegattaSeriesResultsTemplateId = regattaTemplateId;
+        club.DefaultSummarySeriesResultsTemplateId = summaryTemplateId;
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
@@ -204,6 +250,9 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             return; // Already has templates
         }
 
+        var (preDiscardTotal, participation) = await GetScoringSystemColumnVisibilityAsync(clubId)
+            .ConfigureAwait(false);
+
         // Create Standard template
         var standardTemplate = new Db.SeriesResultsTemplate
         {
@@ -215,7 +264,10 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             CompetitorNameHeader = "Helm",
             BoatNameVisibility = ColumnVisibility.OnLargerScreens,
             BoatNameHeader = "Boat",
-            CompetitorClubVisibility = ColumnVisibility.Hidden
+            CompetitorClubVisibility = ColumnVisibility.Hidden,
+            PreDiscardTotalVisibility = preDiscardTotal,
+            ParticipationVisibility = participation,
+            ShowPreDiscardTotal = preDiscardTotal != ColumnVisibility.Hidden
         };
 
         // Create Regatta template
@@ -229,7 +281,10 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             CompetitorNameHeader = "Helm",
             BoatNameVisibility = ColumnVisibility.OnLargerScreens,
             BoatNameHeader = "Boat",
-            CompetitorClubVisibility = ColumnVisibility.OnLargerScreens
+            CompetitorClubVisibility = ColumnVisibility.OnLargerScreens,
+            PreDiscardTotalVisibility = preDiscardTotal,
+            ParticipationVisibility = participation,
+            ShowPreDiscardTotal = preDiscardTotal != ColumnVisibility.Hidden
         };
 
         _dbContext.SeriesResultsTemplates.Add(standardTemplate);
@@ -240,6 +295,34 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         club.DefaultRegattaSeriesResultsTemplateId = regattaTemplate.Id;
 
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    // The standard scoring columns used to be shown by scoring system settings. A club whose
+    // scoring systems show one keeps it in its first views: the most visible setting wins.
+    // The migration that moved these settings to views does the same for existing views.
+    private async Task<(ColumnVisibility PreDiscardTotal, ColumnVisibility Participation)>
+        GetScoringSystemColumnVisibilityAsync(Guid clubId)
+    {
+        var settings = (await _dbContext.ScoringSystems
+                .Where(s => s.ClubId == clubId && s.Settings != null)
+                .Select(s => s.Settings)
+                .ToListAsync()
+                .ConfigureAwait(false))
+            .Select(ScoringSystemSettings.FromJson)
+            .ToList();
+
+        ColumnVisibility MostVisible(string key)
+        {
+            var shown = settings
+                .Select(s => s.GetColumnVisibility(key))
+                .Where(v => v is ColumnVisibility.Always or ColumnVisibility.OnLargerScreens)
+                .ToList();
+            return shown.Contains(ColumnVisibility.Always) ? ColumnVisibility.Always
+                : shown.Count > 0 ? ColumnVisibility.OnLargerScreens
+                : ColumnVisibility.Hidden;
+        }
+
+        return (MostVisible(ScoringColumns.PreDiscardTotalKey), MostVisible(ScoringColumns.ParticipationKey));
     }
 
     public async Task EnsureDefaultTemplatesForAllClubsAsync()

@@ -151,13 +151,16 @@ namespace SailScores.Core.Services
 
                     Guid? defaultTemplateId = isRegattaSeries
                         ? club?.DefaultRegattaSeriesResultsTemplateId
-                        : club?.DefaultSeriesResultsTemplateId;
+                        : seriesDb.Type == dbObj.SeriesType.Summary
+                            ? club?.DefaultSummarySeriesResultsTemplateId ?? club?.DefaultSeriesResultsTemplateId
+                            : club?.DefaultSeriesResultsTemplateId;
 
                     if (defaultTemplateId.HasValue)
                     {
                         var defaultTemplate = await _dbContext.SeriesResultsTemplates
                             .Include(t => t.CustomFields)
                             .Include(t => t.ScoreCodes)
+                            .AsSplitQuery()
                             .FirstOrDefaultAsync(t => t.Id == defaultTemplateId.Value)
                             .ConfigureAwait(false);
                         fullSeries.SeriesResultsTemplate = _mapper.Map<SeriesResultsTemplate>(defaultTemplate);
@@ -912,6 +915,7 @@ namespace SailScores.Core.Services
                         Order = r.Order,
                         Description = r.Description,
                         IsSeries = r.IsSeriesSummary,
+                        ChildSeriesId = r.SourceChildSeriesId,
                         State = r.State,
                         TrackTimes = r.TrackTimes,
                         WeatherIcon = r.Weather?.Icon,
@@ -922,6 +926,7 @@ namespace SailScores.Core.Services
                 if (r is SeriesAsRace seriesAsRace)
                 {
                     flatRace.IsSeries = true;
+                    flatRace.ChildSeriesId = seriesAsRace.Id;
                     flatRace.StartDate = seriesAsRace.StartDate?.ToDateOnly();
                     flatRace.EndDate = seriesAsRace.EndDate?.ToDateOnly();
                     flatRace.TotalChildRaceCount = seriesAsRace.TotalChildRaceCount;
@@ -1341,7 +1346,6 @@ namespace SailScores.Core.Services
             existingSeries.ScoringSystemId = model.ScoringSystemId;
             existingSeries.TrendOption = model.TrendOption;
             existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
-            existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
             existingSeries.SummaryRollupMode = model.SummaryRollupMode;
             existingSeries.IncludeUnrankedChildScores = model.IncludeUnrankedChildScores;

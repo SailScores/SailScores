@@ -37,32 +37,44 @@ public class ResultsTableViewModel
 
     public bool PreferAlternativeSailNumbers { get; set; }
 
-    // From the results template: shows the pre-discard total scoring column even when
-    // the scoring system hides it.
-    public bool ShowPreDiscardTotal { get; set; }
+    // From the results template: the scoring columns every scoring system has.
+    public ColumnVisibility PreDiscardTotalVisibility { get; set; } = ColumnVisibility.Hidden;
+    public ColumnVisibility ParticipationVisibility { get; set; } = ColumnVisibility.Hidden;
 
-    // Scoring columns (after the total) that aren't hidden, with the template override applied.
+    // Scoring columns (after the total) that aren't hidden. The standard columns use the
+    // template's visibility, others the scoring system's.
     public IList<FlatResultColumn> VisibleScoringColumns =>
         (Results?.Columns ?? new List<FlatResultColumn>())
-            .Select(c => ShowPreDiscardTotal
-                    && c.Key == ScoringColumns.PreDiscardTotalKey
-                    && c.Visibility == ColumnVisibility.Hidden
-                ? new FlatResultColumn
-                {
-                    Key = c.Key,
-                    Header = c.Header,
-                    Format = c.Format,
-                    Visibility = ColumnVisibility.Always
-                }
-                : c)
+            .Select(c => new FlatResultColumn
+            {
+                Key = c.Key,
+                Header = c.Header,
+                Format = c.Format,
+                Visibility = ScoringColumns.GetVisibility(c, PreDiscardTotalVisibility, ParticipationVisibility)
+            })
             .Where(c => c.Visibility != ColumnVisibility.Hidden)
             .ToList();
 
     public bool HighlightTopThree { get; set; } = true;
     public ResultsColumnSeparator ColumnSeparators { get; set; } = ResultsColumnSeparator.None;
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
+    public bool TotalsSeparator { get; set; }
 
     public bool ShowRaceColumns => RaceColumnsVisibility != ColumnVisibility.Hidden;
+
+    public bool DiscardStrikethrough { get; set; } = true;
+    public bool DiscardFaded { get; set; } = true;
+    public ResultsTextColor DiscardColor { get; set; } = ResultsTextColor.Default;
+
+    // CSS classes for a discarded score. Faded alone is the usual gray; faded with a color
+    // keeps the color, lightened.
+    public string DiscardCssClass => DiscardColor == ResultsTextColor.Default
+        ? (DiscardFaded ? "discardmuted" : string.Empty)
+        : $"discard-{DiscardColor.ToString().ToLowerInvariant()}{(DiscardFaded ? " discard-faded" : "")}";
+
+    // With no other discard styling, discards are shown in parentheses.
+    public bool DiscardParentheses =>
+        !DiscardStrikethrough && !DiscardFaded && DiscardColor == ResultsTextColor.Default;
 
     public IDictionary<string, SeriesResultsTemplateScoreCode> ScoreCodeDisplays { get; set; } =
         new Dictionary<string, SeriesResultsTemplateScoreCode>(StringComparer.OrdinalIgnoreCase);
@@ -80,28 +92,40 @@ public class ResultsTableViewModel
         BoatNameVisibility = template.BoatNameVisibility;
         BoatNameHeader = template.BoatNameHeader;
         CompetitorClubVisibility = template.CompetitorClubVisibility;
-        ShowPreDiscardTotal = template.ShowPreDiscardTotal;
+        PreDiscardTotalVisibility = template.PreDiscardTotalVisibility;
+        ParticipationVisibility = template.ParticipationVisibility;
         HighlightTopThree = template.HighlightTopThree;
         ColumnSeparators = template.ColumnSeparators;
         RaceColumnsVisibility = template.RaceColumnsVisibility;
+        TotalsSeparator = template.TotalsSeparator;
+        DiscardStrikethrough = template.DiscardStrikethrough;
+        DiscardFaded = template.DiscardFaded;
+        DiscardColor = template.DiscardColor;
         ScoreCodeDisplays = template.ScoreCodes;
         return this;
     }
 
     private IList<FlatRace> _raceList;
 
-    // Whether a separator line goes before the race column at this index.
+    // Whether a separator line goes before the race column at this index. The first race
+    // column has one when the totals are set apart.
     public bool HasSeparatorBefore(int raceIndex)
     {
         var races = _raceList ??= Results?.Races?.ToList();
-        if (races == null || raceIndex <= 0 || raceIndex >= races.Count)
+        if (races == null || raceIndex < 0 || raceIndex >= races.Count)
         {
             return false;
+        }
+        if (raceIndex == 0)
+        {
+            return TotalsSeparator;
         }
         return ColumnSeparators switch
         {
             ResultsColumnSeparator.EveryColumn => true,
             ResultsColumnSeparator.RaceDays => races[raceIndex].Date?.Date != races[raceIndex - 1].Date?.Date,
+            ResultsColumnSeparator.ChildSeries => races[raceIndex].GetChildSeriesId() is Guid childSeriesId
+                && childSeriesId != races[raceIndex - 1].GetChildSeriesId(),
             _ => false
         };
     }
@@ -114,7 +138,6 @@ public class ResultsTableViewModel
     }
 
     public string TrendLegend { get; set; }
-    public bool HideDncDiscards { get; set; }
     public DateTime? UpdatedDate { get; set; }
     public string DefaultDateFormat { get; set; }
 }

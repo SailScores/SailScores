@@ -6,7 +6,8 @@ namespace SailScores.Web.Services.Interfaces;
 
 public interface ICsvService
 {
-    Stream GetCsv(Series series);
+    // The results view sets which standard scoring columns are included.
+    Stream GetCsv(Series series, SeriesResultsTemplate template = null);
     Stream GetCsv(IDictionary<string, IEnumerable<Competitor>> competitors);
     Stream GetCsv(
         IDictionary<string, IEnumerable<Competitor>> competitors,

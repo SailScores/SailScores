@@ -40,18 +40,19 @@ public class SeriesResultsTemplateServiceTests
     }
 
     [Fact]
-    public async Task SetClubDefaultsAsync_WithClubTemplates_SetsBothDefaults()
+    public async Task SetClubDefaultsAsync_WithClubTemplates_SetsAllDefaults()
     {
         await _service.SeedDefaultTemplatesAsync(_clubId);
         var custom = await _service.SaveTemplateAsync(
             new SeriesResultsTemplate { ClubId = _clubId, Name = "Custom" });
         var standardId = _context.Clubs.Single(c => c.Id == _clubId).DefaultSeriesResultsTemplateId;
 
-        await _service.SetClubDefaultsAsync(_clubId, custom.Id, standardId);
+        await _service.SetClubDefaultsAsync(_clubId, custom.Id, standardId, custom.Id);
 
         var club = _context.Clubs.Single(c => c.Id == _clubId);
         Assert.Equal(custom.Id, club.DefaultSeriesResultsTemplateId);
         Assert.Equal(standardId, club.DefaultRegattaSeriesResultsTemplateId);
+        Assert.Equal(custom.Id, club.DefaultSummarySeriesResultsTemplateId);
     }
 
     [Fact]
@@ -59,11 +60,12 @@ public class SeriesResultsTemplateServiceTests
     {
         await _service.SeedDefaultTemplatesAsync(_clubId);
 
-        await _service.SetClubDefaultsAsync(_clubId, null, null);
+        await _service.SetClubDefaultsAsync(_clubId, null, null, null);
 
         var club = _context.Clubs.Single(c => c.Id == _clubId);
         Assert.Null(club.DefaultSeriesResultsTemplateId);
         Assert.Null(club.DefaultRegattaSeriesResultsTemplateId);
+        Assert.Null(club.DefaultSummarySeriesResultsTemplateId);
     }
 
     [Fact]
@@ -73,7 +75,7 @@ public class SeriesResultsTemplateServiceTests
         var before = _context.Clubs.Single(c => c.Id == _clubId).DefaultSeriesResultsTemplateId;
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.SetClubDefaultsAsync(_clubId, _otherClubTemplateId, null));
+            _service.SetClubDefaultsAsync(_clubId, _otherClubTemplateId, null, null));
 
         Assert.Equal(before, _context.Clubs.Single(c => c.Id == _clubId).DefaultSeriesResultsTemplateId);
     }
@@ -196,5 +198,165 @@ public class SeriesResultsTemplateServiceTests
         var code = Assert.Single(reloaded.ScoreCodes);
         Assert.Equal("DNF", code.Code);
         Assert.True(code.Faded);
+    }
+
+    [Fact]
+    public async Task SetClubDefaultsAsync_SummaryFromAnotherClub_Throws()
+    {
+        await _service.SeedDefaultTemplatesAsync(_clubId);
+        var standardId = _context.Clubs.Single(c => c.Id == _clubId).DefaultSeriesResultsTemplateId;
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.SetClubDefaultsAsync(_clubId, standardId, standardId, _otherClubTemplateId));
+
+        Assert.Null(_context.Clubs.Single(c => c.Id == _clubId).DefaultSummarySeriesResultsTemplateId);
+    }
+
+    [Fact]
+    public async Task DeleteTemplateAsync_SummaryDefault_Throws()
+    {
+        var summary = await _service.SaveTemplateAsync(
+            new SeriesResultsTemplate { ClubId = _clubId, Name = "Summary" });
+        await _service.SetClubDefaultsAsync(_clubId, null, null, summary.Id);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeleteTemplateAsync(summary.Id));
+
+        Assert.True(_context.SeriesResultsTemplates.Any(t => t.Id == summary.Id));
+    }
+
+    [Fact]
+    public async Task SaveTemplateAsync_DiscardSettings_SavesThem()
+    {
+        var saved = await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            ClubId = _clubId,
+            Name = "Red discards",
+            DiscardStrikethrough = false,
+            DiscardFaded = false,
+            DiscardColor = ResultsTextColor.Red
+        });
+
+        var db = _context.SeriesResultsTemplates.Single(t => t.Id == saved.Id);
+        Assert.False(db.DiscardStrikethrough);
+        Assert.False(db.DiscardFaded);
+        Assert.Equal(ResultsTextColor.Red, db.DiscardColor);
+    }
+
+    [Theory]
+    [InlineData(ColumnVisibility.OnLargerScreens, true)]
+    [InlineData(ColumnVisibility.Hidden, false)]
+    public async Task SaveTemplateAsync_ScoringColumns_SavesThemAndKeepsOldFlagInStep(
+        ColumnVisibility preDiscardTotal, bool expectedShowPreDiscardTotal)
+    {
+        var saved = await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            ClubId = _clubId,
+            Name = "Columns",
+            PreDiscardTotalVisibility = preDiscardTotal,
+            ParticipationVisibility = ColumnVisibility.Always,
+            TotalsSeparator = true
+        });
+
+        var db = _context.SeriesResultsTemplates.Single(t => t.Id == saved.Id);
+        Assert.Equal(preDiscardTotal, db.PreDiscardTotalVisibility);
+        Assert.Equal(ColumnVisibility.Always, db.ParticipationVisibility);
+        Assert.True(db.TotalsSeparator);
+        // The previous release reads ShowPreDiscardTotal.
+        Assert.Equal(expectedShowPreDiscardTotal, db.ShowPreDiscardTotal);
+    }
+
+    [Fact]
+    public async Task SeedDefaultTemplatesAsync_ScoringSystemsShowStandardColumns_ViewsShowThem()
+    {
+        _context.SeriesResultsTemplates.RemoveRange(_context.SeriesResultsTemplates.Where(t => t.ClubId == _clubId));
+        _context.ScoringSystems.Add(new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "Shows participation",
+            Settings = "{\"ColumnVisibilities\":{\"participation\":2}}"
+        });
+        _context.ScoringSystems.Add(new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _clubId,
+            Name = "Shows both",
+            Settings = "{\"ColumnVisibilities\":{\"participation\":1,\"preDiscardTotal\":2}}"
+        });
+        _context.ScoringSystems.Add(new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            ClubId = _otherClubId,
+            Name = "Other club",
+            Settings = "{\"ColumnVisibilities\":{\"preDiscardTotal\":1}}"
+        });
+        _context.SaveChanges();
+
+        await _service.SeedDefaultTemplatesAsync(_clubId);
+
+        var templates = _context.SeriesResultsTemplates.Where(t => t.ClubId == _clubId).ToList();
+        Assert.Equal(2, templates.Count);
+        Assert.All(templates, t =>
+        {
+            Assert.Equal(ColumnVisibility.Always, t.ParticipationVisibility);
+            Assert.Equal(ColumnVisibility.OnLargerScreens, t.PreDiscardTotalVisibility);
+        });
+    }
+
+    [Fact]
+    public async Task SeedDefaultTemplatesAsync_NoScoringSystemSettings_HidesStandardColumns()
+    {
+        _context.SeriesResultsTemplates.RemoveRange(_context.SeriesResultsTemplates.Where(t => t.ClubId == _clubId));
+        _context.SaveChanges();
+
+        await _service.SeedDefaultTemplatesAsync(_clubId);
+
+        Assert.All(_context.SeriesResultsTemplates.Where(t => t.ClubId == _clubId), t =>
+        {
+            Assert.Equal(ColumnVisibility.Hidden, t.ParticipationVisibility);
+            Assert.Equal(ColumnVisibility.Hidden, t.PreDiscardTotalVisibility);
+        });
+    }
+
+    [Fact]
+    public async Task GetPreviewSeriesAsync_ClubSeries_OnlyWithCurrentResultsNewestFirst()
+    {
+        var season = _context.Seasons.First(s => s.ClubId == _clubId);
+        Db.Series AddSeries(string name, Guid clubId, DateTime updated, bool? currentResults)
+        {
+            var series = new Db.Series
+            {
+                Id = Guid.NewGuid(),
+                ClubId = clubId,
+                Name = name,
+                Season = season,
+                UpdatedDate = updated,
+                Type = Db.SeriesType.Summary
+            };
+            _context.Series.Add(series);
+            if (currentResults.HasValue)
+            {
+                _context.HistoricalResults.Add(new Db.HistoricalResults
+                {
+                    Id = Guid.NewGuid(),
+                    SeriesId = series.Id,
+                    IsCurrent = currentResults.Value,
+                    Results = "{}"
+                });
+            }
+            return series;
+        }
+        var older = AddSeries("Older", _clubId, new DateTime(2026, 5, 1), true);
+        var newer = AddSeries("Newer", _clubId, new DateTime(2026, 6, 1), true);
+        AddSeries("Old results only", _clubId, new DateTime(2026, 7, 1), false);
+        AddSeries("No results", _clubId, new DateTime(2026, 7, 1), null);
+        AddSeries("Other club", _otherClubId, new DateTime(2026, 7, 1), true);
+        _context.SaveChanges();
+
+        var result = await _service.GetPreviewSeriesAsync(_clubId, 10);
+
+        Assert.Equal(new[] { newer.Id, older.Id }, result.Select(s => s.Id));
+        Assert.Equal(season.Name, result[0].Season.Name);
+        Assert.Equal(SeriesType.Summary, result[0].Type);
     }
 }

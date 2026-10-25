@@ -53,17 +53,18 @@ public class ScoringColumnExtensionsTests
     }
 
     [Fact]
-    public void VisibleScoringColumns_TemplateShowsPreDiscardTotal_OverridesHidden()
+    public void VisibleScoringColumns_StandardColumns_UseTemplateVisibility()
     {
         var model = new ResultsTableViewModel
         {
-            ShowPreDiscardTotal = true,
+            PreDiscardTotalVisibility = ColumnVisibility.Always,
+            ParticipationVisibility = ColumnVisibility.Hidden,
             Results = new FlatResults
             {
                 Columns = new List<FlatResultColumn>
                 {
                     Column(ScoringColumns.PreDiscardTotalKey, visibility: ColumnVisibility.Hidden),
-                    Column(ScoringColumns.ParticipationKey, visibility: ColumnVisibility.Hidden)
+                    Column(ScoringColumns.ParticipationKey, visibility: ColumnVisibility.Always)
                 }
             }
         };
@@ -76,20 +77,23 @@ public class ScoringColumnExtensionsTests
     }
 
     [Fact]
-    public void VisibleScoringColumns_TemplateOff_UsesScoringSystemVisibility()
+    public void VisibleScoringColumns_CalculatorColumns_UseScoringSystemVisibility()
     {
         var model = new ResultsTableViewModel
         {
+            PreDiscardTotalVisibility = ColumnVisibility.Always,
             Results = new FlatResults
             {
                 Columns = new List<FlatResultColumn>
                 {
-                    Column(ScoringColumns.PreDiscardTotalKey, visibility: ColumnVisibility.Hidden),
-                    Column(ScoringColumns.PenaltiesKey, visibility: ColumnVisibility.OnLargerScreens)
+                    Column(ScoringColumns.PenaltiesKey, visibility: ColumnVisibility.OnLargerScreens),
+                    Column(ScoringColumns.AverageWithPenaltiesKey, visibility: ColumnVisibility.Hidden)
                 }
             }
         };
 
-        Assert.Equal(new[] { ScoringColumns.PenaltiesKey }, model.VisibleScoringColumns.Select(c => c.Key));
+        var column = Assert.Single(model.VisibleScoringColumns);
+        Assert.Equal(ScoringColumns.PenaltiesKey, column.Key);
+        Assert.Equal(ColumnVisibility.OnLargerScreens, column.Visibility);
     }
 }

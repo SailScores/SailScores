@@ -23,19 +23,42 @@ Each template includes:
 
 - Race columns visibility (the race columns, or child series columns in a summary series).
   When hidden, only competitor and scoring columns (totals, participation) are shown.
-- Show Pre-Discard Total
+- The standard scoring columns, which every scoring system has: Pre-Discard Total
+  (`PreDiscardTotalVisibility`, never shown for percent systems) and Participation
+  (`ParticipationVisibility`). Both hidden by default. Calculator-specific columns
+  (penalties, averages, net points) keep their visibility from the scoring system. The rule
+  is `ScoringColumns.GetVisibility`, used by the results table and the CSV export.
 - Show Club Logo
 - Highlight top three places (gold, silver and bronze cell colors; on by default)
-- Column separators (`ResultsColumnSeparator`): `None`, `EveryColumn` (between every race or
-  child series), or `RaceDays` (where the race date changes)
+- Column separators (`ResultsColumnSeparator`): `None`, `EveryColumn` (between every column),
+  `RaceDays` (where the race date changes), or `ChildSeries` (in a summary series, where the
+  columns change from one child series to the next; a summary showing child races groups them
+  by child series). Each saved column records its child series (`FlatRace.ChildSeriesId`);
+  results saved before that show `ChildSeries` lines only for child-series columns, until the
+  summary is recalculated. The lines are a little stronger than the row lines, with a
+  separate dark mode color.
+- Line between totals and races (`TotalsSeparator`): the same line before the first race (or
+  child series) column, independent of the column separators setting.
+- Discarded scores: strike through and faded (both on by default), and a color
+  (`ResultsTextColor`: `Default`, `Red`, `Blue`, `Green`, `Orange`). Faded with a color keeps
+  the color, lightened. A faded score code setting still mutes a discarded score. With none
+  of the three (no strike through, not faded, normal color), discards are shown in
+  parentheses.
 
 - Score code display, per code (`SeriesResultsTemplateScoreCode`):
-  - `ScoreCodeDisplay`: `CodeAndPoints` (default), `CodeOnly` (no points), or `Hidden` (blank cell)
+  - `ScoreCodeDisplay`: `CodeAndPoints` (default), `CodeOnly` (no points), `Hidden` (blank cell),
+    or `HiddenWhenDiscarded` (blank only when discarded, or for a DNC that doesn't count in a
+    percent system)
   - Faded: muted like a discard
 
   Only codes that differ from the default are stored. Codes match ignoring case. These settings
-  change display only, never scoring. The series-level "Hide discarded DNC scores" option still
-  applies on top of them.
+  change display only, never scoring. DNC "Hidden when discarded" replaces the series option
+  "Hide discarded DNC scores": `Series.HideDncDiscards` is no longer shown or read (saving a
+  series leaves it unchanged, for the previous release). The public API's `HideDncDiscards`
+  comes from the view. The migration `MoveHideDiscardedDncToViews` moved the setting: each view
+  used by a hiding series takes the setting most of its series use, and the other series get a
+  copy of the view named "(discarded DNC hidden)" or "(discarded DNC shown)", so no series
+  changes how it looks. Clubs with hiding series but no views got the seeded views first.
 
 Visibility uses `ColumnVisibility`:
 - `Always`
@@ -51,6 +74,11 @@ Visibility uses `ColumnVisibility`:
   - `ClubId`
   - `Name`
   - column visibility/header fields listed above
+  - `DiscardStrikethrough`, `DiscardFaded` (both default true), `DiscardColor`
+  - `PreDiscardTotalVisibility`, `ParticipationVisibility` (default `Hidden`), `TotalsSeparator`
+  - `ShowPreDiscardTotal`: no longer read. Saving keeps it in step with
+    `PreDiscardTotalVisibility` so the previous release runs on the migrated database; drop it
+    in a later release.
 
 - `SeriesResultsTemplateScoreCode` (child of a template, cascade delete)
   - `SeriesResultsTemplateId`, `Code` (unique per template), `Display`, `Faded`
@@ -58,6 +86,7 @@ Visibility uses `ColumnVisibility`:
 - `Club`
   - `DefaultSeriesResultsTemplateId`
   - `DefaultRegattaSeriesResultsTemplateId`
+  - `DefaultSummarySeriesResultsTemplateId` (null: same as the standard series default)
 
 - `Series`
   - `SeriesResultsTemplateId`
@@ -83,6 +112,13 @@ Default seeded templates:
 
 `EnsureDefaultTemplatesForAllClubsAsync()` runs this logic for clubs missing defaults.
 
+The standard scoring columns used to be shown or hidden by scoring system settings
+(`ColumnVisibilities`). Seeded templates take the most visible setting from the club's
+scoring systems (Always before On Larger Screens), and the migration
+`AddSharedScoringColumnsAndTotalsSeparatorToViews` did the same for existing templates
+(using `ShowPreDiscardTotal` when no system set the pre-discard total). The old scoring system
+values are left in place but no longer used.
+
 The seeding behavior is idempotent. Re-running it does not duplicate templates for clubs
 that already have seeded templates.
 
@@ -92,6 +128,8 @@ When a series is loaded for results display:
 1. If `Series.SeriesResultsTemplateId` is set, that template is used.
 2. Otherwise, the club default template is used:
    - Regatta series => `DefaultRegattaSeriesResultsTemplateId`
+   - Summary series => `DefaultSummarySeriesResultsTemplateId`, or when that is null,
+     `DefaultSeriesResultsTemplateId`
    - Other series => `DefaultSeriesResultsTemplateId`
 
 This fallback is applied in core series-loading logic so callers receive a resolved
@@ -103,9 +141,22 @@ template whenever possible.
 
 Templates are shown to club admins as "Results views". `SeriesResultsTemplate/Index` is the
 single management page, linked from the club settings page (`Admin/Edit`). It holds:
-- The club defaults (standard series and regatta), saved by the `SetDefaults` action through
-  `ISeriesResultsTemplateService.SetClubDefaultsAsync`, which rejects templates from another club.
-- The template list, with badges marking the defaults.
+- The club defaults (standard series, summary series and regatta), saved by the `SetDefaults`
+  action through `ISeriesResultsTemplateService.SetClubDefaultsAsync`, which rejects templates
+  from another club. The summary default can be "Same as standard".
+- The template list, with badges marking the defaults. A default (of any kind) can't be
+  deleted.
+
+The edit page has "Reset to defaults" (`Edit?reset=true`): the form is filled with the default
+settings, keeping the name, with no custom fields or score code settings. Nothing is saved
+until the form is.
+
+The create and edit pages have a Preview panel (`_PreviewPanel`, a Bootstrap offcanvas that
+leaves the page usable). While it is open, `Scripts/seriesResultsTemplatePreview.ts` posts the
+form to the `Preview` action on each change. The action shows one of the club's series with
+the unsaved settings (`_Preview`, which renders `_ResultsTable`); the panel lists the 30 most
+recently updated series with saved results (`GetPreviewSeriesAsync`), the most recent first.
+Series from another club aren't shown.
 
 Opening the page seeds the default templates for a club that has none.
 

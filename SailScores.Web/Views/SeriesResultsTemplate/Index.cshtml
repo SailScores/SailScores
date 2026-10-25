@@ -19,15 +19,12 @@
         <div>
             <h1 class="h2 mb-1">@ViewData["Title"]</h1>
             <p class="text-body-secondary mb-0">
-                Results views are templates that control how series results are displayed: which columns appear,
-                what they are called, and how scores are shown. Every series uses the club default unless it
-                chooses a different view.
+                Templates controlling how series results are shown: which columns appear,
+                what they are called, and how scores are displayed. Every series uses the
+                club default unless it chooses a different view.
             </p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a asp-action="Create" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-primary">
-                Create
-            </a>
             <a asp-controller="Admin" asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
                 Back to Settings
             </a>
@@ -49,7 +46,7 @@
             <h2 class="h5 mb-3">Club defaults</h2>
             <form asp-action="SetDefaults" asp-route-clubInitials="@Model.ClubInitials" method="post">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label asp-for="DefaultSeriesResultsTemplateId" class="form-label"></label>
                         <select asp-for="DefaultSeriesResultsTemplateId" class="form-select">
                             <option value="">(none)</option>
@@ -58,9 +55,20 @@
                                 <option value="@template.Id">@template.Name</option>
                             }
                         </select>
-                        <small class="form-text text-body-secondary">Used by standard and summary series.</small>
+                        <small class="form-text text-body-secondary">Used by standard series.</small>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="DefaultSummarySeriesResultsTemplateId" class="form-label"></label>
+                        <select asp-for="DefaultSummarySeriesResultsTemplateId" class="form-select">
+                            <option value="">Same as standard</option>
+                            @foreach (var template in Model.Templates)
+                            {
+                                <option value="@template.Id">@template.Name</option>
+                            }
+                        </select>
+                        <small class="form-text text-body-secondary">Used by summary series.</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
                         <label asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-label"></label>
                         <select asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-select">
                             <option value="">(none)</option>
@@ -76,6 +84,13 @@
             </form>
         </div>
     }
+
+    <div class="mb-2">
+        <a asp-action="Create" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-primary">
+            <span class="fas fa-plus"></span>
+            New Results View
+        </a>
+    </div>
 
     @if (!Model.Templates.Any())
     {
@@ -112,7 +127,11 @@
                                     <strong>@template.Name</strong>
                                     @if (template.Id == Model.DefaultSeriesResultsTemplateId)
                                     {
-                                        <span class="badge text-bg-primary ms-2">Series default</span>
+                                        <span class="badge text-bg-primary ms-2">Standard default</span>
+                                    }
+                                    @if (template.Id == Model.DefaultSummarySeriesResultsTemplateId)
+                                    {
+                                        <span class="badge text-bg-primary ms-2">Summary default</span>
                                     }
                                     @if (template.Id == Model.DefaultRegattaSeriesResultsTemplateId)
                                     {

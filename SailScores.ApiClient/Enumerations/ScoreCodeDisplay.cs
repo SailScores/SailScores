@@ -12,5 +12,9 @@ public enum ScoreCodeDisplay
     CodeOnly = 1,
 
     [Display(Name = "Hidden")]
-    Hidden = 2
+    Hidden = 2,
+
+    // Blank only when the score is discarded (or, in a percent system, a DNC that doesn't count).
+    [Display(Name = "Hidden when discarded")]
+    HiddenWhenDiscarded = 3
 }

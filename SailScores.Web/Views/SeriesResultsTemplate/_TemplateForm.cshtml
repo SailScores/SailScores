@@ -66,6 +66,29 @@
             </small>
         </div>
     </div>
+
+    <h3 class="h6 mt-2">Scoring columns</h3>
+    <p class="text-body-secondary small mb-3">
+        Columns after the total that every scoring system has. Columns that only some scoring
+        systems have, such as penalties, are set on the scoring system.
+    </p>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="PreDiscardTotalVisibility" class="form-label"></label>
+            <select asp-for="PreDiscardTotalVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select"></select>
+            <small class="form-text text-body-secondary">
+                Each competitor's total before discards. Not shown for percentage-based scoring systems.
+            </small>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="ParticipationVisibility" class="form-label"></label>
+            <select asp-for="ParticipationVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select"></select>
+            <small class="form-text text-body-secondary">
+                The percent of races each competitor sailed.
+            </small>
+        </div>
+    </div>
 </div>
 
 <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
@@ -101,24 +124,50 @@
         </small>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="ColumnSeparators" class="form-label"></label>
-        <select asp-for="ColumnSeparators" asp-items="Html.GetEnumSelectList<ResultsColumnSeparator>()" class="form-select"></select>
-        <small class="form-text text-body-secondary">
-            Draws vertical lines between race columns. In a summary series each child series is one column.
-        </small>
-    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="ColumnSeparators" class="form-label"></label>
+            <select asp-for="ColumnSeparators" asp-items="Html.GetEnumSelectList<ResultsColumnSeparator>()" class="form-select"></select>
+            <small class="form-text text-body-secondary">
+                Draws vertical lines between race columns. "Between child series" is for summary series: a line where the columns change from one child series to the next, whether each child series is one column or shows its races.
+            </small>
+        </div>
 
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" asp-for="ShowPreDiscardTotal" />
-        <label class="form-check-label" asp-for="ShowPreDiscardTotal">
-            Show Pre-Discard Total Column
-        </label>
-        <small class="d-block form-text text-body-secondary">
-            When enabled, results include the "Pre-Discard Total" showing each competitor's total score
-            before applying discards. This option is only displayed for low-point scoring
-            systems, not for percentage-based systems.
-        </small>
+        <div class="col-md-6 mb-3 pt-md-4">
+            <div class="form-check mt-md-2">
+                <input class="form-check-input" type="checkbox" asp-for="TotalsSeparator" />
+                <label class="form-check-label" asp-for="TotalsSeparator"></label>
+                <small class="d-block form-text text-body-secondary">
+                    A vertical line between the totals and the first race (or child series) column.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+    <h2 class="h5 mb-3">Discarded scores</h2>
+    <p class="text-body-secondary small mb-3">
+        How scores that are discarded appear. By default they are struck through and faded.
+        With none of these, discards are shown in parentheses.
+    </p>
+    <div class="row align-items-end">
+        <div class="col-sm-4 col-md-3 mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="DiscardStrikethrough" />
+                <label class="form-check-label" asp-for="DiscardStrikethrough"></label>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3 mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="DiscardFaded" />
+                <label class="form-check-label" asp-for="DiscardFaded"></label>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3 mb-3">
+            <label asp-for="DiscardColor" class="form-label"></label>
+            <select asp-for="DiscardColor" asp-items="Html.GetEnumSelectList<ResultsTextColor>()" class="form-select"></select>
+        </div>
     </div>
 </div>
 
@@ -126,8 +175,9 @@
     <h2 class="h5 mb-3">Score codes</h2>
     <p class="text-body-secondary small mb-3">
         Choose how each score code appears in race cells. <strong>Code only</strong> leaves out the points,
-        <strong>Hidden</strong> leaves the cell blank so only places stand out, and <strong>Faded</strong>
-        mutes the code like a discard. Scoring is not changed.
+        <strong>Hidden</strong> leaves the cell blank so only places stand out,
+        <strong>Hidden when discarded</strong> blanks it only when the score is discarded (for example,
+        discarded DNCs), and <strong>Faded</strong> mutes the code like a discard. Scoring is not changed.
     </p>
     @if (Model.ScoreCodes != null && Model.ScoreCodes.Any())
     {
@@ -175,50 +225,68 @@
     }
 </div>
 
-<div class="border rounded p-3 p-md-4 mb-4 bg-almost">
-    <h2 class="h5 mb-3">Custom competitor fields</h2>
-    <p class="text-body-secondary small mb-3">
-        Select which custom competitor fields should appear in this results view.
-    </p>
-    @if (Model.AvailableCustomFields != null && Model.AvailableCustomFields.Any())
-    {
-        <div class="table-responsive">
-            <table class="table table-sm align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col">Include</th>
-                        <th scope="col">Field</th>
-                        <th scope="col">Visibility</th>
-                        <th scope="col">Order</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
-                    {
-                        var selection = Model.CustomFieldSelections[index];
+@if (Model.CustomFieldsEnabled)
+{
+    <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+        <h2 class="h5 mb-3">Custom competitor fields</h2>
+        <p class="text-body-secondary small mb-3">
+            Select which custom competitor fields should appear in this results view.
+        </p>
+        @if (Model.AvailableCustomFields != null && Model.AvailableCustomFields.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
                         <tr>
-                            <td>
-                                <input type="checkbox" class="form-check-input" asp-for="@Model.CustomFieldSelections[index].Selected" />
-                                <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
-                                <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Name" />
-                                <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
-                                <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
-                            </td>
-                            <td>@(string.IsNullOrWhiteSpace(selection.DisplayHeader) ? selection.Name : selection.DisplayHeader)</td>
-                            <td>
-                                <select class="form-select form-select-sm" asp-for="@Model.CustomFieldSelections[index].Visibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()"></select>
-                            </td>
-                            <td>
-                                <input class="form-control form-control-sm" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" />
-                            </td>
+                            <th scope="col">Include</th>
+                            <th scope="col">Field</th>
+                            <th scope="col">Visibility</th>
+                            <th scope="col">Order</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-    else
+                    </thead>
+                    <tbody>
+                        @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
+                        {
+                            var selection = Model.CustomFieldSelections[index];
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input" asp-for="@Model.CustomFieldSelections[index].Selected" />
+                                    <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
+                                    <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Name" />
+                                    <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
+                                    <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(selection.DisplayHeader) ? selection.Name : selection.DisplayHeader)</td>
+                                <td>
+                                    <select class="form-select form-select-sm" asp-for="@Model.CustomFieldSelections[index].Visibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()"></select>
+                                </td>
+                                <td>
+                                    <input class="form-control form-control-sm" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-body-secondary mb-0">No custom competitor fields are available for this club yet.</p>
+        }
+    </div>
+}
+else
+{
+    @* Custom fields are turned off for the club: keep this view's selections as they are, so
+       turning them back on brings the columns back. *@
+    @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
     {
-        <p class="text-body-secondary mb-0">No custom competitor fields are available for this club yet.</p>
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Selected" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Name" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Visibility" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" />
     }
-</div>
+}
