@@ -1,3 +1,4 @@
+@using SailScores.Web.Extensions
 @using SailScores.Core.Services
 @model SailScores.Web.Models.SailScores.WhatIfResultsViewModel
 @inject IStringLocalizer<SharedResource> localizer
@@ -29,7 +30,7 @@
 <p class="lead">
     @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
     {
-        @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
+        @alternateResults.ParticipationRequiredText()
     }
 </p>
 
@@ -68,9 +69,7 @@
 <p class="lead">
     @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
     {
-        @results.PercentRequired.Value.ToString("G5")
-
-        @:% participation required for ranking
+        @results.ParticipationRequiredText()
     }
 </p>
 
@@ -107,7 +106,7 @@
     <p class="lead">
         @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
         {
-            @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
+            @alternateResults.ParticipationRequiredText()
         }
     </p>
     <div class="row">
@@ -131,9 +130,7 @@
     <p class="lead">
         @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
         {
-            @results.PercentRequired.Value.ToString("G5")
-
-            @:% participation required for ranking
+            @results.ParticipationRequiredText()
         }
     </p>
     <div class="row">

@@ -960,6 +960,7 @@ namespace SailScores.Test.Unit.Core.Scoring
 
             // Assert
             Assert.Equal(60m, results.PercentRequired);
+            Assert.Equal(3, results.RacesRequired);
         }
 
         [Fact]

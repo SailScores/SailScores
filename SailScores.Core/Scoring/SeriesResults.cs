@@ -23,6 +23,9 @@ namespace SailScores.Core.Scoring
 
         public Decimal? PercentRequired { get; set; }
 
+        // The races PercentRequired comes to; null when there's no requirement or no races.
+        public int? RacesRequired { get; set; }
+
         public Dictionary<Competitor, SeriesCompetitorResults> Results { get; set; }
 
         public Dictionary<string,ScoreCodeSummary> ScoreCodesUsed { get; set; }

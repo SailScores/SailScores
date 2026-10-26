@@ -29,6 +29,8 @@ namespace SailScores.Core.FlatModel
         public bool IsPercentSystem { get; set; }
         public bool? LowerScoreWins { get; set; }
         public decimal? PercentRequired { get; set; }
+        // Null for results saved before this was recorded.
+        public int? RacesRequired { get; set; }
         public string ScoringSystemName { get; set; }
 
         public String UpdatedBy { get; set; }

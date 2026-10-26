@@ -1,12 +1,13 @@
 using SailScores.Api.Enumerations;
+using System;
 using System.Linq;
 
 namespace SailScores.Core.Scoring.Eligibility;
 
 // A competitor must have sailed (started, or a code counting as participation) at least the
 // system's ParticipationPercent of the races sailed, discards included, to be ranked. Sets
-// each competitor's ParticipationPercent and the results' PercentRequired. No percent, or no
-// races: everyone is eligible and nothing is set.
+// each competitor's ParticipationPercent and the results' PercentRequired and RacesRequired.
+// No percent, or no races: everyone is eligible and nothing is set.
 // After discards (PBG): the races the competitor sailed and didn't discard, over the races
 // sailed less the maximum discards: what a boat sailing every race would discard. Child series
 // discards: the discard pattern for each child series' races, summed.
@@ -38,6 +39,7 @@ public sealed class ParticipationPercent : IEligibilityRule
 
         var host = workspace.Host;
         var raceCount = RacesToParticipateIn(workspace, results, totalRaceCount, _afterDiscards);
+        results.RacesRequired = RacesRequired(raceCount, percent.Value);
         foreach (var comp in results.Competitors)
         {
             var compResults = results.Results[comp];
@@ -51,6 +53,10 @@ public sealed class ParticipationPercent : IEligibilityRule
             }
         }
     }
+
+    // The fewest races that meet the percent: 50% of 19 races is 10.
+    public static int RacesRequired(int raceCount, decimal percent) =>
+        (int)Math.Ceiling(raceCount * percent / 100m);
 
     public static int SailedRaceCount(SeriesResults results) =>
         results.Races.Count(r =>

@@ -143,6 +143,8 @@ public class PbgCalculatorTests
         Assert.Null(results.For("D").TotalScore);
         Assert.Equal(12m * 100m / 21m, results.For("E").ParticipationPercent);
         Assert.NotNull(results.For("E").TotalScore);
+        // 50% of the 21 races, rounded up.
+        Assert.Equal(11, results.Results.RacesRequired);
     }
 
     [Fact]

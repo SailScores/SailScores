@@ -206,3 +206,13 @@ back) changed the look of no series: all 101 hiding series now hide through thei
 - [x] PBG series, after recalculating: the view's Pre-Discard Total setting shows the column
   (sum of every race score, discards included, beside Net Points). Other average and
   percent systems still don't have it.
+
+### I. Participation races and series info width
+
+- [ ] A series with a participation percent, after recalculating: the info under the title
+  reads "50% participation (10 races) required for ranking". For PBG the count is after
+  discards (half of the races less the most discards a boat could have). Series not yet
+  recalculated show only the percent.
+- [ ] The same text in the series and regatta HTML exports and on the WhatIf page.
+- [ ] Not signed in (or without edit rights): the series info runs the full width. With the
+  New Race panel shown, it wraps beside the panel as before.

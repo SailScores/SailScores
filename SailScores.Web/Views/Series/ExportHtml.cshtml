@@ -71,7 +71,7 @@
                     }
                     @if (results.IsPercentSystem && results.PercentRequired > 0)
                     {
-                        @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
+                        @:&ndash; @results.ParticipationRequiredText()
                     }
                 </div>
             </div>

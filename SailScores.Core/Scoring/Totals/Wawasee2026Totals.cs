@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring.Adjustments;
+using SailScores.Core.Scoring.Eligibility;
 
 namespace SailScores.Core.Scoring.Totals;
 
@@ -29,6 +30,10 @@ public sealed class Wawasee2026Totals : ITotalRule
             : (int)Math.Round(countedRaces.Count * settings.PenaltyThresholdPercent.Value / 100m,
                 MidpointRounding.AwayFromZero);
         var percentRequired = system.EffectiveParticipationPercent ?? 0m;
+        if (percentRequired > 0 && countedRaces.Count > 0)
+        {
+            results.RacesRequired = ParticipationPercent.RacesRequired(countedRaces.Count, percentRequired);
+        }
         var host = workspace.Host;
 
         foreach (var compResults in results.Results.Values)

@@ -850,6 +850,7 @@ namespace SailScores.Core.Services
                 IsPercentSystem = series.Results.IsPercentSystem,
                 LowerScoreWins = series.Results.LowerScoreWins,
                 PercentRequired = series.Results.PercentRequired,
+                RacesRequired = series.Results.RacesRequired,
                 ScoringSystemName = series.ScoringSystem?.Name,
                 ScoreCodesUsed = series.Results.ScoreCodesUsed,
                 AppliedScoreCodeGroupSummaries = series.Results.AppliedScoreCodeGroupSummaries,

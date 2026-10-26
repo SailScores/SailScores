@@ -1,3 +1,4 @@
+@using SailScores.Web.Extensions
 @using SailScores.Api.Enumerations
 @using SailScores.Web.Models.SailScores
 @using SailScores.Core.Model
@@ -28,7 +29,7 @@
 
 <div class="d-flex justify-content-between align-items-start">
 <div class="row flex-grow-1">
-    <div class="col-md-8">
+    <div class="@(Model.CanEdit ? "col-md-8" : "col-12")">
         @Model.Item.Season.Name
         <h1 class="h2">
             @Model.Item.Name
@@ -81,7 +82,7 @@
         }
         @if (results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
         {
-            @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
+            @:&ndash; @results.ParticipationRequiredText()
         }
         @if (!String.IsNullOrWhiteSpace(ViewData["FleetName"]?.ToString()))
         {
@@ -93,9 +94,9 @@
         }
     </div>
 
+    @if (Model.CanEdit)
+    {
     <div class="col-md-4">
-        @if (Model.CanEdit)
-        {
             <br class="d-md-none" />
             <hr class="d-md-none" />
             <div class="row bg-almost">
@@ -116,8 +117,8 @@
                 </div>
             }
             </div>
-        }
     </div>
+    }
 </div>
     @if (resolvedTemplate.ShowClubLogo && Model.ClubLogoFileId.HasValue)
     {
