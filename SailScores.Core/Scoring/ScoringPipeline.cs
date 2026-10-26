@@ -223,6 +223,7 @@ namespace SailScores.Core.Scoring
 
         private void StartRun(Series series)
         {
+            _scoreCodeCache.Clear();
             Workspace = new ScoringWorkspace
             {
                 System = ScoringSystem,
@@ -848,12 +849,26 @@ namespace SailScores.Core.Scoring
             return GetScoreCode(score.Code);
         }
 
+        // Score code lookups by name for the current run; cleared by StartRun.
+        private readonly Dictionary<string, ScoreCode> _scoreCodeCache =
+            new(StringComparer.InvariantCultureIgnoreCase);
+
         private ScoreCode GetScoreCode(string scoreCodeName)
         {
             if (String.IsNullOrWhiteSpace(scoreCodeName))
             {
                 return null;
             }
+            if (!_scoreCodeCache.TryGetValue(scoreCodeName, out var cached))
+            {
+                cached = FindScoreCode(scoreCodeName);
+                _scoreCodeCache[scoreCodeName] = cached;
+            }
+            return cached;
+        }
+
+        private ScoreCode FindScoreCode(string scoreCodeName)
+        {
             var returnScoreCode = ScoringSystem.ScoreCodes
                     .SingleOrDefault(c =>
                         c.Name.Equals(scoreCodeName, CASE_INSENSITIVE));
@@ -947,7 +962,7 @@ namespace SailScores.Core.Scoring
 
             SeriesResults returnResults = GatherInitialResults(series);
 
-            SetScores(returnResults, GetScoresForCalculation(series));
+            SetScores(returnResults, GetScoresForCalculation(series).ToList());
             SetScoresShown(returnResults);
 
             return returnResults;
