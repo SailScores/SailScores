@@ -22,6 +22,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IAnnouncementService, AnnouncementService>();
         services.AddScoped<IDocumentService, DocumentService>();
         services.AddScoped<IRegattaService, RegattaService>();
+        services.AddSingleton(TimeProvider.System);
         services.AddScoped<IAdminTipService, AdminTipService>();
         services.AddScoped<ICsvService, CsvService>();
         services.AddScoped<ICustomViewService, CustomViewService>();

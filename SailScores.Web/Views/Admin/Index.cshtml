@@ -51,6 +51,14 @@
 {
     @await Html.PartialAsync("_AdminToDoList", Model.Tips)
 }
+@if (Model.SeasonTip != null && Model.IsClubAdmin)
+{
+    <div class="alert alert-warning">
+        <a asp-action="@Model.SeasonTip.Link.Action" asp-controller="@Model.SeasonTip.Link.Controller"
+           class="alert-link">@Model.SeasonTip.Title</a>:
+        @Model.SeasonTip.Details
+    </div>
+}
 <div class="row">
     <div class="col-4">
         <a asp-controller="Race"
