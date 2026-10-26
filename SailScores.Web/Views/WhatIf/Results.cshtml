@@ -7,7 +7,6 @@
     var results = Model.Series.FlatResults;
     var alternateResults = Model.AlternateResults;
     ViewData["Title"] = "What If results";
-    ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
@@ -38,6 +37,7 @@
     // Resolve template settings
     var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(Model.Series.SeriesResultsTemplate)
         ?? SeriesResultsTemplateHelper.GetDefaultTemplate(false);
+    ViewData["WideLayout"] = ResultsTableViewModel.UsesWideLayout(results, resolvedTemplate.RaceColumnsVisibility);
 
     var previewModel = new ResultsTableViewModel
         {

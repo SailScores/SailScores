@@ -25,6 +25,7 @@ public class SeriesResultsTemplateControllerTests
     private readonly Mock<ICompetitorFieldService> _competitorFieldServiceMock = new();
     private readonly Mock<IScoringService> _scoringServiceMock = new();
     private readonly Mock<ISeriesService> _seriesServiceMock = new();
+    private readonly Mock<SailScores.Web.Services.Interfaces.IClubService> _webClubServiceMock = new();
     private readonly SeriesResultsTemplateController _controller;
 
     public SeriesResultsTemplateControllerTests()
@@ -41,7 +42,8 @@ public class SeriesResultsTemplateControllerTests
             _clubServiceMock.Object,
             _competitorFieldServiceMock.Object,
             _scoringServiceMock.Object,
-            _seriesServiceMock.Object)
+            _seriesServiceMock.Object,
+            _webClubServiceMock.Object)
         {
             TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>())
         };
@@ -343,6 +345,28 @@ public class SeriesResultsTemplateControllerTests
 
         var vm = Assert.IsType<SeriesResultsTemplateViewModel>(Assert.IsType<ViewResult>(result).Model);
         Assert.Same(recent, vm.PreviewSeries);
+    }
+
+    [Fact]
+    public async Task SetDateFormat_ValidFormat_SavesAndClearsClubCache()
+    {
+        var result = await _controller.SetDateFormat(ClubInitials, "d MMM");
+
+        _templateServiceMock.Verify(s => s.SetClubDateFormatAsync(_clubId, "d MMM"), Times.Once);
+        _webClubServiceMock.Verify(s => s.InvalidateClubCache(ClubInitials), Times.Once);
+        Assert.Equal("Index", Assert.IsType<RedirectToActionResult>(result).ActionName);
+    }
+
+    [Fact]
+    public async Task SetDateFormat_ServiceRejectsFormat_ShowsErrorAndKeepsCache()
+    {
+        _templateServiceMock.Setup(s => s.SetClubDateFormatAsync(_clubId, "bad"))
+            .ThrowsAsync(new InvalidOperationException("Unsupported"));
+
+        await _controller.SetDateFormat(ClubInitials, "bad");
+
+        Assert.Equal("Unsupported", _controller.TempData["ErrorMessage"]);
+        _webClubServiceMock.Verify(s => s.InvalidateClubCache(It.IsAny<string>()), Times.Never);
     }
 
     [Theory]

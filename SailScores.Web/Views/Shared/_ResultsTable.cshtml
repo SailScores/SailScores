@@ -90,7 +90,7 @@
                         if (needCompNameColumn && (race.Date != prevRaceDate || colCount % 23 == 4 ))
                         {
                             needCompNameColumn = false;
-                            <th scope="col">@Model.CompetitorNameHeader</th>
+                            <th scope="col" class="@(Model.HasSeparatorBefore(colCount - 1) ? "results-separator" : null)">@Model.CompetitorNameHeader</th>
                         }
                         if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                         {
@@ -338,7 +338,7 @@
                         if (needCompNameColumn && (race.Date != prevRaceDate || colCount % 23 == 4))
                         {
                             needCompNameColumn = false;
-                            <td>@comp.Name</td>
+                            <td class="@(Model.HasSeparatorBefore(colCount - 1) ? "results-separator" : null)">@comp.Name</td>
 
                         }
                         if (race.State == RaceState.Abandoned)

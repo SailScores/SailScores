@@ -10,6 +10,7 @@ using SailScores.Core.Services;
 using SailScores.Core.Services.Interfaces;
 using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
+using IWebClubService = SailScores.Web.Services.Interfaces.IClubService;
 
 namespace SailScores.Web.Controllers;
 
@@ -21,6 +22,7 @@ public class SeriesResultsTemplateController : Controller
     private readonly ICompetitorFieldService _competitorFieldService;
     private readonly IScoringService _scoringService;
     private readonly ISeriesService _seriesService;
+    private readonly IWebClubService _webClubService;
 
     // How many recent series the preview offers.
     private const int PreviewSeriesCount = 30;
@@ -30,13 +32,15 @@ public class SeriesResultsTemplateController : Controller
         IClubService clubService,
         ICompetitorFieldService competitorFieldService,
         IScoringService scoringService,
-        ISeriesService seriesService)
+        ISeriesService seriesService,
+        IWebClubService webClubService)
     {
         _templateService = templateService;
         _clubService = clubService;
         _competitorFieldService = competitorFieldService;
         _scoringService = scoringService;
         _seriesService = seriesService;
+        _webClubService = webClubService;
     }
 
     // GET: SeriesResultsTemplate
@@ -60,7 +64,8 @@ public class SeriesResultsTemplateController : Controller
             Templates = templates.ToList(),
             DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
             DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId,
-            DefaultSummarySeriesResultsTemplateId = club.DefaultSummarySeriesResultsTemplateId
+            DefaultSummarySeriesResultsTemplateId = club.DefaultSummarySeriesResultsTemplateId,
+            DefaultDateFormat = club.DefaultDateFormat
         };
 
         return View(vm);
@@ -80,6 +85,27 @@ public class SeriesResultsTemplateController : Controller
                 model.DefaultRegattaSeriesResultsTemplateId,
                 model.DefaultSummarySeriesResultsTemplateId);
             TempData["SuccessMessage"] = "Default views saved.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Index), new { clubInitials });
+    }
+
+    // POST: SeriesResultsTemplate/SetDateFormat
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> SetDateFormat(string clubInitials, string defaultDateFormat)
+    {
+        var clubId = await _clubService.GetClubId(clubInitials);
+        try
+        {
+            await _templateService.SetClubDateFormatAsync(clubId, defaultDateFormat);
+            // Results pages read the format from the cached club.
+            _webClubService.InvalidateClubCache(clubInitials);
+            TempData["SuccessMessage"] = "Date format saved.";
         }
         catch (InvalidOperationException ex)
         {

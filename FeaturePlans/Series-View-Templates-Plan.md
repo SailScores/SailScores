@@ -65,7 +65,7 @@ them before clubs and series so their references resolve.
 
 ### A. Template management (phase 1)
 
-- [x] Club admin → Edit Club Info: the "Result views" section shows a link to the management
+- [x] Club admin → Club Settings: the "Result views" section shows a link to the management
       page and no default selectors. Saving club settings leaves the defaults unchanged.
 - [x] Management page: change the standard and regatta defaults, save, reload — the badges
       and selectors show the new defaults; a standard series and a regatta use them.
@@ -92,7 +92,7 @@ HTML, and What If results. Check both light and dark mode.
 - [x] Separators "Between every column": a vertical line before every race column after the
       first, including abandoned/scheduled columns.
 - [x] Separators "Between race days": lines only where the date changes.
-- [ ] Separators "Between child series": in a summary series showing one column per child
+- [x] Separators "Between child series": in a summary series showing one column per child
       series, a line between each; in a summary showing child races, lines only where the
       child series changes (recalculate an existing summary first). No lines in a standard
       series.
@@ -122,7 +122,7 @@ the new CSS.
 - [x] Separators are fainter than before in light mode and still visible in dark mode.
 - [x] Results Views page: "New Results View" (with the plus icon) sits just above the list,
       not in the page header.
-- [ ] Club defaults has "Default View for Summary Series", starting at "Same as standard".
+- [x] Club defaults has "Default View for Summary Series", starting at "Same as standard".
       With it unset, a summary series without its own view uses the standard default; set
       to another view, summary series use that one. The view gets a "Summary default" badge
       and can't be deleted.
@@ -131,7 +131,7 @@ the new CSS.
       light and dark mode, lightened when faded is also on. Existing views still show faded,
       struck-through discards. With strike through and faded off and color Normal,
       discards show in parentheses, e.g. "(DNC 8)".
-- [ ] Edit page "Reset to defaults": the form shows the default settings with the explanation
+- [x] Edit page "Reset to defaults": the form shows the default settings with the explanation
       and keeps the name; Cancel leaves the view unchanged; Save applies the defaults (custom
       fields cleared, score codes all "Code and points").
 
@@ -140,28 +140,28 @@ the new CSS.
 Apply the migration `AddSharedScoringColumnsAndTotalsSeparatorToViews` first. Rebuild so the
 CSS and the new script are compiled, then force-refresh.
 
-- [ ] After the migration, views of a club whose scoring systems showed Participation or
+- [x] After the migration, views of a club whose scoring systems showed Participation or
       Pre-Discard Total (PBGMYS and PBGTEST in the dev data) show the same columns. A view that
       had "Show Pre-Discard Total" on still shows it.
-- [ ] Edit page "Column visibility" has "Pre-Discard Total" and "Participation"
+- [x] Edit page "Column visibility" has "Pre-Discard Total" and "Participation"
       (Always / On Larger Screens / Hidden); the old checkbox is gone. Each setting changes the
       series page, regatta page, HTML exports and CSV export. Pre-Discard Total never appears
       for a percent system.
-- [ ] Scoring system edit page: "Results Columns" no longer lists Pre-Discard Total or
+- [x] Scoring system edit page: "Results Columns" no longer lists Pre-Discard Total or
       Participation and links to the results views; calculator columns (e.g. PBG's net
       columns, Wawasee penalties) are still set there.
-- [ ] "Line between totals and races" (next to Column separators): a line before the first
+- [x] "Line between totals and races" (next to Column separators): a line before the first
       race column, with or without other separators; nothing when race columns are hidden.
-- [ ] Preview (header and next to Save, on both Create and Edit): opens a panel at the bottom
+- [x] Preview (header and next to Save, on both Create and Edit): opens a panel at the bottom
       showing the most recent series; the page still scrolls and the form still works. Changing
       any setting (including typing a header) updates the preview; choosing another series
       shows it. Closing the panel and saving behaves as before; nothing is saved by the preview.
-- [ ] A club with no series results: the panel says there's nothing to preview.
-- [ ] With the preview open on a chosen series, "Reset to defaults" reloads the form with the
+- [x] A club with no series results: the panel says there's nothing to preview.
+- [x] With the preview open on a chosen series, "Reset to defaults" reloads the form with the
   panel still open on that series, showing the defaults.
-- [ ] On a wide screen, a series with seven or fewer races previews at the series page width
+- [x] On a wide screen, a series with seven or fewer races previews at the series page width
   (centered); one with more races uses the full width, as on its series page.
-- [ ] Club with custom competitor fields turned off: the view create and edit pages have no
+- [x] Club with custom competitor fields turned off: the view create and edit pages have no
   "Custom competitor fields" section. Saving a view that had fields keeps them; turning the
   club setting back on shows them again.
 
@@ -170,14 +170,39 @@ CSS and the new script are compiled, then force-refresh.
 Apply the migration `MoveHideDiscardedDncToViews` first. A dry run on the dev data (rolled
 back) changed the look of no series: all 101 hiding series now hide through their view.
 
-- [ ] Series create, create multiple, edit and summary edit pages no longer have "Hide
+- [x] Series create, create multiple, edit and summary edit pages no longer have "Hide
       discarded DNC scores". Saving a series doesn't change the old flag (the previous release
       still reads it).
-- [ ] View edit page, score codes: "Show" has "Hidden when discarded". DNC set to it blanks
+- [x] View edit page, score codes: "Show" has "Hidden when discarded". DNC set to it blanks
       discarded DNCs only; counted DNCs still show. In a percent system, uncounted DNCs are blank.
-- [ ] After the migration: QCMYC has "New Template (discarded DNC hidden)" used by its 18 hiding
+- [x] After the migration: QCMYC has "New Template (discarded DNC hidden)" used by its 18 hiding
       series; PBGMYS Championship hides discarded DNCs, and its 11 other series use
       "PBGMYS Championship (discarded DNC shown)". IRMSC got Standard and Regatta views, with
       Standard hiding discarded DNCs. Spot-check a hiding and a non-hiding series in each.
-- [ ] Trend ("Show Rank Trend") is unchanged and still set on the series.
+- [x] Trend ("Show Rank Trend") is unchanged and still set on the series.
 
+### H. Admin page cleanup
+
+- [x] Club settings: the "Hidden" option reads "Hidden from SailScores front page".
+- [x] Club settings no longer has "Default Date Format"; saving club settings keeps the
+  club's existing format.
+- [x] Results views page, "Race dates": shows the current format and an example for today.
+  Typing updates the example (MMMM in May shows "May", not "5ay"); "Use locale default"
+  clears it.
+- [x] Save a format: race headings on a series page use it straight away. A blank format
+  uses the localization. An unsupported one (hh:mm) shows an error and keeps the old one.
+- [x] Club settings cards: Club Logo | Visibility & Navigation, Results Display | Competitors,
+  Scoring & Localization | Weather. Competitors has the alternative sail number and custom
+  field options; turning custom fields on and off still saves straight away and enables
+  "Manage custom fields".
+- [x] Localization has a note linking to Results Display for the race date format.
+- [x] The results views page is titled "Results Display", with "Default views", "Race dates"
+  and "Views" sections. Its URL hasn't changed.
+- [x] After "Reset to defaults", the notice at the top goes as soon as any setting is changed
+  (typing in a header, a checkbox or a select). Choosing a different preview series doesn't
+  remove it.
+- [x] Preview panel's series list leaves out series with no races. A summary series whose
+  child series have races is still listed.
+- [x] PBG series, after recalculating: the view's Pre-Discard Total setting shows the column
+  (sum of every race score, discards included, beside Net Points). Other average and
+  percent systems still don't have it.

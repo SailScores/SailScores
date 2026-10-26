@@ -126,8 +126,8 @@
   <data name="New Race" xml:space="preserve">
     <value>Nueva prueba</value>
   </data>
-  <data name="Edit Club Info" xml:space="preserve">
-    <value>Editar información del club</value>
+  <data name="Club Settings" xml:space="preserve">
+    <value>Configuración del club</value>
   </data>
   <data name="Club Web Site" xml:space="preserve">
     <value>Sitio web del club</value>

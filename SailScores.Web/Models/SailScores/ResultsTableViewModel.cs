@@ -62,6 +62,14 @@ public class ResultsTableViewModel
 
     public bool ShowRaceColumns => RaceColumnsVisibility != ColumnVisibility.Hidden;
 
+    // Results pages use the full page width for more than seven race columns, and the
+    // normal width when the view hides the race columns.
+    public static bool UsesWideLayout(FlatResults results, ColumnVisibility raceColumnsVisibility)
+    {
+        return raceColumnsVisibility != ColumnVisibility.Hidden
+            && (results?.Races?.Count() ?? 0) > 7;
+    }
+
     public bool DiscardStrikethrough { get; set; } = true;
     public bool DiscardFaded { get; set; } = true;
     public ResultsTextColor DiscardColor { get; set; } = ResultsTextColor.Default;

@@ -9,6 +9,7 @@
   "LowerScoreWins": true,
   "PercentRequired": "50",
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)",
     "netPoints: Net Points (Decimal, Always)",
     "netRaces: Net Series Races (Decimal, Always)"
@@ -38,7 +39,8 @@
       "Columns": {
         "netPoints": "2",
         "netRaces": "2",
-        "participation": "66.6666666667"
+        "participation": "66.6666666667",
+        "preDiscardTotal": "2"
       },
       "Scores": "RCD 0/1 | 1/1 | - | 1/1 | - | - | - | - | - | -"
     },
@@ -54,7 +56,8 @@
       "Columns": {
         "netPoints": "8",
         "netRaces": "3",
-        "participation": "100"
+        "participation": "100",
+        "preDiscardTotal": "8"
       },
       "Scores": "1/1 | 5/1 | - | 2/1 | - | - | - | - | - | -"
     },
@@ -70,7 +73,8 @@
       "Columns": {
         "netPoints": "11",
         "netRaces": "2",
-        "participation": "66.6666666667"
+        "participation": "66.6666666667",
+        "preDiscardTotal": "11"
       },
       "Scores": "3/1 | DNF 8/1 | - | DNC 0 | - | - | - | - | - | -"
     },
@@ -86,7 +90,8 @@
       "Columns": {
         "netPoints": "12",
         "netRaces": "2",
-        "participation": "66.6666666667"
+        "participation": "66.6666666667",
+        "preDiscardTotal": "12"
       },
       "Scores": "DNC 0 | RET 8/1 | - | 4/1 | - | - | - | - | - | -"
     },
@@ -100,7 +105,8 @@
       "Columns": {
         "netPoints": "2",
         "netRaces": "1",
-        "participation": "33.3333333333"
+        "participation": "33.3333333333",
+        "preDiscardTotal": "2"
       },
       "Scores": "2/1 | RCD 0/1 | - | DNC 0 | - | - | - | - | - | -"
     },
@@ -114,7 +120,8 @@
       "Columns": {
         "netPoints": "4",
         "netRaces": "1",
-        "participation": "33.3333333333"
+        "participation": "33.3333333333",
+        "preDiscardTotal": "4"
       },
       "Scores": "DNC 0 | 4/1 | - | DNC 0 | - | - | - | - | - | -"
     },
@@ -128,7 +135,8 @@
       "Columns": {
         "netPoints": "3",
         "netRaces": "1",
-        "participation": "33.3333333333"
+        "participation": "33.3333333333",
+        "preDiscardTotal": "3"
       },
       "Scores": "DNC 0 | 3/1 | - | DNC 0 | - | - | - | - | - | -"
     },
@@ -142,7 +150,8 @@
       "Columns": {
         "netPoints": "2",
         "netRaces": "1",
-        "participation": "33.3333333333"
+        "participation": "33.3333333333",
+        "preDiscardTotal": "2"
       },
       "Scores": "DNC 0 | 2/1 | - | DNC 0 | - | - | - | - | - | -"
     },
@@ -156,7 +165,8 @@
       "Columns": {
         "netPoints": "3",
         "netRaces": "1",
-        "participation": "33.3333333333"
+        "participation": "33.3333333333",
+        "preDiscardTotal": "3"
       },
       "Scores": "DNC 0 | DNC 0 | - | 3/1 | - | - | - | - | - | -"
     }

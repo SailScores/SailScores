@@ -7,9 +7,8 @@
 }
 else
 {
-    @* The same width as the series page: full width only for more than seven races
-       (Series/Details sets WideLayout the same way). *@
-    var wide = (Model.Results?.Races?.Count() ?? 0) > 7;
+    @* The same width as the series page (Series/Details sets WideLayout the same way). *@
+    var wide = ResultsTableViewModel.UsesWideLayout(Model.Results, Model.RaceColumnsVisibility);
     <div class="@(wide ? "" : "container-lg px-0")">
         <partial name="_ResultsTable" model="Model" />
     </div>

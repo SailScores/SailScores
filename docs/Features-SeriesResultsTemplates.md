@@ -24,7 +24,7 @@ Each template includes:
 - Race columns visibility (the race columns, or child series columns in a summary series).
   When hidden, only competitor and scoring columns (totals, participation) are shown.
 - The standard scoring columns, which every scoring system has: Pre-Discard Total
-  (`PreDiscardTotalVisibility`, never shown for percent systems) and Participation
+  (`PreDiscardTotalVisibility`; percent and average systems don't have it, except PBG) and Participation
   (`ParticipationVisibility`). Both hidden by default. Calculator-specific columns
   (penalties, averages, net points) keep their visibility from the scoring system. The rule
   is `ScoringColumns.GetVisibility`, used by the results table and the CSV export.
@@ -139,11 +139,18 @@ template whenever possible.
 
 ### Club admin
 
-Templates are shown to club admins as "Results views". `SeriesResultsTemplate/Index` is the
-single management page, linked from the club settings page (`Admin/Edit`). It holds:
+Templates are shown to club admins as "results views". `SeriesResultsTemplate/Index`, titled
+"Results Display", is the single management page, linked from its own card on the club settings
+page (`Admin/Edit`). It holds:
 - The club defaults (standard series, summary series and regatta), saved by the `SetDefaults`
   action through `ISeriesResultsTemplateService.SetClubDefaultsAsync`, which rejects templates
   from another club. The summary default can be "Same as standard".
+- The club's race date format (`Club.DefaultDateFormat`), used in race headings by every
+  view. Saved by the `SetDateFormat` action through
+  `ISeriesResultsTemplateService.SetClubDateFormatAsync`, which normalizes it with
+  `ClubDateFormatUtility` and rejects unsupported formats; the action then clears the web club
+  cache. Blank uses the club's localization. Club settings (`Admin/Edit`) no longer show it and
+  keep the saved format when they're saved.
 - The template list, with badges marking the defaults. A default (of any kind) can't be
   deleted.
 

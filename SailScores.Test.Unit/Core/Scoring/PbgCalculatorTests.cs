@@ -39,6 +39,19 @@ public class PbgCalculatorTests
         Assert.Equal("Total", ScoringCalculatorRegistry.Get(ScoringCalculatorType.AppendixA).TotalHeader);
     }
 
+    // Average systems leave out the pre-discard total, but PBG keeps it (beside Net Points).
+    [Fact]
+    public void GetColumns_Pbg_KeepsPreDiscardTotalUnlikeOtherAverageSystems()
+    {
+        var pbg = ScoringCalculatorRegistry.GetColumns(ScoringCalculatorType.Pbg)
+            .Single(c => c.Key == ScoringColumns.PreDiscardTotalKey);
+        var average = ScoringCalculatorRegistry.GetColumns(ScoringCalculatorType.LowPointAverageInclDnc)
+            .Single(c => c.Key == ScoringColumns.PreDiscardTotalKey);
+
+        Assert.True(pbg.IncludeForPercentSystems);
+        Assert.False(average.IncludeForPercentSystems);
+    }
+
     [Fact]
     public void Resolve_PbgColumns_UseAverageNumeratorAndDenominator()
     {

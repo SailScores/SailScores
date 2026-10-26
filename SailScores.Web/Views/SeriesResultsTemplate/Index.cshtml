@@ -1,7 +1,8 @@
 @using SailScores.Api.Enumerations
+@using SailScores.Core.Utility
 @model SailScores.Web.Models.SailScores.SeriesResultsTemplateListViewModel
 @{
-    ViewData["Title"] = "Results Views";
+    ViewData["Title"] = "Results Display";
     Layout = "_ClubLayout";
 }
 
@@ -19,9 +20,10 @@
         <div>
             <h1 class="h2 mb-1">@ViewData["Title"]</h1>
             <p class="text-body-secondary mb-0">
-                Templates controlling how series results are shown: which columns appear,
-                what they are called, and how scores are displayed. Every series uses the
-                club default unless it chooses a different view.
+                How series results look: the view each kind of series uses, the race date
+                format, and the views themselves (which columns appear, what they are called,
+                and how scores are displayed). Every series uses the default view unless it
+                chooses a different one.
             </p>
         </div>
         <div class="d-flex flex-wrap gap-2">
@@ -43,7 +45,7 @@
     @if (Model.Templates.Any())
     {
         <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
-            <h2 class="h5 mb-3">Club defaults</h2>
+            <h2 class="h5 mb-3">Default views</h2>
             <form asp-action="SetDefaults" asp-route-clubInitials="@Model.ClubInitials" method="post">
                 <div class="row">
                     <div class="col-md-4 mb-3">
@@ -55,7 +57,6 @@
                                 <option value="@template.Id">@template.Name</option>
                             }
                         </select>
-                        <small class="form-text text-body-secondary">Used by standard series.</small>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label asp-for="DefaultSummarySeriesResultsTemplateId" class="form-label"></label>
@@ -66,7 +67,6 @@
                                 <option value="@template.Id">@template.Name</option>
                             }
                         </select>
-                        <small class="form-text text-body-secondary">Used by summary series.</small>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-label"></label>
@@ -77,7 +77,6 @@
                                 <option value="@template.Id">@template.Name</option>
                             }
                         </select>
-                        <small class="form-text text-body-secondary">Used by regatta series.</small>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Save defaults</button>
@@ -85,6 +84,37 @@
         </div>
     }
 
+    <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+        <h2 class="h5 mb-3">Race dates</h2>
+        <form asp-action="SetDateFormat" asp-route-clubInitials="@Model.ClubInitials" method="post">
+            <div class="mb-3">
+                <label asp-for="DefaultDateFormat" class="form-label"></label>
+                <div class="input-group" style="max-width: 30rem;">
+                    <input asp-for="DefaultDateFormat" class="form-control" placeholder="MM/dd" autocomplete="off" />
+                    <button type="button" class="btn btn-outline-secondary" id="clearDateFormatButton">Use locale default</button>
+                </div>
+                <div class="small text-body-secondary mt-1">
+                    How race dates appear in results headings, for every view. Leave blank to use the
+                    club's localization. Supported tokens: d, dd, M, MM, MMM, MMMM, yy, yyyy. For example,
+                    'M' uses a single-digit month when possible, while 'MM' always uses two digits, and
+                    'MMM' uses the name abbreviation. Popular formats:
+                    <code>M/d</code>, <code>dd.MM</code>, or <code>d MMM</code>.
+                </div>
+                @{
+                    string datePreview = "Uses localization default.";
+                    if (ClubDateFormatUtility.TryNormalize(Model.DefaultDateFormat, out var normalizedFormat, out _)
+                        && !string.IsNullOrWhiteSpace(normalizedFormat))
+                    {
+                        datePreview = $"Example: {DateTime.Today.ToString(normalizedFormat)}";
+                    }
+                }
+                <div class="small text-body-secondary mt-1" id="dateFormatPreview">@datePreview</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save date format</button>
+        </form>
+    </div>
+
+    <h2 class="h5 mb-3">Views</h2>
     <div class="mb-2">
         <a asp-action="Create" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-primary">
             <span class="fas fa-plus"></span>
@@ -184,3 +214,58 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var input = document.getElementById('DefaultDateFormat');
+            var clearButton = document.getElementById('clearDateFormatButton');
+            var preview = document.getElementById('dateFormatPreview');
+            var sampleDate = new Date();
+
+            function formatSampleDate(pattern) {
+                if (!pattern || !pattern.trim()) {
+                    return 'Uses localization default.';
+                }
+
+                var month = sampleDate.getMonth() + 1;
+                var day = sampleDate.getDate();
+                var year = sampleDate.getFullYear();
+
+                var shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                var longMonthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+
+                // One pass, so a month name (May, March) isn't read again as tokens.
+                var tokens = {
+                    yyyy: String(year),
+                    yy: String(year).slice(-2),
+                    MMMM: longMonthNames[month - 1],
+                    MMM: shortMonthNames[month - 1],
+                    MM: String(month).padStart(2, '0'),
+                    M: String(month),
+                    dd: String(day).padStart(2, '0'),
+                    d: String(day)
+                };
+                var output = pattern.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d/g, function (token) {
+                    return tokens[token];
+                });
+
+                return 'Example: ' + output;
+            }
+
+            function updatePreview() {
+                preview.textContent = formatSampleDate(input.value);
+            }
+
+            clearButton.addEventListener('click', function () {
+                input.value = '';
+                updatePreview();
+            });
+
+            input.addEventListener('input', updatePreview);
+        })();
+    </script>
+}

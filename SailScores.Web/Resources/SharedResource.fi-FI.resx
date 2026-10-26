@@ -126,8 +126,8 @@
   <data name="New Race" xml:space="preserve">
     <value>Uusi kilpailu</value>
   </data>
-  <data name="Edit Club Info" xml:space="preserve">
-    <value>Muokkaa seuran tietoja</value>
+  <data name="Club Settings" xml:space="preserve">
+    <value>Seuran asetukset</value>
   </data>
   <data name="Club Web Site" xml:space="preserve">
     <value>Seuran verkkosivusto</value>

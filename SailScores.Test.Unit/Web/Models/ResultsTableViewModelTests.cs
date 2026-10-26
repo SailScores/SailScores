@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
+using SailScores.Core.Scoring;
 using SailScores.Core.Services;
+using SailScores.Web.Extensions;
 using SailScores.Web.Models.SailScores;
 using Xunit;
 
@@ -132,6 +135,54 @@ public class ResultsTableViewModelTests
     {
         Assert.False(MakeTable(ResultsColumnSeparator.None, ColumnVisibility.Hidden).ShowRaceColumns);
         Assert.True(MakeTable(ResultsColumnSeparator.None, ColumnVisibility.OnLargerScreens).ShowRaceColumns);
+    }
+
+    // Results saved before the setting moved to views carry the scoring system's visibility;
+    // the view's setting wins, so Always shows the column on small screens too.
+    [Theory]
+    [InlineData(ColumnVisibility.Always, "d-table-cell")]
+    [InlineData(ColumnVisibility.OnLargerScreens, "d-none d-sm-table-cell")]
+    public void VisibleScoringColumns_Participation_UsesViewVisibilityOverStored(
+        ColumnVisibility viewSetting, string expectedCss)
+    {
+        var table = new ResultsTableViewModel
+        {
+            Results = new FlatResults
+            {
+                Columns = new List<FlatResultColumn>
+                {
+                    new()
+                    {
+                        Key = ScoringColumns.ParticipationKey,
+                        Header = "Participation",
+                        Visibility = viewSetting == ColumnVisibility.Always
+                            ? ColumnVisibility.OnLargerScreens
+                            : ColumnVisibility.Always
+                    }
+                }
+            },
+            ParticipationVisibility = viewSetting
+        };
+
+        var column = Assert.Single(table.VisibleScoringColumns);
+        Assert.Equal(viewSetting, column.Visibility);
+        Assert.Equal(expectedCss, column.Visibility.ToCssClass());
+    }
+
+    [Theory]
+    [InlineData(7, ColumnVisibility.Always, false)]
+    [InlineData(8, ColumnVisibility.Always, true)]
+    [InlineData(8, ColumnVisibility.OnLargerScreens, true)]
+    [InlineData(8, ColumnVisibility.Hidden, false)]
+    public void UsesWideLayout_ManyRaces_WideOnlyWhenRaceColumnsShown(
+        int raceCount, ColumnVisibility raceColumns, bool expected)
+    {
+        var results = new FlatResults
+        {
+            Races = Enumerable.Range(1, raceCount).Select(i => new FlatRace { Id = Guid.NewGuid() }).ToList()
+        };
+
+        Assert.Equal(expected, ResultsTableViewModel.UsesWideLayout(results, raceColumns));
     }
 
     [Fact]

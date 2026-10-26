@@ -98,9 +98,9 @@
 <h5 class="mt-4">Results Columns</h5>
 <p class="small">
     Extra columns shown after the total. Changes apply when the series results are next updated.
-    Columns every scoring system has, such as @string.Join(" and ", ScoringColumns.Standard.Select(c => c.Header)),
-    are shown or hidden by each
-    <a asp-controller="SeriesResultsTemplate" asp-action="Index">results view</a>.
+    Fields shared in all scoring systems, such as @string.Join(" and ", ScoringColumns.Standard.Select(c => c.Header)),
+    are shown or hidden by
+    <a asp-controller="SeriesResultsTemplate" asp-action="Index">results views</a>.
 </p>
 <div class="scoring-method-settings" data-method-panel>
     <div class="scoring-method-settings-heading"><span data-method-name></span> columns</div>

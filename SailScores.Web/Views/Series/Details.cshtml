@@ -18,12 +18,12 @@
 
     ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} Scores - {Model.ClubInitials}";
     Layout = "_ClubLayout";
-    ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
     ViewData["MetaDescription"] =
         $"Results for {Model.Item.Season?.Name} {Model.Item.Name} series racing at {Model.ClubName}";
 
     var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
         Model.Item.SeriesResultsTemplate, Model.Item.Type == SeriesType.Regatta);
+    ViewData["WideLayout"] = ResultsTableViewModel.UsesWideLayout(results, resolvedTemplate.RaceColumnsVisibility);
 }
 
 <div class="d-flex justify-content-between align-items-start">

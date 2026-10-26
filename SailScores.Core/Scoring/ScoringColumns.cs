@@ -15,15 +15,23 @@ namespace SailScores.Core.Scoring
         public const string ParticipationKey = "participation";
         public const string PenaltiesKey = "penalties";
 
-        public static readonly ScoringColumnDescriptor PreDiscardTotal = new(
+        public static readonly ScoringColumnDescriptor PreDiscardTotal = MakePreDiscardTotal(
+            includeForPercentSystems: false);
+
+        // For a percent or average system whose race scores still add up to a meaningful
+        // total (see ScoringCalculatorRegistration.IncludesPreDiscardTotal).
+        public static readonly ScoringColumnDescriptor PreDiscardTotalForAllSystems = MakePreDiscardTotal(
+            includeForPercentSystems: true);
+
+        private static ScoringColumnDescriptor MakePreDiscardTotal(bool includeForPercentSystems) => new(
             PreDiscardTotalKey,
             "Pre-Discard Total",
             "Total of all race scores, including discards.",
             ScoringColumnFormat.Decimal,
             ColumnVisibility.Hidden,
-            includeForPercentSystems: false,
+            includeForPercentSystems: includeForPercentSystems,
             valueFromScore: s => Value(s.TotalScoreIncludingDiscards
-                // Results saved before this was recorded.
+                // Results saved before this was recorded, and calculators that don't record it.
                 ?? s.Scores?.Sum(c => c.ScoreValue ?? 0m)));
 
         public static readonly ScoringColumnDescriptor Participation = new(

@@ -5,6 +5,7 @@ using SailScores.Core.Mapping;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring;
 using SailScores.Core.Services.Interfaces;
+using SailScores.Core.Utility;
 using SailScores.Database;
 using System;
 using System.Collections.Generic;
@@ -139,7 +140,10 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
     {
         var series = await _dbContext.Series
             .Where(s => s.ClubId == clubId
-                && _dbContext.HistoricalResults.Any(h => h.SeriesId == s.Id && h.IsCurrent))
+                && _dbContext.HistoricalResults.Any(h => h.SeriesId == s.Id && h.IsCurrent)
+                && (_dbContext.SeriesRaces.Any(sr => sr.SeriesId == s.Id)
+                    || _dbContext.SeriesToSeriesLinks.Any(l => l.ParentSeriesId == s.Id
+                        && _dbContext.SeriesRaces.Any(sr => sr.SeriesId == l.ChildSeriesId))))
             .OrderByDescending(s => s.UpdatedDate)
             .Take(count)
             .Select(s => new
@@ -225,6 +229,26 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         club.DefaultSeriesResultsTemplateId = seriesTemplateId;
         club.DefaultRegattaSeriesResultsTemplateId = regattaTemplateId;
         club.DefaultSummarySeriesResultsTemplateId = summaryTemplateId;
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public async Task SetClubDateFormatAsync(Guid clubId, string dateFormat)
+    {
+        if (!ClubDateFormatUtility.TryNormalize(dateFormat, out var normalized, out var error))
+        {
+            throw new InvalidOperationException(error);
+        }
+
+        var club = await _dbContext.Clubs
+            .FirstOrDefaultAsync(c => c.Id == clubId)
+            .ConfigureAwait(false);
+
+        if (club == null)
+        {
+            throw new InvalidOperationException("Club not found.");
+        }
+
+        club.DefaultDateFormat = normalized;
         await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 

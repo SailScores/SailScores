@@ -18,6 +18,11 @@ public class SeriesResultsTemplateListViewModel
     [Display(Name = "Default View for Summary Series")]
     public Guid? DefaultSummarySeriesResultsTemplateId { get; set; }
 
+    // Race dates in results headings; blank uses the club's localization.
+    [Display(Name = "Default Date Format")]
+    [StringLength(30)]
+    public string DefaultDateFormat { get; set; }
+
     public bool IsClubDefault(Guid templateId) =>
         templateId == DefaultSeriesResultsTemplateId
         || templateId == DefaultRegattaSeriesResultsTemplateId

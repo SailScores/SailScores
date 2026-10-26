@@ -70,7 +70,7 @@ public static ScoringRecipe Pbg(ScoringSystem system) => new()
 | 8 | The series average isn't rounded; results show it to three decimals (`0.###`). | `LowPointAverage` (no rounding); `_ResultsTable.cshtml` format | Snapshots | implemented. RDGAve still rounds to one decimal (decision 2). |
 | 9 | Ranked boats go lowest average first; unranked boats follow. | `Tiebreaks/Rankings.LowPoint` | Covered by the low point average tests | implemented |
 | (decision 3) | Ties: RRS A8.1, then A8.2. | `Tiebreaks/Rankings.LowPoint` (`AppendixA81LowPoint`, `AppendixA82.LowPoint`) | Covered by the Appendix A tests | implemented |
-| 10 | Daily results show columns for the Average, participation percent, races participated, and Net total. | Columns: the total (headed "Score"), Net Points, and Net Series Races. Participation exists but is hidden by default: turn it on in the club's results views. | `CreateCalculator_Pbg_UsesPbgCalculatorWithNetColumnsAndScoreHeader` | **partly supported**: see below |
+| 10 | Daily results show columns for the Average, participation percent, races participated, and Net total. | Columns: the total (headed "Score"), Net Points, and Net Series Races. Participation and Pre-Discard Total exist but are hidden by default: turn them on in the club's results views. | `CreateCalculator_Pbg_UsesPbgCalculatorWithNetColumnsAndScoreHeader` | **partly supported**: see below |
 | 11 | A summary series can hide the individual race columns. | Nothing | Nothing | **not supported** |
 | 12 | Each series' heading shows the number of races needed to rank. | The heading shows "50% participation required for ranking" (`Series/Details.cshtml`), not a race count. | Nothing | **not supported** |
 

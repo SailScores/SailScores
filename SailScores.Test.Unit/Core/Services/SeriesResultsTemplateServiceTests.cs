@@ -40,6 +40,25 @@ public class SeriesResultsTemplateServiceTests
     }
 
     [Fact]
+    public async Task SetClubDateFormatAsync_SupportedFormat_SavesNormalized()
+    {
+        await _service.SetClubDateFormatAsync(_clubId, "DD/MM");
+
+        Assert.Equal("dd/MM", _context.Clubs.Single(c => c.Id == _clubId).DefaultDateFormat);
+    }
+
+    [Fact]
+    public async Task SetClubDateFormatAsync_UnsupportedFormat_ThrowsAndKeepsFormat()
+    {
+        await _service.SetClubDateFormatAsync(_clubId, "M/d");
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _service.SetClubDateFormatAsync(_clubId, "hh:mm"));
+
+        Assert.Equal("M/d", _context.Clubs.Single(c => c.Id == _clubId).DefaultDateFormat);
+    }
+
+    [Fact]
     public async Task SetClubDefaultsAsync_WithClubTemplates_SetsAllDefaults()
     {
         await _service.SeedDefaultTemplatesAsync(_clubId);
@@ -319,10 +338,12 @@ public class SeriesResultsTemplateServiceTests
     }
 
     [Fact]
-    public async Task GetPreviewSeriesAsync_ClubSeries_OnlyWithCurrentResultsNewestFirst()
+    public async Task GetPreviewSeriesAsync_ClubSeries_OnlyWithCurrentResultsAndRacesNewestFirst()
     {
         var season = _context.Seasons.First(s => s.ClubId == _clubId);
-        Db.Series AddSeries(string name, Guid clubId, DateTime updated, bool? currentResults)
+        var raceId = _context.Races.First().Id;
+        Db.Series AddSeries(string name, Guid clubId, DateTime updated, bool? currentResults,
+            bool hasRace = true)
         {
             var series = new Db.Series
             {
@@ -334,6 +355,10 @@ public class SeriesResultsTemplateServiceTests
                 Type = Db.SeriesType.Summary
             };
             _context.Series.Add(series);
+            if (hasRace)
+            {
+                _context.SeriesRaces.Add(new Db.SeriesRace { SeriesId = series.Id, RaceId = raceId });
+            }
             if (currentResults.HasValue)
             {
                 _context.HistoricalResults.Add(new Db.HistoricalResults
@@ -351,11 +376,25 @@ public class SeriesResultsTemplateServiceTests
         AddSeries("Old results only", _clubId, new DateTime(2026, 7, 1), false);
         AddSeries("No results", _clubId, new DateTime(2026, 7, 1), null);
         AddSeries("Other club", _otherClubId, new DateTime(2026, 7, 1), true);
+        AddSeries("No races", _clubId, new DateTime(2026, 7, 1), true, hasRace: false);
+        // A summary series has no races of its own; its child series' races count.
+        var summary = AddSeries("Summary", _clubId, new DateTime(2026, 4, 1), true, hasRace: false);
+        _context.SeriesToSeriesLinks.Add(new Db.SeriesToSeriesLink
+        {
+            ParentSeriesId = summary.Id,
+            ChildSeriesId = older.Id
+        });
+        var emptySummary = AddSeries("Empty summary", _clubId, new DateTime(2026, 4, 1), true, hasRace: false);
+        _context.SeriesToSeriesLinks.Add(new Db.SeriesToSeriesLink
+        {
+            ParentSeriesId = emptySummary.Id,
+            ChildSeriesId = AddSeries("Empty child", _clubId, new DateTime(2026, 3, 1), null, hasRace: false).Id
+        });
         _context.SaveChanges();
 
         var result = await _service.GetPreviewSeriesAsync(_clubId, 10);
 
-        Assert.Equal(new[] { newer.Id, older.Id }, result.Select(s => s.Id));
+        Assert.Equal(new[] { newer.Id, older.Id, summary.Id }, result.Select(s => s.Id));
         Assert.Equal(season.Name, result[0].Season.Name);
         Assert.Equal(SeriesType.Summary, result[0].Type);
     }

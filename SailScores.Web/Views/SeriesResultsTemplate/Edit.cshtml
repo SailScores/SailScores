@@ -32,15 +32,15 @@
 
     @if (Model.IsReset)
     {
-        <div class="alert alert-info" role="alert">
-            The form now shows the default settings: a very clean view with sail number, helm and boat
-            name, gold/silver/bronze places, faded and struck-through discards, every score code shown
-            with its points, and no custom fields or separators. Nothing has changed yet: save to apply
-            them, or cancel to keep the current settings.
+        <div class="alert alert-info" role="alert" id="resetNotice">
+            Form has been reset to SailScores defaults: a clean view with sail number, helm and boat
+            name, gold/silver/bronze places, faded and struck-through discards, all score codes shown
+            with points, and no custom fields or separators. Changes were not saved yet: use the Save
+            button to save the reset or Cancel to keep the current settings.
         </div>
     }
 
-    <form asp-action="Edit" method="post">
+    <form asp-action="Edit" method="post" id="templateForm">
         <input type="hidden" asp-for="Id" />
         <partial name="_TemplateForm" model="Model" />
         <partial name="_PreviewPanel" model="Model" />
@@ -64,4 +64,27 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/seriesResultsTemplatePreview.js" asp-append-version="true"></script>
+    @if (Model.IsReset)
+    {
+        <script>
+            // The reset notice goes once any setting is changed; choosing a preview series isn't one.
+            (function () {
+                var notice = document.getElementById('resetNotice');
+                var form = document.getElementById('templateForm');
+                if (!notice || !form) {
+                    return;
+                }
+                function hideNotice(event) {
+                    if (event.target.id === 'previewSeriesId') {
+                        return;
+                    }
+                    notice.remove();
+                    form.removeEventListener('input', hideNotice);
+                    form.removeEventListener('change', hideNotice);
+                }
+                form.addEventListener('input', hideNotice);
+                form.addEventListener('change', hideNotice);
+            })();
+        </script>
+    }
 }
