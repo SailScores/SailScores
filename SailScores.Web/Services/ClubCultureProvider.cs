@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Caching.Memory;
 using SailScores.Database;
@@ -39,8 +39,9 @@ public class ClubCultureProvider : IRequestCultureProvider
             {
                 clubInitialsToLocales = _dbContext.Clubs
                     .ToDictionary(
-                        c => c.Initials.ToUpperInvariant(),
-                        c => c.Locale);
+                        c => c.Initials,
+                        c => c.Locale,
+                        StringComparer.OrdinalIgnoreCase);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(300)
@@ -57,12 +58,24 @@ public class ClubCultureProvider : IRequestCultureProvider
 
         if (clubInitialsToLocales == null) return _defaultCultureString;
 
-        var clubCulture = clubInitialsToLocales
-            .FirstOrDefault(kvp =>
-                path.StartsWithSegments($"/{kvp.Key}", StringComparison.InvariantCultureIgnoreCase));
+        var firstSegment = GetFirstSegment(path.Value);
+        if (firstSegment.Length > 0
+            && clubInitialsToLocales.TryGetValue(firstSegment, out var locale))
+        {
+            return locale;
+        }
 
-        return clubCulture.Equals(default(KeyValuePair<string, string>))
-            ? _defaultCultureString
-            : clubCulture.Value;
+        return _defaultCultureString;
+    }
+
+    private static string GetFirstSegment(string path)
+    {
+        if (String.IsNullOrEmpty(path) || path[0] != '/')
+        {
+            return String.Empty;
+        }
+        var span = path.AsSpan(1);
+        var end = span.IndexOf('/');
+        return (end < 0 ? span : span[..end]).ToString();
     }
 }
