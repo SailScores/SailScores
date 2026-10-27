@@ -53,7 +53,7 @@
 }
 @if (Model.SeasonTip != null && Model.IsClubAdmin)
 {
-    <div class="alert alert-warning">
+    <div class="bg-almost alert alert-primary">
         <a asp-action="@Model.SeasonTip.Link.Action" asp-controller="@Model.SeasonTip.Link.Controller"
            class="alert-link">@Model.SeasonTip.Title</a>:
         @Model.SeasonTip.Details
