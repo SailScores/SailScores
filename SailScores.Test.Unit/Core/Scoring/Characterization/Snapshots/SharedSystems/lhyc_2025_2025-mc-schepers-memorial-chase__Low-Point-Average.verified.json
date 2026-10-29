@@ -9,6 +9,7 @@
   "LowerScoreWins": true,
   "PercentRequired": "0",
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)"
   ],
   "Races": [
@@ -29,7 +30,8 @@
       "PointsPossible": "4",
       "ParticipationPercent": "100",
       "Columns": {
-        "participation": "100"
+        "participation": "100",
+        "preDiscardTotal": "6.5"
       },
       "Scores": "1/1 | (2/1) | 1/1 | 1/1 | 1:1.5/1"
     },
@@ -43,7 +45,8 @@
       "PointsPossible": "4",
       "ParticipationPercent": "100",
       "Columns": {
-        "participation": "100"
+        "participation": "100",
+        "preDiscardTotal": "16"
       },
       "Scores": "3/1 | 3/1 | (4/1) | 3/1 | 3/1"
     },
@@ -57,7 +60,8 @@
       "PointsPossible": "4",
       "ParticipationPercent": "40",
       "Columns": {
-        "participation": "40"
+        "participation": "40",
+        "preDiscardTotal": "24"
       },
       "Scores": "(DNC 7) | 1/1 | 2/1 | SB 7/1 | SB 7/1"
     },
@@ -71,7 +75,8 @@
       "PointsPossible": "4",
       "ParticipationPercent": "40",
       "Columns": {
-        "participation": "40"
+        "participation": "40",
+        "preDiscardTotal": "24.5"
       },
       "Scores": "(DNC 7) | DNC 7 | DNC 7 | 2/1 | TIE 1.5/1"
     },
@@ -85,7 +90,8 @@
       "PointsPossible": "4",
       "ParticipationPercent": "60",
       "Columns": {
-        "participation": "60"
+        "participation": "60",
+        "preDiscardTotal": "26"
       },
       "Scores": "2/1 | 5/1 | 5/1 | (DNC 7) | DNC 7"
     },
@@ -99,7 +105,8 @@
       "PointsPossible": "4",
       "ParticipationPercent": "40",
       "Columns": {
-        "participation": "40"
+        "participation": "40",
+        "preDiscardTotal": "28"
       },
       "Scores": "(DNC 7) | 4/1 | 3/1 | DNC 7 | DNC 7"
     }

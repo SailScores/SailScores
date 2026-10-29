@@ -18,6 +18,15 @@ public class SeriesResultsTemplate
     // Column visibility settings
     public ColumnVisibility SailNumberVisibility { get; set; }
 
+    // Header text; empty uses the default, translated header.
+    [StringLength(100)]
+    public string SailNumberHeader { get; set; }
+
+    public ColumnVisibility AlternativeSailNumberVisibility { get; set; } = ColumnVisibility.Hidden;
+
+    [StringLength(100)]
+    public string AlternativeSailNumberHeader { get; set; }
+
     public ColumnVisibility CompetitorNameVisibility { get; set; }
 
     [StringLength(100)]
@@ -29,6 +38,13 @@ public class SeriesResultsTemplate
     public string BoatNameHeader { get; set; }
 
     public ColumnVisibility CompetitorClubVisibility { get; set; }
+
+    [StringLength(100)]
+    public string CompetitorClubHeader { get; set; }
+
+    // Empty uses the scoring system's total header.
+    [StringLength(100)]
+    public string TotalHeader { get; set; }
 
     // Kept in step with PreDiscardTotalVisibility so the previous release still runs on the
     // migrated database. Remove in a later release.
@@ -45,11 +61,12 @@ public class SeriesResultsTemplate
     public ResultsColumnSeparator ColumnSeparators { get; set; }
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
     public bool TotalsSeparator { get; set; }
+    // Wind and weather in the race column headers, for races that have it.
+    public bool ShowWeather { get; set; } = true;
 
     // Discarded score display
     public bool DiscardStrikethrough { get; set; } = true;
     public bool DiscardFaded { get; set; } = true;
-    public ResultsTextColor DiscardColor { get; set; }
 
     public IList<SeriesResultsTemplateCustomField> CustomFields { get; set; } = new List<SeriesResultsTemplateCustomField>();
 

@@ -239,31 +239,26 @@ public class ResultsTableViewModelTests
     }
 
     [Theory]
-    [InlineData(true, ResultsTextColor.Default, "discardmuted")]
-    [InlineData(false, ResultsTextColor.Default, "")]
-    [InlineData(false, ResultsTextColor.Red, "discard-red")]
-    [InlineData(true, ResultsTextColor.Blue, "discard-blue discard-faded")]
-    public void DiscardCssClass_FromSettings_CombinesFadeAndColor(
-        bool faded, ResultsTextColor color, string expected)
+    [InlineData(true, "discardmuted")]
+    [InlineData(false, "")]
+    public void DiscardCssClass_FromSettings_MutesWhenFaded(bool faded, string expected)
     {
-        var table = new ResultsTableViewModel { DiscardFaded = faded, DiscardColor = color };
+        var table = new ResultsTableViewModel { DiscardFaded = faded };
 
         Assert.Equal(expected, table.DiscardCssClass);
     }
 
     [Theory]
-    [InlineData(false, false, ResultsTextColor.Default, true)]
-    [InlineData(true, false, ResultsTextColor.Default, false)]
-    [InlineData(false, true, ResultsTextColor.Default, false)]
-    [InlineData(false, false, ResultsTextColor.Red, false)]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
     public void DiscardParentheses_FromSettings_OnlyWithNoOtherStyling(
-        bool strikethrough, bool faded, ResultsTextColor color, bool expected)
+        bool strikethrough, bool faded, bool expected)
     {
         var table = new ResultsTableViewModel
         {
             DiscardStrikethrough = strikethrough,
-            DiscardFaded = faded,
-            DiscardColor = color
+            DiscardFaded = faded
         };
 
         Assert.Equal(expected, table.DiscardParentheses);
@@ -275,14 +270,104 @@ public class ResultsTableViewModelTests
         var template = new ResolvedTemplate
         {
             DiscardStrikethrough = false,
-            DiscardFaded = false,
-            DiscardColor = ResultsTextColor.Green
+            DiscardFaded = false
         };
 
         var table = new ResultsTableViewModel().WithTemplate(template);
 
         Assert.False(table.DiscardStrikethrough);
         Assert.False(table.DiscardFaded);
-        Assert.Equal(ResultsTextColor.Green, table.DiscardColor);
+    }
+
+    [Fact]
+    public void WithTemplate_CopiesColumnHeadersAndWeather()
+    {
+        var template = new ResolvedTemplate
+        {
+            SailNumberHeader = "Bow",
+            AlternativeSailNumberVisibility = ColumnVisibility.OnLargerScreens,
+            AlternativeSailNumberHeader = "Class #",
+            CompetitorClubHeader = "Yacht Club",
+            TotalHeader = "Points",
+            ShowWeather = false
+        };
+
+        var table = new ResultsTableViewModel().WithTemplate(template);
+
+        Assert.Equal("Bow", table.SailNumberHeader);
+        Assert.Equal(ColumnVisibility.OnLargerScreens, table.AlternativeSailNumberVisibility);
+        Assert.Equal("Class #", table.AlternativeSailNumberHeader);
+        Assert.Equal("Yacht Club", table.CompetitorClubHeader);
+        Assert.Equal("Points", table.TotalHeader);
+        Assert.False(table.ShowWeather);
+    }
+
+    [Theory]
+    [InlineData(false, ColumnVisibility.Hidden, "123")]
+    [InlineData(true, ColumnVisibility.Hidden, "ALT-9")]
+    [InlineData(true, ColumnVisibility.Always, "123")]
+    public void GetSailNumber_PreferAlternative_UsesAlternativeOnlyWithoutItsOwnColumn(
+        bool preferAlternative, ColumnVisibility alternativeColumn, string expected)
+    {
+        var table = new ResultsTableViewModel
+        {
+            PreferAlternativeSailNumbers = preferAlternative,
+            AlternativeSailNumberVisibility = alternativeColumn
+        };
+
+        var result = table.GetSailNumber(new FlatCompetitor { SailNumber = "123", AlternativeSailNumber = "ALT-9" });
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void GetSailNumber_PreferAlternativeWithoutOne_UsesSailNumber()
+    {
+        var table = new ResultsTableViewModel { PreferAlternativeSailNumbers = true };
+
+        Assert.Equal("123", table.GetSailNumber(new FlatCompetitor { SailNumber = "123" }));
+    }
+
+    [Theory]
+    [InlineData(ColumnVisibility.OnLargerScreens, ColumnVisibility.Always, ColumnVisibility.Always, ColumnVisibility.Always, RepeatedCompetitorColumn.CompetitorName, "Ann")]
+    [InlineData(ColumnVisibility.Hidden, ColumnVisibility.Always, ColumnVisibility.Always, ColumnVisibility.Always, RepeatedCompetitorColumn.SailNumber, "123")]
+    [InlineData(ColumnVisibility.Hidden, ColumnVisibility.Hidden, ColumnVisibility.OnLargerScreens, ColumnVisibility.Always, RepeatedCompetitorColumn.BoatName, "Wave")]
+    [InlineData(ColumnVisibility.Hidden, ColumnVisibility.Hidden, ColumnVisibility.Hidden, ColumnVisibility.Always, RepeatedCompetitorColumn.AlternativeSailNumber, "ALT-9")]
+    [InlineData(ColumnVisibility.Hidden, ColumnVisibility.Hidden, ColumnVisibility.Hidden, ColumnVisibility.Hidden, RepeatedCompetitorColumn.None, null)]
+    public void RepeatedColumn_CompetitorNameHidden_UsesFirstShownColumn(
+        ColumnVisibility name, ColumnVisibility sail, ColumnVisibility boat, ColumnVisibility alternative,
+        RepeatedCompetitorColumn expectedColumn, string expectedValue)
+    {
+        var table = new ResultsTableViewModel
+        {
+            CompetitorNameVisibility = name,
+            SailNumberVisibility = sail,
+            BoatNameVisibility = boat,
+            AlternativeSailNumberVisibility = alternative
+        };
+        var competitor = new FlatCompetitor
+        {
+            Name = "Ann",
+            SailNumber = "123",
+            BoatName = "Wave",
+            AlternativeSailNumber = "ALT-9"
+        };
+
+        Assert.Equal(expectedColumn, table.RepeatedColumn);
+        Assert.Equal(expectedValue, table.GetRepeatedValue(competitor));
+    }
+
+    [Fact]
+    public void GetRepeatedValue_SailNumberPreferringAlternative_UsesShownSailNumber()
+    {
+        var table = new ResultsTableViewModel
+        {
+            CompetitorNameVisibility = ColumnVisibility.Hidden,
+            PreferAlternativeSailNumbers = true
+        };
+
+        var result = table.GetRepeatedValue(new FlatCompetitor { SailNumber = "123", AlternativeSailNumber = "ALT-9" });
+
+        Assert.Equal("ALT-9", result);
     }
 }

@@ -15,21 +15,15 @@ namespace SailScores.Core.Scoring
         public const string ParticipationKey = "participation";
         public const string PenaltiesKey = "penalties";
 
-        public static readonly ScoringColumnDescriptor PreDiscardTotal = MakePreDiscardTotal(
-            includeForPercentSystems: false);
-
-        // For a percent or average system whose race scores still add up to a meaningful
-        // total (see ScoringCalculatorRegistration.IncludesPreDiscardTotal).
-        public static readonly ScoringColumnDescriptor PreDiscardTotalForAllSystems = MakePreDiscardTotal(
-            includeForPercentSystems: true);
-
-        private static ScoringColumnDescriptor MakePreDiscardTotal(bool includeForPercentSystems) => new(
+        // Every system has it, percent and average systems too. Their race scores still add up:
+        // points in high point systems, places in average systems, where scores the average
+        // leaves out are already 0.
+        public static readonly ScoringColumnDescriptor PreDiscardTotal = new(
             PreDiscardTotalKey,
             "Pre-Discard Total",
             "Total of all race scores, including discards.",
             ScoringColumnFormat.Decimal,
             ColumnVisibility.Hidden,
-            includeForPercentSystems: includeForPercentSystems,
             valueFromScore: s => Value(s.TotalScoreIncludingDiscards
                 // Results saved before this was recorded, and calculators that don't record it.
                 ?? s.Scores?.Sum(c => c.ScoreValue ?? 0m)));
@@ -106,16 +100,11 @@ namespace SailScores.Core.Scoring
         public static IList<FlatResultColumn> Resolve(
             IEnumerable<ScoringColumnDescriptor> descriptors,
             ScoringSystemSettings effectiveSettings,
-            bool isPercentSystem,
             IList<FlatSeriesScore> scores)
         {
             var columns = new List<FlatResultColumn>();
             foreach (var descriptor in descriptors)
             {
-                if (isPercentSystem && !descriptor.IncludeForPercentSystems)
-                {
-                    continue;
-                }
                 if (descriptor.ValueFromScore != null)
                 {
                     foreach (var score in scores)
@@ -168,7 +157,6 @@ namespace SailScores.Core.Scoring
             results.Columns = Resolve(
                 Standard,
                 null,
-                results.IsPercentSystem,
                 results.CalculatedScores?.ToList() ?? new List<FlatSeriesScore>());
         }
 

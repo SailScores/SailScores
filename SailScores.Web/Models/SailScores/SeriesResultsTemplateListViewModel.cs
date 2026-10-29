@@ -8,18 +8,18 @@ public class SeriesResultsTemplateListViewModel
     public string ClubInitials { get; set; }
     public IList<SeriesResultsTemplate> Templates { get; set; }
 
-    [Display(Name = "Default View for Standard Series")]
+    [Display(Name = "Standard Series")]
     public Guid? DefaultSeriesResultsTemplateId { get; set; }
 
-    [Display(Name = "Default View for Regattas")]
+    [Display(Name = "Regattas")]
     public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
 
     // Null uses the standard series default.
-    [Display(Name = "Default View for Summary Series")]
+    [Display(Name = "Summary Series")]
     public Guid? DefaultSummarySeriesResultsTemplateId { get; set; }
 
-    // Race dates in results headings; blank uses the club's localization.
-    [Display(Name = "Default Date Format")]
+    // Race dates in results headers; blank uses the club's localization.
+    [Display(Name = "Date Format")]
     [StringLength(30)]
     public string DefaultDateFormat { get; set; }
 

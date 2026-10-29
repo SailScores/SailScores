@@ -118,11 +118,16 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
     {
         target.Name = source.Name;
         target.SailNumberVisibility = source.SailNumberVisibility;
+        target.SailNumberHeader = source.SailNumberHeader;
+        target.AlternativeSailNumberVisibility = source.AlternativeSailNumberVisibility;
+        target.AlternativeSailNumberHeader = source.AlternativeSailNumberHeader;
         target.CompetitorNameVisibility = source.CompetitorNameVisibility;
         target.CompetitorNameHeader = source.CompetitorNameHeader;
         target.BoatNameVisibility = source.BoatNameVisibility;
         target.BoatNameHeader = source.BoatNameHeader;
         target.CompetitorClubVisibility = source.CompetitorClubVisibility;
+        target.CompetitorClubHeader = source.CompetitorClubHeader;
+        target.TotalHeader = source.TotalHeader;
         target.PreDiscardTotalVisibility = source.PreDiscardTotalVisibility;
         target.ParticipationVisibility = source.ParticipationVisibility;
         target.ShowPreDiscardTotal = source.PreDiscardTotalVisibility != ColumnVisibility.Hidden;
@@ -131,9 +136,9 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
         target.ColumnSeparators = source.ColumnSeparators;
         target.RaceColumnsVisibility = source.RaceColumnsVisibility;
         target.TotalsSeparator = source.TotalsSeparator;
+        target.ShowWeather = source.ShowWeather;
         target.DiscardStrikethrough = source.DiscardStrikethrough;
         target.DiscardFaded = source.DiscardFaded;
-        target.DiscardColor = source.DiscardColor;
     }
 
     public async Task<IList<Series>> GetPreviewSeriesAsync(Guid clubId, int count)
@@ -167,6 +172,80 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
                 UpdatedDate = s.UpdatedDate,
                 Season = new Season { Name = s.SeasonName }
             })
+            .ToList();
+    }
+
+    public async Task<IList<ScoreCode>> GetClubScoreCodesAsync(Guid clubId)
+    {
+        // The club's own systems and the shared ones it uses directly, then their parents.
+        var rootIds = await _dbContext.ScoringSystems
+            .Where(s => s.ClubId == clubId)
+            .Select(s => s.Id)
+            .ToListAsync()
+            .ConfigureAwait(false);
+        rootIds.AddRange(await _dbContext.Clubs
+            .Where(c => c.Id == clubId && c.DefaultScoringSystemId != null)
+            .Select(c => c.DefaultScoringSystemId.Value)
+            .ToListAsync()
+            .ConfigureAwait(false));
+        rootIds.AddRange(await _dbContext.Series
+            .Where(s => s.ClubId == clubId && s.ScoringSystemId != null)
+            .Select(s => s.ScoringSystemId.Value)
+            .Distinct()
+            .ToListAsync()
+            .ConfigureAwait(false));
+        rootIds.AddRange(await _dbContext.Regattas
+            .Where(r => r.ClubId == clubId && r.ScoringSystemId != null)
+            .Select(r => r.ScoringSystemId.Value)
+            .Distinct()
+            .ToListAsync()
+            .ConfigureAwait(false));
+
+        var parents = await _dbContext.ScoringSystems
+            .Where(s => s.ClubId == clubId || s.ClubId == null)
+            .Select(s => new { s.Id, s.ParentSystemId })
+            .ToDictionaryAsync(s => s.Id, s => s.ParentSystemId)
+            .ConfigureAwait(false);
+        var systemIds = new HashSet<Guid>();
+        foreach (var rootId in rootIds)
+        {
+            // The visited check also stops a parent loop.
+            for (Guid? id = rootId; id.HasValue && systemIds.Add(id.Value);)
+            {
+                id = parents.TryGetValue(id.Value, out var parentId) ? parentId : null;
+            }
+        }
+
+        var defined = await _dbContext.ScoreCodes
+            .Where(c => systemIds.Contains(c.ScoringSystemId) && c.Name != null)
+            .Select(c => new { c.Name, c.Description })
+            .ToListAsync()
+            .ConfigureAwait(false);
+        var used = await _dbContext.Scores
+            .Where(s => s.Race.ClubId == clubId && s.Code != null && s.Code != "")
+            .Select(s => s.Code)
+            .Distinct()
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        // A code defined on several systems takes the first description it has.
+        var codes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var code in defined.Where(c => !string.IsNullOrWhiteSpace(c.Name)))
+        {
+            var name = code.Name.Trim();
+            if (string.IsNullOrWhiteSpace(codes.GetValueOrDefault(name)))
+            {
+                codes[name] = code.Description;
+            }
+        }
+        foreach (var code in used.Where(c => !string.IsNullOrWhiteSpace(c)))
+        {
+            codes.TryAdd(code.Trim(), null);
+        }
+
+        return codes
+            .OrderBy(c => c.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(c => new ScoreCode { Name = c.Key, Description = c.Value })
             .ToList();
     }
 
@@ -285,9 +364,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             Name = "Standard",
             SailNumberVisibility = ColumnVisibility.Always,
             CompetitorNameVisibility = ColumnVisibility.Always,
-            CompetitorNameHeader = "Helm",
             BoatNameVisibility = ColumnVisibility.OnLargerScreens,
-            BoatNameHeader = "Boat",
             CompetitorClubVisibility = ColumnVisibility.Hidden,
             PreDiscardTotalVisibility = preDiscardTotal,
             ParticipationVisibility = participation,
@@ -302,9 +379,7 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             Name = "Regatta",
             SailNumberVisibility = ColumnVisibility.Always,
             CompetitorNameVisibility = ColumnVisibility.Always,
-            CompetitorNameHeader = "Helm",
             BoatNameVisibility = ColumnVisibility.OnLargerScreens,
-            BoatNameHeader = "Boat",
             CompetitorClubVisibility = ColumnVisibility.OnLargerScreens,
             PreDiscardTotalVisibility = preDiscardTotal,
             ParticipationVisibility = participation,

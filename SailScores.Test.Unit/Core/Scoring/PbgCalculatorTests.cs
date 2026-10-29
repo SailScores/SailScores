@@ -39,17 +39,16 @@ public class PbgCalculatorTests
         Assert.Equal("Total", ScoringCalculatorRegistry.Get(ScoringCalculatorType.AppendixA).TotalHeader);
     }
 
-    // Average systems leave out the pre-discard total, but PBG keeps it (beside Net Points).
-    [Fact]
-    public void GetColumns_Pbg_KeepsPreDiscardTotalUnlikeOtherAverageSystems()
+    // Every system has the pre-discard total, average and percent systems included.
+    [Theory]
+    [InlineData(ScoringCalculatorType.Pbg)]
+    [InlineData(ScoringCalculatorType.LowPointAverageInclDnc)]
+    [InlineData(ScoringCalculatorType.HighPointPercentage)]
+    [InlineData(ScoringCalculatorType.TopXHighPoint)]
+    public void GetColumns_AnySystem_IncludesPreDiscardTotal(ScoringCalculatorType calculatorType)
     {
-        var pbg = ScoringCalculatorRegistry.GetColumns(ScoringCalculatorType.Pbg)
-            .Single(c => c.Key == ScoringColumns.PreDiscardTotalKey);
-        var average = ScoringCalculatorRegistry.GetColumns(ScoringCalculatorType.LowPointAverageInclDnc)
-            .Single(c => c.Key == ScoringColumns.PreDiscardTotalKey);
-
-        Assert.True(pbg.IncludeForPercentSystems);
-        Assert.False(average.IncludeForPercentSystems);
+        Assert.Contains(ScoringCalculatorRegistry.GetColumns(calculatorType),
+            c => c.Key == ScoringColumns.PreDiscardTotalKey);
     }
 
     [Fact]
@@ -65,7 +64,7 @@ public class PbgCalculatorTests
         };
 
         var columns = ScoringColumns.Resolve(
-            ScoringCalculatorRegistry.GetColumns(ScoringCalculatorType.Pbg), null, true, scores);
+            ScoringCalculatorRegistry.GetColumns(ScoringCalculatorType.Pbg), null, scores);
 
         // Four 2nds, one discarded: 6 points over 3 races.
         Assert.Contains(columns, c => c.Key == ScoringColumns.NetPointsKey && c.Visibility == ColumnVisibility.Always);

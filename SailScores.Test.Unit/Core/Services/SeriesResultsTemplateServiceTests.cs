@@ -249,16 +249,14 @@ public class SeriesResultsTemplateServiceTests
         var saved = await _service.SaveTemplateAsync(new SeriesResultsTemplate
         {
             ClubId = _clubId,
-            Name = "Red discards",
+            Name = "Plain discards",
             DiscardStrikethrough = false,
-            DiscardFaded = false,
-            DiscardColor = ResultsTextColor.Red
+            DiscardFaded = false
         });
 
         var db = _context.SeriesResultsTemplates.Single(t => t.Id == saved.Id);
         Assert.False(db.DiscardStrikethrough);
         Assert.False(db.DiscardFaded);
-        Assert.Equal(ResultsTextColor.Red, db.DiscardColor);
     }
 
     [Theory]
@@ -397,5 +395,80 @@ public class SeriesResultsTemplateServiceTests
         Assert.Equal(new[] { newer.Id, older.Id, summary.Id }, result.Select(s => s.Id));
         Assert.Equal(season.Name, result[0].Season.Name);
         Assert.Equal(SeriesType.Summary, result[0].Type);
+    }
+
+    [Fact]
+    public async Task SaveTemplateAsync_ColumnHeadersAndWeather_SavesThem()
+    {
+        var saved = await _service.SaveTemplateAsync(new SeriesResultsTemplate
+        {
+            ClubId = _clubId,
+            Name = "Headers",
+            SailNumberHeader = "Bow",
+            AlternativeSailNumberVisibility = ColumnVisibility.OnLargerScreens,
+            AlternativeSailNumberHeader = "Class #",
+            CompetitorClubHeader = "Yacht Club",
+            TotalHeader = "Points",
+            ShowWeather = false
+        });
+
+        var db = _context.SeriesResultsTemplates.Single(t => t.Id == saved.Id);
+        Assert.Equal("Bow", db.SailNumberHeader);
+        Assert.Equal(ColumnVisibility.OnLargerScreens, db.AlternativeSailNumberVisibility);
+        Assert.Equal("Class #", db.AlternativeSailNumberHeader);
+        Assert.Equal("Yacht Club", db.CompetitorClubHeader);
+        Assert.Equal("Points", db.TotalHeader);
+        Assert.False(db.ShowWeather);
+    }
+
+    [Fact]
+    public async Task GetClubScoreCodesAsync_ClubSystemsAndResults_ReturnsOnlyClubCodes()
+    {
+        var sharedParent = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Shared parent",
+            ScoreCodes = new List<Db.ScoreCode> { new() { Name = "RET", Description = "Retired" } }
+        };
+        var sharedUnused = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Shared unused",
+            ScoreCodes = new List<Db.ScoreCode> { new() { Name = "UNUSED" } }
+        };
+        var otherClubSystem = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Other club's",
+            ClubId = _otherClubId,
+            ScoreCodes = new List<Db.ScoreCode> { new() { Name = "OTHER" } }
+        };
+        _context.ScoringSystems.AddRange(sharedParent, sharedUnused, otherClubSystem);
+        _context.ScoringSystems.Single(s => s.ClubId == _clubId).ParentSystemId = sharedParent.Id;
+        _context.Scores.First().Code = "xyz";
+        _context.SaveChanges();
+
+        var codes = await _service.GetClubScoreCodesAsync(_clubId);
+
+        Assert.Equal(new[] { "DNC", "RET", "xyz" }, codes.Select(c => c.Name));
+        Assert.Equal("Retired", codes.Single(c => c.Name == "RET").Description);
+    }
+
+    [Fact]
+    public async Task GetClubScoreCodesAsync_SharedSystemUsedBySeries_IncludesItsCodes()
+    {
+        var shared = new Db.ScoringSystem
+        {
+            Id = Guid.NewGuid(),
+            Name = "Shared",
+            ScoreCodes = new List<Db.ScoreCode> { new() { Name = "SCP" } }
+        };
+        _context.ScoringSystems.Add(shared);
+        _context.Series.First(s => s.ClubId == _clubId).ScoringSystemId = shared.Id;
+        _context.SaveChanges();
+
+        var codes = await _service.GetClubScoreCodesAsync(_clubId);
+
+        Assert.Contains(codes, c => c.Name == "SCP");
     }
 }

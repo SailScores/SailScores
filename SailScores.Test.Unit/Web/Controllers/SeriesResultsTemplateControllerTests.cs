@@ -23,7 +23,6 @@ public class SeriesResultsTemplateControllerTests
     private readonly Mock<ISeriesResultsTemplateService> _templateServiceMock = new();
     private readonly Mock<IClubService> _clubServiceMock = new();
     private readonly Mock<ICompetitorFieldService> _competitorFieldServiceMock = new();
-    private readonly Mock<IScoringService> _scoringServiceMock = new();
     private readonly Mock<ISeriesService> _seriesServiceMock = new();
     private readonly Mock<SailScores.Web.Services.Interfaces.IClubService> _webClubServiceMock = new();
     private readonly SeriesResultsTemplateController _controller;
@@ -35,13 +34,12 @@ public class SeriesResultsTemplateControllerTests
             .ReturnsAsync(new List<CompetitorFieldDefinition>());
         _competitorFieldServiceMock.Setup(s => s.GetTemplateSelectionsAsync(It.IsAny<Guid>()))
             .ReturnsAsync(new List<SeriesResultsTemplateCustomField>());
-        _scoringServiceMock.Setup(s => s.GetScoreCodesAsync(_clubId))
+        _templateServiceMock.Setup(s => s.GetClubScoreCodesAsync(_clubId))
             .ReturnsAsync(new List<ScoreCode>());
         _controller = new SeriesResultsTemplateController(
             _templateServiceMock.Object,
             _clubServiceMock.Object,
             _competitorFieldServiceMock.Object,
-            _scoringServiceMock.Object,
             _seriesServiceMock.Object,
             _webClubServiceMock.Object)
         {
@@ -160,7 +158,7 @@ public class SeriesResultsTemplateControllerTests
             .ReturnsAsync(new List<CompetitorFieldDefinition>());
         _competitorFieldServiceMock.Setup(s => s.GetTemplateSelectionsAsync(template.Id))
             .ReturnsAsync(new List<SeriesResultsTemplateCustomField>());
-        _scoringServiceMock.Setup(s => s.GetScoreCodesAsync(_clubId))
+        _templateServiceMock.Setup(s => s.GetClubScoreCodesAsync(_clubId))
             .ReturnsAsync(new List<ScoreCode>
             {
                 new() { Name = "DNF", Description = "Did not finish" },
@@ -208,7 +206,7 @@ public class SeriesResultsTemplateControllerTests
         var template = SetupTemplate(_clubId);
         template.Name = "Busy";
         template.HighlightTopThree = false;
-        template.DiscardColor = ResultsTextColor.Blue;
+        template.DiscardFaded = false;
         template.ScoreCodes = new List<SeriesResultsTemplateScoreCode>
         {
             new() { Code = "DNC", Display = ScoreCodeDisplay.Hidden }
@@ -218,7 +216,7 @@ public class SeriesResultsTemplateControllerTests
             {
                 new() { Id = Guid.NewGuid(), Name = "Fleet" }
             });
-        _scoringServiceMock.Setup(s => s.GetScoreCodesAsync(_clubId))
+        _templateServiceMock.Setup(s => s.GetClubScoreCodesAsync(_clubId))
             .ReturnsAsync(new List<ScoreCode> { new() { Name = "DNC" } });
 
         var result = await _controller.Edit(ClubInitials, template.Id, reset: true);
@@ -228,7 +226,7 @@ public class SeriesResultsTemplateControllerTests
         Assert.Equal(template.Id, vm.Id);
         Assert.Equal("Busy", vm.Name);
         Assert.True(vm.HighlightTopThree);
-        Assert.Equal(ResultsTextColor.Default, vm.DiscardColor);
+        Assert.True(vm.DiscardFaded);
         Assert.Equal(ScoreCodeDisplay.CodeAndPoints, Assert.Single(vm.ScoreCodes).Display);
         Assert.False(Assert.Single(vm.CustomFieldSelections).Selected);
         _competitorFieldServiceMock.Verify(s => s.GetTemplateSelectionsAsync(It.IsAny<Guid>()), Times.Never);
@@ -290,7 +288,7 @@ public class SeriesResultsTemplateControllerTests
         {
             ParticipationVisibility = ColumnVisibility.Always,
             TotalsSeparator = true,
-            DiscardColor = ResultsTextColor.Green,
+            DiscardFaded = false,
             CustomFieldSelections = new List<TemplateCustomFieldSelectionViewModel>
             {
                 new() { FieldDefinitionId = fieldId, Selected = true, Visibility = ColumnVisibility.Always },
@@ -304,7 +302,7 @@ public class SeriesResultsTemplateControllerTests
         Assert.Same(series.FlatResults, table.Results);
         Assert.Equal(ColumnVisibility.Always, table.ParticipationVisibility);
         Assert.True(table.TotalsSeparator);
-        Assert.Equal(ResultsTextColor.Green, table.DiscardColor);
+        Assert.False(table.DiscardFaded);
         Assert.True(table.ExcludeCompetitorLinks);
         Assert.Equal(fieldId, Assert.Single(table.CustomFieldColumns).FieldDefinitionId);
         _templateServiceMock.Verify(s => s.SaveTemplateAsync(It.IsAny<SeriesResultsTemplate>()), Times.Never);

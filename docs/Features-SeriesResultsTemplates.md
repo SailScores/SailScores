@@ -13,18 +13,34 @@ The feature supports:
 
 ## What can be customized
 
-Each template includes:
-- Sail Number visibility
-- Competitor Name visibility
-- Competitor Name header text (for example, `Helm`)
-- Boat Name visibility
-- Boat Name header text (for example, `Boat`)
-- Competitor Club visibility
+Each template includes (the edit form shows these as one "Columns" table, with a visibility and
+header for each column):
+- Sail Number visibility and header text (`SailNumberHeader`)
+- Alternative Sail Number visibility (`AlternativeSailNumberVisibility`, hidden by default) and
+  header text (`AlternativeSailNumberHeader`). With this column shown, the sail number column
+  always shows the main sail number, even in a series that prefers alternative numbers
+  (`ResultsTableViewModel.GetSailNumber`).
+- Competitor Name visibility and header text (for example, `Skipper`)
+- Boat Name visibility and header text (for example, `Yacht`)
+- Competitor Club visibility and header text (`CompetitorClubHeader`)
+- Total header text (`TotalHeader`). The Total column is always shown; an empty header uses the
+  scoring system's (`FlatResults.TotalHeader`, such as `Total` or `Score`).
+
+  Headers are empty by default: an empty header uses the translated default (resource keys
+  `Sail`, `Alt Sail`, `Helm`, `Boat`, `Club`; `Helm` is "Sailor(s)" in English). The migration
+  `AddResultsViewTotalHeaderAndClearDefaultHeaders` cleared the seeded `Helm` and `Boat`
+  headers so they are translated too.
+- Repeated name column: long tables repeat a competitor column among the race columns, and add
+  one at the end on smaller screens. It is the competitor name, or when that's hidden the first
+  shown of sail number, boat name and alternative sail number
+  (`ResultsTableViewModel.RepeatedColumn`); with all of them hidden there is none.
+- Show weather (`ShowWeather`, on by default): wind and weather under each race header, for
+  races that have weather entered or collected.
 
 - Race columns visibility (the race columns, or child series columns in a summary series).
   When hidden, only competitor and scoring columns (totals, participation) are shown.
 - The standard scoring columns, which every scoring system has: Pre-Discard Total
-  (`PreDiscardTotalVisibility`; percent and average systems don't have it, except PBG) and Participation
+  (`PreDiscardTotalVisibility`; every system has it, percent and average systems too) and Participation
   (`ParticipationVisibility`). Both hidden by default. Calculator-specific columns
   (penalties, averages, net points) keep their visibility from the scoring system. The rule
   is `ScoringColumns.GetVisibility`, used by the results table and the CSV export.
@@ -39,11 +55,8 @@ Each template includes:
   separate dark mode color.
 - Line between totals and races (`TotalsSeparator`): the same line before the first race (or
   child series) column, independent of the column separators setting.
-- Discarded scores: strike through and faded (both on by default), and a color
-  (`ResultsTextColor`: `Default`, `Red`, `Blue`, `Green`, `Orange`). Faded with a color keeps
-  the color, lightened. A faded score code setting still mutes a discarded score. With none
-  of the three (no strike through, not faded, normal color), discards are shown in
-  parentheses.
+- Discarded scores: strike through and faded (both on by default). A faded score code setting
+  still mutes a discarded score. With neither, discards are shown in parentheses.
 
 - Score code display, per code (`SeriesResultsTemplateScoreCode`):
   - `ScoreCodeDisplay`: `CodeAndPoints` (default), `CodeOnly` (no points), `Hidden` (blank cell),
@@ -74,7 +87,7 @@ Visibility uses `ColumnVisibility`:
   - `ClubId`
   - `Name`
   - column visibility/header fields listed above
-  - `DiscardStrikethrough`, `DiscardFaded` (both default true), `DiscardColor`
+  - `DiscardStrikethrough`, `DiscardFaded` (both default true)
   - `PreDiscardTotalVisibility`, `ParticipationVisibility` (default `Hidden`), `TotalsSeparator`
   - `ShowPreDiscardTotal`: no longer read. Saving keeps it in step with
     `PreDiscardTotalVisibility` so the previous release runs on the migrated database; drop it

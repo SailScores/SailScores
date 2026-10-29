@@ -21,5 +21,8 @@ public interface ISeriesResultsTemplateService
     // child series' for a summary series), for previewing a view.
     // Only the id, name, type, update date and season name are filled.
     Task<IList<Series>> GetPreviewSeriesAsync(Guid clubId, int count);
+    // Score codes the club has set up, on its scoring systems or the ones they inherit from, or
+    // has used in race results; one per code, by name. Only the name and description are filled.
+    Task<IList<ScoreCode>> GetClubScoreCodesAsync(Guid clubId);
     Task EnsureDefaultTemplatesForAllClubsAsync();
 }

@@ -20,7 +20,6 @@ public class SeriesResultsTemplateController : Controller
     private readonly ISeriesResultsTemplateService _templateService;
     private readonly IClubService _clubService;
     private readonly ICompetitorFieldService _competitorFieldService;
-    private readonly IScoringService _scoringService;
     private readonly ISeriesService _seriesService;
     private readonly IWebClubService _webClubService;
 
@@ -31,14 +30,12 @@ public class SeriesResultsTemplateController : Controller
         ISeriesResultsTemplateService templateService,
         IClubService clubService,
         ICompetitorFieldService competitorFieldService,
-        IScoringService scoringService,
         ISeriesService seriesService,
         IWebClubService webClubService)
     {
         _templateService = templateService;
         _clubService = clubService;
         _competitorFieldService = competitorFieldService;
-        _scoringService = scoringService;
         _seriesService = seriesService;
         _webClubService = webClubService;
     }
@@ -347,6 +344,7 @@ public class SeriesResultsTemplateController : Controller
     {
         var club = await _clubService.GetMinimalClub(clubId);
         vm.CustomFieldsEnabled = club?.EnableCustomCompetitorFields ?? false;
+        vm.AlternativeSailNumbersEnabled = club?.EnableAlternativeSailNumbers ?? false;
         vm.AvailableCustomFields = await GetFieldDefinitionsAsync(clubId);
     }
 
@@ -377,14 +375,12 @@ public class SeriesResultsTemplateController : Controller
             .ToList();
     }
 
-    // One row per score code the club's scoring systems use, plus any codes the template already
+    // One row per score code the club has set up or used, plus any codes the template already
     // has settings for, keeping the template's settings.
     private async Task LoadScoreCodesAsync(SeriesResultsTemplateViewModel vm, Guid clubId)
     {
-        var clubCodes = (await _scoringService.GetScoreCodesAsync(clubId))
-            .Where(c => !string.IsNullOrWhiteSpace(c.Name))
-            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.First().Description, StringComparer.OrdinalIgnoreCase);
+        var clubCodes = (await _templateService.GetClubScoreCodesAsync(clubId))
+            .ToDictionary(c => c.Name, c => c.Description, StringComparer.OrdinalIgnoreCase);
         var saved = (vm.ScoreCodes ?? new List<TemplateScoreCodeViewModel>())
             .Where(c => !string.IsNullOrWhiteSpace(c.Code))
             .GroupBy(c => c.Code, StringComparer.OrdinalIgnoreCase)

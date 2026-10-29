@@ -33,10 +33,10 @@
     @if (Model.IsReset)
     {
         <div class="alert alert-info" role="alert" id="resetNotice">
-            Form has been reset to SailScores defaults: a clean view with sail number, helm and boat
+            Form has been reset to SailScores defaults: a clean view with sail number, competitor and boat
             name, gold/silver/bronze places, faded and struck-through discards, all score codes shown
-            with points, and no custom fields or separators. Changes were not saved yet: use the Save
-            button to save the reset or Cancel to keep the current settings.
+            with points, and no custom fields or vertical rules. Changes are not saved yet: use the Save
+            button to apply the reset or Cancel to keep the current settings.
         </div>
     }
 
@@ -64,6 +64,12 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/seriesResultsTemplatePreview.js" asp-append-version="true"></script>
+    <script>
+        // Help popovers, opened by a tap on touch screens.
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
+            new bootstrap.Popover(el);
+        });
+    </script>
     @if (Model.IsReset)
     {
         <script>

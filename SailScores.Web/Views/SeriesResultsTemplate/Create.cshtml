@@ -44,4 +44,10 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/seriesResultsTemplatePreview.js" asp-append-version="true"></script>
+    <script>
+        // Help popovers, opened by a tap on touch screens.
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
+            new bootstrap.Popover(el);
+        });
+    </script>
 }

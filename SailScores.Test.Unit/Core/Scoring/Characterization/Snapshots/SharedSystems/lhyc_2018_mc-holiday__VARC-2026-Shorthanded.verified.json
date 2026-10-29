@@ -8,6 +8,7 @@
   "IsPercentSystem": true,
   "LowerScoreWins": false,
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)"
   ],
   "Races": [
@@ -29,6 +30,9 @@
       "Total": "300",
       "TotalIncludingDiscards": "699",
       "PointsEarned": "300",
+      "Columns": {
+        "preDiscardTotal": "699"
+      },
       "Scores": "1:100/100 | 1:100/100 | (2:99/100) | 1:100/100 | (1:100/100) | (SB 0/100) | (1:100/100) | (1:100/100) | (SB 0/100)"
     },
     {
@@ -38,6 +42,9 @@
       "Total": "295",
       "TotalIncludingDiscards": "295",
       "PointsEarned": "295",
+      "Columns": {
+        "preDiscardTotal": "295"
+      },
       "Scores": "(RC 0/100) | (RC 0/100) | 1:100/100 | (DNC 0) | (DNC 0) | (DNC 0) | 6:95/100 | (DNC 0) | 1:100/100"
     },
     {
@@ -47,6 +54,9 @@
       "Total": "295",
       "TotalIncludingDiscards": "866",
       "PointsEarned": "295",
+      "Columns": {
+        "preDiscardTotal": "866"
+      },
       "Scores": "(9:92/100) | 4:97/100 | (6:95/100) | (7:94/100) | (5:96/100) | 1:100/100 | (4:97/100) | 3:98/100 | (4:97/100)"
     },
     {
@@ -56,6 +66,9 @@
       "Total": "295",
       "TotalIncludingDiscards": "575",
       "PointsEarned": "295",
+      "Columns": {
+        "preDiscardTotal": "575"
+      },
       "Scores": "(7:94/100) | (8:94/100) | (9:92/100) | 4:97/100 | 2:99/100 | 2:99/100 | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -65,6 +78,9 @@
       "Total": "295",
       "TotalIncludingDiscards": "671",
       "PointsEarned": "295",
+      "Columns": {
+        "preDiscardTotal": "671"
+      },
       "Scores": "3:98/100 | (5:96/100) | (4:97/100) | 2:99/100 | (9:92/100) | (DNC 0) | (10:91/100) | (RC 0/100) | 3:98/100"
     },
     {
@@ -74,6 +90,9 @@
       "Total": "294",
       "TotalIncludingDiscards": "483",
       "PointsEarned": "294",
+      "Columns": {
+        "preDiscardTotal": "483"
+      },
       "Scores": "(4:97/100) | (10:92/100) | (DNC 0) | 3:98/100 | 3:98/100 | 3:98/100 | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -83,6 +102,9 @@
       "Total": "290",
       "TotalIncludingDiscards": "290",
       "PointsEarned": "290",
+      "Columns": {
+        "preDiscardTotal": "290"
+      },
       "Scores": "8:93/100 | 2:99/100 | 3:98/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -92,6 +114,9 @@
       "Total": "290",
       "TotalIncludingDiscards": "290",
       "PointsEarned": "290",
+      "Columns": {
+        "preDiscardTotal": "290"
+      },
       "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (RC 0/100) | 5:96/100 | 2:99/100 | 6:95/100"
     },
     {
@@ -101,6 +126,9 @@
       "Total": "288",
       "TotalIncludingDiscards": "465",
       "PointsEarned": "288",
+      "Columns": {
+        "preDiscardTotal": "465"
+      },
       "Scores": "(15:87/100) | 9:93/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 2:99/100 | 5:96/100 | (11:90/100)"
     },
     {
@@ -110,6 +138,9 @@
       "Total": "288",
       "TotalIncludingDiscards": "381",
       "PointsEarned": "288",
+      "Columns": {
+        "preDiscardTotal": "381"
+      },
       "Scores": "5:96/100 | 3:98/100 | 7:94/100 | (SB 0/100) | (SB 0/100) | (DNC 0) | (DNC 0) | (DNC 0) | (8:93/100)"
     },
     {
@@ -119,6 +150,9 @@
       "Total": "288",
       "TotalIncludingDiscards": "660",
       "PointsEarned": "288",
+      "Columns": {
+        "preDiscardTotal": "660"
+      },
       "Scores": "6:95/100 | 7:95/100 | (DNC 0) | (6:95/100) | (7:94/100) | (DNC 0) | 3:98/100 | (7:94/100) | (12:89/100)"
     },
     {
@@ -128,6 +162,9 @@
       "Total": "288",
       "TotalIncludingDiscards": "826",
       "PointsEarned": "288",
+      "Columns": {
+        "preDiscardTotal": "826"
+      },
       "Scores": "(13:89/100) | (15:87/100) | 5:96/100 | (9:92/100) | 4:97/100 | 6:95/100 | (11:90/100) | (8:93/100) | (14:87/100)"
     },
     {
@@ -137,6 +174,9 @@
       "Total": "287",
       "TotalIncludingDiscards": "554",
       "PointsEarned": "287",
+      "Columns": {
+        "preDiscardTotal": "554"
+      },
       "Scores": "2:99/100 | (14:88/100) | 8:93/100 | (SB 0/100) | (SB 0/100) | (SB 0/100) | (13:88/100) | 6:95/100 | (10:91/100)"
     },
     {
@@ -146,6 +186,9 @@
       "Total": "284",
       "TotalIncludingDiscards": "376",
       "PointsEarned": "284",
+      "Columns": {
+        "preDiscardTotal": "376"
+      },
       "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | 5:96/100 | (DNC 0) | 5:96/100 | 9:92/100 | (DNC 0) | (9:92/100)"
     },
     {
@@ -155,6 +198,9 @@
       "Total": "283",
       "TotalIncludingDiscards": "641",
       "PointsEarned": "283",
+      "Columns": {
+        "preDiscardTotal": "641"
+      },
       "Scores": "(12:90/100) | (13:89/100) | (DNC 0) | (10:91/100) | 6:95/100 | 7:94/100 | 7:94/100 | (DNC 0) | (13:88/100)"
     },
     {
@@ -164,6 +210,9 @@
       "Total": "279",
       "TotalIncludingDiscards": "279",
       "PointsEarned": "279",
+      "Columns": {
+        "preDiscardTotal": "279"
+      },
       "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 8:93/100 | 9:92/100 | 7:94/100"
     },
     {
@@ -173,6 +222,9 @@
       "Total": "276",
       "TotalIncludingDiscards": "447",
       "PointsEarned": "276",
+      "Columns": {
+        "preDiscardTotal": "447"
+      },
       "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (13:88/100) | 11:90/100 | 4:97/100 | 12:89/100 | (DNC 0) | (18:83/100)"
     },
     {
@@ -182,6 +234,9 @@
       "Total": "272",
       "TotalIncludingDiscards": "359",
       "PointsEarned": "272",
+      "Columns": {
+        "preDiscardTotal": "359"
+      },
       "Scores": "10:91/100 | 12:90/100 | (DNC 0) | (DNC 0) | 10:91/100 | (DNC 0) | (DNC 0) | (DNE 87/100) | (RC 0/100)"
     },
     {
@@ -191,6 +246,9 @@
       "Total": "266",
       "TotalIncludingDiscards": "520",
       "PointsEarned": "266",
+      "Columns": {
+        "preDiscardTotal": "520"
+      },
       "Scores": "16:86/100 | (16:86/100) | (DNC 0) | (DNC 0) | (DNC 0) | 11:90/100 | (15:86/100) | 11:90/100 | (19:82/100)"
     },
     {
@@ -200,6 +258,9 @@
       "Total": "266",
       "TotalIncludingDiscards": "352",
       "PointsEarned": "266",
+      "Columns": {
+        "preDiscardTotal": "352"
+      },
       "Scores": "(DNC 0) | (DNC 0) | 11:90/100 | 12:89/100 | (DNC 0) | (DNC 0) | 14:87/100 | (DNC 0) | (15:86/100)"
     },
     {
@@ -209,6 +270,9 @@
       "Total": "261",
       "TotalIncludingDiscards": "261",
       "PointsEarned": "261",
+      "Columns": {
+        "preDiscardTotal": "261"
+      },
       "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 8:93/100 | (DNC 0) | 12:89/100 | DNF 79/100"
     },
     {
@@ -218,6 +282,9 @@
       "Total": "255",
       "TotalIncludingDiscards": "255",
       "PointsEarned": "255",
+      "Columns": {
+        "preDiscardTotal": "255"
+      },
       "Scores": "(DNC 0) | (DNC 0) | (DNC 0) | 16:85/100 | 12:89/100 | (DNC 0) | (SB 0/100) | (DNC 0) | 20:81/100"
     },
     {
@@ -227,6 +294,9 @@
       "Total": "182",
       "TotalIncludingDiscards": "182",
       "PointsEarned": "182",
+      "Columns": {
+        "preDiscardTotal": "182"
+      },
       "Scores": "DNC 0 | (DNC 0) | (DNC 0) | 11:90/100 | (DNC 0) | 9:92/100 | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -236,6 +306,9 @@
       "Total": "179",
       "TotalIncludingDiscards": "179",
       "PointsEarned": "179",
+      "Columns": {
+        "preDiscardTotal": "179"
+      },
       "Scores": "14:88/100 | 11:91/100 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -245,6 +318,9 @@
       "Total": "174",
       "TotalIncludingDiscards": "174",
       "PointsEarned": "174",
+      "Columns": {
+        "preDiscardTotal": "174"
+      },
       "Scores": "DNC 0 | (DNC 0) | (DNC 0) | 15:86/100 | 13:88/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -254,6 +330,9 @@
       "Total": "99",
       "TotalIncludingDiscards": "99",
       "PointsEarned": "99",
+      "Columns": {
+        "preDiscardTotal": "99"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (RC 0/100) | (RC 0/100) | (DNC 0) | (RC 0/100) | (DNC 0) | 2:99/100"
     },
     {
@@ -263,6 +342,9 @@
       "Total": "97",
       "TotalIncludingDiscards": "97",
       "PointsEarned": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 4:97/100 | (DNC 0)"
     },
     {
@@ -272,6 +354,9 @@
       "Total": "96",
       "TotalIncludingDiscards": "96",
       "PointsEarned": "96",
+      "Columns": {
+        "preDiscardTotal": "96"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 5:96/100"
     },
     {
@@ -281,6 +366,9 @@
       "Total": "93",
       "TotalIncludingDiscards": "93",
       "PointsEarned": "93",
+      "Columns": {
+        "preDiscardTotal": "93"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | 8:93/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -290,6 +378,9 @@
       "Total": "93",
       "TotalIncludingDiscards": "93",
       "PointsEarned": "93",
+      "Columns": {
+        "preDiscardTotal": "93"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | 8:93/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -299,6 +390,9 @@
       "Total": "91",
       "TotalIncludingDiscards": "91",
       "PointsEarned": "91",
+      "Columns": {
+        "preDiscardTotal": "91"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 10:91/100 | (DNC 0)"
     },
     {
@@ -308,6 +402,9 @@
       "Total": "91",
       "TotalIncludingDiscards": "91",
       "PointsEarned": "91",
+      "Columns": {
+        "preDiscardTotal": "91"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | 10:91/100 | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -317,6 +414,9 @@
       "Total": "91",
       "TotalIncludingDiscards": "91",
       "PointsEarned": "91",
+      "Columns": {
+        "preDiscardTotal": "91"
+      },
       "Scores": "DNC 0 | DNC 0 | 10:91/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -326,6 +426,9 @@
       "Total": "87",
       "TotalIncludingDiscards": "87",
       "PointsEarned": "87",
+      "Columns": {
+        "preDiscardTotal": "87"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | 14:87/100 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -335,6 +438,9 @@
       "Total": "85",
       "TotalIncludingDiscards": "85",
       "PointsEarned": "85",
+      "Columns": {
+        "preDiscardTotal": "85"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 16:85/100"
     },
     {
@@ -344,6 +450,9 @@
       "Total": "85",
       "TotalIncludingDiscards": "85",
       "PointsEarned": "85",
+      "Columns": {
+        "preDiscardTotal": "85"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 16:85/100 | (DNC 0) | (DNC 0)"
     },
     {
@@ -353,6 +462,9 @@
       "Total": "84",
       "TotalIncludingDiscards": "84",
       "PointsEarned": "84",
+      "Columns": {
+        "preDiscardTotal": "84"
+      },
       "Scores": "DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0) | 17:84/100"
     },
     {
@@ -362,6 +474,9 @@
       "Total": "0",
       "TotalIncludingDiscards": "0",
       "PointsEarned": "0",
+      "Columns": {
+        "preDiscardTotal": "0"
+      },
       "Scores": "GST 0/100 | GST 0/100 | DNC 0 | (GST 0/100) | (GST 0/100) | (DNC 0) | (DNC 0) | (DNC 0) | (DNC 0)"
     },
     {
@@ -371,6 +486,9 @@
       "Total": "0",
       "TotalIncludingDiscards": "0",
       "PointsEarned": "0",
+      "Columns": {
+        "preDiscardTotal": "0"
+      },
       "Scores": "DNC 0 | DNC 0 | DNC 0 | (DNC 0) | (DNC 0) | (DNC 0) | (SB 0/100) | (DNC 0) | (DNC 0)"
     }
   ],

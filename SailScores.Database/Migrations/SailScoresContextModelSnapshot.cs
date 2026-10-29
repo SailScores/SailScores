@@ -1707,6 +1707,13 @@ namespace SailScores.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AlternativeSailNumberHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("AlternativeSailNumberVisibility")
+                        .HasColumnType("int");
+
                     b.Property<string>("BoatNameHeader")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -1720,6 +1727,10 @@ namespace SailScores.Database.Migrations
                     b.Property<int>("ColumnSeparators")
                         .HasColumnType("int");
 
+                    b.Property<string>("CompetitorClubHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("CompetitorClubVisibility")
                         .HasColumnType("int");
 
@@ -1728,9 +1739,6 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("CompetitorNameVisibility")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DiscardColor")
                         .HasColumnType("int");
 
                     b.Property<bool>("DiscardFaded")
@@ -1756,6 +1764,10 @@ namespace SailScores.Database.Migrations
                     b.Property<int>("RaceColumnsVisibility")
                         .HasColumnType("int");
 
+                    b.Property<string>("SailNumberHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("SailNumberVisibility")
                         .HasColumnType("int");
 
@@ -1764,6 +1776,13 @@ namespace SailScores.Database.Migrations
 
                     b.Property<bool>("ShowPreDiscardTotal")
                         .HasColumnType("bit");
+
+                    b.Property<bool>("ShowWeather")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TotalHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("TotalsSeparator")
                         .HasColumnType("bit");

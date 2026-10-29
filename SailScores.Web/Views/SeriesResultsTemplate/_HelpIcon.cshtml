@@ -1,0 +1,8 @@
+@model string
+@* A help icon with a popover; focusable, so a tap opens it on touch screens. *@
+<a tabindex="0" role="button" class="text-primary ms-1" aria-label="Help"
+   data-bs-container="body"
+   data-bs-toggle="popover"
+   data-bs-placement="top"
+   data-bs-trigger="focus hover"
+   data-bs-content="@Model"><span class="far fa-question-circle"></span></a>

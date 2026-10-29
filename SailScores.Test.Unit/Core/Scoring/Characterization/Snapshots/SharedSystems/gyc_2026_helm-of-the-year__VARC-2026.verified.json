@@ -8,6 +8,7 @@
   "IsPercentSystem": true,
   "LowerScoreWins": false,
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)"
   ],
   "Races": [
@@ -30,6 +31,9 @@
       "Total": "292",
       "TotalIncludingDiscards": "292",
       "PointsEarned": "292",
+      "Columns": {
+        "preDiscardTotal": "292"
+      },
       "Scores": "1:98/100 | 5:96/100 | - | 2:98/100 | - | - | - | - | - | -"
     },
     {
@@ -39,6 +43,9 @@
       "Total": "199",
       "TotalIncludingDiscards": "199",
       "PointsEarned": "199",
+      "Columns": {
+        "preDiscardTotal": "199"
+      },
       "Scores": "RCD 0/100 | 1:100/100 | - | 1:99/100 | - | - | - | - | - | -"
     },
     {
@@ -48,6 +55,9 @@
       "Total": "189",
       "TotalIncludingDiscards": "189",
       "PointsEarned": "189",
+      "Columns": {
+        "preDiscardTotal": "189"
+      },
       "Scores": "DNC 0 | RET 93/100 | - | 4:96/100 | - | - | - | - | - | -"
     },
     {
@@ -57,6 +67,9 @@
       "Total": "189",
       "TotalIncludingDiscards": "189",
       "PointsEarned": "189",
+      "Columns": {
+        "preDiscardTotal": "189"
+      },
       "Scores": "3:96/100 | DNF 93/100 | - | DNC 0 | - | - | - | - | - | -"
     },
     {
@@ -66,6 +79,9 @@
       "Total": "99",
       "TotalIncludingDiscards": "99",
       "PointsEarned": "99",
+      "Columns": {
+        "preDiscardTotal": "99"
+      },
       "Scores": "DNC 0 | 2:99/100 | - | DNC 0 | - | - | - | - | - | -"
     },
     {
@@ -75,6 +91,9 @@
       "Total": "98",
       "TotalIncludingDiscards": "98",
       "PointsEarned": "98",
+      "Columns": {
+        "preDiscardTotal": "98"
+      },
       "Scores": "DNC 0 | 3:98/100 | - | DNC 0 | - | - | - | - | - | -"
     },
     {
@@ -84,6 +103,9 @@
       "Total": "97",
       "TotalIncludingDiscards": "97",
       "PointsEarned": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
       "Scores": "DNC 0 | DNC 0 | - | 3:97/100 | - | - | - | - | - | -"
     },
     {
@@ -93,6 +115,9 @@
       "Total": "97",
       "TotalIncludingDiscards": "97",
       "PointsEarned": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
       "Scores": "DNC 0 | 4:97/100 | - | DNC 0 | - | - | - | - | - | -"
     },
     {
@@ -102,6 +127,9 @@
       "Total": "97",
       "TotalIncludingDiscards": "97",
       "PointsEarned": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
       "Scores": "2:97/100 | RCD 0/100 | - | DNC 0 | - | - | - | - | - | -"
     }
   ],

@@ -22,6 +22,8 @@ namespace SailScores.Core.Services
         private readonly IScoringService _scoringService;
         private readonly IHandicapService _handicapService;
         private readonly IConversionService _converter;
+        // One of the club settings' speed unit options.
+        private const string DefaultWindSpeedUnits = "knots";
         private readonly IForwarderService _forwarderService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly ISailScoresContext _dbContext;
@@ -753,19 +755,23 @@ namespace SailScores.Core.Services
             {
                 return;
             }
+            // Clubs that never chose units have settings with none; knots, as competitor pages assume.
+            var windSpeedUnits = String.IsNullOrWhiteSpace(settings.WindSpeedUnits)
+                ? DefaultWindSpeedUnits
+                : settings.WindSpeedUnits;
             foreach (var race in flatResults.Races)
             {
                 race.WindSpeed =
                     _converter.Convert(
                      race.WindSpeedMeterPerSecond,
                      _converter.MeterPerSecond,
-                     settings.WindSpeedUnits)?.ToString("N0");
+                     windSpeedUnits)?.ToString("N0");
                 race.WindGust =
                      _converter.Convert(
-                         race.WindSpeedMeterPerSecond,
+                         race.WindGustMeterPerSecond,
                          _converter.MeterPerSecond,
-                         settings.WindSpeedUnits)?.ToString("N0");
-                race.WindSpeedUnits = settings.WindSpeedUnits;
+                         windSpeedUnits)?.ToString("N0");
+                race.WindSpeedUnits = windSpeedUnits;
             }
         }
 
@@ -840,7 +846,6 @@ namespace SailScores.Core.Services
                 Columns = ScoringColumns.Resolve(
                     ScoringCalculatorRegistry.GetColumns(series.ScoringSystem?.CalculatorType),
                     series.ScoringSystem?.EffectiveSettings,
-                    series.Results.IsPercentSystem,
                     scores),
                 TotalHeader = ScoringCalculatorRegistry.Get(series.ScoringSystem?.CalculatorType).TotalHeader,
                 UnrankedShowsPoints = ScoringCalculatorRegistry.Get(series.ScoringSystem?.CalculatorType).UnrankedShowsPoints,

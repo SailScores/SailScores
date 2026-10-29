@@ -26,9 +26,6 @@ namespace SailScores.Core.Scoring
         public string TotalHeader { get; init; } = ScoringCalculatorRegistry.DefaultTotalHeader;
         // An unranked competitor's total column shows its points earned (greyed), not its average.
         public bool UnrankedShowsPoints { get; init; }
-        // Percent and average systems leave out the Pre-Discard Total column; set this for one
-        // whose race scores still add up to a meaningful total.
-        public bool IncludesPreDiscardTotal { get; init; }
     }
 
     public static class ScoringCalculatorRegistry
@@ -77,9 +74,7 @@ namespace SailScores.Core.Scoring
                     Create = Pipeline(LowPointAverages.Pbg),
                     AllowedDiscardMethods = new[] { DiscardMethod.ChildSeriesDiscardsOrPattern },
                     Columns = new[] { ScoringColumns.NetPoints, ScoringColumns.NetRaces },
-                    TotalHeader = "Score",
-                    // Race scores are places, so their sum with discards sits beside Net Points.
-                    IncludesPreDiscardTotal = true
+                    TotalHeader = "Score"
                 },
                 new ScoringCalculatorRegistration
                 {
@@ -169,13 +164,7 @@ namespace SailScores.Core.Scoring
         // The standard columns followed by the calculator's own, in display order.
         public static IEnumerable<ScoringColumnDescriptor> GetColumns(ScoringCalculatorType? calculatorType)
         {
-            var registration = Get(calculatorType);
-            var standard = registration.IncludesPreDiscardTotal
-                ? ScoringColumns.Standard.Select(c => c.Key == ScoringColumns.PreDiscardTotalKey
-                    ? ScoringColumns.PreDiscardTotalForAllSystems
-                    : c)
-                : ScoringColumns.Standard;
-            return standard.Concat(registration.Columns);
+            return ScoringColumns.Standard.Concat(Get(calculatorType).Columns);
         }
 
         // Every column the edit form might show, for any calculator.

@@ -305,27 +305,6 @@ span.discardmuted {
     --bs-offcanvas-height: 45vh;
 }
 
-/* Discard colors from the results template; dark mode in _dark-mode.scss */
-span.discard-red {
-    color: #c62828;
-}
-
-span.discard-blue {
-    color: #1565c0;
-}
-
-span.discard-green {
-    color: #2e7d32;
-}
-
-span.discard-orange {
-    color: #c25e00;
-}
-
-span.discard-faded {
-    opacity: 0.6;
-}
-
 .abandoned {
     background: #FFBBBB !important;
     align-content: center !important;

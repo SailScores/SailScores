@@ -27,7 +27,7 @@ public class ScoringColumnsTests
     {
         var scores = new List<FlatSeriesScore> { MakeScore(12m, 75m) };
 
-        var columns = ScoringColumns.Resolve(ScoringColumns.Standard, null, false, scores);
+        var columns = ScoringColumns.Resolve(ScoringColumns.Standard, null, scores);
 
         Assert.Equal(
             new[] { ScoringColumns.PreDiscardTotalKey, ScoringColumns.ParticipationKey },
@@ -38,24 +38,13 @@ public class ScoringColumnsTests
     }
 
     [Fact]
-    public void Resolve_PercentSystem_LeavesOutPreDiscardTotal()
-    {
-        var scores = new List<FlatSeriesScore> { MakeScore(12m, 75m) };
-
-        var columns = ScoringColumns.Resolve(ScoringColumns.Standard, null, true, scores);
-
-        Assert.Equal(new[] { ScoringColumns.ParticipationKey }, columns.Select(c => c.Key));
-        Assert.False(scores[0].ColumnValues.ContainsKey(ScoringColumns.PreDiscardTotalKey));
-    }
-
-    [Fact]
     public void Resolve_SettingsVisibility_OverridesDefault()
     {
         var settings = new ScoringSystemSettings();
         settings.ColumnVisibilities[ScoringColumns.ParticipationKey] = ColumnVisibility.OnLargerScreens;
 
         var columns = ScoringColumns.Resolve(
-            ScoringColumns.Standard, settings, false, new List<FlatSeriesScore> { MakeScore() });
+            ScoringColumns.Standard, settings, new List<FlatSeriesScore> { MakeScore() });
 
         Assert.Equal(ColumnVisibility.OnLargerScreens,
             columns.Single(c => c.Key == ScoringColumns.ParticipationKey).Visibility);
@@ -68,7 +57,7 @@ public class ScoringColumnsTests
     {
         var scores = new List<FlatSeriesScore> { MakeScore() };
 
-        var columns = ScoringColumns.Resolve(new[] { ScoringColumns.Penalties }, null, true, scores);
+        var columns = ScoringColumns.Resolve(new[] { ScoringColumns.Penalties }, null, scores);
 
         Assert.Empty(columns);
     }
@@ -83,7 +72,7 @@ public class ScoringColumnsTests
         };
         var scores = new List<FlatSeriesScore> { MakeScore(), penalized };
 
-        var columns = ScoringColumns.Resolve(new[] { ScoringColumns.Penalties }, null, true, scores);
+        var columns = ScoringColumns.Resolve(new[] { ScoringColumns.Penalties }, null, scores);
 
         var column = Assert.Single(columns);
         Assert.Equal(ColumnVisibility.Always, column.Visibility);

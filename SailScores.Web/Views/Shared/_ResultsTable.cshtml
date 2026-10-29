@@ -21,6 +21,18 @@
         .ToList();
     // Calculator-specific columns after the total, with visibility from the scoring system.
     var scoringColumns = Model?.VisibleScoringColumns ?? new List<FlatResultColumn>();
+    string HeaderOrDefault(string header, string defaultKey) =>
+        string.IsNullOrWhiteSpace(header) ? localizer[defaultKey] : header;
+    var repeatedColumn = Model?.RepeatedColumn ?? RepeatedCompetitorColumn.None;
+    var repeatedHeader = repeatedColumn switch
+    {
+        RepeatedCompetitorColumn.CompetitorName => HeaderOrDefault(Model.CompetitorNameHeader, "Helm"),
+        RepeatedCompetitorColumn.SailNumber => HeaderOrDefault(Model.SailNumberHeader, "Sail"),
+        RepeatedCompetitorColumn.BoatName => HeaderOrDefault(Model.BoatNameHeader, "Boat"),
+        RepeatedCompetitorColumn.AlternativeSailNumber => HeaderOrDefault(Model.AlternativeSailNumberHeader, "Alt Sail"),
+        _ => null
+    };
+    var showRepeatedColumn = repeatedColumn != RepeatedCompetitorColumn.None;
 }
 
 @using System.Collections.Generic
@@ -46,19 +58,23 @@
                     }
                     @if (Model.SailNumberVisibility != ColumnVisibility.Hidden)
                     {
-                        <th scope="col" class="@Model.SailNumberVisibility.ToCssClass()">@localizer["Sail"]</th>
+                        <th scope="col" class="@Model.SailNumberVisibility.ToCssClass()">@HeaderOrDefault(Model.SailNumberHeader, "Sail")</th>
+                    }
+                    @if (Model.AlternativeSailNumberVisibility != ColumnVisibility.Hidden)
+                    {
+                        <th scope="col" class="@Model.AlternativeSailNumberVisibility.ToCssClass()">@HeaderOrDefault(Model.AlternativeSailNumberHeader, "Alt Sail")</th>
                     }
                     @if (Model.CompetitorNameVisibility != ColumnVisibility.Hidden)
                     {
-                        <th scope="col" class="@Model.CompetitorNameVisibility.ToCssClass()">@Model.CompetitorNameHeader</th>
+                        <th scope="col" class="@Model.CompetitorNameVisibility.ToCssClass()">@HeaderOrDefault(Model.CompetitorNameHeader, "Helm")</th>
                     }
                     @if (Model.BoatNameVisibility != ColumnVisibility.Hidden)
                     {
-                        <th scope="col" class="@Model.BoatNameVisibility.ToCssClass()">@Model.BoatNameHeader</th>
+                        <th scope="col" class="@Model.BoatNameVisibility.ToCssClass()">@HeaderOrDefault(Model.BoatNameHeader, "Boat")</th>
                     }
                     @if (Model.CompetitorClubVisibility != ColumnVisibility.Hidden)
                     {
-                        <th scope="col" class="@Model.CompetitorClubVisibility.ToCssClass()">@localizer["Club"]</th>
+                        <th scope="col" class="@Model.CompetitorClubVisibility.ToCssClass()">@HeaderOrDefault(Model.CompetitorClubHeader, "Club")</th>
                     }
                     @foreach (var customField in customFieldColumns)
                     {
@@ -67,7 +83,7 @@
                             : customField.FieldDefinitionId.ToString("D").Substring(0, 8);
                         <th scope="col" class="@customField.Visibility.ToCssClass()">@headerText</th>
                     }
-                    <th scope="col" class="text-center">@localizer[Model?.Results?.TotalHeader ?? "Total"]</th>
+                    <th scope="col" class="text-center">@HeaderOrDefault(Model.TotalHeader, Model.Results?.TotalHeader ?? "Total")</th>
                     @foreach (var scoringColumn in scoringColumns)
                     {
                         <th scope="col" class="text-center @scoringColumn.Visibility.ToCssClass()">@localizer[scoringColumn.Header]</th>
@@ -83,14 +99,14 @@
                     {
                         ++colCount;
                         var raceColumnClass = Model.RaceColumnCssClass(colCount - 1);
-                        if (!needCompNameColumn)
+                        if (!needCompNameColumn && showRepeatedColumn)
                         {
                             needCompNameColumn = colCount % 23 == 20 && (Model.Results.NumberOfSailedRaces - colCount) > 10;
                         }
                         if (needCompNameColumn && (race.Date != prevRaceDate || colCount % 23 == 4 ))
                         {
                             needCompNameColumn = false;
-                            <th scope="col" class="@(Model.HasSeparatorBefore(colCount - 1) ? "results-separator" : null)">@Model.CompetitorNameHeader</th>
+                            <th scope="col" class="@(Model.HasSeparatorBefore(colCount - 1) ? "results-separator" : null)">@repeatedHeader</th>
                         }
                         if (race.State == RaceState.Abandoned || race.State == RaceState.Scheduled)
                         {
@@ -109,6 +125,8 @@
                                                  @localizer.GetShortName(race, Model.DefaultDateFormat)
                                                  , "Details", "Race", new { id = race.Id })
                                     }
+                                    @if (Model.ShowWeather)
+                                    {
                                     <div class="weather">
                                         @if (race.WindDirectionDegrees.HasValue)
                                         {
@@ -126,6 +144,7 @@
                                             <span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
                                         }
                                     </div>
+                                    }
                                 }
                             </th>
                         }
@@ -149,6 +168,8 @@
                                         , "Details", "Race", new { id = race.Id })
                                     }
                                     <br />
+                                    @if (Model.ShowWeather)
+                                    {
                                     <div class="weather">
                                         @if (race.WindDirectionDegrees.HasValue)
                                         {
@@ -161,15 +182,16 @@
                                             <br /><span class="wi @weatherService.GetIconCharacter(race.WeatherIcon) ss-wi"></span>
                                         }
                                     </div>
+                                    }
                                 }
                             </th>
                         }
                         prevRaceDate = race.Date;
                     }
-                    @if (Model.ShowRaceColumns && (Model.Results.NumberOfSailedRaces) > 4)
+                    @if (Model.ShowRaceColumns && showRepeatedColumn && (Model.Results.NumberOfSailedRaces) > 4)
                     {
                         <th scope="col" class="d-table-cell @((Model.Results.NumberOfSailedRaces < 25)?"d-md-none":"")">
-                            @Model.CompetitorNameHeader
+                            @repeatedHeader
                         </th>
                     }
                 </tr>
@@ -233,17 +255,11 @@
                     }
                     @if (Model.SailNumberVisibility != ColumnVisibility.Hidden)
                     {
-                        <th scope="row" class="@Model.SailNumberVisibility.ToCssClass()">
-                            @if ((Model.PreferAlternativeSailNumbers)
-                         && !String.IsNullOrWhiteSpace(comp.AlternativeSailNumber))
-                            {
-                                @comp.AlternativeSailNumber
-                            }
-                            else
-                            {
-                                @comp.SailNumber
-                            }
-                        </th>
+                        <th scope="row" class="@Model.SailNumberVisibility.ToCssClass()">@Model.GetSailNumber(comp)</th>
+                    }
+                    @if (Model.AlternativeSailNumberVisibility != ColumnVisibility.Hidden)
+                    {
+                        <td class="@Model.AlternativeSailNumberVisibility.ToCssClass()">@comp.AlternativeSailNumber</td>
                     }
                     @if (Model.CompetitorNameVisibility != ColumnVisibility.Hidden)
                     {
@@ -331,14 +347,14 @@
                     {
                         ++colCount;
                         var raceColumnClass = Model.RaceColumnCssClass(colCount - 1);
-                        if (!needCompNameColumn)
+                        if (!needCompNameColumn && showRepeatedColumn)
                         {
                                 needCompNameColumn = colCount % 23 == 20 && (Model.Results.NumberOfSailedRaces - colCount) > 10;
                         }
                         if (needCompNameColumn && (race.Date != prevRaceDate || colCount % 23 == 4))
                         {
                             needCompNameColumn = false;
-                            <td class="@(Model.HasSeparatorBefore(colCount - 1) ? "results-separator" : null)">@comp.Name</td>
+                            <td class="@(Model.HasSeparatorBefore(colCount - 1) ? "results-separator" : null)">@Model.GetRepeatedValue(comp)</td>
 
                         }
                         if (race.State == RaceState.Abandoned)
@@ -379,10 +395,10 @@
                         }
                         prevRaceDate = race.Date;
                     }
-                    @if (Model.ShowRaceColumns && (Model.Results.NumberOfSailedRaces) > 4)
+                    @if (Model.ShowRaceColumns && showRepeatedColumn && (Model.Results.NumberOfSailedRaces) > 4)
                     {
                         <th class="d-table-cell @(( Model.Results.NumberOfSailedRaces < 25)?"d-md-none":"")"
-                        scope="row">@comp.Name</th>
+                        scope="row">@Model.GetRepeatedValue(comp)</th>
                     }
                     @{
                         firstRow = false;

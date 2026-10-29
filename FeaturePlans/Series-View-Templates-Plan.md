@@ -127,10 +127,9 @@ the new CSS.
       to another view, summary series use that one. The view gets a "Summary default" badge
       and can't be deleted.
 - [x] Edit page "Discarded scores": strike through off shows discards without the line;
-      faded off shows them in normal text; each color (red, blue, green, orange) shows in
-      light and dark mode, lightened when faded is also on. Existing views still show faded,
-      struck-through discards. With strike through and faded off and color Normal,
-      discards show in parentheses, e.g. "(DNC 8)".
+      faded off shows them in normal text. Existing views still show faded, struck-through
+      discards. With strike through and faded off, discards show in parentheses,
+      e.g. "(DNC 8)".
 - [x] Edit page "Reset to defaults": the form shows the default settings with the explanation
       and keeps the name; Cancel leaves the view unchanged; Save applies the defaults (custom
       fields cleared, score codes all "Code and points").
@@ -209,10 +208,66 @@ back) changed the look of no series: all 101 hiding series now hide through thei
 
 ### I. Participation races and series info width
 
-- [ ] A series with a participation percent, after recalculating: the info under the title
+- [x] A series with a participation percent, after recalculating: the info under the title
   reads "50% participation (10 races) required for ranking". For PBG the count is after
   discards (half of the races less the most discards a boat could have). Series not yet
   recalculated show only the percent.
-- [ ] The same text in the series and regatta HTML exports and on the WhatIf page.
-- [ ] Not signed in (or without edit rights): the series info runs the full width. With the
+- [x] The same text in the series and regatta HTML exports and on the WhatIf page.
+- [x] Not signed in (or without edit rights): the series info runs the full width. With the
   New Race panel shown, it wraps beside the panel as before.
+
+### J. Combined columns, alternative sail number, headers and weather
+
+- [x] Run the migration `AddResultsViewSailNumberClubHeadersAndWeather`. Existing views still
+  show weather under the race headers, have no alternative sail number column, and show the
+  usual Sail and Club headers.
+- [x] Edit page: one "Columns" table lists every column with Show and Header. Header boxes for
+  Sail Number, Alternative Sail Number and Competitor Club start blank, with the default as
+  placeholder; Pre-Discard Total and Participation have no header box. The Alternative Sail
+  Number row notes when alternative sail numbers are off in club settings.
+- [x] Custom Sail Number, Alt Sail and Club headers appear in the results table and preview;
+  clearing one goes back to the default (translated) header. The index list shows custom Sail
+  and Club headers under their badges. The regatta competitor list uses them too.
+- [x] Alternative sail number column shown (both visibilities): it lists each boat's
+  alternative number. In a regatta preferring alternative numbers, the sail number column then
+  shows the main number; with the column hidden, it shows the alternative as before.
+- [x] Show weather off (help says "where weather was entered"): no wind or weather icons under race headers (normal, abandoned and
+  scheduled races). On: shown only for races that have weather.
+- [x] Run `AddResultsViewTotalHeaderAndClearDefaultHeaders`. Views that had "Helm" and "Boat"
+  now have blank headers: results show "Sailor(s)" and "Boat" in English, translated in other
+  club languages. Custom headers (e.g. "Skipper") are kept.
+- [x] Edit page: header placeholders show the defaults in the club's language. A Score row
+  (always shown) takes a header; blank uses the scoring system's (Total, Score, …). A custom
+  total header shows in the results table and preview.
+- [x] Series with more than 4 races (repeated column on small screens) and one with 30+
+  races (repeated mid-table): with Competitor Name hidden the repeated column is Sail Number,
+  then Boat Name, then Alt Sail, with that column's header and values; with all four hidden,
+  no repeated columns.
+- [x] Pre-Discard Total for percent and average systems: recalculate a series using High
+  Point Sum / Top X / Low Point Average / High Point Percentage, turn the column on in its
+  view, and check it's the sum of all race scores (Low Point Average without DNCs: DNCs
+  count 0). Series not yet recalculated don't have the column.
+
+### K. Results Display page and view form on small screens
+
+- [ ] Results Display page: "Back to Settings" has a back arrow; the default selectors read
+  Standard Series / Regattas / Summary Series. The views list has only Name and Actions, with
+  no sideways scroll on a phone. Edit uses the pencil icon.
+- [ ] Each view lists its shown competitor columns by header (custom headers used, hidden ones
+  left out, a desktop icon for "On Larger Screens"). A second line names settings that differ
+  from a new view: race columns, Pre-Discard Total, Participation, custom fields shown, some
+  scores hidden, some codes restyled, no weather, club logo. A view left at the defaults has
+  no second line.
+- [ ] View create and edit at phone width: each setting wraps onto its own rows, with no
+  tables; section boxes have the same background throughout. From tablet width, Columns has
+  Column / Show / Header titles.
+- [ ] Help icons open on hover and on a tap, and close on the next tap. Tapping one beside a
+  checkbox doesn't tick it. The Alternative Sail Number help mentions the regatta's "Prefer
+  Alternative Sail Numbers" (the regatta edit checkbox now uses that wording).
+- [ ] Custom field rows: tapping the field name ticks its checkbox; visibility and Order still
+  save.
+- [ ] Score codes lists only the club's codes: those on its scoring systems and the systems
+  they inherit from, plus codes used in its race results. Codes only on unrelated shared
+  systems are gone; a code the view already has a setting for is still listed.
+- [ ] A club whose weather settings have no wind units: its series pages open, with wind in
+  knots. Gusts show the gust, not the wind speed.

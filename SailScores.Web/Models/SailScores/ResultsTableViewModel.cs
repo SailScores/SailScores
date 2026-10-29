@@ -19,11 +19,18 @@ public class ResultsTableViewModel
 
     // Column visibility settings from template
     public ColumnVisibility SailNumberVisibility { get; set; } = ColumnVisibility.Always;
+    // Custom header text; null or empty uses the default, translated header.
+    public string SailNumberHeader { get; set; }
+    public ColumnVisibility AlternativeSailNumberVisibility { get; set; } = ColumnVisibility.Hidden;
+    public string AlternativeSailNumberHeader { get; set; }
     public ColumnVisibility CompetitorNameVisibility { get; set; } = ColumnVisibility.Always;
-    public string CompetitorNameHeader { get; set; } = "Helm";
+    public string CompetitorNameHeader { get; set; }
     public ColumnVisibility BoatNameVisibility { get; set; } = ColumnVisibility.OnLargerScreens;
-    public string BoatNameHeader { get; set; } = "Boat";
+    public string BoatNameHeader { get; set; }
     public ColumnVisibility CompetitorClubVisibility { get; set; } = ColumnVisibility.Hidden;
+    public string CompetitorClubHeader { get; set; }
+    // Null or empty uses the scoring system's total header.
+    public string TotalHeader { get; set; }
     public IList<SeriesResultsTemplateCustomField> CustomFieldColumns { get; set; } = new List<SeriesResultsTemplateCustomField>();
     public IDictionary<Guid, CompetitorFieldDefinition> CustomFieldDefinitions { get; set; } = new Dictionary<Guid, CompetitorFieldDefinition>();
 
@@ -36,6 +43,34 @@ public class ResultsTableViewModel
     public bool ExcludeCompetitorLinks { get; set; }
 
     public bool PreferAlternativeSailNumbers { get; set; }
+
+    // The sail number column shows the alternative number when the series prefers it, unless
+    // the alternative number has its own column.
+    public string GetSailNumber(FlatCompetitor competitor) =>
+        PreferAlternativeSailNumbers
+            && AlternativeSailNumberVisibility == ColumnVisibility.Hidden
+            && !string.IsNullOrWhiteSpace(competitor?.AlternativeSailNumber)
+            ? competitor.AlternativeSailNumber
+            : competitor?.SailNumber;
+
+    // The column repeated among the race columns of a long table, so rows can still be read:
+    // the competitor name, or when it's hidden, the first shown of sail number, boat name and
+    // alternative sail number. None when all of them are hidden.
+    public RepeatedCompetitorColumn RepeatedColumn =>
+        CompetitorNameVisibility != ColumnVisibility.Hidden ? RepeatedCompetitorColumn.CompetitorName
+        : SailNumberVisibility != ColumnVisibility.Hidden ? RepeatedCompetitorColumn.SailNumber
+        : BoatNameVisibility != ColumnVisibility.Hidden ? RepeatedCompetitorColumn.BoatName
+        : AlternativeSailNumberVisibility != ColumnVisibility.Hidden ? RepeatedCompetitorColumn.AlternativeSailNumber
+        : RepeatedCompetitorColumn.None;
+
+    public string GetRepeatedValue(FlatCompetitor competitor) => RepeatedColumn switch
+    {
+        RepeatedCompetitorColumn.CompetitorName => competitor?.Name,
+        RepeatedCompetitorColumn.SailNumber => GetSailNumber(competitor),
+        RepeatedCompetitorColumn.BoatName => competitor?.BoatName,
+        RepeatedCompetitorColumn.AlternativeSailNumber => competitor?.AlternativeSailNumber,
+        _ => null
+    };
 
     // From the results template: the scoring columns every scoring system has.
     public ColumnVisibility PreDiscardTotalVisibility { get; set; } = ColumnVisibility.Hidden;
@@ -59,6 +94,7 @@ public class ResultsTableViewModel
     public ResultsColumnSeparator ColumnSeparators { get; set; } = ResultsColumnSeparator.None;
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
     public bool TotalsSeparator { get; set; }
+    public bool ShowWeather { get; set; } = true;
 
     public bool ShowRaceColumns => RaceColumnsVisibility != ColumnVisibility.Hidden;
 
@@ -72,17 +108,12 @@ public class ResultsTableViewModel
 
     public bool DiscardStrikethrough { get; set; } = true;
     public bool DiscardFaded { get; set; } = true;
-    public ResultsTextColor DiscardColor { get; set; } = ResultsTextColor.Default;
 
-    // CSS classes for a discarded score. Faded alone is the usual gray; faded with a color
-    // keeps the color, lightened.
-    public string DiscardCssClass => DiscardColor == ResultsTextColor.Default
-        ? (DiscardFaded ? "discardmuted" : string.Empty)
-        : $"discard-{DiscardColor.ToString().ToLowerInvariant()}{(DiscardFaded ? " discard-faded" : "")}";
+    // CSS class for a discarded score.
+    public string DiscardCssClass => DiscardFaded ? "discardmuted" : string.Empty;
 
     // With no other discard styling, discards are shown in parentheses.
-    public bool DiscardParentheses =>
-        !DiscardStrikethrough && !DiscardFaded && DiscardColor == ResultsTextColor.Default;
+    public bool DiscardParentheses => !DiscardStrikethrough && !DiscardFaded;
 
     public IDictionary<string, SeriesResultsTemplateScoreCode> ScoreCodeDisplays { get; set; } =
         new Dictionary<string, SeriesResultsTemplateScoreCode>(StringComparer.OrdinalIgnoreCase);
@@ -95,20 +126,25 @@ public class ResultsTableViewModel
     public ResultsTableViewModel WithTemplate(ResolvedTemplate template)
     {
         SailNumberVisibility = template.SailNumberVisibility;
+        SailNumberHeader = template.SailNumberHeader;
+        AlternativeSailNumberVisibility = template.AlternativeSailNumberVisibility;
+        AlternativeSailNumberHeader = template.AlternativeSailNumberHeader;
         CompetitorNameVisibility = template.CompetitorNameVisibility;
         CompetitorNameHeader = template.CompetitorNameHeader;
         BoatNameVisibility = template.BoatNameVisibility;
         BoatNameHeader = template.BoatNameHeader;
         CompetitorClubVisibility = template.CompetitorClubVisibility;
+        CompetitorClubHeader = template.CompetitorClubHeader;
+        TotalHeader = template.TotalHeader;
         PreDiscardTotalVisibility = template.PreDiscardTotalVisibility;
         ParticipationVisibility = template.ParticipationVisibility;
         HighlightTopThree = template.HighlightTopThree;
         ColumnSeparators = template.ColumnSeparators;
         RaceColumnsVisibility = template.RaceColumnsVisibility;
         TotalsSeparator = template.TotalsSeparator;
+        ShowWeather = template.ShowWeather;
         DiscardStrikethrough = template.DiscardStrikethrough;
         DiscardFaded = template.DiscardFaded;
-        DiscardColor = template.DiscardColor;
         ScoreCodeDisplays = template.ScoreCodes;
         return this;
     }
@@ -148,4 +184,13 @@ public class ResultsTableViewModel
     public string TrendLegend { get; set; }
     public DateTime? UpdatedDate { get; set; }
     public string DefaultDateFormat { get; set; }
+}
+
+public enum RepeatedCompetitorColumn
+{
+    None,
+    CompetitorName,
+    SailNumber,
+    BoatName,
+    AlternativeSailNumber
 }

@@ -131,7 +131,6 @@ Add a `ScoringCalculatorRegistration` in `ScoringCalculatorRegistry` with `Creat
 | `AllowedDiscardMethods` | Defaults to the pattern methods. With exactly one method the dropdown is hidden. |
 | `Columns` | Extra `ScoringColumnDescriptor`s after the standard ones (Pre-Discard Total, Participation). Define them in `ScoringColumns`. |
 | `TotalHeader` | Heading of the total column (default `"Total"`; PBG uses `"Score"`). |
-| `IncludesPreDiscardTotal` | Percent and average systems leave out the Pre-Discard Total column. Set this for one whose race scores still add up to a meaningful total (PBG does). |
 | `CustomSettingsPartial` | Only for settings the generic field renderer can't handle. |
 
 The Edit page, its client-side script (`Scripts/scoringSystemSettings.ts`), validation (`GetValidationErrors`) and the removal of unused settings on save all come from the registration. They usually need no changes.

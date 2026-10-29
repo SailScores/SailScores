@@ -641,5 +641,34 @@ public class SeriesServiceTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task GetHistoricalResults_ClubWithoutWindUnits_ConvertsWindToKnots()
+    {
+        var club = _context.Clubs.First();
+        club.WeatherSettings = new Database.Entities.WeatherSettings();
+        var seriesId = _context.Series.First(s => s.ClubId == club.Id).Id;
+        _context.HistoricalResults.Add(new Database.Entities.HistoricalResults
+        {
+            Id = Guid.NewGuid(), SeriesId = seriesId, IsCurrent = true, Created = DateTime.UtcNow,
+            Results = Newtonsoft.Json.JsonConvert.SerializeObject(new FlatResults
+            {
+                Races = new List<FlatRace>
+                {
+                    new() { Id = Guid.NewGuid(), WindSpeedMeterPerSecond = 5m, WindGustMeterPerSecond = 8m }
+                }
+            })
+        });
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        _mockConversionService.Setup(c => c.MeterPerSecond).Returns("MetersPerSecond");
+        _mockConversionService
+            .Setup(c => c.Convert(It.IsAny<decimal?>(), "MetersPerSecond", "knots"))
+            .Returns((decimal? measure, string _, string _) => measure * 2);
 
+        var results = await _service.GetHistoricalResults(club.Id, seriesId);
+
+        var race = results.Races.Single();
+        Assert.Equal("10", race.WindSpeed);
+        Assert.Equal("16", race.WindGust);
+        Assert.Equal("knots", race.WindSpeedUnits);
+    }
 }

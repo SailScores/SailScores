@@ -9,6 +9,7 @@
   "LowerScoreWins": true,
   "PercentRequired": "51",
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)",
     "penalties: Penalties (Decimal, Always)",
     "averageFinish: Average (Decimal, Always)",
@@ -40,7 +41,8 @@
       "Columns": {
         "averageFinish": "1",
         "averageWithPenalties": "1",
-        "participation": "100"
+        "participation": "100",
+        "preDiscardTotal": "3"
       },
       "Scores": "(RCD 1/1) | 1/1 | - | 1/1 | - | - | - | - | - | -"
     },
@@ -57,7 +59,8 @@
       "Columns": {
         "averageFinish": "3.5",
         "averageWithPenalties": "3.5",
-        "participation": "100"
+        "participation": "100",
+        "preDiscardTotal": "8"
       },
       "Scores": "(1/1) | 5/1 | - | 2/1 | - | - | - | - | - | -"
     },
@@ -74,7 +77,8 @@
       "Columns": {
         "averageFinish": "6",
         "averageWithPenalties": "6",
-        "participation": "100"
+        "participation": "100",
+        "preDiscardTotal": "18"
       },
       "Scores": "(DNP 6) | RET 8/1 | - | 4/1 | - | - | - | - | - | -"
     },
@@ -88,7 +92,8 @@
       "Columns": {
         "averageWithPenalties": "4",
         "participation": "0",
-        "penalties": "1 x 8"
+        "penalties": "1 x 8",
+        "preDiscardTotal": "10"
       },
       "Scores": "(2/1) | RCD null/1 | - | DNP null | - | - | - | - | - | -"
     },
@@ -103,7 +108,8 @@
       "Columns": {
         "averageFinish": "8",
         "averageWithPenalties": "8",
-        "participation": "50"
+        "participation": "50",
+        "preDiscardTotal": "19"
       },
       "Scores": "(3/1) | DNF 8/1 | - | DNP 8 | - | - | - | - | - | -"
     },
@@ -118,7 +124,8 @@
       "Columns": {
         "averageFinish": "4",
         "averageWithPenalties": "4",
-        "participation": "50"
+        "participation": "50",
+        "preDiscardTotal": "12"
       },
       "Scores": "(DNP 4) | 4/1 | - | DNP 4 | - | - | - | - | - | -"
     },
@@ -133,7 +140,8 @@
       "Columns": {
         "averageFinish": "3",
         "averageWithPenalties": "3",
-        "participation": "50"
+        "participation": "50",
+        "preDiscardTotal": "9"
       },
       "Scores": "(DNP 3) | 3/1 | - | DNP 3 | - | - | - | - | - | -"
     },
@@ -148,7 +156,8 @@
       "Columns": {
         "averageFinish": "2",
         "averageWithPenalties": "2",
-        "participation": "50"
+        "participation": "50",
+        "preDiscardTotal": "6"
       },
       "Scores": "(DNP 2) | 2/1 | - | DNP 2 | - | - | - | - | - | -"
     },
@@ -163,7 +172,8 @@
       "Columns": {
         "averageFinish": "3",
         "averageWithPenalties": "3",
-        "participation": "50"
+        "participation": "50",
+        "preDiscardTotal": "9"
       },
       "Scores": "(DNP 3) | DNP 3 | - | 3/1 | - | - | - | - | - | -"
     }

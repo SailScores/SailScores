@@ -29,11 +29,16 @@ public static class SeriesResultsTemplateHelper
         return new ResolvedTemplate
         {
             SailNumberVisibility = effectiveTemplate.SailNumberVisibility,
+            SailNumberHeader = effectiveTemplate.SailNumberHeader,
+            AlternativeSailNumberVisibility = effectiveTemplate.AlternativeSailNumberVisibility,
+            AlternativeSailNumberHeader = effectiveTemplate.AlternativeSailNumberHeader,
             CompetitorNameVisibility = effectiveTemplate.CompetitorNameVisibility,
-            CompetitorNameHeader = effectiveTemplate.CompetitorNameHeader ?? "Helm",
+            CompetitorNameHeader = effectiveTemplate.CompetitorNameHeader,
             BoatNameVisibility = effectiveTemplate.BoatNameVisibility,
-            BoatNameHeader = effectiveTemplate.BoatNameHeader ?? "Boat",
+            BoatNameHeader = effectiveTemplate.BoatNameHeader,
             CompetitorClubVisibility = effectiveTemplate.CompetitorClubVisibility,
+            CompetitorClubHeader = effectiveTemplate.CompetitorClubHeader,
+            TotalHeader = effectiveTemplate.TotalHeader,
             PreDiscardTotalVisibility = effectiveTemplate.PreDiscardTotalVisibility,
             ParticipationVisibility = effectiveTemplate.ParticipationVisibility,
             ShowClubLogo = effectiveTemplate.ShowClubLogo,
@@ -41,9 +46,9 @@ public static class SeriesResultsTemplateHelper
             ColumnSeparators = effectiveTemplate.ColumnSeparators,
             RaceColumnsVisibility = effectiveTemplate.RaceColumnsVisibility,
             TotalsSeparator = effectiveTemplate.TotalsSeparator,
+            ShowWeather = effectiveTemplate.ShowWeather,
             DiscardStrikethrough = effectiveTemplate.DiscardStrikethrough,
             DiscardFaded = effectiveTemplate.DiscardFaded,
-            DiscardColor = effectiveTemplate.DiscardColor,
             ScoreCodes = (effectiveTemplate.ScoreCodes ?? new List<SeriesResultsTemplateScoreCode>())
                 .Where(c => !string.IsNullOrWhiteSpace(c.Code))
                 .GroupBy(c => c.Code, StringComparer.OrdinalIgnoreCase)
@@ -56,10 +61,9 @@ public static class SeriesResultsTemplateHelper
         return new ResolvedTemplate
         {
             SailNumberVisibility = ColumnVisibility.Always,
+            AlternativeSailNumberVisibility = ColumnVisibility.Hidden,
             CompetitorNameVisibility = ColumnVisibility.Always,
-            CompetitorNameHeader = "Helm",
             BoatNameVisibility = ColumnVisibility.OnLargerScreens,
-            BoatNameHeader = "Boat",
             CompetitorClubVisibility = isRegatta ? ColumnVisibility.OnLargerScreens : ColumnVisibility.Hidden,
             PreDiscardTotalVisibility = ColumnVisibility.Hidden,
             ParticipationVisibility = ColumnVisibility.Hidden,
@@ -68,9 +72,9 @@ public static class SeriesResultsTemplateHelper
             ColumnSeparators = ResultsColumnSeparator.None,
             RaceColumnsVisibility = ColumnVisibility.Always,
             TotalsSeparator = false,
+            ShowWeather = true,
             DiscardStrikethrough = true,
             DiscardFaded = true,
-            DiscardColor = ResultsTextColor.Default,
         };
     }
 }
@@ -78,11 +82,18 @@ public static class SeriesResultsTemplateHelper
 public class ResolvedTemplate
 {
     public ColumnVisibility SailNumberVisibility { get; set; }
+    // Null or empty uses the default, translated header.
+    public string SailNumberHeader { get; set; }
+    public ColumnVisibility AlternativeSailNumberVisibility { get; set; } = ColumnVisibility.Hidden;
+    public string AlternativeSailNumberHeader { get; set; }
     public ColumnVisibility CompetitorNameVisibility { get; set; }
     public string CompetitorNameHeader { get; set; }
     public ColumnVisibility BoatNameVisibility { get; set; }
     public string BoatNameHeader { get; set; }
     public ColumnVisibility CompetitorClubVisibility { get; set; }
+    public string CompetitorClubHeader { get; set; }
+    // Null or empty uses the scoring system's total header.
+    public string TotalHeader { get; set; }
     public ColumnVisibility PreDiscardTotalVisibility { get; set; } = ColumnVisibility.Hidden;
     public ColumnVisibility ParticipationVisibility { get; set; } = ColumnVisibility.Hidden;
     public bool ShowClubLogo { get; set; }
@@ -90,9 +101,9 @@ public class ResolvedTemplate
     public ResultsColumnSeparator ColumnSeparators { get; set; }
     public ColumnVisibility RaceColumnsVisibility { get; set; } = ColumnVisibility.Always;
     public bool TotalsSeparator { get; set; }
+    public bool ShowWeather { get; set; } = true;
     public bool DiscardStrikethrough { get; set; } = true;
     public bool DiscardFaded { get; set; } = true;
-    public ResultsTextColor DiscardColor { get; set; }
 
     // Visibility of a scoring column: the shared columns follow the template, calculator-specific
     // columns keep the scoring system's visibility.

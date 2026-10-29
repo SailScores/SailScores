@@ -144,4 +144,41 @@ public class SeriesResultsTemplateHelperTests
     {
         Assert.Empty(SeriesResultsTemplateHelper.GetDefaultTemplate().ScoreCodes);
     }
+
+    [Fact]
+    public void GetDefaultTemplate_ShowsWeatherAndHidesAlternativeSailNumber()
+    {
+        var result = SeriesResultsTemplateHelper.GetDefaultTemplate();
+
+        Assert.True(result.ShowWeather);
+        Assert.Equal(ColumnVisibility.Hidden, result.AlternativeSailNumberVisibility);
+        Assert.Null(result.SailNumberHeader);
+        Assert.Null(result.CompetitorNameHeader);
+        Assert.Null(result.BoatNameHeader);
+        Assert.Null(result.CompetitorClubHeader);
+        Assert.Null(result.TotalHeader);
+    }
+
+    [Fact]
+    public void GetResolvedTemplate_WithColumnHeadersAndWeather_CopiesThem()
+    {
+        var template = new SeriesResultsTemplate
+        {
+            SailNumberHeader = "Bow",
+            AlternativeSailNumberVisibility = ColumnVisibility.Always,
+            AlternativeSailNumberHeader = "Class #",
+            CompetitorClubHeader = "Yacht Club",
+            TotalHeader = "Points",
+            ShowWeather = false
+        };
+
+        var result = SeriesResultsTemplateHelper.GetResolvedTemplate(template);
+
+        Assert.Equal("Bow", result.SailNumberHeader);
+        Assert.Equal(ColumnVisibility.Always, result.AlternativeSailNumberVisibility);
+        Assert.Equal("Class #", result.AlternativeSailNumberHeader);
+        Assert.Equal("Yacht Club", result.CompetitorClubHeader);
+        Assert.Equal("Points", result.TotalHeader);
+        Assert.False(result.ShowWeather);
+    }
 }

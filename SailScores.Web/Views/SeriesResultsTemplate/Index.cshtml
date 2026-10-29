@@ -7,12 +7,64 @@
 }
 
 @functions {
-    private static (string CssClass, string Text) VisibilityBadge(ColumnVisibility visibility) => visibility switch
+    // The competitor columns a view shows, by their header; hidden columns are left out.
+    private static IEnumerable<(string Text, bool LargerScreensOnly)> ShownColumns(SailScores.Core.Model.SeriesResultsTemplate template)
     {
-        ColumnVisibility.Always => ("text-bg-success", "Always"),
-        ColumnVisibility.OnLargerScreens => ("text-bg-info", "On Larger Screens"),
-        _ => ("text-bg-secondary", "Hidden"),
-    };
+        var columns = new[]
+        {
+            (template.SailNumberVisibility, template.SailNumberHeader, "Sail Number"),
+            (template.AlternativeSailNumberVisibility, template.AlternativeSailNumberHeader, "Alt. Sail Number"),
+            (template.CompetitorNameVisibility, template.CompetitorNameHeader, "Competitor Name"),
+            (template.BoatNameVisibility, template.BoatNameHeader, "Boat Name"),
+            (template.CompetitorClubVisibility, template.CompetitorClubHeader, "Club"),
+        };
+        return columns
+            .Where(c => c.Item1 != ColumnVisibility.Hidden)
+            .Select(c => (string.IsNullOrWhiteSpace(c.Item2) ? c.Item3 : c.Item2,
+                c.Item1 == ColumnVisibility.OnLargerScreens));
+    }
+
+    // A few words for each other setting that differs from a new view's.
+    private static IEnumerable<string> OtherSettings(SailScores.Core.Model.SeriesResultsTemplate template)
+    {
+        if (template.RaceColumnsVisibility == ColumnVisibility.Hidden)
+        {
+            yield return "Race columns hidden";
+        }
+        else if (template.RaceColumnsVisibility == ColumnVisibility.OnLargerScreens)
+        {
+            yield return "Race columns on larger screens";
+        }
+        if (template.PreDiscardTotalVisibility != ColumnVisibility.Hidden)
+        {
+            yield return "Pre-discard total shown";
+        }
+        if (template.ParticipationVisibility != ColumnVisibility.Hidden)
+        {
+            yield return "Participation shown";
+        }
+        var customFieldCount = template.CustomFields.Count(f => f.Visibility != ColumnVisibility.Hidden);
+        if (customFieldCount > 0)
+        {
+            yield return customFieldCount == 1 ? "1 custom field shown" : $"{customFieldCount} custom fields shown";
+        }
+        if (template.ScoreCodes.Any(c => c.Display is ScoreCodeDisplay.Hidden or ScoreCodeDisplay.HiddenWhenDiscarded))
+        {
+            yield return "Some scores hidden";
+        }
+        if (template.ScoreCodes.Any(c => c.Display == ScoreCodeDisplay.CodeOnly || c.Faded))
+        {
+            yield return "Some codes restyled";
+        }
+        if (!template.ShowWeather)
+        {
+            yield return "No weather";
+        }
+        if (template.ShowClubLogo)
+        {
+            yield return "Club logo";
+        }
+    }
 }
 
 <div class="container-lg p-0 p-md-2">
@@ -20,15 +72,13 @@
         <div>
             <h1 class="h2 mb-1">@ViewData["Title"]</h1>
             <p class="text-body-secondary mb-0">
-                How series results look: the view each kind of series uses, the race date
-                format, and the views themselves (which columns appear, what they are called,
-                and how scores are displayed). Every series uses the default view unless it
-                chooses a different one.
+                Change the result views: columns, headers,
+                and displayed codes.
             </p>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a asp-controller="Admin" asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
-                Back to Settings
+                <i class="fas fa-arrow-left"></i> Back to Settings
             </a>
         </div>
     </div>
@@ -44,7 +94,7 @@
 
     @if (Model.Templates.Any())
     {
-        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+        <div class="border rounded p-2 p-md-3 mb-4 bg-almost">
             <h2 class="h5 mb-3">Default views</h2>
             <form asp-action="SetDefaults" asp-route-clubInitials="@Model.ClubInitials" method="post">
                 <div class="row">
@@ -84,7 +134,7 @@
         </div>
     }
 
-    <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
+    <div class="border rounded p-2 p-md-3 mb-4 bg-almost">
         <h2 class="h5 mb-3">Race dates</h2>
         <form asp-action="SetDateFormat" asp-route-clubInitials="@Model.ClubInitials" method="post">
             <div class="mb-3">
@@ -94,7 +144,7 @@
                     <button type="button" class="btn btn-outline-secondary" id="clearDateFormatButton">Use locale default</button>
                 </div>
                 <div class="small text-body-secondary mt-1">
-                    How race dates appear in results headings, for every view. Leave blank to use the
+                    Dates in result headers. Leave blank to use the
                     club's localization. Supported tokens: d, dd, M, MM, MMM, MMMM, yy, yyyy. For example,
                     'M' uses a single-digit month when possible, while 'MM' always uses two digits, and
                     'MMM' uses the name abbreviation. Popular formats:
@@ -138,55 +188,58 @@
                     <thead class="bg-body-tertiary">
                         <tr>
                             <th class="text-body-emphasis">Name</th>
-                            <th class="text-body-emphasis">Sail Number</th>
-                            <th class="text-body-emphasis">Competitor Name</th>
-                            <th class="text-body-emphasis">Boat Name</th>
-                            <th class="text-body-emphasis">Competitor Club</th>
                             <th class="text-end text-body-emphasis">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var template in Model.Templates)
                         {
-                            var sailBadge = VisibilityBadge(template.SailNumberVisibility);
-                            var nameBadge = VisibilityBadge(template.CompetitorNameVisibility);
-                            var boatBadge = VisibilityBadge(template.BoatNameVisibility);
-                            var clubBadge = VisibilityBadge(template.CompetitorClubVisibility);
+                            var shownColumns = ShownColumns(template).ToList();
+                            var otherSettings = OtherSettings(template).ToList();
                             <tr>
                                 <td>
-                                    <strong>@template.Name</strong>
-                                    @if (template.Id == Model.DefaultSeriesResultsTemplateId)
+                                    <div>
+                                        <strong>@template.Name</strong>
+                                        @if (template.Id == Model.DefaultSeriesResultsTemplateId)
+                                        {
+                                            <span class="badge text-bg-primary ms-1">Standard default</span>
+                                        }
+                                        @if (template.Id == Model.DefaultSummarySeriesResultsTemplateId)
+                                        {
+                                            <span class="badge text-bg-primary ms-1">Summary default</span>
+                                        }
+                                        @if (template.Id == Model.DefaultRegattaSeriesResultsTemplateId)
+                                        {
+                                            <span class="badge text-bg-primary ms-1">Regatta default</span>
+                                        }
+                                    </div>
+                                    <small class="text-body-secondary">
+                                        @if (shownColumns.Any())
+                                        {
+                                            for (var i = 0; i < shownColumns.Count; i++)
+                                            {
+                                                @(i > 0 ? " · " : "")
+                                                @shownColumns[i].Text
+                                                @if (shownColumns[i].LargerScreensOnly)
+                                                {
+                                                    <i class="fas fa-desktop ms-1" title="Larger screens only"></i>
+                                                    <span class="visually-hidden">(larger screens only)</span>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @:No competitor columns
+                                        }
+                                    </small>
+                                    @if (otherSettings.Any())
                                     {
-                                        <span class="badge text-bg-primary ms-2">Standard default</span>
-                                    }
-                                    @if (template.Id == Model.DefaultSummarySeriesResultsTemplateId)
-                                    {
-                                        <span class="badge text-bg-primary ms-2">Summary default</span>
-                                    }
-                                    @if (template.Id == Model.DefaultRegattaSeriesResultsTemplateId)
-                                    {
-                                        <span class="badge text-bg-primary ms-2">Regatta default</span>
-                                    }
-                                    @if (template.ShowClubLogo)
-                                    {
-                                        <span class="badge text-bg-light border ms-2" title="Shows club logo">
-                                            <i class="fas fa-image"></i> Logo
-                                        </span>
+                                        <small class="text-body-secondary d-block fst-italic">@string.Join(" · ", otherSettings)</small>
                                     }
                                 </td>
-                                <td><span class="badge @sailBadge.CssClass">@sailBadge.Text</span></td>
-                                <td>
-                                    <span class="badge @nameBadge.CssClass">@nameBadge.Text</span>
-                                    <small class="text-body-secondary d-block">(@template.CompetitorNameHeader)</small>
-                                </td>
-                                <td>
-                                    <span class="badge @boatBadge.CssClass">@boatBadge.Text</span>
-                                    <small class="text-body-secondary d-block">(@template.BoatNameHeader)</small>
-                                </td>
-                                <td><span class="badge @clubBadge.CssClass">@clubBadge.Text</span></td>
                                 <td class="text-end text-nowrap">
                                     <a asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" asp-route-id="@template.Id" class="btn btn-sm btn-outline-primary" title="Edit">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-pen"></i>
                                         <span class="visually-hidden">Edit</span>
                                     </a>
                                     @if (Model.IsClubDefault(template.Id))
