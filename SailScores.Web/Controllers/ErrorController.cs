@@ -21,9 +21,11 @@ public class ErrorController : Controller
         {
             var statusCodeReExecuteFeature = HttpContext?.Features?.Get<IStatusCodeReExecuteFeature>();
             var originalPath = statusCodeReExecuteFeature?.OriginalPath ?? HttpContext?.Request?.Path;
-            var originalQueryString = statusCodeReExecuteFeature?.OriginalQueryString;
+            var originalQueryString = statusCodeReExecuteFeature?.OriginalQueryString ?? string.Empty;
 
-            _logger.LogWarning("404 Not Found: {Path}{QueryString}", originalPath, originalQueryString);
+            // Information, not Warning: crawlers request missing pages constantly, and Warning+ logs are
+            // exported to Application Insights unsampled. 404s still appear in request telemetry.
+            _logger.LogInformation("404 Not Found: {Path}{QueryString}", originalPath, originalQueryString);
             return View("Error404");
         }
 
