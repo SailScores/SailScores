@@ -58,6 +58,38 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
+        public async Task GetScoreCodesAsync_ParentSystemCode_IsIncluded()
+        {
+            var (root, child) = await AddRootAndChildSystemsAsync();
+            root.ScoreCodes.Add(new Database.Entities.ScoreCode { Name = "PARENT" });
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var results = await _service.GetScoreCodesAsync(child.ClubId.Value);
+
+            Assert.Contains(results, sc => sc.Name == "PARENT");
+        }
+
+        [Fact]
+        public async Task GetScoreCodesAsync_UnrelatedSharedSystemCode_IsExcluded()
+        {
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            _context.ScoringSystems.Add(new Database.Entities.ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Unrelated shared",
+                ScoreCodes = new List<Database.Entities.ScoreCode>
+                {
+                    new Database.Entities.ScoreCode { Name = "UNRELATED" }
+                }
+            });
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var results = await _service.GetScoreCodesAsync(club.Id);
+
+            Assert.DoesNotContain(results, sc => sc.Name == "UNRELATED");
+        }
+
+        [Fact]
         public async Task GetScoringSystemsAsync_ReturnsASystemWithDnc()
         {
             var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);

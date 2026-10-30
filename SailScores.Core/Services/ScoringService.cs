@@ -30,17 +30,26 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
+        // Codes usable in the club's own scoring systems, including those inherited from
+        // parent systems. Shared systems the club doesn't build on are left out.
         public async Task<IEnumerable<Model.ScoreCode>> GetScoreCodesAsync(Guid clubId)
         {
-            var allScoreCodes = await _dbContext
+            var systemIds = await _dbContext
                 .ScoringSystems
-                .Where(s => s.ClubId == clubId || s.ClubId == null)
-                .SelectMany(s => s.ScoreCodes).ToListAsync()
+                .Where(s => s.ClubId == clubId)
+                .Select(s => s.Id)
+                .ToListAsync()
                 .ConfigureAwait(false);
-            var distinctScoreCodes = allScoreCodes
-                .GroupBy(s => s.Name, (key, g) => g.OrderBy(e => e.Name).First());
 
-            return _mapper.Map<List<Model.ScoreCode>>(distinctScoreCodes);
+            var allScoreCodes = new List<Model.ScoreCode>();
+            foreach (var systemId in systemIds)
+            {
+                allScoreCodes.AddRange(await GetAllCodesAsync(systemId).ConfigureAwait(false));
+            }
+
+            return allScoreCodes
+                .GroupBy(s => s.Name, (key, g) => g.First())
+                .ToList();
         }
 
         public async Task<IList<Model.ScoringSystem>> GetScoringSystemsAsync(
