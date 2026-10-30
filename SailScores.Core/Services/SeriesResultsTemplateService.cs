@@ -177,50 +177,8 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
 
     public async Task<IList<ScoreCode>> GetClubScoreCodesAsync(Guid clubId)
     {
-        // The club's own systems and the shared ones it uses directly, then their parents.
-        var rootIds = await _dbContext.ScoringSystems
-            .Where(s => s.ClubId == clubId)
-            .Select(s => s.Id)
-            .ToListAsync()
-            .ConfigureAwait(false);
-        rootIds.AddRange(await _dbContext.Clubs
-            .Where(c => c.Id == clubId && c.DefaultScoringSystemId != null)
-            .Select(c => c.DefaultScoringSystemId.Value)
-            .ToListAsync()
-            .ConfigureAwait(false));
-        rootIds.AddRange(await _dbContext.Series
-            .Where(s => s.ClubId == clubId && s.ScoringSystemId != null)
-            .Select(s => s.ScoringSystemId.Value)
-            .Distinct()
-            .ToListAsync()
-            .ConfigureAwait(false));
-        rootIds.AddRange(await _dbContext.Regattas
-            .Where(r => r.ClubId == clubId && r.ScoringSystemId != null)
-            .Select(r => r.ScoringSystemId.Value)
-            .Distinct()
-            .ToListAsync()
-            .ConfigureAwait(false));
-
-        var parents = await _dbContext.ScoringSystems
-            .Where(s => s.ClubId == clubId || s.ClubId == null)
-            .Select(s => new { s.Id, s.ParentSystemId })
-            .ToDictionaryAsync(s => s.Id, s => s.ParentSystemId)
-            .ConfigureAwait(false);
-        var systemIds = new HashSet<Guid>();
-        foreach (var rootId in rootIds)
-        {
-            // The visited check also stops a parent loop.
-            for (Guid? id = rootId; id.HasValue && systemIds.Add(id.Value);)
-            {
-                id = parents.TryGetValue(id.Value, out var parentId) ? parentId : null;
-            }
-        }
-
-        var defined = await _dbContext.ScoreCodes
-            .Where(c => systemIds.Contains(c.ScoringSystemId) && c.Name != null)
-            .Select(c => new { c.Name, c.Description })
-            .ToListAsync()
-            .ConfigureAwait(false);
+        // The codes the club can score with, plus any found in its results.
+        var defined = await ClubScoreCodes.GetAsync(_dbContext, clubId).ConfigureAwait(false);
         var used = await _dbContext.Scores
             .Where(s => s.Race.ClubId == clubId && s.Code != null && s.Code != "")
             .Select(s => s.Code)
@@ -228,16 +186,8 @@ public class SeriesResultsTemplateService : ISeriesResultsTemplateService
             .ToListAsync()
             .ConfigureAwait(false);
 
-        // A code defined on several systems takes the first description it has.
-        var codes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var code in defined.Where(c => !string.IsNullOrWhiteSpace(c.Name)))
-        {
-            var name = code.Name.Trim();
-            if (string.IsNullOrWhiteSpace(codes.GetValueOrDefault(name)))
-            {
-                codes[name] = code.Description;
-            }
-        }
+        var codes = defined.ToDictionary(
+            c => c.Name.Trim(), c => c.Description, StringComparer.OrdinalIgnoreCase);
         foreach (var code in used.Where(c => !string.IsNullOrWhiteSpace(c)))
         {
             codes.TryAdd(code.Trim(), null);

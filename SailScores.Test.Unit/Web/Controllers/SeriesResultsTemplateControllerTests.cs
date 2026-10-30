@@ -99,6 +99,21 @@ public class SeriesResultsTemplateControllerTests
     }
 
     [Fact]
+    public async Task SetDefaults_InvalidModel_DoesNotSave()
+    {
+        _controller.ModelState.AddModelError(
+            nameof(SeriesResultsTemplateListViewModel.DefaultSeriesResultsTemplateId), "Invalid");
+
+        var result = await _controller.SetDefaults(ClubInitials, new SeriesResultsTemplateListViewModel());
+
+        _templateServiceMock.Verify(s => s.SetClubDefaultsAsync(
+            It.IsAny<Guid>(), It.IsAny<Guid?>(), It.IsAny<Guid?>(), It.IsAny<Guid?>()),
+            Times.Never);
+        Assert.Equal(nameof(SeriesResultsTemplateController.Index),
+            Assert.IsType<RedirectToActionResult>(result).ActionName);
+    }
+
+    [Fact]
     public async Task Edit_TemplateFromAnotherClub_ReturnsNotFound()
     {
         var template = SetupTemplate(Guid.NewGuid());
@@ -319,6 +334,28 @@ public class SeriesResultsTemplateControllerTests
 
         var table = Assert.IsType<ResultsTableViewModel>(Assert.IsType<PartialViewResult>(result).Model);
         Assert.Equal(series.Id, table.SeriesId);
+    }
+
+    [Fact]
+    public async Task Preview_MissingName_StillShowsTable()
+    {
+        var series = SetupSeries(_clubId);
+        _controller.ModelState.AddModelError(nameof(SeriesResultsTemplateViewModel.Name), "Required");
+
+        var result = await _controller.Preview(ClubInitials, series.Id, new SeriesResultsTemplateViewModel());
+
+        Assert.IsType<ResultsTableViewModel>(Assert.IsType<PartialViewResult>(result).Model);
+    }
+
+    [Fact]
+    public async Task Preview_InvalidModel_ShowsNoTable()
+    {
+        var series = SetupSeries(_clubId);
+        _controller.ModelState.AddModelError(nameof(SeriesResultsTemplateViewModel.TotalHeader), "Too long");
+
+        var result = await _controller.Preview(ClubInitials, series.Id, new SeriesResultsTemplateViewModel());
+
+        Assert.Null(Assert.IsType<PartialViewResult>(result).Model);
     }
 
     [Fact]

@@ -47,7 +47,7 @@ public sealed class ParticipationPercent : IEligibilityRule
 
             compResults.ParticipationPercent = raceCount == 0 ? 0m : racesParticipated * 100m / raceCount;
 
-            if (racesParticipated < raceCount * ((percent ?? 0m) / 100m))
+            if (racesParticipated < raceCount * (percent.Value / 100m))
             {
                 compResults.TotalScore = null;
             }

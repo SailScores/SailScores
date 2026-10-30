@@ -51,7 +51,7 @@ function initResultsViewPreview(
     panel.addEventListener("shown.bs.offcanvas", () => {
         isOpen = true;
         setPagePadding();
-        refresh();
+        void refresh();
     });
     panel.addEventListener("hidden.bs.offcanvas", () => {
         isOpen = false;

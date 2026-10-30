@@ -73,6 +73,12 @@ public class SeriesResultsTemplateController : Controller
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> SetDefaults(string clubInitials, SeriesResultsTemplateListViewModel model)
     {
+        // A template id that doesn't bind would otherwise clear that default.
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "The default views could not be saved.";
+            return RedirectToAction(nameof(Index), new { clubInitials });
+        }
         var clubId = await _clubService.GetClubId(clubInitials);
         try
         {
@@ -246,6 +252,12 @@ public class SeriesResultsTemplateController : Controller
         Guid? previewSeriesId,
         SeriesResultsTemplateViewModel model)
     {
+        // The preview doesn't show the name, so a form still missing one can be previewed.
+        ModelState.Remove(nameof(SeriesResultsTemplateViewModel.Name));
+        if (!ModelState.IsValid)
+        {
+            return PartialView("_Preview", null);
+        }
         var clubId = await _clubService.GetClubId(clubInitials);
         var seriesId = previewSeriesId
             ?? (await _templateService.GetPreviewSeriesAsync(clubId, 1)).FirstOrDefault()?.Id;
