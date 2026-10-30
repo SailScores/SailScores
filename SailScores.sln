@@ -52,7 +52,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SailScores.Test.Integration
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0479EE24-287C-45F1-80D5-75B5EFFD67D1}"
 	ProjectSection(SolutionItems) = preProject
-		docs\ApplicationInsights-Implementation-Summary.md = docs\ApplicationInsights-Implementation-Summary.md
 		docs\BackupSchema.md = docs\BackupSchema.md
 		docs\DatabaseSchema-QuickRef.md = docs\DatabaseSchema-QuickRef.md
 		docs\DatabaseSchema.md = docs\DatabaseSchema.md

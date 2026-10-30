@@ -45,7 +45,7 @@ using MailChimp.Net.Interfaces;
 using MailChimp.Net;
 using SailScores.Web.Resources;
 using SailScores.Web.Authorization;
-using OpenTelemetry.Trace;
+using OpenTelemetry.Instrumentation.AspNetCore;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 
 namespace SailScores.Web;
@@ -353,13 +353,12 @@ public class Startup
 
     private void ConfigureAppInsightsTelemetry(IServiceCollection services)
     {
-        // Configure OpenTelemetry with Azure Monitor exporter and adaptive error-preserving sampler
-        // The Azure Monitor extension sends telemetry to Application Insights.
+        // Configure OpenTelemetry with the Azure Monitor exporter, which sends telemetry to Application Insights.
         // The connection string is read from APPLICATIONINSIGHTS__CONNECTIONSTRING environment variable.
 
-        // Get sampling configuration
-        var targetTracesPerMinute = Configuration.GetValue("OpenTelemetry:TargetTracesPerMinute", 3000);
-        var windowSeconds = Configuration.GetValue("OpenTelemetry:WindowSeconds", 60);
+        // Rate-limited sampling of traces (requests + dependencies). The exporter stamps the
+        // sample rate on each item so Application Insights scales counts back up.
+        var tracesPerSecond = Configuration.GetValue("OpenTelemetry:TracesPerSecond", 1.0);
 
         // Get connection string from environment variable
         var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS__CONNECTIONSTRING")
@@ -379,12 +378,14 @@ public class Startup
                     {
                         options.ConnectionString = connectionString;
                     }
-                })
-                .WithTracing(builder =>
-                {
-                    // Apply our adaptive sampler that preserves errors while maintaining target rate
-                    builder.SetSampler(new AdaptiveErrorPreservingSampler(targetTracesPerMinute, windowSeconds));
+                    options.TracesPerSecond = tracesPerSecond;
+                    // Export warning and error logs even when their request trace was sampled out.
+                    options.EnableTraceBasedLogsSampler = false;
                 });
+
+            // Drop security-scanner requests before sampling so they don't use up the trace budget.
+            services.Configure<AspNetCoreTraceInstrumentationOptions>(options =>
+                options.Filter = TelemetryRequestFilter.ShouldTrace);
 
 
             services.AddHttpContextAccessor();
