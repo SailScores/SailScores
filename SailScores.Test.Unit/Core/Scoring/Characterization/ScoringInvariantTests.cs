@@ -19,7 +19,8 @@ public class ScoringInvariantTests
         ScoringCalculatorType.AppendixAPre2025,
         ScoringCalculatorType.AppAAltFirstIsZero,
         ScoringCalculatorType.AppAAltFirstIsPoint7,
-        ScoringCalculatorType.AppAAltFirstIsPoint75
+        ScoringCalculatorType.AppAAltFirstIsPoint75,
+        ScoringCalculatorType.AppendixBWindsurfing
     ];
 
     public static TheoryData<string, string> AllCases()

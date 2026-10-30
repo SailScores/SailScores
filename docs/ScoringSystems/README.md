@@ -11,6 +11,7 @@ club's document, and a page per system showing where each rule is implemented an
 | Wawasee 2026 | Wawasee | not written yet | `Scoring/Systems/Wawasee2026.cs` | `Wawasee2026CalculatorTests` |
 | VARC 2026, VARC 2026 Shorthanded | VARC | not written yet | `Scoring/Systems/TopX.cs` (`Varc2026`) | `Varc2026CalculatorTests` |
 | PBG | PBG | not written yet | `Scoring/Systems/LowPointAverages.cs` (`Pbg`) | `PbgCalculatorTests` |
+| Appendix B Windsurfing | All clubs (shared base system, RRS 2025-2028) | [AppendixB-Windsurfing.md](AppendixB-Windsurfing.md) | `Scoring/Systems/AppendixB.cs` (`Windsurfing`) | `AppendixBWindsurfingCalculatorTests` |
 
 Recipe paths are under `SailScores.Core/`; tests are under `SailScores.Test.Unit/Core/Scoring/`.
 
