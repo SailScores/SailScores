@@ -17,29 +17,27 @@ namespace SailScores.Core.Scoring.RacePoints;
 public sealed class LowPointPlaces : IRacePointsRule
 {
     public static readonly LowPointPlaces AppendixA = new(firstPlace: 1m, tiedFirstPlace: 1m);
-    // Quirk: low point averages always recalculate places from the boats ahead, ignoring
-    // the series' "use full race scores" setting (docs/Scoring-Quirks.md).
+    // Low point averages count the boats ahead, except in a fleet series that uses full race
+    // scores, where they take the whole-race place as Appendix A does.
     public static readonly LowPointPlaces LowPointAverage =
-        new(firstPlace: 1m, tiedFirstPlace: 1m, useWholeRacePlace: false);
+        new(firstPlace: 1m, tiedFirstPlace: 1m, wholeRacePlaceOnlyForFullRaceScores: true);
     public static readonly LowPointPlaces FirstIsZero = new(firstPlace: 0m, tiedFirstPlace: 0m);
     public static readonly LowPointPlaces FirstIsPoint7 = new(firstPlace: 0.7m, tiedFirstPlace: 0.7m);
-    // Quirk (bug): a tie for first counts first place as 0.7, a value copied from
-    // First = .7 (docs/Scoring-Quirks.md).
-    public static readonly LowPointPlaces FirstIsPoint75 = new(firstPlace: 0.75m, tiedFirstPlace: 0.7m);
+    public static readonly LowPointPlaces FirstIsPoint75 = new(firstPlace: 0.75m, tiedFirstPlace: 0.75m);
 
     private readonly decimal _firstPlace;
     private readonly decimal _tiedFirstPlace;
-    private readonly bool _useWholeRacePlace;
+    private readonly bool _wholeRacePlaceOnlyForFullRaceScores;
 
     // firstPlace: the points for first. tiedFirstPlace: what first counts as when it is
-    // averaged into a tie. useWholeRacePlace: take the boat's place in the whole race when
-    // the workspace says to (no fleet, or full race scores); otherwise always count the boats
-    // ahead.
-    private LowPointPlaces(decimal firstPlace, decimal tiedFirstPlace, bool useWholeRacePlace = true)
+    // averaged into a tie. The boat's place in the whole race is used when the workspace says
+    // to (no fleet, or full race scores); with wholeRacePlaceOnlyForFullRaceScores, only in a
+    // fleet series with full race scores. Otherwise the boats ahead are counted.
+    private LowPointPlaces(decimal firstPlace, decimal tiedFirstPlace, bool wholeRacePlaceOnlyForFullRaceScores = false)
     {
         _firstPlace = firstPlace;
         _tiedFirstPlace = tiedFirstPlace;
-        _useWholeRacePlace = useWholeRacePlace;
+        _wholeRacePlaceOnlyForFullRaceScores = wholeRacePlaceOnlyForFullRaceScores;
     }
 
     public decimal? PerfectScore(ScoringWorkspace workspace, IEnumerable<Score> allScores, Score score) => 1;
@@ -52,7 +50,10 @@ public sealed class LowPointPlaces : IRacePointsRule
         }
 
         decimal? points;
-        if (_useWholeRacePlace && workspace.UseOriginalPlace && score.Place.HasValue && string.IsNullOrEmpty(score.Code))
+        var useWholeRacePlace = _wholeRacePlaceOnlyForFullRaceScores
+            ? workspace.UseFullRaceScores
+            : workspace.UseOriginalPlace;
+        if (useWholeRacePlace && score.Place.HasValue && string.IsNullOrEmpty(score.Code))
         {
             points = Convert.ToDecimal(score.Place.Value);
         }

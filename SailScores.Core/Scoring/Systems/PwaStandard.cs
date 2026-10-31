@@ -9,8 +9,8 @@ using SailScores.Core.Scoring.Totals;
 namespace SailScores.Core.Scoring.Systems;
 
 // PWA (windsurfing) standard scoring: Appendix A with first scoring 0.7, ranked by the PWA
-// tiebreaks: beaten the other more often, better scores including discards, better discard
-// (never decides: a quirk), then the last race.
+// tiebreaks: beaten the other more often, better scores including discards, better discard,
+// then the last race.
 public static class PwaStandard
 {
     public static ScoringRecipe Create(ScoringSystem system) => new()

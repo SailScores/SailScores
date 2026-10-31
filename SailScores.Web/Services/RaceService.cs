@@ -64,6 +64,8 @@ public class RaceService : IRaceService
     public async Task<RaceSummaryListViewModel> GetAllRaceSummariesAsync(
         string clubInitials,
         string seasonName,
+        string month,
+        string fleet,
         bool includeScheduled,
         bool includeAbandoned)
     {
@@ -77,37 +79,80 @@ public class RaceService : IRaceService
         {
             return default;
         }
-        var races = (await _coreRaceService.GetFullRacesAsync(
+        var facets = await _coreRaceService.GetRaceFacetsAsync(
+            club.Id,
+            selectedSeason.Start,
+            selectedSeason.End,
+            includeScheduled,
+            includeAbandoned);
+        var filters = RaceIndexFilterPolicy.Build(
+            facets,
+            month,
+            fleet,
+            selectedSeason.Start,
+            selectedSeason.End,
+            DateTime.Today);
+        if (!filters.IsValid)
+        {
+            return default;
+        }
+
+        var races = (await _coreRaceService.GetRaceSummariesAsync(
                 club.Id,
-                seasonName,
+                filters.StartDate,
+                filters.EndDate,
                 includeScheduled,
-                includeAbandoned))
-            .OrderByDescending(r => r.Date)
-            .ThenBy(r => r.Fleet?.Name)
+                includeAbandoned,
+                filters.FleetId))
+            .OrderBy(r => r.Date)
+            .ThenBy(r => r.FleetName)
             .ThenBy(r => r.Order);
 
         // need to get score codes so viewmodel can determine starting boat count.
         var scoreCodes = await _coreScoringService.GetScoreCodesAsync(club.Id);
 
         var excludedRaces = await _coreRaceService.GetStatsExcludedRaces(club.Id, selectedSeason.Id);
-        var racesVm = _mapper.Map<List<RaceSummaryViewModel>>(races);
-        foreach (var race in racesVm)
-        {
-            if (excludedRaces.Contains(race.Id))
-            {
-                race.ExcludeFromCompStats = true;
-            }
-            foreach (var score in race.Scores)
-            {
-                score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
-            }
-        }
 
         return new RaceSummaryListViewModel
         {
-            Races = racesVm,
+            Races = races
+                .Select(r => ToSummaryViewModel(r, selectedSeason, scoreCodes, excludedRaces))
+                .ToList(),
             Seasons = seasons,
-            CurrentSeason = seasons.FirstOrDefault(s => s.Name == seasonName)
+            CurrentSeason = selectedSeason,
+            Filters = filters
+        };
+    }
+
+    private static RaceSummaryViewModel ToSummaryViewModel(
+        RaceSummary race,
+        Season season,
+        IEnumerable<ScoreCode> scoreCodes,
+        IList<Guid> excludedRaces)
+    {
+        return new RaceSummaryViewModel
+        {
+            Id = race.Id,
+            Name = race.Name,
+            Date = race.Date,
+            Order = race.Order,
+            Description = race.Description,
+            State = race.State,
+            FleetName = race.FleetName,
+            FleetShortName = race.FleetShortName,
+            Season = season,
+            ExcludeFromCompStats = excludedRaces.Contains(race.Id),
+            SeriesUrlAndNames = race.Series
+                .Select(s => new KeyValuePair<string, string>(s.UrlName, s.Name))
+                .ToList(),
+            Scores = race.Scores
+                .Select(s => new ScoreViewModel
+                {
+                    Place = s.Place,
+                    Code = s.Code,
+                    ScoreCode = GetScoreCode(s.Code, scoreCodes)
+                })
+                .ToList()
         };
     }
 
@@ -290,29 +335,29 @@ public class RaceService : IRaceService
     {
         var model = await CreateClubRaceAsync(clubInitials, false, null, includeInactive);
         var series = await _coreSeriesService.GetOneSeriesAsync(seriesId);
-        // Season doesn't include now. so use last race date or season start.
-        if(series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)
-        {
-            if (series.Races.Any(r => r.Date.HasValue))
-            {
-                model.Date = series.Races.Where(r => r.Date.HasValue).Max(r => r.Date);
-            } else // no races, set to start of season.
-            {
-                model.Date = series.Season.Start;
-            }
-        }
+        var lastRaceDate = series.Races?.Where(r => r.Date.HasValue).Max(r => r.Date);
 
-        // Ensure default date falls within the series date range only when the series
-        // is explicitly date restricted. Series start/end values are not used as a
-        // default date limit because they commonly reflect the last race in the series.
-        DateTime candidateDate = model.Date ?? DateTime.Today;
-        if (series.DateRestricted == true)
+        // A date restricted series defaults to its last race date. Without races, it uses
+        // the club default if its range includes today, or else the nearest date in range.
+        // Series start/end values are not used as a default date limit because they
+        // commonly reflect the last race in the series.
+        var restrictedDate = series.DateRestricted == true
+            ? GetDateRestrictedSeriesRaceDate(series, lastRaceDate ?? DateTime.Today)
+            : null;
+        if (restrictedDate.HasValue)
         {
-            var restrictedDate = GetDateRestrictedSeriesRaceDate(series, candidateDate);
-            if (restrictedDate != null)
+            var rangeIncludesToday = restrictedDate == DateTime.Today;
+            if (lastRaceDate.HasValue || !rangeIncludesToday)
             {
                 model.Date = restrictedDate;
+                // The date comes from the series, not the club's default offset.
+                model.NeedsLocalDate = false;
             }
+        }
+        // Season doesn't include now. so use last race date or season start.
+        else if (series.Season.Start > DateTime.Now || series.Season.End < DateTime.Now)
+        {
+            model.Date = lastRaceDate ?? series.Season.Start;
         }
 
         if (model.Date.HasValue && model.Date.Value.Date != DateTime.Today.Date)
@@ -385,7 +430,7 @@ public class RaceService : IRaceService
         {
             return enforcedStart;
         }
-        return null;
+        return candidateDate.Date;
     }
 
     public async Task AddOptionsToRace(RaceWithOptionsViewModel raceWithOptions, bool includeInactive = false)

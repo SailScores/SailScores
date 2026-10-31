@@ -1,0 +1,266 @@
+@using SailScores.Api.Enumerations
+@using SailScores.Web.Resources
+@inject ILocalizerService localizer
+@model SailScores.Web.Models.SailScores.SeriesResultsTemplateViewModel
+
+@* Settings are laid out in grid rows, not tables, so they wrap on phones. *@
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+<div class="border rounded p-2 p-md-3 mb-4 bg-almost">
+    <h2 class="h5 mb-3">Template settings</h2>
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <partial name="_HelpIcon" model="@("Helps you select this view. Not shown on results.")" />
+        <input asp-for="Name" class="form-control" placeholder="e.g., Standard, Mobile-Friendly, Regatta Full" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-check">
+        <input asp-for="ShowClubLogo" class="form-check-input" />
+        <label asp-for="ShowClubLogo" class="form-check-label"></label>
+        <partial name="_HelpIcon" model="@("In the upper right of results, prints and HTML exports.")" />
+    </div>
+</div>
+
+<div class="border rounded p-2 p-md-3 mb-4 bg-almost">
+    <h2 class="h5 mb-2">
+        Columns
+    </h2>
+    <div class="row g-2 d-none d-md-flex small fw-semibold border-bottom pb-1">
+        <div class="col-md-4">Column</div>
+        <div class="col-md-4">Show</div>
+        <div class="col-md-4">Header</div>
+    </div>
+
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4"><label asp-for="SailNumberVisibility" class="mb-0"></label></div>
+        <div class="col-6 col-md-4"><select asp-for="SailNumberVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+        <div class="col-6 col-md-4">
+            <input asp-for="SailNumberHeader" class="form-control form-control-sm" placeholder="@localizer["Sail"]" aria-label="Sail number header" />
+            <span asp-validation-for="SailNumberHeader" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4">
+            <label asp-for="AlternativeSailNumberVisibility" class="mb-0"></label>
+            <partial name="_HelpIcon" model="@("A regatta set to Prefer Alternative Sail Numbers shows them in the sail number column. When this column is shown, the sail number column keeps the main sail number.")" />
+            @if (!Model.AlternativeSailNumbersEnabled)
+            {
+                <small class="form-text text-body-secondary d-block">Turned off in club settings.</small>
+            }
+        </div>
+        <div class="col-6 col-md-4"><select asp-for="AlternativeSailNumberVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+        <div class="col-6 col-md-4">
+            <input asp-for="AlternativeSailNumberHeader" class="form-control form-control-sm" placeholder="@localizer["Alt Sail"]" aria-label="Alternative sail number header" />
+            <span asp-validation-for="AlternativeSailNumberHeader" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4"><label asp-for="CompetitorNameVisibility" class="mb-0"></label></div>
+        <div class="col-6 col-md-4"><select asp-for="CompetitorNameVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+        <div class="col-6 col-md-4">
+            <input asp-for="CompetitorNameHeader" class="form-control form-control-sm" placeholder="@localizer["Helm"]" aria-label="Competitor name header" />
+            <span asp-validation-for="CompetitorNameHeader" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4"><label asp-for="BoatNameVisibility" class="mb-0"></label></div>
+        <div class="col-6 col-md-4"><select asp-for="BoatNameVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+        <div class="col-6 col-md-4">
+            <input asp-for="BoatNameHeader" class="form-control form-control-sm" placeholder="@localizer["Boat"]" aria-label="Boat name header" />
+            <span asp-validation-for="BoatNameHeader" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4"><label asp-for="CompetitorClubVisibility" class="mb-0"></label></div>
+        <div class="col-6 col-md-4"><select asp-for="CompetitorClubVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+        <div class="col-6 col-md-4">
+            <input asp-for="CompetitorClubHeader" class="form-control form-control-sm" placeholder="@localizer["Club"]" aria-label="Competitor club header" />
+            <span asp-validation-for="CompetitorClubHeader" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4">
+            <label asp-for="RaceColumnsVisibility" class="mb-0"></label>
+            <partial name="_HelpIcon" model="@("One per race, or per child series in a summary series. Hidden leaves only the competitor columns and totals.")" />
+        </div>
+        <div class="col-6 col-md-4"><select asp-for="RaceColumnsVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+        <div class="col-6 col-md-4">
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox" asp-for="ShowWeather" />
+                <label class="form-check-label" asp-for="ShowWeather"></label>
+                <partial name="_HelpIcon" model="@("Icons under race headers, for races with weather entered.")" />
+            </div>
+        </div>
+    </div>
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4">
+            <label asp-for="TotalHeader" class="mb-0">Score</label>
+            <partial name="_HelpIcon" model="@("Always shown. A blank header uses the scoring system's, such as Total.")" />
+        </div>
+        <div class="col-6 col-md-4"><span class="text-body-secondary small">Always</span></div>
+        <div class="col-6 col-md-4">
+            <input asp-for="TotalHeader" class="form-control form-control-sm" placeholder="From scoring system" />
+            <span asp-validation-for="TotalHeader" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row g-2 align-items-center py-2 border-bottom">
+        <div class="col-12 col-md-4">
+            <label asp-for="PreDiscardTotalVisibility" class="mb-0"></label>
+            <partial name="_HelpIcon" model="@("The total of all race scores, discards included.")" />
+        </div>
+        <div class="col-6 col-md-4"><select asp-for="PreDiscardTotalVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+    </div>
+    <div class="row g-2 align-items-center py-2">
+        <div class="col-12 col-md-4">
+            <label asp-for="ParticipationVisibility" class="mb-0"></label>
+            <partial name="_HelpIcon" model="@("The percent of races each competitor sailed.")" />
+        </div>
+        <div class="col-6 col-md-4"><select asp-for="ParticipationVisibility" asp-items="Html.GetEnumSelectList<ColumnVisibility>()" class="form-select form-select-sm"></select></div>
+    </div>
+    <p class="text-body-secondary small mt-2 mb-0">
+        Columns only some scoring systems have, such as penalties, are set on the scoring system.
+    </p>
+</div>
+
+<div class="border rounded p-2 p-md-3 mb-4 bg-almost">
+    <h2 class="h5 mb-3">Score display options</h2>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" asp-for="HighlightTopThree" />
+        <label class="form-check-label" asp-for="HighlightTopThree"></label>
+        <partial name="_HelpIcon" model="@("First, second and third place in gold, silver and bronze.")" />
+    </div>
+
+    <div class="row g-3 align-items-center">
+        <div class="col-md-6">
+            <label asp-for="ColumnSeparators" class="form-label"></label>
+            <partial name="_HelpIcon" model="@("Vertical lines between race or series columns.")" />
+            <select asp-for="ColumnSeparators" asp-items="Html.GetEnumSelectList<ResultsColumnSeparator>()" class="form-select"></select>
+        </div>
+
+        <div class="col-md-6 pt-md-4">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="TotalsSeparator" />
+                <label class="form-check-label" asp-for="TotalsSeparator"></label>
+                <partial name="_HelpIcon" model="@("A vertical line between the totals and the first race.")" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="border rounded p-2 p-md-3 mb-4 bg-almost">
+    <h2 class="h5 mb-3">
+        Discarded scores
+        <partial name="_HelpIcon" model="@("With neither, discards are shown in parentheses.")" />
+    </h2>
+    <div class="d-flex flex-wrap column-gap-4 row-gap-2">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" asp-for="DiscardStrikethrough" />
+            <label class="form-check-label" asp-for="DiscardStrikethrough"></label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" asp-for="DiscardFaded" />
+            <label class="form-check-label" asp-for="DiscardFaded"></label>
+        </div>
+    </div>
+</div>
+
+<div class="border rounded p-2 p-md-3 mb-4 bg-almost">
+    <h2 class="h5 mb-2">
+        Score codes
+        <partial name="_HelpIcon" model="@("Code only leaves out the points. Scoring isn't changed.")" />
+    </h2>
+    @if (Model.ScoreCodes != null && Model.ScoreCodes.Any())
+    {
+        @for (var index = 0; index < Model.ScoreCodes.Count; index++)
+        {
+            var scoreCode = Model.ScoreCodes[index];
+            <div class="row g-2 align-items-center py-2 @(index < Model.ScoreCodes.Count - 1 ? "border-bottom" : "")">
+                <div class="col-12 col-sm-4">
+                    <input type="hidden" asp-for="@Model.ScoreCodes[index].Code" />
+                    <input type="hidden" asp-for="@Model.ScoreCodes[index].Description" />
+                    <strong>@scoreCode.Code</strong>
+                    @if (!string.IsNullOrWhiteSpace(scoreCode.Description))
+                    {
+                        <small class="text-body-secondary ms-1">@scoreCode.Description</small>
+                    }
+                </div>
+                <div class="col-8 col-sm-5">
+                    <select class="form-select form-select-sm" asp-for="@Model.ScoreCodes[index].Display"
+                            asp-items="Html.GetEnumSelectList<ScoreCodeDisplay>()"
+                            aria-label="How @scoreCode.Code is shown"></select>
+                </div>
+                <div class="col-4 col-sm-3">
+                    <div class="form-check mb-0">
+                        <input type="checkbox" class="form-check-input" asp-for="@Model.ScoreCodes[index].Faded"
+                               aria-label="Fade @scoreCode.Code" />
+                        <label class="form-check-label" for="@Html.IdFor(m => m.ScoreCodes[index].Faded)">Faded</label>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-body-secondary mb-0">No score codes are available for this club.</p>
+    }
+</div>
+
+@if (Model.CustomFieldsEnabled)
+{
+    <div class="border rounded p-2 p-md-3 mb-4 bg-almost">
+        <h2 class="h5 mb-2">Custom competitor fields</h2>
+        @if (Model.AvailableCustomFields != null && Model.AvailableCustomFields.Any())
+        {
+            @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
+            {
+                var selection = Model.CustomFieldSelections[index];
+                <div class="row g-2 align-items-center py-2 @(index < Model.CustomFieldSelections.Count - 1 ? "border-bottom" : "")">
+                    <div class="col-12 col-md-4">
+                        <div class="form-check mb-0">
+                            <input type="checkbox" class="form-check-input" asp-for="@Model.CustomFieldSelections[index].Selected" />
+                            <label class="form-check-label" for="@Html.IdFor(m => m.CustomFieldSelections[index].Selected)">
+                                @(string.IsNullOrWhiteSpace(selection.DisplayHeader) ? selection.Name : selection.DisplayHeader)
+                            </label>
+                        </div>
+                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
+                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Name" />
+                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
+                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
+                    </div>
+                    <div class="col-7 col-md-4">
+                        <select class="form-select form-select-sm" asp-for="@Model.CustomFieldSelections[index].Visibility"
+                                asp-items="Html.GetEnumSelectList<ColumnVisibility>()" aria-label="Visibility"></select>
+                    </div>
+                    <div class="col-5 col-md-3">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">Order</span>
+                            <input class="form-control" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" aria-label="Order" />
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-body-secondary mb-0">No custom competitor fields are available for this club yet.</p>
+        }
+    </div>
+}
+else
+{
+    @* Custom fields are turned off for the club: keep this view's selections as they are, so
+       turning them back on brings the columns back. *@
+    @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
+    {
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Selected" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Name" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].Visibility" />
+        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" />
+    }
+}

@@ -12,6 +12,8 @@ using SailScores.Core.JobQueue;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using SailScores.Api.Dtos;
+using SailScores.Api.Enumerations;
+using SailScores.Core.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace SailScores.Test.Unit.Core.Services
@@ -48,18 +50,137 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
-        public async Task GetFullRacesAsync_ReturnsAllRaces()
+        public async Task GetRaceSummariesAsync_RaceInRange_ReturnsScoresAndSeries()
         {
-            // Arrange
+            var result = await GetSummariesAsync();
 
-            // Act
-            var result = await _service.GetFullRacesAsync(
+            var race = Assert.Single(result);
+            Assert.Equal(1, Assert.Single(race.Scores).Place);
+            Assert.Equal("SeriesOne", Assert.Single(race.Series).UrlName);
+        }
+
+        [Fact]
+        public async Task GetRaceSummariesAsync_RaceOutOfRange_IsExcluded()
+        {
+            var result = await _service.GetRaceSummariesAsync(
                 _clubId,
-                "NoSeasonName"
-                );
+                DateTime.Today.AddYears(-3),
+                DateTime.Today.AddYears(-2));
 
-            // fail for now
-            Assert.True(result.Count() > 0);
+            Assert.Empty(result);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData(RaceState.Raced)]
+        [InlineData(RaceState.Preliminary)]
+        [InlineData(RaceState.Scheduled)]
+        [InlineData(RaceState.Abandoned)]
+        public async Task GetRaceSummariesAsync_IncludingAllStates_ListsRace(RaceState? state)
+        {
+            await SetRaceStateAsync(state);
+
+            var result = await GetSummariesAsync();
+
+            Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task GetRaceSummariesAsync_ScheduledNotIncluded_ExcludesRace()
+        {
+            await SetRaceStateAsync(RaceState.Scheduled);
+
+            var result = await GetSummariesAsync(includeScheduled: false);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetRaceSummariesAsync_AbandonedNotIncluded_ExcludesRace()
+        {
+            await SetRaceStateAsync(RaceState.Abandoned);
+
+            var result = await GetSummariesAsync(includeAbandoned: false);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetRaceSummariesAsync_FleetId_ReturnsOnlyThatFleet()
+        {
+            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId);
+            await AddRaceAsync(fleet, DateTime.Today);
+
+            var result = await _service.GetRaceSummariesAsync(
+                _clubId,
+                DateTime.Today.AddDays(-1),
+                DateTime.Today.AddDays(2),
+                fleetId: fleet.Id);
+
+            Assert.Equal(fleet.ShortName, Assert.Single(result).FleetShortName);
+        }
+
+        [Fact]
+        public async Task GetRaceFacetsAsync_RacesInMonthsAndFleets_CountsEachGroup()
+        {
+            var fleet = await _context.Fleets.FirstAsync(f => f.ClubId == _clubId);
+            await AddRaceAsync(fleet, new DateTime(2000, 6, 1));
+            await AddRaceAsync(fleet, new DateTime(2000, 6, 20));
+            await AddRaceAsync(fleet, new DateTime(2000, 7, 4));
+
+            var result = await _service.GetRaceFacetsAsync(
+                _clubId,
+                new DateTime(2000, 1, 1),
+                new DateTime(2000, 12, 31));
+
+            Assert.Equal(2, result.Single(f => f.Month == 6).Count);
+            Assert.Equal(1, result.Single(f => f.Month == 7).Count);
+            Assert.All(result, f => Assert.Equal(fleet.Id, f.FleetId));
+        }
+
+        [Fact]
+        public async Task GetRaceFacetsAsync_ScheduledNotIncluded_LeavesRaceOut()
+        {
+            await SetRaceStateAsync(RaceState.Scheduled);
+
+            var result = await _service.GetRaceFacetsAsync(
+                _clubId,
+                DateTime.Today.AddDays(-1),
+                DateTime.Today.AddDays(2),
+                includeScheduled: false);
+
+            Assert.Empty(result);
+        }
+
+        private async Task AddRaceAsync(SailScores.Database.Entities.Fleet fleet, DateTime date)
+        {
+            _context.Races.Add(new SailScores.Database.Entities.Race
+            {
+                Id = Guid.NewGuid(),
+                ClubId = _clubId,
+                Date = date,
+                Fleet = fleet
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        private Task<IList<RaceSummary>> GetSummariesAsync(
+            bool includeScheduled = true,
+            bool includeAbandoned = true)
+        {
+            return _service.GetRaceSummariesAsync(
+                _clubId,
+                DateTime.Today.AddDays(-1),
+                DateTime.Today.AddDays(2),
+                includeScheduled,
+                includeAbandoned);
+        }
+
+        private async Task SetRaceStateAsync(RaceState? state)
+        {
+            var race = await _context.Races.FirstAsync();
+            race.State = state;
+            await _context.SaveChangesAsync();
         }
 
         

@@ -429,25 +429,13 @@ Not part of Phases 1–8. Each item is its own change. The behaviour changes nee
 maintainer's approval, a reviewed snapshot diff, and a note saying which saved results move
 (the corpus baseline shows which series).
 
-### Behaviour fixes (change saved results)
+### Behavior fixes (change saved results)
 
 | Fix | Where | Notes |
 |---|---|---|
-| **A total of 0 should rank first under First = 0** | `LowestTotal(zeroTotalRanksLast: true)` in `Rankings.LowPoint` | Give the First = 0 calculator a ranking with `zeroTotalRanksLast: false`, not the shared one. Unskip `AppAAltFirstIsZero_CompetitorWhoWonEveryCountedRace_RanksFirst`. A SQL query (recursive CTE over scoring system roots, CalculatorType 3, competitors whose wins equal races) finds affected series in production |
 | **Counted races shouldn't depend on scoring order** | `RacesNeedStartersEachDay`, `RacesNeedBoatsAtStart` | Work out counted races once, after all score code group overages are applied (the pipeline's "count races" step, after "code limits"). Changes results only where an overage changes whether a code is a start |
-| **First = .75 tie for first should use 0.75** | `LowPointPlaces.FirstIsPoint75` (`tiedFirstPlace: 0.7m`) | Change to 0.75m. Affects First = .75 series with a tie for first |
-| **Cox-Sprague should keep non-discardable codes** | `Discards/CoxSpragueDiscards` | Filter candidates by `Discardable`, as the unused list intended |
-| **Appendix A pre-2025 participation** | `AppendixAPre2025Calculator` (no `Eligibility`) | Decide whether pre-2025 systems should apply `ParticipationPercent`. Changes results only for pre-2025 systems with a percent set |
-| **Averages should include scores of 0 under First = 0** | `Formulas/Averages.Averaged` | Same recipe-only approach. Check first whether any First = 0 club uses AVE codes |
 | **AVE ND should average the non-discarded scores** | `AverageNonDiscardedFormula` | Today it averages the best (count − average codes − expected discards) scores, not the discards actually chosen. Confirm the intended rule first |
-| **`COD`: implement "scored like another code", or remove it** | Formula set; glossary | No shared system or corpus fixture uses it. Removing means dropping it from the formula choices in the score code editor |
-| **Formula names matched without case everywhere** | `FixedFormula`, `ManualFormula`, `TieFormula.IsTie` | Local dev has only upper-case formulas, so no saved result should change; confirm on production |
-| **Inherited score code groups should apply without an own group** | `ApplyScoreCodeGroupLimits` (after Phase 4: the code limits step) | Affects club child systems whose groups are on the parent. Check production for systems with inherited groups and none of their own |
 | **Cox-Sprague and Top X: PLC% codes should keep the place and take a penalty** | `CalculateRaceDependentScores` overrides | If confirmed: score PLC% codes with `HighPointPlacePlusPercentFormula` (already in their formula set, never reached), leaving RET/DSQ-style codes as one behind last. Also VARC 2026, which inherits it |
-| **PLC% with a series-based DNF should use the DNF score** | `BaseScoringCalculator.GetDnfScore` | RRS 44.3(c). Changes ZFP/SCP/DPI scores in races where a series boat didn't start |
-| **A8.1 should count scores of 0 under First = 0** | `Tiebreaks/AppendixA81LowPoint` | A parameter, set only in the First = 0 ranking. Fix together with the two other zero quirks. Tell a real 0 (a First = 0 win) from a score that is still 0 or null because it isn't worked out yet at that point (maintainer's note) |
-| **PWA tiebreak (C) compares the wrong boat** | `Tiebreaks/PwaBetterDiscard` | One-word fix (`y.CalculatedScores`). Only matters when non-discardable codes make discards differ |
-| **Low point averages should honour "use full race scores"** | `LowPointPlaces.LowPointAverage` (`useWholeRacePlace: false`) | Use the whole-race place when the series uses full race scores, as Appendix A does (`useWholeRacePlace: true`). Changes results only for fleet-filtered low point average and PBG series with full race scores. Update `FleetScenarioTests.FleetWithFullRaceScores_LowPointAverageStillRecalculatesPlaces` |
 | **Check the club systems against each club's Sailing Instructions** | VARC 2026, VARC 2026 Shorthanded, Wawasee 2026, PBG; their score codes (`Sql Utility Scripts/Create … Scoring system(s).sql`) | So far they are checked against tests written from the rules as described. Compare each with the club's current SIs and a scored sheet from the club, including every score code. VARC's codes are copied from Top X High Point, where several are fixed 0 points; that is probably wrong for VARC (for example a boat that came to the start and retired). Fixing a code is a data change to those systems, not a calculator change |
 | **Wawasee 2026 shouldn't need `IsPercentSystem` to show its columns** | `Wawasee2026Calculator`, results views | Display only: let a recipe declare which per-race values show |
 

@@ -85,13 +85,13 @@ public class FleetScenarioTests
         ScenarioAssert.Scores(results, "A", "1:0");
     }
 
-    // Quirk: low point averages recalculate places within the fleet even with full race
-    // scores (docs/Scoring-Quirks.md). Appendix A keeps B's whole-race place, 3.
+    // With full race scores B keeps its whole-race place, 3.
     [Theory]
     [InlineData(ScoringCalculatorType.AppendixA, "3")]
-    [InlineData(ScoringCalculatorType.LowPointAverageInclDnc, "3:2")]
-    [InlineData(ScoringCalculatorType.LowPointAverageExclDnc, "3:2")]
-    public void FleetWithFullRaceScores_LowPointAverageStillRecalculatesPlaces(ScoringCalculatorType calculator, string expected)
+    [InlineData(ScoringCalculatorType.LowPointAverageInclDnc, "3")]
+    [InlineData(ScoringCalculatorType.LowPointAverageExclDnc, "3")]
+    [InlineData(ScoringCalculatorType.Pbg, "3")]
+    public void FleetWithFullRaceScores_KeepsWholeRacePlace(ScoringCalculatorType calculator, string expected)
     {
         var results = Scenario.With(calculator)
             .Discards("0")
@@ -100,5 +100,20 @@ public class FleetScenarioTests
             .Score();
 
         ScenarioAssert.Scores(results, "B", expected);
+    }
+
+    [Theory]
+    [InlineData(ScoringCalculatorType.LowPointAverageInclDnc)]
+    [InlineData(ScoringCalculatorType.LowPointAverageExclDnc)]
+    [InlineData(ScoringCalculatorType.Pbg)]
+    public void LowPointAverage_FleetSeries_RecalculatesPlacesWithinFleet(ScoringCalculatorType calculator)
+    {
+        var results = Scenario.With(calculator)
+            .Discards("0")
+            .Fleet(false, "A", "B")
+            .Race("A:1 X:2 B:3")
+            .Score();
+
+        ScenarioAssert.Scores(results, "B", "3:2");
     }
 }

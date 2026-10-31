@@ -9,22 +9,25 @@ namespace SailScores.Core.Scoring.Systems;
 
 // Wawasee 2026 club series ("Low Point Average Scoring System" in their instructions).
 //   - Race points are finishing places (Appendix A).
-//   - Average-scored codes (DNC, excused absence, breakdown: AVE formulas) score the boat's
-//     average finish: the mean of its other scores in races that count.
+//   - A boat with no result, or a code the system doesn't have, is DNP (did not participate).
+//   - Average-scored codes (DNP, DNS, excused absence, breakdown: AVE formulas) score the boat's
+//     average finish: the mean of its other scores in races that count, not rounded.
 //   - Series points are the total of race points plus penalties: a boat that sailed (started
 //     or a participation code such as excused) fewer than PenaltyThresholdPercent of the
-//     races that count gets PenaltyScoreValue for each race short. The races needed round up:
-//     their rule rounds to the nearest race, then adds a penalty if that falls below 70%.
-//   - Ranking needs ParticipationPercent of the races that count actually started (excused
-//     absences don't count; a breakdown, which starts, does).
+//     races that count gets PenaltyScoreValue for each race short. The races needed round to
+//     the nearest race, a half up, as the club's spreadsheet does: 70% of 16 is 11.2, so 11.
+//   - Ranking needs ParticipationPercent of the races that count competed in: came to the
+//     start (a DNS, scored like DNP, and excused absences don't count; a breakdown does).
 //   - A race counts only when at least MinimumCompetitors boats started a race that day;
 //     otherwise every score in it is a discard. There are no other discards.
 //   - Low total wins; ties go to the lower average finish, then RRS A8.
+// The club's rules: docs/ScoringSystems/Wawasee2026.md.
 public static class Wawasee2026
 {
     public static ScoringRecipe Create(ScoringSystem system) => new()
     {
         Name = "Wawasee 2026",
+        DefaultCode = "DNP",
         RacePoints = LowPointPlaces.AppendixA,
         Adjustments =
         [

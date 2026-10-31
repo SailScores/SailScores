@@ -50,7 +50,27 @@ Known odd behaviour that saved results depend on is listed in `docs/Scoring-Quir
 
 Add the next unused integer to `ScoringCalculatorType` with a `[Display(Name = "...")]` attribute. The display name appears in Site Admin.
 
-### 2. Write the system's recipe
+### 2. Base system script, and the test fixture
+
+Do this before writing the calculator: the tests need the base system in `Fixtures/shared-systems.json`, and it should come from the script rather than be written by hand.
+
+Create the base system with a SQL script in `Sql Utility Scripts/`, modeled on `Create Appendix B Windsurfing Scoring system.sql` (open to every club) or `Create VARC 2026 Scoring systems.sql` (restricted to clubs):
+
+- a fixed `Id` Guid, `ClubId` and `ParentSystemId` null, `CalculatorType`, and defaults for `DiscardPattern`, `DiscardMethod`, `ParticipationPercent` and `Settings`
+- skip the insert when a base system with that `CalculatorType` already exists, so the script can run more than once
+- copy score codes from the closest existing base system
+
+Run it on local dev (and once more, to check it changes nothing), then add the system to the fixture with the fixture tool's `--only`, which updates just that system and keeps the others, so your database doesn't need the club-restricted systems:
+
+```
+dotnet run --project SailScores.FixtureTool -- shared-systems --connection "<local dev>" --out SailScores.Test.Unit/Core/Scoring/Fixtures/shared-systems.json --only <the script's system Id>
+```
+
+The diff should be the one new system. Score code ids are made by `NEWID()`, so they differ in every environment; that's fine, because scores, child system overrides and the tests all refer to codes by name. Only the system `Id` has to match, and the script fixes it.
+
+Until the calculator is registered (step 4), the local site can't score with the new system. Run the script on each environment after deploying and applying migrations.
+
+### 3. Write the system's recipe
 
 - A scoring system is a `ScoringRecipe` built in `Scoring/Systems/`: one static class per system (or family), whose header comment states the club's rules, and which names a rule for each step. `ScoringPipeline` runs it. See `Systems/Wawasee2026.cs` and `Systems/AppendixA.cs`.
 
@@ -78,11 +98,11 @@ Add the next unused integer to `ScoringCalculatorType` with a `[Display(Name = "
   | Adjust scores after formulas | `Adjustments` (in order) | `Scoring/Adjustments/` | `CapAtDefaultScore`, `RaiseToDefaultScore`, `RacesNeedStartersEachDay` |
   | Discards | `Discards` (in order) | `Scoring/Discards/` | `WorstScoresByPattern`, `KeepBestScores`, `UncountedRacesOnly` |
   | Series totals | `Total` | `Scoring/Totals/` | `SumOfScores`, `LowPointAverage`, `Wawasee2026Totals` |
-  | Who can be ranked | `Eligibility` (in order) | `Scoring/Eligibility/` | `ParticipationPercent`, `ParticipationOfRacesNotDiscarded` |
+  | Who can be ranked | `Eligibility` (in order) | `Scoring/Eligibility/` | `ParticipationPercent` |
   | Ranking | `Ranking` | `Scoring/Tiebreaks/` | `Rankings.LowPoint`, `Rankings.HighPoint` |
   | Code glossary | `Glossary` | `Scoring/Glossary/` | `StandardGlossary`, `TopXGlossary` |
 
-  Also `FixedDefaultScore` (Top X: 0) and `AveragedScores` (which codes count in an average). `Systems/Wawasee2026.cs` and `Systems/TopX.cs` (`Varc2026`) show a whole club system as a list of rules. Reuse a rule, or add one with a parameter; don't change a rule other recipes use.
+  Also `DefaultCode` (the code for no result: DNC; Wawasee 2026: DNP), `FixedDefaultScore` (Top X: 0) and `AveragedScores` (which codes count in an average). `Systems/Wawasee2026.cs` and `Systems/TopX.cs` (`Varc2026`) show a whole club system as a list of rules. Reuse a rule, or add one with a parameter; don't change a rule other recipes use.
 - Rules get a `ScoringWorkspace` (the run's discard method, fleet place mode, races that don't count) and ask calculator-specific questions through `workspace.Host` (`IScoringHost`).
 - Score code formulas (FIX, PLC%, AVE…) are classes in `Scoring/Formulas/`, one per formula. A recipe that scores a formula differently sets `Formulas`, e.g. `Formulas = FormulaSet.Standard.With(new PlacePlusPercentFormula(PlacePlusPercentFormula.RoundingPre2025))`. Don't change a formula class other recipes use: write a new one.
 - A new formula clubs can choose: add the class, add it to `FormulaSet.Standard`, and add it to the score code editor's list (`ScoreCodeWithOptionsViewModel.FormulaOptions`). `FormulaSetTests` checks the two lists match.
@@ -100,7 +120,7 @@ Add the next unused integer to `ScoringCalculatorType` with a `[Display(Name = "
 - Rules work on the run's copies of the scores. Read a race's scores with `workspace.ScoresIn(race)` (or `RaceScoresForCounts`), never `Race.Scores`, and don't change the series passed in. Results show `CalculatedScore.Place` and `.Code`.
 - Values for an extra results column go in `SeriesCompetitorResults.ColumnValues[key]` (see `Totals/Wawasee2026Totals`), or come from an existing `FlatSeriesScore` property through `valueFromScore` (see `ScoringColumns.NetPoints`).
 
-### 3. Register it
+### 4. Register it
 
 Add a `ScoringCalculatorRegistration` in `ScoringCalculatorRegistry` with `Create = Pipeline(YourSystem.Create)` (use `Simple(...)` when only `Create` is needed):
 
@@ -115,11 +135,11 @@ Add a `ScoringCalculatorRegistration` in `ScoringCalculatorRegistry` with `Creat
 
 The Edit page, its client-side script (`Scripts/scoringSystemSettings.ts`), validation (`GetValidationErrors`) and the removal of unused settings on save all come from the registration. They usually need no changes.
 
-### 4. New settings (if any)
+### 5. New settings (if any)
 
 Add a **nullable** property (`decimal?`, `int?` or `bool?`) to `ScoringSystemSettings` (null means inherit). `MergeOver`, JSON storage and `KeepOnly` work by reflection. List it in the registration's `Fields`, and read it from `EffectiveSettings`.
 
-### 5. New discard method (rare)
+### 6. New discard method (rare)
 
 Add it to `SailScores.ApiClient/Enumerations/DiscardMethod.cs` (next integer). Then update:
 
@@ -129,19 +149,9 @@ Add it to `SailScores.ApiClient/Enumerations/DiscardMethod.cs` (next integer). T
 - `Views/Shared/_DiscardSummary.cshtml` for the results header
 - the `data-discard-methods` lists in `Views/ScoringSystem/Create.cshtml` and `Edit.cshtml`
 
-### 6. Results display
+### 7. Results display
 
 Results are flattened in `SeriesService.FlattenResults` and saved as JSON in `HistoricalResults`. Anything new on `FlatResults` or `FlatSeriesScore` must treat null as "saved before this existed". Column visibility and the total heading are saved with the results, so **a series shows changes only after it's recalculated**. The results table (`Views/Shared/_ResultsTable.cshtml`) and CSV export (`Services/CsvService.cs`) render registered columns generically.
-
-### 7. Base system script
-
-Create the base system with a SQL script in `Sql Utility Scripts/`, modeled on `Create VARC 2026 Scoring systems.sql`:
-
-- a fixed `Id` Guid, `ClubId` and `ParentSystemId` null, `CalculatorType`, and defaults for `DiscardPattern`, `DiscardMethod`, `ParticipationPercent` and `Settings`
-- skip the insert when a base system with that `CalculatorType` already exists, so the script can run more than once
-- copy score codes from the closest existing base system
-
-Run the script on each environment after deploying and applying migrations, as with the PBG and VARC systems.
 
 ### 8. Club access
 
@@ -151,7 +161,7 @@ If the system is for specific clubs: Site Admin > Shared Scoring Systems > Acces
 
 In `SailScores.Test.Unit/Core/Scoring/`, following `Wawasee2026CalculatorTests.cs` or `PbgCalculatorTests.cs`:
 
-- Run the base system script on local dev and re-export `Fixtures/shared-systems.json` first (see `Core/Scoring/Characterization/README.md`): the scenario builder starts from that base system and its score codes.
+- The scenario builder starts from the base system and its score codes in `Fixtures/shared-systems.json`, so step 2 comes first.
 - Write scenarios with `Scenarios/Scenario.cs` (the race string format is in its header) and check them with `ScenarioAssert`:
 
   ```csharp
@@ -168,7 +178,8 @@ In `SailScores.Test.Unit/Core/Scoring/`, following `Wawasee2026CalculatorTests.c
 - Reproduce the club's worked example: races, finishes and expected totals, ranks, discards and column values. Ask for one if the rules don't include it.
 - Test the registration: the calculator type, columns and allowed discard methods.
 - Test validation for any required settings.
-- Add the new base system to the characterization tests: re-export `Fixtures/shared-systems.json` and accept the new snapshots (see `Core/Scoring/Characterization/README.md`). Check them against the club's rules.
+- Add the new base system to the characterization tests: with it in `Fixtures/shared-systems.json` (step 2), the variant fixtures score with it, and you accept the new snapshots (see `Core/Scoring/Characterization/README.md`). Check them against the club's rules.
+- If the total is the sum of the counted scores and lowest wins, add the type to `LowPointSumCalculators` in `Characterization/ScoringInvariantTests.cs`, so the total and ranking invariants check it too.
 - Run all unit tests. Existing calculator tests and snapshots must pass unchanged (the golden rule).
 
 Name tests `MethodName_StateUnderTest_ExpectedBehavior`.
@@ -185,13 +196,13 @@ Name tests `MethodName_StateUnderTest_ExpectedBehavior`.
 ## Checklist
 
 - [ ] `ScoringCalculatorType` value added (next integer, display name)
+- [ ] Base system SQL script in `Sql Utility Scripts/` (fixed Id, safe to rerun, score codes copied), run on local dev and added to `Fixtures/shared-systems.json` with `--only`
 - [ ] Calculator class added or reused; reads `Effective*` values only
 - [ ] Registration in `ScoringCalculatorRegistry` (fields, discard methods, columns, total heading)
 - [ ] New settings are nullable properties on `ScoringSystemSettings`
 - [ ] No behavior change to existing calculators; existing tests unchanged and passing
 - [ ] Unit tests with the club's worked example
-- [ ] Base system added to characterization snapshots; existing snapshots unchanged
-- [ ] Base system SQL script in `Sql Utility Scripts/` (fixed Id, safe to rerun, score codes copied)
+- [ ] Base system added to characterization snapshots (and to `LowPointSumCalculators` if it applies); existing snapshots unchanged
 - [ ] Deployment notes: run the script after migrations; set club access in Site Admin
 - [ ] Manual check done; series recalculated
 

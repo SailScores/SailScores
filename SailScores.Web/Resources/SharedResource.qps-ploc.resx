@@ -126,8 +126,8 @@
   <data name="New Race" xml:space="preserve">
     <value>[!! ➕🏁 Ñéŵ Ŕâçé !!]</value>
   </data>
-  <data name="Edit Club Info" xml:space="preserve">
-    <value>[!! ✏️🏛️ Éđïţ Ƈļûɓ Ìñƒõ !!]</value>
+  <data name="Club Settings" xml:space="preserve">
+    <value>[!! ⚙️🏛️ Ƈļûɓ Šéţţïñĝš !!]</value>
   </data>
   <data name="Club Web Site" xml:space="preserve">
     <value>[!! 🌐 Ƈļûɓ Ŵéɓ Šïţé !!]</value>

@@ -42,6 +42,8 @@ public class RaceController : Controller
     public async Task<ActionResult> Index(
         string clubInitials,
         string seasonName,
+        string month = null,
+        string fleet = null,
         bool showScheduled = true,
         bool showAbandoned = true)
     {
@@ -63,6 +65,8 @@ public class RaceController : Controller
         var races = await _raceService.GetAllRaceSummariesAsync(
             capInitials,
             seasonName,
+            month,
+            fleet,
             showScheduled,
             showAbandoned);
         

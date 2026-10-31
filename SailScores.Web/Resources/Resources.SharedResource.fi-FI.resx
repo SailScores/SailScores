@@ -281,8 +281,8 @@
   <data name="Description" xml:space="preserve">
     <value>Kuvaus</value>
   </data>
-  <data name="Edit Club Info" xml:space="preserve">
-    <value>Edit Club Info</value>
+  <data name="Club Settings" xml:space="preserve">
+    <value>Seuran asetukset</value>
     <comment>needed</comment>
   </data>
   <data name="Fleets" xml:space="preserve">

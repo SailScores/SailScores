@@ -22,7 +22,6 @@ namespace SailScores.Core.Scoring
             ScoringColumnFormat format,
             ColumnVisibility defaultVisibility,
             bool onlyWhenAnyValue = false,
-            bool includeForPercentSystems = true,
             Func<FlatSeriesScore, ScoringColumnValue> valueFromScore = null)
         {
             Key = key;
@@ -31,7 +30,6 @@ namespace SailScores.Core.Scoring
             Format = format;
             DefaultVisibility = defaultVisibility;
             OnlyWhenAnyValue = onlyWhenAnyValue;
-            IncludeForPercentSystems = includeForPercentSystems;
             ValueFromScore = valueFromScore;
         }
 
@@ -43,7 +41,6 @@ namespace SailScores.Core.Scoring
         public ColumnVisibility DefaultVisibility { get; }
         // Left out of the results when no competitor has a value.
         public bool OnlyWhenAnyValue { get; }
-        public bool IncludeForPercentSystems { get; }
         // For columns built from FlatSeriesScore properties. When null, the calculator
         // writes the value to SeriesCompetitorResults.ColumnValues.
         public Func<FlatSeriesScore, ScoringColumnValue> ValueFromScore { get; }

@@ -535,6 +535,47 @@ namespace SailScores.Test.Unit.Web.Services
             Assert.Contains("\"Boat, The\"", content);
         }
 
+        [Fact]
+        public void GetCsv_WithTemplate_StandardColumnsFollowTemplate()
+        {
+            var series = CreateTestSeries(raceCount: 1, competitorCount: 1, withElapsedTimes: false);
+            series.FlatResults.Columns = new List<FlatResultColumn>
+            {
+                new() { Key = "preDiscardTotal", Header = "Pre-Discard Total", Visibility = ColumnVisibility.Hidden },
+                new() { Key = "participation", Header = "Participation", Visibility = ColumnVisibility.Always },
+                new() { Key = "penalties", Header = "Penalties", Visibility = ColumnVisibility.Always }
+            };
+            _sailscoresLocalizerMock.Setup(l => l.GetShortName(It.IsAny<FlatRace>()))
+                .Returns((FlatRace r) => r.Name);
+            var template = new SeriesResultsTemplate
+            {
+                PreDiscardTotalVisibility = ColumnVisibility.OnLargerScreens,
+                ParticipationVisibility = ColumnVisibility.Hidden
+            };
+
+            var headers = GetCsvLines(_service.GetCsv(series, template))[0].Split(',');
+
+            Assert.Contains("Pre-Discard Total", headers);
+            Assert.DoesNotContain("Participation", headers);
+            Assert.Contains("Penalties", headers);
+        }
+
+        [Fact]
+        public void GetCsv_WithoutTemplate_HidesStandardColumns()
+        {
+            var series = CreateTestSeries(raceCount: 1, competitorCount: 1, withElapsedTimes: false);
+            series.FlatResults.Columns = new List<FlatResultColumn>
+            {
+                new() { Key = "participation", Header = "Participation", Visibility = ColumnVisibility.Always }
+            };
+            _sailscoresLocalizerMock.Setup(l => l.GetShortName(It.IsAny<FlatRace>()))
+                .Returns((FlatRace r) => r.Name);
+
+            var headers = GetCsvLines(_service.GetCsv(series))[0].Split(',');
+
+            Assert.DoesNotContain("Participation", headers);
+        }
+
         #endregion
 
         #region Competitor CSV Tests

@@ -18,6 +18,14 @@ namespace SailScores.Core.FlatModel
         public int? TotalChildRaceCount { get; set; } = 0;
         public string seriesUrlName { get; set; }
 
+        // Summary series: the child series this column comes from (a child race or the child
+        // series itself). Null for other series and for results saved before this was added.
+        public Guid? ChildSeriesId { get; set; }
+
+        // The child series of this column; results saved before ChildSeriesId fall back to
+        // the id of a child-series column.
+        public Guid? GetChildSeriesId() => ChildSeriesId ?? (IsSeries == true ? Id : null);
+
         public RaceState? State { get; set; }
 
         public DateTime? UpdatedDate { get; set; }

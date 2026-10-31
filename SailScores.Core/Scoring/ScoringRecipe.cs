@@ -15,7 +15,7 @@ namespace SailScores.Core.Scoring;
 //
 // The steps, in the order they run for each competitor, then for the series:
 //   RacePoints   points for each finish
-//   (code limits, missing results scored as DNC: the same for every system)
+//   (code limits, missing results scored as DefaultCode: the same for every system)
 //   Formulas     score code formulas (FIX, PLC%, AVE...)
 //   Adjustments  changes after formulas: caps, club rules
 //   Discards     which scores are discarded
@@ -38,11 +38,18 @@ public sealed class ScoringRecipe
     // default score isn't taken from a series count (Cox-Sprague).
     public bool SeriesFormulas { get; init; } = true;
 
-    // The score for no result, when it isn't the DNC code's (Top X: 0).
+    // The code for no result, and for a code the system doesn't have (Wawasee 2026: DNP).
+    public string DefaultCode { get; init; } = "DNC";
+
+    // The score for no result, when it isn't the default code's (Top X: 0).
     public decimal? FixedDefaultScore { get; init; }
 
     // Which scores count in an average when the code doesn't say.
     public AveragedScores AveragedScores { get; init; } = AveragedScores.All;
+
+    // True when a race can score 0 (First = 0): average formulas count scores of 0. Elsewhere
+    // a 0 marks a score left out of averages (low point averages' codes that aren't averaged).
+    public bool ZeroIsAScore { get; init; }
 
     public required IReadOnlyList<IScoreAdjustment> Adjustments { get; init; }
 

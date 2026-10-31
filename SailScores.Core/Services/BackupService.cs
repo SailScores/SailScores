@@ -55,6 +55,7 @@ public class BackupService : IBackupService
         public bool EnableCustomCompetitorFields { get; set; }
         public Guid? DefaultSeriesResultsTemplateId { get; set; }
         public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
+        public Guid? DefaultSummarySeriesResultsTemplateId { get; set; }
     }
 
     public BackupService(ISailScoresContext dbContext, ILogger<BackupService> logger)
@@ -166,7 +167,8 @@ public class BackupService : IBackupService
             EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers,
             EnableCustomCompetitorFields = club.EnableCustomCompetitorFields,
             DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
-            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId
+            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId,
+            DefaultSummarySeriesResultsTemplateId = club.DefaultSummarySeriesResultsTemplateId
         };
 
         // Boat Classes
@@ -1150,6 +1152,7 @@ public class BackupService : IBackupService
         club.EnableAlternativeSailNumbers = backup.EnableAlternativeSailNumbers;
         club.DefaultSeriesResultsTemplateId = backup.DefaultSeriesResultsTemplateId;
         club.DefaultRegattaSeriesResultsTemplateId = backup.DefaultRegattaSeriesResultsTemplateId;
+        club.DefaultSummarySeriesResultsTemplateId = backup.DefaultSummarySeriesResultsTemplateId;
     }
 
     private static void AddBasicClubSettingsAssignments(
@@ -1281,6 +1284,15 @@ public class BackupService : IBackupService
             "@defaultRegattaSeriesResultsTemplateId",
             backup.DefaultRegattaSeriesResultsTemplateId ?? (object)DBNull.Value,
             cancellationToken).ConfigureAwait(false);
+
+        await AddAssignmentIfColumnExistsAsync(
+            assignments,
+            parameters,
+            "DefaultSummarySeriesResultsTemplateId",
+            "DefaultSummarySeriesResultsTemplateId = @defaultSummarySeriesResultsTemplateId",
+            "@defaultSummarySeriesResultsTemplateId",
+            backup.DefaultSummarySeriesResultsTemplateId ?? (object)DBNull.Value,
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static void AddAssignment(
@@ -1390,7 +1402,8 @@ public class BackupService : IBackupService
             DefaultHandicapSystemId = club.DefaultHandicapSystemId,
             EnableAlternativeSailNumbers = club.EnableAlternativeSailNumbers,
             DefaultSeriesResultsTemplateId = club.DefaultSeriesResultsTemplateId,
-            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId
+            DefaultRegattaSeriesResultsTemplateId = club.DefaultRegattaSeriesResultsTemplateId,
+            DefaultSummarySeriesResultsTemplateId = club.DefaultSummarySeriesResultsTemplateId
         };
     }
 
@@ -1420,6 +1433,7 @@ public class BackupService : IBackupService
         await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "EnableAlternativeSailNumbers", cancellationToken).ConfigureAwait(false);
         await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "DefaultSeriesResultsTemplateId", cancellationToken).ConfigureAwait(false);
         await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "DefaultRegattaSeriesResultsTemplateId", cancellationToken).ConfigureAwait(false);
+        await AddClubBackupSnapshotColumnIfExistsAsync(requestedColumns, "DefaultSummarySeriesResultsTemplateId", cancellationToken).ConfigureAwait(false);
 
         return requestedColumns;
     }
@@ -1529,6 +1543,13 @@ public class BackupService : IBackupService
             reader,
             "DefaultRegattaSeriesResultsTemplateId",
             (s, value) => s.DefaultRegattaSeriesResultsTemplateId = value,
+            ReadOptionalGuid);
+        ApplyOptionalSnapshotValue(
+            snapshot,
+            requestedColumns,
+            reader,
+            "DefaultSummarySeriesResultsTemplateId",
+            (s, value) => s.DefaultSummarySeriesResultsTemplateId = value,
             ReadOptionalGuid);
     }
 

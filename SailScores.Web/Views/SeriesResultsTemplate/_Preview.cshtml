@@ -1,0 +1,15 @@
+@model SailScores.Web.Models.SailScores.ResultsTableViewModel
+@* Returned by the Preview action and placed in the panel by seriesResultsTemplatePreview.js. *@
+
+@if (Model == null)
+{
+    <p class="text-body-secondary mb-0">There are no series with results to preview yet.</p>
+}
+else
+{
+    @* The same width as the series page (Series/Details sets WideLayout the same way). *@
+    var wide = ResultsTableViewModel.UsesWideLayout(Model.Results, Model.RaceColumnsVisibility);
+    <div class="@(wide ? "" : "container-lg px-0")">
+        <partial name="_ResultsTable" model="Model" />
+    </div>
+}

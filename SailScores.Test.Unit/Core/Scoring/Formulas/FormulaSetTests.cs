@@ -25,6 +25,7 @@ public class FormulaSetTests
     [InlineData("MAN", FormulaStep.Race)]
     [InlineData("FIN+", FormulaStep.Race)]
     [InlineData("CTS+", FormulaStep.Race)]
+    [InlineData("STR+", FormulaStep.Race)]
     [InlineData("PLC%", FormulaStep.Race)]
     [InlineData("SER+", FormulaStep.Series)]
     [InlineData("AVE", FormulaStep.Average)]
@@ -73,12 +74,12 @@ public class FormulaSetTests
         Assert.IsType<HighPointPlacePlusPercentFormula>(FormulaSet.HighPoint.Find("PLC%"));
     }
 
-    // Quirk: TIE is matched with case (docs/Scoring-Quirks.md).
     [Theory]
     [InlineData("TIE", true)]
-    [InlineData("tie", false)]
+    [InlineData("tie", true)]
+    [InlineData("FIX", false)]
     [InlineData(null, false)]
-    public void IsTie_MatchesUpperCaseOnly(string formula, bool expected)
+    public void IsTie_AnyCase_Matches(string formula, bool expected)
     {
         Assert.Equal(expected, TieFormula.IsTie(new ScoreCode { Formula = formula }));
     }
@@ -89,6 +90,7 @@ public class FormulaSetTests
     [InlineData("FIN+", "1", "Number of boats that finished race + 1")]
     [InlineData("FIN+", "0", "Number of boats that finished race")]
     [InlineData("CTS+", "1", "Number of boats that came to starting area + 1")]
+    [InlineData("STR+", "1", "Number of boats that started + 1")]
     [InlineData("SER+", "2.5", "Number of boats entered in series + 2.5")]
     [InlineData("PLC%", "20", "Place + penalty (20% of DNF score)")]
     [InlineData("AVE", null, "Average of results")]

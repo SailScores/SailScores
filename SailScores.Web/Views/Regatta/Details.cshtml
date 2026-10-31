@@ -288,19 +288,19 @@
                             <th class="col-1"></th>
                             @if (Model.Item.RegattaResultsTemplate?.SailNumberVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                             {
-                                <th scope="col" class="col-1 @(Model.Item.RegattaResultsTemplate?.SailNumberVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@localizer["Sail Number"]</th>
+                                <th scope="col" class="col-1 @(Model.Item.RegattaResultsTemplate?.SailNumberVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(string.IsNullOrWhiteSpace(Model.Item.RegattaResultsTemplate?.SailNumberHeader) ? localizer["Sail Number"] : Model.Item.RegattaResultsTemplate.SailNumberHeader)</th>
                             }
                             @if (Model.Item.RegattaResultsTemplate?.CompetitorNameVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                             {
-                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.CompetitorNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(Model.Item.RegattaResultsTemplate?.CompetitorNameHeader ?? localizer["Name"])</th>
+                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.CompetitorNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(string.IsNullOrWhiteSpace(Model.Item.RegattaResultsTemplate?.CompetitorNameHeader) ? localizer["Helm"] : Model.Item.RegattaResultsTemplate.CompetitorNameHeader)</th>
                             }
                             @if (Model.Item.RegattaResultsTemplate?.BoatNameVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                             {
-                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.BoatNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(Model.Item.RegattaResultsTemplate?.BoatNameHeader ?? localizer["Boat"])</th>
+                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.BoatNameVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(string.IsNullOrWhiteSpace(Model.Item.RegattaResultsTemplate?.BoatNameHeader) ? localizer["Boat"] : Model.Item.RegattaResultsTemplate.BoatNameHeader)</th>
                             }
                             @if (Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility != SailScores.Api.Enumerations.ColumnVisibility.Hidden)
                             {
-                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@localizer["Club"]</th>
+                                <th scope="col" class="col-2 @(Model.Item.RegattaResultsTemplate?.CompetitorClubVisibility == SailScores.Api.Enumerations.ColumnVisibility.OnLargerScreens ? "d-none d-md-table-cell" : "")">@(string.IsNullOrWhiteSpace(Model.Item.RegattaResultsTemplate?.CompetitorClubHeader) ? localizer["Club"] : Model.Item.RegattaResultsTemplate.CompetitorClubHeader)</th>
                             }
                             @foreach (var customField in customFieldsForList)
                             {
@@ -406,13 +406,6 @@
                             SeriesId = currentSeries.Id,
                             Results = currentSeries.FlatResults,
                             ShowTrend = showTrend,
-                            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-                            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-                            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-                            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-                            BoatNameHeader = resolvedTemplate.BoatNameHeader,
-                            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
-                            ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
                             CustomFieldColumns = customFieldColumns,
                             CustomFieldDefinitions = customFieldDefinitions,
                             IsExport = false,
@@ -420,10 +413,9 @@
                             ExcludeCompetitorLinks = true,
                             PreferAlternativeSailNumbers = currentSeries.PreferAlternativeSailNumbers ?? false,
                             TrendLegend = trendLegend,
-                            HideDncDiscards = currentSeries.HideDncDiscards,
                             UpdatedDate = currentSeries.UpdatedDate,
                             DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-                        };
+                        }.WithTemplate(resolvedTemplate);
 
                     @await Html.PartialAsync("_ResultsTable", tableModel)
                     

@@ -9,6 +9,7 @@
   "LowerScoreWins": false,
   "PercentRequired": "0",
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)"
   ],
   "Races": [
@@ -30,6 +31,9 @@
       "SailNumber": "JB",
       "Total": "298",
       "PointsEarned": "298",
+      "Columns": {
+        "preDiscardTotal": "298"
+      },
       "Scores": "RCD 99/100 | 1:100/100 | - | 1:99/100 | - | - | - | - | - | -"
     },
     {
@@ -38,6 +42,9 @@
       "SailNumber": "DB",
       "Total": "292",
       "PointsEarned": "292",
+      "Columns": {
+        "preDiscardTotal": "292"
+      },
       "Scores": "1:98/100 | 5:96/100 | - | 2:98/100 | - | - | - | - | - | -"
     },
     {
@@ -46,6 +53,9 @@
       "SailNumber": "AF",
       "Total": "198",
       "PointsEarned": "198",
+      "Columns": {
+        "preDiscardTotal": "198"
+      },
       "Scores": "2:97/100 | RCD 101/100 | - | DNC null | - | - | - | - | - | -"
     },
     {
@@ -54,6 +64,9 @@
       "SailNumber": "AN",
       "Total": "189",
       "PointsEarned": "189",
+      "Columns": {
+        "preDiscardTotal": "189"
+      },
       "Scores": "3:96/100 | DNF 93/100 | - | DNC null | - | - | - | - | - | -"
     },
     {
@@ -62,6 +75,9 @@
       "SailNumber": "SC",
       "Total": "189",
       "PointsEarned": "189",
+      "Columns": {
+        "preDiscardTotal": "189"
+      },
       "Scores": "DNC null | RET 93/100 | - | 4:96/100 | - | - | - | - | - | -"
     },
     {
@@ -70,6 +86,9 @@
       "SailNumber": "MM",
       "Total": "99",
       "PointsEarned": "99",
+      "Columns": {
+        "preDiscardTotal": "99"
+      },
       "Scores": "DNC null | 2:99/100 | - | DNC null | - | - | - | - | - | -"
     },
     {
@@ -78,6 +97,9 @@
       "SailNumber": "LF",
       "Total": "98",
       "PointsEarned": "98",
+      "Columns": {
+        "preDiscardTotal": "98"
+      },
       "Scores": "DNC null | 3:98/100 | - | DNC null | - | - | - | - | - | -"
     },
     {
@@ -86,6 +108,9 @@
       "SailNumber": "JG",
       "Total": "97",
       "PointsEarned": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
       "Scores": "DNC null | 4:97/100 | - | DNC null | - | - | - | - | - | -"
     },
     {
@@ -94,6 +119,9 @@
       "SailNumber": "TL",
       "Total": "97",
       "PointsEarned": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
       "Scores": "DNC null | DNC null | - | 3:97/100 | - | - | - | - | - | -"
     }
   ],

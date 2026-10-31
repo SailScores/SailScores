@@ -24,6 +24,8 @@ namespace SailScores.Core.Scoring
         public string CustomSettingsPartial { get; init; }
         // Heading of the results' total column.
         public string TotalHeader { get; init; } = ScoringCalculatorRegistry.DefaultTotalHeader;
+        // An unranked competitor's total column shows its points earned (greyed), not its average.
+        public bool UnrankedShowsPoints { get; init; }
     }
 
     public static class ScoringCalculatorRegistry
@@ -92,7 +94,7 @@ namespace SailScores.Core.Scoring
                         new ScoringFieldDescriptor(
                             nameof(ScoringSystemSettings.MinimumCompetitors),
                             "Minimum boats",
-                            "A race counts only when at least this many boats in the series came to the start. Its scores show as discards otherwise. Leave blank to count every race.",
+                            "A race counts only when at least this many boats in the series were scored (any score but DNC). Its scores show as discards otherwise. Leave blank to count every race.",
                             ScoringFieldType.Integer,
                             required: false),
                         new ScoringFieldDescriptor(
@@ -113,7 +115,7 @@ namespace SailScores.Core.Scoring
                         new ScoringFieldDescriptor(
                             nameof(ScoringSystemSettings.PenaltyThresholdPercent),
                             "Penalty threshold",
-                            "Boats that sailed fewer than this percent of the races that count (rounded up to a whole race) get penalty points for each race short. Excused absences count as sailed.",
+                            "Boats that sailed fewer than this percent of the races that count (rounded to the nearest race, a half up) get penalty points for each race short. Excused absences count as sailed.",
                             ScoringFieldType.Percent,
                             required: true),
                         new ScoringFieldDescriptor(
@@ -137,7 +139,8 @@ namespace SailScores.Core.Scoring
                         ScoringColumns.AverageFinish,
                         ScoringColumns.AverageWithPenalties
                     },
-                    TotalHeader = "Points (with Penalties)"
+                    TotalHeader = "Points (with Penalties)",
+                    UnrankedShowsPoints = true
                 }
             }.ToDictionary(r => r.CalculatorType);
 

@@ -126,8 +126,8 @@
   <data name="New Race" xml:space="preserve">
     <value>Nueva prueba</value>
   </data>
-  <data name="Edit Club Info" xml:space="preserve">
-    <value>Editar información del club</value>
+  <data name="Club Settings" xml:space="preserve">
+    <value>Configuración del club</value>
   </data>
   <data name="Club Web Site" xml:space="preserve">
     <value>Sitio web del club</value>
@@ -293,5 +293,23 @@
   </data>
   <data name="Regatta!" xml:space="preserve">
     <value>¡Regata!</value>
+  </data>
+  <data name="All Dates" xml:space="preserve">
+    <value>Todas las fechas</value>
+  </data>
+  <data name="All Fleets" xml:space="preserve">
+    <value>Todas las flotas</value>
+  </data>
+  <data name="Filter by month" xml:space="preserve">
+    <value>Filtrar por mes</value>
+  </data>
+  <data name="Filter by fleet" xml:space="preserve">
+    <value>Filtrar por flota</value>
+  </data>
+  <data name="No races match these filters." xml:space="preserve">
+    <value>Ninguna prueba coincide con estos filtros.</value>
+  </data>
+  <data name="Clear filters" xml:space="preserve">
+    <value>Borrar filtros</value>
   </data>
 </root>

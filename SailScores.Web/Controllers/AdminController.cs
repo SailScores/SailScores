@@ -5,7 +5,6 @@ using SailScores.Web.Authorization;
 using SailScores.Web.Models.SailScores;
 using SailScores.Web.Services;
 using SailScores.Web.Services.Interfaces;
-using SailScores.Core.Utility;
 using IAuthorizationService = SailScores.Web.Services.Interfaces.IAuthorizationService;
 
 namespace SailScores.Web.Controllers;
@@ -81,26 +80,12 @@ public class AdminController : Controller
                 clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
                 clubAdmin.LocaleOptions = club.LocaleOptions;
                 clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
-                clubAdmin.TemplateOptions = club.TemplateOptions;
                 clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
                 return View(clubAdmin);
             }
 
-            if (!ClubDateFormatUtility.TryNormalize(clubAdmin.DefaultDateFormat, out var normalizedDateFormat, out var dateFormatError))
-            {
-                ModelState.AddModelError(nameof(clubAdmin.DefaultDateFormat), dateFormatError);
-                var club = await _adminService.GetClubForEdit(clubInitials);
-                clubAdmin.Seasons = club.Seasons;
-                clubAdmin.ScoringSystemOptions = club.ScoringSystemOptions;
-                clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
-                clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
-                clubAdmin.LocaleOptions = club.LocaleOptions;
-                clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
-                clubAdmin.TemplateOptions = club.TemplateOptions;
-                return View(clubAdmin);
-            }
-
-            clubAdmin.DefaultDateFormat = normalizedDateFormat;
+            // The date format is set on the Results Display page; keep the saved one.
+            clubAdmin.DefaultDateFormat = (await _adminService.GetClubForEdit(clubInitials)).DefaultDateFormat;
 
             try
             {
@@ -117,7 +102,6 @@ public class AdminController : Controller
                 clubAdmin.LocaleOptions = club.LocaleOptions;
                 clubAdmin.DefaultRaceDateOffset = club.DefaultRaceDateOffset;
                 clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
-                clubAdmin.TemplateOptions = club.TemplateOptions;
                 clubAdmin.LogoFile = null; // Clear the file input
                 return View(clubAdmin);
             }
@@ -127,8 +111,6 @@ public class AdminController : Controller
                 clubAdmin.DefaultScoringSystemId;
             clubObject.DefaultHandicapSystemId = clubAdmin.DefaultHandicapSystemId;
             clubObject.EnableCustomCompetitorFields = clubAdmin.EnableCustomCompetitorFields;
-            clubObject.DefaultSeriesResultsTemplateId = clubAdmin.DefaultSeriesResultsTemplateId;
-            clubObject.DefaultRegattaSeriesResultsTemplateId = clubAdmin.DefaultRegattaSeriesResultsTemplateId;
             clubObject.WeatherSettings = new WeatherSettings
             {
                 Latitude = clubAdmin.Latitude,
@@ -150,7 +132,6 @@ public class AdminController : Controller
             clubAdmin.SpeedUnitOptions = club.SpeedUnitOptions;
             clubAdmin.TemperatureUnitOptions = club.TemperatureUnitOptions;
             clubAdmin.HandicapSystemOptions = club.HandicapSystemOptions;
-            clubAdmin.TemplateOptions = club.TemplateOptions;
             return View(clubAdmin);
         }
     }

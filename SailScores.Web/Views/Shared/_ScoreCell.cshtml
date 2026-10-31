@@ -1,4 +1,5 @@
 @using Humanizer
+@using SailScores.Api.Enumerations
 
 @model SailScores.Web.Models.SailScores.ScoreCellViewModel
 @{
@@ -8,6 +9,18 @@
     var scoreValue = Model.Result?.ScoreValue;
     var hasCode = !String.IsNullOrEmpty(Model.Result?.Code);
     var isTie = Model.Result?.Code == "TIE";
+    // In percent systems a DNC is shown like a discard when it doesn't count toward
+    // the result. In high point percent systems that's every DNC; in Low Point Average
+    // systems an uncounted DNC is scored as zero, and a counted one is shown normally.
+    var isUncountedDnc = Model.IsPercentSystem && Model.Result?.Code == "DNC"
+        && (!Model.LowerScoreWins || (Model.Result.ScoreValue ?? 0m) == 0m);
+    var isDiscard = Model.Result?.Discard ?? false;
+
+    // Score code settings from the results template.
+    var hideForCode = Model.CodeDisplay?.Display == ScoreCodeDisplay.Hidden
+        || (Model.CodeDisplay?.Display == ScoreCodeDisplay.HiddenWhenDiscarded && (isDiscard || isUncountedDnc));
+    var showPoints = Model.CodeDisplay?.Display != ScoreCodeDisplay.CodeOnly;
+    var fadeForCode = Model.CodeDisplay?.Faded ?? false;
     if ((place == 1 || (scoreValue == 1m && !Model.IsPercentSystem)) && !hasCode &&
         (scoreValue < 1m || scoreValue == 1m || scoreValue == 1.5m || scoreValue == 2.0m || Model.IsPercentSystem))
     {
@@ -38,33 +51,43 @@
     {
         classSb.Append("finish-third ");
     }
+    if (!Model.HighlightTopThree || hideForCode)
+    {
+        classSb.Clear();
+    }
 
-    // In percent systems a DNC is shown like a discard when it doesn't count toward
-    // the result. In high point percent systems that's every DNC; in Low Point Average
-    // systems an uncounted DNC is scored as zero, and a counted one is shown normally.
-    var isUncountedDnc = Model.IsPercentSystem && Model.Result?.Code == "DNC"
-        && (!Model.LowerScoreWins || (Model.Result.ScoreValue ?? 0m) == 0m);
-
-    if ((Model.Result != null && Model.Result.Discard) || isUncountedDnc)
+    if (isDiscard || isUncountedDnc)
     {
         classSb.Append("discardmuted ");
     }
 
     cellFinishClasses = classSb.ToString();
+
+    // Discards use the template's discard style; a faded score code is muted too.
+    var strikeDiscard = isDiscard && Model.DiscardStrikethrough;
+    var parenDiscard = isDiscard && Model.DiscardParentheses;
+    var scoreSpanClass = string.Join(" ", new[]
+    {
+        isDiscard ? Model.DiscardCssClass : null,
+        fadeForCode ? "discardmuted" : null
+    }.Where(c => !string.IsNullOrEmpty(c)).Distinct());
 }
 
 
 @if (Model != null && Model.Result != null )
 {
-    <td class="text-center @cellFinishClasses ">
-        <span class="@(Model.Result.Discard ? "discardmuted" : "")">
-            @* hide all cell contents if DNC, discarded, and series setting. *@
-            @if (!(Model.HideDncDiscards && Model.Result.Code == "DNC" &&
-                (Model.Result.Discard || isUncountedDnc)))
+    <td class="text-center @cellFinishClasses @Model.CssClass">
+        <span class="@scoreSpanClass">
+            @* hide all cell contents if the template hides the code (always or when discarded). *@
+            @if (!hideForCode)
             {
-                @if (Model.Result.Discard)
+                @if (strikeDiscard)
                 {
                     @Html.Raw("<s>")
+                }
+                @if (parenDiscard)
+                {
+                    @Html.Raw("(")
                 }
                 @if(Model.Result.Code != null
                    && Model.ScoreCodesUsed != null
@@ -80,17 +103,22 @@
                 {
                     @Html.Raw("</span> ")
                 }
-                @if (Model.IsPercentSystem && Model.Result.Place.HasValue)
+                @* points are left out when the template shows only the code *@
+                @if (showPoints && Model.IsPercentSystem && Model.Result.Place.HasValue)
                 {
                     var tooltipText = Model.Result.PerfectScoreValue == null ?
                         Model.Result.Place.Value.Ordinalize() :
                     $"of {Model.Result.PerfectScoreValue.Value}&#010;{Model.Result.Place.Value.Ordinalize()}";
                 
                     <span data-bs-html="true" title="@Html.Raw(tooltipText)">@((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("0.##"))</span>
-                } else {
+                } else if (showPoints) {
                     @((Model.Result.ScoreValue ?? Model.Result.Place)?.ToString("0.##"))
                 }
-                @if (Model.Result.Discard)
+                @if (parenDiscard)
+                {
+                    @Html.Raw(")")
+                }
+                @if (strikeDiscard)
                 {
                     @Html.Raw("</s>")
                 }
@@ -100,5 +128,5 @@
 }
 else
 {
-    <td></td>
+    <td class="@Model?.CssClass"></td>
 }

@@ -9,6 +9,7 @@
   "LowerScoreWins": false,
   "PercentRequired": "0",
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)"
   ],
   "Races": [
@@ -25,6 +26,9 @@
       "SailNumber": "1280",
       "Total": "493",
       "PointsEarned": "493",
+      "Columns": {
+        "preDiscardTotal": "493"
+      },
       "Scores": "1:98/100 | 2:99/100 | 1:100/100 | 1:98/100 | 1:98/100"
     },
     {
@@ -33,6 +37,9 @@
       "SailNumber": "TC49",
       "Total": "483",
       "PointsEarned": "483",
+      "Columns": {
+        "preDiscardTotal": "483"
+      },
       "Scores": "3:96/100 | 3:98/100 | 4:97/100 | 3:96/100 | 3:96/100"
     },
     {
@@ -41,6 +48,9 @@
       "SailNumber": "1935",
       "Total": "397",
       "PointsEarned": "397",
+      "Columns": {
+        "preDiscardTotal": "397"
+      },
       "Scores": "DNC null | 1:100/100 | 2:99/100 | SB 99/100 | SB 99/100"
     },
     {
@@ -49,6 +59,9 @@
       "SailNumber": "2322",
       "Total": "289",
       "PointsEarned": "289",
+      "Columns": {
+        "preDiscardTotal": "289"
+      },
       "Scores": "2:97/100 | 5:96/100 | 5:96/100 | DNC null | DNC null"
     },
     {
@@ -57,6 +70,9 @@
       "SailNumber": "1765",
       "Total": "195",
       "PointsEarned": "195",
+      "Columns": {
+        "preDiscardTotal": "195"
+      },
       "Scores": "DNC null | 4:97/100 | 3:98/100 | DNC null | DNC null"
     },
     {
@@ -65,6 +81,9 @@
       "SailNumber": "2539",
       "Total": "194",
       "PointsEarned": "194",
+      "Columns": {
+        "preDiscardTotal": "194"
+      },
       "Scores": "DNC null | DNC null | DNC null | 2:97/100 | TIE 97/100"
     }
   ],

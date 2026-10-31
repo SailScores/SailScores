@@ -1,179 +1,96 @@
 @model SailScores.Web.Models.SailScores.SeriesResultsTemplateViewModel
 @{
-    ViewData["Title"] = "Edit Results Display Template";
+    ViewData["Title"] = "Edit Results View";
     Layout = "_ClubLayout";
 }
 
 <div class="container-lg p-0 p-md-2">
-    <div class="mb-3">
-        <h1 class="h2 mb-1">@ViewData["Title"]</h1>
-        <p class="text-body-secondary mb-0">
-            Modify this template's column visibility and header settings.
-        </p>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2 mb-3">
+        <div>
+            <h1 class="h2 mb-1">@ViewData["Title"]</h1>
+            <p class="text-body-secondary mb-0">
+                Change how series results are displayed for series that use this view.
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-outline-secondary text-nowrap" data-bs-toggle="offcanvas"
+                    data-bs-target="#resultsViewPreview" aria-controls="resultsViewPreview">
+                <span class="fas fa-eye"></span>
+                Preview
+            </button>
+            @if (!Model.IsReset)
+            {
+                <a asp-action="Edit" asp-route-clubInitials="@Model.ClubInitials" asp-route-id="@Model.Id"
+                   asp-route-reset="true" class="btn btn-outline-secondary text-nowrap" data-keeps-preview
+                   title="Fill in the default settings. Nothing changes until you save.">
+                    <span class="fas fa-undo"></span>
+                    Reset to defaults
+                </a>
+            }
+        </div>
     </div>
 
-    <form asp-action="Edit" method="post">
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    @if (Model.IsReset)
+    {
+        <div class="alert alert-info" role="alert" id="resetNotice">
+            Form has been reset to SailScores defaults: a clean view with sail number, competitor and boat
+            name, gold/silver/bronze places, faded and struck-through discards, all score codes shown
+            with points, and no custom fields or vertical rules. Changes are not saved yet: use the Save
+            button to apply the reset or Cancel to keep the current settings.
+        </div>
+    }
+
+    <form asp-action="Edit" method="post" id="templateForm">
         <input type="hidden" asp-for="Id" />
+        <partial name="_TemplateForm" model="Model" />
+        <partial name="_PreviewPanel" model="Model" />
 
-        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
-            <h2 class="h5 mb-3">Template settings</h2>
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" placeholder="e.g., Standard, Mobile-Friendly, Regatta Full" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-                <small class="form-text text-body-secondary">Give this template a descriptive name to help identify its purpose.</small>
-            </div>
-
-            <div class="form-check">
-                <input asp-for="ShowClubLogo" class="form-check-input" />
-                <label asp-for="ShowClubLogo" class="form-check-label"></label>
-                <small class="form-text text-body-secondary d-block">Displays the club logo in the upper right of the results page, browser prints, and HTML exports.</small>
-            </div>
-        </div>
-
-        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
-            <h2 class="h5 mb-3">Column visibility</h2>
-            <p class="text-body-secondary small mb-3">
-                Choose when each column should be displayed:
-                <strong>Always</strong> = visible on all devices,
-                <strong>On Larger Screens</strong> = hidden on phones but visible on tablets/desktops,
-                <strong>Hidden</strong> = never shown.
-            </p>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="SailNumberVisibility" class="form-label"></label>
-                    <select asp-for="SailNumberVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
-                    <span asp-validation-for="SailNumberVisibility" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="CompetitorNameVisibility" class="form-label"></label>
-                    <select asp-for="CompetitorNameVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
-                    <span asp-validation-for="CompetitorNameVisibility" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="BoatNameVisibility" class="form-label"></label>
-                    <select asp-for="BoatNameVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
-                    <span asp-validation-for="BoatNameVisibility" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="CompetitorClubVisibility" class="form-label"></label>
-                    <select asp-for="CompetitorClubVisibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()" class="form-select"></select>
-                    <span asp-validation-for="CompetitorClubVisibility" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
-            <h2 class="h5 mb-3">Column headers</h2>
-            <p class="text-body-secondary small mb-3">
-                Customize the text shown in column headers. Common examples: "Helm", "Skipper", "Crew", "Name" for competitors;
-                "Boat", "Yacht", "Dinghy" for boat names.
-            </p>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="CompetitorNameHeader" class="form-label"></label>
-                    <input asp-for="CompetitorNameHeader" class="form-control" placeholder="Helm" />
-                    <span asp-validation-for="CompetitorNameHeader" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="BoatNameHeader" class="form-label"></label>
-                    <input asp-for="BoatNameHeader" class="form-control" placeholder="Boat" />
-                    <span asp-validation-for="BoatNameHeader" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" asp-for="ShowPreDiscardTotal" />
-                <label class="form-check-label" asp-for="ShowPreDiscardTotal">
-                    Show Pre-Discard Total Column
-                </label>
-                <small class="d-block form-text text-body-secondary mt-2">
-                    When enabled, results include the "Pre-Discard Total" showing each competitor's total score
-                    before applying discards. This option is only displayed for low-point scoring
-                    systems, not for percentage-based systems.
-                </small>
-            </div>
-        </div>
-
-    <div class="border rounded p-3 p-md-4 mb-4 bg-almost">
-        <h2 class="h5 mb-3">Score display options</h2>
-        <p class="text-body-secondary small mb-3">
-            Configure additional scoring display options.
-        </p>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Custom Competitor Fields</h5>
-        </div>
-        <div class="card-body">
-            <p class="text-muted small">
-                Select which custom competitor fields should appear in this results view.
-            </p>
-            @if (Model.AvailableCustomFields != null && Model.AvailableCustomFields.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead>
-                            <tr>
-                                <th scope="col">Include</th>
-                                <th scope="col">Field</th>
-                                <th scope="col">Visibility</th>
-                                <th scope="col">Order</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (var index = 0; index < Model.CustomFieldSelections.Count; index++)
-                            {
-                                var selection = Model.CustomFieldSelections[index];
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="form-check-input" asp-for="@Model.CustomFieldSelections[index].Selected" />
-                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].FieldDefinitionId" />
-                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DisplayHeader" />
-                                        <input type="hidden" asp-for="@Model.CustomFieldSelections[index].DataType" />
-                                    </td>
-                                    <td>@(string.IsNullOrWhiteSpace(selection.DisplayHeader) ? selection.Name : selection.DisplayHeader)</td>
-                                    <td>
-                                        <select class="form-select form-select-sm" asp-for="@Model.CustomFieldSelections[index].Visibility" asp-items="Html.GetEnumSelectList<SailScores.Api.Enumerations.ColumnVisibility>()"></select>
-                                    </td>
-                                    <td>
-                                        <input class="form-control form-control-sm" asp-for="@Model.CustomFieldSelections[index].DisplayOrder" />
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted">No custom competitor fields are available for this club yet.</p>
-            }
-        </div>
-    </div>
-
-      <div class="mb-3">
+        <div class="d-flex flex-wrap gap-2 mb-3">
             <button type="submit" class="btn btn-primary">
                 Save
+            </button>
+            <button type="button" class="btn btn-outline-secondary text-nowrap" data-bs-toggle="offcanvas"
+                    data-bs-target="#resultsViewPreview" aria-controls="resultsViewPreview">
+                <span class="fas fa-eye"></span>
+                Preview
             </button>
             <a asp-action="Index" asp-route-clubInitials="@Model.ClubInitials" class="btn btn-outline-primary">
                 Cancel
             </a>
-      </div>
-  </form>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/seriesResultsTemplatePreview.js" asp-append-version="true"></script>
+    <script>
+        // Help popovers, opened by a tap on touch screens.
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
+            new bootstrap.Popover(el);
+        });
+    </script>
+    @if (Model.IsReset)
+    {
+        <script>
+            // The reset notice goes once any setting is changed; choosing a preview series isn't one.
+            (function () {
+                var notice = document.getElementById('resetNotice');
+                var form = document.getElementById('templateForm');
+                if (!notice || !form) {
+                    return;
+                }
+                function hideNotice(event) {
+                    if (event.target.id === 'previewSeriesId') {
+                        return;
+                    }
+                    notice.remove();
+                    form.removeEventListener('input', hideNotice);
+                    form.removeEventListener('change', hideNotice);
+                }
+                form.addEventListener('input', hideNotice);
+                form.addEventListener('change', hideNotice);
+            })();
+        </script>
+    }
 }

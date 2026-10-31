@@ -30,9 +30,6 @@ public class MultipleSeriesWithOptionsViewModel
     [Display(Name = "Calculate Rank Trend")]
     public TrendOption? TrendOption { get; set; } = Api.Enumerations.TrendOption.None;
 
-    [Display(Name = "Hide discarded DNC scores")]
-    public bool HideDncDiscards { get; set; }
-
     public IList<MultipleSeriesRowViewModel> Series { get; set; } = new List<MultipleSeriesRowViewModel>();
 
     [Display(Name = "Add series to summary series")]

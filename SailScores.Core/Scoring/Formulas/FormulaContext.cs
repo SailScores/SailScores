@@ -28,12 +28,15 @@ public sealed class FormulaContext
 public interface IFormulaHost
 {
     // The formula for a score code name, following the calculator's lookup (an unknown code
-    // is scored as DNC). Null for a blank code.
+    // is scored as the default code, DNC). Null for a blank code.
     IScoreCodeFormula FormulaFor(string codeName);
 
     bool CountsAsFinished(Score score);
 
     bool CameToStart(Score score);
+
+    // A place with no code, or a code that counts as started.
+    bool CountsAsStarted(Score score);
 
     // The race's scores that count for boat numbers: every score, or only the fleet's when
     // places are recalculated within a fleet.
@@ -43,4 +46,7 @@ public interface IFormulaHost
 
     // Discards the competitor is expected to have, for averages of non-discarded races.
     int ExpectedDiscards(SeriesCompetitorResults competitor);
+
+    // True when scores of 0 count in averages (ScoringRecipe.ZeroIsAScore).
+    bool AveragesCountZeroScores { get; }
 }

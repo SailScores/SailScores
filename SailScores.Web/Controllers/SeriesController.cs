@@ -169,6 +169,10 @@ public class SeriesController : Controller
                 {
                     template = await _templateService.GetTemplateAsync(club.DefaultRegattaSeriesResultsTemplateId.Value);
                 }
+                else if (series.Type == SeriesType.Summary && club.DefaultSummarySeriesResultsTemplateId.HasValue)
+                {
+                    template = await _templateService.GetTemplateAsync(club.DefaultSummarySeriesResultsTemplateId.Value);
+                }
                 else if (club.DefaultSeriesResultsTemplateId.HasValue)
                 {
                     template = await _templateService.GetTemplateAsync(club.DefaultSeriesResultsTemplateId.Value);
@@ -184,7 +188,7 @@ public class SeriesController : Controller
             customFieldDefinitions = definitions?.ToDictionary(d => d.Id, d => d) ?? new Dictionary<Guid, CompetitorFieldDefinition>();
         }
 
-        Stream csv = _csvService.GetCsv(series);
+        Stream csv = _csvService.GetCsv(series, template);
 
         return File(csv, "text/csv", filename);
     }

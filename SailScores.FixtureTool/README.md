@@ -15,7 +15,7 @@ dotnet run --project SailScores.FixtureTool -- <command> ...
 ### `shared-systems`: export the shared base systems
 
 ```
-shared-systems --connection "<connection string>" --out shared-systems.json
+shared-systems --connection "<connection string>" --out shared-systems.json [--only <system id> ...]
 ```
 
 Club backups only hold the club's own scoring systems. Club systems inherit their
@@ -23,6 +23,10 @@ calculator type, settings and score codes from the shared base systems (`ClubId`
 so extraction needs those too. This command exports them, along with the shared handicap
 systems, from any database that has them (a local copy of production is fine). It reads
 every column, so it works against older schemas.
+
+With `--only` (repeatable), it updates just those scoring systems in an existing file,
+adding any that are new, and leaves the rest of the file as it was. Use it to add a new
+base system from a local database that doesn't have every shared system.
 
 ### `list`: inventory a backup
 

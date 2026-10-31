@@ -262,6 +262,9 @@ namespace SailScores.Database.Migrations
                     b.Property<Guid?>("DefaultSeriesResultsTemplateId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("DefaultSummarySeriesResultsTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -331,6 +334,8 @@ namespace SailScores.Database.Migrations
                     b.HasIndex("DefaultScoringSystemId");
 
                     b.HasIndex("DefaultSeriesResultsTemplateId");
+
+                    b.HasIndex("DefaultSummarySeriesResultsTemplateId");
 
                     b.HasIndex("WeatherSettingsId");
 
@@ -1702,6 +1707,13 @@ namespace SailScores.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AlternativeSailNumberHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("AlternativeSailNumberVisibility")
+                        .HasColumnType("int");
+
                     b.Property<string>("BoatNameHeader")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -1711,6 +1723,13 @@ namespace SailScores.Database.Migrations
 
                     b.Property<Guid>("ClubId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ColumnSeparators")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompetitorClubHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("CompetitorClubVisibility")
                         .HasColumnType("int");
@@ -1722,10 +1741,32 @@ namespace SailScores.Database.Migrations
                     b.Property<int>("CompetitorNameVisibility")
                         .HasColumnType("int");
 
+                    b.Property<bool>("DiscardFaded")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DiscardStrikethrough")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HighlightTopThree")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ParticipationVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PreDiscardTotalVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RaceColumnsVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SailNumberHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("SailNumberVisibility")
                         .HasColumnType("int");
@@ -1734,6 +1775,16 @@ namespace SailScores.Database.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("ShowPreDiscardTotal")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowWeather")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TotalHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("TotalsSeparator")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -1769,6 +1820,34 @@ namespace SailScores.Database.Migrations
                         .HasDatabaseName("IX_TemplateCustomField_TemplateField");
 
                     b.ToTable("SeriesResultsTemplateCustomFields");
+                });
+
+            modelBuilder.Entity("SailScores.Database.Entities.SeriesResultsTemplateScoreCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Display")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Faded")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("SeriesResultsTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeriesResultsTemplateId", "Code")
+                        .IsUnique();
+
+                    b.ToTable("SeriesResultsTemplateScoreCodes");
                 });
 
             modelBuilder.Entity("SailScores.Database.Entities.SeriesToSeriesLink", b =>
@@ -2063,6 +2142,11 @@ namespace SailScores.Database.Migrations
                     b.HasOne("SailScores.Database.Entities.SeriesResultsTemplate", null)
                         .WithMany()
                         .HasForeignKey("DefaultSeriesResultsTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SailScores.Database.Entities.SeriesResultsTemplate", null)
+                        .WithMany()
+                        .HasForeignKey("DefaultSummarySeriesResultsTemplateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SailScores.Database.Entities.WeatherSettings", "WeatherSettings")
@@ -2559,6 +2643,17 @@ namespace SailScores.Database.Migrations
                     b.Navigation("SeriesResultsTemplate");
                 });
 
+            modelBuilder.Entity("SailScores.Database.Entities.SeriesResultsTemplateScoreCode", b =>
+                {
+                    b.HasOne("SailScores.Database.Entities.SeriesResultsTemplate", "SeriesResultsTemplate")
+                        .WithMany("ScoreCodes")
+                        .HasForeignKey("SeriesResultsTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SeriesResultsTemplate");
+                });
+
             modelBuilder.Entity("SailScores.Database.Entities.SeriesToSeriesLink", b =>
                 {
                     b.HasOne("SailScores.Database.Entities.Series", "ChildSeries")
@@ -2690,6 +2785,8 @@ namespace SailScores.Database.Migrations
             modelBuilder.Entity("SailScores.Database.Entities.SeriesResultsTemplate", b =>
                 {
                     b.Navigation("CustomFields");
+
+                    b.Navigation("ScoreCodes");
                 });
 #pragma warning restore 612, 618
         }

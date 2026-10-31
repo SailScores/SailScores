@@ -3,6 +3,7 @@ using Microsoft.Extensions.Localization;
 using SailScores.Api.Enumerations;
 using SailScores.Core.FlatModel;
 using SailScores.Core.Model;
+using SailScores.Core.Services;
 using SailScores.Web.Extensions;
 using SailScores.Web.Resources;
 using System.IO;
@@ -31,8 +32,9 @@ public class CsvService : ICsvService, IDisposable
         _customViewService = customViewService;
     }
 
-    public Stream GetCsv(Series series)
+    public Stream GetCsv(Series series, SeriesResultsTemplate template = null)
     {
+        var scoringColumns = GetScoringColumns(series, template);
         if (stream != null)
         {
             stream.Dispose();
@@ -44,12 +46,12 @@ public class CsvService : ICsvService, IDisposable
         }
         streamWriter = new StreamWriter(stream, System.Text.Encoding.UTF8);
 
-        streamWriter.WriteLine(GetHeaders(series));
+        streamWriter.WriteLine(GetHeaders(series, scoringColumns));
         var compList = series.FlatResults?.Competitors;
         if (compList != null)
             foreach (var comp in compList)
             {
-                streamWriter.WriteLine(GetCompResults(series, comp));
+                streamWriter.WriteLine(GetCompResults(series, comp, scoringColumns));
             }
         streamWriter.Flush();
         stream.Position = 0;
@@ -57,7 +59,7 @@ public class CsvService : ICsvService, IDisposable
         return stream;
     }
 
-    private string GetHeaders(Series series)
+    private string GetHeaders(Series series, IList<FlatResultColumn> scoringColumns)
     {
         var sb = new StringBuilder();
         sb.Append(GetEscapedLocalizedValue("Place"));
@@ -70,7 +72,7 @@ public class CsvService : ICsvService, IDisposable
         sb.Append(_separator);
         sb.Append(GetEscapedLocalizedValue(series.FlatResults?.TotalHeader ?? "Total"));
         sb.Append(_separator);
-        foreach (var column in GetScoringColumns(series))
+        foreach (var column in scoringColumns)
         {
             sb.Append(GetEscapedLocalizedValue(column.Header));
             sb.Append(_separator);
@@ -91,14 +93,18 @@ public class CsvService : ICsvService, IDisposable
         return sb.ToString();
     }
 
-    // Scoring columns the scoring system doesn't hide.
-    private static IEnumerable<FlatResultColumn> GetScoringColumns(Series series)
+    // Scoring columns that aren't hidden: the standard columns by the results view, others by
+    // the scoring system.
+    private static IList<FlatResultColumn> GetScoringColumns(Series series, SeriesResultsTemplate template)
     {
+        var resolved = SeriesResultsTemplateHelper.GetResolvedTemplate(
+            template, series.Type == SeriesType.Regatta);
         return (series.FlatResults?.Columns ?? new List<FlatResultColumn>())
-            .Where(c => c.Visibility != ColumnVisibility.Hidden);
+            .Where(c => resolved.GetScoringColumnVisibility(c) != ColumnVisibility.Hidden)
+            .ToList();
     }
 
-    private string GetCompResults(Series series, FlatCompetitor comp)
+    private string GetCompResults(Series series, FlatCompetitor comp, IList<FlatResultColumn> scoringColumns)
     {
         var sb = new StringBuilder();
         var score = series.FlatResults.GetScore(comp);
@@ -122,7 +128,7 @@ public class CsvService : ICsvService, IDisposable
         var totalString = String.Format("{0:0.##}", score?.TotalScore ?? 0);
         sb.Append(GetEscapedValue(totalString.ToString()));
         sb.Append(_separator);
-        foreach (var column in GetScoringColumns(series))
+        foreach (var column in scoringColumns)
         {
             sb.Append(GetEscapedValue(column.GetDisplayText(score)));
             sb.Append(_separator);

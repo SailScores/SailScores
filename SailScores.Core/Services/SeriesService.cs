@@ -22,6 +22,8 @@ namespace SailScores.Core.Services
         private readonly IScoringService _scoringService;
         private readonly IHandicapService _handicapService;
         private readonly IConversionService _converter;
+        // One of the club settings' speed unit options.
+        private const string DefaultWindSpeedUnits = "knots";
         private readonly IForwarderService _forwarderService;
         private readonly IDbObjectBuilder _dbObjectBuilder;
         private readonly ISailScoresContext _dbContext;
@@ -123,6 +125,8 @@ namespace SailScores.Core.Services
                 .Include(s => s.ChildLinks)
                 .Include(s => s.SeriesResultsTemplate)
                     .ThenInclude(t => t.CustomFields)
+                .Include(s => s.SeriesResultsTemplate)
+                    .ThenInclude(t => t.ScoreCodes)
                 .AsSingleQuery()
                 .FirstOrDefaultAsync(c => c.Id == seriesId)
                 .ConfigureAwait(false);
@@ -149,12 +153,16 @@ namespace SailScores.Core.Services
 
                     Guid? defaultTemplateId = isRegattaSeries
                         ? club?.DefaultRegattaSeriesResultsTemplateId
-                        : club?.DefaultSeriesResultsTemplateId;
+                        : seriesDb.Type == dbObj.SeriesType.Summary
+                            ? club?.DefaultSummarySeriesResultsTemplateId ?? club?.DefaultSeriesResultsTemplateId
+                            : club?.DefaultSeriesResultsTemplateId;
 
                     if (defaultTemplateId.HasValue)
                     {
                         var defaultTemplate = await _dbContext.SeriesResultsTemplates
                             .Include(t => t.CustomFields)
+                            .Include(t => t.ScoreCodes)
+                            .AsSplitQuery()
                             .FirstOrDefaultAsync(t => t.Id == defaultTemplateId.Value)
                             .ConfigureAwait(false);
                         fullSeries.SeriesResultsTemplate = _mapper.Map<SeriesResultsTemplate>(defaultTemplate);
@@ -747,19 +755,23 @@ namespace SailScores.Core.Services
             {
                 return;
             }
+            // Clubs that never chose units have settings with none; knots, as competitor pages assume.
+            var windSpeedUnits = String.IsNullOrWhiteSpace(settings.WindSpeedUnits)
+                ? DefaultWindSpeedUnits
+                : settings.WindSpeedUnits;
             foreach (var race in flatResults.Races)
             {
                 race.WindSpeed =
                     _converter.Convert(
                      race.WindSpeedMeterPerSecond,
                      _converter.MeterPerSecond,
-                     settings.WindSpeedUnits)?.ToString("N0");
+                     windSpeedUnits)?.ToString("N0");
                 race.WindGust =
                      _converter.Convert(
-                         race.WindSpeedMeterPerSecond,
+                         race.WindGustMeterPerSecond,
                          _converter.MeterPerSecond,
-                         settings.WindSpeedUnits)?.ToString("N0");
-                race.WindSpeedUnits = settings.WindSpeedUnits;
+                         windSpeedUnits)?.ToString("N0");
+                race.WindSpeedUnits = windSpeedUnits;
             }
         }
 
@@ -834,15 +846,16 @@ namespace SailScores.Core.Services
                 Columns = ScoringColumns.Resolve(
                     ScoringCalculatorRegistry.GetColumns(series.ScoringSystem?.CalculatorType),
                     series.ScoringSystem?.EffectiveSettings,
-                    series.Results.IsPercentSystem,
                     scores),
                 TotalHeader = ScoringCalculatorRegistry.Get(series.ScoringSystem?.CalculatorType).TotalHeader,
+                UnrankedShowsPoints = ScoringCalculatorRegistry.Get(series.ScoringSystem?.CalculatorType).UnrankedShowsPoints,
                 NumberOfDiscards = series.Results.NumberOfDiscards,
                 DiscardMethod = series.Results.DiscardMethod,
                 NumberOfSailedRaces = series.Results.SailedRaces.Count(),
                 IsPercentSystem = series.Results.IsPercentSystem,
                 LowerScoreWins = series.Results.LowerScoreWins,
                 PercentRequired = series.Results.PercentRequired,
+                RacesRequired = series.Results.RacesRequired,
                 ScoringSystemName = series.ScoringSystem?.Name,
                 ScoreCodesUsed = series.Results.ScoreCodesUsed,
                 AppliedScoreCodeGroupSummaries = series.Results.AppliedScoreCodeGroupSummaries,
@@ -908,6 +921,7 @@ namespace SailScores.Core.Services
                         Order = r.Order,
                         Description = r.Description,
                         IsSeries = r.IsSeriesSummary,
+                        ChildSeriesId = r.SourceChildSeriesId,
                         State = r.State,
                         TrackTimes = r.TrackTimes,
                         WeatherIcon = r.Weather?.Icon,
@@ -918,6 +932,7 @@ namespace SailScores.Core.Services
                 if (r is SeriesAsRace seriesAsRace)
                 {
                     flatRace.IsSeries = true;
+                    flatRace.ChildSeriesId = seriesAsRace.Id;
                     flatRace.StartDate = seriesAsRace.StartDate?.ToDateOnly();
                     flatRace.EndDate = seriesAsRace.EndDate?.ToDateOnly();
                     flatRace.TotalChildRaceCount = seriesAsRace.TotalChildRaceCount;
@@ -1337,7 +1352,6 @@ namespace SailScores.Core.Services
             existingSeries.ScoringSystemId = model.ScoringSystemId;
             existingSeries.TrendOption = model.TrendOption;
             existingSeries.ExcludeFromCompetitorStats = model.ExcludeFromCompetitorStats;
-            existingSeries.HideDncDiscards = model.HideDncDiscards;
             existingSeries.UpdatedBy = model.UpdatedBy;
             existingSeries.SummaryRollupMode = model.SummaryRollupMode;
             existingSeries.IncludeUnrankedChildScores = model.IncludeUnrankedChildScores;

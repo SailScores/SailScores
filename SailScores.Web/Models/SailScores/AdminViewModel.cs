@@ -48,6 +48,7 @@ public class AdminViewModel
     public IList<HandicapSystemSummary> HandicapSystems { get; set; }
 
     public IList<AdminToDoViewModel> Tips { get; set; }
+    public AdminToDoViewModel SeasonTip { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
     public string TemperatureUnits { get; set; }
@@ -63,8 +64,6 @@ public class AdminViewModel
 
     public Guid? DefaultSeriesResultsTemplateId { get; set; }
     public Guid? DefaultRegattaSeriesResultsTemplateId { get; set; }
-
-    public IList<SeriesResultsTemplate> TemplateOptions { get; set; }
 
     public bool HasRaces { get; set; }
     public bool HasCompetitors { get; internal set; }

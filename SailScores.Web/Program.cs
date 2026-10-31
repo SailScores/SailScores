@@ -1,15 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using SailScores.Web;
+using SailScores.Web.Extensions;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load OpenTelemetry configuration
-builder.Host.ConfigureAppConfiguration((ctx, config) =>
-{
-    config.AddJsonFile("appsettings.OpenTelemetry.json", optional: true);
-});
+// Load OpenTelemetry configuration, overridable by environment-specific files and App Service settings
+builder.Configuration.AddJsonFileAfterAppSettings("appsettings.OpenTelemetry.json");
 
 var startup = new Startup(builder.Configuration, builder.Environment);
 

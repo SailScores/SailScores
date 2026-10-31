@@ -1,3 +1,4 @@
+@using SailScores.Web.Extensions
 @using SailScores.Core.Services
 @model SailScores.Web.Models.SailScores.WhatIfResultsViewModel
 @inject IStringLocalizer<SharedResource> localizer
@@ -7,7 +8,6 @@
     var results = Model.Series.FlatResults;
     var alternateResults = Model.AlternateResults;
     ViewData["Title"] = "What If results";
-    ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
     Layout = "~/Views/Shared/_ClubLayout.cshtml";
 }
 
@@ -30,7 +30,7 @@
 <p class="lead">
     @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
     {
-        @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
+        @alternateResults.ParticipationRequiredText()
     }
 </p>
 
@@ -38,6 +38,7 @@
     // Resolve template settings
     var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(Model.Series.SeriesResultsTemplate)
         ?? SeriesResultsTemplateHelper.GetDefaultTemplate(false);
+    ViewData["WideLayout"] = ResultsTableViewModel.UsesWideLayout(results, resolvedTemplate.RaceColumnsVisibility);
 
     var previewModel = new ResultsTableViewModel
         {
@@ -45,12 +46,6 @@
             Results = alternateResults,
             ShowTrend = true,
             ShowTrendOnAllDevices = true,
-            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-            BoatNameHeader = resolvedTemplate.BoatNameHeader,
-            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
             IsExport = false,
             ShowExportButtons = false,
             ExcludeCompetitorLinks = true,
@@ -58,7 +53,7 @@
             TrendLegend = "Rank change from existing scoring method.",
             UpdatedDate = null,
             DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-        };
+        }.WithTemplate(resolvedTemplate);
 }
 @await Html.PartialAsync("_ResultsTable", previewModel)
 
@@ -74,9 +69,7 @@
 <p class="lead">
     @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
     {
-        @results.PercentRequired.Value.ToString("G5")
-
-        @:% participation required for ranking
+        @results.ParticipationRequiredText()
     }
 </p>
 
@@ -86,13 +79,6 @@
             SeriesId = Model.Series.Id,
             Results = Model.Series.FlatResults,
             ShowTrend = false,
-            SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-            CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-            CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-            BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-            BoatNameHeader = resolvedTemplate.BoatNameHeader,
-            CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
-            ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
             IsExport = false,
             ShowExportButtons = false,
             ExcludeCompetitorLinks = true,
@@ -100,7 +86,7 @@
             TrendLegend = String.Empty,
             UpdatedDate = null,
             DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-        };
+        }.WithTemplate(resolvedTemplate);
 }
 @await Html.PartialAsync("_ResultsTable", currentResults)
 
@@ -120,7 +106,7 @@
     <p class="lead">
         @if (alternateResults.IsPercentSystem && alternateResults.PercentRequired.HasValue && alternateResults.PercentRequired.Value > 1)
         {
-            @alternateResults.PercentRequired.Value.ToString("G5")@:% participation required for ranking
+            @alternateResults.ParticipationRequiredText()
         }
     </p>
     <div class="row">
@@ -144,9 +130,7 @@
     <p class="lead">
         @if (results.IsPercentSystem && results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
         {
-            @results.PercentRequired.Value.ToString("G5")
-
-            @:% participation required for ranking
+            @results.ParticipationRequiredText()
         }
     </p>
     <div class="row">

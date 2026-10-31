@@ -75,9 +75,8 @@ public class HighPointScenarioTests
         ScenarioAssert.Scores(results, "E", "5:96 4:97");
     }
 
-    // Quirk: Cox-Sprague can discard a code that isn't discardable (docs/Scoring-Quirks.md).
     [Fact]
-    public void CoxSprague_NonDiscardableCodeAtStart_CanBeDiscarded()
+    public void CoxSprague_NonDiscardableCodeAtStart_IsKept()
     {
         var results = Scenario.With(ScoringCalculatorType.CoxSprague)
             .Discards("0,1")
@@ -90,7 +89,27 @@ public class HighPointScenarioTests
             .Race("A:NDQ B:1 C:2")
             .Score();
 
-        // NDQ came to the start, so scores one behind last (17 of 3 starters), and is discarded.
-        ScenarioAssert.Scores(results, "A", "1:31 (NDQ 17)");
+        // NDQ came to the start, so scores one behind last (17 of 3 starters). It can't be
+        // discarded, and dropping the win would lower A's percentage, so both count.
+        ScenarioAssert.Scores(results, "A", "1:31 NDQ 17");
+    }
+
+    [Fact]
+    public void CoxSprague_NonDiscardableCodeAtStart_NextWorstRaceDiscarded()
+    {
+        var results = Scenario.With(ScoringCalculatorType.CoxSprague)
+            .Discards("0,0,1")
+            .Code(new ScoreCode
+            {
+                Name = "NDQ", Formula = "FIX", FormulaValue = 0, CameToStart = true, Started = true,
+                Finished = false, Discardable = false, PreserveResult = false
+            })
+            .Race("A:1 B:2 C:3")
+            .Race("A:NDQ B:1 C:2")
+            .Race("C:1 B:2 A:3")
+            .Score();
+
+        // NDQ (17) is A's worst score but can't be discarded, so the 3rd (21) goes instead.
+        ScenarioAssert.Scores(results, "A", "1:31 NDQ 17 (3:21)");
     }
 }

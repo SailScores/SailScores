@@ -30,17 +30,11 @@ namespace SailScores.Core.Services
             _mapper = mapper;
         }
 
+        // Codes the club can score with; see ClubScoreCodes.
         public async Task<IEnumerable<Model.ScoreCode>> GetScoreCodesAsync(Guid clubId)
         {
-            var allScoreCodes = await _dbContext
-                .ScoringSystems
-                .Where(s => s.ClubId == clubId || s.ClubId == null)
-                .SelectMany(s => s.ScoreCodes).ToListAsync()
-                .ConfigureAwait(false);
-            var distinctScoreCodes = allScoreCodes
-                .GroupBy(s => s.Name, (key, g) => g.OrderBy(e => e.Name).First());
-
-            return _mapper.Map<List<Model.ScoreCode>>(distinctScoreCodes);
+            var codes = await ClubScoreCodes.GetAsync(_dbContext, clubId).ConfigureAwait(false);
+            return _mapper.Map<List<Model.ScoreCode>>(codes);
         }
 
         public async Task<IList<Model.ScoringSystem>> GetScoringSystemsAsync(

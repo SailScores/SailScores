@@ -52,8 +52,8 @@ public class ScoringInvariantTests
         }
     }
 
-    // A total of 0 ranks last: LowestTotal(zeroTotalRanksLast: true) treats it as "no scores". See
-    // AppAAltFirstIsZero_CompetitorWhoWonEveryCountedRace_RanksFirst for where that's wrong.
+    // A total of 0 ranks last, as "no scores", except under First = 0, where a 0 made of
+    // counted scores (wins) is a real total.
     [Theory]
     [MemberData(nameof(AllCases))]
     public async Task Ranks_LowPointSumCalculator_OrderedByTotal(string fixture, string sharedSystem)
@@ -61,22 +61,26 @@ public class ScoringInvariantTests
         var scored = await FixtureScorer.ScoreAsync(fixture, sharedSystem);
         Assert.SkipUnless(IsLowPointSum(scored), "Not a low point sum calculator.");
 
+        var zeroIsAScore = scored.CalculatorType == ScoringCalculatorType.AppAAltFirstIsZero;
         var totals = Ranked(scored.Results)
-            .Select(s => s.TotalScore is null or 0 ? decimal.MaxValue : s.TotalScore.Value)
+            .Select(s => s.TotalScore is null
+                || (s.TotalScore == 0 && !(zeroIsAScore && s.Scores.Any(r => !r.Discard && r.ScoreValue.HasValue)))
+                    ? decimal.MaxValue
+                    : s.TotalScore.Value)
             .ToList();
 
         Assert.Equal(totals.Order(), totals);
     }
 
-    // Known bug, left alone because fixing it changes saved results. Under First = 0 a win
-    // scores 0, so a boat that wins every counted race totals 0, and the comparer ranks a 0
-    // total last. Its tiebreak also ignores 0 scores, so wins don't count there either.
-    [Fact(Skip = "Known bug in LowestTotal(zeroTotalRanksLast: true): a total of 0 ranks last. Needs maintainer approval to fix.")]
+    // Under First = 0 a win scores 0, so a boat that wins every counted race totals 0 and
+    // ranks first.
+    [Fact]
     public async Task AppAAltFirstIsZero_CompetitorWhoWonEveryCountedRace_RanksFirst()
     {
         var scored = await FixtureScorer.ScoreAsync("gyc_2026_helm-of-the-year", "Appendix A Alternative - First = 0");
-        // The boat that won every counted race (fixture names are anonymized, so find it by id).
-        var winner = scored.Results.Competitors.Single(c => c.Id == new Guid("e0ca124e-49bc-43d0-a476-e00685800adc"));
+        // The boat that won every counted race (the fixture's anonymized name; scoring gives
+        // competitors new ids).
+        var winner = scored.Results.Competitors.Single(c => c.Name == "CompJB2");
 
         Assert.Equal(1, scored.Results.CalculatedScores.Single(s => s.CompetitorId == winner.Id).Rank);
     }

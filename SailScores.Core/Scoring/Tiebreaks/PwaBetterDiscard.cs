@@ -2,16 +2,14 @@ using System.Linq;
 
 namespace SailScores.Core.Scoring.Tiebreaks;
 
-// PWA tiebreak (C): the boat that discarded a better result ranks ahead.
-//
-// Quirk (bug): both lists are built from x, so this never separates two boats and ties go
-// on to the next step (docs/Scoring-Quirks.md).
+// PWA tiebreak (C): the boat that discarded a better result ranks ahead. If the discards are
+// the same as far as the shorter list goes, the boat with more discards ranks ahead.
 public sealed class PwaBetterDiscard : ITieBreak
 {
     public int Compare(ScoringWorkspace workspace, SeriesCompetitorResults x, SeriesCompetitorResults y)
     {
         var xDiscards = DiscardsBestFirst(x);
-        var yDiscards = DiscardsBestFirst(x);
+        var yDiscards = DiscardsBestFirst(y);
 
         int minLength = System.Math.Min(xDiscards.Length, yDiscards.Length);
         for (int i = 0; i < minLength; i++)

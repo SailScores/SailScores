@@ -18,6 +18,7 @@ namespace SailScores.Core.Model
         // FIN+ - competitors who finished this race + FormulaValue
         // SER+ - competitors in this series + FormulaValue
         // CTS+ - competitors who came to start + FormulaValue
+        // STR+ - competitors who started (no code, or a code marked Started) + FormulaValue
         // AVE - average of all non-average races
         // AVE ND - average of all non-discarded races
         // AVE P - average of prior races

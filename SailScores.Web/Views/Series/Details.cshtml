@@ -1,3 +1,4 @@
+@using SailScores.Web.Extensions
 @using SailScores.Api.Enumerations
 @using SailScores.Web.Models.SailScores
 @using SailScores.Core.Model
@@ -18,17 +19,17 @@
 
     ViewBag.Title = $"{Model.Item.Season?.Name} {Model.Item.Name} Scores - {Model.ClubInitials}";
     Layout = "_ClubLayout";
-    ViewData["WideLayout"] = (results.Races?.Count() ?? 0) > 7;
     ViewData["MetaDescription"] =
         $"Results for {Model.Item.Season?.Name} {Model.Item.Name} series racing at {Model.ClubName}";
 
     var resolvedTemplate = SeriesResultsTemplateHelper.GetResolvedTemplate(
         Model.Item.SeriesResultsTemplate, Model.Item.Type == SeriesType.Regatta);
+    ViewData["WideLayout"] = ResultsTableViewModel.UsesWideLayout(results, resolvedTemplate.RaceColumnsVisibility);
 }
 
 <div class="d-flex justify-content-between align-items-start">
 <div class="row flex-grow-1">
-    <div class="col-md-8">
+    <div class="@(Model.CanEdit ? "col-md-8" : "col-12")">
         @Model.Item.Season.Name
         <h1 class="h2">
             @Model.Item.Name
@@ -81,7 +82,7 @@
         }
         @if (results.PercentRequired.HasValue && results.PercentRequired.Value > 1)
         {
-            @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
+            @:&ndash; @results.ParticipationRequiredText()
         }
         @if (!String.IsNullOrWhiteSpace(ViewData["FleetName"]?.ToString()))
         {
@@ -93,9 +94,9 @@
         }
     </div>
 
+    @if (Model.CanEdit)
+    {
     <div class="col-md-4">
-        @if (Model.CanEdit)
-        {
             <br class="d-md-none" />
             <hr class="d-md-none" />
             <div class="row bg-almost">
@@ -116,8 +117,8 @@
                 </div>
             }
             </div>
-        }
     </div>
+    }
 </div>
     @if (resolvedTemplate.ShowClubLogo && Model.ClubLogoFileId.HasValue)
     {
@@ -157,13 +158,6 @@
         SeriesId = Model.Item.Id,
         Results = Model.Item.FlatResults,
         ShowTrend = showTrend,
-        SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-        CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-        CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-        BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-        BoatNameHeader = resolvedTemplate.BoatNameHeader,
-        CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
-        ShowPreDiscardTotal = resolvedTemplate.ShowPreDiscardTotal,
         CustomFieldColumns = customFieldColumns,
         CustomFieldDefinitions = customFieldDefinitions,
         IsExport = false,
@@ -171,10 +165,9 @@
         ExcludeCompetitorLinks = false,
         PreferAlternativeSailNumbers = Model.Item.PreferAlternativeSailNumbers ?? false,
         TrendLegend = trendLegend,
-        HideDncDiscards = Model.Item.HideDncDiscards,
         UpdatedDate = Model.Item.UpdatedDate,
         DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-    };
+    }.WithTemplate(resolvedTemplate);
 }
 
 @await Html.PartialAsync("_ResultsTable", tableModel)

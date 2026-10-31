@@ -14,7 +14,7 @@ public sealed class NotAveragedExcludedGlossary : ICodeGlossary
     }
 
     public string Formula(ScoringWorkspace workspace, ScoreCode code) =>
-        (code?.IncludeInAverage ?? _averaged.IncludesByDefault(code, workspace.Formulas))
+        (code?.IncludeInAverage ?? _averaged.IncludesByDefault(code, workspace.Host.FormulaFor(code?.Name)))
             ? GlossaryText.Formula(workspace.Formulas, code)
             : GlossaryText.Excluded(code);
 }

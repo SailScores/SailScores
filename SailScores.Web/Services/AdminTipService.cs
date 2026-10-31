@@ -5,6 +5,13 @@ namespace SailScores.Web.Services;
 
 public class AdminTipService : IAdminTipService
 {
+    private readonly TimeProvider _timeProvider;
+
+    public AdminTipService(TimeProvider timeProvider)
+    {
+        _timeProvider = timeProvider;
+    }
+
     public void AddTips(ref AdminViewModel viewModel)
     {
         if (viewModel == null)
@@ -13,6 +20,7 @@ public class AdminTipService : IAdminTipService
         }
         if (viewModel.HasRaces)
         {
+            viewModel.SeasonTip = GetSeasonTip(viewModel);
             return;
         }
 
@@ -87,6 +95,29 @@ public class AdminTipService : IAdminTipService
             },
         };
 
+    }
+
+    // Once a club is set up, remind admins to add next year's season before
+    // anyone tries to create a series for it.
+    private AdminToDoViewModel GetSeasonTip(AdminViewModel viewModel)
+    {
+        var today = _timeProvider.GetLocalNow().Date;
+        if (viewModel.Seasons?.Any(s => s.End >= today) ?? false)
+        {
+            return null;
+        }
+
+        return new AdminToDoViewModel
+        {
+            Title = "Add the next season",
+            Details = "No season covers today's date or starts later. Each series belongs to a season, so add one before creating new series.",
+            Link = new ToDoLinkViewModel
+            {
+                Action = "Create",
+                Controller = "Season"
+            },
+            Completed = false
+        };
     }
 
     public void AddTips(ref RaceWithOptionsViewModel race)

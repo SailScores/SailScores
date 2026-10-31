@@ -15,15 +15,17 @@ namespace SailScores.Core.Scoring
         public const string ParticipationKey = "participation";
         public const string PenaltiesKey = "penalties";
 
+        // Every system has it, percent and average systems too. Their race scores still add up:
+        // points in high point systems, places in average systems, where scores the average
+        // leaves out are already 0.
         public static readonly ScoringColumnDescriptor PreDiscardTotal = new(
             PreDiscardTotalKey,
             "Pre-Discard Total",
-            "Total of all race scores, including discards. A results template can also show this column.",
+            "Total of all race scores, including discards.",
             ScoringColumnFormat.Decimal,
             ColumnVisibility.Hidden,
-            includeForPercentSystems: false,
             valueFromScore: s => Value(s.TotalScoreIncludingDiscards
-                // Results saved before this was recorded.
+                // Results saved before this was recorded, and calculators that don't record it.
                 ?? s.Scores?.Sum(c => c.ScoreValue ?? 0m)));
 
         public static readonly ScoringColumnDescriptor Participation = new(
@@ -85,7 +87,8 @@ namespace SailScores.Core.Scoring
                 ? Value(s.PointsEarned / s.PointsPossible)
                 : null);
 
-        // Columns every calculator produces.
+        // Columns every calculator produces. Results views set whether they're shown; see
+        // GetVisibility.
         public static readonly IReadOnlyList<ScoringColumnDescriptor> Standard = new[]
         {
             PreDiscardTotal,
@@ -97,16 +100,11 @@ namespace SailScores.Core.Scoring
         public static IList<FlatResultColumn> Resolve(
             IEnumerable<ScoringColumnDescriptor> descriptors,
             ScoringSystemSettings effectiveSettings,
-            bool isPercentSystem,
             IList<FlatSeriesScore> scores)
         {
             var columns = new List<FlatResultColumn>();
             foreach (var descriptor in descriptors)
             {
-                if (isPercentSystem && !descriptor.IncludeForPercentSystems)
-                {
-                    continue;
-                }
                 if (descriptor.ValueFromScore != null)
                 {
                     foreach (var score in scores)
@@ -136,6 +134,18 @@ namespace SailScores.Core.Scoring
             return columns;
         }
 
+        // The visibility of a scoring column on a results page: the standard columns use the
+        // results view's settings, other columns keep the visibility from the scoring system.
+        public static ColumnVisibility GetVisibility(
+            FlatResultColumn column,
+            ColumnVisibility preDiscardTotal,
+            ColumnVisibility participation) => column.Key switch
+        {
+            PreDiscardTotalKey => preDiscardTotal,
+            ParticipationKey => participation,
+            _ => column.Visibility
+        };
+
         // Results saved before scoring columns existed get the standard columns with
         // default visibility.
         public static void AddLegacyColumns(FlatResults results)
@@ -147,7 +157,6 @@ namespace SailScores.Core.Scoring
             results.Columns = Resolve(
                 Standard,
                 null,
-                results.IsPercentSystem,
                 results.CalculatedScores?.ToList() ?? new List<FlatSeriesScore>());
         }
 

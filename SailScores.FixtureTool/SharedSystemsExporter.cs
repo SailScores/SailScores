@@ -71,6 +71,34 @@ internal static class SharedSystemsExporter
         };
     }
 
+    // Replaces the given scoring systems in an earlier export with their exported copies,
+    // adding any that are new in name order, and leaves everything else as it was. This
+    // updates one system from a database that doesn't have all the others (a local
+    // database without the club-restricted systems, say).
+    public static void Merge(JsonObject existing, JsonObject exported, IReadOnlyCollection<Guid> systemIds)
+    {
+        var systems = existing["scoringSystems"] as JsonArray
+            ?? throw new InvalidDataException("The existing file has no scoringSystems.");
+        foreach (var id in systemIds)
+        {
+            var system = Json.Objects(exported, "scoringSystems").FirstOrDefault(s => Json.Guid(s, "id") == id)
+                ?? throw new ArgumentException($"No shared scoring system with id {id} in the database.");
+            var copy = system.DeepClone();
+
+            var index = systems.OfType<JsonObject>().ToList().FindIndex(s => Json.Guid(s, "id") == id);
+            if (index >= 0)
+            {
+                systems[index] = copy;
+                continue;
+            }
+
+            var name = Json.String(system, "name");
+            var insertAt = systems.OfType<JsonObject>().ToList()
+                .FindIndex(s => StringComparer.OrdinalIgnoreCase.Compare(Json.String(s, "name"), name) > 0);
+            systems.Insert(insertAt < 0 ? systems.Count : insertAt, copy);
+        }
+    }
+
     private static JsonArray Children(List<JsonObject> rows, Guid? systemId)
     {
         var children = rows.Where(r => Json.Guid(r, "scoringSystemId") == systemId)

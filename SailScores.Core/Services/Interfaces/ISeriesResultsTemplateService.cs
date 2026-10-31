@@ -11,6 +11,18 @@ public interface ISeriesResultsTemplateService
     Task<SeriesResultsTemplate> GetTemplateAsync(Guid templateId);
     Task<SeriesResultsTemplate> SaveTemplateAsync(SeriesResultsTemplate template);
     Task DeleteTemplateAsync(Guid templateId);
+    // A null summary template means summary series use the standard series default.
+    Task SetClubDefaultsAsync(Guid clubId, Guid? seriesTemplateId, Guid? regattaTemplateId, Guid? summaryTemplateId);
     Task SeedDefaultTemplatesAsync(Guid clubId);
+    // Race dates in results headings; blank uses the club's localization. Throws
+    // InvalidOperationException for a format that isn't supported.
+    Task SetClubDateFormatAsync(Guid clubId, string dateFormat);
+    // The club's most recently updated series with saved results and races (its own, or a
+    // child series' for a summary series), for previewing a view.
+    // Only the id, name, type, update date and season name are filled.
+    Task<IList<Series>> GetPreviewSeriesAsync(Guid clubId, int count);
+    // Score codes the club has set up, on its scoring systems or the ones they inherit from, or
+    // has used in race results; one per code, by name. Only the name and description are filled.
+    Task<IList<ScoreCode>> GetClubScoreCodesAsync(Guid clubId);
     Task EnsureDefaultTemplatesForAllClubsAsync();
 }

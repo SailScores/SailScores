@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using SailScores.Core.Model;
 using SailScores.Core.Scoring.Adjustments;
+using SailScores.Core.Scoring.Eligibility;
 
 namespace SailScores.Core.Scoring.Totals;
 
 // Wawasee 2026: points are the sum of scores in races that count, plus PenaltyScoreValue for
 // each race short of PenaltyThresholdPercent of those races sailed (started or a
-// participation code; races needed round up). A competitor is ranked only with
-// ParticipationPercent of the counted races started and an average finish. Sets the
+// participation code; races needed round to the nearest race, a half up). A competitor is ranked only with
+// ParticipationPercent of the counted races competed in (came to the start; excused
+// absences don't count) and an average finish. Sets the
 // penalties column and the results' number of discards to the most any competitor has.
 public sealed class Wawasee2026Totals : ITotalRule
 {
@@ -25,14 +27,20 @@ public sealed class Wawasee2026Totals : ITotalRule
         var penaltyValue = settings?.PenaltyScoreValue;
         var racesToAvoidPenalty = settings?.PenaltyThresholdPercent == null
             ? 0
-            : (int)Math.Ceiling(countedRaces.Count * settings.PenaltyThresholdPercent.Value / 100m);
+            : (int)Math.Round(countedRaces.Count * settings.PenaltyThresholdPercent.Value / 100m,
+                MidpointRounding.AwayFromZero);
         var percentRequired = system.EffectiveParticipationPercent ?? 0m;
+        if (percentRequired > 0 && countedRaces.Count > 0)
+        {
+            results.RacesRequired = ParticipationPercent.RacesRequired(countedRaces.Count, percentRequired);
+        }
         var host = workspace.Host;
 
         foreach (var compResults in results.Results.Values)
         {
             var countedScores = countedRaces.Select(r => compResults.CalculatedScores[r]).ToList();
-            var racesStarted = countedScores.Count(s => host.CountsAsStarted(s.RawScore));
+            var racesCompeted = countedScores.Count(s =>
+                host.CountsAsStarted(s.RawScore) || host.CameToStart(s.RawScore));
             var racesSailed = countedScores.Count(s =>
                 host.CountsAsStarted(s.RawScore) || host.CountsAsParticipation(s.RawScore));
 
@@ -54,7 +62,7 @@ public sealed class Wawasee2026Totals : ITotalRule
             compResults.TotalScoreIncludingDiscards =
                 compResults.CalculatedScores.Values.Sum(s => s.ScoreValue ?? 0m) + penaltyPoints;
             compResults.ParticipationPercent = countedRaces.Count > 0
-                ? racesStarted * 100m / countedRaces.Count
+                ? racesCompeted * 100m / countedRaces.Count
                 : 0m;
             compResults.TotalScore = compResults.Average != null
                 && compResults.ParticipationPercent >= percentRequired

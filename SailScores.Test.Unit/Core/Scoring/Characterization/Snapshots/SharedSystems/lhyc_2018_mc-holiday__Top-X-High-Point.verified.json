@@ -9,6 +9,7 @@
   "LowerScoreWins": false,
   "PercentRequired": "0",
   "Columns": [
+    "preDiscardTotal: Pre-Discard Total (Decimal, Hidden)",
     "participation: Participation (Percent, Hidden)"
   ],
   "Races": [
@@ -29,6 +30,9 @@
       "SailNumber": "2169",
       "Total": "502",
       "PointsEarned": "502",
+      "Columns": {
+        "preDiscardTotal": "901"
+      },
       "Scores": "1:100/100 | 1:100/100 | 2:99/100 | 1:100/100 | 1:100/100 | SB 101/100 | 1:100/100 | 1:100/100 | SB 101/100"
     },
     {
@@ -37,6 +41,9 @@
       "SailNumber": "2144",
       "Total": "497",
       "PointsEarned": "497",
+      "Columns": {
+        "preDiscardTotal": "857"
+      },
       "Scores": "2:99/100 | 14:88/100 | 8:93/100 | SB 101/100 | SB 101/100 | SB 101/100 | 13:88/100 | 6:95/100 | 10:91/100"
     },
     {
@@ -45,6 +52,9 @@
       "SailNumber": "2644",
       "Total": "497",
       "PointsEarned": "497",
+      "Columns": {
+        "preDiscardTotal": "497"
+      },
       "Scores": "RC 101/100 | RC 101/100 | 1:100/100 | DNC null | DNC null | DNC null | 6:95/100 | DNC null | 1:100/100"
     },
     {
@@ -53,6 +63,9 @@
       "SailNumber": "2604",
       "Total": "493",
       "PointsEarned": "493",
+      "Columns": {
+        "preDiscardTotal": "772"
+      },
       "Scores": "3:98/100 | 5:96/100 | 4:97/100 | 2:99/100 | 9:92/100 | DNC null | 10:91/100 | RC 101/100 | 3:98/100"
     },
     {
@@ -61,6 +74,9 @@
       "SailNumber": "1894",
       "Total": "490",
       "PointsEarned": "490",
+      "Columns": {
+        "preDiscardTotal": "583"
+      },
       "Scores": "5:96/100 | 3:98/100 | 7:94/100 | SB 101/100 | SB 101/100 | DNC null | DNC null | DNC null | 8:93/100"
     },
     {
@@ -69,6 +85,9 @@
       "SailNumber": "1847",
       "Total": "489",
       "PointsEarned": "489",
+      "Columns": {
+        "preDiscardTotal": "866"
+      },
       "Scores": "9:92/100 | 4:97/100 | 6:95/100 | 7:94/100 | 5:96/100 | 1:100/100 | 4:97/100 | 3:98/100 | 4:97/100"
     },
     {
@@ -77,6 +96,9 @@
       "SailNumber": "2539",
       "Total": "483",
       "PointsEarned": "483",
+      "Columns": {
+        "preDiscardTotal": "575"
+      },
       "Scores": "7:94/100 | 8:94/100 | 9:92/100 | 4:97/100 | 2:99/100 | 2:99/100 | DNC null | DNC null | DNC null"
     },
     {
@@ -85,6 +107,9 @@
       "SailNumber": "2511",
       "Total": "483",
       "PointsEarned": "483",
+      "Columns": {
+        "preDiscardTotal": "483"
+      },
       "Scores": "4:97/100 | 10:92/100 | DNC null | 3:98/100 | 3:98/100 | 3:98/100 | DNC null | DNC null | DNC null"
     },
     {
@@ -93,6 +118,9 @@
       "SailNumber": "2161",
       "Total": "477",
       "PointsEarned": "477",
+      "Columns": {
+        "preDiscardTotal": "660"
+      },
       "Scores": "6:95/100 | 7:95/100 | DNC null | 6:95/100 | 7:94/100 | DNC null | 3:98/100 | 7:94/100 | 12:89/100"
     },
     {
@@ -101,6 +129,9 @@
       "SailNumber": "1935",
       "Total": "473",
       "PointsEarned": "473",
+      "Columns": {
+        "preDiscardTotal": "826"
+      },
       "Scores": "13:89/100 | 15:87/100 | 5:96/100 | 9:92/100 | 4:97/100 | 6:95/100 | 11:90/100 | 8:93/100 | 14:87/100"
     },
     {
@@ -109,6 +140,9 @@
       "SailNumber": "2652",
       "Total": "465",
       "PointsEarned": "465",
+      "Columns": {
+        "preDiscardTotal": "465"
+      },
       "Scores": "15:87/100 | 9:93/100 | DNC null | DNC null | DNC null | DNC null | 2:99/100 | 5:96/100 | 11:90/100"
     },
     {
@@ -117,6 +151,9 @@
       "SailNumber": "2322",
       "Total": "464",
       "PointsEarned": "464",
+      "Columns": {
+        "preDiscardTotal": "641"
+      },
       "Scores": "12:90/100 | 13:89/100 | DNC null | 10:91/100 | 6:95/100 | 7:94/100 | 7:94/100 | DNC null | 13:88/100"
     },
     {
@@ -125,6 +162,9 @@
       "SailNumber": "1474",
       "Total": "460",
       "PointsEarned": "460",
+      "Columns": {
+        "preDiscardTotal": "460"
+      },
       "Scores": "10:91/100 | 12:90/100 | DNC null | DNC null | 10:91/100 | DNC null | DNC null | DNE 87/100 | RC 101/100"
     },
     {
@@ -133,6 +173,9 @@
       "SailNumber": "TC55",
       "Total": "447",
       "PointsEarned": "447",
+      "Columns": {
+        "preDiscardTotal": "447"
+      },
       "Scores": "DNC null | DNC null | DNC null | 13:88/100 | 11:90/100 | 4:97/100 | 12:89/100 | DNC null | 18:83/100"
     },
     {
@@ -141,6 +184,9 @@
       "SailNumber": "TC49",
       "Total": "438",
       "PointsEarned": "438",
+      "Columns": {
+        "preDiscardTotal": "520"
+      },
       "Scores": "16:86/100 | 16:86/100 | DNC null | DNC null | DNC null | 11:90/100 | 15:86/100 | 11:90/100 | 19:82/100"
     },
     {
@@ -149,6 +195,9 @@
       "SailNumber": "1850",
       "Total": "404",
       "PointsEarned": "404",
+      "Columns": {
+        "preDiscardTotal": "404"
+      },
       "Scores": "GST 101/100 | GST 101/100 | DNC null | GST 101/100 | GST 101/100 | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -157,6 +206,9 @@
       "SailNumber": "1687",
       "Total": "402",
       "PointsEarned": "402",
+      "Columns": {
+        "preDiscardTotal": "402"
+      },
       "Scores": "DNC null | DNC null | DNC null | RC 101/100 | RC 101/100 | DNC null | RC 101/100 | DNC null | 2:99/100"
     },
     {
@@ -165,6 +217,9 @@
       "SailNumber": "1933",
       "Total": "391",
       "PointsEarned": "391",
+      "Columns": {
+        "preDiscardTotal": "391"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | RC 101/100 | 5:96/100 | 2:99/100 | 6:95/100"
     },
     {
@@ -173,6 +228,9 @@
       "SailNumber": "1850",
       "Total": "376",
       "PointsEarned": "376",
+      "Columns": {
+        "preDiscardTotal": "376"
+      },
       "Scores": "DNC null | DNC null | DNC null | 5:96/100 | DNC null | 5:96/100 | 9:92/100 | DNC null | 9:92/100"
     },
     {
@@ -181,6 +239,9 @@
       "SailNumber": "1664",
       "Total": "356",
       "PointsEarned": "356",
+      "Columns": {
+        "preDiscardTotal": "356"
+      },
       "Scores": "DNC null | DNC null | DNC null | 16:85/100 | 12:89/100 | DNC null | SB 101/100 | DNC null | 20:81/100"
     },
     {
@@ -189,6 +250,9 @@
       "SailNumber": "TC08",
       "Total": "352",
       "PointsEarned": "352",
+      "Columns": {
+        "preDiscardTotal": "352"
+      },
       "Scores": "DNC null | DNC null | 11:90/100 | 12:89/100 | DNC null | DNC null | 14:87/100 | DNC null | 15:86/100"
     },
     {
@@ -197,6 +261,9 @@
       "SailNumber": "TC25",
       "Total": "290",
       "PointsEarned": "290",
+      "Columns": {
+        "preDiscardTotal": "290"
+      },
       "Scores": "8:93/100 | 2:99/100 | 3:98/100 | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -205,6 +272,9 @@
       "SailNumber": "2091",
       "Total": "279",
       "PointsEarned": "279",
+      "Columns": {
+        "preDiscardTotal": "279"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | 8:93/100 | 9:92/100 | 7:94/100"
     },
     {
@@ -213,6 +283,9 @@
       "SailNumber": "TC18",
       "Total": "261",
       "PointsEarned": "261",
+      "Columns": {
+        "preDiscardTotal": "261"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | 8:93/100 | DNC null | 12:89/100 | DNF 79/100"
     },
     {
@@ -221,6 +294,9 @@
       "SailNumber": "TC36",
       "Total": "182",
       "PointsEarned": "182",
+      "Columns": {
+        "preDiscardTotal": "182"
+      },
       "Scores": "DNC null | DNC null | DNC null | 11:90/100 | DNC null | 9:92/100 | DNC null | DNC null | DNC null"
     },
     {
@@ -229,6 +305,9 @@
       "SailNumber": "2599",
       "Total": "179",
       "PointsEarned": "179",
+      "Columns": {
+        "preDiscardTotal": "179"
+      },
       "Scores": "14:88/100 | 11:91/100 | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -237,6 +316,9 @@
       "SailNumber": "1337",
       "Total": "174",
       "PointsEarned": "174",
+      "Columns": {
+        "preDiscardTotal": "174"
+      },
       "Scores": "DNC null | DNC null | DNC null | 15:86/100 | 13:88/100 | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -245,6 +327,9 @@
       "SailNumber": "TC16",
       "Total": "101",
       "PointsEarned": "101",
+      "Columns": {
+        "preDiscardTotal": "101"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | SB 101/100 | DNC null | DNC null"
     },
     {
@@ -253,6 +338,9 @@
       "SailNumber": "TC10",
       "Total": "97",
       "PointsEarned": "97",
+      "Columns": {
+        "preDiscardTotal": "97"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | 4:97/100 | DNC null"
     },
     {
@@ -261,6 +349,9 @@
       "SailNumber": "TC67",
       "Total": "96",
       "PointsEarned": "96",
+      "Columns": {
+        "preDiscardTotal": "96"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | 5:96/100"
     },
     {
@@ -269,6 +360,9 @@
       "SailNumber": "TC37",
       "Total": "93",
       "PointsEarned": "93",
+      "Columns": {
+        "preDiscardTotal": "93"
+      },
       "Scores": "DNC null | DNC null | DNC null | 8:93/100 | DNC null | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -277,6 +371,9 @@
       "SailNumber": "2121",
       "Total": "93",
       "PointsEarned": "93",
+      "Columns": {
+        "preDiscardTotal": "93"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | 8:93/100 | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -285,6 +382,9 @@
       "SailNumber": "TC??",
       "Total": "91",
       "PointsEarned": "91",
+      "Columns": {
+        "preDiscardTotal": "91"
+      },
       "Scores": "DNC null | DNC null | 10:91/100 | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -293,6 +393,9 @@
       "SailNumber": "TC11",
       "Total": "91",
       "PointsEarned": "91",
+      "Columns": {
+        "preDiscardTotal": "91"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | 10:91/100 | DNC null | DNC null | DNC null"
     },
     {
@@ -301,6 +404,9 @@
       "SailNumber": "TC70",
       "Total": "91",
       "PointsEarned": "91",
+      "Columns": {
+        "preDiscardTotal": "91"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | 10:91/100 | DNC null"
     },
     {
@@ -309,6 +415,9 @@
       "SailNumber": "TC51",
       "Total": "87",
       "PointsEarned": "87",
+      "Columns": {
+        "preDiscardTotal": "87"
+      },
       "Scores": "DNC null | DNC null | DNC null | 14:87/100 | DNC null | DNC null | DNC null | DNC null | DNC null"
     },
     {
@@ -317,6 +426,9 @@
       "SailNumber": "1262",
       "Total": "85",
       "PointsEarned": "85",
+      "Columns": {
+        "preDiscardTotal": "85"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | 16:85/100 | DNC null | DNC null"
     },
     {
@@ -325,6 +437,9 @@
       "SailNumber": "1765",
       "Total": "85",
       "PointsEarned": "85",
+      "Columns": {
+        "preDiscardTotal": "85"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | 16:85/100"
     },
     {
@@ -333,6 +448,9 @@
       "SailNumber": "1280",
       "Total": "84",
       "PointsEarned": "84",
+      "Columns": {
+        "preDiscardTotal": "84"
+      },
       "Scores": "DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | DNC null | 17:84/100"
     }
   ],

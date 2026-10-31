@@ -22,9 +22,19 @@ public static class AppendixA
 {
     public static ScoringRecipe Standard(ScoringSystem system) => Recipe("Appendix A", LowPointPlaces.AppendixA);
 
-    // A4.2 alternatives: first scores 0, .7 or .75.
-    public static ScoringRecipe FirstIsZero(ScoringSystem system) =>
-        Recipe("Appendix A, First = 0", LowPointPlaces.FirstIsZero);
+    // A4.2 alternatives: first scores 0, .7 or .75. With first 0, a score of 0 is a win: it
+    // counts in averages, in A8.1 and in the total that ranks.
+    public static ScoringRecipe FirstIsZero(ScoringSystem system) => new()
+    {
+        Name = "Appendix A, First = 0",
+        RacePoints = LowPointPlaces.FirstIsZero,
+        ZeroIsAScore = true,
+        Adjustments = [new CapAtDefaultScore()],
+        Discards = [new WorstScoresByPattern()],
+        Total = new SumOfScores(),
+        Eligibility = [new ParticipationPercent()],
+        Ranking = Rankings.LowPointFirstIsZero
+    };
 
     public static ScoringRecipe FirstIsPoint7(ScoringSystem system) =>
         Recipe("Appendix A, First = .7", LowPointPlaces.FirstIsPoint7);

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using SailScores.Api.Enumerations;
 
@@ -22,8 +21,8 @@ public sealed class AverageFinishOverCountedRaces : IScoreAdjustment
         }
     }
 
-    // Mean of the scores that aren't averages or 0, in races that count, rounded to one
-    // decimal like other average codes. Null when there are none.
+    // Mean of the scores that aren't averages or 0, in races that count, not rounded (the
+    // club's rule). Null when there are none.
     public static decimal? For(ScoringWorkspace workspace, SeriesCompetitorResults competitor)
     {
         var finishes = competitor.CalculatedScores
@@ -35,6 +34,6 @@ public sealed class AverageFinishOverCountedRaces : IScoreAdjustment
             .ToList();
         return finishes.Count == 0
             ? null
-            : Math.Round(finishes.Average(), 1, MidpointRounding.AwayFromZero);
+            : finishes.Average();
     }
 }

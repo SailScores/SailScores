@@ -58,6 +58,73 @@ namespace SailScores.Test.Unit.Core.Services
         }
 
         [Fact]
+        public async Task GetScoreCodesAsync_ParentSystemCode_IsIncluded()
+        {
+            var (root, child) = await AddRootAndChildSystemsAsync();
+            root.ScoreCodes.Add(new Database.Entities.ScoreCode { Name = "PARENT" });
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var results = await _service.GetScoreCodesAsync(child.ClubId.Value);
+
+            Assert.Contains(results, sc => sc.Name == "PARENT");
+        }
+
+        [Fact]
+        public async Task GetScoreCodesAsync_UnrelatedSharedSystemCode_IsExcluded()
+        {
+            var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);
+            _context.ScoringSystems.Add(new Database.Entities.ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Unrelated shared",
+                ScoreCodes = new List<Database.Entities.ScoreCode>
+                {
+                    new Database.Entities.ScoreCode { Name = "UNRELATED" }
+                }
+            });
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var results = await _service.GetScoreCodesAsync(club.Id);
+
+            Assert.DoesNotContain(results, sc => sc.Name == "UNRELATED");
+        }
+
+        [Fact]
+        public async Task GetScoreCodesAsync_SharedSystemUsedBySeries_IsIncluded()
+        {
+            var shared = new Database.Entities.ScoringSystem
+            {
+                Id = Guid.NewGuid(),
+                Name = "Shared used by series",
+                ScoreCodes = new List<Database.Entities.ScoreCode>
+                {
+                    new Database.Entities.ScoreCode { Name = "SCP" }
+                }
+            };
+            _context.ScoringSystems.Add(shared);
+            var series = await _context.Series.FirstAsync(TestContext.Current.CancellationToken);
+            series.ScoringSystemId = shared.Id;
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var results = await _service.GetScoreCodesAsync(series.ClubId);
+
+            Assert.Contains(results, sc => sc.Name == "SCP");
+        }
+
+        [Fact]
+        public async Task GetScoreCodesAsync_ClubOverridesParentCode_ReturnsClubVersion()
+        {
+            var (root, child) = await AddRootAndChildSystemsAsync();
+            root.ScoreCodes.Add(new Database.Entities.ScoreCode { Name = "ZFP", FormulaValue = 20 });
+            child.ScoreCodes.Add(new Database.Entities.ScoreCode { Name = "ZFP", FormulaValue = 10 });
+            await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var results = await _service.GetScoreCodesAsync(child.ClubId.Value);
+
+            Assert.Equal(10, Assert.Single(results, sc => sc.Name == "ZFP").FormulaValue);
+        }
+
+        [Fact]
         public async Task GetScoringSystemsAsync_ReturnsASystemWithDnc()
         {
             var club = await _context.Clubs.FirstAsync(TestContext.Current.CancellationToken);

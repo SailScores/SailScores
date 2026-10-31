@@ -91,6 +91,10 @@ namespace SailScores.Core.Services
                 .ThenInclude(rs => rs.Series)
                 .ThenInclude(s => s.SeriesResultsTemplate)
                 .ThenInclude(t => t.CustomFields)
+                .Include(r => r.RegattaSeries)
+                .ThenInclude(rs => rs.Series)
+                .ThenInclude(s => s.SeriesResultsTemplate)
+                .ThenInclude(t => t.ScoreCodes)
                 .Include(r => r.Season)
                 .Include(r => r.Announcements)
                 .AsSplitQuery()
@@ -113,6 +117,7 @@ namespace SailScores.Core.Services
 
             var defaultRegattaTemplate = club.DefaultRegattaSeriesResultsTemplateId.HasValue
                 ? await _dbContext.SeriesResultsTemplates
+                    .Include(t => t.ScoreCodes)
                     .Where(t => t.Id == club.DefaultRegattaSeriesResultsTemplateId)
                     .SingleOrDefaultAsync()
                     .ConfigureAwait(false)

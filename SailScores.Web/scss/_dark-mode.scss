@@ -44,6 +44,11 @@
         --bs-btn-border-color: #{$almost-dark-primary};
     }
 
+    /* Race Index filters */
+    .race-filter[aria-current] {
+        color: $white;
+    }
+
     /* Navigation */
     header.bg-dark,
     nav.bg-dark {
@@ -97,6 +102,10 @@
     /* Race status colors */
     span.discardmuted {
         color: #909090 !important;
+    }
+
+    .table > :not(caption) > * > .results-separator {
+        border-left-color: rgba(255, 255, 255, 0.14);
     }
 
     .abandoned {

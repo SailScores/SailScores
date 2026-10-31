@@ -1,12 +1,11 @@
 @model SailScores.Web.Models.SailScores.AdminEditViewModel
-@using SailScores.Core.Utility
 
 @{
-    ViewData["Title"] = "Edit " + Model.Name;
+    ViewData["Title"] = Model.Name + " Settings";
     Layout = "_ClubLayout";
 }
 
-<h2>@Model.Name</h2>
+<h2>@Model.Name Settings</h2>
 
 <form asp-action="Edit" enctype="multipart/form-data">
     <input hidden asp-for="Id" />
@@ -190,7 +189,7 @@
                     <div class="form-check mb-3">
                         <input asp-for="IsHidden" class="form-check-input" id="IsHidden" />
                         <label class="form-check-label" for="IsHidden">
-                            Hidden
+                            Hidden from SailScores front page
                             <a class="text-primary"
                                data-bs-container="body"
                                data-bs-toggle="popover"
@@ -221,91 +220,37 @@
                             a calendar is always accessible at <a href="/@Model.Initials/Calendar"
                             target="_blank">/@Model.Initials/Calendar</a>.</small>
                     </div>
-
-                    <div class="small fw-semibold text-body-secondary mb-2">Result views</div>
-
-                    <div class="mb-3">
-                        <a asp-controller="SeriesResultsTemplate"
-                           asp-action="Index"
-                           class="btn btn-outline-primary">
-                            Edit result view templates
-                        </a>
-                    </div>
-
-                    @if (Model.TemplateOptions != null && Model.TemplateOptions.Any())
-                    {
-                        <div class="mb-3">
-                            <label asp-for="DefaultSeriesResultsTemplateId" class="form-label">
-                                Default View for Non-Regatta Series
-                                <a class="text-primary"
-                                   data-bs-container="body"
-                                   data-bs-toggle="popover"
-                                   data-bs-placement="top"
-                                   data-bs-trigger="focus hover"
-                                   data-bs-content="Choose the default template for displaying results in standard series. Series can override this individually.">
-                                    <span class="far fa-question-circle"></span>
-                                </a>
-                            </label>
-                            <select asp-for="DefaultSeriesResultsTemplateId" class="form-select">
-                                <option value="">(none)</option>
-                                @foreach (var template in Model.TemplateOptions)
-                                {
-                                    <option value="@template.Id">@template.Name</option>
-                                }
-                            </select>
-                            <span asp-validation-for="DefaultSeriesResultsTemplateId" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-label">
-                                Default View for Regattas
-                                <a class="text-primary"
-                                   data-bs-container="body"
-                                   data-bs-toggle="popover"
-                                   data-bs-placement="top"
-                                   data-bs-trigger="focus hover"
-                                   data-bs-content="Choose the default template for displaying results in regattas. Series marked as regatta type can override this individually.">
-                                    <span class="far fa-question-circle"></span>
-                                </a>
-                            </label>
-                            <select asp-for="DefaultRegattaSeriesResultsTemplateId" class="form-select">
-                                <option value="">(none)</option>
-                                @foreach (var template in Model.TemplateOptions)
-                                {
-                                    <option value="@template.Id">@template.Name</option>
-                                }
-                            </select>
-                            <span asp-validation-for="DefaultRegattaSeriesResultsTemplateId" class="text-danger"></span>
-                        </div>
-                    }
-
-
                 </div>
             </div>
         </div>
 
-        <!-- Scoring & Localization -->
+        <!-- Results Display -->
         <div class="col-12 col-md-6">
             <div class="card h-100">
                 <div class="card-header">
-                    <h6 class="mb-0">Scoring & Localization</h6>
+                    <h6 class="mb-0">Results Display</h6>
                 </div>
                 <div class="card-body">
-                    <div class="form-check mb-3">
-                        <input asp-for="EnableHandicapScoring" class="form-check-input" id="EnableHandicapScoring" />
-                        <label class="form-check-label" for="EnableHandicapScoring">
-                            Enable Handicap Scoring
-                            <a class="text-primary"
-                               data-bs-container="body"
-                               data-bs-toggle="popover"
-                               data-bs-placement="top"
-                               data-bs-trigger="focus hover"
-                               data-bs-content="Enables corrected‑time scoring. Adds handicap fields to series and competitor pages.">
-                                <span class="far fa-question-circle"></span>
-                            </a>
-                        </label>
-                    </div>
+                    <a asp-controller="SeriesResultsTemplate"
+                       asp-action="Index"
+                       class="btn btn-outline-primary">
+                        Manage results display
+                    </a>
+                    <small class="form-text text-muted d-block">
+                        Choose the views each kind of series uses and the race date format, and edit how
+                        series results are displayed.
+                    </small>
+                </div>
+            </div>
+        </div>
 
+        <!-- Competitors -->
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Competitors</h6>
+                </div>
+                <div class="card-body">
                     <div class="form-check mb-3">
                         <input asp-for="EnableAlternativeSailNumbers" class="form-check-input" id="EnableAlternativeSailNumbers" />
                         <label class="form-check-label" for="EnableAlternativeSailNumbers">
@@ -330,7 +275,7 @@
                                data-bs-toggle="popover"
                                data-bs-placement="top"
                                data-bs-trigger="focus hover"
-                               data-bs-content="Turns on club-defined custom competitor fields. When enabled, scorekeepers can add date-based values for each field on competitor edit/create pages and include the fields in series results templates.">
+                               data-bs-content="Turns on club-defined custom competitor fields. When enabled, scorekeepers can add date-based values for each field on competitor edit/create pages and include the fields in results views.">
                                 <span class="far fa-question-circle"></span>
                             </a>
                         </label>
@@ -338,7 +283,7 @@
                     <div class="small text-body-secondary mb-3" id="customCompetitorFieldsNote">
                         Turn this on to edit field definitions below. This setting saves immediately when changed.
                     </div>
-                    <div class="mb-3">
+                    <div>
                         <a asp-controller="CompetitorField"
                            asp-action="Index"
                            asp-route-clubInitials="@Model.Initials"
@@ -349,6 +294,31 @@
                             Manage custom fields
                         </a>
                         <div class="small text-body-secondary mt-2" id="customCompetitorFieldsStatus"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scoring & Localization -->
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Scoring & Localization</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input asp-for="EnableHandicapScoring" class="form-check-input" id="EnableHandicapScoring" />
+                        <label class="form-check-label" for="EnableHandicapScoring">
+                            Enable Handicap Scoring
+                            <a class="text-primary"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-placement="top"
+                               data-bs-trigger="focus hover"
+                               data-bs-content="Enables corrected‑time scoring. Adds handicap fields to series and competitor pages.">
+                                <span class="far fa-question-circle"></span>
+                            </a>
+                        </label>
                     </div>
 
                     <div class="mb-3" id="defaultHandicapSystemRow">
@@ -430,41 +400,10 @@
                         </label>
                         <select id="locale" asp-for="Locale" class="form-select" asp-items="new SelectList(Model.LocaleOptions)"></select>
                         <span asp-validation-for="Locale" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="DefaultDateFormat" class="form-label">
-                            Default Date Format
-                            <a class="text-primary"
-                               data-bs-container="body"
-                               data-bs-toggle="popover"
-                               data-bs-placement="top"
-                               data-bs-trigger="focus hover"
-                               data-bs-content="Overrides default race date formatting in results headers for this club. Leave blank to use localization defaults.">
-                                <span class="far fa-question-circle"></span>
-                            </a>
-                        </label>
-                        <div class="input-group">
-                            <input asp-for="DefaultDateFormat" class="form-control" placeholder="MM/dd" autocomplete="off" />
-                            <button type="button" class="btn btn-outline-secondary" id="clearDateFormatButton">Use locale default</button>
-                        </div>
-                        <span asp-validation-for="DefaultDateFormat" class="text-danger"></span>
-                        <div class="small text-muted">
-                            Supported tokens: d, dd, M, MM, MMM, MMMM, yy, yyyy. For example, 'M' uses a
-                            single-digit month when possible, while 'MM' always uses two digits, and 'MMM' uses the
-                            name abbreviation. Popular formats:
-                            <code>M/d</code>, <code>dd.MM</code>, or <code>d MMM</code>.<br />
-                            This format will be used in series race headings.
-                        </div>
-                        @{
-                            string preview = "Uses localization default.";
-                            if (ClubDateFormatUtility.TryNormalize(Model.DefaultDateFormat, out var normalizedFormat, out _)
-                                && !string.IsNullOrWhiteSpace(normalizedFormat))
-                            {
-                                preview = $"Example: {DateTime.Today.ToString(normalizedFormat)}";
-                            }
-                        }
-                        <div class="small text-body-secondary mt-1" id="dateFormatPreview">@preview</div>
+                        <small class="form-text text-muted d-block">
+                            The date format in race headings can be changed in
+                            <a asp-controller="SeriesResultsTemplate" asp-action="Index">Results Display</a>.
+                        </small>
                     </div>
                 </div>
             </div>
@@ -683,54 +622,5 @@
                 preview.style.display = 'none';
             }
         });
-
-        (function () {
-            var input = document.getElementById('DefaultDateFormat');
-            var clearButton = document.getElementById('clearDateFormatButton');
-            var preview = document.getElementById('dateFormatPreview');
-            // set the sample to today:
-            var sampleDate = Date.Today;
-//            var sampleDate = new Date(2026, 0, 23);
-
-            function formatSampleDate(pattern) {
-                if (!pattern || !pattern.trim()) {
-                    return 'Uses localization default.';
-                }
-
-                var month = sampleDate.getMonth() + 1;
-                var day = sampleDate.getDate();
-                var year = sampleDate.getFullYear();
-
-                var shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                var longMonthNames = [
-                    'January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'
-                ];
-
-                var output = pattern;
-                output = output.replace(/yyyy/g, String(year));
-                output = output.replace(/yy/g, String(year).slice(-2));
-                output = output.replace(/MMMM/g, longMonthNames[month - 1]);
-                output = output.replace(/MMM/g, shortMonthNames[month - 1]);
-                output = output.replace(/MM/g, String(month).padStart(2, '0'));
-                output = output.replace(/M/g, String(month));
-                output = output.replace(/dd/g, String(day).padStart(2, '0'));
-                output = output.replace(/d/g, String(day));
-
-                return 'Example: ' + output;
-            }
-
-            function updatePreview() {
-                preview.textContent = formatSampleDate(input.value);
-            }
-
-            clearButton.addEventListener('click', function () {
-                input.value = '';
-                updatePreview();
-            });
-
-            input.addEventListener('input', updatePreview);
-            updatePreview();
-        })();
     </script>
 }

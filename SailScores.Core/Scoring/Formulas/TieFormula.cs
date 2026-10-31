@@ -1,3 +1,4 @@
+using System;
 using SailScores.Core.Model;
 
 namespace SailScores.Core.Scoring.Formulas;
@@ -15,6 +16,6 @@ public sealed class TieFormula : IScoreCodeFormula
 
     public string Describe(ScoreCode code) => "Average of tied places";
 
-    // Quirk: matched with case, unlike other formulas, so "tie" isn't a tie.
-    public static bool IsTie(ScoreCode code) => code?.Formula == FormulaName;
+    public static bool IsTie(ScoreCode code) =>
+        string.Equals(code?.Formula, FormulaName, StringComparison.OrdinalIgnoreCase);
 }

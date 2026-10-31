@@ -2713,7 +2713,7 @@
     {
       "id": "b7f3c2d4-6a1e-4f8b-9c05-3e2d8a71f4b6",
       "name": "PBG",
-      "discardPattern": "0",
+      "discardPattern": "0,0,0,0,0,1",
       "participationPercent": 50.00,
       "isSiteDefault": false,
       "calculatorType": 14,
@@ -3391,7 +3391,7 @@
           "name": "BFD",
           "description": "Disqualification under rule 30.4",
           "preserveResult": false,
-          "discardable": false,
+          "discardable": true,
           "started": false,
           "formulaValue": 0.000,
           "adjustOtherScores": false,
@@ -3418,7 +3418,7 @@
           "name": "DNE",
           "description": "Disqualification that is not excludable",
           "preserveResult": false,
-          "discardable": false,
+          "discardable": true,
           "started": true,
           "formulaValue": 0.000,
           "adjustOtherScores": true,
@@ -3457,16 +3457,16 @@
         {
           "id": "d5c54d86-bf27-4aa6-8eef-3a62c4fe6640",
           "name": "DPI",
-          "description": "Discretionary penalty",
-          "preserveResult": true,
+          "description": "Discretionary penalty: scored as DNC",
+          "preserveResult": false,
           "discardable": true,
-          "started": true,
-          "formulaValue": 20.000,
-          "adjustOtherScores": false,
-          "cameToStart": true,
-          "finished": true,
-          "formula": "PLC%",
-          "formulaValueDecimal": 20.000
+          "started": false,
+          "formulaValue": 0.000,
+          "adjustOtherScores": true,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "FIX",
+          "formulaValueDecimal": 0.000
         },
         {
           "id": "c3bf8a2e-7a2e-4828-85d2-486b7d568da2",
@@ -3538,16 +3538,16 @@
         {
           "id": "c98d5e70-c3b2-4bf5-b429-c69ec977e9a4",
           "name": "SCP",
-          "description": "Scoring Penalty imposed",
-          "preserveResult": true,
+          "description": "Scoring Penalty imposed: scored as DNC",
+          "preserveResult": false,
           "discardable": true,
-          "started": true,
-          "formulaValue": 20.000,
-          "adjustOtherScores": false,
-          "cameToStart": true,
-          "finished": true,
-          "formula": "PLC%",
-          "formulaValueDecimal": 20.000
+          "started": false,
+          "formulaValue": 0.000,
+          "adjustOtherScores": true,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "FIX",
+          "formulaValueDecimal": 0.000
         },
         {
           "id": "a3324ebb-7050-4d5f-84e0-362129a64d68",
@@ -3578,16 +3578,16 @@
         {
           "id": "8f3b9abc-3ca8-494b-9186-bcc7eb54ea1a",
           "name": "ZFP",
-          "description": "20% Penalty under rule 30.2",
-          "preserveResult": true,
+          "description": "20% Penalty under rule 30.2: scored as DNC",
+          "preserveResult": false,
           "discardable": true,
-          "started": true,
-          "formulaValue": 20.000,
-          "adjustOtherScores": false,
-          "cameToStart": true,
-          "finished": true,
-          "formula": "PLC%",
-          "formulaValueDecimal": 20.000
+          "started": false,
+          "formulaValue": 0.000,
+          "adjustOtherScores": true,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "FIX",
+          "formulaValueDecimal": 0.000
         }
       ],
       "scoreCodeGroups": []
@@ -3606,7 +3606,7 @@
           "name": "BFD",
           "description": "Disqualification under rule 30.4",
           "preserveResult": false,
-          "discardable": false,
+          "discardable": true,
           "started": false,
           "formulaValue": 0.000,
           "adjustOtherScores": false,
@@ -3633,7 +3633,7 @@
           "name": "DNE",
           "description": "Disqualification that is not excludable",
           "preserveResult": false,
-          "discardable": false,
+          "discardable": true,
           "started": true,
           "formulaValue": 0.000,
           "adjustOtherScores": true,
@@ -3672,16 +3672,16 @@
         {
           "id": "a34029bf-b8d4-4472-84ea-bb8e770505d1",
           "name": "DPI",
-          "description": "Discretionary penalty",
-          "preserveResult": true,
+          "description": "Discretionary penalty: scored as DNC",
+          "preserveResult": false,
           "discardable": true,
-          "started": true,
-          "formulaValue": 20.000,
-          "adjustOtherScores": false,
-          "cameToStart": true,
-          "finished": true,
-          "formula": "PLC%",
-          "formulaValueDecimal": 20.000
+          "started": false,
+          "formulaValue": 0.000,
+          "adjustOtherScores": true,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "FIX",
+          "formulaValueDecimal": 0.000
         },
         {
           "id": "69491270-cbb1-456e-a5ce-8bb33daf23d3",
@@ -3753,16 +3753,16 @@
         {
           "id": "70831450-05a2-4cbc-982b-592a163ed11f",
           "name": "SCP",
-          "description": "Scoring Penalty imposed",
-          "preserveResult": true,
+          "description": "Scoring Penalty imposed: scored as DNC",
+          "preserveResult": false,
           "discardable": true,
-          "started": true,
-          "formulaValue": 20.000,
-          "adjustOtherScores": false,
-          "cameToStart": true,
-          "finished": true,
-          "formula": "PLC%",
-          "formulaValueDecimal": 20.000
+          "started": false,
+          "formulaValue": 0.000,
+          "adjustOtherScores": true,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "FIX",
+          "formulaValueDecimal": 0.000
         },
         {
           "id": "db99b5c8-c58f-48bc-ac6d-89c8f41077dd",
@@ -3793,16 +3793,16 @@
         {
           "id": "8f4cae5d-1cb1-4951-ba08-b29a7204acd9",
           "name": "ZFP",
-          "description": "20% Penalty under rule 30.2",
-          "preserveResult": true,
+          "description": "20% Penalty under rule 30.2: scored as DNC",
+          "preserveResult": false,
           "discardable": true,
-          "started": true,
-          "formulaValue": 20.000,
-          "adjustOtherScores": false,
-          "cameToStart": true,
-          "finished": true,
-          "formula": "PLC%",
-          "formulaValueDecimal": 20.000
+          "started": false,
+          "formulaValue": 0.000,
+          "adjustOtherScores": true,
+          "cameToStart": false,
+          "finished": false,
+          "formula": "FIX",
+          "formulaValueDecimal": 0.000
         }
       ],
       "scoreCodeGroups": []
@@ -3846,15 +3846,17 @@
         },
         {
           "id": "dfd9acb7-9e5c-4d3f-aedc-e821f55f3f63",
-          "name": "DNC",
-          "description": "Did not come to the starting area: scored the average finish",
+          "name": "DNP",
+          "description": "Did not participate: scored the average finish",
           "preserveResult": false,
           "discardable": true,
           "started": false,
+          "formulaValue": 1.0,
           "adjustOtherScores": false,
           "cameToStart": false,
           "finished": false,
           "formula": "AVE",
+          "formulaValueDecimal": 1.0,
           "countAsParticipation": false
         },
         {
@@ -3882,21 +3884,23 @@
           "adjustOtherScores": true,
           "cameToStart": true,
           "finished": false,
-          "formula": "SER+",
+          "formula": "STR+",
           "formulaValueDecimal": 1.000
         },
         {
           "id": "59de16fc-b72a-49cd-b51d-43993f498cfa",
           "name": "DNS",
-          "description": "Came to start area but did not start",
+          "description": "Did not start: scored the average finish, like DNP",
           "preserveResult": false,
           "discardable": true,
           "started": false,
-          "formulaValue": 1.000,
-          "cameToStart": true,
+          "formulaValue": 1.0,
+          "adjustOtherScores": false,
+          "cameToStart": false,
           "finished": false,
-          "formula": "SER+",
-          "formulaValueDecimal": 1.000
+          "formula": "AVE",
+          "formulaValueDecimal": 1.0,
+          "countAsParticipation": false
         },
         {
           "id": "33d874dd-9829-49cb-8b1a-b6a582441b41",
@@ -3923,7 +3927,7 @@
           "adjustOtherScores": true,
           "cameToStart": true,
           "finished": true,
-          "formula": "SER+",
+          "formula": "STR+",
           "formulaValueDecimal": 1.000
         },
         {
@@ -4002,7 +4006,7 @@
           "adjustOtherScores": true,
           "cameToStart": true,
           "finished": true,
-          "formula": "SER+",
+          "formula": "STR+",
           "formulaValueDecimal": 1.000
         },
         {
@@ -4030,6 +4034,20 @@
           "cameToStart": true,
           "finished": true,
           "formula": "TIE"
+        },
+        {
+          "id": "606a4818-fb19-4313-8faa-9c6655f5439f",
+          "name": "TLE",
+          "description": "Did not finish within the time limit: boats that finished, plus two",
+          "preserveResult": false,
+          "discardable": true,
+          "started": true,
+          "formulaValue": 2.0,
+          "adjustOtherScores": true,
+          "cameToStart": true,
+          "finished": false,
+          "formula": "FIN+",
+          "formulaValueDecimal": 2.0
         },
         {
           "id": "9142a2de-35c8-4b07-8590-229e8c399c00",
@@ -4060,7 +4078,20 @@
           "formulaValueDecimal": 20.000
         }
       ],
-      "scoreCodeGroups": []
+      "scoreCodeGroups": [
+        {
+          "id": "33adeffe-254e-41c3-b788-1991995cb884",
+          "name": "Breakdown throw-outs",
+          "limitationType": 0,
+          "limitationValue": 1.00,
+          "useNonDiscardedRaces": false,
+          "overageCodeName": "RET",
+          "overageSelectionMethod": 0,
+          "codes": [
+            "BKD"
+          ]
+        }
+      ]
     }
   ],
   "handicapSystems": [

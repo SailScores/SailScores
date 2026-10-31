@@ -71,7 +71,7 @@
                     }
                     @if (results.IsPercentSystem && results.PercentRequired > 0)
                     {
-                        @:&ndash; @results.PercentRequired.Value.ToString("G5")% participation required for ranking
+                        @:&ndash; @results.ParticipationRequiredText()
                     }
                 </div>
             </div>
@@ -92,21 +92,14 @@
                     SeriesId = Model.Id,
                     Results = Model.FlatResults,
                     ShowTrend = false,
-                    SailNumberVisibility = resolvedTemplate.SailNumberVisibility,
-                    CompetitorNameVisibility = resolvedTemplate.CompetitorNameVisibility,
-                    CompetitorNameHeader = resolvedTemplate.CompetitorNameHeader,
-                    BoatNameVisibility = resolvedTemplate.BoatNameVisibility,
-                    BoatNameHeader = resolvedTemplate.BoatNameHeader,
-                    CompetitorClubVisibility = resolvedTemplate.CompetitorClubVisibility,
                     IsExport = true,
                     ShowExportButtons = false,
                     ExcludeCompetitorLinks = true,
                     PreferAlternativeSailNumbers = Model.PreferAlternativeSailNumbers ?? false,
                     TrendLegend = trendLegend,
-                    HideDncDiscards = Model.HideDncDiscards,
                     UpdatedDate = Model.UpdatedDate,
                     DefaultDateFormat = ViewData["DefaultDateFormat"]?.ToString()
-                };
+                }.WithTemplate(resolvedTemplate);
 
                 }
 
