@@ -76,7 +76,7 @@ public static class RaceIndexFilterPolicy
             effectiveMonth,
             defaultMonth,
             fleetKey);
-        filters.FleetChips = BuildFleetChips(facets, requestedMonth, fleetKey, month);
+        filters.FleetChips = BuildFleetChips(facets, requestedMonth, wantsAllMonths, fleetKey, today);
 
         var isBusy = facets.Sum(f => f.Count) >= ShowChipsMinimumRaces;
         var distinctMonths = facets.Select(GetMonth).Distinct().Count();
@@ -150,8 +150,9 @@ public static class RaceIndexFilterPolicy
     private static IList<RaceFilterChip> BuildFleetChips(
         IList<RaceFacet> facets,
         DateTime? requestedMonth,
+        bool wantsAllMonths,
         string selectedFleet,
-        string month)
+        DateTime today)
     {
         var monthFacets = requestedMonth.HasValue
             ? facets.Where(f => GetMonth(f) == requestedMonth.Value).ToList()
@@ -163,7 +164,7 @@ public static class RaceIndexFilterPolicy
             {
                 Count = monthFacets.Sum(f => f.Count),
                 IsSelected = selectedFleet == null,
-                Month = month
+                Month = GetMonthLink(facets, requestedMonth, wantsAllMonths, today)
             }
         };
         chips.AddRange(GetFleets(facets)
@@ -174,11 +175,33 @@ public static class RaceIndexFilterPolicy
                     .Where(m => m.FleetId == f.FleetId)
                     .Sum(m => m.Count),
                 IsSelected = f.FleetShortName == selectedFleet,
-                Month = month,
+                Month = GetMonthLink(
+                    facets.Where(m => m.FleetId == f.FleetId).ToList(),
+                    requestedMonth,
+                    wantsAllMonths,
+                    today),
                 Fleet = f.FleetShortName
             })
             .Where(c => c.Count > 0 || c.IsSelected));
         return chips;
+    }
+
+    // Keeps the current month in a link, unless that month is already what the
+    // bare URL would show. This keeps one URL for each page.
+    private static string GetMonthLink(
+        IList<RaceFacet> facets,
+        DateTime? requestedMonth,
+        bool wantsAllMonths,
+        DateTime today)
+    {
+        var defaultMonth = GetDefaultMonth(facets, today);
+        if (wantsAllMonths)
+        {
+            return defaultMonth.HasValue ? AllMonths : null;
+        }
+        return requestedMonth == defaultMonth
+            ? null
+            : requestedMonth?.ToString(MonthFormat, CultureInfo.InvariantCulture);
     }
 
     private static IList<RaceFacet> GetFleets(IEnumerable<RaceFacet> facets)

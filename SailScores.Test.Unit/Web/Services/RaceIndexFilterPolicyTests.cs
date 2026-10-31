@@ -231,6 +231,30 @@ public class RaceIndexFilterPolicyTests
     }
 
     [Fact]
+    public void Build_MonthAll_FleetChipOmitsMonthUnlessFleetDefaultsToOne()
+    {
+        var filters = Build(
+            new List<RaceFacet> { Lasers(6, 60), Lasers(7, 60), Thistles(6, 10) },
+            month: "all");
+
+        Assert.Equal("all", filters.FleetChips[0].Month);
+        Assert.Equal("all", filters.FleetChips.Single(c => c.Fleet == "lasers").Month);
+        Assert.Null(filters.FleetChips.Single(c => c.Fleet == "thistles").Month);
+    }
+
+    [Fact]
+    public void Build_RequestedMonthIsDefault_ClearingFleetLinksToBareUrl()
+    {
+        var filters = Build(
+            new List<RaceFacet> { Lasers(6, 60), Lasers(7, 60), Thistles(7, 5), Thistles(6, 5) },
+            month: "2026-07",
+            fleet: "thistles");
+
+        Assert.Null(filters.FleetChips[0].Month);
+        Assert.Null(filters.FleetChips.Single(c => c.Fleet == "lasers").Month);
+    }
+
+    [Fact]
     public void Build_ValidCombinationWithNoRaces_KeepsSelectedChips()
     {
         var filters = Build(
