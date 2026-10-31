@@ -15,6 +15,13 @@ namespace SailScores.Core.Services
             DateTime startDate,
             DateTime endDate,
             bool includeScheduled = true,
+            bool includeAbandoned = true,
+            Guid? fleetId = null);
+        Task<IList<RaceFacet>> GetRaceFacetsAsync(
+            Guid clubId,
+            DateTime startDate,
+            DateTime endDate,
+            bool includeScheduled = true,
             bool includeAbandoned = true);
         Task<Race> GetRaceAsync(Guid raceId);
         Task<Guid> SaveAsync(RaceDto race);

@@ -8,6 +8,8 @@ public interface IRaceService
     Task<RaceSummaryListViewModel> GetAllRaceSummariesAsync(
         string clubInitials,
         string seasonName,
+        string month,
+        string fleet,
         bool includeScheduled,
         bool includeAbandoned);
     Task<RaceViewModel> GetSingleRaceDetailsAsync(string clubInitials, Guid id);

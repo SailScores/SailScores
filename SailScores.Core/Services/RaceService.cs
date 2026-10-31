@@ -92,13 +92,15 @@ namespace SailScores.Core.Services
             DateTime startDate,
             DateTime endDate,
             bool includeScheduled = true,
-            bool includeAbandoned = true)
+            bool includeAbandoned = true,
+            Guid? fleetId = null)
         {
             return await _dbContext.Races
                 .Where(r => r.ClubId == clubId
                     && r.Date >= startDate
                     && r.Date <= endDate)
                 .Where(IsListed(includeScheduled, includeAbandoned))
+                .Where(r => fleetId == null || r.Fleet.Id == fleetId)
                 .Select(r => new RaceSummary
                 {
                     Id = r.Id,
@@ -117,6 +119,39 @@ namespace SailScores.Core.Services
                         .ToList()
                 })
                 .AsSplitQuery()
+                .ToListAsync()
+                .ConfigureAwait(false);
+        }
+
+        public async Task<IList<RaceFacet>> GetRaceFacetsAsync(
+            Guid clubId,
+            DateTime startDate,
+            DateTime endDate,
+            bool includeScheduled = true,
+            bool includeAbandoned = true)
+        {
+            return await _dbContext.Races
+                .Where(r => r.ClubId == clubId
+                    && r.Date >= startDate
+                    && r.Date <= endDate)
+                .Where(IsListed(includeScheduled, includeAbandoned))
+                .GroupBy(r => new
+                {
+                    r.Date.Value.Year,
+                    r.Date.Value.Month,
+                    FleetId = (Guid?)r.Fleet.Id,
+                    r.Fleet.ShortName,
+                    r.Fleet.Name
+                })
+                .Select(g => new RaceFacet
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    FleetId = g.Key.FleetId,
+                    FleetShortName = g.Key.ShortName,
+                    FleetName = g.Key.Name,
+                    Count = g.Count()
+                })
                 .ToListAsync()
                 .ConfigureAwait(false);
         }

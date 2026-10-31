@@ -67,11 +67,46 @@ public class RaceServiceTests
     {
         var season = SetupRaceSummaries(new List<RaceSummary>());
 
-        var result = await _service.GetAllRaceSummariesAsync("TEST", seasonName, true, true);
+        var result = await _service.GetAllRaceSummariesAsync("TEST", seasonName, null, null, true, true);
 
         Assert.Same(season, result.CurrentSeason);
         _coreRaceServiceMock.Verify(r => r.GetRaceSummariesAsync(
-            It.IsAny<Guid>(), season.Start, season.End, true, true));
+            It.IsAny<Guid>(), season.Start, season.End, true, true, null));
+    }
+
+    [Fact]
+    public async Task GetAllRaceSummariesAsync_MonthAndFleet_NarrowsRaceQuery()
+    {
+        var season = SetupRaceSummaries(new List<RaceSummary>());
+        var fleetId = Guid.NewGuid();
+        var june = new DateTime(2026, 6, 1);
+        _coreRaceServiceMock
+            .Setup(r => r.GetRaceFacetsAsync(It.IsAny<Guid>(), season.Start, season.End, true, true))
+            .ReturnsAsync(new List<RaceFacet>
+            {
+                new() { Year = 2026, Month = 6, FleetId = fleetId, FleetShortName = "lasers", Count = 1 }
+            });
+        _coreRaceServiceMock
+            .Setup(r => r.GetRaceSummariesAsync(
+                It.IsAny<Guid>(), june, june.AddMonths(1).AddTicks(-1), true, true, fleetId))
+            .ReturnsAsync(new List<RaceSummary> { MakeSummary(new List<RaceSummaryScore>()) });
+
+        var result = await _service.GetAllRaceSummariesAsync(
+            "TEST", "summer-2026", "2026-06", "lasers", true, true);
+
+        Assert.Single(result.Races);
+        Assert.Equal(fleetId, result.Filters.FleetId);
+    }
+
+    [Fact]
+    public async Task GetAllRaceSummariesAsync_InvalidFilter_ReturnsNull()
+    {
+        SetupRaceSummaries(new List<RaceSummary>());
+
+        var result = await _service.GetAllRaceSummariesAsync(
+            "TEST", "summer-2026", "1999-01", null, true, true);
+
+        Assert.Null(result);
     }
 
     [Fact]
@@ -79,7 +114,7 @@ public class RaceServiceTests
     {
         SetupRaceSummaries(new List<RaceSummary>());
 
-        var result = await _service.GetAllRaceSummariesAsync("TEST", "other", true, true);
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "other", null, null, true, true);
 
         Assert.Null(result);
     }
@@ -98,7 +133,7 @@ public class RaceServiceTests
             })
         });
 
-        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", true, true);
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", null, null, true, true);
 
         Assert.Equal(2, Assert.Single(result.Races).CompetitorCount);
     }
@@ -110,7 +145,7 @@ public class RaceServiceTests
         var included = MakeSummary(new List<RaceSummaryScore>());
         SetupRaceSummaries(new List<RaceSummary> { excluded, included }, excluded.Id);
 
-        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", true, true);
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", null, null, true, true);
 
         Assert.True(result.Races.Single(r => r.Id == excluded.Id).ExcludeFromCompStats);
         Assert.False(result.Races.Single(r => r.Id == included.Id).ExcludeFromCompStats);
@@ -123,7 +158,7 @@ public class RaceServiceTests
         race.Series.Add(new RaceSummarySeries { UrlName = "tuesdays", Name = "Tuesdays" });
         var season = SetupRaceSummaries(new List<RaceSummary> { race });
 
-        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", true, true);
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", null, null, true, true);
 
         var summary = Assert.Single(result.Races);
         Assert.Same(season, summary.Season);
@@ -168,8 +203,10 @@ public class RaceServiceTests
             .ReturnsAsync(scoreCodes);
         _coreRaceServiceMock.Setup(r => r.GetStatsExcludedRaces(clubId, season.Id))
             .ReturnsAsync(excludedRaces.ToList());
+        _coreRaceServiceMock.Setup(r => r.GetRaceFacetsAsync(clubId, season.Start, season.End, true, true))
+            .ReturnsAsync(new List<RaceFacet>());
         _coreRaceServiceMock.Setup(r => r.GetRaceSummariesAsync(
-                clubId, season.Start, season.End, true, true))
+                clubId, season.Start, season.End, true, true, null))
             .ReturnsAsync(races);
 
         return season;

@@ -64,6 +64,8 @@ public class RaceService : IRaceService
     public async Task<RaceSummaryListViewModel> GetAllRaceSummariesAsync(
         string clubInitials,
         string seasonName,
+        string month,
+        string fleet,
         bool includeScheduled,
         bool includeAbandoned)
     {
@@ -77,12 +79,31 @@ public class RaceService : IRaceService
         {
             return default;
         }
+        var facets = await _coreRaceService.GetRaceFacetsAsync(
+            club.Id,
+            selectedSeason.Start,
+            selectedSeason.End,
+            includeScheduled,
+            includeAbandoned);
+        var filters = RaceIndexFilterPolicy.Build(
+            facets,
+            month,
+            fleet,
+            selectedSeason.Start,
+            selectedSeason.End,
+            DateTime.Today);
+        if (!filters.IsValid)
+        {
+            return default;
+        }
+
         var races = (await _coreRaceService.GetRaceSummariesAsync(
                 club.Id,
-                selectedSeason.Start,
-                selectedSeason.End,
+                filters.StartDate,
+                filters.EndDate,
                 includeScheduled,
-                includeAbandoned))
+                includeAbandoned,
+                filters.FleetId))
             .OrderByDescending(r => r.Date)
             .ThenBy(r => r.FleetName)
             .ThenBy(r => r.Order);
@@ -98,7 +119,8 @@ public class RaceService : IRaceService
                 .Select(r => ToSummaryViewModel(r, selectedSeason, scoreCodes, excludedRaces))
                 .ToList(),
             Seasons = seasons,
-            CurrentSeason = selectedSeason
+            CurrentSeason = selectedSeason,
+            Filters = filters
         };
     }
 
