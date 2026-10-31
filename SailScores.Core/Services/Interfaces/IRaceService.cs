@@ -10,9 +10,10 @@ namespace SailScores.Core.Services
     {
         Task<IList<Model.Race>> GetRacesAsync(Guid clubId);
         Task<IList<Model.Race>> GetRecentRacesAsync(Guid clubId, int daysBack);
-        Task<IList<Model.Race>> GetFullRacesAsync(
+        Task<IList<RaceSummary>> GetRaceSummariesAsync(
             Guid clubId,
-            string seasonName,
+            DateTime startDate,
+            DateTime endDate,
             bool includeScheduled = true,
             bool includeAbandoned = true);
         Task<Race> GetRaceAsync(Guid raceId);

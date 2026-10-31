@@ -60,6 +60,121 @@ public class RaceServiceTests
             _loggerMock.Object);
     }
 
+    [Theory]
+    [InlineData("summer-2026")]
+    [InlineData("Summer 2026")]
+    public async Task GetAllRaceSummariesAsync_SeasonUrlNameOrName_UsesSeason(string seasonName)
+    {
+        var season = SetupRaceSummaries(new List<RaceSummary>());
+
+        var result = await _service.GetAllRaceSummariesAsync("TEST", seasonName, true, true);
+
+        Assert.Same(season, result.CurrentSeason);
+        _coreRaceServiceMock.Verify(r => r.GetRaceSummariesAsync(
+            It.IsAny<Guid>(), season.Start, season.End, true, true));
+    }
+
+    [Fact]
+    public async Task GetAllRaceSummariesAsync_UnknownSeason_ReturnsNull()
+    {
+        SetupRaceSummaries(new List<RaceSummary>());
+
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "other", true, true);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetAllRaceSummariesAsync_MixedScoreCodes_CountsBoatsThatCameToStart()
+    {
+        SetupRaceSummaries(new List<RaceSummary>
+        {
+            MakeSummary(new List<RaceSummaryScore>
+            {
+                new() { Place = 1 },
+                new() { Code = "DNF" },
+                new() { Code = "DNC" },
+                new() { Place = 0 }
+            })
+        });
+
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", true, true);
+
+        Assert.Equal(2, Assert.Single(result.Races).CompetitorCount);
+    }
+
+    [Fact]
+    public async Task GetAllRaceSummariesAsync_RaceInExcludedSeries_MarksRaceExcluded()
+    {
+        var excluded = MakeSummary(new List<RaceSummaryScore>());
+        var included = MakeSummary(new List<RaceSummaryScore>());
+        SetupRaceSummaries(new List<RaceSummary> { excluded, included }, excluded.Id);
+
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", true, true);
+
+        Assert.True(result.Races.Single(r => r.Id == excluded.Id).ExcludeFromCompStats);
+        Assert.False(result.Races.Single(r => r.Id == included.Id).ExcludeFromCompStats);
+    }
+
+    [Fact]
+    public async Task GetAllRaceSummariesAsync_RaceWithSeries_CarriesSeriesAndSeason()
+    {
+        var race = MakeSummary(new List<RaceSummaryScore>());
+        race.Series.Add(new RaceSummarySeries { UrlName = "tuesdays", Name = "Tuesdays" });
+        var season = SetupRaceSummaries(new List<RaceSummary> { race });
+
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", true, true);
+
+        var summary = Assert.Single(result.Races);
+        Assert.Same(season, summary.Season);
+        var series = Assert.Single(summary.SeriesUrlAndNames);
+        Assert.Equal("tuesdays", series.Key);
+        Assert.Equal("Tuesdays", series.Value);
+    }
+
+    private static RaceSummary MakeSummary(IList<RaceSummaryScore> scores)
+    {
+        return new RaceSummary
+        {
+            Id = Guid.NewGuid(),
+            Date = new DateTime(2026, 7, 1),
+            Scores = scores,
+            Series = new List<RaceSummarySeries>()
+        };
+    }
+
+    private Season SetupRaceSummaries(IList<RaceSummary> races, params Guid[] excludedRaces)
+    {
+        var clubId = Guid.NewGuid();
+        var season = new Season
+        {
+            Id = Guid.NewGuid(),
+            Name = "Summer 2026",
+            UrlName = "summer-2026",
+            Start = new DateTime(2026, 5, 1),
+            End = new DateTime(2026, 9, 30)
+        };
+        IEnumerable<ScoreCode> scoreCodes = new List<ScoreCode>
+        {
+            new() { Name = "DNF", CameToStart = true },
+            new() { Name = "DNC", CameToStart = false }
+        };
+
+        _clubServiceMock.Setup(c => c.GetMinimalClub("TEST"))
+            .ReturnsAsync(new Club { Id = clubId });
+        _coreSeasonServiceMock.Setup(s => s.GetSeasons(clubId))
+            .ReturnsAsync(new List<Season> { season });
+        _coreScoringServiceMock.Setup(s => s.GetScoreCodesAsync(clubId))
+            .ReturnsAsync(scoreCodes);
+        _coreRaceServiceMock.Setup(r => r.GetStatsExcludedRaces(clubId, season.Id))
+            .ReturnsAsync(excludedRaces.ToList());
+        _coreRaceServiceMock.Setup(r => r.GetRaceSummariesAsync(
+                clubId, season.Start, season.End, true, true))
+            .ReturnsAsync(races);
+
+        return season;
+    }
+
     [Fact]
     public async Task GetSingleRaceDetailsAsync_TrackTimesAndOneSystem_ShowsCorrectedTime()
     {

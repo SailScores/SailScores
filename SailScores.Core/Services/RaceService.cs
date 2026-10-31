@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Linq.Expressions;
 using SailScores.Core.Model;
 using Db = SailScores.Database.Entities;
 using SailScores.Api.Dtos;
@@ -86,61 +87,49 @@ namespace SailScores.Core.Services
             return _mapper.Map<List<Model.Race>>(dbObjects);
         }
 
-        public async Task<IList<Model.Race>> GetFullRacesAsync(
+        public async Task<IList<RaceSummary>> GetRaceSummariesAsync(
             Guid clubId,
-            string seasonName,
+            DateTime startDate,
+            DateTime endDate,
             bool includeScheduled = true,
             bool includeAbandoned = true)
         {
-            var seasonToUse = await GetSeasonAsync(clubId, seasonName)
-                .ConfigureAwait(false);
-            var startDate = seasonToUse?.Start ?? DateTime.Today.AddYears(-5);
-            var endDate = seasonToUse?.End ?? DateTime.Today.AddYears(1);
-
-            var dbRaces = await _dbContext.Races
+            return await _dbContext.Races
                 .Where(r => r.ClubId == clubId
                     && r.Date >= startDate
                     && r.Date <= endDate)
-                .Where(r => r.State == RaceState.Raced || r.State == null ||
-                    r.State == RaceState.Abandoned ||
-                        (includeScheduled && (r.State == RaceState.Scheduled)) ||
-                        (includeAbandoned && (r.State == RaceState.Abandoned)))
-                .Include(r => r.Fleet)
-                .Include(r => r.Scores)
-                .Include(r => r.SeriesRaces)
+                .Where(IsListed(includeScheduled, includeAbandoned))
+                .Select(r => new RaceSummary
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Date = r.Date,
+                    Order = r.Order,
+                    Description = r.Description,
+                    State = r.State,
+                    FleetName = r.Fleet.Name,
+                    FleetShortName = r.Fleet.ShortName,
+                    Scores = r.Scores
+                        .Select(s => new RaceSummaryScore { Place = s.Place, Code = s.Code })
+                        .ToList(),
+                    Series = r.SeriesRaces
+                        .Select(sr => new RaceSummarySeries { UrlName = sr.Series.UrlName, Name = sr.Series.Name })
+                        .ToList()
+                })
                 .AsSplitQuery()
                 .ToListAsync()
                 .ConfigureAwait(false);
-
-            var modelRaces = _mapper.Map<List<Model.Race>>(dbRaces);
-
-            var dbSeries = await _dbContext.Series
-                .Where(s => s.ClubId == clubId).ToListAsync()
-                .ConfigureAwait(false);
-            var modelSeries = _mapper.Map<List<Model.Series>>(dbSeries);
-
-            foreach (var race in modelRaces)
-            {
-                race.Series = modelSeries.Where(s => dbRaces
-                        .First(r => r.Id == race.Id)
-                        .SeriesRaces.Any(sr => sr.SeriesId == s.Id))
-                    .ToList();
-                race.Season = _mapper.Map<Season>(seasonToUse);
-            }
-            return modelRaces;
         }
 
-        private async Task<Season> GetSeasonAsync(Guid clubId, string seasonName)
+        private static Expression<Func<Db.Race, bool>> IsListed(
+            bool includeScheduled,
+            bool includeAbandoned)
         {
-            if (String.IsNullOrWhiteSpace(seasonName))
-            {
-                return await GetMostRecentRaceSeasonAsync(clubId).ConfigureAwait(false);
-            }
-            var dbSeason = await _dbContext.Seasons.FirstOrDefaultAsync(s =>
-                s.ClubId == clubId && s.UrlName == seasonName)
-                .ConfigureAwait(false);
-
-            return _mapper.Map<Season>(dbSeason);
+            return r => r.State == null
+                || r.State == RaceState.Raced
+                || r.State == RaceState.Preliminary
+                || (includeScheduled && r.State == RaceState.Scheduled)
+                || (includeAbandoned && r.State == RaceState.Abandoned);
         }
 
         public async Task<Season> GetMostRecentRaceSeasonAsync(Guid clubId)

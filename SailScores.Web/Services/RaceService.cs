@@ -77,37 +77,60 @@ public class RaceService : IRaceService
         {
             return default;
         }
-        var races = (await _coreRaceService.GetFullRacesAsync(
+        var races = (await _coreRaceService.GetRaceSummariesAsync(
                 club.Id,
-                seasonName,
+                selectedSeason.Start,
+                selectedSeason.End,
                 includeScheduled,
                 includeAbandoned))
             .OrderByDescending(r => r.Date)
-            .ThenBy(r => r.Fleet?.Name)
+            .ThenBy(r => r.FleetName)
             .ThenBy(r => r.Order);
 
         // need to get score codes so viewmodel can determine starting boat count.
         var scoreCodes = await _coreScoringService.GetScoreCodesAsync(club.Id);
 
         var excludedRaces = await _coreRaceService.GetStatsExcludedRaces(club.Id, selectedSeason.Id);
-        var racesVm = _mapper.Map<List<RaceSummaryViewModel>>(races);
-        foreach (var race in racesVm)
-        {
-            if (excludedRaces.Contains(race.Id))
-            {
-                race.ExcludeFromCompStats = true;
-            }
-            foreach (var score in race.Scores)
-            {
-                score.ScoreCode = GetScoreCode(score.Code, scoreCodes);
-            }
-        }
 
         return new RaceSummaryListViewModel
         {
-            Races = racesVm,
+            Races = races
+                .Select(r => ToSummaryViewModel(r, selectedSeason, scoreCodes, excludedRaces))
+                .ToList(),
             Seasons = seasons,
-            CurrentSeason = seasons.FirstOrDefault(s => s.Name == seasonName)
+            CurrentSeason = selectedSeason
+        };
+    }
+
+    private static RaceSummaryViewModel ToSummaryViewModel(
+        RaceSummary race,
+        Season season,
+        IEnumerable<ScoreCode> scoreCodes,
+        IList<Guid> excludedRaces)
+    {
+        return new RaceSummaryViewModel
+        {
+            Id = race.Id,
+            Name = race.Name,
+            Date = race.Date,
+            Order = race.Order,
+            Description = race.Description,
+            State = race.State,
+            FleetName = race.FleetName,
+            FleetShortName = race.FleetShortName,
+            Season = season,
+            ExcludeFromCompStats = excludedRaces.Contains(race.Id),
+            SeriesUrlAndNames = race.Series
+                .Select(s => new KeyValuePair<string, string>(s.UrlName, s.Name))
+                .ToList(),
+            Scores = race.Scores
+                .Select(s => new ScoreViewModel
+                {
+                    Place = s.Place,
+                    Code = s.Code,
+                    ScoreCode = GetScoreCode(s.Code, scoreCodes)
+                })
+                .ToList()
         };
     }
 
