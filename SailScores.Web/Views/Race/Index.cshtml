@@ -11,11 +11,50 @@
 
 
 @{
-    ViewBag.Title = $"{Model.Item.CurrentSeason?.Name} {Model.ClubInitials} {localizer["Races"]}";
-    ViewData["MetaDescription"] = $"{Model.ClubName} {localizer["Races"]} list";
+    var filters = Model.Item.Filters;
+    var filterLabel = String.Join(" ", new[]
+    {
+        filters.RequestedMonth?.ToString("MMMM yyyy"),
+        filters.FleetName
+    }.Where(l => !String.IsNullOrEmpty(l)));
+    var racesLabel = String.IsNullOrEmpty(filterLabel)
+        ? localizer["Races"].Value
+        : $"{filterLabel} {localizer["Races"]}";
+
+    // A month in the title already says when, so it replaces the season name.
+    ViewBag.Title = filters.RequestedMonth.HasValue
+        ? $"{Model.ClubInitials} {racesLabel}"
+        : $"{Model.Item.CurrentSeason?.Name} {Model.ClubInitials} {racesLabel}";
+    ViewData["MetaDescription"] = $"{Model.ClubName} {racesLabel} list";
+    if (filters.IsFleetAndMonth || (filters.HasActiveFilter && !Model.Item.Races.Any()))
+    {
+        ViewData["MetaRobots"] = "noindex,follow";
+    }
     Layout = "_ClubLayout";
     bool hasExcluded = false;
     var returnUrl = settingsService.GetRelativeUri(Context.Request);
+    var showMonthHeadings = Model.Item.Races
+        .Select(r => r.Date?.ToString("yyyy-MM"))
+        .Distinct()
+        .Count() > 1;
+    string monthHeading = null;
+
+    async Task RenderChips(IList<RaceFilterChip> chips, string label)
+    {
+        <nav class="mb-2" aria-label="@label">
+            @foreach (var chip in chips)
+            {
+                <a asp-route="Race"
+                   asp-route-clubInitials="@Model.ClubInitials"
+                   asp-route-seasonName="@Model.Item.CurrentSeason.UrlName"
+                   asp-route-month="@chip.Month"
+                   asp-route-fleet="@chip.Fleet"
+                   rel="@(chip.IsFleetAndMonth ? "nofollow" : null)"
+                   aria-current="@(chip.IsSelected ? "true" : null)"
+                   class="btn btn-sm @(chip.IsSelected ? "btn-primary" : "btn-outline-primary") me-1 mb-1">@(chip.Label ?? localizer["All"].Value) <small>(@chip.Count)</small></a>
+            }
+        </nav>
+    }
 }
 
 @section Sidebar {
@@ -67,8 +106,31 @@
             <h2>@Model.Item.CurrentSeason?.Name</h2>
         </div>
     </div>
+    @if (filters.ShowMonthChips)
+    {
+        await RenderChips(filters.MonthChips, localizer["Filter by month"].Value);
+    }
+    @if (filters.ShowFleetChips)
+    {
+        await RenderChips(filters.FleetChips, localizer["Filter by fleet"].Value);
+    }
+    @if (filters.HasActiveFilter && !Model.Item.Races.Any())
+    {
+        <p>
+            @localizer["No races match these filters."]
+            <a asp-route="Race"
+               asp-route-clubInitials="@Model.ClubInitials"
+               asp-route-seasonName="@Model.Item.CurrentSeason.UrlName">@localizer["Clear filters"]</a>
+        </p>
+    }
     @foreach (var race in Model.Item.Races)
     {
+        var raceMonth = race.Date?.ToString("MMMM yyyy");
+        if (showMonthHeadings && raceMonth != monthHeading)
+        {
+            monthHeading = raceMonth;
+            <h3 class="h5 mt-3">@monthHeading</h3>
+        }
 
         <div class="row border-bottom">
             @if (Model.CanEdit)

@@ -294,4 +294,19 @@
   <data name="Regatta!" xml:space="preserve">
     <value>¡Regata!</value>
   </data>
+  <data name="All" xml:space="preserve">
+    <value>Todas</value>
+  </data>
+  <data name="Filter by month" xml:space="preserve">
+    <value>Filtrar por mes</value>
+  </data>
+  <data name="Filter by fleet" xml:space="preserve">
+    <value>Filtrar por flota</value>
+  </data>
+  <data name="No races match these filters." xml:space="preserve">
+    <value>Ninguna prueba coincide con estos filtros.</value>
+  </data>
+  <data name="Clear filters" xml:space="preserve">
+    <value>Borrar filtros</value>
+  </data>
 </root>
