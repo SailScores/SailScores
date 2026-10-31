@@ -139,6 +139,20 @@ public class RaceServiceTests
     }
 
     [Fact]
+    public async Task GetAllRaceSummariesAsync_RacesOnDifferentDays_ListsOldestFirst()
+    {
+        var newer = MakeSummary(new List<RaceSummaryScore>());
+        newer.Date = new DateTime(2026, 7, 1);
+        var older = MakeSummary(new List<RaceSummaryScore>());
+        older.Date = new DateTime(2026, 6, 1);
+        SetupRaceSummaries(new List<RaceSummary> { newer, older });
+
+        var result = await _service.GetAllRaceSummariesAsync("TEST", "summer-2026", null, null, true, true);
+
+        Assert.Equal(new[] { older.Id, newer.Id }, result.Races.Select(r => r.Id));
+    }
+
+    [Fact]
     public async Task GetAllRaceSummariesAsync_RaceInExcludedSeries_MarksRaceExcluded()
     {
         var excluded = MakeSummary(new List<RaceSummaryScore>());

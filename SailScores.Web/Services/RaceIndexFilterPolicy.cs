@@ -62,6 +62,7 @@ public static class RaceIndexFilterPolicy
             FleetId = selectedFleet?.FleetId,
             FleetName = selectedFleet?.FleetName,
             RequestedMonth = requestedMonth,
+            EffectiveMonth = effectiveMonth,
             HasActiveFilter = !String.IsNullOrEmpty(month) || selectedFleet != null
         };
         if (effectiveMonth.HasValue)

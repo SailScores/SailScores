@@ -294,8 +294,11 @@
   <data name="Regatta!" xml:space="preserve">
     <value>¡Regata!</value>
   </data>
-  <data name="All" xml:space="preserve">
-    <value>Todas</value>
+  <data name="All Dates" xml:space="preserve">
+    <value>Todas las fechas</value>
+  </data>
+  <data name="All Fleets" xml:space="preserve">
+    <value>Todas las flotas</value>
   </data>
   <data name="Filter by month" xml:space="preserve">
     <value>Filtrar por mes</value>

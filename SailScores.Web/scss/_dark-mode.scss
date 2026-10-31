@@ -44,6 +44,11 @@
         --bs-btn-border-color: #{$almost-dark-primary};
     }
 
+    /* Race Index filters */
+    .race-filter[aria-current] {
+        color: $white;
+    }
+
     /* Navigation */
     header.bg-dark,
     nav.bg-dark {

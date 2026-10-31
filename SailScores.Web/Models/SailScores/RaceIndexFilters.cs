@@ -13,6 +13,9 @@ public class RaceIndexFilters
 
     // First of the month when the URL names a month, not when one is the default.
     public DateTime? RequestedMonth { get; set; }
+
+    // First of the month the list shows, whether named in the URL or the default.
+    public DateTime? EffectiveMonth { get; set; }
     public string FleetName { get; set; }
 
     public bool HasActiveFilter { get; set; }

@@ -73,6 +73,20 @@ public class RaceIndexFilterPolicyTests
         Assert.Null(filters.RequestedMonth);
     }
 
+    [Theory]
+    [InlineData(null, 7)]
+    [InlineData("2026-06", 6)]
+    [InlineData("all", null)]
+    public void Build_MonthValue_SetsEffectiveMonthToMonthShown(string month, int? expectedMonth)
+    {
+        var filters = Build(new List<RaceFacet> { Lasers(6, 60), Lasers(7, 60) }, month);
+
+        var expected = expectedMonth.HasValue
+            ? new DateTime(2026, expectedMonth.Value, 1)
+            : (DateTime?)null;
+        Assert.Equal(expected, filters.EffectiveMonth);
+    }
+
     [Fact]
     public void Build_OneFleet_HidesFleetChips()
     {

@@ -14,7 +14,7 @@
     var filters = Model.Item.Filters;
     var filterLabel = String.Join(" ", new[]
     {
-        filters.RequestedMonth?.ToString("MMMM yyyy"),
+        filters.EffectiveMonth?.ToString("MMMM yyyy"),
         filters.FleetName
     }.Where(l => !String.IsNullOrEmpty(l)));
     var racesLabel = String.IsNullOrEmpty(filterLabel)
@@ -22,7 +22,7 @@
         : $"{filterLabel} {localizer["Races"]}";
 
     // A month in the title already says when, so it replaces the season name.
-    ViewBag.Title = filters.RequestedMonth.HasValue
+    ViewBag.Title = filters.EffectiveMonth.HasValue
         ? $"{Model.ClubInitials} {racesLabel}"
         : $"{Model.Item.CurrentSeason?.Name} {Model.ClubInitials} {racesLabel}";
     ViewData["MetaDescription"] = $"{Model.ClubName} {racesLabel} list";
@@ -39,9 +39,9 @@
         .Count() > 1;
     string monthHeading = null;
 
-    async Task RenderChips(IList<RaceFilterChip> chips, string label)
+    async Task RenderChips(IList<RaceFilterChip> chips, string label, string allLabel)
     {
-        <nav class="mb-2" aria-label="@label">
+        <nav class="race-filters" aria-label="@label">
             @foreach (var chip in chips)
             {
                 <a asp-route="Race"
@@ -51,7 +51,7 @@
                    asp-route-fleet="@chip.Fleet"
                    rel="@(chip.IsFleetAndMonth ? "nofollow" : null)"
                    aria-current="@(chip.IsSelected ? "true" : null)"
-                   class="btn btn-sm @(chip.IsSelected ? "btn-primary" : "btn-outline-primary") me-1 mb-1">@(chip.Label ?? localizer["All"].Value) <small>(@chip.Count)</small></a>
+                   class="race-filter">@(chip.Label ?? allLabel) <small>(@chip.Count)</small></a>
             }
         </nav>
     }
@@ -108,11 +108,11 @@
     </div>
     @if (filters.ShowMonthChips)
     {
-        await RenderChips(filters.MonthChips, localizer["Filter by month"].Value);
+        await RenderChips(filters.MonthChips, localizer["Filter by month"].Value, localizer["All Dates"].Value);
     }
     @if (filters.ShowFleetChips)
     {
-        await RenderChips(filters.FleetChips, localizer["Filter by fleet"].Value);
+        await RenderChips(filters.FleetChips, localizer["Filter by fleet"].Value, localizer["All Fleets"].Value);
     }
     @if (filters.HasActiveFilter && !Model.Item.Races.Any())
     {

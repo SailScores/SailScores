@@ -295,6 +295,48 @@ nav.bg-dark {
     border-left: 2px solid rgba(0, 0, 0, 0.12);
 }
 
+/* Race Index filters: flat text, so they read as filters and not as buttons.
+ * Dark mode in _dark-mode.scss. */
+.race-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .125rem .25rem;
+    margin-bottom: .5rem;
+
+    /* Month headings bring their own top margin; a list without one needs the same gap. */
+    + .row,
+    + p {
+        margin-top: 1rem;
+    }
+}
+
+.race-filter {
+    border-radius: .125rem;
+    color: var(--bs-body-color);
+    font-size: .875rem;
+    padding: .125rem .5rem;
+
+    small {
+        color: var(--bs-secondary-color);
+    }
+
+    &:hover,
+    &:focus {
+        background-color: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
+    }
+
+    &[aria-current] {
+        background-color: var(--bs-primary-bg-subtle);
+        color: var(--bs-primary-text-emphasis);
+        font-weight: 600;
+
+        small {
+            color: inherit;
+        }
+    }
+}
+
 /* Race status */
 span.discardmuted {
     color: #6c757d !important;

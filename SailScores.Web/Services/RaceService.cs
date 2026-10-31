@@ -104,7 +104,7 @@ public class RaceService : IRaceService
                 includeScheduled,
                 includeAbandoned,
                 filters.FleetId))
-            .OrderByDescending(r => r.Date)
+            .OrderBy(r => r.Date)
             .ThenBy(r => r.FleetName)
             .ThenBy(r => r.Order);
 
