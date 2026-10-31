@@ -23,21 +23,9 @@ public static class RaceIndexFilterPolicy
         DateTime today)
     {
         var wantsAllMonths = month == AllMonths;
-        DateTime? requestedMonth = null;
-        if (!String.IsNullOrEmpty(month) && !wantsAllMonths)
+        if (!TryGetRequestedMonth(month, seasonStart, seasonEnd, out var requestedMonth))
         {
-            if (!DateTime.TryParseExact(
-                    month,
-                    MonthFormat,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var parsedMonth)
-                || parsedMonth > seasonEnd
-                || parsedMonth.AddMonths(1) <= seasonStart)
-            {
-                return new RaceIndexFilters { IsValid = false };
-            }
-            requestedMonth = parsedMonth;
+            return new RaceIndexFilters { IsValid = false };
         }
 
         var selectedFleet = String.IsNullOrEmpty(fleet)
@@ -88,6 +76,36 @@ public static class RaceIndexFilterPolicy
             || (distinctFleets > 1 && (isBusy || filters.HasActiveFilter));
 
         return filters;
+    }
+
+    // False when the value isn't a month in this season. Blank and "all" name
+    // no month, so they succeed with a null result.
+    private static bool TryGetRequestedMonth(
+        string month,
+        DateTime seasonStart,
+        DateTime seasonEnd,
+        out DateTime? requestedMonth)
+    {
+        requestedMonth = null;
+        if (String.IsNullOrEmpty(month) || month == AllMonths)
+        {
+            return true;
+        }
+
+        if (!DateTime.TryParseExact(
+                month,
+                MonthFormat,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var parsedMonth)
+            || parsedMonth > seasonEnd
+            || parsedMonth.AddMonths(1) <= seasonStart)
+        {
+            return false;
+        }
+
+        requestedMonth = parsedMonth;
+        return true;
     }
 
     // Only long lists default to a month. Looks at the selected fleet's races
